@@ -148,6 +148,18 @@ The floating widget persists across client-side page navigation (SPA routing). I
 
 All other events from `16-embedding-and-web-component.md` (`binding-click`, `turn-complete`, `token-expired`, etc.) fire identically from `<ai-chat-widget>`.
 
+### Browser notifications
+
+When `showBadge` is enabled, the widget can optionally request the **Web Notifications API** permission to surface a browser notification when a shared conversation receives a new message and the widget is collapsed. This is relevant when the user is on a different browser tab or has the host application in the background.
+
+| Behaviour | Specification |
+|-----------|--------------|
+| Permission request | The widget never requests notification permission proactively. Permission is only requested when the user explicitly opts in — via a *"Notify me of shared conversation activity"* control in the conversations panel. |
+| Notification payload | *"[Participant name] replied in [conversation title]"* — no message content in the notification for privacy |
+| Click action | Clicking the notification opens the host application and expands the widget to the mini state, navigating to the relevant conversation |
+| Denial handling | If the user declines or revokes permission, the badge count remains the only unread signal. No fallback prompt is shown. |
+| Host control | `showBadge: false` in the widget config suppresses both badge and browser notifications entirely. |
+
 ### Config
 
 The `widget` config section in the application config controls widget-level defaults:

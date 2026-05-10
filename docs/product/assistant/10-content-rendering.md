@@ -123,14 +123,16 @@ Mathematical expressions are rendered using **KaTeX** — fast, lightweight, and
 
 ---
 
-## Attached document display
+## Attached document and image display
 
-Attached documents appear in the **user message bubble** as a labelled file card:
+**Non-image documents** (PDF, Excel, Word) appear in the user message bubble as a labelled file card:
 - Format icon
 - File name
 - Page count (PDF), sheet count (Excel), or section count (Word)
 
-Documents are **not rendered inline** in the conversation thread. When the model references a specific section, it cites by page number (PDF), sheet name (Excel), or heading (Word).
+Non-image documents are **not rendered inline**. When the model references a specific section, it cites by page number (PDF), sheet name (Excel), or heading (Word).
+
+**Images** (PNG, JPEG, WEBP) are **rendered inline** in the user message bubble at a constrained size (max 320px wide, max 240px tall, maintaining aspect ratio). Multiple images in one turn stack vertically. Clicking an image opens it in a full-screen lightbox overlay. The original file is downloadable from the lightbox and from the artefact tray.
 
 ---
 
@@ -159,4 +161,14 @@ Citations are rendered as part of the markdown prose block. Superscript numbers 
 | Tool call disclosures | Appear as an in-progress card while the tool is running; update on result receipt |
 | Artefact chips | *"Added to artefacts ↗"* chip appears beneath each completed non-prose block |
 
-While the model is streaming, the input field is disabled and replaced by a **stop-generation button**. Stopping generation saves the partial response to the audit trail as a partial turn — it does not discard it.
+While the model is streaming, the input field is disabled and replaced by a **stop-generation button**. Stopping generation saves the partial response to the audit trail as a partial turn — it does not discard it. When stopped, a *"(generation stopped)"* label appears beneath the partial response.
+
+### Truncated response — continue generating
+
+When the model's response ends without a natural conclusion (detected heuristically: response ends mid-sentence, or the model emits a continuation signal), a **Continue** button appears below the response:
+
+> *"Response may be incomplete.* **Continue →***"*
+
+Clicking Continue submits an implicit *"Please continue"* turn, which regenerates from the end of the incomplete response in a new branch. The original truncated response is preserved. This handles output-token-limit cases transparently without requiring the user to know why the response stopped.
+
+The Continue button is shown for a maximum of 60 seconds after the truncated response; after that it is dismissed to avoid polluting old threads.

@@ -131,8 +131,11 @@ At any point, the user may start a new conversation thread from the current cont
 │  └── Q3 Review Thread        │
 ├─────────────────────────────┤
 │  My Conversations            │
+│  — Today —                   │
 │  ├── Payment service audit   │
+│  — Yesterday —               │
 │  ├── Refund policy query     │
+│  — Past 7 days —             │
 │  └── Onboarding questions    │
 ├─────────────────────────────┤
 │  Shared With Me              │
@@ -142,10 +145,12 @@ At any point, the user may start a new conversation thread from the current cont
 ```
 
 - **Pinned** — conversations explicitly pinned by the user; always at the top regardless of recency; max 5; pin/unpin via right-click or long-press context menu
-- **My Conversations** — all conversations created by the authenticated user; reverse-chronological
+- **My Conversations** — all conversations created by the authenticated user; grouped by recency (Today / Yesterday / Past 7 days / Past 30 days / Older); within each group, reverse-chronological. Groups with no conversations are omitted.
 - **Shared With Me** — conversations to which the user has accepted an invitation; reverse-chronological; visually distinct (shared icon)
 - Conversations with unread turns in shared threads show a badge count
 - Archived conversations are hidden unless the archived filter is active
+- **Empty state** — when the user has no conversations at all (first visit, or after deletion of all conversations), the My Conversations area shows a brief prompt to start a new conversation, mirroring the onboarding state in the conversation area
+- **Search empty state** — when a search query returns no results, the panel shows *"No conversations matching '[query]'"* with a prompt to try different terms
 
 ---
 

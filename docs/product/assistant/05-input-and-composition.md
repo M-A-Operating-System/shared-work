@@ -10,6 +10,7 @@ The primary input is a **multi-line natural-language text field**.
 | Submit | `Cmd/Ctrl + Enter` |
 | While streaming | Input is disabled; replaced by a stop-generation button |
 | Character limit | None enforced in v1 (subject to model context window) |
+| Draft preservation | An unsent message is preserved per conversation in browser storage. If the user switches to another conversation or navigates away, the draft is restored when they return to that conversation. Drafts are discarded on explicit send or when the user manually clears the field. `@`-binding chips are included in draft state. |
 
 ---
 

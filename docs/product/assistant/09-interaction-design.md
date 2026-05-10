@@ -102,6 +102,7 @@ When the software keyboard raises on mobile, the conversation thread scrolls to 
 
 ### User messages
 
+- Appear immediately in the conversation thread on submit (**optimistic UI**) — the message is visible before the API acknowledges receipt. If the send fails, the message is styled as failed with an inline retry control.
 - Right-aligned in a muted bubble
 - `@`-binding chips render as interactive pills within the bubble
 - In shared conversations: author's name and avatar above the bubble
@@ -112,17 +113,50 @@ When the software keyboard raises on mobile, the conversation thread scrolls to 
 - Distinct colour per participant (derived from host primary brand colour)
 - Author name and avatar above the bubble
 
-### Report icon — every turn
+### Message timestamps
 
-Every turn in the conversation thread (both user messages and assistant responses) carries a **report icon**. On desktop it is visible on hover; on mobile it is always visible below the turn.
+Every message in the conversation thread carries a **timestamp**.
 
-Clicking opens:
+| Display rule | Format |
+|-------------|--------|
+| Default | Relative: *"Just now"*, *"3 min ago"*, *"Yesterday"*, *"Mon 09:14"* |
+| Hover (desktop) | Absolute: *"Monday 11 May 2026, 09:14:32"* |
+| Older than 7 days | Absolute date always shown: *"4 May, 09:14"* |
+
+Timestamps are shown below each message bubble (user and assistant). They are not shown during active streaming — the timestamp appears when streaming completes.
+
+### Thinking indicator
+
+After the user submits a message and before the first streaming token arrives, the assistant displays a **thinking indicator** in the conversation thread:
+
+```
+[AssistantName] is thinking…   ●●●
+```
+
+An animated three-dot pulse appears beneath a placeholder response bubble. The indicator is replaced immediately by the first streaming token. If the model is queuing tool calls before generating prose, the thinking indicator transitions to the tool call disclosure card (in-progress state) without a gap.
+
+The thinking indicator is suppressed if the model begins streaming within 300 ms of submission.
+
+### Per-turn feedback
+
+**User messages** carry a **report icon** (visible on hover / always visible on mobile). Clicking opens the report dialog:
 
 > **What's wrong with this?**  
 > [Text field — optional explanation]  
 > [Submit report] &nbsp;&nbsp; [Cancel]
 
 On submit, an improvement signal is captured against the specific turn (see [12-continuous-improvement.md](./12-continuous-improvement.md)).
+
+**Assistant responses** carry a feedback row with three controls:
+
+| Control | Desktop | Mobile | Action |
+|---------|---------|--------|--------|
+| 👍 Thumbs up | Appears on hover | Always visible below the response | Records a positive improvement signal against the turn. One-click — no dialog. Fills on selection; toggleable. |
+| 👎 Thumbs down | Appears on hover | Always visible below the response | Opens the report dialog (same as user message report). Records a negative signal on submit. |
+| Regenerate | Appears on hover | Always visible below the response | Creates a new branch from this turn (see doc 04). |
+| Copy full response | Appears on hover | Always visible below the response | Copies the full response text to clipboard. |
+
+Both thumbs signals feed the improvement pipeline (doc 12). Thumbs up signals are used to identify high-quality turns for reference; thumbs down signals trigger the same improvement signal workflow as the explicit report.
 
 ### Assistant responses
 
@@ -131,9 +165,7 @@ Each assistant response carries:
 | Element | Desktop | Mobile |
 |---------|---------|--------|
 | Metadata line | Appears on hover — model label + token counts + (in shared sessions) submitting user's name | Revealed on tap of the response bubble |
-| Report icon | Appears on hover | Always visible below the response |
-| Regenerate | Appears on hover | Always visible below the response |
-| Copy full response | Appears on hover | Always visible below the response |
+| Feedback row (👍 👎 Regenerate Copy) | Appears on hover | Always visible below the response |
 | Artefact chips | *"Added to artefacts ↗"* beneath each generated block | Same |
 
 ### Suggested follow-ups
@@ -205,6 +237,8 @@ The onboarding state is shown once per user — it is not shown again once the u
 | State | Presentation | User action |
 |-------|-------------|------------|
 | Model timeout | Inline error card with retry button | Retry re-submits the last message |
+| Send failure (network) | Failed user message styled with error colour + inline retry icon | Tap/click retry to resend |
+| Connection lost | Non-blocking banner below the conversation header: *"Connection lost — reconnecting…"*; animated reconnect indicator. Banner updates to *"Reconnected"* (auto-dismisses after 3s) on restore. | Wait; drafts are preserved locally |
 | MCP tool failure | Tool call disclosure shows error status and raw detail | Rephrase or copy error to report |
 | Always-on MCP server unavailable | Degraded-mode banner; session continues in text-only mode | Model answers from system prompt context only |
 | Opt-in MCP server unavailable | Error in tool call disclosure | Disable the failing server for the session |
@@ -227,6 +261,9 @@ WCAG 2.1 AA compliance is a platform requirement. The following are platform-spe
 | Conversation thread live region | The thread is an `aria-live` region — streaming responses and new shared conversation messages are announced to screen readers |
 | `@`-binding typeahead | Fully keyboard-navigable (arrow keys, Enter/Tab to select, Escape to dismiss); focus returns to input field on selection or dismissal |
 | Branding token contrast | Platform validates that host-provided colour tokens meet WCAG 2.1 AA contrast ratios at config submission |
+| `prefers-reduced-motion` | When the OS-level reduced motion preference is active: streaming text renders immediately (no character-by-character animation); panel slide transitions are instant; the thinking indicator uses a static label instead of the animated three-dot pulse; the FAB pulse animation on stream-in-progress is suppressed; Mermaid and Vega-Lite render-in animations are disabled |
+| Focus management | When a shared conversation message arrives, focus is not stolen from the input field. The unread badge and "Jump to latest" button are announced via the live region. Focus only moves to new content on explicit user action. |
+| Modal focus trap | All modal overlays (full widget state, diagram full-screen, write confirmation) implement a focus trap — Tab cycles only within the modal; Escape dismisses |
 
 ---
 
