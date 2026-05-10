@@ -1,0 +1,33 @@
+# .gitignore
+# Ignore node_modules, logs, OS files, and editor settings
+node_modules/
+*.log
+.DS_Store
+Thumbs.db
+.vscode/
+.env
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.idea/
+*.swp
+*.swo
+*.bak
+*.tmp
+*.cache
+*.coverage
+*.egg-info/
+dist/
+build/
+
+# Ignore macOS and Windows system files
+Icon?
+
+# Ignore Python virtual environments
+venv/
+ENV/
+.venv/
+
+# Ignore Jupyter Notebook checkpoints
+.ipynb_checkpoints/
