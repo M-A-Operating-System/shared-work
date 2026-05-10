@@ -1,85 +1,63 @@
 # 07 — Tool Access
 
-## DDA MCP server — always-on
+## Host-registered MCP servers
 
-The DDA MCP server is the **primary tool provider** for every Data AI Assistant session. It cannot be disabled.
+The AI Chat Platform has **no built-in always-on tool**. Every MCP server available in a session is registered by the host application in the `mcpServers` section of the application config (see [00-host-application-config.md](./00-host-application-config.md)).
 
-- The model accesses all tools exposed via `entityMeta.ts` (generated from `entityRegistry.ts`) for the authenticated user's permission level.
-- Tool access is entitlement-aware — what a user can see in the DDA UI, they can access via MCP. What they cannot, they cannot.
-- See [docs/product/mcp/](../mcp/README.md) for the full DDA MCP server design specification.
+Host teams can discover available MCP tools via the **MCP Repository** complementary service before registering them (see [17-complementary-mcp-services.md](./17-complementary-mcp-services.md)).
 
-### What the DDA MCP server provides
+If no MCP servers are registered, the assistant operates in **prompt-only mode** — it answers from system prompt knowledge only, with no live data access.
 
-| Tool category | Exposure | Typical invocation |
-|--------------|---------|-------------------|
-| Entity lookup | All entities with an `mcp` block in `entityMeta.ts` (generated from `entityRegistry.ts`) | *"Find all entities in the Customer domain"* |
-| Entity detail | Single entity by Display ID | *"Tell me about DMD00000001"* |
-| Survey objects | Survey records — title, scope, response summary, key findings, strategic recommendations | *"What did the Q2 data maturity survey say about the Finance domain?"* |
-| Governance summary | Cross-domain health, quality metrics, compliance status | *"Give me a governance health summary for this week"* |
-| Guided prompts (5) | Pre-built governance workflow prompts | *"Run a data quality assessment for the Finance domain"* |
-| Semantic search | pgvector RAG — not active; `search_model` stub returns empty | Not available |
-| Resources (7) | Static markdown governance resources | *"What is the DDA classification framework?"* |
-| Policy and standards | Codified organisational policy, data standards, and business process documentation structured as DDA records — accessible via MCP as a planned capability. Enables Andi to reason about compliance and process questions against the authoritative policy corpus rather than relying on model training data. | *"Does our data retention policy cover customer contact records?"* (planned) |
-| Entity update (CRUD) | Update and status-change operations exposed through the DDA MCP server. Andi enforces the same DDA security model as the DDA UI — users can only update records they have write access to. Every proposed update displays a before/after confirmation step before the MCP write call is made. | *"Update the data owner for DMD00000001 to Jane Smith"* |
+### Access tiers
 
----
+| Tier | Behaviour |
+|------|-----------|
+| **Always-on** | Active in every session; cannot be disabled by the end user. Designated by setting `accessTier: "always-on"` in the server's config entry. Host applications should designate as always-on only the MCP servers that should be available to all sessions without user action. |
+| **Opt-in** | Off by default; enabled by the end user per session via the tool selection panel. Does not persist across sessions. Designated by `accessTier: "opt-in"`. |
 
-## Additional tools — opt-in per session
+The always-on tier should be used sparingly. Each always-on tool's description is injected into the system prompt on every session, consuming token budget. Opt-in tools inject their description only when enabled.
 
-Additional MCP tools beyond the always-on DDA server are defined in the **build-time MCP tool registry** (see [13-mcp-tool-registry.md](./13-mcp-tool-registry.md)).
+### Role-based tool access
 
-| Behaviour | Specification |
-|-----------|--------------|
-| Default state | **Off** — no additional tools active at session start |
-| Activation | Per-session — enabled by the user via the tool selection panel |
-| Persistence | **Does not persist across sessions** — users re-enable tools each session |
-| Access | The tool selection panel opens via the tool icon in the input area |
+MCP servers can be restricted to specific user roles via the `roles` field in the server config entry. Roles are matched against the user's JWT claims forwarded via the authentication bridge. If `roles` is empty, the server is available to all authenticated users.
 
-The opt-in model means that the model's tool context starts minimal and grows only when the user explicitly requests additional capability. This keeps the model's available tool surface predictable and auditable.
+A user who does not hold a required role will not see the server in the tool selection panel and cannot activate it. The server description will not be injected into their system prompt.
 
 ---
 
 ## Guided workflows
 
-Five DDA guided workflow prompts are available from the **Guided Workflows drawer**, opened via the **DDA platform nav** (left side). The drawer slides in over the history panel — it is not part of the right sidebar, which is reserved for conversation-specific content.
+Guided workflows are host-defined conversation starters accessible from the **Workflow Library** panel. They are configured in the `workflows` section of the application config.
 
 | Invocation method | How it works |
 |------------------|-------------|
-| Click in Guided Workflows drawer | Single click injects the full workflow prompt into the input field; drawer closes; user submits |
-| `@`-binding | Typing `@Data Quality Assessment` and selecting from typeahead injects the workflow prompt on submission |
-| Natural language | Phrasing that matches a guided workflow trigger (e.g. *"run a quality check"*) causes the model to invoke the workflow pattern |
+| Click in Workflow Library panel | Single click opens a parameter form (if parameters are defined); the assembled prompt is injected into the input field; user reviews and submits |
+| `@`-binding | If a workflow is configured as a bindable type, typing `@` followed by the workflow name injects the workflow prompt on submission |
+| Natural language | Phrasing that closely matches a workflow's purpose may cause the model to suggest the workflow and offer to launch it |
 
-Guided workflows are **platform-managed** — the prompts are version-controlled and deployed centrally. Users cannot create or modify guided workflows.
+Guided workflows are **host-managed** — the prompts are version-controlled in the application config. End users cannot create or modify guided workflows.
 
-### Current guided workflows (v1)
+### Workflow parameter types
 
-The five guided workflow prompts cover the most common DDA governance patterns. They are designed for the full persona range — from CDO to Business Staff — not data modellers only. Each workflow has been reviewed against the existing MCP prompt library (`docs/product/mcp/06-prompts.md`) and updated or extended as noted.
+| Parameter type | UI presentation |
+|---------------|-----------------|
+| `binding` | Opens an `@`-binding typeahead scoped to the configured `bindableTypeId` |
+| `text` | Free-text input field with the parameter's `label` |
+| `select` | Dropdown populated from the `options` array in the parameter config |
 
-| # | Workflow name | Primary persona | MCP prompt basis | Key improvements for Andi |
-|---|--------------|----------------|-----------------|--------------------------|
-| 1 | **Governance Health Check** | CDO, Governance Officer | Extends `explore_domain` | Reoriented from data-model exploration to executive governance summary. Triggers cross-domain health scoring, quality flags, and ownership gaps in one workflow. Argument: optional `domain` scope (defaults to all domains). |
-| 2 | **Data Quality Assessment** | Data Practitioner, Governance Officer | Extends `concept_coverage_gaps` | Broadened from concept completeness gaps to full quality rule pass/fail analysis with Vega-Lite chart output. Argument: `domain` (required). |
-| 3 | **Entity Ownership Review** | CDO, Governance Officer | New — no MCP equivalent | Surfaces all entities missing a data owner, or where the assigned owner has left the organisation. Returns a table and a remediation prompt. No arguments. |
-| 4 | **Classification Compliance Audit** | Governance Officer, Data Practitioner | Extends `find_pii_attributes` | Expanded from PII-only to full classification label audit — finds unclassified entities, misclassified assets, and entities missing a sensitivity tier. Argument: optional `classification_tier`. |
-| 5 | **New User Orientation** | New User / Onboarder | Extends `onboard_me` | Rewritten from data-model tour to DDA platform orientation for non-technical users. Explains governance concepts in plain language, lists the user's owned entities (if any), and suggests first actions. No arguments. |
-
-**Not carried forward from MCP prompts:**
-- `trace_lineage` — available as a natural-language MCP tool call; not needed as a guided workflow
-- `compare_concepts` — available via `@`-binding two entities; not needed as a guided workflow
-
-See [ROADMAP.md](./ROADMAP.md) for planned additions to the guided workflow library.
+Required parameters must be filled before the workflow can be launched. Optional parameters may be left empty.
 
 ---
 
 ## Tool call transparency
 
-Every MCP tool invocation renders as a **collapsible disclosure card** in the conversation thread. This is mandatory — tool calls are never hidden (P1 — governance-first transparency).
+Every MCP tool invocation renders as a **collapsible disclosure card** in the conversation thread. This is mandatory — tool calls are never hidden (P1 — transparency first).
 
 ### Disclosure card anatomy
 
 ```
 ┌─────────────────────────────────────────────────────┐
-│ 🔧 DDA MCP · list_entities          ✓ 12 results  ▼ │
+│ 🔧 Governance Platform · list_entities  ✓ 12 results  ▼ │
 └─────────────────────────────────────────────────────┘
 ```
 
@@ -87,7 +65,7 @@ On expansion:
 
 ```
 ┌─────────────────────────────────────────────────────┐
-│ 🔧 DDA MCP · list_entities          ✓ 12 results  ▲ │
+│ 🔧 Governance Platform · list_entities  ✓ 12 results  ▲ │
 ├─────────────────────────────────────────────────────┤
 │ Input parameters                                    │
 │   domain: "Finance"                                 │
@@ -101,19 +79,54 @@ On expansion:
 
 | Card element | Content |
 |-------------|---------|
-| Tool name | MCP server name + tool name (e.g. `DDA MCP · list_entities`) |
+| Tool name | MCP server name + tool name (e.g. `Governance Platform · list_entities`) |
 | Status icon | ✓ success / ✗ error / ⏳ in-progress |
 | Result summary | Brief outcome (e.g. `12 results`, `error: permission denied`) |
 | Expand/collapse | Chevron — collapsed by default |
 | Input parameters | Full parameter object |
-| Response status | HTTP status code + latency |
+| Response status | HTTP status code + latency in milliseconds |
 | Result detail | Full result summary or error detail |
+
+### Write operations
+
+When the model proposes a write action (an MCP tool call that modifies data), the assistant **must** surface a confirmation step before executing the call:
+
+```
+┌─────────────────────────────────────────────────────┐
+│ ✏️  Proposed update to Finance Domain               │
+├─────────────────────────────────────────────────────┤
+│ Before: Owner → Jane Smith                          │
+│ After:  Owner → Alex Johnson                        │
+├─────────────────────────────────────────────────────┤
+│ [Confirm update]        [Cancel]                    │
+└─────────────────────────────────────────────────────┘
+```
+
+The confirmation step is mandatory and non-configurable. The assistant never implies a write has occurred if it has not.
 
 ### Error states in disclosures
 
 When a tool call fails, the disclosure card shows error status with full detail. The model surfaces the error to the user in plain language, citing the specific tool and the nature of the failure.
 
-MCP server unavailability triggers a **degraded-mode banner** on the session — the session continues in text-only mode from system prompt context. No silent failure. The banner is persistent until connectivity is restored.
+### MCP server unavailability
+
+If a host MCP server is unreachable:
+- An **always-on server failure** triggers a **degraded-mode banner** across the session: *"[Server name] is unavailable. [AssistantName] is answering from its own knowledge only — data may not reflect the current state of your application."* The session continues in text-only mode. No silent failure.
+- An **opt-in server failure** shows an error in the tool call disclosure card. The user is informed and may disable the failing server for the session.
+
+The degraded-mode banner is persistent until connectivity is restored.
+
+---
+
+## Tool selection panel (UI)
+
+The tool selection panel is accessible via the tool icon in the input area. It shows:
+
+- All **always-on** servers with a permanent "always active" indicator (no toggle)
+- All **opt-in** servers with `enabled: true` in the registry: name, one-sentence description, and a toggle switch (off by default)
+- Opt-in servers restricted by role are not shown to users who don't hold the required role
+
+Tools enabled in the panel are active for the remainder of the session only. The panel state does not persist across sessions.
 
 ---
 
@@ -121,4 +134,15 @@ MCP server unavailability triggers a **degraded-mode banner** on the session —
 
 The active model and enabled opt-in tools apply to the session as a whole. The user who submits a message determines the tool context for that turn based on their current tool panel state. Other participants see the tool call disclosure cards in the thread.
 
-Participants cannot access MCP tools beyond their own DDA permission level. If a tool call succeeds for the submitting user but would return restricted data for another participant, the other participant sees the disclosure card with a `[Restricted — insufficient permissions]` notice on the result summary.
+Participants cannot access MCP tools beyond their own permission level. If a tool call succeeds for the submitting user but the host MCP server enforces per-user access control, other participants may see restricted results in the disclosure card (`[Restricted — insufficient permissions]` on the result summary).
+
+---
+
+## Complementary MCP services in tool context
+
+Beyond host-registered MCP servers, two platform-level ecosystem services are available for integration:
+
+- **MCP Repository** — Host teams use this during configuration to discover and browse available MCP tools before registering them. It is not directly invoked in conversations but informs the tool registry setup.
+- **MCP Resources Service** — Provides centralised skills, static resources, and reusable prompt artefacts. Host applications may choose to register the MCP Resources Service as an opt-in or always-on server, making its capabilities available during conversations.
+
+See [17-complementary-mcp-services.md](./17-complementary-mcp-services.md) for full descriptions of both services.

@@ -2,122 +2,130 @@
 
 ## Purpose
 
-The MCP tool registry is a **proposed build-time JSON configuration file** (`src/config/mcp-tool-registry.json`) in the DDA repository. This file does not yet exist — it is specified here as a new artefact to be created as part of the Data AI Assistant build. It will be the **single source of truth** for which MCP tools are available in Data AI Assistant sessions and how they behave.
+The MCP tool registry is the **per-tenant runtime list of MCP servers** available in a session. It is derived directly from the `mcpServers` array in the tenant's application config — there is no separate registry file or database table beyond the config itself.
 
-The registry is **bundled into and consumed by the MCP client** as part of the standard deployment pipeline — it is not fetched at runtime from a separate source or a database table. The MCP client reads it at startup and makes the configured tools available to the session. Adding or removing a tool requires a client build and deploy; there is no runtime mechanism for modifying the tool surface.
+When a session starts, the platform resolves the active registry from the tenant's current config and:
+1. Activates all `always-on` servers immediately
+2. Makes `opt-in` servers available in the tool selection panel (but not active)
+3. Injects descriptions for active servers into the system prompt
+
+This document covers the registry model, how host teams populate it, the relationship to the MCP Repository complementary service, and how the registry interacts with the MCP Resources Service.
 
 ---
 
 ## Access tiers
 
-| Tier | Behaviour | Current tools |
-|------|-----------|--------------|
-| **Always-on** | Active in every session; cannot be disabled by users | DDA MCP server |
-| **Opt-in** | Off by default; enabled per session by the user via the tool selection panel; does not persist across sessions | Additional registered tools |
+| Tier | Behaviour |
+|------|-----------|
+| **Always-on** | Active in every session; description injected into system prompt automatically; user cannot disable |
+| **Opt-in** | Off by default; user activates per session via tool selection panel; description injected only when active; does not persist across sessions |
 
-The always-on tier is intentionally minimal. The DDA MCP server is the only tool that should be active in every session — it provides the authoritative data estate context that anchors every conversation.
+Use `always-on` for servers that are foundational to the assistant's usefulness (e.g. the host application's primary data API). Use `opt-in` for servers that are situationally useful but not needed in every session (e.g. a warehouse query tool, an external analytics service).
 
 ---
 
 ## Registry schema
 
+The registry is the `mcpServers` array in the application config. Each entry:
+
 ```json
 {
-  "mcpToolRegistry": {
-    "version": "1.0.0",
-    "tools": [
-      {
-        "id": "dda",
-        "name": "DDA Platform",
-        "description": "Data Design & Architecture platform — entity master, governance workflows, data models, lineage, and quality. Primary tool for all sessions.",
-        "endpoint": "https://datadesign.maoperatingsystem.com/mcp",
-        "accessTier": "always-on",
-        "roles": ["all"],
-        "enabled": true
-      },
-      {
-        "id": "placeholder",
-        "name": "Future Integration",
-        "description": "Placeholder — specific tools to be confirmed during build scoping.",
-        "endpoint": null,
-        "accessTier": "opt-in",
-        "roles": ["all"],
-        "enabled": false
-      }
-    ]
-  }
+  "id":          "string — unique within tenant",
+  "name":        "string — shown in tool selection panel",
+  "description": "string — injected into system prompt when active; write for the model",
+  "endpoint":    "string — MCP-compliant HTTPS URL",
+  "authType":    "bearer | api-key | none",
+  "accessTier":  "always-on | opt-in",
+  "roles":       ["array of role identifiers — empty = all users"],
+  "enabled":     true
 }
 ```
 
----
+The `enabled` field allows stubs to be added before an endpoint is production-ready. Setting `enabled: false` keeps the entry in the config but excludes it from session resolution — the tool does not appear in the tool selection panel and its description is never injected.
 
-## Registry field reference
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | string | Unique internal identifier — never displayed to users |
-| `name` | string | Human-readable name shown in the tool selection panel |
-| `description` | string | One-sentence description injected into the system prompt when the tool is enabled |
-| `endpoint` | string \| null | MCP server URL. `null` for stubs not yet production-ready |
-| `accessTier` | `"always-on"` \| `"opt-in"` | Determines activation behaviour |
-| `roles` | string[] | Permitted DDA role identifiers. `["all"]` = no role restriction |
-| `enabled` | boolean | Build-time on/off switch — `false` stubs are present in config but inactive |
+Full field reference is in [00-host-application-config.md — mcpServers](./00-host-application-config.md).
 
 ---
 
-## Tool selection panel (UI)
+## Tool description quality
 
-The tool selection panel is accessible via the tool icon in the input area. It shows:
+The `description` field is **the most important field in the registry**. It is injected directly into the model's system prompt and directly influences whether the model invokes the correct tool for a given user query.
 
-- All `opt-in` tools with `enabled: true`
-- Name and one-sentence description for each tool
-- Toggle switch per tool (off by default)
-- A permanent note indicating that the DDA Platform tool is always active
+**Good description (written for the model):**
+> Provides access to Acme Corp's data governance platform. Use this tool to look up data domains, entities, quality metrics, data ownership records, and policy information. Use when the user asks about data assets, governance status, quality issues, owners, or compliance.
 
-Tools enabled in the panel are active for the remainder of the session only. The panel state does not persist across sessions.
+**Poor description (written for the user):**
+> Governance Platform MCP server.
 
----
-
-## System prompt injection
-
-When a tool is active in a session (either always-on or opt-in enabled), its `description` is injected into the system prompt at session start. This informs the model of the tool's purpose and when to invoke it.
-
-The DDA MCP server `description` is always injected. Opt-in tool descriptions are injected only when the user has enabled the tool for the session.
+Application Admins should review and iterate on tool descriptions based on improvement signals. Poor tool descriptions are one of the most common causes of the model choosing the wrong tool.
 
 ---
 
-## Adding a new tool to the registry
+## Adding a new MCP server to the registry
 
-New tools require the following before being added:
+| Step | Description |
+|------|-------------|
+| 1. Identify the server | Browse the **MCP Repository** to find an existing server, or confirm the host team's own MCP endpoint |
+| 2. Verify the endpoint | Confirm the MCP endpoint is production-ready and accessible from the platform's network |
+| 3. Confirm auth compatibility | Verify that `bearer` (host JWT forwarded), `api-key`, or `none` auth is appropriate |
+| 4. Draft the description | Write the description for the model — describe what data it provides and when to use it |
+| 5. Decide access tier | `always-on` if needed in every session; `opt-in` if situationally useful |
+| 6. Decide role restriction | Which users should see or activate this tool; empty `roles` array = all users |
+| 7. Update the config | Add the entry to `mcpServers` via the Config Editor UI or Admin API |
+| 8. Validate | The platform runs an endpoint reachability check on config submission |
+| 9. Monitor | Watch improvement signals in the first weeks for tool invocation failures or misuse |
 
-| Pre-requisite | Detail |
-|--------------|--------|
-| GitHub issue | Documents the tool's purpose, endpoint, and intended users |
-| PDD authoring | Product Design Document approved by CDAiO |
-| Confirmed MCP endpoint | A production-ready MCP server URL (or `null` for stub) |
-| Authentication compatibility | Verified that the tool's auth is compatible with Supabase JWT |
-| CDAiO-approved description | One-sentence description reviewed and approved — this is injected directly into the system prompt |
-| Role restriction decision | Which DDA roles may access this tool (`["all"]` or specific role identifiers) |
-| Build deployment | Registry change requires a build + deploy |
-
-Tools **may be added as `enabled: false` stubs** before their endpoint is ready. This allows the system prompt injection to be drafted and reviewed before the tool is active.
+Servers may be added as `enabled: false` stubs before their endpoint is ready. This allows the description to be drafted and reviewed before the server becomes active.
 
 ---
 
 ## Versioning
 
-The registry follows **semantic versioning**:
+Tool registry changes are versioned as part of the overall application config (see [00-host-application-config.md — Config versioning](./00-host-application-config.md)):
 
-| Increment | When |
-|-----------|------|
-| **Minor** (e.g. 1.0.0 → 1.1.0) | New tool added |
-| **Major** (e.g. 1.0.0 → 2.0.0) | Schema changes (new fields, field type changes, breaking changes) |
-| **Patch** (e.g. 1.0.0 → 1.0.1) | Description or name updates to existing tools; endpoint changes |
+| Change | Config version increment |
+|--------|--------------------------|
+| New MCP server added | Minor |
+| Existing server description or name updated | Patch |
+| Server removed or `enabled` changed to `false` | Minor |
+| `authType`, `endpoint`, or `accessTier` changed | Minor |
 
 ---
 
-## Relationship to `entityRegistry.ts` and `entityMeta.ts`
+## Relationship to the MCP Repository
 
-The MCP tool registry governs **which MCP servers** are available in Data AI Assistant sessions. It is distinct from `src/config/entityRegistry.ts` (source of truth) and the generated `supabase/functions/_shared/entityMeta.ts`, which govern which **entity types are bindable** via `@`-binding and which entity-level tools the DDA MCP server exposes.
+The **MCP Repository** is a complementary ecosystem service (see [17-complementary-mcp-services.md](./17-complementary-mcp-services.md)) that provides a discoverable catalogue of available MCP servers — both from the platform ecosystem and from external contributors.
 
-Any entity type with a valid `mcp` block in `entityMeta.ts` is automatically bindable — no registry change is required to make a new entity type available in `@`-binding typeahead. The registry controls the tool servers, not the entity surface within those servers.
+The relationship to the per-tenant registry is:
+
+```
+MCP Repository               Per-tenant registry
+(discover & browse)    →     (configure & activate)
+```
+
+Host teams use the MCP Repository to find servers that already exist and are ready to integrate. Once a suitable server is found, its details (endpoint, suggested description, auth type) are used to populate the `mcpServers` entry in the application config.
+
+The MCP Repository is a read-only browsing surface at config time — it is not invoked at session runtime. The per-tenant registry (derived from the config) is the authoritative source for what is available in a session.
+
+---
+
+## Relationship to the MCP Resources Service
+
+The **MCP Resources Service** is a complementary ecosystem service that provides centralised skills, static resources, and reusable prompt artefacts for use across the MCP ecosystem (see [17-complementary-mcp-services.md](./17-complementary-mcp-services.md)).
+
+Host applications may register the MCP Resources Service as an MCP server in their tenant registry (typically as an `opt-in` server). When registered and activated in a session:
+- The model can invoke the MCP Resources Service to retrieve platform-standard skills, guidance documents, and reusable prompt patterns
+- Resources returned appear as MCP tool results in the conversation thread with the standard tool call disclosure card
+- Resources are added to the session artefact tray for download
+
+The MCP Resources Service endpoint is published in the MCP Repository.
+
+---
+
+## System prompt injection
+
+When a server is active in a session (always-on or opt-in enabled), its `description` is injected into the system prompt at session start. This informs the model of the server's purpose and when to invoke it.
+
+Always-on server descriptions are always injected. Opt-in server descriptions are injected only when the user has enabled the server for the session. This keeps the system prompt lean when opt-in tools are not in use.
+
+Combined description injection is included in the prompt cache — the cache hit rate metric accounts for the combined length of all active tool descriptions.

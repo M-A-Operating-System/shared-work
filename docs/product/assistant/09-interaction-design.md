@@ -1,31 +1,24 @@
 # 09 — Interaction Design
 
-## Page structure
+## Component structure
 
-Data AI Assistant is a **top-level navigation destination** within the DDA platform. The layout uses **four zones**, designed to integrate cleanly with the DDA platform's existing left navigation and to allow future sharing of the left nav between DDA modules and the assistant.
+The AI Chat Platform is delivered as an `<ai-chat>` web component that host applications embed within their own UI. The component owns a **three-zone layout** inside its mounting point. The host application retains full ownership of its own navigation, header, and surrounding UI — the component does not attempt to replace or extend the host UI beyond its mounting point.
 
-| Zone | Location | Contents |
-|------|----------|---------|
-| **DDA platform nav** | Far left (shared with DDA) | Top-level DDA navigation including Data AI Assistant entry; assistant sub-items: New Conversation, History, Guided Workflows |
-| **History panel** | Inner left sidebar | Conversation list — **My Conversations** and **Shared With Me** (reverse-chronological); conversation search; pinned conversations; new conversation button |
+| Zone | Location within component | Contents |
+|------|--------------------------|---------|
+| **History panel** | Left sidebar | Conversation list — **My Conversations** and **Shared With Me** (reverse-chronological); conversation search; pinned conversations; new conversation button; workflow library access |
 | **Conversation area** | Centre — primary | Message thread, streaming responses, rendered content, input area |
-| **Conversation panel** | Right sidebar | Attachments and artefacts for the **current conversation only**; participant list and share management; session token summary |
+| **Conversation panel** | Right sidebar | Attachments and artefacts for the current conversation; participant list and share management; session token summary |
 
-### Why this layout
+### Why three zones (not four)
 
-The left side of the screen belongs to navigation and access — history and workflow entry points are navigation choices that fit naturally with the DDA platform's existing left nav pattern. The right side belongs to the **current conversation**: what has been attached, what has been produced, who is in the conversation. This distinction scales cleanly: as DDA adds more modules, the left nav can surface assistant navigation alongside them without restructuring the conversation view.
+The original DDA design used a fourth zone for the host application's own navigation. In the generic platform, the host application manages its own navigation independently. The `<ai-chat>` component occupies its mounting point and manages history and workflow navigation internally. This clean separation means the host application can embed the component anywhere in its layout — as a full page, a side panel, or a modal drawer.
 
-### DDA platform nav — assistant sub-items
+### Workflow Library
 
-When the user is in Data AI Assistant, the DDA platform nav shows assistant-level sub-items beneath the top-level entry:
+The Workflow Library (the generic equivalent of the DDA Guided Workflows drawer) is accessible via a **Workflows** button in the history panel header. It slides in as a panel over the history list — it is not part of the right sidebar, which is reserved for conversation-specific content.
 
-| Sub-item | Behaviour |
-|----------|----------|
-| **New Conversation** | Starts a fresh conversation; clears the conversation area |
-| **History** | Opens / collapses the inner left history panel |
-| **Guided Workflows** | Opens the guided workflow library as a slide-in drawer over the history panel (not in the right sidebar) |
-
-This means guided workflows are accessible from the nav, not pinned to the right sidebar. The right sidebar remains entirely conversation-specific.
+When clicked, a workflow from the library opens a parameter form (if the workflow has parameters) before injecting the prompt into the input field.
 
 ### Conversation panel (right sidebar) detail
 
@@ -34,7 +27,7 @@ The right panel is scoped entirely to the **active conversation** — it changes
 | Section | Contents |
 |---------|---------|
 | **Attachments** | All documents and images attached to the current conversation, in submission order; file name, type, turn back-link |
-| **Artefacts tray** | All output artefacts generated in the current conversation (Mermaid diagrams, Vega-Lite charts, data tables, JSON exports, code blocks); badge count on panel tab |
+| **Artefacts tray** | All output artefacts generated in the current conversation; badge count on panel tab |
 | **Participants** | Participant list (shared conversations); invite control; leave / remove actions |
 | **Session summary** | Running token totals (`14 turns · 18,430 tokens`) with tooltip expanding to input / output / cached breakdown |
 
@@ -42,28 +35,30 @@ The right panel is scoped entirely to the **active conversation** — it changes
 
 ## Responsive and mobile design
 
-Mobile-first and responsive layout is a core DDA platform standard — see [_design/02-responsive-and-mobile.md](../_design/02-responsive-and-mobile.md) for the platform-wide requirements. The following covers assistant-specific layout behaviour at each breakpoint.
+Mobile-first and responsive layout is a core platform standard. The following covers layout behaviour at each breakpoint when the component is mounted at full-page width.
 
 | Viewport | Layout |
 |----------|--------|
-| Desktop (≥ 1280px) | Full four-zone layout — DDA nav + history panel + conversation area + conversation panel |
-| Desktop narrow (1024px – 1279px) | History panel collapses to icon-only rail; conversation panel remains; DDA nav unchanged |
-| Tablet (768px – 1023px) | DDA nav collapses to icon rail; history and conversation panels become slide-in drawers; conversation area is primary |
-| Mobile (< 768px) | Single-column; DDA nav as top bar or bottom bar per platform convention; history and conversation panels as bottom-sheet drawers; input pinned to bottom |
+| Desktop (≥ 1280px) | Full three-zone layout — history panel + conversation area + conversation panel |
+| Desktop narrow (1024px – 1279px) | History panel collapses to icon-only rail; conversation panel remains |
+| Tablet (768px – 1023px) | Both panels become slide-in drawers; conversation area is primary |
+| Mobile (< 768px) | Single-column; history and conversation panels as bottom-sheet drawers; input pinned to bottom |
+
+When the component is mounted in a constrained container (e.g. a side panel or modal), it uses the container width rather than viewport width to determine layout breakpoints. See [16-embedding-and-web-component.md](./16-embedding-and-web-component.md) for container sizing guidance.
 
 ### Mobile-specific requirements
 
 | Requirement | Specification |
 |-------------|--------------|
-| Input controls | All controls (attachment, tool selection, model chip, send/stop) are thumb-reachable and fully visible — no controls hidden behind secondary menus |
+| Input controls | All controls (attachment, tool selection, model chip, send/stop) are thumb-reachable — no controls hidden behind secondary menus on mobile |
 | `@`-binding typeahead | Anchors to the bottom of the viewport (not cursor position); sized so the top edge is visible above the raised keyboard |
 | Mermaid diagrams | Horizontally scrollable — never scaled to illegibility |
 | Vega-Lite charts | `width: "container"` for responsive sizing |
-| Data tables | Horizontally scrollable; first column (entity name or Display ID) is sticky |
+| Data tables | Horizontally scrollable; first column is sticky |
 | Conversation panel | Opens as full-height bottom sheet — accessible via a tray icon in the input area footer |
-| History panel | Opens as full-height bottom sheet — accessible via the history sub-item in the DDA platform nav |
+| History panel | Opens as full-height bottom sheet — accessible via a history button |
 | Conversation search | Opens as full-screen overlay with keyboard raised |
-| Touch targets | Minimum 44 × 44 px (Apple HIG / Material Design) — see [_design/03-accessibility.md](../_design/03-accessibility.md) |
+| Touch targets | Minimum 44 × 44 px (Apple HIG / Material Design) |
 
 ### Input area on mobile
 
@@ -71,31 +66,24 @@ The input toolbar presents all controls in a **single row above the text field**
 
 | Control | Mobile behaviour |
 |---------|----------------|
-| Paperclip / attachment | Opens the native mobile file picker — includes camera roll, Files app, and camera capture. Drag-and-drop is desktop-only. |
-| Image from camera | Accessible via the native file picker; camera capture supported on devices with a camera |
+| Paperclip / attachment | Opens the native mobile file picker (camera roll, Files app, camera capture) |
 | Tool selection | Opens a full-screen bottom sheet listing available MCP tools |
-| Model chip | Opens a bottom sheet listing available models |
-| Text input | Grows to 3 lines maximum on mobile (vs. 5 on desktop) to preserve space above the raised keyboard |
-| Submit | Large dedicated tap target — always visible; `Cmd/Ctrl + Enter` is the keyboard shortcut on desktop but the Send button is the primary action on mobile |
-| Profile indicator | Hidden in the input area on mobile; accessible via the DDA profile settings page |
+| Model chip | Opens a bottom sheet listing allowed models |
+| Text input | Grows to 3 lines maximum on mobile (vs. 5 on desktop) |
+| Submit | Large dedicated tap target — always visible |
 
 ### Keyboard and viewport behaviour
 
-When the software keyboard raises on mobile, the conversation thread scrolls to keep the latest turn visible above the input area. The input area stays pinned to the top of the keyboard — it does not scroll out of view. The `@`-binding typeahead panel appears above the keyboard, not above the cursor.
-
-The **Jump to latest ↓** button is positioned above the input area so it remains visible and tappable when the keyboard is raised.
+When the software keyboard raises on mobile, the conversation thread scrolls to keep the latest turn visible above the input area. The input area stays pinned to the top of the keyboard. The `@`-binding typeahead panel appears above the keyboard.
 
 ### Hover states on mobile
 
-Many desktop interactions are hover-triggered. On mobile, hover does not exist. The following table defines the mobile equivalents for all hover-dependent controls.
-
 | Desktop (hover) | Mobile equivalent |
 |----------------|-----------------|
-| Report icon appears on hover over a turn | Report icon is always visible on mobile — shown as a small persistent icon below each turn |
-| Edit icon appears on hover over a user message | Edit icon always visible below each user message |
-| Assistant response action row (regenerate, copy, artefact chip) appears on hover | Always visible below each assistant response |
-| Metadata line (model + tokens) appears on hover | Tap the assistant response bubble to reveal the metadata line as an inline callout; tap again to hide |
-| Inactive binding chip tooltip (`(inactive)` suffix) | Shown as permanent suffix text on the chip — no hover required |
+| Report icon appears on hover over a turn | Always visible below each turn |
+| Edit icon appears on hover over a user message | Always visible below each user message |
+| Assistant response action row appears on hover | Always visible below each assistant response |
+| Metadata line appears on hover | Tap the response bubble to reveal; tap again to hide |
 
 ### Gestures
 
@@ -103,29 +91,10 @@ Many desktop interactions are hover-triggered. On mobile, hover does not exist. 
 |---------|--------|
 | Swipe right from left edge | Opens the history panel bottom sheet |
 | Swipe left from right edge | Opens the conversation panel bottom sheet |
-| Long press on a user message | Opens the message action menu (edit, report, copy) |
-| Long press on an assistant response | Opens the response action menu (copy, report, regenerate) |
-| Tap a binding chip | Navigates to the DDA page for the bound object |
+| Long press on a user message | Opens message action menu (edit, report, copy) |
+| Long press on an assistant response | Opens response action menu (copy, report, regenerate) |
+| Tap a binding chip | Fires `binding-click` event to the host application |
 | Pinch-to-zoom on a Mermaid diagram | Enters full-screen diagram view |
-
-### File attachment on mobile
-
-On mobile, **drag-and-drop is not supported**. The paperclip icon opens the native file picker with the following sources:
-
-- Camera roll / photo library
-- Files app (iCloud Drive, device storage, third-party providers)
-- Camera capture (take a photo directly)
-- Documents from other apps (share sheet integration)
-
-Clipboard paste (copy image from another app, then paste into the input field) is supported on mobile browsers that expose clipboard access.
-
-### CSAT prompt on mobile
-
-On mobile, the CSAT floating card is **centred in the viewport as a bottom sheet** rather than anchored to the bottom-right corner. It appears above the input area and does not obscure the conversation thread. Tap outside the sheet to skip.
-
-### Keyboard shortcuts on mobile
-
-Hardware keyboard shortcuts (`Cmd/Ctrl + Enter`, `Cmd/Ctrl + K`, etc.) are only applicable when a hardware keyboard is connected. On a software keyboard, all actions are performed via on-screen controls. The keyboard shortcut reference (`?` icon) is not shown on mobile unless a hardware keyboard is detected.
 
 ---
 
@@ -140,36 +109,28 @@ Hardware keyboard shortcuts (`Cmd/Ctrl + Enter`, `Cmd/Ctrl + K`, etc.) are only 
 ### Other participants' messages (shared conversations only)
 
 - Left-aligned
-- Distinct colour per participant (DDA design system participant palette — up to nine distinct colours)
+- Distinct colour per participant (derived from host primary brand colour)
 - Author name and avatar above the bubble
 
 ### Report icon — every turn
 
-Every turn in the conversation thread (both user messages and assistant responses) carries a **report icon**. On desktop it is visible on hover; on mobile it is always visible below the turn (no hover state exists on touch devices).
+Every turn in the conversation thread (both user messages and assistant responses) carries a **report icon**. On desktop it is visible on hover; on mobile it is always visible below the turn.
 
-Clicking it opens:
+Clicking opens:
 
-> **What's wrong with this?**
-> [Text field — optional explanation]
+> **What's wrong with this?**  
+> [Text field — optional explanation]  
 > [Submit report] &nbsp;&nbsp; [Cancel]
 
-The explanation is optional but strongly encouraged. On submit, an improvement signal is captured and stored against the specific turn (see [12-continuous-improvement.md](./12-continuous-improvement.md)).
-
-| Report scenario | Turn type | Example |
-|----------------|-----------|---------|
-| Incorrect answer | Assistant | Model states the wrong data owner |
-| Misleading framing | Assistant | Summary omits a known quality issue |
-| Wrong entity referenced | User | User bound the wrong `@Entity` and wants to flag it for audit |
-| Inappropriate response in shared session | Assistant | Response in shared context revealed restricted framing |
+On submit, an improvement signal is captured against the specific turn (see [12-continuous-improvement.md](./12-continuous-improvement.md)).
 
 ### Assistant responses
 
-- Occupy the full content width
-- Each assistant response carries:
+Each assistant response carries:
 
 | Element | Desktop | Mobile |
 |---------|---------|--------|
-| Metadata line | Appears on hover — model label + token counts + (in shared sessions) the name of the submitting user | Revealed on tap of the response bubble |
+| Metadata line | Appears on hover — model label + token counts + (in shared sessions) submitting user's name | Revealed on tap of the response bubble |
 | Report icon | Appears on hover | Always visible below the response |
 | Regenerate | Appears on hover | Always visible below the response |
 | Copy full response | Appears on hover | Always visible below the response |
@@ -177,7 +138,7 @@ The explanation is optional but strongly encouraged. On submit, an improvement s
 
 ### Suggested follow-ups
 
-At the end of each assistant response, up to **three suggested follow-up queries** are presented as pill chips generated by the model. Single-click to submit. Follow-ups are model-generated — not sourced from a static list.
+At the end of each assistant response, up to **three suggested follow-up queries** are presented as pill chips generated by the model. Single-click to submit. Follow-ups are model-generated — not from a static list.
 
 ---
 
@@ -185,39 +146,39 @@ At the end of each assistant response, up to **three suggested follow-up queries
 
 | Control | Function |
 |---------|---------|
-| Paperclip icon | Opens file picker or accepts drag-and-drop (PDF, Excel, Word, images); images also accepted via clipboard paste (Cmd/Ctrl+V) |
+| Paperclip icon | Opens file picker or accepts drag-and-drop (PDF, Excel, Word, images); images also accepted via clipboard paste |
 | Tool selection icon | Opens MCP tool opt-in panel |
 | Active model chip | Opens model selection popover |
 | Text input | Multi-line, grows to 5 lines, `Cmd/Ctrl + Enter` to submit |
-| Profile indicator | Read-only `Style · Verbosity` link to DDA profile settings — not an editable inline control, but clickable |
+| Profile indicator | Read-only `Style · Verbosity` link to host app profile settings — clickable |
 | Send / Stop | Submits message or stops active stream |
-| Share icon | Opens participant management panel (invite, view, and remove participants) |
+| Share icon | Opens participant management panel |
 
 ---
 
 ## Session artefact tray
 
-The artefact tray accumulates every input and output artefact produced during a conversation. It persists for the full lifetime of the conversation record — all file content is stored in Supabase Storage as part of the audit trail.
+The artefact tray accumulates every input and output artefact produced during a conversation. It persists for the full lifetime of the conversation record.
 
 ### Artefact classes
 
 | Class | Direction | Examples |
 |-------|-----------|---------|
-| Attached document | Input | PDF report, Excel extract, Word policy document |
-| Generated document | Output | Markdown report, Word document, PDF summary |
-| Mermaid diagram | Output | ERD, lineage flow, workflow sequence |
-| Vega-Lite chart | Output | Quality distribution, coverage metric, trend |
+| Attached document | Input | PDF report, Excel extract, Word document |
+| Generated document | Output | Markdown report, summary |
+| Mermaid diagram | Output | Relationship diagram, flow, sequence |
+| Vega-Lite chart | Output | Bar chart, trend line, distribution |
 | Data table | Output | Multi-row query result (CSV) |
-| JSON export | Output | Entity record or tool result |
-| Code block | Output | SQL, Python, YAML |
-| Binding reference | Input | Non-downloadable — reference card linking to the DDA entity record |
+| JSON export | Output | Tool result or entity record |
+| Code block | Output | SQL, Python, YAML, shell |
+| Binding reference | Input | Non-downloadable — reference card linking to the host application object |
 
 ### Tray entry anatomy
 
 Each tray entry shows:
 - Format icon
 - Auto-generated name: `[Content type] — [Subject] — [Date]`
-- Turn back-link (click to jump to the source turn in the conversation)
+- Turn back-link (click to jump to the source turn)
 - Direction label (Input / Output)
 - Download button
 - Preview link
@@ -228,15 +189,14 @@ Users may **rename** tray entries. A **"Download all"** control packages all art
 
 ## Onboarding state
 
-On **first visit**, the conversation area shows a welcome state:
+On **first visit**, the conversation area shows a welcome state drawn from the host application config:
 
-1. A one-sentence description of the CDO second brain concept
-2. Three suggested starter questions — drawn from the **same guided workflow list** used in the Guided Workflows tab (e.g. the first three workflows in the platform-managed prompt library, surfaced as plain-language questions)
-3. A link to the full guided workflow library (opens the Guided Workflows drawer from the DDA platform nav)
+1. The host-configured `identity.assistantDescription`
+2. Starter workflows from `features.starterWorkflows` (up to 3, shown as question-style prompts)
+3. Starter questions from `features.starterQuestions` (up to 3, if no starter workflows or alongside them)
+4. A link to the full Workflow Library
 
-The onboarding state is shown once — it is not shown again once the user has started a conversation.
-
-The starter questions are not hardcoded strings — they are generated from the platform-managed guided workflow registry, so they stay current as workflows are added or updated without a separate onboarding content change.
+The onboarding state is shown once per user — it is not shown again once the user has started a conversation.
 
 ---
 
@@ -246,30 +206,33 @@ The starter questions are not hardcoded strings — they are generated from the 
 |-------|-------------|------------|
 | Model timeout | Inline error card with retry button | Retry re-submits the last message |
 | MCP tool failure | Tool call disclosure shows error status and raw detail | Rephrase or copy error to report |
-| MCP server unavailable | Degraded-mode banner; session continues in text-only mode | Model answers from system prompt context only; no silent failure |
+| Always-on MCP server unavailable | Degraded-mode banner; session continues in text-only mode | Model answers from system prompt context only |
+| Opt-in MCP server unavailable | Error in tool call disclosure | Disable the failing server for the session |
 | Context window limit (80%) | Subtle warning in conversation header | Branch to new thread or accept auto-summarisation |
 | Out-of-scope query | Model explains scope boundary and suggests reformulation | No error state — graceful redirect |
-| Auth session expired | Modal overlay prompting re-authentication | Re-auth restores session and full conversation history; any unsent in-progress input is lost |
+| Auth session expired | Modal overlay prompting re-authentication | Re-auth restores session and full conversation history |
 | Unsupported file type | Inline notice on file selection | User prompted to use a supported format |
 | Last participant constraint | Tooltip on disabled Leave/Remove controls | Invite another user before leaving |
+| Component mount failure | Error state within the component mount point | Host application is notified via the `error` event |
 
 ---
 
 ## Accessibility
 
-Platform-wide accessibility standards (WCAG 2.1 AA, keyboard navigation, touch targets, screen reader requirements, colour + state) are defined in [_design/03-accessibility.md](../_design/03-accessibility.md). The following are assistant-specific additions to those standards.
+WCAG 2.1 AA compliance is a platform requirement. The following are platform-specific additions.
 
-| Assistant-specific requirement | Specification |
-|-------------------------------|--------------|
+| Requirement | Specification |
+|-------------|--------------|
 | Mermaid SVG alt text | Descriptive alt text generated by the model for each Mermaid diagram |
-| Conversation thread live region | The conversation thread is an `aria-live` region — streaming assistant responses and new messages in shared conversations are announced to screen readers |
+| Conversation thread live region | The thread is an `aria-live` region — streaming responses and new shared conversation messages are announced to screen readers |
 | `@`-binding typeahead | Fully keyboard-navigable (arrow keys, Enter/Tab to select, Escape to dismiss); focus returns to input field on selection or dismissal |
+| Branding token contrast | Platform validates that host-provided colour tokens meet WCAG 2.1 AA contrast ratios at config submission |
 
 ---
 
 ## Jump to latest
 
-When a user has scrolled up in a conversation (to review earlier turns) and new content arrives (streaming response or shared conversation message), a **"Jump to latest ↓"** pill button appears, anchored to the bottom of the conversation area above the input field. Clicking it scrolls immediately to the most recent turn. The button disappears when the user is already at the bottom.
+When a user has scrolled up and new content arrives (streaming response or shared conversation message), a **"Jump to latest ↓"** pill button appears anchored above the input field. Clicking it scrolls immediately to the most recent turn. The button disappears when the user is already at the bottom.
 
 ---
 
@@ -283,29 +246,27 @@ When a user has scrolled up in a conversation (to review earlier turns) and new 
 | `Cmd/Ctrl + N` | Start a new conversation |
 | `Escape` | Cancel edit / dismiss typeahead / close modal |
 | `↑` in empty input | Edit most recent user message |
-| `Arrow keys` | Navigate `@`-binding typeahead; navigate in-conversation search results |
+| `Arrow keys` | Navigate `@`-binding typeahead; navigate search results |
 | `Enter` / `Tab` | Select item in `@`-binding typeahead |
 | `Cmd/Ctrl + Shift + C` | Copy most recent assistant response to clipboard |
 | `?` or `Cmd/Ctrl + /` | Show keyboard shortcut reference |
-
-Keyboard shortcut reference is also accessible via the **`?` icon** in the input area footer.
 
 ---
 
 ## Post-session CSAT prompt
 
-A **1–5 star rating prompt** is shown to a random 20% sample of users at the end of a session (not on every session — to avoid survey fatigue). See metric definition in [14-success-metrics.md](./14-success-metrics.md).
+A **1–5 star rating prompt** is shown to a random sample of users (configured via `features.csatSampleRate`) at the end of a session, after 30 seconds of idle time following the last assistant response.
 
-**Placement and presentation:**
+The prompt appears as a **non-blocking floating card** anchored to the bottom-right of the conversation area:
 
-The prompt appears as a **non-blocking floating card** anchored to the bottom-right of the conversation area, after the user has been idle for 30 seconds following the last assistant response:
-
-> **How useful was this conversation?**
-> ★ ★ ★ ★ ★
-> [Optional: What could be better? — single text line]
+> **How useful was this conversation?**  
+> ★ ★ ★ ★ ★  
+> [Optional: What could be better? — single text line]  
 > [Submit] &nbsp;&nbsp; [Skip]
 
-- The card is dismissible (Skip or click outside)
-- It does not block the input field or any conversation content
-- Skipping is not counted as a negative signal — only submitted ratings are recorded
-- The rating and optional comment are stored in `assistant.conversations.csat_score` and `assistant.conversations.csat_comment`
+- Non-blocking — does not prevent input
+- Dismissible (Skip or click outside)
+- Skipping is not counted as a negative signal
+- On mobile: appears as a bottom sheet centred in the viewport
+
+The rating and optional comment are stored in `assistant.conversations.csat_score` and `assistant.conversations.csat_comment`.

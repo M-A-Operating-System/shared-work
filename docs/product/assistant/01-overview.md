@@ -2,27 +2,25 @@
 
 ## Vision
 
-### The CDO's second brain
+### Conversational AI for any application
 
-The **Data AI Assistant** is a conversational interface embedded within the DDA platform. Its primary purpose is to function as the **Chief Data Officer's second brain** — a persistent, always-available intelligence layer that knows the organisation's data estate, understands governance context, and surfaces the right entity, model, or next action at the speed of a question.
+The **AI Chat Platform** enables any application to give its users a persistent, context-aware conversational interface — without building AI infrastructure. The experience is modelled on the best native AI desktop applications: rich rendered output, transparent tool usage, and a conversation that remembers where you left off. It is not a general-purpose assistant layer — each deployment is a **specialist** tuned to its host application's domain.
 
-The experience is modelled on the Claude native desktop application: a context-aware conversation with rich rendered output. It is not a general-purpose assistant. Every interaction is anchored to the DDA domain — entities, models, lineage, quality, governance posture.
+> **Governing intent:** Give any application team the ability to drop a production-grade AI assistant into their product within days — fully branded, scoped to their domain, connected to their data, and backed by a complete audit trail.
 
-> **Governing intent:** Replace point-and-click navigation of the DDA platform with a conversational interface that gives the CDO and their team instant, contextual access to the full data estate — at the speed of a question.
-
-### What it is and is not
+### What the platform is and is not
 
 | It is | It is not |
 |-------|-----------|
-| A specialist governance assistant with deep DDA platform knowledge | A general-purpose AI assistant |
-| The primary access layer for non-technical business users | A replacement for the DDA UI for power users |
-| A complete governance audit trail for every conversation and artefact | A transient chat tool with no persistent record |
-| Extensible to additional MCP tools via a controlled registry | An open integration surface for arbitrary tools |
-| A read and write governance assistant — queries, reasoning, and governed entity updates via the DDA security model | A system that bypasses DDA security or writes without governance controls |
+| A white-label assistant layer any application can embed as a web component | A standalone AI product with its own brand or identity |
+| A multi-tenant platform where each host application brings its own scope, tools, and branding | A shared assistant all host applications configure from a single pool |
+| A complete audit trail for every conversation turn and artefact | A transient chat tool with no persistent record |
+| A controlled, host-configured MCP integration surface | An open API that allows arbitrary tool connections without host approval |
+| A read-and-write assistant — queries, reasoning, and actions via host-registered MCP tools | A system that bypasses host application security models or acts without user confirmation |
 
-### Naming
+### The assistant has no platform name
 
-The AI assistant is named **Andi**. The screen/navigation title within the DDA platform is **"Data AI Assistant"**. The informal shorthand used by the team and in business communications is **"ask Andi"**.
+The platform has no end-user-facing name. Every tenant names their own assistant in their application config (`identity.assistantName`). End users see only that name — they are not exposed to the underlying platform. This document uses **[AssistantName]** as a placeholder wherever the assistant name would appear.
 
 ---
 
@@ -30,69 +28,103 @@ The AI assistant is named **Andi**. The screen/navigation title within the DDA p
 
 ### In scope
 
-- Persistent, named conversation threads scoped to the authenticated DDA user
-- Full-text search across all user conversations
-- Conversation branching via message edit or regeneration — preserving the complete governance audit trail
-- `@`-binding for DDA objects (domains, concepts, products, entities, data models, data owners, surveys, guided workflows)
-- Document attachments (PDF, Excel, Word) stored as turn-level artefacts
-- Model switching between Claude Sonnet 4, Opus 4, and Haiku 4 mid-conversation
-- Communication style and verbosity controlled by the authenticated user's DDA profile
-- Always-on DDA MCP server providing entity lookup, governance summaries, data model queries, and survey content
-- Governed entity update and status-change via MCP — subject to the DDA security model; every proposed update requires explicit user confirmation before the write call is made
-- Opt-in additional MCP tools via a build-time registry
-- Five DDA guided workflow prompts accessible from the Guided Workflows drawer (DDA platform nav)
-- Shared conversations — up to ten authenticated DDA participants with equal rights
-- Four-zone responsive layout (DDA platform nav with assistant sub-items, history panel, conversation area, conversation panel) functional on mobile
+- Embeddable `<ai-chat>` web component with full branding token support
+- Multi-tenant architecture with complete per-tenant data isolation
+- Persistent, named conversation threads scoped to the authenticated user within their tenant
+- Conversation branching via message edit or regeneration — preserving the complete audit trail
+- Full-text search across all user conversations within the tenant
+- Host-configured `@`-binding for application-defined object types
+- Host-configured Display ID pattern detection and auto-resolution
+- Document attachments (PDF, Excel, Word, images) stored as platform artefacts
+- Model switching within the host-configured allowed model set; provider-agnostic architecture
+- Communication style and verbosity driven by host-provided user profile claims
+- Host-registered MCP servers with always-on and opt-in access tiers
+- Host-defined guided workflow prompts accessible from the Workflow Library panel
+- Tool call transparency — every MCP invocation rendered as a collapsible disclosure card
+- Write operations — actions via host MCP tools with explicit user confirmation before execution
+- Shared conversations — up to ten participants within the same tenant, equal-participant model
+- Personal memory (user-managed) and application context (Application Admin-managed)
+- Session artefact tray accumulating all input and output artefacts
+- Three-zone responsive layout (history panel, conversation area, conversation panel) embedded within host app UI
 - Rich content rendering: Mermaid, Vega-Lite, JSON inspector, data tables, syntax-highlighted code, prose markdown, math (KaTeX)
-- Full governance audit trail: raw prompt, resolved prompt, attached files, model response, tool call log, output artefacts, token counts
-- Continuous improvement signal capture and GitHub issue pipeline
+- Continuous improvement signal capture and per-tenant improvement issue pipeline
+- Full audit trail per turn: raw prompt, resolved prompt, tool call log, output artefacts, token counts
+- Complementary MCP ecosystem services: MCP Repository (tool discovery) and MCP Resources (shared skills and artefacts)
 
 ### Out of scope
 
-- Semantic search over entity descriptions (pgvector RAG) — entity lookup uses structured MCP tool calls
-- Data warehouse query access — read access to the underlying business data warehouse is a planned capability (see [ROADMAP.md](./ROADMAP.md))
-- Conversation export (PDF or markdown)
-- User-customisable prompt library — the guided workflow library is platform-managed only
+- Semantic search over application data (pgvector RAG) — structured MCP tool calls are the primary data access pattern in v1
+- Conversation export (PDF or markdown) — planned; data classification complexity must be resolved first
 - Voice or multimodal input
+- Context globbing (pulling context from multiple past conversations into one session)
+- Incognito or temporary chat (no-history mode) — conflicts with audit completeness
+- Web search (real-time internet retrieval)
+- Image or content generation
+- Code execution sandbox
+- Public shareable links — all sharing is participant-controlled and tenant-scoped
+- Read receipts in shared conversations
+- Dark mode — not in v1
 
 ---
 
-## Relationship to other DDA modules
+## Platform architecture
 
 ```
-┌─────────────────────────────────────────┐
-│           DDA Platform (Lovable)         │
-│                                         │
-│  ┌─────────────┐   ┌──────────────────┐ │
-│  │  Data AI Assistant   │──▶│  DDA MCP Server  │ │
-│  │ (this doc)  │   │ (docs/product/   │ │
-│  │             │   │      mcp/)       │ │
-│  └─────────────┘   └────────┬─────────┘ │
-│                             │           │
-│                    ┌────────▼─────────┐ │
-│                    │   entityCrud     │ │
-│                    │  edge function   │ │
-│                    └──────────────────┘ │
-└─────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────┐
+│                     Host Application                          │
+│                                                              │
+│   ┌────────────────────────────────────────┐                 │
+│   │        <ai-chat> web component         │                 │
+│   │   (embedded in host application UI)    │                 │
+│   └────────────────┬───────────────────────┘                 │
+│                    │ Authentication bridge (JWT + claims)    │
+└────────────────────┼─────────────────────────────────────────┘
+                     │
+┌────────────────────▼─────────────────────────────────────────┐
+│                  AI Chat Platform                             │
+│                                                              │
+│  ┌─────────────────┐   ┌──────────────────────────────────┐  │
+│  │  Conversation   │   │  AI Provider Edge Function        │  │
+│  │  Engine         │◀──│  (Anthropic Claude, provider-     │  │
+│  │                 │   │   agnostic abstraction)           │  │
+│  └────────┬────────┘   └──────────────────────────────────┘  │
+│           │                                                  │
+│  ┌────────▼────────┐   ┌──────────────────────────────────┐  │
+│  │  Audit Storage  │   │  Per-tenant tool registry         │  │
+│  │  (multi-tenant) │   │  (from application config)        │  │
+│  └─────────────────┘   └──────────────────────────────────┘  │
+└──────────────────────────────────────────────────────────────┘
+                     │
+     ┌───────────────┼────────────────────┐
+     │               │                    │
+┌────▼────┐   ┌──────▼──────┐   ┌────────▼───────┐
+│ Host    │   │ Host MCP    │   │ Complementary  │
+│ App     │   │ Server(s)   │   │ MCP Services   │
+│ API     │   │ (registered │   │ (Repository +  │
+│         │   │  in config) │   │  Resources)    │
+└─────────┘   └─────────────┘   └────────────────┘
 ```
 
-- **DDA MCP Server** ([docs/product/mcp/](../mcp/README.md)) is the tool provider for every Data AI Assistant session. The always-on DDA tool in the MCP registry calls the MCP server; the MCP server wraps `entityCrud`.
-- **entityCrud** is the single source of truth for entity data. **Andi never reads the database directly** — all data flows through `entityCrud` via the MCP server. This applies to all current and future tool capabilities: the MCP server is the only path to DDA data.
-- **Data AI Assistant** owns the conversational surface, rendering, audit trail, shared conversation model, and improvement signal pipeline. It depends on, but does not duplicate, the capabilities of the layers beneath it.
+### Components
+
+**AI Chat Platform** owns the conversational surface, content rendering, audit trail, shared conversation model, memory management, and improvement signal pipeline. It depends on, but does not duplicate, the capabilities of the host application or its MCP servers.
+
+**Host Application** owns the user identity model, application business logic, and MCP server endpoints. It embeds the platform via the web component and passes user context via the authentication bridge.
+
+**Host MCP Servers** are the host application's data and action providers. The platform routes tool calls to these servers and surfaces the results transparently in the conversation thread.
+
+**Complementary MCP Services** — the MCP Repository and MCP Resources — are ecosystem-level services that operate alongside both the platform and host MCP servers. They are not owned by the platform or by individual host applications. See [17-complementary-mcp-services.md](./17-complementary-mcp-services.md).
 
 ---
 
 ## Dependencies
 
-- DDA MCP server — always-on tool provider (see [docs/product/mcp/](../mcp/README.md))
-- Supabase Auth — identity provider and JWT issuer for all API calls
-- **AI model provider** — v1 uses Anthropic Claude (Sonnet 4 default, Opus 4, Haiku 4). The architecture is designed to be provider-agnostic; OpenAI and Gemini models are the planned follow-on providers. The model provider abstraction is owned by the edge function layer.
-- Supabase Storage — binary artefact retention (attached documents, generated outputs)
-- Supabase Edge Function — JWT handling, AI provider API request construction, SSE stream passthrough; provider-agnostic interface
-- `src/config/entityRegistry.ts` + generated `supabase/functions/_shared/entityMeta.ts` — source of truth for bindable object types and MCP tool availability
-- DDA design system — typography, colour, spacing, component library
-
-## Related issues
-
-- Issue #216 — this work
-- Issue #6 / docs/product/mcp — DDA MCP server (tool provider)
+| Dependency | Role |
+|------------|------|
+| **AI provider** | v1: Anthropic Claude (Sonnet 4.6 default, Opus 4.7, Haiku 4.5). Architecture is provider-agnostic; OpenAI and Gemini are planned follow-on providers. |
+| **Platform storage** | Relational database with row-level security for conversation records; object storage for binary artefacts. |
+| **Platform edge function** | JWT handling, AI provider API request construction, SSE stream passthrough, MCP call routing. Provider-agnostic interface. |
+| **Host authentication** | The host application issues JWTs for its users. The platform validates these tokens and trusts the embedded claims. No re-authentication is performed by the platform. |
+| **Host MCP server(s)** | The host's registered MCP endpoints providing data access and action capabilities. |
+| **MCP Repository** | Complementary ecosystem service — discoverable registry of available MCP tools. |
+| **MCP Resources Service** | Complementary ecosystem service — centralised skills, static resources, and reusable prompt artefacts. |
