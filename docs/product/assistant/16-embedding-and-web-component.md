@@ -216,16 +216,18 @@ When the component is mounted in a container narrower than the desktop breakpoin
 The `<ai-chat>` component requires the following CSP directives on the host page:
 
 ```
-script-src    https://chat-platform.io;
+script-src    https://chat-platform.io [renderer module origins];
 connect-src   https://api.chat-platform.io wss://api.chat-platform.io;
 frame-src     'none';
 img-src       https://cdn.chat-platform.io [host CDN origins];
 style-src     https://chat-platform.io 'nonce-{page-nonce}';
 ```
 
-Additionally, any URLs provided in the `branding` config (`logoUrl`, `faviconUrl`) must be included in `img-src`.
+Additionally:
+- Any URLs provided in the `branding` config (`logoUrl`, `faviconUrl`) must be included in `img-src`.
+- Each origin hosting a custom renderer module (from `renderers[].moduleUrl` in the application config) must be included in `script-src`. Renderer modules are loaded via dynamic `import()` at runtime and are subject to the host page's CSP. A module blocked by CSP will cause that renderer to fall back to syntax-highlighted code — the platform will not bypass CSP.
 
-The component does not use `eval`, `inline-script`, or `blob:` URLs. All assets are loaded from `https://chat-platform.io` or `https://cdn.chat-platform.io`.
+The component itself does not use `eval`, `inline-script`, or `blob:` URLs. All platform assets are loaded from `https://chat-platform.io` or `https://cdn.chat-platform.io`. Renderer modules are loaded from host-provided origins only.
 
 ---
 

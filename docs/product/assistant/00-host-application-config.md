@@ -25,6 +25,7 @@ Config takes effect on the **next new conversation session** after the update is
   "bindableTypes": [ ... ],
   "mcpServers":    [ ... ],
   "workflows":     [ ... ],
+  "renderers":     [ ... ],
   "models":        { ... },
   "userProfile":   { ... },
   "memory":        { ... },
@@ -270,6 +271,44 @@ Workflow prompts are host-managed — users cannot create or modify them.
 
 ---
 
+## `renderers`
+
+Host applications may register **custom content renderers** that the platform loads at runtime. When the model produces a fenced code block tagged with a registered renderer's trigger, the platform invokes the host's renderer instead of its built-in pipeline. This enables domain-specific visualisations — risk gauges, org charts, Gantt views, financial waterfall charts, compliance scorecards — that the platform's built-in renderers do not cover.
+
+See [10-content-rendering.md](./10-content-rendering.md) for the full runtime rendering contract and system prompt guidance injection.
+
+```json
+{
+  "renderers": [
+    {
+      "id":                   "risk-gauge",
+      "trigger":              "risk-gauge",
+      "name":                 "Risk Gauge",
+      "description":          "Interactive risk score gauge with traffic-light colouring",
+      "moduleUrl":            "https://cdn.acme.com/ai-renderers/risk-gauge.js",
+      "exportName":           "RiskGaugeRenderer",
+      "systemPromptGuidance": "Use a ```risk-gauge block when asked for a risk score or risk assessment. The block must contain a JSON object: { \"score\": <0–100>, \"label\": \"<risk level label>\", \"breakdown\": [ { \"factor\": \"<name>\", \"score\": <0–100> } ] }. Only use this block when a numeric risk score is directly requested."
+    }
+  ]
+}
+```
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `id` | Yes | Unique identifier within the tenant |
+| `trigger` | Yes | Fenced code block tag that activates this renderer (e.g. `risk-gauge` → ` ```risk-gauge ` in the model output). Must be lowercase alphanumeric with hyphens; must not conflict with a built-in trigger (`mermaid`, `vega-lite`, `math`, `json`, `csv`, `table`). |
+| `name` | Yes | Display name shown in the platform admin UI and in the content block header within the conversation thread |
+| `description` | Yes | One-sentence description shown in the admin UI. Not injected into the system prompt. |
+| `moduleUrl` | Yes | HTTPS URL to an ES module exporting the renderer. Must be served from an origin declared in the tenant's registered origins. Loaded once per session; cached for the session lifetime. |
+| `exportName` | No | Named export from the module. Default: `"default"`. |
+| `systemPromptGuidance` | No | Text injected verbatim into the system prompt to instruct the model when and how to produce this content type. Include the expected fenced block format and any content schema the renderer requires. If omitted, the platform injects a minimal generic instruction: *"You may produce `{trigger}` blocks using ` ```{trigger} ` fencing."* |
+
+### Origin registration
+
+The `moduleUrl` origin must be declared during tenant registration (or updated via the Platform Admin API). At config submission, the platform validates that the declared origin is reachable and that the module can be loaded. Modules served from unregistered origins are rejected. The host's CSP `script-src` must include the renderer origin — see [16-embedding-and-web-component.md](./16-embedding-and-web-component.md).
+
+---
+
 ## `models`
 
 ```json
@@ -443,5 +482,7 @@ Submitting a config via the Admin API runs **synchronous validation** before app
 | Model IDs in `allowedModels` | Must be available in the platform for the configured `provider` |
 | `contextTemplate` syntax | Mustache syntax check for all bindable type templates |
 | `starterWorkflows` references | All IDs in `starterWorkflows` must match a `workflows[].id` |
+| Renderer trigger uniqueness | No two renderers may share the same `trigger`; no renderer `trigger` may match a built-in tag |
+| Renderer module reachability | Each `moduleUrl` must respond to a HEAD request from the platform's validation origin; the origin must be registered for the tenant |
 
 Validation errors return a structured response with field-level detail. The config is not applied until all validation checks pass.

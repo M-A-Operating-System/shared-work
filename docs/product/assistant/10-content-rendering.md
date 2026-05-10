@@ -7,14 +7,15 @@ The rendering engine evaluates each content block in an assistant response in pr
 | Priority | Trigger | Rendered as |
 |----------|---------|------------|
 | 1 | Tool call event (`mcp_tool_use` / `mcp_tool_result`) | **Tool Call Disclosure** card |
-| 2 | Fenced block tagged ` ```mermaid ` | **Mermaid diagram** — SVG, expandable, exportable |
-| 3 | Fenced block tagged ` ```vega-lite ` | **Vega-Lite chart** — interactive, responsive |
-| 4 | Fenced block tagged ` ```math ` or `$$...$$` display block | **Math expression** — KaTeX rendered display block |
-| 5 | Fenced block tagged ` ```json ` | **JSON inspector** — collapsible tree, copy-to-clipboard |
-| 6 | Fenced block tagged ` ```csv ` or ` ```table ` | **Data table** — sortable, filterable, paginated, CSV export |
-| 7 | Any other fenced block | **Syntax-highlighted code** — Prism, copy-to-clipboard, line numbers > 5 lines |
-| 8 | Inline `$...$` within prose | **Inline math** — KaTeX rendered inline |
-| 9 | All other content | **Rich markdown prose** — GFM |
+| 2 | Fenced block tag matching a registered host renderer (`renderers[].trigger`) | **Custom host renderer** — host-provided ES module; see below |
+| 3 | Fenced block tagged ` ```mermaid ` | **Mermaid diagram** — SVG, expandable, exportable |
+| 4 | Fenced block tagged ` ```vega-lite ` | **Vega-Lite chart** — interactive, responsive |
+| 5 | Fenced block tagged ` ```math ` or `$$...$$` display block | **Math expression** — KaTeX rendered display block |
+| 6 | Fenced block tagged ` ```json ` | **JSON inspector** — collapsible tree, copy-to-clipboard |
+| 7 | Fenced block tagged ` ```csv ` or ` ```table ` | **Data table** — sortable, filterable, paginated, CSV export |
+| 8 | Any other fenced block | **Syntax-highlighted code** — Prism, copy-to-clipboard, line numbers > 5 lines |
+| 9 | Inline `$...$` within prose | **Inline math** — KaTeX rendered inline |
+| 10 | All other content | **Rich markdown prose** — GFM |
 
 The system prompt (injected by the platform) instructs the model to prefer structured outputs — Vega-Lite for metrics and trends, Mermaid for relationships and flows, data tables for entity lists — over prose equivalents when the data supports it.
 
@@ -25,6 +26,7 @@ The system prompt (injected by the platform) instructs the model to prefer struc
 | Content type | Trigger | Typical use cases |
 |-------------|---------|------------------|
 | Prose / markdown | Default | Explanations, summaries, narrative answers |
+| Custom host renderer | Registered `trigger` tag | Host-defined domain-specific visualisations (risk gauges, compliance scorecards, Gantt views, org charts) |
 | Mermaid diagram | ` ```mermaid ` | Entity relationships, process flows, system dependencies, hierarchies |
 | Vega-Lite chart | ` ```vega-lite ` | Metrics, trends, distributions, comparisons |
 | Math expression | ` ```math ` / `$$...$$` / `$...$` | Scoring formulas, ratios, statistical expressions, metric definitions |
@@ -32,6 +34,101 @@ The system prompt (injected by the platform) instructs the model to prefer struc
 | Data table | ` ```csv ` / ` ```table ` | Multi-row query results, lists, comparison tables |
 | Tool call disclosure | Automatic | All MCP tool invocations — always visible, collapsed by default |
 | Syntax code | All other fenced blocks | SQL, Python, YAML, shell, TypeScript |
+
+---
+
+## Custom host renderers
+
+Host applications may register custom content renderers in the `renderers` section of their application config (see [00-host-application-config.md](./00-host-application-config.md)). When the model produces a fenced block tagged with a registered `trigger`, the platform loads and invokes the host's renderer module.
+
+### Module loading
+
+Renderer modules are **ES modules** loaded once per session when the first block matching their trigger arrives. The platform loads the module using a dynamic `import()` from the registered `moduleUrl`. Modules are cached for the session lifetime — they are not re-fetched on each block.
+
+The module must export a **renderer class** (or factory function returning an object) that implements the following interface:
+
+```typescript
+interface HostRenderer {
+  // Called once per content block after the full fenced block content is received.
+  // `container` is a plain HTMLElement inside a shadow root — render freely within it.
+  render(container: HTMLElement, content: string, context: RendererContext): void | Promise<void>;
+
+  // Optional — called when the rendered element is removed from the DOM.
+  dispose?(): void;
+}
+
+interface RendererContext {
+  tenantId:    string;                    // the current tenant
+  conversationId: string;                 // the current conversation
+  turnId:      string;                    // the turn this block belongs to
+  trigger:     string;                    // the fenced block tag that matched
+  themeTokens: Record<string, string>;    // host brand CSS custom properties (e.g. "--color-primary")
+}
+```
+
+The platform instantiates the renderer class once per content block, passes the full fenced block content as a string to `render()`, and calls `dispose()` when the block leaves the DOM (e.g. conversation navigation, component unmount).
+
+### Isolation
+
+Each rendered block's `container` is the interior of a **shadow root** — the renderer's DOM and styles are isolated from the platform UI and from other rendered blocks. The renderer may use any DOM APIs available to the module. It may not access the platform's internal state, the user's JWT, or other conversations.
+
+### Streaming behaviour
+
+Custom renderers receive the **full fenced block content** after `content_block_stop` — they cannot stream incrementally. While the block is buffering, the platform shows a loading skeleton in place of the renderer output. The skeleton is replaced by the rendered output on receipt.
+
+### System prompt guidance injection
+
+For each registered renderer, the platform injects the renderer's `systemPromptGuidance` (or a generated fallback) into the system prompt at session start. This tells the model when and how to produce the custom content type:
+
+```
+[Custom content types]
+{renderer.name}: {renderer.systemPromptGuidance}
+```
+
+All registered renderer guidance blocks are appended together in the order they appear in the `renderers` config array. They are injected after tool descriptions and before memory blocks in the assembled system prompt.
+
+### Fallback behaviour
+
+If the renderer module fails to load, or if `render()` throws, the platform:
+
+1. Logs the error to the improvement signal pipeline
+2. Renders the fenced block content as a **syntax-highlighted code block** (priority 8)
+3. Shows an inline notice beneath the block: *"[Renderer name] could not render this content. Showing raw output."*
+
+The fallback is transparent to the user and non-blocking — the rest of the response continues rendering normally.
+
+### Artefact tray
+
+Custom-rendered blocks are added to the artefact tray as downloadable raw content (the fenced block source, stored as plain text with the trigger name as the format label). The renderer name and trigger are shown in the tray entry. If the renderer exposes a `getExportBlob?(): Promise<Blob>` method, the platform calls it on download and uses the returned blob in preference to the raw source — allowing the renderer to export a rendered image or structured file.
+
+### Example: risk gauge renderer
+
+Given the config:
+
+```json
+{
+  "id":      "risk-gauge",
+  "trigger": "risk-gauge",
+  "name":    "Risk Gauge",
+  "moduleUrl": "https://cdn.acme.com/ai-renderers/risk-gauge.js",
+  "systemPromptGuidance": "Use a ```risk-gauge block when asked for a risk score. The block must contain JSON: { \"score\": <0–100>, \"label\": \"<text>\", \"breakdown\": [ { \"factor\": \"<name>\", \"score\": <0–100> } ] }."
+}
+```
+
+The model produces:
+
+````
+```risk-gauge
+{ "score": 72, "label": "Medium-High", "breakdown": [
+    { "factor": "Data quality", "score": 80 },
+    { "factor": "Ownership coverage", "score": 55 },
+    { "factor": "Policy compliance", "score": 90 }
+  ]
+}
+```
+````
+
+The platform calls `RiskGaugeRenderer.render(container, content, context)`. The renderer parses the JSON and renders a gauge widget into `container`. The raw JSON is stored in the artefact tray.
 
 ---
 
