@@ -1,8 +1,24 @@
-# 16 — Embedding and Web Component
+# 16 — Embedding and Web Component (Mode 2 — Inline Page)
+
+## Scope of this document
+
+This document covers the **`<ai-chat>` component** — the inline page embedding mode (Mode 2). It is the complete, full-featured conversation interface for use on dedicated assistant pages or embedded content sections.
+
+The AI Chat Platform has three distinct embedding modes. For the full picture, see [18-entry-points-and-embedding-modes.md](./18-entry-points-and-embedding-modes.md):
+
+| Mode | Component | Description |
+|------|-----------|-------------|
+| **1 — Floating Widget** | `<ai-chat-widget>` | FAB + collapsible mini/full panel, persists across pages |
+| **2 — Inline Page** | `<ai-chat>` | This document — full three-zone layout embedded in a page |
+| **3 — Form Field Assist** | `<ai-chat-field>` | Ephemeral contextual popover scoped to a form field |
+
+Modes 1 and 2 share conversation history. Mode 3 is ephemeral and fully independent.
+
+---
 
 ## Overview
 
-The AI Chat Platform is delivered as a **custom HTML element** (`<ai-chat>`) that host applications embed within their own UI. The component is self-contained — it manages its own state, handles streaming, renders content, and communicates with the platform API independently of the host application's framework.
+The `<ai-chat>` component is a **custom HTML element** that host applications embed within their own UI. The component is self-contained — it manages its own state, handles streaming, renders content, and communicates with the platform API independently of the host application's framework.
 
 Host applications include the component script once and configure it via HTML attributes and a JavaScript API. No framework-specific adapters are required; the component works in any modern web environment.
 

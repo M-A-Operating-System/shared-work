@@ -48,8 +48,9 @@ Start at `00` and read through in sequence. Each document assumes you have read 
 | 13 | [13-mcp-tool-registry.md](./13-mcp-tool-registry.md) | Per-tenant tool registry, tool registration, relationship to complementary MCP services |
 | 14 | [14-success-metrics.md](./14-success-metrics.md) | Platform-level and application-level metrics, definitions, and targets |
 | 15 | [15-memory-and-recall.md](./15-memory-and-recall.md) | Personal memory, application context, recall scope |
-| 16 | [16-embedding-and-web-component.md](./16-embedding-and-web-component.md) | Web component API, authentication bridge, CSP, sizing |
+| 16 | [16-embedding-and-web-component.md](./16-embedding-and-web-component.md) | `<ai-chat>` web component API (Mode 2 — Inline Page): attributes, events, authentication bridge, CSP, sizing |
 | 17 | [17-complementary-mcp-services.md](./17-complementary-mcp-services.md) | MCP Repository and MCP Resources — ecosystem services that complement the platform |
+| 18 | [18-entry-points-and-embedding-modes.md](./18-entry-points-and-embedding-modes.md) | All three embedding modes: Floating Widget, Inline Page, and Form Field Assist |
 | — | [ROADMAP.md](./ROADMAP.md) | Planned enhancements beyond the current release |
 
 ---
@@ -69,6 +70,9 @@ Start at `00` and read through in sequence. Each document assumes you have read 
 | **Authentication bridge** | The mechanism by which the host application passes the authenticated user's identity and claims to the web component |
 | **MCP Repository** | A complementary platform service providing a discoverable registry of available MCP tools that tenants can browse and register |
 | **MCP Resources Service** | A complementary platform service providing centralised skills, static resources, and reusable prompt artifacts across the MCP ecosystem |
+| **`<ai-chat>`** | Mode 2 web component — full inline assistant embedded in a host app page |
+| **`<ai-chat-widget>`** | Mode 1 web component — floating FAB that expands to a mini/full chat panel; persists across pages |
+| **`<ai-chat-field>`** | Mode 3 web component — ephemeral contextual assist scoped to a single form field |
 
 ---
 
