@@ -92,7 +92,7 @@ When the context window reaches **80%**, the platform **automatically summarises
 | Element | Behaviour |
 |---------|----------|
 | What gets summarised | Oldest turns first — the earliest 40% of turns are summarised; the most recent 60% are always kept verbatim in the context window |
-| Summary model | A separate **Claude Haiku 4.5** API call generates the summary before the next user turn is processed |
+| Summary model | A separate **fast-tier model** API call generates the summary before the next user turn is processed |
 | Summary format | Structured: **Key entities discussed** · **Key findings** · **Decisions or conclusions reached** · **Unresolved questions** |
 | Visibility | A **condensation marker** is inserted in the conversation thread: *"↑ N turns summarised — [tap to expand]"* |
 | Expansion | Tapping the marker shows the full structured summary inline |
@@ -111,11 +111,15 @@ At any point, the user may start a new conversation thread from the current cont
 
 ### Model context limits
 
-| Model | Context window | Warning threshold |
-|-------|---------------|------------------|
-| Claude Haiku 4.5 | 200K tokens | 160K tokens (80%) |
-| Claude Sonnet 4.6 | 200K tokens | 160K tokens (80%) |
-| Claude Opus 4.7 | 200K tokens | 160K tokens (80%) |
+Context window sizes are determined by the configured AI provider and model tier. The 80% warning threshold applies regardless of context size.
+
+| Model tier | Typical context window | Warning threshold |
+|------------|----------------------|------------------|
+| Fast | Provider-specific — refer to provider documentation | 80% of context window |
+| Standard | Provider-specific | 80% of context window |
+| Powerful | Provider-specific | 80% of context window |
+
+The platform queries the active model's context limit at session start and calculates the warning threshold dynamically. Summarisation triggers at 80% of whatever the active model's window is — no manual threshold configuration is needed.
 
 ---
 

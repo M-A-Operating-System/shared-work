@@ -28,7 +28,7 @@ Typing `@` anywhere in the input opens a **scoped typeahead panel** that filters
 
 ### Bindable types
 
-Bindable types are entirely host-configured. The platform provides the typeahead mechanism; the host defines what can be bound via the `bindableTypes` section of the application config (see [00-host-application-config.md](./00-host-application-config.md)).
+Bindable types are entirely host-configured. The platform provides the typeahead mechanism; the host defines what can be bound via the `bindableTypes` section of the application config (see [01-host-application-config.md](./01-host-application-config.md)).
 
 Examples of host-configured bindable types:
 

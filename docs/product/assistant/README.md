@@ -32,8 +32,8 @@ Start at `00` and read through in sequence. Each document assumes you have read 
 
 | # | Document | Purpose |
 |---|----------|---------|
-| 00 | [00-host-application-config.md](./00-host-application-config.md) | The JSON config schema every host application provides — the single most important document |
-| 01 | [01-overview.md](./01-overview.md) | Vision, what the platform is and is not, scope |
+| 00 | [00-overview.md](./00-overview.md) | Vision, what the platform is and is not, scope — **start here** |
+| 01 | [01-host-application-config.md](./01-host-application-config.md) | The JSON config schema every host application provides — the single most important reference for host developers |
 | 02 | [02-personas-and-journeys.md](./02-personas-and-journeys.md) | Platform-level and application-level user archetypes and journeys |
 | 03 | [03-design-principles.md](./03-design-principles.md) | Nine governing principles that take precedence over any feature decision |
 | 04 | [04-conversation-management.md](./04-conversation-management.md) | Conversation model, branching, search, context window management |

@@ -29,7 +29,7 @@ All conversation content is retained in full at write time. Nothing is reconstru
 | Tool call log | Tool name, input parameters, response payload, latency, success/error per invocation |
 | Attached input files | Full binary stored in platform object storage |
 | Output artefacts | Full content stored in turn record |
-| Model version | Exact model string (e.g. `claude-sonnet-4-6-20260501`) |
+| Model version | Exact provider model string (e.g. `provider-name:model-id:version`) and resolved tier (`fast` / `standard` / `powerful`) |
 | Token counts | Input, output, cache read, cache write — per turn and running session totals |
 | Improvement signals | Detected signals with confidence score and lifecycle status |
 | Author | `user_id` FK on every turn (critical for shared conversations) |

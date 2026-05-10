@@ -71,7 +71,7 @@ Items are never permanently deleted — the record is retained with `status = ar
 
 1. User opens the conversation picker (full-text search across their conversation history)
 2. User selects a past conversation
-3. A dedicated **Claude Haiku 4.5** call analyses the selected conversation using a structured extraction prompt — it identifies discrete, self-contained statements of user context worth persisting (role declarations, expressed preferences, corrections made, constraints stated)
+3. A dedicated **fast-tier model** call analyses the selected conversation using a structured extraction prompt — it identifies discrete, self-contained statements of user context worth persisting (role declarations, expressed preferences, corrections made, constraints stated)
 4. The assistant presents a **review panel** showing each proposed item with: suggested text, suggested category, estimated token cost, and source conversation reference
 5. User accepts, edits, or discards each proposal **individually** — there is no bulk accept
 6. Accepted items are saved as Active; discarded proposals are not stored

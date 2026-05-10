@@ -39,7 +39,7 @@ The system prompt (injected by the platform) instructs the model to prefer struc
 
 ## Custom host renderers
 
-Host applications may register custom content renderers in the `renderers` section of their application config (see [00-host-application-config.md](./00-host-application-config.md)). When the model produces a fenced block tagged with a registered `trigger`, the platform loads and invokes the host's renderer module.
+Host applications may register custom content renderers in the `renderers` section of their application config (see [01-host-application-config.md](./01-host-application-config.md)). When the model produces a fenced block tagged with a registered `trigger`, the platform loads and invokes the host's renderer module.
 
 ### Module loading
 

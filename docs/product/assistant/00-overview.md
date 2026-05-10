@@ -85,8 +85,8 @@ The platform has no end-user-facing name. Every tenant names their own assistant
 │                                                              │
 │  ┌─────────────────┐   ┌──────────────────────────────────┐  │
 │  │  Conversation   │   │  AI Provider Edge Function        │  │
-│  │  Engine         │◀──│  (Anthropic Claude, provider-     │  │
-│  │                 │   │   agnostic abstraction)           │  │
+│  │  Engine         │◀──│  (provider-agnostic abstraction;  │  │
+│  │                 │   │   fast / standard / powerful tier)│  │
 │  └────────┬────────┘   └──────────────────────────────────┘  │
 │           │                                                  │
 │  ┌────────▼────────┐   ┌──────────────────────────────────┐  │
@@ -121,7 +121,7 @@ The platform has no end-user-facing name. Every tenant names their own assistant
 
 | Dependency | Role |
 |------------|------|
-| **AI provider** | v1: Anthropic Claude (Sonnet 4.6 default, Opus 4.7, Haiku 4.5). Architecture is provider-agnostic; OpenAI and Gemini are planned follow-on providers. |
+| **AI provider** | Provider-agnostic abstraction exposing three model tiers: `fast`, `standard` (default), `powerful`. The platform maps tiers to the tenant's configured provider's current models. Multiple providers planned — see [ROADMAP.md](./ROADMAP.md). |
 | **Platform storage** | Relational database with row-level security for conversation records; object storage for binary artefacts. |
 | **Platform edge function** | JWT handling, AI provider API request construction, SSE stream passthrough, MCP call routing. Provider-agnostic interface. |
 | **Host authentication** | The host application issues JWTs for its users. The platform validates these tokens and trusts the embedded claims. No re-authentication is performed by the platform. |

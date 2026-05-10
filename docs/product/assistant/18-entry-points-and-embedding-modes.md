@@ -50,7 +50,7 @@ The mini state is a compact, non-blocking chat panel anchored above the FAB. Def
 │  [User message]                      │
 │                                      │
 ├──────────────────────────────────────┤
-│  [📎] [⚙] [✦ Sonnet]  [input…] [→]  │  ← Input area (compact)
+│  [📎] [⚙] [✦ Standard]  [input…] [→]  │  ← Input area (compact)
 └──────────────────────────────────────┘
 ```
 

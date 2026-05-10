@@ -314,8 +314,8 @@ The `moduleUrl` origin must be declared during tenant registration (or updated v
 ```json
 {
   "models": {
-    "defaultModel":  "claude-sonnet-4-6",
-    "allowedModels": ["claude-sonnet-4-6", "claude-opus-4-7", "claude-haiku-4-5"],
+    "defaultModel":  "standard",
+    "allowedModels": ["fast", "standard", "powerful"],
     "userCanSwitch": true,
     "provider":      "anthropic"
   }
@@ -324,10 +324,10 @@ The `moduleUrl` origin must be declared during tenant registration (or updated v
 
 | Field | Required | Description |
 |-------|----------|-------------|
-| `defaultModel` | Yes | Model used for new conversations unless the user switches |
-| `allowedModels` | Yes | Array of model IDs users may switch to. Must include `defaultModel`. |
-| `userCanSwitch` | No | Whether users can switch models mid-conversation (default: `true`). Set to `false` to lock all sessions to `defaultModel`. |
-| `provider` | Yes | AI provider identifier. v1 supports `anthropic` only. Planned: `openai`, `gemini`. |
+| `defaultModel` | Yes | Model tier used for new conversations unless the user switches. Accepted values: `"fast"`, `"standard"`, `"powerful"`. See [06-model-configuration.md](./06-model-configuration.md) for tier profiles. |
+| `allowedModels` | Yes | Array of model tiers users may switch to. Must include `defaultModel`. |
+| `userCanSwitch` | No | Whether users can switch model tier mid-conversation (default: `true`). Set to `false` to lock all sessions to `defaultModel`. |
+| `provider` | Yes | AI provider identifier. The platform maps tier names to the provider's current models. Multiple providers planned — see [ROADMAP.md](./ROADMAP.md). |
 
 ---
 

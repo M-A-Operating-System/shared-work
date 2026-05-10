@@ -4,31 +4,36 @@
 
 The AI Chat Platform is designed to be **AI provider-agnostic**. The model provider is abstracted behind the platform's edge function layer — the conversational surface, MCP tool access, `@`-binding resolution, and audit trail are identical regardless of which AI provider is active for a tenant.
 
-| Release | Provider | Models |
-|---------|---------|--------|
-| **v1 (current)** | Anthropic Claude | Sonnet 4.6 (default), Opus 4.7, Haiku 4.5 |
-| **Planned** | OpenAI | GPT-4o and successors |
-| **Planned** | Google | Gemini Pro and successors |
+| Release | Provider examples |
+|---------|-----------------|
+| **v1 (current)** | One AI provider configured per tenant — host selects from the platform's supported providers at tenant registration |
+| **Planned** | Multiple providers available for selection; model capability parity validated across providers before enablement |
 
-The provider abstraction means host applications will eventually be able to select provider as well as model. In v1, only Claude models are available. The provider is configured per tenant in the `models.provider` field of the application config.
+The provider abstraction means host applications select provider as well as model tier at the tenant level. The conversational surface, MCP tool access, `@`-binding resolution, and audit trail are identical regardless of which provider is active. See [ROADMAP.md](./ROADMAP.md) for the multi-provider timeline.
+
+---
+
+## Model tiers
+
+The platform exposes three **model tiers** that host applications configure in their `models` section. Each tier maps to the configured provider's appropriate model — the host config uses tier names, not provider-specific model IDs.
+
+| Tier | Config value | Profile | Typical use |
+|------|-------------|---------|------------|
+| **Standard** | `"standard"` | Default — balanced capability and speed | General queries, data lookup, summaries, diagram generation |
+| **Powerful** | `"powerful"` | Maximum capability, higher latency and cost | Complex multi-entity reasoning, cross-domain analysis, large document analysis |
+| **Fast** | `"fast"` | Fastest, lowest latency and cost | Quick lookups, simple factual answers, Display ID resolution |
+
+The platform maps each tier to the provider's current best-fit model at the time of session start. When the provider releases a new model, the platform updates the tier mapping — host application configs do not need to change.
 
 ---
 
 ## Model switching
 
-Users may switch the active model at any point in a conversation. The switch takes effect on the **next turn** — it does not re-process previous turns.
+Users may switch the active model tier at any point in a conversation. The switch takes effect on the **next turn** — it does not re-process previous turns.
 
-The host-configured system prompt, MCP tool access, and `@`-binding resolutions are identical across all models within the active provider.
+The host-configured system prompt, MCP tool access, and `@`-binding resolutions are identical across all tiers within the active provider.
 
-Host applications configure the allowed model set and default model in the `models` section of the application config. Users can only switch to models in the `allowedModels` list. Setting `userCanSwitch: false` locks all sessions to the `defaultModel`.
-
-### v1 available models (Anthropic Claude)
-
-| Model | Profile | Typical use |
-|-------|---------|------------|
-| **Claude Sonnet 4.6** | Default — balanced capability and speed | General queries, entity lookup, domain summaries, diagram generation |
-| **Claude Opus 4.7** | Maximum capability, higher latency | Complex multi-entity reasoning, cross-domain analysis, large document analysis |
-| **Claude Haiku 4.5** | Fastest, lowest latency | Quick lookups, simple factual answers, Display ID resolution |
+Host applications configure the allowed tiers and default tier in the `models` section of the application config. Users can only switch to tiers in the `allowedModels` list. Setting `userCanSwitch: false` locks all sessions to the `defaultModel` tier.
 
 ### Model UI
 
@@ -47,7 +52,7 @@ The active model and any opt-in MCP tools apply to the session as a whole. The u
 
 The model's communication style and verbosity are driven by **claims in the user's authenticated JWT** — not a chat-specific setting. This keeps the assistant experience consistent with the rest of the host application, where user preferences are already managed.
 
-Host applications configure which JWT claim fields map to style and verbosity, and define the prompt text for each value, in the `userProfile` section of the application config (see [00-host-application-config.md](./00-host-application-config.md)).
+Host applications configure which JWT claim fields map to style and verbosity, and define the prompt text for each value, in the `userProfile` section of the application config (see [01-host-application-config.md](./01-host-application-config.md)).
 
 ### Example style definitions
 

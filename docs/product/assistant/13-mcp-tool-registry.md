@@ -43,7 +43,7 @@ The registry is the `mcpServers` array in the application config. Each entry:
 
 The `enabled` field allows stubs to be added before an endpoint is production-ready. Setting `enabled: false` keeps the entry in the config but excludes it from session resolution — the tool does not appear in the tool selection panel and its description is never injected.
 
-Full field reference is in [00-host-application-config.md — mcpServers](./00-host-application-config.md).
+Full field reference is in [01-host-application-config.md — mcpServers](./01-host-application-config.md).
 
 ---
 
@@ -81,7 +81,7 @@ Servers may be added as `enabled: false` stubs before their endpoint is ready. T
 
 ## Versioning
 
-Tool registry changes are versioned as part of the overall application config (see [00-host-application-config.md — Config versioning](./00-host-application-config.md)):
+Tool registry changes are versioned as part of the overall application config (see [01-host-application-config.md — Config versioning](./01-host-application-config.md)):
 
 | Change | Config version increment |
 |--------|--------------------------|

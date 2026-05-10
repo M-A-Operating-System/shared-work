@@ -2,7 +2,7 @@
 
 ## Host-registered MCP servers
 
-The AI Chat Platform has **no built-in always-on tool**. Every MCP server available in a session is registered by the host application in the `mcpServers` section of the application config (see [00-host-application-config.md](./00-host-application-config.md)).
+The AI Chat Platform has **no built-in always-on tool**. Every MCP server available in a session is registered by the host application in the `mcpServers` section of the application config (see [01-host-application-config.md](./01-host-application-config.md)).
 
 Host teams can discover available MCP tools via the **MCP Repository** complementary service before registering them (see [17-complementary-mcp-services.md](./17-complementary-mcp-services.md)).
 
