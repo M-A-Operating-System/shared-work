@@ -97,6 +97,8 @@ Start at `00` and read through in sequence. Each document assumes you have read 
 - Shared conversations with equal-participant model (max 10 users); sharing scoped to users within the same tenant
 - Personal memory (user-managed) and application context (Application Admin-managed)
 - Session artefact tray accumulating all input and output artefacts
+- Document canvas — iteratable working-document surface in the right panel; versioned, editable, model-revisable
+- Real-time web search via the Web Search complementary MCP service (host-registered, opt-in)
 - Three-zone layout (history panel, conversation area, conversation panel) embedded within host app UI
 - Rich content rendering: Mermaid diagrams, Vega-Lite charts, JSON inspector, data tables, syntax-highlighted code, prose markdown, math (KaTeX)
 - Inline source citations linking to MCP tool call disclosure cards
@@ -111,7 +113,7 @@ Start at `00` and read through in sequence. Each document assumes you have read 
 - Voice or multimodal input
 - Context globbing (pulling context from multiple past conversations into one session)
 - Incognito / temporary chat (no-history mode) — conflicts with audit completeness
-- Web search (real-time internet retrieval)
+- Platform-owned web search — available via the Web Search complementary MCP service registered by the host
 - Image or content generation
 - Code execution sandbox
 - Public shareable links — all sharing is participant-controlled and tenant-scoped

@@ -8,16 +8,19 @@ The rendering engine evaluates each content block in an assistant response in pr
 |----------|---------|------------|
 | 1 | Tool call event (`mcp_tool_use` / `mcp_tool_result`) | **Tool Call Disclosure** card |
 | 2 | Fenced block tag matching a registered host renderer (`renderers[].trigger`) | **Custom host renderer** — host-provided ES module; see below |
-| 3 | Fenced block tagged ` ```mermaid ` | **Mermaid diagram** — SVG, expandable, exportable |
-| 4 | Fenced block tagged ` ```vega-lite ` | **Vega-Lite chart** — interactive, responsive |
-| 5 | Fenced block tagged ` ```math ` or `$$...$$` display block | **Math expression** — KaTeX rendered display block |
-| 6 | Fenced block tagged ` ```json ` | **JSON inspector** — collapsible tree, copy-to-clipboard |
-| 7 | Fenced block tagged ` ```csv ` or ` ```table ` | **Data table** — sortable, filterable, paginated, CSV export |
-| 8 | Any other fenced block | **Syntax-highlighted code** — Prism, copy-to-clipboard, line numbers > 5 lines |
-| 9 | Inline `$...$` within prose | **Inline math** — KaTeX rendered inline |
-| 10 | All other content | **Rich markdown prose** — GFM |
+| 3 | Fenced block tagged ` ```document ` | **Document canvas** — opens in right panel canvas; reference card in thread |
+| 4 | Fenced block tagged ` ```mermaid ` | **Mermaid diagram** — SVG, expandable, exportable |
+| 5 | Fenced block tagged ` ```vega-lite ` | **Vega-Lite chart** — interactive, responsive |
+| 6 | Fenced block tagged ` ```math ` or `$$...$$` display block | **Math expression** — KaTeX rendered display block |
+| 7 | Fenced block tagged ` ```json ` | **JSON inspector** — collapsible tree, copy-to-clipboard |
+| 8 | Fenced block tagged ` ```csv ` or ` ```table ` | **Data table** — sortable, filterable, paginated, CSV export |
+| 9 | Any other fenced block | **Syntax-highlighted code** — Prism, copy-to-clipboard, line numbers > 5 lines |
+| 10 | Inline `$...$` within prose | **Inline math** — KaTeX rendered inline |
+| 11 | All other content | **Rich markdown prose** — GFM |
 
-The system prompt (injected by the platform) instructs the model to prefer structured outputs — Vega-Lite for metrics and trends, Mermaid for relationships and flows, data tables for entity lists — over prose equivalents when the data supports it.
+The system prompt (injected by the platform) instructs the model to:
+- Prefer structured outputs — Vega-Lite for metrics and trends, Mermaid for relationships and flows, data tables for entity lists — over prose equivalents when the data supports it
+- Use `document` blocks for substantial prose outputs (reports, summaries, plans, policy drafts, analyses) where the user is likely to iterate across multiple turns rather than simply read once
 
 ---
 
@@ -26,6 +29,7 @@ The system prompt (injected by the platform) instructs the model to prefer struc
 | Content type | Trigger | Typical use cases |
 |-------------|---------|------------------|
 | Prose / markdown | Default | Explanations, summaries, narrative answers |
+| Document canvas | ` ```document ` | Reports, policy drafts, structured summaries, plans — any substantial prose the user will iterate on |
 | Custom host renderer | Registered `trigger` tag | Host-defined domain-specific visualisations (risk gauges, compliance scorecards, Gantt views, org charts) |
 | Mermaid diagram | ` ```mermaid ` | Entity relationships, process flows, system dependencies, hierarchies |
 | Vega-Lite chart | ` ```vega-lite ` | Metrics, trends, distributions, comparisons |

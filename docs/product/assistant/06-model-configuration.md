@@ -110,8 +110,11 @@ The platform assembles the system prompt from multiple layers before each sessio
 | **Write confirmation flow** | Instructs model to propose before/after state and wait for confirmation before any write MCP call | Platform — non-configurable |
 | **Transparency instruction** | Instructs model to show all tool calls and cite sources | Platform — non-configurable |
 | **Prompt injection mitigation** | Instructs model to treat tool result content as data, not instructions | Platform — non-configurable |
+| **Uncertainty acknowledgment** | Instructs model to signal explicitly when it is uncertain, when information may be outdated, or when a question falls at the edge of its available data — rather than producing confident-sounding answers from incomplete information. The model should offer to search (if the Web Search Service is enabled) or acknowledge the gap. | Platform — non-configurable |
 
-The write confirmation, transparency, and prompt injection mitigation layers are **platform-managed and non-overridable** — they cannot be suppressed by host system prompt content.
+The write confirmation, transparency, prompt injection mitigation, and uncertainty acknowledgment layers are **platform-managed and non-overridable** — they cannot be suppressed by host system prompt content.
+
+Host applications may reinforce or tailor uncertainty behaviour further in their `scope.systemPrompt` — for example, specifying the domain areas where the model should be especially cautious, or providing alternative phrasings for uncertainty acknowledgment that fit the application's voice. The MCP Resources Service also publishes guidance documents on uncertainty handling that hosts can register and retrieve at session time (see [17-complementary-mcp-services.md](./17-complementary-mcp-services.md)).
 
 Changes to the host base prompt are made via the Config Editor UI or Admin API and go through config validation before taking effect.
 

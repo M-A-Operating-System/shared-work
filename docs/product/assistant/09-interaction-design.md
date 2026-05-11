@@ -8,7 +8,7 @@ The AI Chat Platform is delivered as an `<ai-chat>` web component that host appl
 |------|--------------------------|---------|
 | **History panel** | Left sidebar | Conversation list — **My Conversations** and **Shared With Me** (reverse-chronological); conversation search; pinned conversations; new conversation button; workflow library access |
 | **Conversation area** | Centre — primary | Message thread, streaming responses, rendered content, input area |
-| **Conversation panel** | Right sidebar | Attachments and artefacts for the current conversation; participant list and share management; session token summary |
+| **Conversation panel** | Right sidebar | **Canvas** (active when a document is open for iteration); attachments and artefacts; participant list and share management; session token summary |
 
 ### Why three zones (not four)
 
@@ -22,14 +22,16 @@ When clicked, a workflow from the library opens a parameter form (if the workflo
 
 ### Conversation panel (right sidebar) detail
 
-The right panel is scoped entirely to the **active conversation** — it changes when the user switches conversations.
+The right panel is scoped entirely to the **active conversation** and switches between two primary modes via a tab strip at the top:
 
-| Section | Contents |
-|---------|---------|
-| **Attachments** | All documents and images attached to the current conversation, in submission order; file name, type, turn back-link |
-| **Artefacts tray** | All output artefacts generated in the current conversation; badge count on panel tab |
-| **Participants** | Participant list (shared conversations); invite control; leave / remove actions |
-| **Session summary** | Running token totals (`14 turns · 18,430 tokens`) with tooltip expanding to input / output / cached breakdown |
+| Tab | Contents | When active |
+|-----|---------|-------------|
+| **Canvas** | The active working document — editable, versioned, iteratable | Whenever a canvas document is open in the conversation |
+| **Attachments & Artefacts** | All input documents and output artefacts in submission order | Always available |
+| **Participants** | Participant list (shared conversations); invite control; leave / remove actions | Always available |
+| **Session summary** | Running token totals (`14 turns · 18,430 tokens`) with tooltip expanding to input / output / cached breakdown | Always available |
+
+When a canvas document is opened, the panel automatically switches to the **Canvas** tab. Switching to another tab does not close the canvas — the document remains active and the model retains its context.
 
 ---
 
@@ -216,6 +218,145 @@ Each tray entry shows:
 - Preview link
 
 Users may **rename** tray entries. A **"Download all"** control packages all artefacts as a zip archive.
+
+Canvas documents in the artefact tray carry an additional **"Open in canvas"** action that re-opens the document in the canvas panel for further editing, regardless of which turn produced it.
+
+---
+
+## Document canvas
+
+The canvas is the platform's working-document surface — a persistent, editable panel where the model and user collaborate iteratively on a document across multiple turns, rather than treating each AI response as a disposable message.
+
+### What opens in canvas
+
+The model uses a ` ```document ` fenced block to produce canvas-eligible output. The platform's non-overridable system prompt layer instructs the model to use `document` blocks for substantial, document-like prose outputs — reports, summaries, plans, policy drafts, specifications, structured analyses — where the user is likely to want to refine rather than simply read and move on.
+
+Non-prose outputs (Mermaid diagrams, Vega-Lite charts, data tables, code blocks, JSON) remain as inline thread content and artefact tray entries. They do not open in canvas.
+
+Users may also manually promote any text artefact in the tray to canvas by clicking **"Open in canvas"** on that tray entry.
+
+### Canvas panel layout
+
+```
+┌─────────────────────────────────────────┐
+│ [Document title — editable]    v3  [ ↗ ]│  ← Header: title + version + full-screen
+├───────────────────────────────────────┬─┤
+│ [Toolbar: Edit | Copy | Download]     │ │
+├───────────────────────────────────────┤ │
+│                                       │ │
+│  The canvas document content renders  │ │
+│  here as styled markdown. In Edit     │ │
+│  mode, becomes a live text editor.    │ │
+│                                       │ │
+│                                       │ │
+└───────────────────────────────────────┴─┘
+```
+
+| Element | Behaviour |
+|---------|----------|
+| **Document title** | Auto-generated from document content; editable inline by clicking |
+| **Version indicator** | Shows current version (v1, v2 …); clicking opens a version history dropdown listing every model-generated and user-edited version with timestamp. Selecting a prior version restores it as a new version (no destructive overwrites). |
+| **Full-screen toggle** | Expands canvas to fill the component mount point; the conversation area collapses to a narrow strip. Second click restores the split layout. |
+| **Edit mode** | Clicking **Edit** transforms the canvas from a read-only rendered view into a live markdown editor. User edits are saved immediately as a new version. Exiting edit mode re-renders the markdown. |
+| **Copy** | Copies the full markdown source to the clipboard |
+| **Download** | Downloads the document as `.md` (default), `.txt`, or `.pdf` (platform-rendered) |
+
+### In-thread reference card
+
+When the model produces a `document` block, the conversation thread shows a compact **reference card** in place of the full content:
+
+```
+┌────────────────────────────────────────┐
+│ 📄  Q2 Governance Summary              │
+│     Report · 1,240 words               │
+│                           [Open canvas →] │
+└────────────────────────────────────────┘
+```
+
+The full document is in the canvas panel — it is not rendered inline in the thread. This keeps the conversation thread scannable and avoids large content blocks interrupting the exchange.
+
+### Model-assisted revision
+
+When a canvas document is open, the platform automatically includes the current canvas content in the model's context:
+
+```
+[Canvas document — Q2 Governance Summary]
+{full document markdown}
+[End canvas document]
+```
+
+The user can ask the model to revise the document in natural language: *"Shorten the executive summary to two sentences"*, *"Add a risks section after the findings"*, *"Rewrite this in a more formal tone"*. The model responds with a new `document` block containing the full revised document, which replaces the canvas content and is saved as a new version. The model's reply in the conversation thread confirms what changed: *"Updated — shortened the executive summary and added a risks section."*
+
+### Multiple canvases
+
+A conversation may produce more than one canvas document. Each is a separate tab within the canvas panel, ordered by creation time. The active tab is the most recently updated document.
+
+### Canvas in Mode 1 (floating widget)
+
+The canvas panel is only available in **full state**. In the mini state, canvas documents show as reference cards in the thread with an *"Expand for canvas view ↗"* note. Transitioning to full state opens the canvas panel for the active document.
+
+### Canvas and the artefact tray
+
+All canvas document versions are stored in the artefact tray as versioned entries. The tray shows the latest version with a version count badge (e.g. `v4`). Individual versions are downloadable from the version history dropdown in the canvas panel.
+
+---
+
+## Returning user state
+
+### Mode 2 — Inline Page (`<ai-chat>`)
+
+When the component mounts and the authenticated user has prior conversation history, the **conversation area** shows a home state before opening any conversation. The home state is shown on the **first mount per browser session** — subsequent navigations to the page within the same session resume the last-active conversation directly.
+
+```
+┌─────────────────────────────────────────────────────────┐
+│  Welcome back, [name]                                   │
+│                                                         │
+│  Continue where you left off:                           │
+│  ┌──────────────────────────────────────────────────┐  │
+│  │ 📄 Q2 Governance Summary   ·  2 hours ago   [→]  │  │
+│  └──────────────────────────────────────────────────┘  │
+│                                                         │
+│  Recent                                                 │
+│  ├── Payment service audit          Yesterday           │
+│  └── Onboarding checklist review    Monday              │
+│                                                         │
+│  ┌─ Unread shared activity ─────────────────────────┐  │
+│  │ 📋 Team review session — 3 new messages          │  │
+│  └──────────────────────────────────────────────────┘  │
+│                                                         │
+│  [+ Start new conversation]                             │
+└─────────────────────────────────────────────────────────┘
+```
+
+| Element | Specification |
+|---------|--------------|
+| **Continue card** | The single most recently active conversation; single click opens it directly |
+| **Recent list** | Up to 2 further recent conversations; click to open |
+| **Unread shared activity** | Shown only if there are unread messages in shared conversations; click to open the conversation at the first unread turn |
+| **Start new conversation** | Clears to a new conversation with the onboarding welcome state (first-time) or an empty input (returning) |
+| **Trigger condition** | Shown when the user has ≥ 1 prior conversation and has not interacted with the component in the current browser session |
+| **Skip condition** | Not shown if the user is deep-linked to a specific conversation via the `initial-conversation-id` attribute |
+
+### Mode 1 — Floating Widget (`<ai-chat-widget>`)
+
+When the widget transitions from collapsed FAB to mini state for the first time in a browser session — and the user was last active more than **4 hours** ago (configurable via `widget.returningUserThreshold` in hours) — the mini panel opens to a compact returning-user card rather than resuming mid-conversation:
+
+```
+┌──────────────────────────────────────┐
+│ 🤖 Atlas                 [ ↗ ] [ × ] │
+├──────────────────────────────────────┤
+│  Welcome back                        │
+│  ┌────────────────────────────────┐  │
+│  │ Continue: Q2 Governance…  [→]  │  │
+│  └────────────────────────────────┘  │
+│  [📋 3 unread in Team review]        │
+│  [+ New conversation]                │
+├──────────────────────────────────────┤
+│  [input…]                      [→]   │
+└──────────────────────────────────────┘
+```
+
+The card auto-dismisses when the user clicks any option or starts typing in the input field. If the threshold has not been exceeded (recent session), the widget opens directly into the last conversation.
 
 ---
 

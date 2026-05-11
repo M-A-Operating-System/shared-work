@@ -167,9 +167,10 @@ The `widget` config section in the application config controls widget-level defa
 ```json
 {
   "widget": {
-    "defaultState": "collapsed",
-    "fabIcon":      "https://cdn.acme.com/atlas-icon.svg",
-    "showBadge":    true
+    "defaultState":           "collapsed",
+    "fabIcon":                "https://cdn.acme.com/atlas-icon.svg",
+    "showBadge":              true,
+    "returningUserThreshold": 4
   }
 }
 ```
@@ -179,6 +180,7 @@ The `widget` config section in the application config controls widget-level defa
 | `defaultState` | `"collapsed"` | State on first page load: `"collapsed"` or `"mini"` |
 | `fabIcon` | Assistant logo from `branding.logoUrl` | Custom icon for the FAB. 40×40px SVG or PNG. |
 | `showBadge` | `true` | Show unread badge count on FAB for shared conversation activity |
+| `returningUserThreshold` | `4` | Hours of inactivity after which the widget opens to the returning-user card instead of resuming mid-conversation. Set to `0` to always resume mid-conversation. |
 
 ---
 

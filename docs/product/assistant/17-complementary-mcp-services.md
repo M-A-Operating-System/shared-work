@@ -1,6 +1,6 @@
 # 17 — Complementary MCP Services
 
-The AI Chat Platform assumes the availability of two ecosystem-level MCP services that operate alongside the platform and host application MCP servers. These services are not owned or operated by the AI Chat Platform itself, nor by individual host applications — they are shared infrastructure within the broader MCP ecosystem. The platform is designed to work with them, and host applications are expected to benefit from them, but neither service is a hard dependency for platform operation.
+The AI Chat Platform assumes the availability of three ecosystem-level MCP services that operate alongside the platform and host application MCP servers. These services are not owned or operated by the AI Chat Platform itself, nor by individual host applications — they are shared infrastructure within the broader MCP ecosystem. The platform is designed to work with them, and host applications are expected to benefit from them, but none is a hard dependency for platform operation.
 
 ---
 
@@ -82,6 +82,7 @@ Static reference documents that apply across many host applications and are impr
 - Data privacy handling guidance for AI-assisted workflows
 - Model capability and limitation reference cards
 - Prompt engineering best practices for domain-specific applications
+- **Uncertainty handling guidance** — instructions for how the assistant should communicate the limits of its knowledge, signal when data may be outdated, and offer next steps (such as web search) when it cannot answer with confidence. This document is injected as a resource at session start by hosts that want consistent, domain-appropriate uncertainty behaviour beyond the platform's non-overridable baseline.
 
 Guidance documents are versioned by the MCP Resources Service. When retrieved in a conversation, the document version is recorded in the tool call log.
 
@@ -125,3 +126,51 @@ The MCP Resources Service is independent of the AI Chat Platform — the platfor
 - Resource retrievals are included in the tenant's MCP tool error rate metric and improvement signal pipeline
 
 If the MCP Resources Service is unavailable, it behaves like any other unavailable opt-in MCP server — an error is shown in the tool call disclosure card, and the session continues without it.
+
+---
+
+## Web Search Service
+
+### Overview
+
+The **Web Search Service** is an ecosystem-level MCP server that provides the assistant with real-time access to web search results. It is registered as a host application MCP server like any other — the distinction is that it is a shared, ecosystem-managed service rather than a server built and operated by the host team.
+
+Web search complements the platform's primary data access pattern (structured MCP tool calls against the host application's own data) in situations where current information is needed that the host's tools and the model's training knowledge cannot provide — recent news, current pricing, up-to-date documentation, or any query that requires information beyond the host application's data scope.
+
+### What the Web Search Service provides
+
+| Tool | Description |
+|------|-------------|
+| `web_search` | Executes a web search query and returns a ranked list of results: title, URL, snippet, and publication date |
+| `fetch_page` | Retrieves and extracts the readable text content of a specific URL from search results or user-provided links |
+
+Results are returned as structured MCP tool output — they appear in a tool call disclosure card and are cited inline using the platform's standard source citation mechanism (superscript numerals linking to the disclosure card). The model does not present web results as its own knowledge.
+
+### How host applications integrate the Web Search Service
+
+Host applications register the Web Search Service as an MCP server in their tenant tool registry. It is typically configured as `opt-in` — the end user enables it per session when real-time information is needed — though hosts may configure it `always-on` if their use case depends on current information in every session:
+
+```json
+{
+  "id":          "web-search",
+  "name":        "Web Search",
+  "description": "Searches the web for current information. Use when the user needs up-to-date facts, recent news, current documentation, or any information beyond the host application's data and the model's training knowledge. Always cite the source URL.",
+  "endpoint":    "https://search.mcp-ecosystem.io/mcp",
+  "authType":    "api-key",
+  "accessTier":  "opt-in",
+  "roles":       []
+}
+```
+
+The Web Search Service endpoint and API key are available from the MCP Repository. The suggested `description` field text above is optimised for system prompt injection and is published in the Repository record.
+
+### Transparency and citation
+
+Web search results follow the platform's mandatory tool call transparency rules — every search invocation and every page fetch appears as a collapsible disclosure card in the conversation thread. The model is instructed (via the platform-managed system prompt layer) to:
+- Cite all web-sourced claims with inline source citations linking to the disclosure card
+- Acknowledge when search results are recent vs. when the model is supplementing with training knowledge
+- Not present search result content as the model's own knowledge
+
+### Relationship to the platform
+
+The Web Search Service is independent of the AI Chat Platform. When unavailable, it behaves like any other unavailable MCP server — an error in the disclosure card and the session continues without it. Web results rendered as prose are subject to the platform's standard content rendering rules; results rendered as structured data (tables, lists) use the platform's data table rendering.
