@@ -5,7 +5,7 @@ Generates a single PDF from the AI Chat Platform design specification.
 Usage:
     python generate_pdf.py [output.pdf]
 
-Output defaults to ./AI-Chat-Platform-Design-Spec.pdf
+Output defaults to ./docs/product/assistant/assistant_product_design.pdf
 
 Requirements:
     pip install markdown weasyprint
@@ -18,7 +18,7 @@ from pathlib import Path
 # ---------- configuration ----------
 
 DOCS_DIR = Path(__file__).parent / "docs" / "product" / "assistant"
-DEFAULT_OUTPUT = Path(__file__).parent / "AI-Chat-Platform-Design-Spec.pdf"
+DEFAULT_OUTPUT = DOCS_DIR / "assistant_product_design.pdf"
 
 DOC_TITLE = "AI Chat Platform"
 DOC_SUBTITLE = "Product Design Specification"
