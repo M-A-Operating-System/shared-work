@@ -2,11 +2,11 @@
 
 ## Conversation model
 
-Each conversation is a **named, persistent thread** scoped to the authenticated user. Key properties:
+Each conversation is a **named, persistent thread** scoped to the authenticated user within their tenant. Key properties:
 
 - Conversations survive browser refresh and are resumable across sessions.
 - The history panel lists all past conversations in reverse-chronological order with auto-generated titles derived from the first user message.
-- Users may rename, archive, or delete conversations — subject to the retention policy minimum (see [11-audit-and-storage.md](./11-audit-and-storage.md)).
+- Users may rename, archive, or delete conversations — subject to the tenant's configured retention period (see [11-audit-and-storage.md](./11-audit-and-storage.md)).
 - Conversations are **append-only at the turn level**. No turn is ever overwritten or destroyed. Editing creates a new branched thread; the original is preserved in full.
 
 ### Conversation states
@@ -14,10 +14,10 @@ Each conversation is a **named, persistent thread** scoped to the authenticated 
 | State | Description |
 |-------|-------------|
 | **Active** | Has been interacted with in the last 30 days; appears in the default history view |
-| **Pinned** | Permanently anchored to the top of the My Conversations list regardless of recency. Any active conversation may be pinned. Maximum 5 pinned conversations. Useful for recurring governance reviews (e.g. weekly health check, open audit thread). |
+| **Pinned** | Permanently anchored to the top of the My Conversations list regardless of recency. Maximum 5 pinned conversations. Useful for recurring reviews or ongoing work threads. |
 | **Archived** | Hidden from default history view; accessible via archived filter; retains full content |
-| **Deleted** | Removed from user view; physical deletion deferred to retention expiry per DDA audit log policy |
-| **Shared** | One or more other authenticated DDA users have accepted an invitation; appears under **Shared With Me** group in history panel |
+| **Deleted** | Removed from user view; physical deletion deferred to retention expiry per tenant retention policy |
+| **Shared** | One or more other authenticated users in the same tenant have accepted an invitation; appears under **Shared With Me** group in history panel |
 | **Locked (read-only)** | Last remaining participant's account deactivated; flagged for administrative review |
 
 ---
@@ -43,21 +43,21 @@ Regeneration (resending an unchanged message for a fresh model response) follows
 
 ### Why branching, not in-place editing?
 
-> **Audit completeness (P4):** Governance platforms require a complete, reproducible record. If editing overwrote turns in place, a reviewer could not reconstruct the original query-response pair. Branching preserves both the original intent and the refined intent as independent, auditable threads.
+> **Audit completeness (P4):** Every turn is an auditable record. Overwriting turns in place would destroy the original query-response pair. Branching preserves both the original intent and the refined intent as independent, auditable threads. This design holds regardless of the host application domain.
 
 ---
 
 ## Conversation search
 
-A search field at the top of the history panel searches across all the authenticated user's conversations — personal and shared.
+A search field at the top of the history panel searches across all the authenticated user's conversations — personal and shared — within their tenant.
 
 ### Search scope
 
 | Field searched | Examples |
 |---------------|---------|
 | Conversation title | "Finance governance review" |
-| User message text | "Compare quality scores for `@{Finance Domain}`" |
-| Assistant response text | "The Finance domain has three entities with outstanding quality issues" |
+| User message text | "Compare error rates for `@{Payment Service}`" |
+| Assistant response text | "The Payment Service had three error spikes in the last hour" |
 
 ### Search behaviour
 
@@ -71,42 +71,39 @@ A search field at the top of the history panel searches across all the authentic
 
 ## Context window management
 
-Silent truncation is not permitted (P1 — governance-first transparency). The user is always informed when context is being condensed.
+Silent truncation is not permitted (P1 — transparency first). The user is always informed when context is being condensed.
 
 ### Conversation length limit
 
-A conversation may not exceed **100 turns**. This is an explicit product limit — not a technical one — chosen to keep conversations focused and auditable. At 100 turns, the conversation is closed to new input and the user is prompted to continue in a new thread (see branching above). The 100-turn history is always retained in full in the audit trail.
+A conversation may not exceed **100 turns** (configurable per tenant up to the platform maximum via `conversations.maxTurnLimit`). This is an explicit product limit — not a technical one — chosen to keep conversations focused and auditable. At the turn limit, the conversation is closed to new input and the user is prompted to continue in a new thread (see branching above). The full turn history is always retained in the audit trail.
 
 ### Token warning — 80%
 
-Before the turn limit is reached, the active context window may fill based on message length and attachment size. When a conversation reaches **80% of the model's context window** (160K tokens on the current 200K models), a **persistent warning banner** appears in the conversation header:
+Before the turn limit is reached, the active context window may fill based on message length and attachment size. When a conversation reaches **80% of the model's context window** (160K tokens on current 200K context models), a **persistent warning banner** appears in the conversation header:
 
-> *"This conversation is getting long. Older turns are being summarised automatically to keep Andi running. [View summary ↗]"*
+> *"This conversation is getting long. Older turns are being summarised automatically to keep [AssistantName] running. [View summary ↗]"*
 
 The warning is persistent (not dismissible) and remains visible until the conversation ends or is branched.
 
 ### Automatic summarisation — default behaviour
 
-When the context window reaches **80%**, Data AI Assistant **automatically summarises the oldest turns** to free space, without requiring user action. This is the default path.
+When the context window reaches **80%**, the platform **automatically summarises the oldest turns** to free space, without requiring user action.
 
 | Element | Behaviour |
 |---------|----------|
-| What gets summarised | Oldest turns first (sliding window) — the earliest 40% of turns are summarised; the most recent 60% are always kept verbatim in the context window |
-| Summary model | A separate **Claude Haiku 4** API call generates the summary before the next user turn is processed — fast and low-cost for this task |
-| Summary format | Structured, not narrative: **Key entities discussed** · **Key findings** · **Decisions or conclusions reached** · **Unresolved questions**. Preserves actionable context without padding. |
-| Visibility | A **condensation marker** is inserted in the conversation thread at the point where turns were summarised: *"↑ N turns summarised — [tap to expand]"* |
+| What gets summarised | Oldest turns first — the earliest 40% of turns are summarised; the most recent 60% are always kept verbatim in the context window |
+| Summary model | A separate **fast-tier model** API call generates the summary before the next user turn is processed |
+| Summary format | Structured: **Key entities discussed** · **Key findings** · **Decisions or conclusions reached** · **Unresolved questions** |
+| Visibility | A **condensation marker** is inserted in the conversation thread: *"↑ N turns summarised — [tap to expand]"* |
 | Expansion | Tapping the marker shows the full structured summary inline |
-| Audit trail | Original turn content is **always retained in full** in `assistant.turns` — the summarisation affects only the active context window sent to the API, not stored data. The summary text is stored separately in `assistant.conversation_summaries`. |
-| Frequency | Re-summarises as needed on each subsequent turn that would exceed the context limit; summarises incrementally (not from scratch each time) |
-| Summary injection | The summary is injected as a `[Context from earlier turns]` block at the top of the conversation context sent to the Anthropic API — clearly labelled so the model treats it as historical context, not live conversation |
-
-The user never needs to take action for summarisation to occur. They are always informed it happened via the condensation marker.
+| Audit trail | Original turn content is **always retained in full** in `assistant.turns`. Summarisation affects only the active context window sent to the AI provider, not stored data. |
+| Frequency | Re-summarises incrementally on each subsequent turn that would exceed the context limit |
+| Injection | Summary injected as a `[Context from earlier turns]` block at the top of the conversation context — clearly labelled so the model treats it as historical context |
 
 ### Manual branch — user-initiated
 
-At any point (including when the context warning is showing), the user may choose to **start a new conversation thread** from the current context. This is the right choice for users who want a clean slate while retaining the thread link.
+At any point, the user may start a new conversation thread from the current context. A **"Continue in new thread"** button appears in the warning banner. Clicking it:
 
-A **"Continue in new thread"** button appears in the warning banner. Clicking it:
 1. Creates a new conversation thread
 2. Pre-loads it with the auto-generated summary as the opening context
 3. Links it back to the origin conversation with a *"Continued from: [title], turn N"* header chip
@@ -114,11 +111,15 @@ A **"Continue in new thread"** button appears in the warning banner. Clicking it
 
 ### Model context limits
 
-| Model | Context window | Warning threshold |
-|-------|---------------|------------------|
-| Claude Haiku 4 | 200K tokens | 160K tokens (80%) |
-| Claude Sonnet 4 | 200K tokens | 160K tokens (80%) |
-| Claude Opus 4 | 200K tokens | 160K tokens (80%) |
+Context window sizes are determined by the configured AI provider and model tier. The 80% warning threshold applies regardless of context size.
+
+| Model tier | Typical context window | Warning threshold |
+|------------|----------------------|------------------|
+| Fast | Provider-specific — refer to provider documentation | 80% of context window |
+| Standard | Provider-specific | 80% of context window |
+| Powerful | Provider-specific | 80% of context window |
+
+The platform queries the active model's context limit at session start and calculates the warning threshold dynamically. Summarisation triggers at 80% of whatever the active model's window is — no manual threshold configuration is needed.
 
 ---
 
@@ -131,24 +132,29 @@ A **"Continue in new thread"** button appears in the warning banner. Clicking it
 ├─────────────────────────────┤
 │  📌 Pinned                   │
 │  ├── Weekly Governance Check │
-│  └── Finance Audit Q2        │
+│  └── Q3 Review Thread        │
 ├─────────────────────────────┤
 │  My Conversations            │
-│  ├── Finance Q2 Review       │
-│  ├── Customer Domain Audit   │
-│  └── Onboarding orientation  │
+│  — Today —                   │
+│  ├── Payment service audit   │
+│  — Yesterday —               │
+│  ├── Refund policy query     │
+│  — Past 7 days —             │
+│  └── Onboarding questions    │
 ├─────────────────────────────┤
 │  Shared With Me              │
-│  ├── 📋 Q1 Governance Board  │
-│  └── 📋 Operations Deep Dive │
+│  ├── 📋 Team review session  │
+│  └── 📋 Incident post-mortem │
 └─────────────────────────────┘
 ```
 
 - **Pinned** — conversations explicitly pinned by the user; always at the top regardless of recency; max 5; pin/unpin via right-click or long-press context menu
-- **My Conversations** — all conversations created by the authenticated user; reverse-chronological
+- **My Conversations** — all conversations created by the authenticated user; grouped by recency (Today / Yesterday / Past 7 days / Past 30 days / Older); within each group, reverse-chronological. Groups with no conversations are omitted.
 - **Shared With Me** — conversations to which the user has accepted an invitation; reverse-chronological; visually distinct (shared icon)
 - Conversations with unread turns in shared threads show a badge count
 - Archived conversations are hidden unless the archived filter is active
+- **Empty state** — when the user has no conversations at all (first visit, or after deletion of all conversations), the My Conversations area shows a brief prompt to start a new conversation, mirroring the onboarding state in the conversation area
+- **Search empty state** — when a search query returns no results, the panel shows *"No conversations matching '[query]'"* with a prompt to try different terms
 
 ---
 
