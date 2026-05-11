@@ -57,6 +57,39 @@ Binding chips for objects that are marked inactive in the host application's sea
 
 This ensures historical conversations remain navigable even when referenced objects have been retired — the binding never silently breaks.
 
+### Typeahead layout
+
+```
+┌──────────────────────────────────────────────────────────┐
+│  Tell me about @fin                                      │  ← Input with @ typed
+│              ┌──────────────────────────────────────┐    │
+│              │ Data Domains                          │    │
+│              │  🗄 Finance Domain       DOM-001  ▶  │    │  ← Highlighted result
+│              │  🗄 Financial Reporting  DOM-012     │    │
+│              │  🗄 FinTech Partnerships DOM-037     │    │
+│              │                                      │    │
+│              │ Policies                              │    │
+│              │  🛡 Financial Controls Policy        │    │
+│              │  🛡 Finance Data Retention           │    │
+│              └──────────────────────────────────────┘    │
+└──────────────────────────────────────────────────────────┘
+  Arrow keys to navigate · Enter or Tab to select · Esc to dismiss
+```
+
+After selection, the chosen object becomes a binding chip inline in the input:
+
+```
+┌──────────────────────────────────────────────────────────┐
+│  Tell me about [@Finance Domain ×]                       │  ← Binding chip
+└──────────────────────────────────────────────────────────┘
+```
+
+Inactive objects appear below active results with a greyed style:
+
+```
+              │  🗄 Finance Domain  (inactive)  DOM-004  │
+```
+
 ### Typeahead behaviour
 
 | Behaviour | Specification |
@@ -79,6 +112,20 @@ If a submitted message contains a binding to an object that another participant 
 ## Display ID detection
 
 When a host application configures a `displayIdPattern` on a bindable type, pasting text that matches the pattern anywhere in the input is **detected automatically**. On detection, the interface presents a direct lookup confirmation:
+
+```
+┌──────────────────────────────────────────────────────────┐
+│  Please review DOM-4821                                  │  ← Pasted text
+│  ┌────────────────────────────────────────────────────┐  │
+│  │ That looks like a Data Domain ID.                  │  │
+│  │ Want me to look up DOM-4821?                       │  │
+│  │                                                    │  │
+│  │  [Yes, look it up]          [No, keep as text]     │  │
+│  └────────────────────────────────────────────────────┘  │
+└──────────────────────────────────────────────────────────┘
+```
+
+If confirmed, `DOM-4821` is resolved to a binding chip exactly as if the user had selected it via the `@`-binding typeahead.
 
 > *"That looks like a [Type] ID. Want me to look up [displayId]?"*  
 > [Yes, look it up] &nbsp;&nbsp; [No, keep as text]
@@ -127,6 +174,40 @@ Attached files are **stored in full** in platform storage as part of the convers
 
 Attached documents appear in the user message bubble as a labelled file card: format icon, file name, and page/sheet count. Documents are not rendered inline.
 
+```
+┌────────────────────────────────────────────────────────────┐
+│  ┌──────────────────────┐  ┌────────────────────────────┐  │
+│  │ 📄 Q2 Report.pdf     │  │ 📊 Finance Data.xlsx       │  │  ← File cards
+│  │   32 pages           │  │   3 sheets                 │  │
+│  └──────────────────────┘  └────────────────────────────┘  │
+│                                                            │
+│  Summarise the key governance findings and compare         │  ← Message text
+│  against the Finance domain metrics.                       │
+└────────────────────────────────────────────────────────────┘
+```
+
+The attachment budget indicator appears below the input area:
+
+```
+┌──────────────────────────────────────────────────────────┐
+│  [input…]                                          [→]   │
+├──────────────────────────────────────────────────────────┤
+│ 📎  42 MB of 100 MB used  ████████░░░░░░░░░░░░░░         │
+└──────────────────────────────────────────────────────────┘
+```
+
+When the conversation attachment budget is exhausted:
+
+```
+┌──────────────────────────────────────────────────────────┐
+│  [📎 disabled]  [input…]                           [→]   │
+├──────────────────────────────────────────────────────────┤
+│ 📎  100 MB of 100 MB used  ████████████████████████  ⚠   │
+│ Attachment limit reached. Start a new conversation to    │
+│ attach more files.                                       │
+└──────────────────────────────────────────────────────────┘
+```
+
 When the model references a specific section of an attached document, it cites by page number (PDF), sheet name (Excel), or heading (Word).
 
 ---
@@ -141,6 +222,23 @@ An **edit icon** is associated with each past user message. On desktop it appear
 | `@`-binding chips | Preserved in the edit field; editable |
 | Submit | Creates a new branched conversation thread (see [04-conversation-management.md](./04-conversation-management.md)) |
 | `Escape` | Cancels edit; no branch created; original conversation untouched |
+
+### Edit field layout
+
+```
+┌──────────────────────────────────────────────────────────┐
+│                                                          │
+│  ┌────────────────────────────────────────────────────┐  │
+│  │ Show me the quality gaps for @{Finance Domain}     │  │  ← Edit field
+│  │                                              ↵     │  │    (pre-populated,
+│  └────────────────────────────────────────────────────┘  │     chips editable)
+│                                                          │
+│  [Save and branch →]               [Cancel  Esc]        │
+│                                                          │
+│  ⓘ Editing creates a new branch — the original          │
+│     conversation and responses are preserved.            │
+└──────────────────────────────────────────────────────────┘
+```
 
 ### What editing does not do
 

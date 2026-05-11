@@ -13,6 +13,19 @@ Requirements:
 
 import re
 import sys
+
+# fontTools raises ValueError when it encounters OS/2 Unicode range bit 123 (out of
+# spec, 0–122 valid). Some system fonts on Linux carry this invalid bit. Patch the
+# setter to silently discard out-of-range bits so WeasyPrint can continue.
+try:
+    from fontTools.ttLib.tables import O_S_2f_2 as _os2_mod
+    _Table = _os2_mod.table_O_S_2f_2
+    _orig = _Table.setUnicodeRanges
+    def _safe_setUnicodeRanges(self, value):
+        _orig(self, {b for b in value if 0 <= b <= 122})
+    _Table.setUnicodeRanges = _safe_setUnicodeRanges
+except Exception:
+    pass
 from pathlib import Path
 
 # ---------- configuration ----------
