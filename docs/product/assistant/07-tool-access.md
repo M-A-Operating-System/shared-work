@@ -140,9 +140,10 @@ Participants cannot access MCP tools beyond their own permission level. If a too
 
 ## Complementary MCP services in tool context
 
-Beyond host-registered MCP servers, two platform-level ecosystem services are available for integration:
+Beyond host-registered MCP servers, three platform-level ecosystem services are available for integration:
 
 - **MCP Repository** — Host teams use this during configuration to discover and browse available MCP tools before registering them. It is not directly invoked in conversations but informs the tool registry setup.
 - **MCP Resources Service** — Provides centralised skills, static resources, and reusable prompt artefacts. Host applications may choose to register the MCP Resources Service as an opt-in or always-on server, making its capabilities available during conversations.
+- **Web Search Service** — Provides real-time web search and page retrieval. Registered by host applications as an opt-in or always-on MCP server for sessions that need current information beyond the host's own data.
 
-See [17-complementary-mcp-services.md](./17-complementary-mcp-services.md) for full descriptions of both services.
+See [17-complementary-mcp-services.md](./17-complementary-mcp-services.md) for full descriptions of all three services.

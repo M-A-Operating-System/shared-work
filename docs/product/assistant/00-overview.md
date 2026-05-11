@@ -45,11 +45,12 @@ The platform has no end-user-facing name. Every tenant names their own assistant
 - Shared conversations — up to ten participants within the same tenant, equal-participant model
 - Personal memory (user-managed) and application context (Application Admin-managed)
 - Session artefact tray accumulating all input and output artefacts
+- Document canvas — iteratable working-document surface in the conversation panel; versioned, editable, model-revisable
 - Three-zone responsive layout (history panel, conversation area, conversation panel) embedded within host app UI
 - Rich content rendering: Mermaid, Vega-Lite, JSON inspector, data tables, syntax-highlighted code, prose markdown, math (KaTeX)
 - Continuous improvement signal capture and per-tenant improvement issue pipeline
 - Full audit trail per turn: raw prompt, resolved prompt, tool call log, output artefacts, token counts
-- Complementary MCP ecosystem services: MCP Repository (tool discovery) and MCP Resources (shared skills and artefacts)
+- Complementary MCP ecosystem services: MCP Repository (tool discovery), MCP Resources (shared skills and artefacts), and Web Search (real-time web search)
 
 ### Out of scope
 
@@ -58,7 +59,7 @@ The platform has no end-user-facing name. Every tenant names their own assistant
 - Voice or multimodal input
 - Context globbing (pulling context from multiple past conversations into one session)
 - Incognito or temporary chat (no-history mode) — conflicts with audit completeness
-- Web search (real-time internet retrieval)
+- Platform-owned web search — available via the Web Search complementary MCP service registered by the host (see [17-complementary-mcp-services.md](./17-complementary-mcp-services.md))
 - Image or content generation
 - Code execution sandbox
 - Public shareable links — all sharing is participant-controlled and tenant-scoped
@@ -98,11 +99,12 @@ The platform has no end-user-facing name. Every tenant names their own assistant
      ┌───────────────┼────────────────────┐
      │               │                    │
 ┌────▼────┐   ┌──────▼──────┐   ┌────────▼───────┐
-│ Host    │   │ Host MCP    │   │ Complementary  │
-│ App     │   │ Server(s)   │   │ MCP Services   │
-│ API     │   │ (registered │   │ (Repository +  │
-│         │   │  in config) │   │  Resources)    │
-└─────────┘   └─────────────┘   └────────────────┘
+│ Host    │   │ Host MCP    │   │ Complementary     │
+│ App     │   │ Server(s)   │   │ MCP Services      │
+│ API     │   │ (registered │   │ (Repository +     │
+│         │   │  in config) │   │  Resources +      │
+│         │   │             │   │  Web Search)      │
+└─────────┘   └─────────────┘   └───────────────────┘
 ```
 
 ### Components
@@ -113,7 +115,7 @@ The platform has no end-user-facing name. Every tenant names their own assistant
 
 **Host MCP Servers** are the host application's data and action providers. The platform routes tool calls to these servers and surfaces the results transparently in the conversation thread.
 
-**Complementary MCP Services** — the MCP Repository and MCP Resources — are ecosystem-level services that operate alongside both the platform and host MCP servers. They are not owned by the platform or by individual host applications. See [17-complementary-mcp-services.md](./17-complementary-mcp-services.md).
+**Complementary MCP Services** — the MCP Repository, MCP Resources Service, and Web Search Service — are ecosystem-level services that operate alongside both the platform and host MCP servers. They are not owned by the platform or by individual host applications. See [17-complementary-mcp-services.md](./17-complementary-mcp-services.md).
 
 ---
 
@@ -128,3 +130,4 @@ The platform has no end-user-facing name. Every tenant names their own assistant
 | **Host MCP server(s)** | The host's registered MCP endpoints providing data access and action capabilities. |
 | **MCP Repository** | Complementary ecosystem service — discoverable registry of available MCP tools. |
 | **MCP Resources Service** | Complementary ecosystem service — centralised skills, static resources, and reusable prompt artefacts. |
+| **Web Search Service** | Complementary ecosystem service — real-time web search and page retrieval; registered by hosts as an opt-in or always-on MCP server. |

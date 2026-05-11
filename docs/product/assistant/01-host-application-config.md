@@ -30,7 +30,8 @@ Config takes effect on the **next new conversation session** after the update is
   "userProfile":   { ... },
   "memory":        { ... },
   "conversations": { ... },
-  "features":      { ... }
+  "features":      { ... },
+  "widget":        { ... }
 }
 ```
 
@@ -453,6 +454,30 @@ Feature flags that enable or disable platform capabilities for this tenant.
 | `artefactTray` | `true` | Enable the session artefact tray panel |
 | `starterWorkflows` | `[]` | Workflow IDs shown as suggested starters on the onboarding screen (references `workflows[].id`) |
 | `starterQuestions` | `[]` | Plain-text starter questions shown on onboarding (up to 3, shown only if `starterWorkflows` is empty or alongside them) |
+
+---
+
+## `widget`
+
+Configures the **Mode 1 floating widget** (`<ai-chat-widget>`) behaviour for this tenant. Applies only when the host embeds the floating widget web component — ignored for Mode 2 (`<ai-chat>`) and Mode 3 (`<ai-chat-field>`) deployments. See [18-entry-points-and-embedding-modes.md](./18-entry-points-and-embedding-modes.md) for full widget behaviour.
+
+```json
+{
+  "widget": {
+    "defaultState":            "mini",
+    "fabIcon":                 "chat-bubble",
+    "showBadge":               true,
+    "returningUserThreshold":  14400
+  }
+}
+```
+
+| Field | Default | Description |
+|-------|---------|-------------|
+| `defaultState` | `"mini"` | Initial expansion state when the user opens the widget for the first time in a browser session. Accepted values: `"mini"` (compact panel, ~400 × 600 px) or `"full"` (full-panel overlay). |
+| `fabIcon` | `"chat-bubble"` | Icon displayed on the floating action button. Platform icon name or absolute URL to an SVG. |
+| `showBadge` | `true` | Whether to show an unread-indicator badge on the FAB when the assistant has produced a new response while the widget is collapsed. |
+| `returningUserThreshold` | `14400` | Idle time in seconds before a returning user's mini-widget shows a compact re-entry card (summarising the last conversation and offering quick actions) rather than the new-conversation home state. Default: 14 400 seconds (4 hours). Set to `0` to always show the re-entry card when a prior conversation exists. |
 
 ---
 

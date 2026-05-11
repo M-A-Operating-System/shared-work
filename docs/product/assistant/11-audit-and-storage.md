@@ -29,6 +29,7 @@ All conversation content is retained in full at write time. Nothing is reconstru
 | Tool call log | Tool name, input parameters, response payload, latency, success/error per invocation |
 | Attached input files | Full binary stored in platform object storage |
 | Output artefacts | Full content stored in turn record |
+| Canvas version | If the turn produces or accepts a canvas revision, a `canvas_versions` row is written linked to this turn |
 | Model version | Exact provider model string (e.g. `provider-name:model-id:version`) and resolved tier (`fast` / `standard` / `powerful`) |
 | Token counts | Input, output, cache read, cache write — per turn and running session totals |
 | Improvement signals | Detected signals with confidence score and lifecycle status |
@@ -89,6 +90,8 @@ The `assistant` schema contains the following tables:
 | `assistant.user_memory` | One row per personal memory item; `tenant_id`, user_id, content, category, status |
 | `assistant.app_context` | One row per application context item; `tenant_id`, content, category, status, approval workflow fields |
 | `assistant.app_context_versions` | Version history for application context items |
+| `assistant.canvas_documents` | One row per document canvas open in a conversation; `tenant_id`, conversation FK, title, current version reference |
+| `assistant.canvas_versions` | One row per canvas version; `tenant_id`, canvas FK, turn FK (the turn that produced or accepted this version), full markdown content, author (`user` or `model`), created_at |
 
 ### RLS policies (summary)
 
@@ -99,6 +102,7 @@ The `assistant` schema contains the following tables:
 - Platform Admins can `SELECT` all records across all tenants.
 - No user can `UPDATE` or `DELETE` turn records.
 - `assistant.conversation_participants` records are append-only — departure is recorded as `departed_at` timestamp, not row deletion.
+- `assistant.canvas_versions` records are append-only — each edit creates a new version row; no version row is modified after insertion.
 
 ---
 

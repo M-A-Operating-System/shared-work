@@ -12,11 +12,11 @@ The AI Chat Platform is delivered as an `<ai-chat>` web component that host appl
 
 ### Why three zones (not four)
 
-The original DDA design used a fourth zone for the host application's own navigation. In the generic platform, the host application manages its own navigation independently. The `<ai-chat>` component occupies its mounting point and manages history and workflow navigation internally. This clean separation means the host application can embed the component anywhere in its layout — as a full page, a side panel, or a modal drawer.
+The platform component owns three zones inside its mounting point. The host application manages its own navigation independently — the `<ai-chat>` component occupies its mounting point only, making it embeddable anywhere in the host layout: a full page, a side panel, or a modal drawer.
 
 ### Workflow Library
 
-The Workflow Library (the generic equivalent of the DDA Guided Workflows drawer) is accessible via a **Workflows** button in the history panel header. It slides in as a panel over the history list — it is not part of the right sidebar, which is reserved for conversation-specific content.
+The Workflow Library is accessible via a **Workflows** button in the history panel header. It slides in as a panel over the history list — it is not part of the right sidebar, which is reserved for conversation-specific content.
 
 When clicked, a workflow from the library opens a parameter form (if the workflow has parameters) before injecting the prompt into the input field.
 
