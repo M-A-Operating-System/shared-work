@@ -1,45 +1,37 @@
 # AI Analytics Platform — Proposed Roadmap
 
-This document describes **one proposed delivery sequence** for the AI Analytics Platform — a specific phasing of capabilities that represents a reasonable progression from a shippable v1.0 core to a full-featured platform. It is not the only valid sequence. The product specification (all numbered documents in this folder) defines what the platform must do; this roadmap describes one way to get there incrementally.
+This document describes **one proposed sequence of deliverables** for the AI Analytics Platform — a progression from an initial MVP to a full target-state platform. It is not the only valid sequence, and it is not a committed delivery plan. The product specification (all numbered documents in this folder) defines what the platform must do; this roadmap describes one way to build toward that in meaningful, shippable increments.
 
-Phase boundaries, release contents, and sequencing should be revisited as implementation proceeds, customer feedback is gathered, and technical constraints are better understood. A decision to resequence a phase or move a component between releases should be documented here — it does not require changes to the product specification.
-
-|                    |                           |
-|--------------------|---------------------------|
-| **Current release**| v1.0                      |
-| **Date**           | May 2026                  |
-| **Status**         | v1.0 in production; subsequent phases proposed, not committed |
+Phase boundaries and sequencing should be revisited as implementation proceeds, customer feedback is gathered, and technical constraints become clearer. Decisions to resequence or regroup phases should be recorded here — they do not require changes to the product specification.
 
 ---
 
-## Release summary
+## Delivery sequence
 
-| Release | Theme | End-user headline | Status |
-|---------|-------|------------------|--------|
-| **v1.0** | Governed semantic analytics core | Any MCP consumer can query governed metrics, receive results with charts, narrative, and full lineage | **Shipped** |
-| **v1.1** | Scheduled queries and alert delivery | Metrics monitor themselves — users get Slack/webhook alerts when thresholds breach | Proposed |
-| **v1.2** | SMR authoring assistance | Metric owners define new metrics in plain English; platform generates the YAML draft | Proposed |
-| **v1.3** | Cross-session memory | Preferences, saved queries, and favourite metrics persist across sessions | Proposed |
-| **v2.0** | Proactive analytical intelligence | Platform surfaces anomalies and trend signals without being asked | Proposed |
-| **v2.1** | Collaborative analytical sessions | Multiple users share a governed session and co-explore data | Proposed |
-| **v2.2** | Cross-backend drilldown | Drilldown traversal spans multiple registered execution backends | Proposed |
-| **v2.3** | Analytical intent extensions | Ranking, window analytics, scenario comparison, and inline benchmarks in a single query | Proposed |
-| **v3.0** | API surface extensions | SMR browser API, result streaming, GraphQL layer, lineage query API | Proposed |
+| Phase | What is achieved | End-user headline |
+|-------|-----------------|-------------------|
+| **Governed Analytical Core** | The complete governed query pipeline — any MCP consumer can query registered metrics with full lineage | A portfolio manager asks a quantitative question and gets a governed, auditable result |
+| **Automated Monitoring and Alerts** | Queries run on a schedule; thresholds trigger push notifications | A risk officer receives a Slack alert when VaR breaches its limit — no manual check needed |
+| **SMR Authoring Assistance** | Metric owners define new metrics in plain English | A Head of Fixed Income describes a metric in two sentences and gets a YAML draft back in 30 seconds |
+| **Cross-Session Memory** | Preferences, saved queries, and favourites persist across sessions | A Power Analyst opens the platform each morning with their context already applied |
+| **Proactive Analytical Intelligence** | Platform surfaces anomalies and trends without being asked | A portfolio manager finds insight cards waiting on Monday morning — no queries submitted |
+| **Collaborative Sessions** | Multiple users share a governed session and co-explore data | A portfolio manager and risk officer jointly prepare an investment committee pack |
+| **Cross-Backend Drilldown** | Drilldown traversal spans multiple registered execution backends | An analyst drills from warehouse data into graph relationships in one continuous navigation |
+| **Advanced Query Capabilities** | Ranking, window analytics, scenario comparison, and inline benchmarks in a single query | A performance analyst composes a complex multi-dimensional query without splitting it into parts |
+| **Open API Surface** | SMR browser API, result streaming, GraphQL layer, lineage query API | A compliance team queries the lineage store directly; a BI team integrates via their existing GraphQL gateway |
 
 ---
 
-## v1.0 — Governed Semantic Analytics Core
+## MVP — Governed Analytical Core
 
-**Shipped: May 2026**
-
-> **End-user outcome:** A portfolio manager, risk officer, or compliance analyst can ask a governed quantitative question — in natural language or via a structured MCP tool call — and receive a computed result with a chart, narrative summary, and a complete lineage record. The result uses only metrics registered in the SMR, is scoped to exactly what their role entitles them to see, and can be audited end-to-end.
+> **What this achieves:** Any MCP-compatible consumer — a conversational AI assistant, a custom application, or an autonomous agent — can submit a governed analytical query against registered metrics and receive a computed result with a chart specification, narrative summary, and complete lineage record. The result uses only metrics registered in the SMR, is scoped to exactly what the user's role entitles them to see, and every step from intent to result is auditable.
 
 ### Shippable components
 
-| Component | Functionality shipped in v1.0 |
-|-----------|-------------------------------|
+| Component | Functionality |
+|-----------|--------------|
 | **Platform Admin API** | Authenticated REST API for backend registration, SMR management, entitlement policy configuration, and tenant governance settings. Full CRUD on the Data Source Catalog, SMR metric definitions, and role entitlement records. |
-| **Admin Console** | Web UI over the Platform Admin API. Metric definition editor, entitlement policy builder, Data Source Catalog manager, governance threshold controls. Application Admins and Metric Owners can manage the full platform configuration without writing JSON. |
+| **Admin Console** | Web UI over the Platform Admin API. Metric definition editor, entitlement policy builder, Data Source Catalog manager, governance threshold controls. Application Admins and Metric Owners manage the full platform configuration without writing JSON. |
 | **Semantic Metrics Registry (SMR) service** | PostgreSQL primary store with row-level security; Elasticsearch metric search index. Metric CRUD with proposal → review → approved state machine. Append-only version records for each metric definition. Fuzzy metric search by name and description. |
 | **MCP Capability Layer** | Cloudflare Workers edge deployment. JWT validation at the edge. Exposes four capabilities: `analyse_metric`, `compare_portfolios`, `list_metrics`, `get_metric_definition`. MCP Streamable HTTP transport. All requests authenticated; unauthenticated requests rejected before platform processing begins. |
 | **Semantic Intent Layer** | Claude Sonnet (standard tier) for natural language → structured MCP tool call parameter translation. Claude Opus (complex tier) for multi-metric attribution queries and ambiguous intent. System prompt constructed from SMR metric and dimension names — no physical schema injected. Structured output validated against MCP tool input schema before proceeding. |
@@ -52,7 +44,7 @@ Phase boundaries, release contents, and sequencing should be revisited as implem
 | **Analytical Lineage Store** | PostgreSQL structured lineage records. One record per executed query: intent, SMR definition versions used, tool call parameters, role projection record, LQP, per-backend sub-plans and raw responses, assembled result, governance decisions, SCL display spec. Lineage inspector API — retrieve full lineage by `result_id`. Result artefacts (CSV downloads, large datasets) in S3-compatible object storage; URL referenced in lineage record. 7-year default retention for regulated deployments. |
 | **vite2img rendering service** | Vite + vega-embed + headless Chromium (Playwright). Renders any Vega-Lite v5 SCL spec to SVG or PNG. Renders `type: "table"` display specs via styled HTML table template. Used by report pipelines and agentic consumers that need static images for PDF embedding. |
 
-### Infrastructure shipped
+### Infrastructure
 
 | Component | Technology | Notes |
 |-----------|-----------|-------|
@@ -62,24 +54,21 @@ Phase boundaries, release contents, and sequencing should be revisited as implem
 | Metric search index | Elasticsearch / OpenSearch | SMR metric name/description fuzzy search |
 | Result cache | Platform-managed in-memory + PostgreSQL | Per-tenant, TTL-governed; >10MB results bypass cache and stream directly |
 | Object storage | S3-compatible | Result artefacts, CSV exports, vite2img output |
+| Message queue | Cloud-native (SQS / Pub/Sub) | Async lineage writes, governance audit events |
 | Secrets management | HashiCorp Vault or cloud-native equivalent | Backend API keys, platform service credentials |
 
-### What is NOT in v1.0
+### Acceptance criteria
 
-- No scheduled or recurring query execution
-- No alert threshold monitoring or push delivery
-- No SMR natural language authoring assistance
-- No cross-session user preferences or saved queries
-- No multi-user shared sessions
-- No cross-backend drilldown (drilldown limited to single-backend sub-plans per hierarchy level)
-- No ranking / window / scenario / inline benchmark query parameters
-- No SMR browser REST API, result streaming, or GraphQL layer
+- A natural language query resolves to a governed result with an SCL display spec, narrative, and lineage record in under 3 seconds (p95)
+- An unregistered metric ID in a tool call returns a structured METRIC_NOT_FOUND error — no partial execution
+- A user with no matching role claim receives ENTITLEMENT_DENIED before any query reaches an execution backend
+- Every executed query — successful or governance-blocked — has a complete lineage record (lineage completeness: 100%)
 
 ---
 
-## v1.1 — Scheduled Queries and Alert Delivery
+## Automated Monitoring and Alerts
 
-> **End-user outcome:** A risk officer registers a daily VaR breach check once. From that point, the platform runs it automatically every morning and sends a Slack message — with a lineage-referenced chart attached — whenever any portfolio exceeds its VaR limit. No manual query required.
+> **What this achieves:** Analytical queries can be registered to run on a schedule. When metric values breach defined thresholds, the platform delivers a push notification — with a lineage-referenced chart — to a registered endpoint. The platform monitors itself so users do not have to.
 
 ### Shippable components
 
@@ -94,43 +83,43 @@ Phase boundaries, release contents, and sequencing should be revisited as implem
 
 - A scheduled query with a 09:00 cron fires within 60 seconds of its scheduled time
 - An alert delivery reaches the registered webhook within 30 seconds of breach detection
-- Every alert event has a lineage record; lineage completeness metric remains 100%
-- Scheduled queries respect the owner's entitlements at execution time — not superuser access
+- Every alert event has a lineage record; lineage completeness remains 100%
+- Scheduled queries respect the owner's entitlements at execution time — no superuser access at runtime
 
-### Pre-requisites
+### Depends on
 
-Cron execution infrastructure (Kubernetes CronJob or cloud-native scheduler); message queue for async delivery (SQS / Pub/Sub — already in v1.0 infra stack); Slack MCP server available in the deployment environment.
+Governed Analytical Core (full governance pipeline, lineage store, result artefact store); cron execution infrastructure (Kubernetes CronJob or cloud-native scheduler); Slack MCP server available in the deployment environment.
 
 ---
 
-## v1.2 — SMR Authoring Assistance
+## SMR Authoring Assistance
 
-> **End-user outcome:** A Head of Fixed Income Risk needs to register a new metric — `modified_duration_weighted`. Instead of writing YAML from scratch, they describe it in two sentences. Within 30 seconds they have a complete draft YAML definition with formula, aggregation rule, dimensions, and data domain inferred. They review, adjust one field, and submit for Application Admin approval — no YAML knowledge required.
+> **What this achieves:** Metric owners and Application Admins can describe a new metric in plain English and receive a complete, schema-valid draft YAML definition for review — with automatic consistency checking against existing metric definitions. No YAML authoring knowledge required to propose a new metric.
 
 ### Shippable components
 
 | Component | Functionality |
 |-----------|--------------|
 | **Natural Language → Metric Draft Generator** | Metric Owner or Application Admin describes a metric in prose via the Admin Console. Claude Sonnet generates a complete SMR YAML draft: `id`, `label`, `formula`, `aggregation`, `dimensions`, `data.domain`, `units`, `description`. Output validated against the SMR schema before presenting for review. Draft enters the existing `proposed` state — it cannot be activated without Application Admin approval. |
-| **SMR Consistency Checker** | Before the draft is presented for review, it is automatically compared against all existing active metric definitions. Flags: potential duplicate (cosine similarity > 0.85 on formula or description), naming conflict (similar `id` or `label`), dimension mismatch (references dimensions not registered in SMR), data domain mismatch (inferred domain not in Data Source Catalog). Findings shown to the reviewer with resolution suggestions. |
+| **SMR Consistency Checker** | Before the draft is presented for review, it is automatically compared against all existing active metric definitions. Flags: potential duplicate (cosine similarity > 0.85 on formula or description), naming conflict (similar `id` or `label`), dimension mismatch (references dimensions not registered in the SMR), data domain mismatch (inferred domain not in the Data Source Catalog). Findings shown to the reviewer with resolution suggestions. |
 | **Metric Draft Review UI** | New Admin Console draft review screen. Side-by-side view: original prose description vs. generated YAML. Inline field editing before submission. Consistency checker findings shown in-context. One-click submit to standard approval workflow. Edit history preserved. |
 
 ### Acceptance criteria
 
 - Generated YAML draft passes SMR JSON schema validation in ≥ 90% of cases without manual correction
 - Consistency checker correctly identifies exact duplicates in 100% of cases; approximate duplicates in ≥ 80%
-- Draft metric cannot be queried until approved — no bypass path
+- Draft metric cannot be queried until approved — no bypass path through the authoring flow
 - All draft generation events logged (input prose, generated YAML, reviewer identity, approval outcome)
 
-### Pre-requisites
+### Depends on
 
-v1.0 SMR approval workflow; Claude Sonnet API access with prompt caching enabled for SMR context injection.
+Governed Analytical Core (SMR approval workflow, Admin Console); Claude Sonnet API access with prompt caching enabled for SMR context injection.
 
 ---
 
-## v1.3 — Cross-Session Memory
+## Cross-Session Memory
 
-> **End-user outcome:** A Power Analyst who always starts with equity portfolios, quarterly period, and tracking error as their first dimension no longer has to re-specify these each morning. Their saved "Monday risk sweep" query is one click away and automatically flagged if a metric definition change has invalidated it since they last ran it.
+> **What this achieves:** User preferences, saved queries, and favourite metrics persist across sessions. Returning users find their analytical context pre-applied. Saved queries are version-controlled against the SMR — changes to metric definitions surface as a staleness warning rather than silent breakage.
 
 ### Shippable components
 
@@ -139,24 +128,24 @@ v1.0 SMR approval workflow; Claude Sonnet API access with prompt caching enabled
 | **User Preference Store** | Per-user persisted preferences (PostgreSQL, scoped by `tenant_id` + `sub`): default time period, default dimensions, preferred chart type overrides (Power Analyst only), preferred measure groups, UI density preference. Applied as defaults in intent resolution — user can override per query. |
 | **Saved Query Registry** | Named analytical queries saved by Power Analysts and Application Admins. Each saved query stores the exact validated MCP tool call parameters (not natural language). Version-controlled: when a metric or dimension in a saved query changes in the SMR, the query is flagged as `needs_review` and the owner notified. Saved queries are private by default; Application Admins can promote a saved query to tenant-wide visibility. |
 | **Favourite Metrics Index** | Users mark SMR metrics as personal favourites. Favourites surfaced first in `list_metrics` results, intent resolution disambiguation suggestions, and the SMR browser. Favourites are per-user and never affect other users' results. |
-| **Preference and Saved Query UI** | New "My Workspace" section in any consuming UI (or accessible via Admin API). Preference editor, saved query list (with staleness indicator), favourites management. |
+| **My Workspace UI** | New section in any consuming UI (or accessible via Admin API). Preference editor, saved query list (with staleness indicator), favourites management. |
 
 ### Acceptance criteria
 
 - User preferences applied consistently — the same user sees the same defaults across sessions and across devices
-- A saved query flagged as `needs_review` due to SMR change cannot be silently executed with stale parameters — user must acknowledge the change
-- No preference leaks across tenants or users — strict `tenant_id` + `sub` isolation
+- A saved query flagged as `needs_review` due to an SMR change cannot be silently executed with stale parameters — user must acknowledge the change
+- No preference or saved query data leaks across tenants or users — strict `tenant_id` + `sub` isolation
 - Preferences do not affect governance or entitlement enforcement — they are display defaults only
 
-### Pre-requisites
+### Depends on
 
-v1.0 User identity model (JWT `sub` claim); PostgreSQL preference schema migration; Admin Console extensible enough to host new "My Workspace" section.
+Governed Analytical Core (JWT `sub` claim for user identity, PostgreSQL for preference store, SMR change notification infrastructure).
 
 ---
 
-## v2.0 — Proactive Analytical Intelligence
+## Proactive Analytical Intelligence
 
-> **End-user outcome:** A portfolio manager opens the platform on Monday morning to find three proactive insight cards waiting for them — one flagging that the tracking error on Global Equity has climbed above its 90-day average for three consecutive weeks, one noting that Emerging Markets debt concentration has reached a 12-month high, and one showing that two portfolios have moved into the top decile of their peer group. None of these required a manual query.
+> **What this achieves:** The platform monitors metric series produced by scheduled queries and surfaces anomalies, trend signals, and peer comparisons as unsolicited insight cards — without the user needing to submit a query. The platform tells users what has changed, not just what they ask.
 
 ### Shippable components
 
@@ -164,7 +153,7 @@ v1.0 User identity model (JWT `sub` claim); PostgreSQL preference schema migrati
 |-----------|--------------|
 | **Anomaly Detection Service** | Background service that monitors scheduled query results. For each metric series, maintains a configurable statistical baseline (rolling mean ± N standard deviations; configurable lookback window). Generates a proactive insight event when a metric value falls outside the baseline. Anomaly events are scoped to the role that owns the scheduled query — no cross-entitlement visibility. |
 | **Trend Signal Detector** | Identifies metrics showing consistent directional movement across configurable consecutive periods (e.g. 3 periods up, configurable). Trend signals generated as insight events with the metric ID, direction, number of consistent periods, and the lineage reference to the underlying data. |
-| **Proactive Insight Card Delivery** | Insight events delivered as structured cards to the consumer's registered notification endpoint (same delivery infrastructure as v1.1 alerts). Cards include: insight type (anomaly / trend), metric ID and label, the observed value vs. baseline, a narrative summary (Haiku-generated, anchored to the anomaly data), and the `result_id` for lineage inspection. |
+| **Proactive Insight Card Delivery** | Insight events delivered as structured cards to the consumer's registered notification endpoint (same delivery infrastructure as Automated Monitoring). Cards include: insight type (anomaly / trend), metric ID and label, the observed value vs. baseline, a narrative summary (Haiku-generated, anchored to the anomaly data), and the `result_id` for lineage inspection. |
 | **Peer Comparison Signals** | Where the Benchmark Data Service or Regulatory Reference Service is registered, the anomaly service extends its baseline to include peer percentile comparisons. A metric that moves from the 3rd to 1st quartile of its peer group generates a peer comparison signal. |
 | **Insight Configuration UI** | Application Admins configure per-metric anomaly detection settings: baseline window, sensitivity (N standard deviations), minimum signal strength (suppress noise below a configurable threshold), and opt-in/opt-out per user role. |
 
@@ -175,15 +164,15 @@ v1.0 User identity model (JWT `sub` claim); PostgreSQL preference schema migrati
 - False positive rate configurable — default sensitivity set so < 10% of signals are dismissed by users (monitored via insight card dismissal rate)
 - Every insight card has a lineage reference — users can inspect the underlying data from any card
 
-### Pre-requisites
+### Depends on
 
-v1.1 Scheduled Query Service (anomaly detection runs against scheduled query result series); statistical baseline storage (time-series extension to lineage store or dedicated metric series store).
+Automated Monitoring and Alerts (anomaly detection runs against scheduled query result series); statistical baseline storage (time-series extension to lineage store or dedicated metric series store).
 
 ---
 
-## v2.1 — Collaborative Analytical Sessions
+## Collaborative Sessions
 
-> **End-user outcome:** A portfolio manager and a risk officer join the same analytical session before an investment committee meeting. The portfolio manager submits a performance attribution query; the risk officer submits a VaR decomposition. Both sets of results are visible to both participants — but each result is governed by the submitting user's entitlements. They annotate the charts together, then export the full session as a PDF pack for the committee.
+> **What this achieves:** Multiple authenticated users within the same tenant can share a live analytical session, each submitting queries governed by their own entitlements. The joint session can be exported as a PDF pack with all results, narratives, annotations, and lineage references attached.
 
 ### Shippable components
 
@@ -191,25 +180,25 @@ v1.1 Scheduled Query Service (anomaly detection runs against scheduled query res
 |-----------|--------------|
 | **Session Sharing Service** | Authenticated users within the same tenant can invite other authenticated users to an active analytical session by `sub` claim. Invitee receives a session join link valid for 24 hours. Both users can submit queries; all results are visible to all active session participants. Session has an owner (the inviting user); only the owner can close the session or revoke access. |
 | **Per-Participant Governance Engine** | Each query submitted in a shared session is evaluated using the submitting participant's own entitlements — not the session owner's. Results from a query the invitee would not be entitled to run are not surfaced to participants who lack that entitlement. The governance engine tags each result with the submitting participant's `sub` and the entitlement projection applied. |
-| **Annotation Layer** | Session participants can annotate any result card — chart, table, or narrative — with free-text comments. Annotations are visible to all current session participants. Annotations are stored in the session record and included in session exports. Annotations are not operational data — they do not affect query execution or lineage records. |
+| **Annotation Layer** | Session participants can annotate any result card — chart, table, or narrative — with free-text comments. Annotations are visible to all current session participants. Annotations are stored in the session record and included in session exports. Annotations do not affect query execution or lineage records. |
 | **Session Export Service** | Export a complete shared session as a structured PDF (all query cards, charts rendered via vite2img, narrative summaries, annotations) or as a ZIP archive (PDF + raw JSON result sets + lineage URLs). Export is flagged in the audit trail as a session export artefact. `requireLineageForExport: true` governance config applies — each exported result includes its `result_id` and lineage URL. |
 
 ### Acceptance criteria
 
-- Participant entitlements are independently enforced — participant A cannot see a result that participant B's query produced if participant A would receive ENTITLEMENT_DENIED for the same query
-- All shared session events (joins, queries, annotations, exports) logged in the audit trail under individual participant identities — not merged into a single session identity
+- Participant entitlements are independently enforced — participant A cannot see a result that participant B produced if participant A would receive ENTITLEMENT_DENIED for the same query
+- All shared session events (joins, queries, annotations, exports) logged under individual participant identities — not merged into a single session identity
 - Session export includes a lineage reference for every result — no result appears in an exported PDF without a traceable `result_id`
-- Session state is consistent across participants — a result submitted by one participant appears for all within 2 seconds (p99)
+- A result submitted by one participant appears for all participants within 2 seconds (p99)
 
-### Pre-requisites
+### Depends on
 
-v1.0 Analytical Lineage Store; v1.1 Push Delivery Service (for session join notifications); v1.0 vite2img (for PDF rendering of charts).
+Governed Analytical Core (lineage store, vite2img for PDF rendering); Automated Monitoring and Alerts (Push Delivery Service for session join notifications).
 
 ---
 
-## v2.2 — Cross-Backend Drilldown
+## Cross-Backend Drilldown
 
-> **End-user outcome:** An analyst drilling from portfolio-level issuer concentration (sourced from the SQL warehouse) into the network of legal entity relationships for the top-concentration issuer (sourced from the Graph Data API) navigates in one continuous drilldown — no need to open a separate query.
+> **What this achieves:** Drilldown traversal is no longer constrained to a single execution backend per hierarchy level. An analyst can drill from a warehouse-sourced view directly into a graph database or API-backed relationship model in one continuous navigation — the backend boundary is transparent.
 
 ### Shippable components
 
@@ -223,64 +212,64 @@ v1.0 Analytical Lineage Store; v1.1 Push Delivery Service (for session join noti
 
 - Drilldown traversal that crosses a backend boundary completes within 500ms additional latency vs. same-backend drilldown (p95)
 - Merged drilldown result is a single SCL display spec — consumer does not need to handle multi-part responses
-- If the child-level backend is unavailable, the drilldown returns a structured error (not a partial result with a silent gap)
+- If the child-level backend is unavailable, the drilldown returns a structured error — not a partial result with a silent gap
 - Lineage record for cross-backend drilldown is complete — both backends' sub-plans and raw responses captured
 
-### Pre-requisites
+### Depends on
 
-v1.0 FQP with Graph Data API adapter registered; at least one tenant with both SQL warehouse and Graph API backends registered for the same analytical domain hierarchy.
+Governed Analytical Core (FQP with Graph Data API adapter registered); at least one deployment with both SQL warehouse and Graph API backends registered for the same analytical domain hierarchy.
 
 ---
 
-## v2.3 — Analytical Intent Extensions
+## Advanced Query Capabilities
 
-> **End-user outcome:** A performance analyst asks "show me the top 10 portfolios by quarter-to-date return with a 30-day moving average and comparison to the MSCI World blend" in a single query — rather than running separate queries for ranking, the moving average, and the benchmark comparison and assembling them manually.
+> **What this achieves:** Ranking, window analytics, scenario comparison, and inline benchmark composition are expressible as a single query — rather than requiring the consumer to compose and join multiple separate queries. The parameter model of the Analytical Intent Validator is extended to cover these patterns natively.
 
 ### Shippable components
 
 | Component | Functionality |
 |-----------|--------------|
-| **Ranking and Percentile Query Parameters** | `rank_by` parameter: rank result rows by any metric in the result set. `rank_direction`: `ASC` or `DESC`. `rank_limit`: return only the top/bottom N rows. `rank_percentile`: return rows above/below a percentile threshold. These replace the current workaround of ordering + limiting, which does not apply ranking semantics correctly in federated results. |
+| **Ranking and Percentile Query Parameters** | `rank_by` parameter: rank result rows by any metric in the result set. `rank_direction`: `ASC` or `DESC`. `rank_limit`: return only the top/bottom N rows. `rank_percentile`: return rows above/below a percentile threshold. Rankings computed across the full assembled result set — not within each backend's sub-result. |
 | **Window Analytics Parameters** | `window_op` parameter: `moving_average`, `rolling_sum`, `period_over_period`. `window_size`: number of periods. `window_anchor`: `trailing` or `centred`. Window operations computed at FQP result assembly — not delegated to backends that may not support them. |
 | **Scenario Comparison Parameter** | `scenario` parameter: compare actual metric values against a registered scenario definition (stress test, budget, or forecast registered in the SMR). Scenario definitions are registered by Application Admins in the SMR. A scenario comparison query returns actual values, scenario values, and the delta as a single result set. |
-| **Inline Composite Benchmark** | `benchmark` dimension field accepts either a pre-registered Benchmark Data Service ID or an inline composition object (`[{ "benchmark_id": "b_msci_world", "weight": 0.60 }, ...]`). Inline compositions are resolved at query time — no pre-registration required. Inline compositions are not persisted; they are logged in the lineage record. |
+| **Inline Composite Benchmark** | `benchmark` dimension field accepts either a pre-registered Benchmark Data Service ID or an inline composition object (`[{ "benchmark_id": "b_msci_world", "weight": 0.60 }, ...]`). Inline compositions are resolved at query time — no pre-registration required. Inline compositions are logged in the lineage record. |
 
 ### Acceptance criteria
 
-- `rank_by` + `rank_limit` applied correctly in federated results — rankings are computed across the full assembled result set, not within each backend's sub-result
+- `rank_by` + `rank_limit` applied correctly in federated results — rankings computed across the full assembled result set
 - Window operations produce the same result as an equivalent backend-level window function for backends that support it — verified in integration tests
-- Scenario comparison results include both actual and scenario values in the same result set — consumer does not need to join two separate queries
+- Scenario comparison results include both actual and scenario values in the same result set — no consumer-side join required
 - Inline benchmark compositions are logged in the lineage record — auditors can reconstruct the exact composition used in any query
 
-### Pre-requisites
+### Depends on
 
-v1.0 Analytical Intent Validator with parameter model extensibility; v1.0 FQP result assembly layer for window computation; v1.0 Benchmark Data Service integration for composite benchmark resolution.
+Governed Analytical Core (Analytical Intent Validator parameter model extensibility, FQP result assembly layer for window computation, Benchmark Data Service integration for composite benchmark resolution).
 
 ---
 
-## v3.0 — API Surface Extensions
+## Open API Surface
 
-> **End-user outcome:** A compliance engineering team builds a bespoke regulatory audit dashboard that queries the lineage store directly by metric ID and time range. A BI team integrates the Analytics Platform into their existing GraphQL gateway with no protocol translation work. A report pipeline begins streaming FQP results progressively rather than waiting for full assembly.
+> **What this achieves:** The platform's internal surfaces — the SMR, the lineage store, and the analytical query interface — are accessible via purpose-built REST and GraphQL APIs. Consumers can build metric discovery tools, regulatory audit dashboards, and BI integrations directly against the platform's data without going through the MCP interface or Admin Console.
 
 ### Shippable components
 
 | Component | Functionality |
 |-----------|--------------|
-| **SMR Browser REST API** | `GET /v1/smr/metrics` — paginated list of active metric definitions. `GET /v1/smr/metrics/{id}` — full metric definition including formula, aggregation rule, dimension list, data domain, owner, and version history. `GET /v1/smr/dimensions` — dimension catalogue. `GET /v1/smr/hierarchies` — drilldown hierarchy definitions. All endpoints authenticated by JWT; results scoped to the user's entitled metric visibility. Enables consumers to build metric discovery, browsing, and documentation experiences without screen-scraping the Admin Console. |
-| **NDJSON Result Streaming** | The MCP Capability Layer and FQP support streaming delivery of assembled sub-plan results in NDJSON format. Consumers receive individual backend sub-results as they arrive — rather than waiting for full assembly. First sub-result delivered within 200ms of FQP execution start (p95). Streaming responses include a terminal frame with the complete assembled result, SCL display spec, and lineage URL. Compatible with existing non-streaming consumers (full response frame always present). |
-| **GraphQL API Gateway** | Optional GraphQL schema layer over the MCP endpoint. Exposes `analyseMetric`, `comparePortfolios`, `listMetrics`, `getMetricDefinition`, and `drilldown` as GraphQL queries with typed input and output schemas. JWT auth via HTTP header. Enables consumers with existing GraphQL infrastructure to integrate without MCP client tooling. GraphQL layer is a passthrough — all requests route through the same governance pipeline as MCP calls; no governance bypass. |
-| **Lineage Query REST API** | `GET /v1/lineage/{result_id}` — retrieve full lineage record for a result. `POST /v1/lineage/search` — search lineage records by `user_sub`, `metric_id`, `time_range`, `backend_id`, or `governance_decision`. `GET /v1/lineage/{result_id}/sub-plans` — retrieve per-backend sub-plans and raw responses for a result. Paginated; JWT-scoped to the querying user's own lineage records (Platform Admins can query tenant-wide). Enables regulatory audit tooling, compliance review dashboards, and operational monitoring to be built directly against the lineage store without direct database access. |
+| **SMR Browser REST API** | `GET /v1/smr/metrics` — paginated list of active metric definitions. `GET /v1/smr/metrics/{id}` — full metric definition including formula, aggregation rule, dimension list, data domain, owner, and version history. `GET /v1/smr/dimensions` — dimension catalogue. `GET /v1/smr/hierarchies` — drilldown hierarchy definitions. All endpoints authenticated by JWT; results scoped to the user's entitled metric visibility. |
+| **NDJSON Result Streaming** | The MCP Capability Layer and FQP support streaming delivery of assembled sub-plan results in NDJSON format. Consumers receive individual backend sub-results as they arrive rather than waiting for full assembly. First sub-result delivered within 200ms of FQP execution start (p95). Streaming responses include a terminal frame with the complete assembled result, SCL display spec, and lineage URL. Compatible with existing non-streaming consumers. |
+| **GraphQL API Gateway** | Optional GraphQL schema layer over the MCP endpoint. Exposes `analyseMetric`, `comparePortfolios`, `listMetrics`, `getMetricDefinition`, and `drilldown` as GraphQL queries with typed input and output schemas. JWT auth via HTTP header. GraphQL layer is a passthrough — all requests route through the same governance pipeline; no governance bypass. |
+| **Lineage Query REST API** | `GET /v1/lineage/{result_id}` — retrieve full lineage record. `POST /v1/lineage/search` — search by `user_sub`, `metric_id`, `time_range`, `backend_id`, or `governance_decision`. `GET /v1/lineage/{result_id}/sub-plans` — retrieve per-backend sub-plans and raw responses. Paginated; JWT-scoped to the querying user's own records (Platform Admins can query tenant-wide). |
 
 ### Acceptance criteria
 
 - SMR Browser API results are consistent with the Admin Console SMR view — same data, same entitlement scoping
-- Streaming first-frame latency is ≤ 200ms (p95) — measurably faster than full assembly for multi-backend queries
-- GraphQL responses are byte-for-byte equivalent to MCP responses — the API layer adds no data transformation
-- Lineage query API search latency ≤ 500ms for queries over 7-year retention window (p95) — usable for real-time compliance review
+- Streaming first-frame latency ≤ 200ms (p95) — measurably faster than full assembly for multi-backend queries
+- GraphQL responses are semantically equivalent to MCP responses — the API layer adds no data transformation
+- Lineage query API search latency ≤ 500ms for queries over the full 7-year retention window (p95)
 
-### Pre-requisites
+### Depends on
 
-v1.0 Analytical Lineage Store with indexed search; v1.0 SMR service with read API; v1.0 FQP result assembly refactored to support incremental streaming (internal architecture prerequisite).
+Governed Analytical Core (lineage store with indexed search, SMR service read API); FQP result assembly refactored to support incremental streaming (internal architecture pre-requisite).
 
 ---
 
@@ -288,7 +277,7 @@ v1.0 Analytical Lineage Store with indexed search; v1.0 SMR service with read AP
 
 | Item | Rationale |
 |------|-----------|
-| **Raw SQL passthrough** | Architecturally prohibited. Violates P1 (semantic abstraction over physical exposure) and P10 (deterministic computation, not generation). Not planned at any version. |
+| **Raw SQL passthrough** | Architecturally prohibited. Violates P1 (semantic abstraction over physical exposure) and P10 (deterministic computation, not generation). Not planned at any phase. |
 | **Physical schema exposure to AI model** | Architecturally prohibited. Violates P1. The Semantic Intent Layer receives SMR metric and dimension names — no table names, column names, or JOIN paths. Not planned. |
 | **Ad hoc LLM-generated SQL** | Architecturally prohibited. Violates P2 (governance before execution) and P10. All queries are expressed as validated MCP tool call parameters resolved against the SMR. Not planned. |
 | **Unauthenticated analytical access** | Violates P2 and P5 (role-aware by default). JWT validation at the edge is non-negotiable. Not planned. |
