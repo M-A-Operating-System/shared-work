@@ -1,8 +1,10 @@
-# 17 — Proposed Technical Architecture
+# 17 — Reference Implementation: One Possible Technical Stack
 
-This document describes the **proposed implementation stack** for the AI Analytics Platform. It maps each platform layer to the chosen technology, explains the rationale, and compares credible alternatives at each layer.
+This document describes **one reference implementation** of the AI Analytics Platform — a specific set of technology choices that satisfies the product specification. It is not the only valid stack. The product specification (all other documents in this folder) is intentionally stack-agnostic; any implementation that fulfils the specified behaviours, governance guarantees, and interface contracts is conformant.
 
-The product specification (all other documents in this folder) is intentionally stack-agnostic. This document is the single place where technology choices are named and justified. A decision to change a stack component should be reflected here, not in the product spec.
+This reference stack is presented to make architectural trade-offs concrete and to give implementers a starting point. Each layer maps to a chosen technology, explains the rationale for that choice, and compares credible alternatives — any of which could be substituted without changing the product specification.
+
+A decision to adopt a different technology at any layer should be documented here as a replacement or alternative to the reference choice. Changes to technology choices never require changes to the product spec.
 
 ---
 
