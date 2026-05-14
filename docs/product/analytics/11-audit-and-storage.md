@@ -2,7 +2,11 @@
 
 ## Governing principle
 
-Every analytical query on the AI Analytics Platform produces a complete, queryable lineage record. The audit trail is not a log — it is a first-class data structure that supports regulatory enquiry, governance review, and analytical reproducibility. A regulator, auditor, or internal reviewer must be able to reconstruct exactly what was queried, by whom, under what entitlements, using which metric definitions, through which execution engines, and with what results — without reference to any external system.
+**Analytical lineage is not data lineage.** Data lineage tracks how data moves between systems — ETL pipelines, data warehouse loads, column-level transformation chains. That is handled by separate data infrastructure tooling outside this platform.
+
+Analytical lineage, as defined here, is computation provenance: a complete, queryable record of how the analytics engine used individual data elements to calculate a specific response. Every analytical query on this platform produces a lineage record that answers: which metric definitions were used and at what version; which aggregation rules applied; which dimensions and filters scoped the calculation; which role projection restricted the visible data; which execution backends contributed which sub-results; and what those raw sub-results were before assembly into the final result.
+
+The lineage record is not a log — it is a first-class data structure. A regulator, auditor, or internal reviewer must be able to reconstruct exactly how a specific number was calculated, by whom, under what entitlements, using which metric definitions, from which backends, and with what result — without re-running the query and without reference to any external system.
 
 ---
 

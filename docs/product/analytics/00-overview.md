@@ -54,7 +54,7 @@ The platform serves multiple consumer types simultaneously: human users querying
 - Visualisation Ontology — a governed schema of chart contracts, interaction semantics, drilldown definitions, and chart contract parameters; produces a Semantic Charting Language (SCL) display specification returned to the consumer — the platform does not render charts
 - MCP Capability Layer — exposes bounded, pre-defined analytical operations to AI orchestrators via MCP-compatible interfaces
 - Narrative synthesis — LLM-generated prose explanations anchored to execution results, governed to prohibit metric hallucination
-- Analytical lineage trail — complete, queryable lineage from intent resolution through semantic planning, execution, and result delivery
+- Analytical lineage trail — computation provenance (not data lineage): a complete, queryable record of which metric definitions, aggregation rules, role projections, and backend sub-results the engine used to calculate each specific response
 - Example industry model (Financial Services) — a reference set of pre-built metric definitions for wealth management, banking, investment management, and regulatory reporting; demonstrates the model packaging pattern for other industry domains
 - Host-configured analytical domain scoping, metric access policies, and execution engine registration
 - Governed drilldown — traversal of registered analytical hierarchies within host-configured scope

@@ -42,13 +42,17 @@ A given metric name must resolve to exactly one governed definition for a given 
 
 ## P4 — Complete analytical lineage
 
-Every analytical result has a complete, queryable lineage chain: the user's natural language intent, the resolved analytical intent, the validated tool call parameters, the Logical Query Plan, the physical backend sub-plans, the execution backend responses, the assembled result set, and the applied governance decisions. This lineage is a first-class artefact.
+**This is not data lineage.** Data lineage describes how data moves between systems — ETL pipelines, source-to-warehouse flows, column-level data transformation chains. That is a separate concern handled outside this platform.
+
+Analytical lineage, as defined here, is **computation provenance**: a complete, queryable record of exactly how the analytics engine used individual data elements to calculate a specific response. Given any result, a reviewer must be able to answer: which metric definitions were applied, at which version, with which aggregation rule; which dimensions and filters scoped the data; which role projection restricted the visible rows and columns; which execution backends provided which sub-results; and what those sub-results were before assembly. The lineage chain extends from the original question to the final number displayed — no step is opaque.
+
+Every analytical result has a complete lineage chain: the user's intent, the resolved metric and dimension definitions (including SMR version at query time), the validated tool call parameters, the role projection record, the Logical Query Plan, the per-backend sub-plans and their raw responses, the assembled result set, the applied governance decisions, and the SCL display specification generated. This lineage is a first-class artefact — not a log entry.
 
 **Consequences:**
 - Lineage records are written atomically with the result — a result with no lineage record is a platform defect.
-- The lineage inspector UI is available to Power Analysts and above for every analytical result in their session.
-- Exported analytical results include a lineage reference that can be used to reconstruct the full execution chain.
-- Regulatory audit requests can be satisfied by querying the lineage store directly.
+- The lineage inspector is available to Power Analysts and above for every analytical result in their session — showing exactly which metric definition version was used, which rows were included after role projection, and which backends contributed to the answer.
+- Exported analytical results include a lineage reference that can be used to reconstruct the full computation chain.
+- Regulatory audit requests can be satisfied by querying the lineage store directly — the answer to "how was this number calculated?" is always available without re-running the query.
 - Lineage records are not mutable after writing. Corrections produce a new lineage record referencing the original.
 
 ---
