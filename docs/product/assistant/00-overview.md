@@ -33,7 +33,7 @@ The platform has no end-user-facing name. Every tenant names their own assistant
 | **Transparent tool usage** | Every MCP tool call is disclosed in the conversation thread via a collapsible disclosure card. Users always know when the assistant is accessing external systems. |
 | **Confirmation before action** | Write operations via MCP tools require explicit user confirmation. The assistant never mutates host application state without an approval step visible in the conversation. |
 | **No privileged data path** | All data access is via host-registered MCP tools. The platform has no direct database access and cannot reach application data that the host has not explicitly exposed via an MCP server. |
-| **Consumer-rendered, governed display** | Rich content — charts, tables, diagrams, code — is rendered via a governed content rendering pipeline. Chart specifications returned by connected services (e.g., the Analytics Platform) are rendered by the platform; the AI model does not choose display formats ad hoc. |
+| **Consumer-rendered, governed display** | Rich content — charts, tables, diagrams, code — is rendered via a governed content rendering pipeline. SCL display specifications returned by connected services (e.g., the Analytics Platform) are rendered by the platform; the AI model does not choose display formats ad hoc. |
 
 ---
 
@@ -60,7 +60,7 @@ The platform has no end-user-facing name. Every tenant names their own assistant
 - Session artefact tray accumulating all input and output artefacts
 - Document canvas — iteratable working-document surface in the conversation panel; versioned, editable, model-revisable
 - Three-zone responsive layout (history panel, conversation area, conversation panel) embedded within host app UI
-- Rich content rendering: Mermaid, Vega-Lite, JSON inspector, data tables, syntax-highlighted code, prose markdown, math (KaTeX)
+- Rich content rendering: diagrams, chart specifications (SCL), structured data, syntax-highlighted code, formatted prose, mathematical notation
 - Continuous improvement signal capture and per-tenant improvement issue pipeline
 - Full audit trail per turn: raw prompt, resolved prompt, tool call log, output artefacts, token counts
 - Complementary MCP ecosystem services: MCP Repository (tool discovery), MCP Resources (shared skills and artefacts), and Web Search (real-time web search)
