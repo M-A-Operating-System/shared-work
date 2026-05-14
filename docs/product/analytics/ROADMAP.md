@@ -73,14 +73,14 @@
 
 ---
 
-## Phase 2 — Federated drilldown across engines
+## Phase 2 — Federated drilldown across backends
 
-**Objective:** Enable drilldown traversal that spans multiple execution engines (currently drilldown is limited to sub-plans served by a single engine per hierarchy level).
+**Objective:** Enable drilldown traversal that spans multiple execution backends (currently drilldown is limited to sub-plans served by a single backend per hierarchy level).
 
 | Item | Description |
 |------|-------------|
-| Cross-engine drilldown | The FQP coordinates drilldown across engines by identifying the affinity change point in the hierarchy and routing the child-level sub-plan to the appropriate engine. Result assembly handles the cross-engine join at the drilldown boundary. |
-| Drilldown result merging | When a drilldown traversal produces sub-results from multiple engines, the FQP uses the shared dimension keys to assemble a coherent drilldown result. |
+| Cross-backend drilldown | The FQP coordinates drilldown across backends by identifying the affinity change point in the hierarchy and routing the child-level sub-plan to the appropriate backend. Result assembly handles the cross-backend join at the drilldown boundary. |
+| Drilldown result merging | When a drilldown traversal produces sub-results from multiple backends, the FQP uses the shared dimension keys to assemble a coherent drilldown result. |
 
 ---
 
@@ -103,10 +103,10 @@
 
 | Item | Description |
 |------|-------------|
-| SMR browser API | Full read access to the tenant's SMR — metric definitions, dimensions, hierarchies — via authenticated REST endpoints. Enables host applications to build metric discovery and browsing experiences. |
+| SMR browser API | Full read access to the tenant's SMR — metric definitions, dimensions, hierarchies — via authenticated REST endpoints. Enables consumers to build metric discovery and browsing experiences. |
 | Result streaming | Stream FQP results to consumers in NDJSON format for real-time progressive display as sub-plan results arrive. |
-| GraphQL layer | Optional GraphQL API layer over the MCP endpoint for host applications with existing GraphQL infrastructure. |
-| Lineage query API | Direct queryable access to the lineage store — search by user, metric, time range, or result ID. Supports regulatory audit tooling built by the host. |
+| GraphQL layer | Optional GraphQL API layer over the MCP endpoint for consumers with existing GraphQL infrastructure. |
+| Lineage query API | Direct queryable access to the lineage store — search by user, metric, time range, or result ID. Supports regulatory audit tooling. |
 
 ---
 

@@ -6,7 +6,7 @@ These ten principles govern all design decisions for the AI Analytics Platform. 
 
 ## P1 — Semantic abstraction over physical exposure
 
-The platform never exposes physical storage schemas, table names, column names, or execution engine internals to AI models or end users. All AI interaction is mediated through the Semantic Metrics Registry. If a business concept is not registered in the SMR, it is not queryable. There is no escape hatch to raw SQL.
+The platform never exposes physical storage schemas, table names, column names, or execution backend internals to AI models or end users. All AI interaction is mediated through the Semantic Metrics Registry. If a business concept is not registered in the SMR, it is not queryable. There is no escape hatch to raw SQL.
 
 **Consequences:**
 - The Analytical Intent Validator operates exclusively on SMR-registered identifiers. Any attempt to introduce unregistered identifiers is rejected at the validation boundary.
@@ -23,7 +23,7 @@ Every analytical query passes through the governance pipeline before any physica
 **Consequences:**
 - The execution sequence is invariant: Intent Resolution → SMR Resolution → Role-Aware Projection → Intent Validation → Governance Validation → FQP → Execution. No step may be skipped.
 - Queries that fail governance checks are blocked entirely — they do not partially execute. Partial results from a governance-blocked query are never returned.
-- Governance decisions are logged before the query reaches an execution engine, so the audit trail reflects the governance state at decision time, not at result time.
+- Governance decisions are logged before the query reaches an execution backend, so the audit trail reflects the governance state at decision time, not at result time.
 - Governance configuration changes (entitlement policies, classification gates, cost limits) take effect on the next query — there is no cache of pre-governance query plans.
 
 ---

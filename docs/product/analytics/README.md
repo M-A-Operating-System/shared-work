@@ -80,11 +80,11 @@ Start at `00` and read through in sequence. Each document assumes you have read 
 | **Semantic Metrics Registry (SMR)** | The governed catalogue of metrics, dimensions, hierarchies, and aggregation rules that defines all resolvable analytical concepts for a tenant |
 | **Analytical Intent Validator** | The platform component that validates MCP tool call parameters against the SMR, applies role projection, and compiles a Logical Query Plan — the MCP JSON parameter format is the query interface, no custom query language |
 | **Logical Query Plan (LQP)** | The structured, backend-agnostic representation of a validated analytical request, produced by the Analytical Intent Validator before federation |
-| **Federated Query Planner (FQP)** | The component that routes LQP fragments to appropriate execution engines and assembles results |
+| **Federated Query Planner (FQP)** | The component that routes LQP fragments to appropriate execution backends and assembles results |
 | **Visualisation Ontology** | The governed schema of chart types, interaction contracts, and rendering semantics used to deterministically select and parameterise visualisations |
 | **MCP Capability Layer** | The MCP-style interface that exposes bounded analytical operations to AI orchestrators |
 | **Role-Aware Projection** | The semantic-layer enforcement of entitlements — applying row filters, column masks, and metric restrictions before query execution |
-| **Semantic Execution Governance** | The suite of circuit breakers, cost controls, and compliance checks applied at the semantic layer before any query reaches a physical execution engine |
+| **Semantic Execution Governance** | The suite of circuit breakers, cost controls, and compliance checks applied at the semantic layer before any query reaches a physical execution backend |
 | **Analytical Intent** | The business question expressed by a user or AI agent, resolved against the SMR before any query is formed |
 | **Application Admin** | A privileged user within a tenant who manages the SMR, entitlement policies, and tenant configuration |
 
@@ -97,11 +97,11 @@ Start at `00` and read through in sequence. Each document assumes you have read 
 | **A1** | The platform never exposes physical schema to AI models. All AI interaction is mediated through the Semantic Metrics Registry and Analytical Intent Validator. |
 | **A2** | Raw query generation by LLMs is not a permitted execution path on this platform. All queries are expressed as validated MCP tool call parameters resolved against the SMR. |
 | **A3** | Every metric must be registered in the SMR before it is resolvable. Unregistered metrics cannot be queried. |
-| **A4** | Entitlements are enforced at the semantic layer — before the logical query plan is compiled and before any execution engine is contacted. |
-| **A5** | All analytical execution produces a lineage record linking analytical intent → semantic plan → logical query plan → execution engine call → result. |
+| **A4** | Entitlements are enforced at the semantic layer — before the logical query plan is compiled and before any execution backend is contacted. |
+| **A5** | All analytical execution produces a lineage record linking analytical intent → semantic plan → logical query plan → execution backend call → result. |
 | **A6** | Visualisation type selection is deterministic and governed by the Visualisation Ontology — not inferred ad hoc by the LLM per query. |
 | **A7** | The Analytical Intent Validator produces a Logical Query Plan that is backend-agnostic. Physical execution is the responsibility of the Federated Query Planner. |
-| **A8** | Cost and execution circuit breakers are applied at the semantic layer. No query reaches a physical execution engine without passing governance checks. |
+| **A8** | Cost and execution circuit breakers are applied at the semantic layer. No query reaches a physical execution backend without passing governance checks. |
 | **A9** | Entitlements are the only isolation boundary. A single shared platform instance serves all consumers — access to metrics, dimensions, and data rows is controlled exclusively by the configured entitlement model and JWT role claims. |
 | **A10** | Narrative synthesis (prose explanation of analytical results) is always anchored to the governed metric values returned — the LLM may not introduce metric values not present in the execution result. |
 

@@ -94,13 +94,13 @@ The platform governs *which* chart contract is selected and *how* it is paramete
 
 ## Token refresh
 
-JWTs issued by the host application expire per the host's standard session policy. When a token approaches expiry:
+JWTs issued by the consuming application expire per the organisation's standard session policy. When a token approaches expiry:
 
-1. The host application issues a refreshed JWT.
+1. The consuming application issues a refreshed JWT.
 2. The consumer includes the new token in the next request header.
 3. No re-authentication step is required on the platform side — the new JWT is validated at the boundary of each request.
 
-For long-running agentic consumers, the host application must supply fresh JWTs before the previous token's `exp` timestamp.
+For long-running agentic consumers, the consuming application must supply fresh JWTs before the previous token's `exp` timestamp.
 
 ---
 
