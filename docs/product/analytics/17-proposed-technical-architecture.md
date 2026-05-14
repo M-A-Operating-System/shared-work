@@ -33,8 +33,9 @@ The product specification (all other documents in this folder) is intentionally 
 └────────────────────────────┬────────────────────────────────────┘
                              │
 ┌────────────────────────────▼────────────────────────────────────┐
-│                 Analytics DSL Compiler                           │
-│    Custom DSL → Logical Query Plan (DAG) compiler (Rust)        │
+│              Analytical Intent Validator                          │
+│    MCP JSON params → SMR validation → LQP generator             │
+│    (TypeScript — JSON schema validation + SMR resolution)        │
 └────────────────────────────┬────────────────────────────────────┘
                              │
 ┌────────────────────────────▼────────────────────────────────────┐
@@ -134,20 +135,24 @@ The product specification (all other documents in this folder) is intentionally 
 
 ---
 
-### Analytics DSL Compiler
+### Analytical Intent Validator and LQP Generator
+
+There is no custom query language. The MCP tool call JSON parameter format (metric IDs, dimension IDs, time period, filters) is the analytical intent representation — consistent with established semantic layer query conventions (Cube.js, MetricFlow). The validator implements JSON schema validation + SMR ID resolution + LQP generation, not a grammar compiler.
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
-| **DSL implementation** | Custom compiler (Rust) | Full control over the grammar; Rust provides performance for compilation-heavy workloads and safety guarantees |
-| **LQP format** | Custom DAG (JSON + internal IR) | Engine-agnostic; portable across backend types (SQL, API, Graph) |
+| **Intent format** | MCP tool call JSON parameters | Already the standard AI tool-use format; no separate language needed; consistent with Cube.js/MetricFlow query conventions |
+| **Implementation** | TypeScript (JSON schema validation + SMR resolution) | Lightweight; no custom grammar or parser required; JSON schema validation is well-tooled |
+| **LQP format** | Custom DAG (JSON) | Engine-agnostic; portable across SQL, OpenData API, and Graph API backends |
 
 **Alternatives considered:**
 
 | Alternative | Why not chosen |
 |------------|---------------|
+| Custom textual DSL (EBNF grammar, Rust compiler) | Over-engineered; the MCP JSON format already expresses the same intent; custom grammar adds maintenance burden for no consumer benefit |
+| MetricFlow (dbt) query language | Closest existing alternative; excellent for semantic metric queries; tied to SQL/dbt ecosystem; does not cover OpenData/Graph backends |
+| PRQL | SQL target only |
 | Apache Calcite SQL dialect | SQL-specific; cannot represent OpenData API or Graph API operations natively |
-| PRQL | Interesting alternative; compile target is SQL only; does not support API backends |
-| dbt Semantic Layer query language | Excellent for metric-layer scenarios; tied to dbt ecosystem; does not cover OpenData/Graph paths |
 
 ---
 

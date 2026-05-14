@@ -47,7 +47,7 @@ The platform serves multiple consumer types simultaneously: human users querying
 - Headless MCP API (`POST /v1/mcp`) — the sole entry point for all consumers; returns structured JSON result sets and SCL display specifications; no rendering layer
 - Multi-tenant architecture with complete per-tenant data isolation
 - Semantic Metrics Registry (SMR) — the governing catalogue of all resolvable metrics, dimensions, hierarchies, aggregation rules, ownership assignments, and lineage metadata
-- Analytics DSL — a constrained, AI-readable query language that exposes business semantics and compiles to engine-agnostic Logical Query Plans
+- Analytical Intent Validator — validates MCP tool call parameters (metric IDs, dimension IDs, time periods, filters) against the SMR, applies role projection, and compiles to an engine-agnostic Logical Query Plan; no custom query language — the MCP JSON parameter format is the query interface
 - Federated Query Planner — routes Logical Query Plan fragments to registered execution backends and assembles results; backends may be SQL-based data warehouses, OpenData APIs, Graph Data APIs, semantic layers, or any other registered retrieval mechanism
 - Role-Aware Projection Layer — applies entitlement filters (row restrictions, column masks, metric visibility rules) at the semantic tier before plan compilation
 - Semantic Execution Governance — circuit breakers, cost controls, query complexity limits, and compliance classification checks applied before any backend call
@@ -106,8 +106,8 @@ The platform serves multiple consumer types simultaneously: human users querying
 │  └──────────────────────┬──────────────────────────────────────┘  │
 │                         │                                          │
 │  ┌──────────────────────▼──────────────────────────────────────┐  │
-│  │                 Analytics DSL Compiler                       │  │
-│  │  (governed DSL → Logical Query Plan)                        │  │
+│  │              Analytical Intent Validator                     │  │
+│  │  (MCP JSON params → SMR validation → LQP)                   │  │
 │  └──────────────────────┬──────────────────────────────────────┘  │
 │                         │                                          │
 │  ┌──────────────────────▼──────────────────────────────────────┐  │
@@ -155,7 +155,7 @@ The platform serves multiple consumer types simultaneously: human users querying
 
 **Role-Aware Projection Layer** applies the authenticated user's entitlement claims against the resolved intent. It filters the metric set to what the user is permitted to see, injects row-level security predicates, and applies column-level masking rules — before any query plan is compiled.
 
-**Analytics DSL Compiler** translates the projected analytical intent into an engine-agnostic Logical Query Plan (LQP) expressed in the platform's Analytics DSL. The LQP is a directed acyclic graph (DAG) of analytical operations with no physical engine references.
+**Analytical Intent Validator** takes the structured JSON parameters from an MCP tool call, validates all metric and dimension IDs against the SMR, applies role-aware projection, validates semantic rules (required dimensions, aggregation compatibility, time granularity), and produces an engine-agnostic Logical Query Plan (LQP). The LQP is a directed acyclic graph (DAG) of analytical operations with no physical engine or backend references. There is no separate query language — the MCP JSON parameter format is the analytical intent representation, consistent with established semantic layer query conventions (Cube.js, MetricFlow).
 
 **Semantic Execution Governance** validates the LQP against circuit breakers (cost estimates, complexity limits, data classification compliance) before releasing it to the Federated Query Planner. Governance applies regardless of which backend type will execute the plan.
 
@@ -321,7 +321,7 @@ The following diagram shows all three consumption modes operating against the sa
 │  MCP Capability Layer  ──►  Semantic Intent Layer                             │
 │                        ──►  Semantic Metrics Registry (SMR)                  │
 │                        ──►  Role-Aware Projection Layer                       │
-│                        ──►  Analytics DSL Compiler                            │
+│                        ──►  Analytical Intent Validator                       │
 │                        ──►  Semantic Execution Governance                     │
 │                        ──►  Federated Query Planner (FQP)                     │
 │                        ──►  Visualisation Ontology (SCL display spec generation)│
