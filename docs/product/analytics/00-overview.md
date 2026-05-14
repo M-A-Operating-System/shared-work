@@ -2,15 +2,15 @@
 
 ## Vision
 
-### Governed AI analytics for any regulated application
+### Governed AI analytics for any application or agent
 
-The **AI Analytics Platform** enables any application — and any AI agent operating within that application — to access governed, explainable, role-aware analytical intelligence against large-scale datasets, without building semantic query infrastructure. The experience is modelled on the best institutional analytics environments: deterministic metric resolution, auditable execution, role-enforced data access, and AI-generated insights that are always anchored to governed, registered business definitions.
+The **AI Analytics Platform** is a shared analytical backend service that gives any application or AI agent governed, role-aware access to analytical intelligence against registered data sources — without building query infrastructure. The experience is modelled on the best institutional analytics environments: deterministic metric resolution, auditable execution, role-enforced data access, and AI-generated insights anchored exclusively to governed, registered business definitions.
 
-It is not a general-purpose analytics tool and not a natural-language SQL interface. Each deployment is a **governed analytical specialist** configured to its host application's metric domain, entitlement model, and regulatory context.
+It is not a general-purpose analytics tool and not a natural-language SQL interface. It is a **governed analytical specialist** scoped to a registered Semantic Metrics Registry, a declared set of data sources, and a configured entitlement model.
 
-The platform serves multiple consumer types simultaneously: human users querying through an embedded analytics component, conversational AI users asking questions through the **AI Chat Platform**, and autonomous agents running scheduled or event-triggered analytical workflows. All consumers share the same governance pipeline and lineage trail.
+The platform serves multiple consumer types simultaneously: human users querying via any MCP-compatible client, conversational AI users asking questions through the **AI Chat Platform**, and autonomous agents running scheduled or event-triggered analytical workflows. All consumers share the same governance pipeline and lineage trail.
 
-> **Governing intent:** Give any application team the ability to deploy a production-grade, governed AI analytics layer into their product within days — fully scoped to their semantic metric domain, connected to their execution engines via a federated query planner, enforcing their entitlement model, and producing a complete analytical lineage trail for every query — whether that query originates from a human user, a conversational assistant, or an autonomous agent.
+> **Governing intent:** Give any application or agent the ability to access a production-grade, governed AI analytics layer — fully scoped to a registered semantic metric domain, connected to registered data sources via a federated query planner, enforcing a configured entitlement model, and producing a complete analytical lineage trail for every query — whether that query originates from a human user, a conversational assistant, or an autonomous agent.
 
 ### What the platform is and is not
 
@@ -45,7 +45,7 @@ The platform serves multiple consumer types simultaneously: human users querying
 ### In scope
 
 - Headless MCP API (`POST /v1/mcp`) — the sole entry point for all consumers; returns structured JSON result sets and SCL display specifications; no rendering layer
-- Multi-tenant architecture with complete per-tenant data isolation
+- Data Source Catalog — the platform's registry of all available execution backends and the data domains they serve; the FQP routes queries to backends by data domain affinity declared in the SMR
 - Semantic Metrics Registry (SMR) — the governing catalogue of all resolvable metrics, dimensions, hierarchies, aggregation rules, ownership assignments, and lineage metadata
 - Analytical Intent Validator — validates MCP tool call parameters (metric IDs, dimension IDs, time periods, filters) against the SMR, applies role projection, and compiles to an engine-agnostic Logical Query Plan; no custom query language — the MCP JSON parameter format is the query interface
 - Federated Query Planner — routes Logical Query Plan fragments to registered execution backends and assembles results; backends may be SQL-based data warehouses, OpenData APIs, Graph Data APIs, semantic layers, or any other registered retrieval mechanism
@@ -243,7 +243,7 @@ This headless design means:
 | **AI provider** | Provider-agnostic abstraction used by the Semantic Intent Layer and Narrative Synthesis Engine. The platform maps tiers to the tenant's configured provider's current models. |
 | **Platform storage** | Relational database with RLS for SMR records, lineage records, and configuration; object storage for cached result sets and artefacts. |
 | **Platform edge function** | JWT handling, intent resolution API, intent validation and LQP compilation, governance checks, FQP orchestration, result assembly, SCL display spec generation. |
-| **Host authentication** | The host application issues JWTs for its users, including role claims used by the Role-Aware Projection Layer. |
+| **Consumer authentication** | The organisation's identity provider issues JWTs for users and service accounts, including the role claims used by the Role-Aware Projection Layer. |
 | **Host execution backends** | The host's registered data retrieval backends — SQL data warehouses, OpenData APIs, Graph Data APIs, semantic layers, OLAP engines, or any other mechanism the host registers. The FQP translates Logical Query Plan fragments into each backend's native request protocol. |
 | **AI Chat Platform** | The primary conversational consumer of the Analytics Platform's MCP Capability Layer. See [Role in the AI-Enablement Product Ecosystem](#role-in-the-ai-enablement-product-ecosystem) below. |
 | **Static image rendering service** | Optional complementary service — accepts a `display_spec` JSON object and returns a static image (PNG or SVG). Used by agentic consumers, report pipelines, and email delivery workflows where interactive rendering is unavailable. |

@@ -102,15 +102,15 @@ Users and compliance functions must be able to understand exactly what was queri
 
 ---
 
-## P9 — Host sovereignty within governance bounds
+## P9 — Administrator sovereignty within governance bounds
 
-The host application has final authority over the analytical configuration — which metrics are registered, how entitlements are structured, which execution engines are used, and what governance thresholds apply. The platform enforces a set of non-negotiable governance minimums (lineage, role-awareness, semantic abstraction) but within those bounds, the host is in control.
+Platform administrators have authority over analytical configuration — which data sources are registered, which metrics are in the SMR, how entitlements are structured, and what governance thresholds apply. The platform enforces a set of non-negotiable governance minimums (lineage, role-awareness, semantic abstraction) but within those bounds, administrators are in control.
 
 **Consequences:**
-- Host applications configure their SMR, entitlement model, execution engines, and governance thresholds via the application config and Admin API.
-- Platform-managed governance (no raw SQL, mandatory lineage, role-aware projection, semantic abstraction) are non-overridable — they cannot be disabled by host config.
-- Hosts may raise governance thresholds (tighter cost limits, stricter classification gates) but may not lower them below platform minimums.
-- New platform-level governance defaults that would affect existing tenants require a migration path and advance notice.
+- Administrators configure the data source catalog, SMR, entitlement model, and governance thresholds via the Platform Admin API.
+- Platform-managed governance (no raw query passthrough, mandatory lineage, role-aware projection, semantic abstraction) are non-overridable — they cannot be disabled by configuration.
+- Administrators may raise governance thresholds (tighter cost limits, stricter classification gates) but may not lower them below platform minimums.
+- New platform-level governance defaults require a migration path and advance notice before taking effect.
 
 ---
 
@@ -125,4 +125,4 @@ The host application has final authority over the analytical configuration — w
 | P6 (governed narrative) vs narrative quality | Strict anchoring may produce less fluent prose | Narrative quality improves with richer result sets; the constraint prevents hallucination at the cost of occasional prosaic output |
 | P7 (deterministic visualisation) vs user chart preferences | Users may prefer a different chart type | Ontology includes an override mechanism for Power Analysts — overrides are logged in the lineage record |
 | P8 (explainability) vs UX simplicity | Full lineage exposure may overwhelm casual users | Lineage inspector is progressive disclosure — collapsed by default, expandable by Power Analysts |
-| P9 (host sovereignty) vs P2 (governance before execution) | Host wants to bypass governance for internal tools | Governance minimums are absolute — the platform does not provide a governance bypass mode |
+| P9 (administrator sovereignty) vs P2 (governance before execution) | Administrators want to bypass governance for internal tooling | Governance minimums are absolute — the platform does not provide a governance bypass mode |
