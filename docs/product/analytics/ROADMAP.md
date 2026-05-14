@@ -1,10 +1,14 @@
-# AI Analytics Platform — Product Roadmap
+# AI Analytics Platform — Proposed Roadmap
+
+This document describes **one proposed delivery sequence** for the AI Analytics Platform — a specific phasing of capabilities that represents a reasonable progression from a shippable v1.0 core to a full-featured platform. It is not the only valid sequence. The product specification (all numbered documents in this folder) defines what the platform must do; this roadmap describes one way to get there incrementally.
+
+Phase boundaries, release contents, and sequencing should be revisited as implementation proceeds, customer feedback is gathered, and technical constraints are better understood. A decision to resequence a phase or move a component between releases should be documented here — it does not require changes to the product specification.
 
 |                    |                           |
 |--------------------|---------------------------|
 | **Current release**| v1.0                      |
 | **Date**           | May 2026                  |
-| **Status**         | v1.0 in production; v1.1 next planned release |
+| **Status**         | v1.0 in production; subsequent phases proposed, not committed |
 
 ---
 
@@ -13,14 +17,14 @@
 | Release | Theme | End-user headline | Status |
 |---------|-------|------------------|--------|
 | **v1.0** | Governed semantic analytics core | Any MCP consumer can query governed metrics, receive results with charts, narrative, and full lineage | **Shipped** |
-| **v1.1** | Scheduled queries and alert delivery | Metrics monitor themselves — users get Slack/webhook alerts when thresholds breach | Planned |
-| **v1.2** | SMR authoring assistance | Metric owners define new metrics in plain English; platform generates the YAML draft | Planned |
-| **v1.3** | Cross-session memory | Preferences, saved queries, and favourite metrics persist across sessions | Planned |
-| **v2.0** | Proactive analytical intelligence | Platform surfaces anomalies and trend signals without being asked | Planned |
-| **v2.1** | Collaborative analytical sessions | Multiple users share a governed session and co-explore data | Planned |
-| **v2.2** | Cross-backend drilldown | Drilldown traversal spans multiple registered execution backends | Planned |
-| **v2.3** | Analytical intent extensions | Ranking, window analytics, scenario comparison, and inline benchmarks in a single query | Planned |
-| **v3.0** | API surface extensions | SMR browser API, result streaming, GraphQL layer, lineage query API | Planned |
+| **v1.1** | Scheduled queries and alert delivery | Metrics monitor themselves — users get Slack/webhook alerts when thresholds breach | Proposed |
+| **v1.2** | SMR authoring assistance | Metric owners define new metrics in plain English; platform generates the YAML draft | Proposed |
+| **v1.3** | Cross-session memory | Preferences, saved queries, and favourite metrics persist across sessions | Proposed |
+| **v2.0** | Proactive analytical intelligence | Platform surfaces anomalies and trend signals without being asked | Proposed |
+| **v2.1** | Collaborative analytical sessions | Multiple users share a governed session and co-explore data | Proposed |
+| **v2.2** | Cross-backend drilldown | Drilldown traversal spans multiple registered execution backends | Proposed |
+| **v2.3** | Analytical intent extensions | Ranking, window analytics, scenario comparison, and inline benchmarks in a single query | Proposed |
+| **v3.0** | API surface extensions | SMR browser API, result streaming, GraphQL layer, lineage query API | Proposed |
 
 ---
 
@@ -294,4 +298,4 @@ v1.0 Analytical Lineage Store with indexed search; v1.0 SMR service with read AP
 
 ---
 
-*For the current product specification, see [README.md](./README.md) and the numbered specification documents. For the reference implementation stack, see [17-proposed-technical-architecture.md](./17-proposed-technical-architecture.md).*
+*This is a proposed delivery sequence, not a committed plan. For the product specification, see [README.md](./README.md) and the numbered specification documents. For the proposed reference implementation stack, see [17-proposed-technical-architecture.md](./17-proposed-technical-architecture.md).*
