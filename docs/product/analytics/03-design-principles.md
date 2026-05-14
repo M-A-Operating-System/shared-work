@@ -1,12 +1,12 @@
 # 03 — Design Principles
 
-These nine principles govern all design decisions for the AI Analytics Platform. Where a proposed feature conflicts with a principle, the principle takes precedence. Deviations require an explicit decision record.
+These ten principles govern all design decisions for the AI Analytics Platform. Where a proposed feature conflicts with a principle, the principle takes precedence. Deviations require an explicit decision record.
 
 ---
 
 ## P1 — Semantic abstraction over physical exposure
 
-The platform never exposes physical storage schemas, table names, column names, or execution engine internals to AI models or end users. All AI interaction is mediated through the Semantic Metrics Registry. If a business concept is not registered in the SMR, it is not queryable. There is no escape hatch to raw SQL.
+The platform never exposes physical storage schemas, table names, column names, or execution backend internals to AI models or end users. All AI interaction is mediated through the Semantic Metrics Registry. If a business concept is not registered in the SMR, it is not queryable. There is no escape hatch to raw SQL.
 
 **Consequences:**
 - The Analytical Intent Validator operates exclusively on SMR-registered identifiers. Any attempt to introduce unregistered identifiers is rejected at the validation boundary.
@@ -23,7 +23,7 @@ Every analytical query passes through the governance pipeline before any physica
 **Consequences:**
 - The execution sequence is invariant: Intent Resolution → SMR Resolution → Role-Aware Projection → Intent Validation → Governance Validation → FQP → Execution. No step may be skipped.
 - Queries that fail governance checks are blocked entirely — they do not partially execute. Partial results from a governance-blocked query are never returned.
-- Governance decisions are logged before the query reaches an execution engine, so the audit trail reflects the governance state at decision time, not at result time.
+- Governance decisions are logged before the query reaches an execution backend, so the audit trail reflects the governance state at decision time, not at result time.
 - Governance configuration changes (entitlement policies, classification gates, cost limits) take effect on the next query — there is no cache of pre-governance query plans.
 
 ---
@@ -42,13 +42,17 @@ A given metric name must resolve to exactly one governed definition for a given 
 
 ## P4 — Complete analytical lineage
 
-Every analytical result has a complete, queryable lineage chain: the user's natural language intent, the resolved analytical intent, the validated tool call parameters, the Logical Query Plan, the physical backend sub-plans, the execution backend responses, the assembled result set, and the applied governance decisions. This lineage is a first-class artefact.
+**This is not data lineage.** Data lineage describes how data moves between systems — ETL pipelines, source-to-warehouse flows, column-level data transformation chains. That is a separate concern handled outside this platform.
+
+Analytical lineage, as defined here, is **computation provenance**: a complete, queryable record of exactly how the analytics engine used individual data elements to calculate a specific response. Given any result, a reviewer must be able to answer: which metric definitions were applied, at which version, with which aggregation rule; which dimensions and filters scoped the data; which role projection restricted the visible rows and columns; which execution backends provided which sub-results; and what those sub-results were before assembly. The lineage chain extends from the original question to the final number displayed — no step is opaque.
+
+Every analytical result has a complete lineage chain: the user's intent, the resolved metric and dimension definitions (including SMR version at query time), the validated tool call parameters, the role projection record, the Logical Query Plan, the per-backend sub-plans and their raw responses, the assembled result set, the applied governance decisions, and the SCL display specification generated. This lineage is a first-class artefact — not a log entry.
 
 **Consequences:**
 - Lineage records are written atomically with the result — a result with no lineage record is a platform defect.
-- The lineage inspector UI is available to Power Analysts and above for every analytical result in their session.
-- Exported analytical results include a lineage reference that can be used to reconstruct the full execution chain.
-- Regulatory audit requests can be satisfied by querying the lineage store directly.
+- The lineage inspector is available to Power Analysts and above for every analytical result in their session — showing exactly which metric definition version was used, which rows were included after role projection, and which backends contributed to the answer.
+- Exported analytical results include a lineage reference that can be used to reconstruct the full computation chain.
+- Regulatory audit requests can be satisfied by querying the lineage store directly — the answer to "how was this number calculated?" is always available without re-running the query.
 - Lineage records are not mutable after writing. Corrections produce a new lineage record referencing the original.
 
 ---
@@ -102,15 +106,38 @@ Users and compliance functions must be able to understand exactly what was queri
 
 ---
 
-## P9 — Host sovereignty within governance bounds
+## P9 — Administrator sovereignty within governance bounds
 
-The host application has final authority over the analytical configuration — which metrics are registered, how entitlements are structured, which execution engines are used, and what governance thresholds apply. The platform enforces a set of non-negotiable governance minimums (lineage, role-awareness, semantic abstraction) but within those bounds, the host is in control.
+Platform administrators have authority over analytical configuration — which data sources are registered, which metrics are in the SMR, how entitlements are structured, and what governance thresholds apply. The platform enforces a set of non-negotiable governance minimums (lineage, role-awareness, semantic abstraction) but within those bounds, administrators are in control.
 
 **Consequences:**
-- Host applications configure their SMR, entitlement model, execution engines, and governance thresholds via the application config and Admin API.
-- Platform-managed governance (no raw SQL, mandatory lineage, role-aware projection, semantic abstraction) are non-overridable — they cannot be disabled by host config.
-- Hosts may raise governance thresholds (tighter cost limits, stricter classification gates) but may not lower them below platform minimums.
-- New platform-level governance defaults that would affect existing tenants require a migration path and advance notice.
+- Administrators configure the data source catalog, SMR, entitlement model, and governance thresholds via the Platform Admin API.
+- Platform-managed governance (no raw query passthrough, mandatory lineage, role-aware projection, semantic abstraction) are non-overridable — they cannot be disabled by configuration.
+- Administrators may raise governance thresholds (tighter cost limits, stricter classification gates) but may not lower them below platform minimums.
+- New platform-level governance defaults require a migration path and advance notice before taking effect.
+
+---
+
+## P10 — Deterministic computation, not generation
+
+The AI Analytics Platform is a **semantic computation engine**. Analytical results — metric values, aggregated figures, comparative outputs — are always computed from registered metric definitions applied to data retrieved from execution backends. They are never generated by an AI model.
+
+Generative AI has exactly two bounded roles in the platform:
+
+1. **Intent translation (input side):** The Semantic Intent Layer uses a language model to translate a natural-language question into a structured set of MCP tool call parameters — metric IDs, dimension IDs, time period, filters. The output of this step is a structured JSON object that is validated against the SMR. No metric values are produced here.
+
+2. **Narrative synthesis (output side):** The Narrative Synthesis Engine uses a language model to write a prose description of a computed result. The prose is strictly constrained to values present in the execution result — it cannot introduce figures from outside the result set. See P6.
+
+Every number in an analytical result is the product of computation. No number is the product of generation.
+
+The platform can be operated with zero generative AI in the pipeline: if a consumer submits a structured MCP tool call directly (explicit metric IDs, dimensions, and filters — no natural language), the Semantic Intent Layer is bypassed entirely. The computation layer — SMR resolution, role projection, governance, FQP, result assembly — is purely deterministic code.
+
+**Consequences:**
+- The same structured query, submitted at the same point in time with the same entitlements and the same underlying data, always returns the same result. The computation layer has no non-determinism.
+- An LLM cannot influence, hallucinate, or approximate metric values. If a metric value appears in a result, it was computed from a registered definition and data retrieved from a registered backend — or the query would have failed.
+- If an analytical result is wrong, the cause is either incorrect data in the execution backend, an incorrect metric definition in the SMR, or an incorrect intent translation (the wrong query was constructed). None of these are hallucination — all are diagnosable from the lineage record.
+- Features that feel like AI — natural language queries, prose narratives, chart contract selection — are AI-assisted interfaces around a deterministic analytical core. The core does not become non-deterministic because AI surrounds it.
+- Consumers, auditors, and regulators can rely on the fact that the number in the result is calculated, not estimated or inferred.
 
 ---
 
@@ -125,4 +152,4 @@ The host application has final authority over the analytical configuration — w
 | P6 (governed narrative) vs narrative quality | Strict anchoring may produce less fluent prose | Narrative quality improves with richer result sets; the constraint prevents hallucination at the cost of occasional prosaic output |
 | P7 (deterministic visualisation) vs user chart preferences | Users may prefer a different chart type | Ontology includes an override mechanism for Power Analysts — overrides are logged in the lineage record |
 | P8 (explainability) vs UX simplicity | Full lineage exposure may overwhelm casual users | Lineage inspector is progressive disclosure — collapsed by default, expandable by Power Analysts |
-| P9 (host sovereignty) vs P2 (governance before execution) | Host wants to bypass governance for internal tools | Governance minimums are absolute — the platform does not provide a governance bypass mode |
+| P9 (administrator sovereignty) vs P2 (governance before execution) | Administrators want to bypass governance for internal tooling | Governance minimums are absolute — the platform does not provide a governance bypass mode |

@@ -8,9 +8,9 @@ The AI Analytics Platform assumes the availability of three ecosystem-level comp
 
 ### Overview
 
-The **Semantic Registry Service** is a curated, publicly discoverable library of pre-built metric definitions, dimension schemas, and hierarchy definitions for financial services analytical domains. It reduces the time and expertise required for host teams to populate their Semantic Metrics Registry from scratch.
+The **Semantic Registry Service** is a curated, publicly discoverable library of pre-built metric definitions, dimension schemas, and hierarchy definitions for financial services analytical domains. It reduces the time and expertise required for platform administrators to populate their Semantic Metrics Registry from scratch.
 
-The Semantic Registry Service is primarily a **config-time resource** — host teams use it when establishing their SMR baseline. Approved definitions may be imported into the tenant's SMR via the Admin API.
+The Semantic Registry Service is primarily a **config-time resource** — platform administrators use it when establishing their SMR baseline. Approved definitions may be imported into the tenant's SMR via the Admin API.
 
 ### What the Semantic Registry Service provides
 
@@ -27,7 +27,7 @@ The service organises its content into analytical domain packages:
 
 Each package provides:
 - **Metric definitions** in the platform's SMR YAML schema (ready for import)
-- **Dimension schemas** compatible with the Analytics DSL
+- **Dimension schemas** in the platform's SMR schema format
 - **Hierarchy definitions** for navigable drilldown
 - **Measure group collections** for common analytical workflows
 - **Formula documentation** with calculation methodology references
@@ -35,7 +35,7 @@ Each package provides:
 
 ### Integration with the tenant SMR
 
-Host teams integrate the Semantic Registry Service at initial SMR setup via the Admin API:
+Platform administrators integrate the Semantic Registry Service at initial SMR setup via the Admin API:
 
 ```bash
 # Seed the SMR from a registry package
@@ -48,7 +48,7 @@ POST /v1/smr/import
 }
 ```
 
-Imported definitions are marked with `source: "semantic_registry_service"` and `source_version: "2.3.0"` in their SMR metadata. When the Semantic Registry Service publishes an updated package version, host teams receive a notification and may import the update via the same API.
+Imported definitions are marked with `source: "semantic_registry_service"` and `source_version: "2.3.0"` in their SMR metadata. When the Semantic Registry Service publishes an updated package version, platform administrators receive a notification and may import the update via the same API.
 
 ### Governance of imported definitions
 
@@ -56,7 +56,7 @@ Imported metric definitions are subject to the tenant's normal SMR governance wo
 
 ### Relationship to the platform
 
-The Semantic Registry Service is an optional companion to the platform. Host teams using the `seedTemplate` config field are seeding from a cached snapshot of the relevant Semantic Registry Service package, pre-bundled at platform installation. The live Semantic Registry Service provides the most current definitions and supports packages beyond the core seed templates.
+The Semantic Registry Service is an optional companion to the platform. Platform administrators using the `seedTemplate` config field are seeding from a cached snapshot of the relevant Semantic Registry Service package, pre-bundled at platform installation. The live Semantic Registry Service provides the most current definitions and supports packages beyond the core seed templates.
 
 ---
 
@@ -64,9 +64,9 @@ The Semantic Registry Service is an optional companion to the platform. Host tea
 
 ### Overview
 
-The **Regulatory Reference Service** is an ecosystem service that provides up-to-date regulatory metric definitions, compliance thresholds, and reporting templates for the major financial regulatory regimes. It is a **runtime service** — registered as an execution engine data source that the FQP can route regulatory metric sub-plans to.
+The **Regulatory Reference Service** is an ecosystem service that provides up-to-date regulatory metric definitions, compliance thresholds, and reporting templates for the major financial regulatory regimes. It is a **runtime service** — registered as an execution backend that the FQP can route regulatory metric sub-plans to.
 
-Unlike host-managed execution engines, the Regulatory Reference Service holds the authoritative definitions and current threshold values for regulatory metrics — eliminating the need for host teams to maintain regulatory threshold tables internally.
+Unlike internally-managed execution backends, the Regulatory Reference Service holds the authoritative definitions and current threshold values for regulatory metrics — eliminating the need for platform administrators to maintain regulatory threshold tables internally.
 
 ### What the Regulatory Reference Service provides
 
@@ -77,11 +77,11 @@ Unlike host-managed execution engines, the Regulatory Reference Service holds th
 | **Transition schedule** | Announced future threshold changes with effective dates (e.g. Basel III transition to Basel IV) |
 | **Reporting templates** | Structured result formats compatible with common regulatory submission templates (XBRL, COREP, FINREP) |
 
-### Registration in the tenant config
+### Registration in the Data Source Catalog
 
 ```json
 {
-  "executionEngines": [
+  "executionBackends": [
     {
       "id":           "regulatory-reference",
       "name":         "Regulatory Reference Service",
@@ -114,7 +114,7 @@ If the Regulatory Reference Service is unavailable, the FQP falls back to the ne
 
 ### Overview
 
-The **Benchmark Data Service** is an ecosystem service that provides market index and benchmark data as a registered execution engine within the analytics platform. It enables benchmark comparison queries without host teams needing to license, ingest, and maintain benchmark data independently.
+The **Benchmark Data Service** is an ecosystem service that provides market index and benchmark data as a registered execution backend within the analytics platform. It enables benchmark comparison queries without platform administrators needing to license, ingest, and maintain benchmark data independently.
 
 ### What the Benchmark Data Service provides
 
@@ -126,11 +126,11 @@ The **Benchmark Data Service** is an ecosystem service that provides market inde
 | **Custom benchmark blends** | Host-configurable blended benchmark compositions from registered components |
 | **Factor indices** | MSCI Minimum Volatility, MSCI Value, MSCI Quality, MSCI Momentum |
 
-### Registration in the tenant config
+### Registration in the Data Source Catalog
 
 ```json
 {
-  "executionEngines": [
+  "executionBackends": [
     {
       "id":           "benchmark-data",
       "name":         "Benchmark Data Service",
@@ -149,11 +149,11 @@ The **Benchmark Data Service** is an ecosystem service that provides market inde
 
 ### Benchmark dimension integration
 
-When the Benchmark Data Service is registered, the `benchmark` dimension in the SMR is backed by the service's benchmark catalogue. Users and AI agents can reference benchmark IDs in DSL `COMPARE TO BENCHMARK(...)` clauses, which the FQP resolves against the service.
+When the Benchmark Data Service is registered, the `benchmark` dimension in the SMR is backed by the service's benchmark catalogue. Users and AI agents can include benchmark IDs in the `benchmark` dimension field of MCP tool call parameters; the FQP resolves these against the service.
 
 ### Custom benchmark blends
 
-Host applications may register custom benchmark blends via the Benchmark Data Service Admin API:
+Platform administrators may register custom benchmark blends via the Benchmark Data Service Admin API:
 
 ```json
 {
@@ -174,7 +174,7 @@ Custom benchmarks are accessible within the tenant's queries using the registere
 
 ### Data licensing
 
-The Benchmark Data Service operates under data licensing agreements with index providers. Host applications using the service must confirm their licensing entitlement for each index they access. The service enforces licensing checks per tenant — tenants that are not licensed for a specific index cannot access that benchmark via the service.
+The Benchmark Data Service operates under data licensing agreements with index providers. Tenants using the service must confirm their licensing entitlement for each index they access. The service enforces licensing checks per tenant — tenants that are not licensed for a specific index cannot access that benchmark via the service.
 
 ---
 
@@ -183,5 +183,5 @@ The Benchmark Data Service operates under data licensing agreements with index p
 | Service | Type | Activation | Primary benefit |
 |---------|------|-----------|----------------|
 | Semantic Registry Service | Config-time resource | Import via Admin API | Accelerated SMR setup from vetted financial services metric definitions |
-| Regulatory Reference Service | Runtime execution engine | Register as execution engine in config | Authoritative, up-to-date regulatory metrics without host-side maintenance |
-| Benchmark Data Service | Runtime execution engine | Register as execution engine in config | Licensed benchmark data for comparison queries without host-side data licensing and ingestion |
+| Regulatory Reference Service | Runtime execution backend | Register in Data Source Catalog | Authoritative, up-to-date regulatory metrics without internal maintenance |
+| Benchmark Data Service | Runtime execution backend | Register in Data Source Catalog | Licensed benchmark data for comparison queries without internal data licensing and ingestion |

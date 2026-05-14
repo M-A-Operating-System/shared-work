@@ -2,20 +2,25 @@
 
 ## Vision
 
-### Governed AI analytics for any regulated application
+### A deterministic semantic computation engine — used by GenAI
 
-The **AI Analytics Platform** enables any application — and any AI agent operating within that application — to access governed, explainable, role-aware analytical intelligence against large-scale datasets, without building semantic query infrastructure. The experience is modelled on the best institutional analytics environments: deterministic metric resolution, auditable execution, role-enforced data access, and AI-generated insights that are always anchored to governed, registered business definitions.
+The **AI Analytics Platform** is a **deterministic semantic computation engine**, not a generative AI product. Given a structured analytical query — a set of metric IDs, dimensions, time period, and filters resolved against the Semantic Metrics Registry — it always computes the same answer from the same data. There is no probability, no sampling, no generation. Metric values are calculated from registered definitions applied to data retrieved from execution backends.
 
-It is not a general-purpose analytics tool and not a natural-language SQL interface. Each deployment is a **governed analytical specialist** configured to its host application's metric domain, entitlement model, and regulatory context.
+Generative AI is a consumer of the platform, not the platform itself. A conversational AI assistant uses the platform's MCP Capability Layer as a tool — submitting structured queries and receiving computed results. The AI narrates those results in prose. The AI never produces the numbers. The platform always produces the numbers, deterministically.
 
-The platform serves multiple consumer types simultaneously: human users querying through an embedded analytics component, conversational AI users asking questions through the **AI Chat Platform**, and autonomous agents running scheduled or event-triggered analytical workflows. All consumers share the same governance pipeline and lineage trail.
+It is a shared analytical backend service: a governed, role-aware computation layer over registered data sources, accessible to any MCP-compatible consumer — applications, AI agents, or automated pipelines — without each consumer needing to build query infrastructure or implement query governance independently.
 
-> **Governing intent:** Give any application team the ability to deploy a production-grade, governed AI analytics layer into their product within days — fully scoped to their semantic metric domain, connected to their execution engines via a federated query planner, enforcing their entitlement model, and producing a complete analytical lineage trail for every query — whether that query originates from a human user, a conversational assistant, or an autonomous agent.
+It is not a general-purpose analytics tool and not a natural-language SQL interface. It is a **governed analytical specialist** scoped to a registered Semantic Metrics Registry, a declared set of data sources, and a configured entitlement model.
+
+The platform serves multiple consumer types simultaneously: human users querying via any MCP-compatible client, conversational AI users asking questions through the **AI Chat Platform**, and autonomous agents running scheduled or event-triggered analytical workflows. All consumers share the same governance pipeline and lineage trail.
+
+> **Governing intent:** Give any application or agent the ability to access a production-grade, governed AI analytics layer — fully scoped to a registered semantic metric domain, connected to registered data sources via a federated query planner, enforcing a configured entitlement model, and producing a complete analytical lineage trail for every query — whether that query originates from a human user, a conversational assistant, or an autonomous agent.
 
 ### What the platform is and is not
 
 | It is | It is not |
 |-------|-----------|
+| A **deterministic semantic computation engine** — the same query, the same data, the same entitlements always produce the same result; metric values are computed from registered definitions applied to data, never generated | A generative AI product — GenAI is a consumer of this platform, not the platform itself; the AI narrates results, the engine computes them |
 | A headless MCP API service — it returns structured JSON result sets and optional SCL display specifications; any application or agent can consume it regardless of their UI stack | A general-purpose SQL query interface, BI tool replacement, or UI-rendering layer |
 | A platform where all AI-accessible metrics are registered, governed, and version-controlled in a Semantic Metrics Registry | A system that allows LLMs to generate arbitrary SQL against physical schemas |
 | A federated query planner that routes governed analytical plans to appropriate execution backends — SQL data warehouses, OpenData APIs, Graph Data APIs, semantic layers, or any registered retrieval mechanism | A single-engine analytics layer coupled to one database or query technology |
@@ -34,9 +39,45 @@ The platform serves multiple consumer types simultaneously: human users querying
 | **Governed by default** | No metric, query, or result escapes the governance pipeline. Circuit breakers, compliance classification, cost controls, and role enforcement apply to every request regardless of consumer type. There is no fast path that bypasses governance. |
 | **Semantic, not syntactic** | All analytical intent is expressed in business vocabulary registered in the SMR. Physical schemas, SQL, and execution-engine specifics are never exposed to AI models or to consumers. The platform owns the translation from intent to execution. |
 | **Headless and consumer-agnostic** | The platform produces structured JSON results and SCL display specifications. It never renders charts or generates HTML. Rendering is always the consumer's responsibility — any MCP-compatible consumer renders from the returned display specification using their own UI stack. |
-| **Role enforcement at the semantic tier** | Entitlements are applied at the Role-Aware Projection Layer before any Logical Query Plan is compiled. The execution engine is not the security boundary — a query that the user is not entitled to see never reaches physical execution. |
+| **Role enforcement at the semantic tier** | Entitlements are applied at the Role-Aware Projection Layer before any Logical Query Plan is compiled. The execution backend is not the security boundary — a query that the user is not entitled to see never reaches physical execution. |
 | **Lineage for everything** | Every analytical result carries a `result_id` linking to a complete, queryable provenance chain from natural-language intent through SMR resolution, role projection, plan compilation, engine routing, and result assembly. |
 | **Equal governance for all consumer types** | Human users, conversational assistants, and autonomous agents route through the same pipeline and receive results with identical metric definitions, entitlement enforcement, and lineage provenance. There is no privileged consumer class and no governance bypass. |
+| **Computation, not generation** | Analytical results are computed from registered metric definitions and retrieved data — never generated by an AI model. GenAI participates at two explicitly bounded points only: translating natural language into structured query parameters (input side), and narrating computed values in prose (output side). The numbers are always the product of deterministic computation. |
+
+---
+
+## Deterministic computation engine — not generative AI
+
+This distinction is foundational and must be understood before anything else in this specification.
+
+The AI Analytics Platform is a **deterministic semantic computation engine**. Given a structured analytical query — a set of metric IDs, dimensions, a time period, and filters resolved against the Semantic Metrics Registry — the platform always computes the same answer from the same data. There is no probability, no sampling, no model inference in the computation layer. Metric values are calculated from versioned, registered definitions applied to data retrieved from execution backends.
+
+### What generative AI does — and does not do — in this platform
+
+Generative AI has exactly two bounded roles:
+
+| Role | Where | What the model does | What the model cannot do |
+|------|-------|--------------------|-----------------------|
+| **Intent translation** | Input — Semantic Intent Layer | Converts a natural-language question into a structured set of MCP tool call parameters: metric IDs, dimension IDs, time period, filters. Output is a JSON object validated against the SMR. | Produce metric values, construct queries that bypass the SMR, or access execution backends directly. |
+| **Narrative synthesis** | Output — Narrative Synthesis Engine | Writes a prose description of a computed result, strictly constrained to values present in the execution result. | Introduce metric values, comparisons, or figures not present in the computed result set. |
+
+Every number in an analytical result is the product of computation. No number is the product of generation.
+
+### The platform runs without generative AI
+
+If a consumer submits a structured MCP tool call directly — explicit metric IDs, dimensions, and filters, no natural language — the Semantic Intent Layer is bypassed entirely. The computation pipeline (SMR resolution → role projection → governance → FQP → result assembly) is purely deterministic code. This is how automated agents, scheduled pipelines, and direct API integrations typically operate.
+
+Natural language is a convenience layer over a computation engine. The computation engine is the product.
+
+### What this means in practice
+
+| Implication | Detail |
+|-------------|--------|
+| **Results are reproducible** | The same structured query at the same point in time with the same data always returns the same result. There is no run-to-run variation in the computation layer. |
+| **Metric values cannot be hallucinated** | If a metric value appears in a result, it was computed from a registered definition and data from a registered backend. If the metric ID does not exist in the SMR, the query fails — it does not produce an approximation. |
+| **Errors are diagnosable** | If a result is wrong, the cause is incorrect data in the backend, an incorrect metric definition in the SMR, or an incorrect intent translation (the wrong query was submitted). All three are visible in the lineage record. None is hallucination. |
+| **Auditors and regulators get computed facts** | The number in the result is calculated, not estimated or inferred. The lineage record shows exactly which definition version was used and which data was retrieved to produce it. |
+| **AI narrates; the engine calculates** | The AI Chat Platform, autonomous agents, and any other GenAI consumer receive the platform's computed results and may describe, summarise, or act on them. They do not produce the underlying analytical values. |
 
 ---
 
@@ -45,7 +86,7 @@ The platform serves multiple consumer types simultaneously: human users querying
 ### In scope
 
 - Headless MCP API (`POST /v1/mcp`) — the sole entry point for all consumers; returns structured JSON result sets and SCL display specifications; no rendering layer
-- Multi-tenant architecture with complete per-tenant data isolation
+- Data Source Catalog — the platform's registry of all available execution backends and the data domains they serve; the FQP routes queries to backends by data domain affinity declared in the SMR
 - Semantic Metrics Registry (SMR) — the governing catalogue of all resolvable metrics, dimensions, hierarchies, aggregation rules, ownership assignments, and lineage metadata
 - Analytical Intent Validator — validates MCP tool call parameters (metric IDs, dimension IDs, time periods, filters) against the SMR, applies role projection, and compiles to an engine-agnostic Logical Query Plan; no custom query language — the MCP JSON parameter format is the query interface
 - Federated Query Planner — routes Logical Query Plan fragments to registered execution backends and assembles results; backends may be SQL-based data warehouses, OpenData APIs, Graph Data APIs, semantic layers, or any other registered retrieval mechanism
@@ -54,9 +95,9 @@ The platform serves multiple consumer types simultaneously: human users querying
 - Visualisation Ontology — a governed schema of chart contracts, interaction semantics, drilldown definitions, and chart contract parameters; produces a Semantic Charting Language (SCL) display specification returned to the consumer — the platform does not render charts
 - MCP Capability Layer — exposes bounded, pre-defined analytical operations to AI orchestrators via MCP-compatible interfaces
 - Narrative synthesis — LLM-generated prose explanations anchored to execution results, governed to prohibit metric hallucination
-- Analytical lineage trail — complete, queryable lineage from intent resolution through semantic planning, execution, and result delivery
+- Analytical lineage trail — computation provenance (not data lineage): a complete, queryable record of which metric definitions, aggregation rules, role projections, and backend sub-results the engine used to calculate each specific response
 - Example industry model (Financial Services) — a reference set of pre-built metric definitions for wealth management, banking, investment management, and regulatory reporting; demonstrates the model packaging pattern for other industry domains
-- Host-configured analytical domain scoping, metric access policies, and execution engine registration
+- Platform-configured analytical domain scoping, metric access policies, and execution backend registration
 - Governed drilldown — traversal of registered analytical hierarchies within host-configured scope
 
 ### Out of scope
@@ -117,7 +158,7 @@ The platform serves multiple consumer types simultaneously: human users querying
 │                         │                                          │
 │  ┌──────────────────────▼──────────────────────────────────────┐  │
 │  │               Federated Query Planner (FQP)                  │  │
-│  │  (routes LQP fragments to registered execution engines)      │  │
+│  │  (routes LQP fragments to registered execution backends)     │  │
 │  └──────────────────────┬──────────────────────────────────────┘  │
 │                         │                                          │
 │  ┌──────────────────────▼──────────────────────────────────────┐  │
@@ -243,7 +284,7 @@ This headless design means:
 | **AI provider** | Provider-agnostic abstraction used by the Semantic Intent Layer and Narrative Synthesis Engine. The platform maps tiers to the tenant's configured provider's current models. |
 | **Platform storage** | Relational database with RLS for SMR records, lineage records, and configuration; object storage for cached result sets and artefacts. |
 | **Platform edge function** | JWT handling, intent resolution API, intent validation and LQP compilation, governance checks, FQP orchestration, result assembly, SCL display spec generation. |
-| **Host authentication** | The host application issues JWTs for its users, including role claims used by the Role-Aware Projection Layer. |
+| **Consumer authentication** | The organisation's identity provider issues JWTs for users and service accounts, including the role claims used by the Role-Aware Projection Layer. |
 | **Host execution backends** | The host's registered data retrieval backends — SQL data warehouses, OpenData APIs, Graph Data APIs, semantic layers, OLAP engines, or any other mechanism the host registers. The FQP translates Logical Query Plan fragments into each backend's native request protocol. |
 | **AI Chat Platform** | The primary conversational consumer of the Analytics Platform's MCP Capability Layer. See [Role in the AI-Enablement Product Ecosystem](#role-in-the-ai-enablement-product-ecosystem) below. |
 | **Static image rendering service** | Optional complementary service — accepts a `display_spec` JSON object and returns a static image (PNG or SVG). Used by agentic consumers, report pipelines, and email delivery workflows where interactive rendering is unavailable. |
@@ -274,11 +315,11 @@ This separation is intentional. The AI Chat Platform remains a generic conversat
 
 ### Consumption modes
 
-The AI Analytics Platform is designed for three modes of consumption, which may be used simultaneously by the same host application:
+The AI Analytics Platform is designed for three modes of consumption, which may be used simultaneously by the same consuming organisation:
 
 | Mode | Consumer | When to use |
 |------|---------|-------------|
-| **Direct API consumer** | A custom application calling `POST /v1/mcp` directly — rendering the returned JSON result sets and SCL display specifications using their own UI stack | Dedicated analytics views, dashboards, analytical workbooks built by the host team — where the application owns the rendering layer entirely |
+| **Direct API consumer** | A custom application calling `POST /v1/mcp` directly — rendering the returned JSON result sets and SCL display specifications using their own UI stack | Dedicated analytics views, dashboards, analytical workbooks built by the consuming team — where the application owns the rendering layer entirely |
 | **Conversational backend** | AI Chat Platform, registered via `mcpServers` config | Conversational analytics — where the user asks quantitative questions in natural language; the AI Chat Platform routes tool calls to the Analytics Platform's MCP endpoint |
 | **Agentic consumer** | Autonomous AI agents, scheduled pipelines, event-triggered workflows | Any AI orchestrator that needs to query large datasets, monitor metrics, generate governed reports, or trigger analytical workflows without a human in the loop — all via the same MCP Capability Layer |
 
@@ -292,7 +333,7 @@ The following diagram shows all three consumption modes operating against the sa
 
 ```
 ┌────────────────────────────────────────────────────────────────────────────┐
-│                              Host Application                               │
+│                           Consuming Organisation                            │
 │                                                                            │
 │  ┌───────────────────────┐  ┌─────────────────────┐  ┌───────────────────┐ │
 │  │  <ai-chat> component  │  │ Custom analytics UI  │  │ Agentic consumers │ │
@@ -340,13 +381,13 @@ The following diagram shows all three consumption modes operating against the sa
            └─────────────┘ └─────────────┘ └──────────────────┘
 ```
 
-No consumer — AI Chat Platform, `<ai-analytics>` component, or agentic agent — has a path to execution engines, physical schemas, or raw SQL. Every analytical request routes through the MCP Capability Layer and the full governance pipeline. The Analytical Lineage Store records every invocation, regardless of which consumer initiated it.
+No consumer — AI Chat Platform, `<ai-analytics>` component, or agentic agent — has a path to execution backends, physical schemas, or raw SQL. Every analytical request routes through the MCP Capability Layer and the full governance pipeline. The Analytical Lineage Store records every invocation, regardless of which consumer initiated it.
 
 ---
 
 ### MCP registration
 
-To connect the Analytics Platform to the AI Chat Platform, a host application adds the following entry to the `mcpServers` section of its AI Chat Platform application config:
+To connect the Analytics Platform to the AI Chat Platform, a consuming application adds the following entry to the `mcpServers` section of its AI Chat Platform config:
 
 ```json
 {
@@ -360,7 +401,7 @@ To connect the Analytics Platform to the AI Chat Platform, a host application ad
 }
 ```
 
-The `description` field is injected verbatim into the AI Chat Platform's system prompt and is the primary signal the AI model uses to decide when to route a question to the Analytics Platform versus other registered MCP servers. The description above is the recommended starting point; host teams should customise it to reflect their specific metric domains.
+The `description` field is injected verbatim into the AI Chat Platform's system prompt and is the primary signal the AI model uses to decide when to route a question to the Analytics Platform versus other registered MCP servers. The description above is the recommended starting point; integration engineers should customise it to reflect their specific metric domains.
 
 Setting `accessTier: "always-on"` ensures the Analytics Platform's capabilities are available in every session without user action — appropriate because most quantitative questions in a governed financial application require the Analytics Platform by default.
 
@@ -397,7 +438,7 @@ AI Analytics Platform — governance pipeline:
   4. Role-Aware Projection: filter to portfolios the user is entitled to see
   5. Intent validation → Logical Query Plan
   6. Semantic Execution Governance: cost estimate check, compliance classification
-  7. Federated Query Planner: route to registered execution engine(s)
+  7. Federated Query Planner: route to registered execution backend(s)
   8. Result assembly + lineage record written
 
   ↓  Returns governed MCP tool response to AI Chat Platform:
@@ -451,15 +492,15 @@ At no point in this flow does the AI model construct SQL, access a physical sche
 
 ### Routing alongside other MCP servers (AI Chat Platform)
 
-Host applications that deploy both platforms will typically register the Analytics Platform alongside their own operational MCP servers. The AI model routes between them based on the `description` fields in the `mcpServers` config:
+Organisations that deploy both platforms will typically register the Analytics Platform alongside their own operational MCP servers. The AI model routes between them based on the `description` fields in the `mcpServers` config:
 
 | Server | Handles | Example queries |
 |--------|---------|----------------|
 | **Analytics Platform MCP** | Large-scale, governed metric computation; federated query; attribution and decomposition | *"What is the tracking error for my equity portfolios?"*, *"Break down the risk drivers for Global Equity"* |
-| **Host application MCP** | Operational data, workflow actions, entity lookups, real-time state (balances, positions, alerts, approval queues) | *"Show me the latest valuation for fund XYZ"*, *"What trades are pending settlement today?"* |
+| **Operational MCP** | Operational data, workflow actions, entity lookups, real-time state (balances, positions, alerts, approval queues) | *"Show me the latest valuation for fund XYZ"*, *"What trades are pending settlement today?"* |
 | **Web Search MCP** | Current market news, regulatory announcements, external reference data | *"What did the Fed announce yesterday?"*, *"What is the current SOFR rate?"* |
 
-For quantitative analytical questions, the AI model routes to the Analytics Platform. For operational lookups and real-time state, it routes to the host application's own servers. The `description` field on each server is the primary routing signal — the suggested `description` text above is optimised for correct routing in a financial services deployment.
+For quantitative analytical questions, the AI model routes to the Analytics Platform. For operational lookups and real-time state, it routes to the organisation's own operational servers. The `description` field on each server is the primary routing signal — the suggested `description` text above is optimised for correct routing in a financial services deployment.
 
 ### Agentic consumers
 

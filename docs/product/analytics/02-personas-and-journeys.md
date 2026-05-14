@@ -1,6 +1,6 @@
 # 02 — Personas and User Journeys
 
-The AI Analytics Platform is deployed by host applications across regulated financial services contexts. This document describes personas at two levels: **platform-level archetypes** (roles that exist across all deployments) and **illustrative host application journeys** (examples showing how different financial services contexts use the platform).
+The AI Analytics Platform serves consumers across regulated financial services contexts. This document describes personas at two levels: **platform-level archetypes** (roles that exist across all deployments) and **illustrative deployment journeys** (examples showing how different financial services contexts use the platform).
 
 ---
 
@@ -8,11 +8,11 @@ The AI Analytics Platform is deployed by host applications across regulated fina
 
 | Persona | Role | Primary need |
 |---------|------|--------------|
-| **Analytical End User** | Authenticated user of the host application using the analytics layer as their primary data access interface | Ask governed analytical questions and receive reliable, role-appropriate results without knowledge of underlying data structures or metric definitions |
+| **Analytical End User** | Authenticated user accessing the analytics platform as their primary data access interface | Ask governed analytical questions and receive reliable, role-appropriate results without knowledge of underlying data structures or metric definitions |
 | **Power Analyst** | Experienced user who composes multi-dimensional analytical requests and navigates drilldown hierarchies | Multi-dimensional analytical exploration, governed drilldown, lineage inspection, result export for downstream use |
 | **Application Admin** | Privileged user within the tenant responsible for the SMR, entitlement policies, and governance configuration | Manage metric definitions, approve registry changes, maintain entitlement policies, review governance audit trail |
 | **Metric Owner** | Subject-matter expert assigned ownership of one or more metric definitions in the SMR | Review proposed changes to owned metrics, approve aggregation rule changes, maintain metric documentation |
-| **Host Developer** | Engineer at the host application team responsible for config and engine integration | Register execution engines, maintain the application config, integrate entitlement model |
+| **Integration Engineer** | Engineer responsible for data source registration, consumer integration, and platform configuration | Register execution backends, maintain the platform config, integrate entitlement model |
 | **Platform Admin** | AI Analytics Platform team member with cross-tenant visibility | Platform health, tenant onboarding, infrastructure, governance audit review |
 
 ### Application Admin design note
@@ -22,20 +22,20 @@ The Application Admin role is the platform's equivalent of a Chief Data Officer 
 - Managing the Semantic Metrics Registry — approving new metric definitions, deprecating obsolete ones, resolving definition conflicts
 - Maintaining entitlement policies — role-to-metric-access mappings, row predicates, column masks
 - Reviewing the governance audit trail — flagging unusual query patterns or policy violations
-- Configuring execution engine routing priorities and cost limits
-- Approving Application Context for the analytical assistant
+- Configuring execution backend routing priorities and cost limits
+- Configuring the analytical assistant context
 
 This role must exist in every tenant before go-live.
 
 ---
 
-## Illustrative host application journeys
+## Illustrative deployment journeys
 
 ---
 
 ### Journey A — Wealth management: portfolio morning briefing
 
-**Host application type:** Wealth management platform  
+**Deployment context:** Wealth management platform  
 **Persona:** Portfolio Manager (Analytical End User)  
 **Setting:** Desktop, first thing in the morning
 
@@ -56,7 +56,7 @@ The manager clicks the Technology bar segment. A governed drilldown traverses th
 
 ### Journey B — Risk management: VaR limit breach investigation
 
-**Host application type:** Investment risk management system  
+**Deployment context:** Investment risk management system  
 **Persona:** Risk Officer (Power Analyst)  
 **Setting:** Desktop, intraday monitoring
 
@@ -69,7 +69,7 @@ The result is:
 - A drilldown-ready table of limit breach amounts
 - Narrative synthesis: *"3 portfolios are breaching their VaR 95 limit today. Emerging Markets High Yield has the most severe breach at 142% of limit. The dominant risk factor for all three portfolios is credit spread widening in BBB-rated corporate bonds, accounting for 64–71% of the excess VaR."*
 
-The risk officer opens the lineage inspector. They can see exactly which execution engines were called, what predicates were applied, and which metric definitions from the SMR were used.
+The risk officer opens the lineage inspector. They can see exactly which execution backends were called, what predicates were applied, and which metric definitions from the SMR were used.
 
 **Features exercised:** Multi-engine federation, VaR metrics, risk factor attribution, heatmap rendering, narrative synthesis, lineage inspector.
 
@@ -77,7 +77,7 @@ The risk officer opens the lineage inspector. They can see exactly which executi
 
 ### Journey C — Compliance: regulatory reporting preparation
 
-**Host application type:** Banking compliance management platform  
+**Deployment context:** Banking compliance management platform  
 **Persona:** Compliance Analyst  
 **Setting:** Desktop, end-of-quarter regulatory reporting cycle
 
@@ -96,7 +96,7 @@ The result is:
 
 ### Journey D — Institutional analytics: issuer concentration review
 
-**Host application type:** Institutional asset management platform  
+**Deployment context:** Institutional asset management platform  
 **Persona:** Power Analyst  
 **Setting:** Desktop, pre-investment committee
 
@@ -114,7 +114,7 @@ They export the result as PDF — the lineage record is automatically attached. 
 
 ### Journey E — Application Admin: metric definition governance
 
-**Host application type:** Any financial services platform  
+**Deployment context:** Any financial services platform  
 **Persona:** Application Admin  
 **Setting:** Platform Admin UI
 
@@ -136,7 +136,7 @@ The Application Admin reviews, notes that the formula is consistent with the exi
 
 ## Persona × Feature Matrix
 
-| Feature | End User | Power Analyst | Compliance Analyst | App Admin | Metric Owner | Host Developer |
+| Feature | End User | Power Analyst | Compliance Analyst | App Admin | Metric Owner | Integration Engineer |
 |---------|:--------:|:-------------:|:-----------------:|:---------:|:------------:|:--------------:|
 | Natural language query | ✓ | ✓ | ✓ | ✓ | | |
 | Metric resolution from SMR | ✓ | ✓ | ✓ | ✓ | | |
@@ -149,7 +149,7 @@ The Application Admin reviews, notes that the formula is consistent with the exi
 | SMR metric proposal | | | | ✓ | ✓ | |
 | SMR metric approval | | | | ✓ | | |
 | Entitlement policy management | | | | ✓ | | |
-| Engine registration | | | | | | ✓ |
+| Backend registration | | | | | | ✓ |
 | Governance audit trail | | | ✓ | ✓ | | ✓ |
 | Config management | | | | ✓ | | ✓ |
 | Regulatory metric domain | | | ✓ | ✓ | | |

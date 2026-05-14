@@ -196,7 +196,7 @@ The FQP maintains a result cache keyed by the LQP signature (a deterministic has
 |----------------|--------------|
 | Cache key | SHA-256 of (metric IDs + versions, dimension IDs, filter predicates, time expression, entitlement hash, tenant ID) |
 | Cache TTL | Configurable per `data.refresh_cadence` in the metric definition. Default: `3600` seconds. |
-| Cache invalidation | On metric definition version change; on execution engine data refresh signal (if the engine emits one); on explicit cache clear via Admin API |
+| Cache invalidation | On metric definition version change; on execution backend data refresh signal (if the backend emits one); on explicit cache clear via Admin API |
 | Cache scope | Per-tenant. Results from one tenant are never served to another. |
 | Cache storage | Platform-managed result cache. Results over 10MB bypass the cache and are streamed directly. |
 | Cache hit disclosure | Cache hits are disclosed in the lineage record and (optionally) to the user as a *"Result from cache (data as of [timestamp])"* indicator. |

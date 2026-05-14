@@ -2,7 +2,7 @@
 
 ## Overview
 
-The **Role-Aware Projection Layer** is the component that applies the authenticated user's entitlement model to the resolved analytical intent before any query plan is compiled. It is the semantic-layer enforcement of data access controls — operating above the physical execution layer, before any query reaches an execution engine.
+The **Role-Aware Projection Layer** is the component that applies the authenticated user's entitlement model to the resolved analytical intent before any query plan is compiled. It is the semantic-layer enforcement of data access controls — operating above the physical execution layer, before any query reaches an execution backend.
 
 Role-aware projection is not optional and not bypassable. Every analytical request — whether from natural language or an MCP tool call — passes through the projection layer.
 
@@ -118,7 +118,7 @@ portfolio_id IN ('GLOB_EQ_OPP', 'UK_CORE_INC', 'STRAT_BAL')
 
 ## Column masking
 
-Column masks are applied by the FQP during result assembly, after sub-results are returned from execution engines but before the result is returned to the calling layer.
+Column masks are applied by the FQP during result assembly, after sub-results are returned from execution backends but before the result is returned to the calling layer.
 
 **Masking modes (configured per tenant):**
 
