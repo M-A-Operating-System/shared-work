@@ -46,6 +46,41 @@ The platform serves multiple consumer types simultaneously: human users querying
 
 ---
 
+## Deterministic computation engine — not generative AI
+
+This distinction is foundational and must be understood before anything else in this specification.
+
+The AI Analytics Platform is a **deterministic semantic computation engine**. Given a structured analytical query — a set of metric IDs, dimensions, a time period, and filters resolved against the Semantic Metrics Registry — the platform always computes the same answer from the same data. There is no probability, no sampling, no model inference in the computation layer. Metric values are calculated from versioned, registered definitions applied to data retrieved from execution backends.
+
+### What generative AI does — and does not do — in this platform
+
+Generative AI has exactly two bounded roles:
+
+| Role | Where | What the model does | What the model cannot do |
+|------|-------|--------------------|-----------------------|
+| **Intent translation** | Input — Semantic Intent Layer | Converts a natural-language question into a structured set of MCP tool call parameters: metric IDs, dimension IDs, time period, filters. Output is a JSON object validated against the SMR. | Produce metric values, construct queries that bypass the SMR, or access execution backends directly. |
+| **Narrative synthesis** | Output — Narrative Synthesis Engine | Writes a prose description of a computed result, strictly constrained to values present in the execution result. | Introduce metric values, comparisons, or figures not present in the computed result set. |
+
+Every number in an analytical result is the product of computation. No number is the product of generation.
+
+### The platform runs without generative AI
+
+If a consumer submits a structured MCP tool call directly — explicit metric IDs, dimensions, and filters, no natural language — the Semantic Intent Layer is bypassed entirely. The computation pipeline (SMR resolution → role projection → governance → FQP → result assembly) is purely deterministic code. This is how automated agents, scheduled pipelines, and direct API integrations typically operate.
+
+Natural language is a convenience layer over a computation engine. The computation engine is the product.
+
+### What this means in practice
+
+| Implication | Detail |
+|-------------|--------|
+| **Results are reproducible** | The same structured query at the same point in time with the same data always returns the same result. There is no run-to-run variation in the computation layer. |
+| **Metric values cannot be hallucinated** | If a metric value appears in a result, it was computed from a registered definition and data from a registered backend. If the metric ID does not exist in the SMR, the query fails — it does not produce an approximation. |
+| **Errors are diagnosable** | If a result is wrong, the cause is incorrect data in the backend, an incorrect metric definition in the SMR, or an incorrect intent translation (the wrong query was submitted). All three are visible in the lineage record. None is hallucination. |
+| **Auditors and regulators get computed facts** | The number in the result is calculated, not estimated or inferred. The lineage record shows exactly which definition version was used and which data was retrieved to produce it. |
+| **AI narrates; the engine calculates** | The AI Chat Platform, autonomous agents, and any other GenAI consumer receive the platform's computed results and may describe, summarise, or act on them. They do not produce the underlying analytical values. |
+
+---
+
 ## Scope
 
 ### In scope
