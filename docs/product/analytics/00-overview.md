@@ -18,7 +18,7 @@ The platform serves multiple consumer types simultaneously: human users querying
 |-------|-----------|
 | A headless MCP API service — it returns structured JSON result sets and optional Vega-Lite chart specifications; any application or agent can consume it regardless of their UI stack | A general-purpose SQL query interface, BI tool replacement, or UI-rendering layer |
 | A platform where all AI-accessible metrics are registered, governed, and version-controlled in a Semantic Metrics Registry | A system that allows LLMs to generate arbitrary SQL against physical schemas |
-| A federated query engine that routes governed analytical plans to appropriate execution backends | A single-engine analytics layer coupled to one database or warehouse |
+| A federated query planner that routes governed analytical plans to appropriate execution backends — SQL data warehouses, OpenData APIs, Graph Data APIs, semantic layers, or any registered retrieval mechanism | A single-engine analytics layer coupled to one database or query technology |
 | A role-aware entitlement enforcement layer applied at the semantic tier before execution | A system that relies on database-level access controls as the primary security boundary for AI queries |
 | A headless chart specification layer — the Visualisation Ontology selects chart contracts and produces Vega-Lite specs; rendering is always the consumer's responsibility | A system that allows LLMs to select chart types ad hoc without a governing contract, or that renders charts directly |
 | A complete analytical lineage trail from business question to execution result | A black-box analytics system with no explainability mechanism |
@@ -44,13 +44,13 @@ The platform serves multiple consumer types simultaneously: human users querying
 
 ### In scope
 
-- Headless MCP API (`POST /v1/mcp`) — the sole entry point for all consumers; returns structured JSON result sets and optional Vega-Lite chart specifications; no rendering layer
+- Headless MCP API (`POST /v1/mcp`) — the sole entry point for all consumers; returns structured JSON result sets and SCL display specifications; no rendering layer
 - Multi-tenant architecture with complete per-tenant data isolation
 - Semantic Metrics Registry (SMR) — the governing catalogue of all resolvable metrics, dimensions, hierarchies, aggregation rules, ownership assignments, and lineage metadata
 - Analytics DSL — a constrained, AI-readable query language that exposes business semantics and compiles to engine-agnostic Logical Query Plans
-- Federated Query Planner — routes Logical Query Plan fragments to registered execution engines and assembles results
+- Federated Query Planner — routes Logical Query Plan fragments to registered execution backends and assembles results; backends may be SQL-based data warehouses, OpenData APIs, Graph Data APIs, semantic layers, or any other registered retrieval mechanism
 - Role-Aware Projection Layer — applies entitlement filters (row restrictions, column masks, metric visibility rules) at the semantic tier before plan compilation
-- Semantic Execution Governance — circuit breakers, cost controls, query complexity limits, and compliance classification checks applied before any physical engine call
+- Semantic Execution Governance — circuit breakers, cost controls, query complexity limits, and compliance classification checks applied before any backend call
 - Visualisation Ontology — a governed schema of chart contracts, interaction semantics, drilldown definitions, and chart contract parameters; produces a Semantic Charting Language (SCL) display specification returned to the consumer — the platform does not render charts
 - MCP Capability Layer — exposes bounded, pre-defined analytical operations to AI orchestrators via MCP-compatible interfaces
 - Narrative synthesis — LLM-generated prose explanations anchored to execution results, governed to prohibit metric hallucination
@@ -63,9 +63,9 @@ The platform serves multiple consumer types simultaneously: human users querying
 
 - Chart or table rendering of any kind — consumers are responsible for all display
 - Web component or UI embedding layer — any such component is a separate consumer product
-- Direct SQL execution against host databases
-- Physical schema exposure to AI model context
-- Ad hoc LLM-generated SQL at any layer
+- Direct query execution against host data sources — all queries are expressed as Logical Query Plans and executed via registered backends
+- Exposure of physical data source schemas, endpoints, or query languages to AI model context
+- Ad hoc query generation against unregistered data sources at any layer
 - Real-time streaming data ingestion (v1)
 - General-purpose BI authoring beyond governed narrative synthesis
 - Cross-tenant metric federation
@@ -141,9 +141,9 @@ The platform serves multiple consumer types simultaneously: human users querying
          │               │                   │
 ┌────────▼───────┐ ┌─────▼──────────┐ ┌─────▼──────────────┐
 │ Execution      │ │ Execution       │ │ Execution           │
-│ Engine A       │ │ Engine B        │ │ Engine C            │
-│ (data warehouse│ │ (distributed    │ │ (semantic layer /   │
-│  / cloud DB)   │ │  query engine)  │ │  OLAP engine)       │
+│ Backend A      │ │ Backend B       │ │ Backend C           │
+│ (SQL data      │ │ (OpenData API / │ │ (Graph Data API /   │
+│  warehouse)    │ │  semantic layer)│ │  OLAP engine)       │
 └────────────────┘ └────────────────┘ └────────────────────┘
 ```
 
@@ -157,9 +157,9 @@ The platform serves multiple consumer types simultaneously: human users querying
 
 **Analytics DSL Compiler** translates the projected analytical intent into an engine-agnostic Logical Query Plan (LQP) expressed in the platform's Analytics DSL. The LQP is a directed acyclic graph (DAG) of analytical operations with no physical engine references.
 
-**Semantic Execution Governance** validates the LQP against circuit breakers (cost estimates, complexity limits, data classification compliance) before releasing it to the Federated Query Planner.
+**Semantic Execution Governance** validates the LQP against circuit breakers (cost estimates, complexity limits, data classification compliance) before releasing it to the Federated Query Planner. Governance applies regardless of which backend type will execute the plan.
 
-**Federated Query Planner (FQP)** decomposes the LQP into engine-specific sub-plans, routes them to registered execution engines, handles result assembly, and manages caching and materialisation.
+**Federated Query Planner (FQP)** decomposes the LQP into backend-specific sub-plans, routes them to registered execution backends, handles result assembly, and manages caching and materialisation. Registered backends may include SQL-based data warehouses, OpenData APIs, Graph Data APIs, semantic layers, OLAP engines, or any other data retrieval mechanism the host has registered — the LQP is backend-agnostic and the FQP owns the translation to each backend's query or request protocol.
 
 **Visualisation Ontology** receives the assembled result set and applies the governing Visualisation Ontology to select a chart contract and parameterise it from the result schema. It produces a **Semantic Charting Language (SCL)** display specification — a governed `display_spec` JSON object — that is returned to the consumer as part of the MCP tool response. The Analytics Platform does not render charts; rendering is always the consumer's responsibility.
 
@@ -244,7 +244,7 @@ This headless design means:
 | **Platform storage** | Relational database with RLS for SMR records, lineage records, and configuration; object storage for cached result sets and artefacts. |
 | **Platform edge function** | JWT handling, intent resolution API, DSL compilation, governance checks, FQP orchestration, result assembly, SCL display spec generation. |
 | **Host authentication** | The host application issues JWTs for its users, including role claims used by the Role-Aware Projection Layer. |
-| **Host execution engines** | The host's registered analytical backends (data warehouses, semantic layers, OLAP engines) that execute physical query plans. |
+| **Host execution backends** | The host's registered data retrieval backends — SQL data warehouses, OpenData APIs, Graph Data APIs, semantic layers, OLAP engines, or any other mechanism the host registers. The FQP translates Logical Query Plan fragments into each backend's native request protocol. |
 | **AI Chat Platform** | The primary conversational consumer of the Analytics Platform's MCP Capability Layer. See [Role in the AI-Enablement Product Ecosystem](#role-in-the-ai-enablement-product-ecosystem) below. |
 | **Static image rendering service** | Optional complementary service — accepts a `display_spec` JSON object and returns a static image (PNG or SVG). Used by agentic consumers, report pipelines, and email delivery workflows where interactive rendering is unavailable. |
 | **Semantic Registry Service** | Complementary ecosystem service — a curated library of pre-built metric definitions for financial services domains. |
@@ -333,10 +333,10 @@ The following diagram shows all three consumption modes operating against the sa
                   │               │               │
            ┌──────▼──────┐ ┌──────▼──────┐ ┌─────▼───────────┐
            │ Execution   │ │ Execution   │ │ Execution        │
-           │ Engine A    │ │ Engine B    │ │ Engine C          │
-           │ (data       │ │ (distributed│ │ (semantic layer / │
-           │  warehouse) │ │  query      │ │  OLAP engine)     │
-           │             │ │  engine)    │ │                   │
+           │ Backend A   │ │ Backend B   │ │ Backend C         │
+           │ (SQL data   │ │ (OpenData   │ │ (Graph Data API / │
+           │  warehouse) │ │  API /      │ │  OLAP engine)     │
+           │             │ │  sem. layer)│ │                   │
            └─────────────┘ └─────────────┘ └──────────────────┘
 ```
 
