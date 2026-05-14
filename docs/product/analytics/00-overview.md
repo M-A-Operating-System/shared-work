@@ -16,7 +16,7 @@ The platform serves multiple consumer types simultaneously: human users querying
 
 | It is | It is not |
 |-------|-----------|
-| A white-label governed semantic analytics layer any application can embed as a web component | A general-purpose SQL query interface or BI tool replacement |
+| A headless MCP API service — it returns structured JSON result sets and optional Vega-Lite chart specifications; any application or agent can consume it regardless of their UI stack | A general-purpose SQL query interface, BI tool replacement, or UI-rendering layer |
 | A platform where all AI-accessible metrics are registered, governed, and version-controlled in a Semantic Metrics Registry | A system that allows LLMs to generate arbitrary SQL against physical schemas |
 | A federated query engine that routes governed analytical plans to appropriate execution backends | A single-engine analytics layer coupled to one database or warehouse |
 | A role-aware entitlement enforcement layer applied at the semantic tier before execution | A system that relies on database-level access controls as the primary security boundary for AI queries |
@@ -44,7 +44,7 @@ The platform serves multiple consumer types simultaneously: human users querying
 
 ### In scope
 
-- Embeddable `<ai-analytics>` web component with full branding token support
+- Headless MCP API (`POST /v1/mcp`) — the sole entry point for all consumers; returns structured JSON result sets and optional Vega-Lite chart specifications; no rendering layer
 - Multi-tenant architecture with complete per-tenant data isolation
 - Semantic Metrics Registry (SMR) — the governing catalogue of all resolvable metrics, dimensions, hierarchies, aggregation rules, ownership assignments, and lineage metadata
 - Analytics DSL — a constrained, AI-readable query language that exposes business semantics and compiles to engine-agnostic Logical Query Plans
@@ -61,6 +61,8 @@ The platform serves multiple consumer types simultaneously: human users querying
 
 ### Out of scope
 
+- Chart or table rendering of any kind — consumers are responsible for all display
+- Web component or UI embedding layer — any such component is a separate consumer product
 - Direct SQL execution against host databases
 - Physical schema exposure to AI model context
 - Ad hoc LLM-generated SQL at any layer
@@ -75,14 +77,14 @@ The platform serves multiple consumer types simultaneously: human users querying
 
 ```
 ┌────────────────────────────────────────────────────────────────────┐
-│                        Host Application                             │
+│                   Consumer (any MCP-compatible caller)              │
 │                                                                    │
-│   ┌──────────────────────────────────────────────┐                │
-│   │         <ai-analytics> web component          │                │
-│   │    (embedded in host application UI)          │                │
-│   └───────────────────┬──────────────────────────┘                │
-│                        │  Authentication bridge (JWT + role claims) │
-└────────────────────────┼───────────────────────────────────────────┘
+│   AI Chat Platform · autonomous agent · custom application         │
+│   — presents user JWT with role claims                             │
+│                                                                    │
+└────────────────────────────────────────────────────────────────────┘
+                         │
+                         │  POST /v1/mcp  (JWT + MCP tool call)
                          │
 ┌────────────────────────▼───────────────────────────────────────────┐
 │                   AI Analytics Platform                             │
@@ -175,14 +177,14 @@ The AI Analytics Platform is a **headless service**. It has no rendering layer a
 |-------------|------|-------------|
 | `result_id` | string | Unique identifier for this execution result, linking to the full lineage record |
 | `result` | JSON array | Tabular result set — rows and typed columns |
-| `vega_lite_spec` | JSON object (optional) | Vega-Lite chart specification governed by the Visualisation Ontology — present when the result schema maps to a registered chart contract |
+| `vega_lite_spec` | JSON object (optional) | Vega-Lite chart specification governed by the Visualisation Ontology — present only when the result schema maps to a registered chart contract (bar, line, scatter, heatmap, etc.). Absent for purely tabular results — Vega-Lite has no native table type; the consumer renders the `result` array as a table using their own UI |
 | `narrative` | string (optional) | Governed prose explanation produced by the Narrative Synthesis Engine — present when the host has enabled narrative synthesis for the tenant |
 
 **Rendering is always the consumer's responsibility:**
 
-| Consumer | Renders Vega-Lite spec using |
+| Consumer | How they render |
 |---------|------------------------------|
-| `<ai-analytics>` web component | Built-in Vega-Lite renderer embedded in the component |
+| Custom analytics UI (host-built) | Any Vega-Lite-compatible library (Vega-Embed, Observable Plot, etc.) integrated by the host team |
 | AI Chat Platform | Native Vega-Lite content rendering pipeline (priority 5 in the content rendering stack) |
 | Agentic consumers producing PDF/email reports | Optional `vite2img` static image service — consumes the Vega-Lite spec and returns a PNG or SVG for embedding in non-interactive output |
 | Custom consumers | Any Vega-Lite-compatible rendering library |
@@ -222,7 +224,7 @@ The AI Analytics Platform and the **AI Chat Platform** form a complementary two-
 | Layer | Product | Responsibility |
 |-------|---------|---------------|
 | **Conversational surface** | AI Chat Platform | Generative chat interface, conversation management, multi-modal content rendering, tool call transparency, shared conversations, memory, and audit trail. Provides the user's entry point for all interaction. Has no built-in analytical capability. |
-| **Analytical backend** | AI Analytics Platform | Governed semantic metric resolution, large-scale federated query execution, role-aware entitlement enforcement, deterministic visualisation, and lineage-backed result delivery. Has no conversational surface of its own in this configuration. |
+| **Analytical backend** | AI Analytics Platform | Governed semantic metric resolution, large-scale federated query execution, role-aware entitlement enforcement, Vega-Lite chart specification generation, and lineage-backed result delivery. Headless — returns structured data and chart specs; has no rendering layer and no conversational surface. |
 
 The AI Chat Platform is **one consumer** of the Analytics Platform's capabilities, not the only one. The Analytics Platform's MCP Capability Layer (see [08-mcp-capability-layer.md](./08-mcp-capability-layer.md)) is an MCP-compatible interface designed to be consumed by any AI orchestrator — the AI Chat Platform today, and additional agentic consumers in the future.
 
@@ -238,7 +240,7 @@ The AI Analytics Platform is designed for three modes of consumption, which may 
 
 | Mode | Consumer | When to use |
 |------|---------|-------------|
-| **Standalone** | `<ai-analytics>` web component embedded directly in a host application page | Dedicated analytics views, dashboards, analytical workbooks — where the user is in an explicitly analytical context and the full analytics surface is the primary UI |
+| **Direct API consumer** | A custom application calling `POST /v1/mcp` directly — rendering the returned JSON result sets and Vega-Lite specs using their own UI stack | Dedicated analytics views, dashboards, analytical workbooks built by the host team — where the application owns the rendering layer entirely |
 | **Conversational backend** | AI Chat Platform, registered via `mcpServers` config | Conversational analytics — where the user asks quantitative questions in natural language; the AI Chat Platform routes tool calls to the Analytics Platform's MCP endpoint |
 | **Agentic consumer** | Autonomous AI agents, scheduled pipelines, event-triggered workflows | Any AI orchestrator that needs to query large datasets, monitor metrics, generate governed reports, or trigger analytical workflows without a human in the loop — all via the same MCP Capability Layer |
 
@@ -255,9 +257,9 @@ The following diagram shows all three consumption modes operating against the sa
 │                              Host Application                               │
 │                                                                            │
 │  ┌───────────────────────┐  ┌─────────────────────┐  ┌───────────────────┐ │
-│  │  <ai-chat> component  │  │ <ai-analytics>       │  │ Agentic consumers │ │
-│  │  (conversational UI)  │  │  component           │  │ (scheduled agents,│ │
-│  └──────────┬────────────┘  │  (standalone views)  │  │  event monitors,  │ │
+│  │  <ai-chat> component  │  │ Custom analytics UI  │  │ Agentic consumers │ │
+│  │  (conversational UI)  │  │ (host-built; renders │  │ (scheduled agents,│ │
+│  └──────────┬────────────┘  │  returned JSON/spec) │  │  event monitors,  │ │
 │             │ JWT           └──────────┬────────────┘  │  report pipelines)│ │
 └─────────────┼──────────────────────────┼───────────────┴────────┬──────────┘
               │                          │ JWT                     │ JWT
