@@ -55,7 +55,7 @@ The platform serves multiple consumer types simultaneously: human users querying
 - MCP Capability Layer — exposes bounded, pre-defined analytical operations to AI orchestrators via MCP-compatible interfaces
 - Narrative synthesis — LLM-generated prose explanations anchored to execution results, governed to prohibit metric hallucination
 - Analytical lineage trail — complete, queryable lineage from intent resolution through semantic planning, execution, and result delivery
-- Financial services reference semantic model — pre-built metric definitions for wealth management, banking, investment management, and regulatory reporting domains
+- Example industry model (Financial Services) — a reference set of pre-built metric definitions for wealth management, banking, investment management, and regulatory reporting; demonstrates the model packaging pattern for other industry domains
 - Host-configured analytical domain scoping, metric access policies, and execution engine registration
 - Governed drilldown — traversal of registered analytical hierarchies within host-configured scope
 
