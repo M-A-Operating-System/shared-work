@@ -24,6 +24,19 @@ The platform has no end-user-facing name. Every tenant names their own assistant
 
 ---
 
+## Guiding principles
+
+| Principle | What it means in practice |
+|-----------|--------------------------|
+| **Host-scoped by default** | Every capability is bounded by host configuration. The host defines the assistant's identity, allowed tools, permitted model set, and UI branding. Nothing is available to end users that the host has not explicitly configured. |
+| **Audit completeness** | No conversation turn, edit, branch, or tool call is ever deleted. The audit trail is append-only. Branching preserves originals. Edits create new threads, not in-place modifications. |
+| **Transparent tool usage** | Every MCP tool call is disclosed in the conversation thread via a collapsible disclosure card. Users always know when the assistant is accessing external systems. |
+| **Confirmation before action** | Write operations via MCP tools require explicit user confirmation. The assistant never mutates host application state without an approval step visible in the conversation. |
+| **No privileged data path** | All data access is via host-registered MCP tools. The platform has no direct database access and cannot reach application data that the host has not explicitly exposed via an MCP server. |
+| **Consumer-rendered, governed display** | Rich content — charts, tables, diagrams, code — is rendered via a governed content rendering pipeline. Chart specifications returned by connected services (e.g., the Analytics Platform) are rendered by the platform; the AI model does not choose display formats ad hoc. |
+
+---
+
 ## Scope
 
 ### In scope

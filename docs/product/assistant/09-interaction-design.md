@@ -10,15 +10,111 @@ The AI Chat Platform is delivered as an `<ai-chat>` web component that host appl
 | **Conversation area** | Centre — primary | Message thread, streaming responses, rendered content, input area |
 | **Conversation panel** | Right sidebar | **Canvas** (active when a document is open for iteration); attachments and artefacts; participant list and share management; session token summary |
 
+### Desktop layout (≥ 1280px)
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    <ai-chat> component                       │
+├─────────────┬───────────────────────────┬────────────────────┤
+│ History     │                           │ Conversation panel │
+│             │    Conversation area      │                    │
+│ [🔍 Search]│                           │ Canvas  Artefacts  │
+│             │  ┌─────────────────────┐  │ Participants    ∑  │
+│ ▾ My Convs │  │ 🔧 Tool call card   │  ├────────────────────┤
+│   — Today   │  └─────────────────────┘  │                    │
+│   Conv 1    │  ┌─────────────────────┐  │  [Active canvas    │
+│   Conv 2    │  │ Assistant response  │  │   or artefact      │
+│   — Yesterday│  │ [👍][👎][↻][⎘]  │  │   panel content]   │
+│   Conv 3    │  └─────────────────────┘  │                    │
+│             │                           │ — Artefacts —      │
+│ ▾ Shared   │  ┌─────────────────────┐  │  📄 report.pdf     │
+│   Conv A    │  │ User message bubble │  │  📊 chart.xlsx     │
+│             │  └─────────────────────┘  │                    │
+│ [Workflows] ├───────────────────────────┤  14 turns · 18 k  │
+│             │ 📎 ⚙ [✦ Standard][→]   │                    │
+└─────────────┴───────────────────────────┴────────────────────┘
+```
+
 ### Why three zones (not four)
 
 The platform component owns three zones inside its mounting point. The host application manages its own navigation independently — the `<ai-chat>` component occupies its mounting point only, making it embeddable anywhere in the host layout: a full page, a side panel, or a modal drawer.
+
+### History panel
+
+```
+┌──────────────────────────┐
+│ My Conversations    [+ ] │  ← New conversation
+├──────────────────────────┤
+│ [🔍 Search conversations]│
+├──────────────────────────┤
+│ 📌 Pinned                │
+│   Q2 Governance Review   │
+├──────────────────────────┤
+│ Today                    │
+│ ▶ Finance domain audit   │  ← Active (highlighted)
+│   Onboarding checklist   │
+├──────────────────────────┤
+│ Yesterday                │
+│   Payment service SLOs   │
+│   Team standup recap     │
+├──────────────────────────┤
+│ Past 7 days              │
+│   Policy gap analysis    │
+├──────────────────────────┤
+│ Past 30 days             │
+│   Data quality review    │
+├──────────────────────────┤
+│ Shared With Me           │
+│   Team review session ③  │  ← Unread badge
+├──────────────────────────┤
+│ [⚡ Workflows]           │
+└──────────────────────────┘
+```
 
 ### Workflow Library
 
 The Workflow Library is accessible via a **Workflows** button in the history panel header. It slides in as a panel over the history list — it is not part of the right sidebar, which is reserved for conversation-specific content.
 
 When clicked, a workflow from the library opens a parameter form (if the workflow has parameters) before injecting the prompt into the input field.
+
+```
+┌──────────────────────────────────────┐
+│ ⚡ Workflow Library          [ × ]   │
+├──────────────────────────────────────┤
+│ [🔍 Search workflows…]               │
+├──────────────────────────────────────┤
+│ ⚡ Governance Health Check           │
+│   Summarise coverage and quality     │
+│   gaps across a selected domain. [→] │
+├──────────────────────────────────────┤
+│ 📅 Weekly Status Report              │
+│   Generate a plain-language weekly   │
+│   summary for a team.           [→]  │
+├──────────────────────────────────────┤
+│ 📋 Policy Compliance Scan            │
+│   Review entities against active     │
+│   policies.                     [→]  │
+└──────────────────────────────────────┘
+```
+
+Selecting a workflow with parameters opens a parameter form before launch:
+
+```
+┌──────────────────────────────────────┐
+│ ← Governance Health Check            │
+├──────────────────────────────────────┤
+│ Summarise governance coverage,       │
+│ quality gaps, and policy compliance  │
+│ across a selected domain.            │
+├──────────────────────────────────────┤
+│ Data Domain *                        │
+│ ┌──────────────────────────────────┐ │
+│ │ @{Finance Domain}              × │ │  ← @-binding typeahead
+│ └──────────────────────────────────┘ │
+├──────────────────────────────────────┤
+│             [Launch workflow →]      │
+└──────────────────────────────────────┘
+```
 
 ### Conversation panel (right sidebar) detail
 
@@ -47,6 +143,86 @@ Mobile-first and responsive layout is a core platform standard. The following co
 | Mobile (< 768px) | Single-column; history and conversation panels as bottom-sheet drawers; input pinned to bottom |
 
 When the component is mounted in a constrained container (e.g. a side panel or modal), it uses the container width rather than viewport width to determine layout breakpoints. See [16-embedding-and-web-component.md](./16-embedding-and-web-component.md) for container sizing guidance.
+
+### Narrow desktop layout (1024px – 1279px)
+
+The history panel collapses to an icon-only rail. Hovering an icon reveals its label tooltip; clicking a conversation icon opens it.
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    <ai-chat> component                       │
+├──────┬────────────────────────────────┬──────────────────────┤
+│  ☰   │                                │ Conversation panel   │
+│  🔍  │     Conversation area          │                      │
+│  ─── │                                │ Canvas  Artefacts    │
+│  ●   │  ┌──────────────────────────┐  │ Participants    ∑    │
+│  ●   │  │ Assistant response       │  ├──────────────────────┤
+│  ─── │  │ [👍][👎][↻][⎘]         │  │                      │
+│  ●   │  └──────────────────────────┘  │  [Panel content]     │
+│  ─── │  ┌──────────────────────────┐  │                      │
+│  ●   │  │ User message             │  │                      │
+│  ─── ├──────────────────────────────────┤                    │
+│  ⚡  │ 📎 ⚙ [✦ Standard][input][→]│                      │
+└──────┴──────────────────────────────────┴──────────────────────┘
+     Icon rail — hover to label, click to expand
+```
+
+### Tablet layout (768px – 1023px)
+
+Both panels become slide-in drawers triggered by header buttons. The conversation area is the primary view.
+
+```
+┌──────────────────────────────────────────────────┐
+│                <ai-chat> component                │
+├──────────────────────────────────────────────────┤
+│  [☰ History]                      [⊞ Panel]     │  ← Drawer triggers in header
+├──────────────────────────────────────────────────┤
+│                                                  │
+│         Conversation area                        │
+│                                                  │
+│  ┌────────────────────────────────────────────┐  │
+│  │ Assistant response                         │  │
+│  │ [👍][👎][↻][⎘]                           │  │
+│  └────────────────────────────────────────────┘  │
+│  ┌────────────────────────────────────────────┐  │
+│  │ User message bubble                        │  │
+│  └────────────────────────────────────────────┘  │
+│                                                  │
+├──────────────────────────────────────────────────┤
+│ 📎 ⚙ [✦ Standard]  [input…]             [→]    │
+└──────────────────────────────────────────────────┘
+  Slide-in drawers — swipe from edge or tap header button
+```
+
+### Mobile layout (< 768px)
+
+Single-column; history and conversation panels as full-height bottom-sheet drawers; input pinned to bottom of screen above the keyboard.
+
+```
+┌────────────────────────────────────────┐
+│           <ai-chat> component          │
+├────────────────────────────────────────┤
+│                                        │
+│       Conversation area                │
+│                                        │
+│  ┌──────────────────────────────────┐  │
+│  │ Assistant response               │  │
+│  │ [👍][👎][↻][⎘]                 │  │
+│  └──────────────────────────────────┘  │
+│                                        │
+│  ┌──────────────────────────────────┐  │
+│  │              User message        │  │
+│  └──────────────────────────────────┘  │
+│                                        │
+│  ┌────────────────────────────────┐    │
+│  │ Jump to latest ↓               │    │  ← Anchored above input when scrolled
+│  └────────────────────────────────┘    │
+├────────────────────────────────────────┤
+│ 📎 ⚙ ✦ Standard   [input…]     [→]   │  ← Pinned above keyboard
+└────────────────────────────────────────┘
+  ← swipe right: history panel (bottom sheet)
+  ← swipe left:  conversation panel (bottom sheet)
+```
 
 ### Mobile-specific requirements
 
@@ -139,6 +315,49 @@ An animated three-dot pulse appears beneath a placeholder response bubble. The i
 
 The thinking indicator is suppressed if the model begins streaming within 300 ms of submission.
 
+### Full thread anatomy
+
+A complete exchange showing all thread elements in sequence:
+
+```
+┌──────────────────────────────────────────────────────────┐
+│                    Conversation area                      │
+│                                                          │
+│  ┌────────────────────────────────────────────────────┐  │
+│  │  Show me the governance health for @{Finance       │  │  ← User message bubble
+│  │  Domain}                                           │  │    (right-aligned)
+│  │                                     Just now  🕐  │  │  ← Timestamp
+│  └────────────────────────────────────────────────────┘  │
+│                                                          │
+│  Atlas is thinking…   ● ● ●                              │  ← Thinking indicator
+│                                                          │
+│  ┌──────────────────────────────────────────────────┐    │
+│  │ 🔧 Governance Platform · get_domain_health  ✓ ▼ │    │  ← Tool call disclosure
+│  └──────────────────────────────────────────────────┘    │    (collapsed)
+│                                                          │
+│  ┌────────────────────────────────────────────────────┐  │
+│  │ The Finance Domain is in **good health** overall.  │  │  ← Assistant response
+│  │                                                    │  │
+│  │ | Metric          | Status   |                     │  │
+│  │ | Coverage        | 94 %     |                     │  │
+│  │ | Quality score   | 87 / 100 |                     │  │
+│  │ | Open issues     | 3        |                     │  │
+│  │                                                    │  │
+│  │ ¹ Governance Platform · get_domain_health          │  │  ← Inline source citation
+│  │                                                    │  │
+│  │ ✦ Standard · 1,240 tokens · 3 min ago             │  │  ← Metadata (hover/tap)
+│  │ [👍] [👎] [↻ Regenerate] [⎘ Copy]               │  │  ← Feedback row
+│  └────────────────────────────────────────────────────┘  │
+│                                                          │
+│  · What are the open quality issues?                     │  ← Suggested follow-ups
+│  · Who owns the Finance domain?                          │
+│  · Show me a breakdown by sub-domain                     │
+│                                                          │
+├──────────────────────────────────────────────────────────┤
+│  📎  ⚙  [✦ Standard]  [input…]                   [→]   │
+└──────────────────────────────────────────────────────────┘
+```
+
 ### Per-turn feedback
 
 **User messages** carry a **report icon** (visible on hover / always visible on mobile). Clicking opens the report dialog:
@@ -187,6 +406,62 @@ At the end of each assistant response, up to **three suggested follow-up queries
 | Profile indicator | Read-only `Style · Verbosity` link to host app profile settings — clickable |
 | Send / Stop | Submits message or stops active stream |
 | Share icon | Opens participant management panel |
+
+### Input area layout
+
+```
+┌──────────────────────────────────────────────────────────┐
+│  @{Finance Domain} What are the quality gaps in this     │  ← Text input
+│  domain? Any open ownership issues?                      │    (grows to 5 lines)
+├──────────────────────────────────────────────────────────┤
+│ 📎  ⚙  [✦ Standard]  [Technical · Concise]  [⇪]  [→]  │  ← Controls row
+└──────────────────────────────────────────────────────────┘
+  📎 Attachment        — file picker / drag-and-drop / clipboard paste
+  ⚙  Tool selection   — opens MCP tool opt-in panel (see below)
+  ✦ Standard          — model tier chip; opens model selection popover
+  Technical · Concise — profile indicator (style · verbosity); read-only link
+  ⇪  Share            — opens participant management panel
+  →  Send / Stop      — always visible; submits or stops active stream
+```
+
+While streaming, the input field is disabled and the Send button becomes a Stop button:
+
+```
+┌──────────────────────────────────────────────────────────┐
+│  [input disabled while streaming]                        │
+├──────────────────────────────────────────────────────────┤
+│ 📎  ⚙  [✦ Standard]  [Technical · Concise]  [⇪]  [■]  │  ← ■ Stop
+└──────────────────────────────────────────────────────────┘
+```
+
+### Tool selection panel
+
+Opened via the ⚙ icon in the input area:
+
+```
+┌──────────────────────────────────────┐
+│ Tools                         [ × ]  │
+├──────────────────────────────────────┤
+│ Always active                        │
+│                                      │
+│  ● Governance Platform               │
+│    Entities, quality, policies       │
+│    [Always on — cannot be disabled]  │
+├──────────────────────────────────────┤
+│ Available for this session           │
+│                                      │
+│  ○ Data Warehouse        [Enable →]  │
+│    Read-only warehouse access        │
+│                                      │
+│  ○ Web Search            [Enable →]  │
+│    Real-time web results             │
+│                                      │
+│  ○ Platform Resources    [Enable →]  │
+│    Shared skills and templates       │
+└──────────────────────────────────────┘
+  Enabled tools are active for this session only.
+  Settings reset on the next session.
+```
 
 ---
 
@@ -257,6 +532,50 @@ Users may also manually promote any text artefact in the tray to canvas by click
 | **Document title** | Auto-generated from document content; editable inline by clicking |
 | **Version indicator** | Shows current version (v1, v2 …); clicking opens a version history dropdown listing every model-generated and user-edited version with timestamp. Selecting a prior version restores it as a new version (no destructive overwrites). |
 | **Full-screen toggle** | Expands canvas to fill the component mount point; the conversation area collapses to a narrow strip. Second click restores the split layout. |
+
+### Canvas full-screen layout
+
+```
+┌───────────────────────────────────────────────────────────────┐
+│                      <ai-chat> component                       │
+├────────────────────────────────────────────────────────┬───────┤
+│ [Document title — editable]     v3  [Edit][Copy][↙]×  │ [msg] │
+├────────────────────────────────────────────────────────┤  ···  │
+│                                                        │ [msg] │
+│   Full-width canvas document — headings, prose, and    │       │
+│   tables render at full canvas width.                  │ [msg] │
+│                                                        │       │
+│   Section heading                                      │       │
+│   ───────────────                                      │       │
+│   Body text renders here with full line length.        │ [inp] │
+│   | Col A | Col B |   ← tables at full width          │  [→]  │
+│   | ───── | ───── |                                   │       │
+│   | val 1 | val 2 |                                   │       │
+│                                                        │       │
+└────────────────────────────────────────────────────────┴───────┘
+  ↙ collapses back to split layout    × closes canvas
+```
+
+### Canvas version history
+
+Clicking the version indicator (e.g. **v3**) opens a dropdown listing every version of the document:
+
+```
+┌────────────────────────────────────────────┐
+│ [Document title — editable]     v3   [ ↗ ] │
+│                           ┌──────────────┐  │
+│  [Toolbar]                │ ● v3 · 09:14 │  │  ← Current version
+│                           │   Model rev. │  │
+│  Document content         │   v2 · 08:52 │  │  ← User edit
+│  renders here.            │   User edit  │  │
+│                           │   v1 · 08:47 │  │  ← Initial output
+│                           │   Initial    │  │
+│                           │              │  │
+│                           │ [Restore v2] │  │
+│                           └──────────────┘  │
+└────────────────────────────────────────────┘
+  Restoring a prior version creates a new version — no destructive overwrite.
+```
 | **Edit mode** | Clicking **Edit** transforms the canvas from a read-only rendered view into a live markdown editor. User edits are saved immediately as a new version. Exiting edit mode re-renders the markdown. |
 | **Copy** | Copies the full markdown source to the clipboard |
 | **Download** | Downloads the document as `.md` (default), `.txt`, or `.pdf` (platform-rendered) |
@@ -290,6 +609,20 @@ The user can ask the model to revise the document in natural language: *"Shorten
 ### Multiple canvases
 
 A conversation may produce more than one canvas document. Each is a separate tab within the canvas panel, ordered by creation time. The active tab is the most recently updated document.
+
+```
+┌──────────────────────────────────────────┐
+│ Q2 Governance Summary │ Risk Register  ▾ │  ← Canvas tabs (+ overflow menu)
+├──────────────────────────────────────────┤
+│ [Edit] [Copy] [Download]         v3 [ ↗] │
+├──────────────────────────────────────────┤
+│                                          │
+│  Q2 Governance Summary content           │
+│  (active tab)                            │
+│                                          │
+└──────────────────────────────────────────┘
+  Switching tabs does not close the inactive canvas — both remain in context.
+```
 
 ### Canvas in Mode 1 (floating widget)
 
@@ -390,6 +723,71 @@ The onboarding state is shown once per user — it is not shown again once the u
 | Last participant constraint | Tooltip on disabled Leave/Remove controls | Invite another user before leaving |
 | Component mount failure | Error state within the component mount point | Host application is notified via the `error` event |
 
+### Error state layouts
+
+**Connection lost — non-blocking banner:**
+
+```
+┌──────────────────────────────────────────────────────────┐
+│ ⚠ Connection lost — reconnecting…  ◌ ◌ ◌               │  ← Banner below header
+├──────────────────────────────────────────────────────────┤
+│                                                          │
+│   [conversation thread — still readable]                 │
+│   Input disabled until reconnected                       │
+│                                                          │
+└──────────────────────────────────────────────────────────┘
+  Banner updates to "✓ Reconnected" and auto-dismisses after 3 seconds.
+```
+
+**Always-on MCP server unavailable — degraded-mode banner:**
+
+```
+┌──────────────────────────────────────────────────────────┐
+│ ⚠ Governance Platform is unavailable. Atlas is answering │
+│   from its own knowledge only — data may not reflect     │
+│   the current state of your application.                 │
+├──────────────────────────────────────────────────────────┤
+│                                                          │
+│   [conversation thread — text-only mode]                 │
+│                                                          │
+└──────────────────────────────────────────────────────────┘
+  Persistent until connectivity is restored.
+```
+
+**Auth session expired — blocking modal:**
+
+```
+┌──────────────────────────────────────────────────────────┐
+│           Session expired                                │
+├──────────────────────────────────────────────────────────┤
+│                                                          │
+│  Please sign in again to continue. Your conversation     │
+│  history is preserved and will be restored on sign-in.   │
+│                                                          │
+│                    [Sign in again]                       │
+│                                                          │
+└──────────────────────────────────────────────────────────┘
+  Full-viewport modal — no interaction behind it.
+```
+
+**Send failure — inline retry on user message:**
+
+```
+  ┌────────────────────────────────────────────────────┐
+  │ What are the quality gaps in the Finance domain?   │
+  │ ⚠ Failed to send  [↺ Retry]                       │  ← Inline retry
+  └────────────────────────────────────────────────────┘
+```
+
+**Context window warning (80% threshold) — subtle header indicator:**
+
+```
+┌──────────────────────────────────────────────────────────┐
+│ Atlas                    ⚠ Long conversation — 83% full  │  ← Header indicator
+│                          [Branch to new thread]          │
+├──────────────────────────────────────────────────────────┤
+```
+
 ---
 
 ## Accessibility
@@ -416,6 +814,23 @@ When a user has scrolled up and new content arrives (streaming response or share
 
 ## Keyboard shortcuts
 
+The shortcut reference overlay (triggered by `?` or `Cmd/Ctrl + /`):
+
+```
+┌──────────────────────────────────────────────┐
+│ Keyboard shortcuts                    [ × ]  │
+├──────────────────────────────────────────────┤
+│ Cmd/Ctrl + Enter     Submit message          │
+│ Cmd/Ctrl + K         Cross-conversation search│
+│ Cmd/Ctrl + F         In-conversation search  │
+│ Cmd/Ctrl + N         New conversation        │
+│ ↑  (empty input)     Edit last user message  │
+│ Escape               Dismiss / cancel edit   │
+│ Cmd/Ctrl + Shift + C Copy last response      │
+│ ?  /  Cmd/Ctrl + /   This shortcut list      │
+└──────────────────────────────────────────────┘
+```
+
 | Shortcut | Action |
 |----------|--------|
 | `Cmd/Ctrl + Enter` | Submit message |
@@ -436,6 +851,19 @@ When a user has scrolled up and new content arrives (streaming response or share
 A **1–5 star rating prompt** is shown to a random sample of users (configured via `features.csatSampleRate`) at the end of a session, after 30 seconds of idle time following the last assistant response.
 
 The prompt appears as a **non-blocking floating card** anchored to the bottom-right of the conversation area:
+
+```
+                          ┌────────────────────────────┐
+                          │ How useful was this        │
+                          │ conversation?              │
+                          │                            │
+                          │  ★  ★  ★  ★  ☆            │
+                          │                            │
+                          │ [What could be better?…]   │
+                          │                            │
+                          │   [Submit]       [Skip]    │
+                          └────────────────────────────┘
+```
 
 > **How useful was this conversation?**  
 > ★ ★ ★ ★ ★  

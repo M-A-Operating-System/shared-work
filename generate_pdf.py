@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 """
-Generates a single PDF from the AI Chat Platform design specification.
+Generates a PDF for each product in docs/product/, placing the output inside
+the respective product folder.
 
 Usage:
-    python generate_pdf.py [output.pdf]
+    python generate_pdf.py [product-name]
 
-Output defaults to ./AI-Chat-Platform-Design-Spec.pdf
+    python generate_pdf.py          → generates all products
+    python generate_pdf.py assistant → generates only the assistant product
+    python generate_pdf.py analytics → generates only the analytics product
 
 Requirements:
     pip install markdown weasyprint
@@ -13,16 +16,39 @@ Requirements:
 
 import re
 import sys
+
+# fontTools raises ValueError when it encounters OS/2 Unicode range bit 123 (out of
+# spec, 0–122 valid). Some system fonts on Linux carry this invalid bit. Patch the
+# setter to silently discard out-of-range bits so WeasyPrint can continue.
+try:
+    from fontTools.ttLib.tables import O_S_2f_2 as _os2_mod
+    _Table = _os2_mod.table_O_S_2f_2
+    _orig = _Table.setUnicodeRanges
+    def _safe_setUnicodeRanges(self, value):
+        _orig(self, {b for b in value if 0 <= b <= 122})
+    _Table.setUnicodeRanges = _safe_setUnicodeRanges
+except Exception:
+    pass
 from pathlib import Path
 
-# ---------- configuration ----------
+# ---------- product registry ----------
 
-DOCS_DIR = Path(__file__).parent / "docs" / "product" / "assistant"
-DEFAULT_OUTPUT = Path(__file__).parent / "AI-Chat-Platform-Design-Spec.pdf"
+PRODUCTS_DIR = Path(__file__).parent / "docs" / "product"
 
-DOC_TITLE = "AI Chat Platform"
-DOC_SUBTITLE = "Product Design Specification"
-DOC_META = "Draft v1.0 · May 2026"
+PRODUCTS = {
+    "assistant": {
+        "title":    "AI Chat Platform",
+        "subtitle": "Product Design Specification",
+        "meta":     "Draft v1.0 · May 2026",
+        "output":   "assistant_product_design.pdf",
+    },
+    "analytics": {
+        "title":    "AI Analytics Platform",
+        "subtitle": "Product Design Specification",
+        "meta":     "Draft v1.0 · May 2026",
+        "output":   "analytics_product_design.pdf",
+    },
+}
 
 EXCLUDE = {"README.md"}
 
@@ -47,7 +73,7 @@ def strip_md_links(text: str) -> str:
     return re.sub(r"\(\./[\w-]+\.md(?:#[\w-]*)?\)", "()", text)
 
 
-def build_html(files: list[Path]) -> str:
+def build_html(files: list[Path], title: str, subtitle: str, meta: str) -> str:
     import markdown
 
     md = markdown.Markdown(
@@ -66,16 +92,16 @@ def build_html(files: list[Path]) -> str:
 <div class="cover-page">
   <div class="cover-inner">
     <p class="cover-eyebrow">Confidential · Internal</p>
-    <h1 class="cover-title">{DOC_TITLE}</h1>
-    <p class="cover-subtitle">{DOC_SUBTITLE}</p>
+    <h1 class="cover-title">{title}</h1>
+    <p class="cover-subtitle">{subtitle}</p>
     <hr class="cover-rule">
-    <p class="cover-meta">{DOC_META}</p>
+    <p class="cover-meta">{meta}</p>
   </div>
 </div>"""
 
     return f"""<!DOCTYPE html>
 <html lang="en">
-<head><meta charset="utf-8"><title>{DOC_TITLE} — {DOC_SUBTITLE}</title></head>
+<head><meta charset="utf-8"><title>{title} — {subtitle}</title></head>
 <body>
 {cover}
 {"".join(sections)}
@@ -257,37 +283,62 @@ h1, h2, h3 { page-break-after: avoid; }
 tr          { page-break-inside: avoid; }
 """
 
-# ---------- main ----------
+# ---------- per-product generation ----------
 
-def main():
-    try:
-        from weasyprint import HTML, CSS as WeasyprintCSS
-    except ImportError:
-        print("weasyprint not installed. Run: pip install markdown weasyprint")
-        sys.exit(1)
+def generate_product(name: str, config: dict) -> None:
+    docs_dir = PRODUCTS_DIR / name
+    if not docs_dir.is_dir():
+        print(f"  [skip] {name}: directory not found at {docs_dir}")
+        return
 
-    output = Path(sys.argv[1]) if len(sys.argv) > 1 else DEFAULT_OUTPUT
-    files = get_ordered_files(DOCS_DIR)
+    output = docs_dir / config["output"]
+    files = get_ordered_files(docs_dir)
 
     if not files:
-        print(f"No markdown files found in {DOCS_DIR}")
-        sys.exit(1)
+        print(f"  [skip] {name}: no markdown files found in {docs_dir}")
+        return
 
+    print(f"\n── {name} ──────────────────────────────────────────")
     print(f"Documents ({len(files)}):")
     for f in files:
         print(f"  {f.name}")
 
-    print("\nBuilding HTML…")
-    html = build_html(files)
+    print("Building HTML…")
+    html = build_html(files, config["title"], config["subtitle"], config["meta"])
 
     print("Rendering PDF (this may take a moment)…")
-    HTML(string=html, base_url=str(DOCS_DIR)).write_pdf(
+    from weasyprint import HTML, CSS as WeasyprintCSS
+    HTML(string=html, base_url=str(docs_dir)).write_pdf(
         str(output),
         stylesheets=[WeasyprintCSS(string=CSS)],
     )
 
     size_mb = output.stat().st_size / 1_000_000
-    print(f"\nDone → {output}  ({size_mb:.1f} MB)")
+    print(f"Done → {output}  ({size_mb:.1f} MB)")
+
+# ---------- main ----------
+
+def main():
+    try:
+        from weasyprint import HTML  # noqa: F401
+    except ImportError:
+        print("weasyprint not installed. Run: pip install markdown weasyprint")
+        sys.exit(1)
+
+    requested = sys.argv[1] if len(sys.argv) > 1 else None
+
+    if requested:
+        if requested not in PRODUCTS:
+            print(f"Unknown product '{requested}'. Available: {', '.join(PRODUCTS)}")
+            sys.exit(1)
+        targets = {requested: PRODUCTS[requested]}
+    else:
+        targets = PRODUCTS
+
+    for name, config in targets.items():
+        generate_product(name, config)
+
+    print("\nAll done.")
 
 
 if __name__ == "__main__":

@@ -32,6 +32,17 @@ The widget renders as a **floating action button** (FAB) in the configured corne
 - An unread **badge** count when there are new messages in a shared conversation the user has not viewed
 - A subtle pulse animation when the assistant is mid-stream in a minimised conversation
 
+```
+                                   ┌───────┐
+                                   │       │
+                                   │   🤖  │  ← Assistant icon / initial
+                                   │    ③  │  ← Unread badge (3 new)
+                                   └───────┘
+                                       ╲╲ pulse ring during active stream
+```
+
+Badge is suppressed when `showBadge: false` is set in the widget config.
+
 Clicking the FAB transitions to the mini state.
 
 #### Mini state — compact chat panel
@@ -67,6 +78,26 @@ The mini state is a compact, non-blocking chat panel anchored above the FAB. Def
 | Resize | User can drag the top edge to adjust panel height within the range 360px–80vh. Width is fixed. |
 | Draggable | The panel header is draggable — user can reposition the mini panel within the viewport. |
 | Keyboard shortcut | `Escape` collapses mini state back to FAB. |
+
+**Conversation list overlay** (opened via ☰ in the mini-state header):
+
+```
+┌──────────────────────────────────────┐
+│ ☰  Conversations           [ × ]     │  ← Overlay within panel
+├──────────────────────────────────────┤
+│  [+ New conversation]                │
+├──────────────────────────────────────┤
+│  My Conversations                    │
+│  ─────────────────────────────────── │
+│  ▶ Finance domain audit    Today     │  ← Active (highlighted)
+│    Onboarding checklist    Today     │
+│    Payment service SLOs    Yesterday │
+├──────────────────────────────────────┤
+│  Shared With Me                      │
+│  ─────────────────────────────────── │
+│  Team review session  ③  Yesterday  │  ← Unread badge
+└──────────────────────────────────────┘
+```
 
 **Header controls in mini state:**
 
@@ -189,6 +220,48 @@ The `widget` config section in the application config controls widget-level defa
 ### Overview
 
 The inline page mode embeds the assistant as a first-class content block within a host application page. It uses the `<ai-chat>` component described in full in `16-embedding-and-web-component.md`. It is the **richest and most capable** embedding mode — the full three-zone layout with no constraints on features or content rendering.
+
+### Mode 2 in host application context
+
+The `<ai-chat>` component occupies its mounting point only — the host application retains full ownership of its navigation, header, and page shell.
+
+**Dedicated assistant page (full content area):**
+
+```
+┌──────────────────────────────────────────────────────────────────────┐
+│ HOST APPLICATION                                                      │
+│ ┌────────────────────────────────────────────────────────────────┐   │
+│ │ App navigation bar         [Profile]  [Settings]               │   │
+│ ├────────────────────────────────────────────────────────────────┤   │
+│ │                                                                │   │
+│ │  ┌─────────────────────────────────────────────────────────┐   │   │
+│ │  │               <ai-chat> component                       │   │   │
+│ │  │                                                         │   │   │
+│ │  │  [History] │    Conversation area    │ [Conv. panel]    │   │   │
+│ │  │                                                         │   │   │
+│ │  └─────────────────────────────────────────────────────────┘   │   │
+│ │                                                                │   │
+│ └────────────────────────────────────────────────────────────────┘   │
+└──────────────────────────────────────────────────────────────────────┘
+```
+
+**Split-panel page (assistant alongside host content):**
+
+```
+┌──────────────────────────────────────────────────────────────────────┐
+│ HOST APPLICATION                                                      │
+│ ┌────────────────────────────────────────────────────────────────┐   │
+│ │ App navigation bar                                             │   │
+│ ├───────────────────────────────────┬────────────────────────────┤   │
+│ │                                   │                            │   │
+│ │  Host application content         │  <ai-chat> component       │   │
+│ │  (data table, detail panel, etc.) │  (min 480px recommended)   │   │
+│ │                                   │                            │   │
+│ │                                   │  [Hist] Conversation [Pan] │   │
+│ │                                   │                            │   │
+│ └───────────────────────────────────┴────────────────────────────┘   │
+└──────────────────────────────────────────────────────────────────────┘
+```
 
 ### Conversation model
 
