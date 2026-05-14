@@ -65,6 +65,8 @@ Start at `00` and read through in sequence. Each document assumes you have read 
 | 14 | [14-success-metrics.md](./14-success-metrics.md) | Platform-level and application-level metrics, definitions, and targets |
 | 15 | [15-consumer-integration.md](./15-consumer-integration.md) | MCP endpoint, JWT authentication, response handling, agentic consumer patterns |
 | 16 | [16-complementary-services.md](./16-complementary-services.md) | Semantic Registry Service, Benchmark Data Service, Regulatory Reference Service |
+| 17 | [17-proposed-technical-architecture.md](./17-proposed-technical-architecture.md) | One reference implementation stack with rationale and alternatives at each layer |
+| 18 | [18-text-to-sql-antipattern.md](./18-text-to-sql-antipattern.md) | Why Text-to-SQL GenAI is a quick win but the wrong long-term foundation — risks and failure modes |
 | — | [ROADMAP.md](./ROADMAP.md) | Planned enhancements beyond the current release |
 
 ---
