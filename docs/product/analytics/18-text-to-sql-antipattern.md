@@ -210,16 +210,16 @@ The LLM's role is constrained to what it is reliable at: translating natural lan
 
 ## Summary
 
-| Concern | Text-to-SQL outcome |
-|---------|-------------------|
-| Metric consistency | ✗ — definitions inferred per query; no guarantee of consistency |
-| Schema security | ✗ — physical schema exposed to the AI model and its provider |
-| Audit trail | ✗ — no reproducible calculation record; regulatory audit impossible |
-| Entitlement enforcement | ✗ — boundary is the database credential, not the user's role |
-| Complex query accuracy | ✗ — degrades rapidly for regulated formulas, window functions, cross-domain queries |
-| Metric change management | ✗ — no versioned definitions; no approval workflow; no lineage by definition version |
-| Scope control | ✗ — system will attempt to answer any question, including ones it should not |
-| Query cost governance | ✗ — LLM-generated SQL is unpredictable in execution cost |
-| Multi-source federation | ✗ — limited to single SQL target; cannot span heterogeneous backends |
-| Time to first demo | ✓ — hours to a working demo on a well-structured schema |
-| Appropriate for regulated production use | ✗ |
+| Concern | Text-to-SQL | Semantic Analytics Platform |
+|---------|------------|------------------------------|
+| Metric consistency | ✗ — definitions inferred per query; no guarantee of consistency | ✓ — every metric resolves to exactly one versioned SMR definition at any point in time |
+| Schema security | ✗ — physical schema exposed to the AI model and its provider | ✓ — physical schema is never visible to the AI model; the SMR is the only input surface |
+| Audit trail | ✗ — no reproducible calculation record; regulatory audit impossible | ✓ — full computation provenance record for every result: definition version, role projection, sub-plan responses, assembled result |
+| Entitlement enforcement | ✗ — boundary is the database credential, not the user's role | ✓ — enforced at the semantic tier before any backend is contacted; role determines which metrics, dimensions, and rows are visible |
+| Complex query accuracy | ✗ — degrades rapidly for regulated formulas, window functions, cross-domain queries | ✓ — complex metric formulas are defined once in the SMR and applied deterministically; the LLM translates intent, not formula logic |
+| Metric change management | ✗ — no versioned definitions; no approval workflow; no lineage by definition version | ✓ — SMR version-controls every definition; approval workflow before activation; lineage records preserve the definition version used at each query |
+| Scope control | ✗ — system will attempt to answer any question, including ones it should not | ✓ — queries referencing unregistered metric or dimension IDs are rejected with a structured error before execution |
+| Query cost governance | ✗ — LLM-generated SQL is unpredictable in execution cost | ✓ — cost estimated from the LQP before execution; circuit breaker blocks queries exceeding the configured limit |
+| Multi-source federation | ✗ — limited to single SQL target; cannot span heterogeneous backends | ✓ — FQP routes LQP fragments to any registered backend type; SQL warehouses, OpenData APIs, Graph Data APIs, and semantic layers served from one query |
+| Time to first demo | ✓ — hours to a working demo on a well-structured schema | △ — days to weeks; requires data source registration and SMR metric definitions before queries are resolvable |
+| Appropriate for regulated production use | ✗ | ✓ |
