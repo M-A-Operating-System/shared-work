@@ -83,6 +83,57 @@ A decision to adopt a different technology at any layer should be documented her
 
 ## Layer-by-layer stack decisions
 
+### Platform Admin API
+
+The Platform Admin API is the authenticated management surface for the entire platform — backend registration, SMR management, entitlement policy configuration, and governance threshold controls. It is a separate service from the MCP Capability Layer (which serves consumers) and runs as a standard backend service rather than at the edge.
+
+| Decision | Choice | Rationale |
+|----------|--------|-----------|
+| **Runtime** | Node.js (Express / Fastify) on Kubernetes | Admin operations are low-frequency and latency-tolerant — edge deployment not required; standard backend service pattern is simpler and more flexible for complex admin workflows |
+| **Auth** | JWT with `platform_admin` or `app_admin` role claim | Reuses the same JWT infrastructure as the MCP Capability Layer; admin role claims are validated at the API gateway before any admin operation executes |
+| **API style** | REST (JSON) | Admin operations are well-modelled as CRUD on named resources (backends, metrics, entitlement policies, governance config); REST is simpler than GraphQL for these patterns |
+| **Data store** | PostgreSQL (shared primary database) | Admin state (Data Source Catalog, SMR definitions, entitlement policies, governance config) lives in the same PostgreSQL instance as the lineage store and preference store — one managed instance |
+
+**Alternatives considered:**
+
+| Alternative | Why not chosen |
+|------------|---------------|
+| Cloudflare Workers for Admin API | Admin operations include long-running validations (SMR consistency checks, impact analysis) that exceed the Workers CPU budget |
+| Separate database for admin state | Unnecessary operational overhead — admin state and operational state are naturally co-located and share the same RLS tenant isolation |
+| GraphQL | Admin operations don't benefit from graph-style query composition; REST CRUD is simpler to implement and document |
+
+---
+
+### Admin Console (web UI)
+
+| Decision | Choice | Rationale |
+|----------|--------|-----------|
+| **Framework** | React + TypeScript (SPA) | Standard choice for data-heavy admin UIs; rich ecosystem for form handling, table rendering, and YAML editors |
+| **Hosting** | Static assets on CDN (Cloudflare Pages or S3 + CloudFront) | Single-page app with no server-side rendering requirement; CDN hosting is simple and globally fast |
+| **YAML editor** | Monaco Editor (embedded) | VS Code's editor engine; built-in YAML syntax highlighting and validation; familiar to the metric owners and engineers who write SMR definitions |
+| **Auth** | Same JWT as Platform Admin API | Console authenticates via the same identity provider as the rest of the platform; no separate session management |
+
+**Alternatives considered:**
+
+| Alternative | Why not chosen |
+|------------|---------------|
+| Server-side rendered (Next.js) | Not required — admin console does not need SEO or first-paint optimisation; SPA is simpler to deploy |
+| Low-code admin builder (Retool, AdminJS) | Insufficient control over the SMR definition editor, consistency checker UI, and governance configuration workflows |
+
+---
+
+### Data Source Catalog
+
+The Data Source Catalog is the platform's registry of all registered execution backends. It is stored in the primary PostgreSQL database and managed exclusively via the Platform Admin API — it is not a separate service.
+
+| Decision | Choice | Rationale |
+|----------|--------|-----------|
+| **Storage** | PostgreSQL table (`analytics.execution_backends`) | Structured; strongly-typed; shares RLS tenant isolation with the rest of the platform |
+| **Runtime access** | In-memory cache in the FQP service (refreshed on catalog change events via message queue) | The FQP reads the catalog on every query; caching in-process eliminates per-query database round-trips; cache invalidated on any catalog mutation via the message queue |
+| **Change propagation** | Message queue event (`CATALOG_UPDATED`) published by Admin API on any backend registration change | Decouples Admin API from FQP; FQP subscribes and refreshes its in-memory cache; no direct service-to-service call required |
+
+---
+
 ### MCP Capability Layer
 
 | Decision | Choice | Rationale |
@@ -134,6 +185,27 @@ A decision to adopt a different technology at any layer should be documented her
 | MongoDB | Schema-less is a disadvantage for governed metric definitions; stronger typing needed |
 | dbt + Git (as the registry) | Excellent for engineering teams; poor UX for business owners; no runtime query path |
 | Apache Atlas | Heavy; enterprise-only adoption patterns; integration complexity not justified for v1 |
+
+---
+
+### Financial Services Reference Model
+
+The reference model is the pre-built industry seed for the SMR — a set of versioned YAML bundles that ship with the platform and seed a new tenant's SMR baseline on first setup.
+
+| Decision | Choice | Rationale |
+|----------|--------|-----------|
+| **Packaging format** | Versioned YAML bundles (one per analytical domain) | YAML is human-readable and directly importable via the Admin API; one bundle per domain (`portfolio`, `performance`, `risk`, `regulatory`, `counterparty`, `benchmarks`) allows selective import |
+| **Distribution** | Bundled with the platform at installation; also importable from the Semantic Registry Service for updated versions | Platform installation includes a pinned snapshot for air-gapped deployments; connected tenants can pull updated packages from the live Semantic Registry Service |
+| **Activation** | `analyticalDomain` config field triggers SMR import at tenant setup | Tenant specifies `analyticalDomain: "wealth_management"` (or `"banking"`, `"investment_management"`) in Admin Console; platform imports the relevant domain bundles as `proposed` definitions; Application Admin approves before they become resolvable |
+| **Customisation** | Full edit/override via Admin API after import | Imported definitions are not locked — Application Admins can modify formula, aggregation rules, or dimensions before or after approval. Customised definitions are marked `source: "tenant"` to distinguish them from the reference baseline |
+
+**Alternatives considered:**
+
+| Alternative | Why not chosen |
+|------------|---------------|
+| Embedded in platform binary | YAML bundles are easier to inspect, diff, and update without a platform rebuild; Admin Console can render them as human-readable definitions |
+| Pulled from external registry only (no bundled snapshot) | Air-gapped regulated deployments need a local copy; bundled snapshot + optional live update is the safer default |
+| SQL seed scripts | Less portable across SMR schema versions; YAML bundles can be re-imported idempotently |
 
 ---
 
@@ -190,6 +262,23 @@ The FQP backend adapter layer ships with adapters for the following:
 | **Custom** | Custom adapter interface | Host-implemented adapter conforming to the LQP fragment adapter protocol |
 
 **Named products here are adapter targets, not platform dependencies.** The platform does not require any specific backend; the host registers whichever backends they operate.
+
+---
+
+### Ecosystem complementary services
+
+Three shared ecosystem services integrate with the platform as registered execution backends and config-time resources. They are not owned or operated by the platform — they are external services that the platform is designed to work with.
+
+| Service | Integration type | Implementation choice | Rationale |
+|---------|-----------------|----------------------|-----------|
+| **Semantic Registry Service** | Config-time resource — `POST /v1/smr/import` | REST API client in the Platform Admin API service | Import is infrequent (setup + version updates); a lightweight REST call from the Admin API service is sufficient; no persistent connection needed |
+| **Regulatory Reference Service** | Runtime execution backend — registered in Data Source Catalog with `dataAffinity: ["regulatory"]` | Custom FQP adapter (REST/OData) using the OpenData API adapter pattern | Regulatory data is read-only reference data; the OpenData adapter pattern handles it without a specialised driver |
+| **Benchmark Data Service** | Runtime execution backend — registered in Data Source Catalog with `dataAffinity: ["benchmarks"]` | Custom FQP adapter (REST/OData) using the OpenData API adapter pattern | Same adapter pattern as Regulatory Reference Service; benchmark data is time-series reference data over a REST endpoint |
+
+**Integration notes:**
+- Both runtime services (Regulatory Reference, Benchmark Data) are registered in the Data Source Catalog at tenant setup and routed by the FQP via `dataAffinity` matching — no special-casing in the FQP core
+- Licensing enforcement for the Benchmark Data Service is handled at the service level — the FQP adapter propagates `BENCHMARK_NOT_LICENSED` errors as structured sub-plan failures
+- If either runtime service is unavailable, the FQP falls back to the next registered backend with matching `dataAffinity`, or returns a partial result with a structured warning if no fallback is configured
 
 ---
 
@@ -295,6 +384,6 @@ The platform does not mandate a consumer rendering library. The following are th
 
 ## Version compatibility matrix
 
-| Platform version | Vega-Lite (SCL) | MCP protocol | Node.js | Rust compiler |
-|-----------------|----------------|-------------|---------|--------------|
-| v1.0 | 5.x | MCP 1.x (Streamable HTTP) | 22 LTS | 1.78+ |
+| Platform version | Vega-Lite (SCL) | MCP protocol | Node.js |
+|-----------------|----------------|-------------|---------|
+| v1.0 | 5.x | MCP 1.x (Streamable HTTP) | 22 LTS |

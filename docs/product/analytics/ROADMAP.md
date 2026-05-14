@@ -16,9 +16,11 @@ Phase boundaries and sequencing should be revisited as implementation proceeds, 
 | **Cross-Session Memory** | Preferences, saved queries, and favourites persist across sessions | A Power Analyst opens the platform each morning with their context already applied |
 | **Proactive Analytical Intelligence** | Platform surfaces anomalies and trends without being asked | A portfolio manager finds insight cards waiting on Monday morning — no queries submitted |
 | **Collaborative Sessions** | Multiple users share a governed session and co-explore data | A portfolio manager and risk officer jointly prepare an investment committee pack |
+| **Ecosystem Service Integrations** | Regulatory Reference, Benchmark Data, and Semantic Registry Services connected as registered backends | Regulatory metrics sourced from the authoritative service; benchmark queries use licensed index data without internal ingestion |
+| **Regulatory Compliance Modes** | MiFID II, Basel III/IV, and SEC Reg BI compliance profiles active in the governance pipeline | A Basel III LCR query automatically writes a regulatory snapshot; a MiFID II user is prompted for business justification before client-data queries |
 | **Cross-Backend Drilldown** | Drilldown traversal spans multiple registered execution backends | An analyst drills from warehouse data into graph relationships in one continuous navigation |
 | **Advanced Query Capabilities** | Ranking, window analytics, scenario comparison, and inline benchmarks in a single query | A performance analyst composes a complex multi-dimensional query without splitting it into parts |
-| **Open API Surface** | SMR browser API, result streaming, GraphQL layer, lineage query API | A compliance team queries the lineage store directly; a BI team integrates via their existing GraphQL gateway |
+| **Open API Surface** | SMR browser API, result streaming with progress events, GraphQL layer, lineage query API, FQP adaptive planning, materialised views | A compliance team queries the lineage store directly; high-frequency queries hit pre-computed materialised views; consumers see real-time progress during query execution |
 
 ---
 
@@ -33,7 +35,8 @@ Phase boundaries and sequencing should be revisited as implementation proceeds, 
 | **Platform Admin API** | Authenticated REST API for backend registration, SMR management, entitlement policy configuration, and tenant governance settings. Full CRUD on the Data Source Catalog, SMR metric definitions, and role entitlement records. |
 | **Admin Console** | Web UI over the Platform Admin API. Metric definition editor, entitlement policy builder, Data Source Catalog manager, governance threshold controls. Application Admins and Metric Owners manage the full platform configuration without writing JSON. |
 | **Semantic Metrics Registry (SMR) service** | PostgreSQL primary store with row-level security; Elasticsearch metric search index. Metric CRUD with proposal → review → approved state machine. Append-only version records for each metric definition. Fuzzy metric search by name and description. |
-| **MCP Capability Layer** | Cloudflare Workers edge deployment. JWT validation at the edge. Exposes four capabilities: `analyse_metric`, `compare_portfolios`, `list_metrics`, `get_metric_definition`. MCP Streamable HTTP transport. All requests authenticated; unauthenticated requests rejected before platform processing begins. |
+| **Financial Services Reference Model** | Bundled industry seed model covering six analytical domains: `portfolio`, `performance`, `risk`, `regulatory`, `counterparty`, `benchmarks`. Includes pre-built metric definitions (AUM, portfolio return, tracking error, VaR, issuer concentration, LCR, NSFR, and others), dimension schemas, drilldown hierarchies (asset class, geography, sector), and measure groups. Platform administrators seed their SMR at setup by specifying `analyticalDomain: "wealth_management"`, `"banking"`, or `"investment_management"` in the platform config — the relevant subset of the reference model is imported as the tenant's starting SMR baseline. All imported definitions enter the standard `proposed` → approval workflow before becoming resolvable. Definitions may be customised or superseded via the Admin API. |
+| **MCP Capability Layer** | Cloudflare Workers edge deployment. JWT validation at the edge. MCP Streamable HTTP transport. All requests authenticated; unauthenticated requests rejected before platform processing begins. Exposes eight analytical capabilities: `analyse_metric` (governed metric query), `compare_portfolios` (cross-portfolio comparison with optional benchmark), `issuer_concentration` (concentration risk calculation), `risk_breakdown` (risk factor attribution — VaR, tracking error, beta), `performance_attribution` (BHB/BF attribution decomposition), `regulatory_metric` (LCR, NSFR, leverage ratio — feature-flag gated), `list_metrics` (SMR metric catalogue for the authenticated user), `drilldown` (hierarchy traversal from a prior result). Capability manifest endpoint returns per-user, per-tenant availability for each capability including feature flag gating. |
 | **Semantic Intent Layer** | Claude Sonnet (standard tier) for natural language → structured MCP tool call parameter translation. Claude Opus (complex tier) for multi-metric attribution queries and ambiguous intent. System prompt constructed from SMR metric and dimension names — no physical schema injected. Structured output validated against MCP tool input schema before proceeding. |
 | **Analytical Intent Validator** | JSON schema validation of MCP tool call parameters. SMR ID resolution — rejects unregistered metric and dimension IDs. LQP (Logical Query Plan) generator — produces a backend-agnostic execution DAG from validated parameters. Intent confirmation card payload included in response when enabled. |
 | **Role-Aware Projection Layer** | JWT claim extraction (`roles`, `managed_portfolios`, `entity_ids`, `display_name`). Row predicate injection into LQP from role definition templates. Column mask application to result assembly. Metric and dimension visibility enforcement per role. `defaultDenyAll: true` enforcement — users with no matching role receive ENTITLEMENT_DENIED before any query executes. |
@@ -196,6 +199,58 @@ Governed Analytical Core (lineage store, vite2img for PDF rendering); Automated 
 
 ---
 
+## Ecosystem Service Integrations
+
+> **What this achieves:** The platform connects to three shared ecosystem services as registered execution backends — providing authoritative regulatory metric values, licensed market benchmark data, and a curated library of importable metric definitions. Tenants no longer need to license, ingest, or maintain this reference data independently.
+
+### Shippable components
+
+| Component | Functionality |
+|-----------|--------------|
+| **Semantic Registry Service integration** | `POST /v1/smr/import` endpoint for importing pre-built metric definition packages from the Semantic Registry Service. Six financial services packages available: `fsi-wealth-v1`, `fsi-investment-v1`, `fsi-banking-v1`, `fsi-risk-v1`, `fsi-regulatory-v1`, `fsi-esg-v1`. Imported definitions are marked with `source: "semantic_registry_service"` and `source_version` in SMR metadata. Version update notifications when the registry publishes a new package version. All imported definitions enter the standard `proposed` → approval workflow. |
+| **Regulatory Reference Service adapter** | Registration of the Regulatory Reference Service as a named execution backend in the Data Source Catalog (`dataAffinity: ["regulatory"]`). The FQP routes all sub-plans with `regulatory` data affinity to this backend first, ensuring regulatory metric values (LCR, NSFR, leverage ratio, capital ratios) are always sourced from the authoritative service. Threshold update notification handling: when the service publishes updated regulatory thresholds, the Application Admin is notified and can update tenant SMR display thresholds accordingly. Fallback to the next registered `regulatory` backend if the service is unavailable. |
+| **Benchmark Data Service adapter** | Registration of the Benchmark Data Service as a named execution backend (`dataAffinity: ["benchmarks"]`). Provides licensed market index and benchmark data (MSCI World, Bloomberg Global Aggregate, S&P 500, and others) as a resolved data source for benchmark comparison queries. Custom benchmark blend registration via the Benchmark Data Service Admin API — blends registered by `id` and accessible in any query's `benchmark` dimension field. Per-tenant licensing check enforcement — tenants not licensed for a specific index receive a structured error, not silent data omission. |
+
+### Acceptance criteria
+
+- `POST /v1/smr/import` idempotent — re-importing the same package version produces no duplicate definitions and does not overwrite tenant customisations
+- FQP routes `regulatory` data affinity sub-plans to the Regulatory Reference Service; falls back correctly when the service is unavailable with a structured partial-result warning
+- Benchmark Data Service licensing check fires before any benchmark data is returned — unlicensed index access returns `BENCHMARK_NOT_LICENSED`, not empty data
+- Every query result using Regulatory Reference Service or Benchmark Data Service data includes those backends in the `meta.backendsUsed` field and lineage record
+
+### Depends on
+
+Governed Analytical Core (Data Source Catalog, FQP backend adapter layer, `POST /v1/smr/import` Admin API endpoint).
+
+---
+
+## Regulatory Compliance Modes
+
+> **What this achieves:** The governance layer is extended with three named compliance profiles — MiFID II, Basel III/IV, and SEC Regulation BI — that automatically apply regime-specific rules, additional audit records, and query-time constraints without requiring manual configuration per query. A compliance analyst querying LCR under Basel III mode gets a regulatory snapshot record written automatically; a compliance officer under MiFID II is prompted for a business justification before any query touching client-identifiable data proceeds.
+
+### Shippable components
+
+| Component | Functionality |
+|-----------|--------------|
+| **Compliance Mode Framework** | `complianceMode` tenant configuration field accepting `"mifid2"`, `"basel3"`, or `"sec_reg_bi"`. Compliance mode is evaluated as step 5 of the governance pipeline — after classification gate, before concurrency check. Compliance mode configuration changes take effect on the next query; no caching of pre-compliance query plans. Multiple modes may be enabled simultaneously for multi-jurisdictional deployments. |
+| **MiFID II compliance mode** | Business justification prompt: queries touching `client_name`, `account_number`, or other PII-adjacent dimensions surface a mandatory justification step before execution. Best execution validation: queries on best-execution metrics require an explicit `date` dimension — rejected with a structured validation error if absent. Transaction reporting trace: all queries involving client-related metrics produce an additional lineage record written to the `analytics.mifid2_trace` table for regulatory reporting. |
+| **Basel III/IV compliance mode** | Entity dimension requirement: all regulatory capital metric queries (LCR, NSFR, leverage ratio, capital ratio) require the `entity` dimension — rejected with a structured error if absent. Regulatory snapshot writes: LCR and NSFR queries trigger an automatic snapshot write to the `analytics.regulatory_snapshots` table. Stress scenario classification enforcement: stress scenario metrics are automatically classified at `RESTRICTED` regardless of their SMR classification setting, ensuring they cannot be returned to roles without RESTRICTED access. |
+| **SEC Regulation BI compliance mode** | Narrative synthesis constraint: an additional prompt-level constraint is injected into the Narrative Synthesis Engine prohibiting investment recommendations in any narrative output — even when result values might suggest one. Suitability record requirement: advisory queries require a `suitability_record_id` parameter; queries without it are blocked with a structured error before execution. |
+| **Compliance mode audit trail** | `analytics.mifid2_trace` table: per-query record for MiFID II transaction reporting queries (query ID, user, entity, timestamp, business justification text, result ID). `analytics.regulatory_snapshots` table: per-query daily snapshot for Basel III/IV regulatory metric queries (entity ID, metric ID, value, regulatory minimum, compliance status, as-of date). Both tables are append-only and retained per the tenant's compliance mode retention policy. |
+
+### Acceptance criteria
+
+- Enabling `complianceMode: "mifid2"` causes every query on a PII-adjacent dimension to require a business justification — no bypass path
+- A Basel III LCR query without the `entity` dimension returns a structured `REQUIRED_DIMENSION_MISSING` error — no partial execution
+- `analytics.mifid2_trace` and `analytics.regulatory_snapshots` records are written atomically with the query lineage record — a query result with no compliance trace record is a platform defect
+- SEC Reg BI narrative synthesis constraint is enforced via post-generation validation — narratives containing investment recommendation language are rejected and regenerated
+
+### Depends on
+
+Governed Analytical Core (Semantic Execution Governance pipeline, Analytical Lineage Store); Ecosystem Service Integrations (Regulatory Reference Service providing authoritative regulatory metric values for snapshot records).
+
+---
+
 ## Cross-Backend Drilldown
 
 > **What this achieves:** Drilldown traversal is no longer constrained to a single execution backend per hierarchy level. An analyst can drill from a warehouse-sourced view directly into a graph database or API-backed relationship model in one continuous navigation — the backend boundary is transparent.
@@ -243,7 +298,7 @@ Governed Analytical Core (FQP with Graph Data API adapter registered); at least 
 
 ### Depends on
 
-Governed Analytical Core (Analytical Intent Validator parameter model extensibility, FQP result assembly layer for window computation, Benchmark Data Service integration for composite benchmark resolution).
+Governed Analytical Core (Analytical Intent Validator parameter model extensibility, FQP result assembly layer for window computation); Ecosystem Service Integrations (Benchmark Data Service registered for composite benchmark resolution).
 
 ---
 
@@ -257,19 +312,25 @@ Governed Analytical Core (Analytical Intent Validator parameter model extensibil
 |-----------|--------------|
 | **SMR Browser REST API** | `GET /v1/smr/metrics` — paginated list of active metric definitions. `GET /v1/smr/metrics/{id}` — full metric definition including formula, aggregation rule, dimension list, data domain, owner, and version history. `GET /v1/smr/dimensions` — dimension catalogue. `GET /v1/smr/hierarchies` — drilldown hierarchy definitions. All endpoints authenticated by JWT; results scoped to the user's entitled metric visibility. |
 | **NDJSON Result Streaming** | The MCP Capability Layer and FQP support streaming delivery of assembled sub-plan results in NDJSON format. Consumers receive individual backend sub-results as they arrive rather than waiting for full assembly. First sub-result delivered within 200ms of FQP execution start (p95). Streaming responses include a terminal frame with the complete assembled result, SCL display spec, and lineage URL. Compatible with existing non-streaming consumers. |
+| **Streaming Progress Events** | Four structured progress events emitted during FQP execution and delivered to streaming consumers: `intent_resolved` (Semantic Intent Layer has produced validated tool call parameters), `entitlements_applied` (Role-Aware Projection Layer has produced the row predicate and column mask set), `plan_compiled` (Analytical Intent Validator has produced the LQP), `executing` (FQP has dispatched sub-plans to backends). Events enable consumers to render progressive UI states (e.g. "Applying entitlements…", "Querying risk engine…") rather than displaying a static spinner. |
+| **FQP Adaptive Planning** | The FQP tracks observed p50 and p95 execution latency per registered backend (stored in PostgreSQL). When a backend's observed latency degrades beyond its baseline by a configurable multiplier, the adaptive planner automatically routes the next query to the next registered backend with matching `dataAffinity`. Cost estimate calibration: observed execution costs are used to refine the governance layer's cost unit estimates, improving circuit breaker accuracy over time. |
+| **Materialised View Registration** | Application Admins register pre-computed result templates via the Admin API — named queries whose results are pre-computed on a cron schedule and stored as cached result sets. When a query matches a registered materialised view (same metric IDs, dimensions, and time expression), the governance cost estimate applies a `-800 unit` offset (as per the cost model in the governance spec). Used for high-frequency analytical queries (e.g. nightly NAV calculations, daily regulatory ratio snapshots) where result freshness within the refresh cadence is acceptable. |
 | **GraphQL API Gateway** | Optional GraphQL schema layer over the MCP endpoint. Exposes `analyseMetric`, `comparePortfolios`, `listMetrics`, `getMetricDefinition`, and `drilldown` as GraphQL queries with typed input and output schemas. JWT auth via HTTP header. GraphQL layer is a passthrough — all requests route through the same governance pipeline; no governance bypass. |
 | **Lineage Query REST API** | `GET /v1/lineage/{result_id}` — retrieve full lineage record. `POST /v1/lineage/search` — search by `user_sub`, `metric_id`, `time_range`, `backend_id`, or `governance_decision`. `GET /v1/lineage/{result_id}/sub-plans` — retrieve per-backend sub-plans and raw responses. Paginated; JWT-scoped to the querying user's own records (Platform Admins can query tenant-wide). |
 
 ### Acceptance criteria
 
 - SMR Browser API results are consistent with the Admin Console SMR view — same data, same entitlement scoping
-- Streaming first-frame latency ≤ 200ms (p95) — measurably faster than full assembly for multi-backend queries
+- Streaming first-frame latency ≤ 200ms (p95) for NDJSON result streaming — measurably faster than full assembly for multi-backend queries
+- All four progress events emitted in correct order for every streaming query — no query completes without emitting `executing` before the first result frame
+- Adaptive planner latency tracking is transparent to consumers — routing changes are logged in the lineage record's `meta.backendsUsed` field but require no consumer changes
+- Materialised view matches reduce governance cost estimate by 800 units — verified against the cost model
 - GraphQL responses are semantically equivalent to MCP responses — the API layer adds no data transformation
 - Lineage query API search latency ≤ 500ms for queries over the full 7-year retention window (p95)
 
 ### Depends on
 
-Governed Analytical Core (lineage store with indexed search, SMR service read API); FQP result assembly refactored to support incremental streaming (internal architecture pre-requisite).
+Governed Analytical Core (lineage store with indexed search, SMR service read API, FQP result assembly refactored to support incremental streaming); Automated Monitoring and Alerts (Scheduled Query Service provides the execution infrastructure for materialised view refresh).
 
 ---
 
