@@ -16,11 +16,11 @@ The platform serves multiple consumer types simultaneously: human users querying
 
 | It is | It is not |
 |-------|-----------|
-| A headless MCP API service — it returns structured JSON result sets and optional Vega-Lite chart specifications; any application or agent can consume it regardless of their UI stack | A general-purpose SQL query interface, BI tool replacement, or UI-rendering layer |
+| A headless MCP API service — it returns structured JSON result sets and optional SCL display specifications; any application or agent can consume it regardless of their UI stack | A general-purpose SQL query interface, BI tool replacement, or UI-rendering layer |
 | A platform where all AI-accessible metrics are registered, governed, and version-controlled in a Semantic Metrics Registry | A system that allows LLMs to generate arbitrary SQL against physical schemas |
 | A federated query planner that routes governed analytical plans to appropriate execution backends — SQL data warehouses, OpenData APIs, Graph Data APIs, semantic layers, or any registered retrieval mechanism | A single-engine analytics layer coupled to one database or query technology |
 | A role-aware entitlement enforcement layer applied at the semantic tier before execution | A system that relies on database-level access controls as the primary security boundary for AI queries |
-| A headless chart specification layer — the Visualisation Ontology selects chart contracts and produces Vega-Lite specs; rendering is always the consumer's responsibility | A system that allows LLMs to select chart types ad hoc without a governing contract, or that renders charts directly |
+| A headless chart specification layer — the Visualisation Ontology selects chart contracts and produces SCL display specifications; rendering is always the consumer's responsibility | A system that allows LLMs to select chart types ad hoc without a governing contract, or that renders charts directly |
 | A complete analytical lineage trail from business question to execution result | A black-box analytics system with no explainability mechanism |
 | A governed narrative synthesis layer anchored to registered metric values | A free-text generation layer that can introduce metric values not present in the execution result |
 | An MCP Capability Layer accessible to any MCP-compatible AI orchestrator — conversational assistants, autonomous agents, and pipelines alike | A data API accessible only to a specific AI platform or a specific consumer type |
@@ -33,7 +33,7 @@ The platform serves multiple consumer types simultaneously: human users querying
 |-----------|--------------------------|
 | **Governed by default** | No metric, query, or result escapes the governance pipeline. Circuit breakers, compliance classification, cost controls, and role enforcement apply to every request regardless of consumer type. There is no fast path that bypasses governance. |
 | **Semantic, not syntactic** | All analytical intent is expressed in business vocabulary registered in the SMR. Physical schemas, SQL, and execution-engine specifics are never exposed to AI models or to consumers. The platform owns the translation from intent to execution. |
-| **Headless and consumer-agnostic** | The platform produces structured JSON results and Vega-Lite chart specifications. It never renders charts or generates HTML. Rendering is always the consumer's responsibility — the `<ai-analytics>` component, the AI Chat Platform, the `vite2img` service, or any Vega-Lite-compatible library. |
+| **Headless and consumer-agnostic** | The platform produces structured JSON results and SCL display specifications. It never renders charts or generates HTML. Rendering is always the consumer's responsibility — any MCP-compatible consumer renders from the returned display specification using their own UI stack. |
 | **Role enforcement at the semantic tier** | Entitlements are applied at the Role-Aware Projection Layer before any Logical Query Plan is compiled. The execution engine is not the security boundary — a query that the user is not entitled to see never reaches physical execution. |
 | **Lineage for everything** | Every analytical result carries a `result_id` linking to a complete, queryable provenance chain from natural-language intent through SMR resolution, role projection, plan compilation, engine routing, and result assembly. |
 | **Equal governance for all consumer types** | Human users, conversational assistants, and autonomous agents route through the same pipeline and receive results with identical metric definitions, entitlement enforcement, and lineage provenance. There is no privileged consumer class and no governance bypass. |
@@ -242,7 +242,7 @@ This headless design means:
 |------------|------|
 | **AI provider** | Provider-agnostic abstraction used by the Semantic Intent Layer and Narrative Synthesis Engine. The platform maps tiers to the tenant's configured provider's current models. |
 | **Platform storage** | Relational database with RLS for SMR records, lineage records, and configuration; object storage for cached result sets and artefacts. |
-| **Platform edge function** | JWT handling, intent resolution API, DSL compilation, governance checks, FQP orchestration, result assembly, SCL display spec generation. |
+| **Platform edge function** | JWT handling, intent resolution API, intent validation and LQP compilation, governance checks, FQP orchestration, result assembly, SCL display spec generation. |
 | **Host authentication** | The host application issues JWTs for its users, including role claims used by the Role-Aware Projection Layer. |
 | **Host execution backends** | The host's registered data retrieval backends — SQL data warehouses, OpenData APIs, Graph Data APIs, semantic layers, OLAP engines, or any other mechanism the host registers. The FQP translates Logical Query Plan fragments into each backend's native request protocol. |
 | **AI Chat Platform** | The primary conversational consumer of the Analytics Platform's MCP Capability Layer. See [Role in the AI-Enablement Product Ecosystem](#role-in-the-ai-enablement-product-ecosystem) below. |
@@ -262,7 +262,7 @@ The AI Analytics Platform and the **AI Chat Platform** form a complementary two-
 | Layer | Product | Responsibility |
 |-------|---------|---------------|
 | **Conversational surface** | AI Chat Platform | Generative chat interface, conversation management, multi-modal content rendering, tool call transparency, shared conversations, memory, and audit trail. Provides the user's entry point for all interaction. Has no built-in analytical capability. |
-| **Analytical backend** | AI Analytics Platform | Governed semantic metric resolution, large-scale federated query execution, role-aware entitlement enforcement, Vega-Lite chart specification generation, and lineage-backed result delivery. Headless — returns structured data and chart specs; has no rendering layer and no conversational surface. |
+| **Analytical backend** | AI Analytics Platform | Governed semantic metric resolution, large-scale federated query execution, role-aware entitlement enforcement, SCL display specification generation, and lineage-backed result delivery. Headless — returns structured data and display specs; has no rendering layer and no conversational surface. |
 
 The AI Chat Platform is **one consumer** of the Analytics Platform's capabilities, not the only one. The Analytics Platform's MCP Capability Layer (see [08-mcp-capability-layer.md](./08-mcp-capability-layer.md)) is an MCP-compatible interface designed to be consumed by any AI orchestrator — the AI Chat Platform today, and additional agentic consumers in the future.
 
@@ -278,7 +278,7 @@ The AI Analytics Platform is designed for three modes of consumption, which may 
 
 | Mode | Consumer | When to use |
 |------|---------|-------------|
-| **Direct API consumer** | A custom application calling `POST /v1/mcp` directly — rendering the returned JSON result sets and Vega-Lite specs using their own UI stack | Dedicated analytics views, dashboards, analytical workbooks built by the host team — where the application owns the rendering layer entirely |
+| **Direct API consumer** | A custom application calling `POST /v1/mcp` directly — rendering the returned JSON result sets and SCL display specifications using their own UI stack | Dedicated analytics views, dashboards, analytical workbooks built by the host team — where the application owns the rendering layer entirely |
 | **Conversational backend** | AI Chat Platform, registered via `mcpServers` config | Conversational analytics — where the user asks quantitative questions in natural language; the AI Chat Platform routes tool calls to the Analytics Platform's MCP endpoint |
 | **Agentic consumer** | Autonomous AI agents, scheduled pipelines, event-triggered workflows | Any AI orchestrator that needs to query large datasets, monitor metrics, generate governed reports, or trigger analytical workflows without a human in the loop — all via the same MCP Capability Layer |
 
@@ -395,7 +395,7 @@ AI Analytics Platform — governance pipeline:
   2. Capability availability check (feature flags + user role)
   3. SMR resolution: verify tracking_error, tracking_error_limit, portfolio dimension
   4. Role-Aware Projection: filter to portfolios the user is entitled to see
-  5. DSL compilation → Logical Query Plan
+  5. Intent validation → Logical Query Plan
   6. Semantic Execution Governance: cost estimate check, compliance classification
   7. Federated Query Planner: route to registered execution engine(s)
   8. Result assembly + lineage record written
@@ -413,7 +413,7 @@ AI Analytics Platform — governance pipeline:
      }
 
 AI Chat Platform:
-  - Renders result as data table + Vega-Lite bar chart (from the returned spec) in conversation thread
+  - Renders result as data table + bar chart (from the returned SCL display spec) in conversation thread
   - Displays tool call disclosure card (collapsible): inputs, result_id, latency
   - AI model generates governed narrative:
     "Three portfolios are above their tracking error limit this quarter:
@@ -438,7 +438,7 @@ At no point in this flow does the AI model construct SQL, access a physical sche
 
 | Capability | Provided by |
 |-----------|-------------|
-| **Large-scale, multi-engine data analytics from a conversation** | Analytics Platform FQP routes governed plans to Snowflake, Databricks, Trino, or any registered engine — irrespective of result set size |
+| **Large-scale, multi-backend data analytics from a conversation** | Analytics Platform FQP routes governed plans to any registered execution backend — SQL data warehouses, OpenData APIs, Graph Data APIs, or other backends — irrespective of result set size |
 | **Role-aware results without any configuration in the chat layer** | Analytics Platform's Role-Aware Projection Layer enforces entitlements before results leave the analytical backend; the AI Chat Platform surfaces only what the authenticated user is permitted to see |
 | **Governed metric vocabulary, not ad hoc SQL** | The AI model calls named, registered capabilities (`analyse_metric`, `risk_breakdown`, etc.) — the Analytics Platform's SMR ensures metric definitions are consistent, versioned, and owned |
 | **Deterministic chart specification** | The Analytics Platform's Visualisation Ontology selects chart types based on the result schema and metric semantics, returning a governed SCL display spec — the AI Chat Platform renders that spec, not a chart chosen ad hoc by the LLM |

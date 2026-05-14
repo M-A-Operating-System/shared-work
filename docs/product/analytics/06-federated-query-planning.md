@@ -2,9 +2,9 @@
 
 ## Overview
 
-The **Federated Query Planner (FQP)** is the component that receives a validated Logical Query Plan (LQP) from the Analytics DSL compiler, decomposes it into engine-specific sub-plans, routes sub-plans to registered execution engines, manages result assembly, and handles caching and materialisation.
+The **Federated Query Planner (FQP)** is the component that receives a validated Logical Query Plan (LQP) from the Analytical Intent Validator, decomposes it into backend-specific sub-plans, routes sub-plans to registered execution backends, manages result assembly, and handles caching and materialisation.
 
-The FQP is the only component in the platform that has knowledge of physical execution engines. No other component — not the DSL compiler, not the Semantic Intent Layer, not the AI model — has access to engine connection details or physical schema information.
+The FQP is the only component in the platform that has knowledge of physical execution backends. No other component — not the Analytical Intent Validator, not the Semantic Intent Layer, not the AI model — has access to backend connection details or physical schema information.
 
 ---
 
@@ -30,8 +30,8 @@ The FQP is the only component in the platform that has knowledge of physical exe
 │  └───────────────────┬──────────────────────────────────────┘ │
 │                      │                                         │
 │  ┌───────────────────▼──────────────────────────────────────┐ │
-│  │  4. Engine Selection & Routing                           │ │
-│  │  (match sub-plans to engines by affinity + capability)   │ │
+│  │  4. Backend Selection & Routing                          │ │
+│  │  (match sub-plans to backends by affinity + capability)  │ │
 │  └───────────────────┬──────────────────────────────────────┘ │
 │                      │                                         │
 │  ┌───────────────────▼──────────────────────────────────────┐ │
@@ -90,9 +90,9 @@ When multiple engines are registered for the same data affinity, the FQP selects
 
 ## Physical query generation
 
-The FQP translates sub-plans into engine-specific query dialects. This is the only point in the platform where engine-specific syntax is generated:
+The FQP translates sub-plans into backend-specific query formats. This is the only point in the platform where backend-specific syntax is generated. The specific query dialect — SQL, semantic layer query API, OLAP query format, REST/OData, or graph query language — depends entirely on the registered backend type.
 
-### Snowflake dialect example
+### SQL warehouse backend example
 
 **Sub-plan (LQP fragment):**
 ```json
@@ -106,7 +106,7 @@ The FQP translates sub-plans into engine-specific query dialects. This is the on
 }
 ```
 
-**Generated Snowflake SQL (internal, never exposed to AI or user):**
+**Generated SQL (internal, never exposed to AI or user):**
 ```sql
 SELECT
   p.portfolio_id,
@@ -121,7 +121,7 @@ GROUP BY p.portfolio_id, p.portfolio_name
 ORDER BY p.portfolio_name ASC
 ```
 
-### dbt Semantic Layer dialect example
+### Semantic layer backend example
 
 **Sub-plan (LQP fragment):**
 ```json
@@ -132,7 +132,7 @@ ORDER BY p.portfolio_name ASC
 }
 ```
 
-**Generated dbt Semantic Layer query:**
+**Generated semantic layer query (illustrative):**
 ```json
 {
   "metrics": [{ "name": "var_95" }],
@@ -142,7 +142,7 @@ ORDER BY p.portfolio_name ASC
 }
 ```
 
-### Cube OLAP dialect example
+### OLAP backend example
 
 **Sub-plan (LQP fragment):**
 ```json
@@ -153,7 +153,7 @@ ORDER BY p.portfolio_name ASC
 }
 ```
 
-**Generated Cube query:**
+**Generated OLAP query (illustrative):**
 ```json
 {
   "measures": ["Portfolios.aum"],
@@ -198,7 +198,7 @@ The FQP maintains a result cache keyed by the LQP signature (a deterministic has
 | Cache TTL | Configurable per `data.refresh_cadence` in the metric definition. Default: `3600` seconds. |
 | Cache invalidation | On metric definition version change; on execution engine data refresh signal (if the engine emits one); on explicit cache clear via Admin API |
 | Cache scope | Per-tenant. Results from one tenant are never served to another. |
-| Cache storage | Platform-managed Redis-compatible store. Results over 10MB bypass the cache and are streamed directly. |
+| Cache storage | Platform-managed result cache. Results over 10MB bypass the cache and are streamed directly. |
 | Cache hit disclosure | Cache hits are disclosed in the lineage record and (optionally) to the user as a *"Result from cache (data as of [timestamp])"* indicator. |
 
 ### Materialised views

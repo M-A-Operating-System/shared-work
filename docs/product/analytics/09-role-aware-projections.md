@@ -4,7 +4,7 @@
 
 The **Role-Aware Projection Layer** is the component that applies the authenticated user's entitlement model to the resolved analytical intent before any query plan is compiled. It is the semantic-layer enforcement of data access controls — operating above the physical execution layer, before any query reaches an execution engine.
 
-Role-aware projection is not optional and not bypassable. Every analytical request — whether from natural language, DSL, or MCP capability — passes through the projection layer.
+Role-aware projection is not optional and not bypassable. Every analytical request — whether from natural language or an MCP tool call — passes through the projection layer.
 
 ---
 
@@ -14,8 +14,8 @@ The projection layer applies four categories of restriction:
 
 | Restriction type | Description | Applied at |
 |-----------------|-------------|------------|
-| **Metric access filter** | Removes metrics from the resolved intent that the user's role is not entitled to query | DSL compilation — Stage 3 |
-| **Dimension access filter** | Removes dimensions the user is not entitled to slice by | DSL compilation — Stage 3 |
+| **Metric access filter** | Removes metrics from the resolved intent that the user's role is not entitled to query | Intent validation — Stage 3 |
+| **Dimension access filter** | Removes dimensions the user is not entitled to slice by | Intent validation — Stage 3 |
 | **Row predicate injection** | Injects SQL-like predicates that restrict which data rows the user can access | FQP physical query generation |
 | **Column mask application** | Replaces or nullifies column values the user is not permitted to see in the assembled result | FQP result assembly |
 

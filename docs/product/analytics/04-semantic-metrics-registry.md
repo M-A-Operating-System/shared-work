@@ -4,7 +4,7 @@
 
 The **Semantic Metrics Registry (SMR)** is the governing catalogue of every analytical concept resolvable on the platform. It is the single source of truth for what can be queried, how metrics are defined, what dimensions are available, how hierarchies are structured, who owns each definition, and what lineage metadata applies.
 
-Nothing is queryable that is not registered in the SMR. This is an architectural constraint, not a policy. The Analytics DSL compiler rejects any metric identifier not present in the SMR for the active tenant.
+Nothing is queryable that is not registered in the SMR. This is an architectural constraint, not a policy. The Analytical Intent Validator rejects any metric identifier not present in the SMR for the active tenant.
 
 ---
 
@@ -74,16 +74,16 @@ metric:
 
 | Field | Required | Description |
 |-------|----------|-------------|
-| `id` | Yes | Unique metric identifier within the tenant. Lowercase, underscores. Used in DSL expressions and API calls. |
+| `id` | Yes | Unique metric identifier within the tenant. Lowercase, underscores. Used in MCP tool call parameters. |
 | `version` | Yes | Semantic version. Increment on formula changes (major), aggregation changes (minor), documentation changes (patch). |
 | `label` | Yes | Human-readable metric name. Used in UI, narrative synthesis, and chart axis labels. |
 | `description` | Yes | Full prose definition. Must be unambiguous — this definition is injected into the AI model context. |
 | `formula` | Yes | Business-logic formula expressed in the platform's formula language (see below). Does not reference physical table columns directly — references other SMR metrics or canonical data source identifiers. |
 | `unit` | Yes | Value unit. Accepted: `percentage`, `currency`, `basis_points`, `ratio`, `count`, `years`, `days`, `custom`. |
 | `aggregation.default` | Yes | Default aggregation rule when the metric is rolled up across a dimension. |
-| `aggregation.allowed` | Yes | All permitted aggregation rules for this metric. Requests using non-allowed rules are rejected at DSL compilation. |
+| `aggregation.allowed` | Yes | All permitted aggregation rules for this metric. Requests using non-allowed rules are rejected at intent validation. |
 | `aggregation.granularity` | Yes | Time granularities at which this metric is calculable. Requests at unsupported granularities are rejected. |
-| `dimensions.required` | Yes | Dimensions that must be present in any query using this metric. Missing required dimensions cause a DSL compilation error. |
+| `dimensions.required` | Yes | Dimensions that must be present in any query using this metric. Missing required dimensions cause a validation error. |
 | `dimensions.optional` | No | Dimensions that may optionally be applied. |
 | `data.domain` | Yes | The logical data domain this metric belongs to. Must match a domain registered in the SMR. |
 | `data.refresh_cadence` | Yes | How frequently the underlying data is updated. Displayed in the lineage inspector and narrative synthesis. |
