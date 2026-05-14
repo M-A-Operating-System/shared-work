@@ -176,25 +176,62 @@ The AI Analytics Platform is a **headless service**. It has no rendering layer a
 | Output field | Type | Description |
 |-------------|------|-------------|
 | `result_id` | string | Unique identifier for this execution result, linking to the full lineage record |
-| `result` | JSON array | Tabular result set — rows and typed columns |
-| `vega_lite_spec` | JSON object (optional) | Vega-Lite chart specification governed by the Visualisation Ontology — present only when the result schema maps to a registered chart contract (bar, line, scatter, heatmap, etc.). Absent for purely tabular results — Vega-Lite has no native table type; the consumer renders the `result` array as a table using their own UI |
+| `display_spec` | JSON object | A JSON display specification — always present. Either a standard Vega-Lite chart spec or a platform-defined tabular spec (see below). Consumers render from this object regardless of result shape. |
 | `narrative` | string (optional) | Governed prose explanation produced by the Narrative Synthesis Engine — present when the host has enabled narrative synthesis for the tenant |
+
+### Display spec format
+
+Vega-Lite specifications are pure JSON, which makes it natural to use a single `display_spec` envelope for all result types. The platform returns one of two JSON shapes, distinguished by a `type` field:
+
+**Chart result** — a standard Vega-Lite specification:
+
+```json
+{
+  "type": "vega-lite",
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "mark": "bar",
+  "data": { "values": [ ... ] },
+  "encoding": {
+    "x": { "field": "portfolio", "type": "nominal" },
+    "y": { "field": "tracking_error", "type": "quantitative" }
+  }
+}
+```
+
+**Tabular result** — a minimal platform extension using the same JSON envelope:
+
+```json
+{
+  "type": "table",
+  "columns": [
+    { "field": "portfolio",      "label": "Portfolio",      "type": "string"  },
+    { "field": "tracking_error", "label": "Tracking Error", "type": "number", "format": ".2%" },
+    { "field": "limit",          "label": "Limit",          "type": "number", "format": ".2%" },
+    { "field": "breached",       "label": "Breached",       "type": "boolean" }
+  ],
+  "data": [ ... ]
+}
+```
+
+The `type: "table"` spec is a deliberate, minimal extension of the Vega-Lite JSON convention — it carries the same `data` array and typed column definitions, but signals to the consumer that a grid layout is the appropriate presentation rather than a chart. Vega-Lite itself has no native table mark; this extension fills that gap without introducing a second output format.
+
+The Visualisation Ontology determines which shape is returned based on the result schema and the registered chart contract for the query type. Consumers always render from `display_spec.type` — they do not need to inspect the raw result to decide how to display it.
 
 **Rendering is always the consumer's responsibility:**
 
 | Consumer | How they render |
 |---------|------------------------------|
-| Custom analytics UI (host-built) | Any Vega-Lite-compatible library (Vega-Embed, Observable Plot, etc.) integrated by the host team |
-| AI Chat Platform | Native Vega-Lite content rendering pipeline (priority 5 in the content rendering stack) |
-| Agentic consumers producing PDF/email reports | Optional `vite2img` static image service — consumes the Vega-Lite spec and returns a PNG or SVG for embedding in non-interactive output |
-| Custom consumers | Any Vega-Lite-compatible rendering library |
+| Custom analytics UI (host-built) | Inspect `display_spec.type`; render `"vega-lite"` with any Vega-Lite-compatible library (Vega-Embed, etc.) and `"table"` with their own grid component |
+| AI Chat Platform | Native content rendering pipeline — `"vega-lite"` via the built-in Vega-Lite renderer; `"table"` via the built-in data table renderer |
+| Agentic consumers producing PDF/email reports | Pass `display_spec` to the optional `vite2img` service, which handles both `"vega-lite"` (renders to PNG/SVG) and `"table"` (renders to an HTML table image) |
+| Custom consumers | Any Vega-Lite library for chart specs; any grid/table component for the tabular extension |
 
-The optional **`vite2img` service** accepts a Vega-Lite specification and returns a static image (PNG or SVG). It is a separate, independently deployable service intended for use cases where interactive chart rendering is unavailable — automated report generation, email delivery, PDF document production, and batch analytical pipelines. It does not interact with the Analytics Platform's governance pipeline; it receives only the already-produced Vega-Lite spec.
+The optional **`vite2img` service** accepts a `display_spec` JSON object and returns a static image (PNG or SVG). It is a separate, independently deployable service intended for use cases where interactive rendering is unavailable — automated report generation, email delivery, PDF production, and batch pipelines. It does not interact with the Analytics Platform's governance pipeline.
 
 This headless design means:
 - The Analytics Platform can serve any consumer regardless of their UI stack.
-- Consumers can substitute alternative Vega-Lite renderers or post-process specs without any change to the Analytics Platform.
-- The governed chart contract (which chart type, which axes, which colours by semantic meaning) is always enforced at the spec-generation level — rendering libraries cannot override it.
+- A single `display_spec` field is always present — consumers never need to branch on whether a chart or table was produced.
+- The governed chart contract (chart type, axis semantics, colour by meaning) is enforced at spec-generation time — rendering libraries cannot override it.
 
 ---
 
@@ -363,10 +400,15 @@ AI Analytics Platform — governance pipeline:
 
   ↓  Returns governed MCP tool response to AI Chat Platform:
      {
-       "result_id":     "res_...",
-       "result":        [ /* tabular result rows */ ],
-       "vega_lite_spec": { /* governed Vega-Lite chart specification */ },
-       "narrative":     null   ← narrative generated in step below
+       "result_id":    "res_...",
+       "display_spec": {
+         "type":    "vega-lite",
+         "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+         "mark":    "bar",
+         "data":    { "values": [ ... ] },
+         "encoding": { ... }
+       },
+       "narrative": null   ← narrative generated in step below
      }
 
 AI Chat Platform:
