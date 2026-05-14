@@ -2,7 +2,7 @@
 
 |                    |                           |
 |--------------------|---------------------------|
-| **Current release**| v1 — governed semantic analytics layer, SMR, Analytics DSL, FQP, role-aware projection, visualisation ontology, MCP capability layer |
+| **Current release**| v1 — governed semantic analytics layer, SMR, Analytical Intent Validator, FQP, role-aware projection, visualisation ontology, MCP capability layer |
 | **Date**           | May 2026                  |
 
 ---
@@ -13,7 +13,7 @@
 
 | Item | Description |
 |------|-------------|
-| Scheduled query registration | Application Admins and Power Analysts register DSL expressions for scheduled execution (cron-based). Scheduled queries run through the full governance pipeline using the owner's entitlement claims at execution time. Results written to the result artefact store. |
+| Scheduled query registration | Application Admins and Power Analysts register analytical queries for scheduled execution (cron-based). Scheduled queries run through the full governance pipeline using the owner's entitlement claims at execution time. Results written to the result artefact store. |
 | Threshold alert configuration | Define metric thresholds on scheduled queries. When a result exceeds a threshold, trigger a webhook or in-platform notification. |
 | Alert lineage | Each alert event generates a lineage record linked to the query that triggered it. Alert audit trail is preserved for regulatory review. |
 | Push delivery | Results delivered to registered endpoints (webhook, email, Slack via MCP) with the lineage reference attached. |
@@ -84,29 +84,29 @@
 
 ---
 
-## Phase 2 — Analytical DSL extensions
+## Phase 2 — Analytical intent extensions
 
-**Objective:** Extend the Analytics DSL to support more complex analytical expressions.
+**Objective:** Expand the analytical intent parameter model to support more complex query patterns via new MCP tool capabilities.
 
 | Item | Description |
 |------|-------------|
-| `RANK()` and `NTILE()` operations | Ranking metrics within a dimension (e.g. top-10 portfolios by return) expressible natively in DSL. Currently approximated by ordering + limiting. |
-| `WINDOW()` analytics | Moving averages, rolling sums, period-over-period comparisons expressible as DSL window operations rather than separate queries. |
-| `SCENARIO()` modifier | Compare actual metric values against scenario-adjusted values (e.g. stress test scenarios) within a single DSL expression. |
-| `COMPOSITE_BENCHMARK()` | Define blended benchmark compositions inline in DSL without requiring pre-registration in the Benchmark Data Service. |
+| Ranking and percentile queries | Ranking metrics within a dimension (e.g. top-10 portfolios by return) expressed as `rank_by` and `limit` parameters. Currently approximated by ordering + limiting. |
+| Window analytics | Moving averages, rolling sums, and period-over-period comparisons expressed as dedicated window operation parameters rather than requiring separate queries. |
+| Scenario comparison | Compare actual metric values against scenario-adjusted values (e.g. stress test scenarios) within a single query via a `scenario` parameter. |
+| Composite benchmark definition | Define blended benchmark compositions inline in the query without requiring pre-registration in the Benchmark Data Service. |
 
 ---
 
-## Phase 3 — Headless analytics API
+## Phase 3 — API surface extensions
 
-**Objective:** Expose the full analytical pipeline via a governed headless API for host applications to embed analytical results in their own interfaces without using the web component.
+**Objective:** Expand the headless API surface and delivery options for host consumers.
 
 | Item | Description |
 |------|-------------|
-| REST analytics API | Full query, result, lineage, and SMR access via authenticated REST API. Same governance pipeline as the web component — no bypass path. |
-| Result streaming | Stream FQP results to the host application in NDJSON format for real-time display in host-owned UI components. |
-| Vega-Lite spec delivery | Return Vega-Lite chart specifications from the Visualisation Ontology as part of the query response — host renders the chart in their own UI using the platform-provided spec. |
-| GraphQL layer | Optional GraphQL API over the headless analytics API for host applications with existing GraphQL infrastructure. |
+| SMR browser API | Full read access to the tenant's SMR — metric definitions, dimensions, hierarchies — via authenticated REST endpoints. Enables host applications to build metric discovery and browsing experiences. |
+| Result streaming | Stream FQP results to consumers in NDJSON format for real-time progressive display as sub-plan results arrive. |
+| GraphQL layer | Optional GraphQL API layer over the MCP endpoint for host applications with existing GraphQL infrastructure. |
+| Lineage query API | Direct queryable access to the lineage store — search by user, metric, time range, or result ID. Supports regulatory audit tooling built by the host. |
 
 ---
 

@@ -44,7 +44,7 @@ Every record in the `analytics` schema carries a `tenant_id` column. Row-Level S
 
 | Element | Table | Content |
 |---------|-------|---------|
-| Query record | `analytics.queries` | User ID, tenant ID, raw natural language, DSL expression, intent pattern, timestamp, governance status, execution status, cost units consumed |
+| Query record | `analytics.queries` | User ID, tenant ID, raw natural language, tool call parameters, intent pattern, timestamp, governance status, execution status, cost units consumed |
 | Lineage record | `analytics.lineage_records` | Complete chain: intent → SMR resolution → projection record → LQP → FQP execution record → result schema → visualisation contract → narrative synthesis status |
 | SMR snapshot | `analytics.lineage_records.metric_versions` | For each metric in the query: metric ID, SMR definition version, formula at query time |
 | Projection record | `analytics.lineage_records.projection_record` | Roles, requested metrics, projected metrics, blocked metrics, row predicates, column masks |
@@ -66,7 +66,7 @@ CREATE TABLE analytics.queries (
   session_id          TEXT NOT NULL,
   created_at          TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   natural_language    TEXT,
-  dsl_expression      TEXT,
+  tool_call_params    JSONB,
   intent_pattern      TEXT,
   governance_status   TEXT NOT NULL,  -- 'approved', 'blocked', 'partial'
   execution_status    TEXT NOT NULL,  -- 'success', 'error', 'timeout', 'cancelled'

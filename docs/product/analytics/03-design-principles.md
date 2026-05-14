@@ -9,7 +9,7 @@ These nine principles govern all design decisions for the AI Analytics Platform.
 The platform never exposes physical storage schemas, table names, column names, or execution engine internals to AI models or end users. All AI interaction is mediated through the Semantic Metrics Registry. If a business concept is not registered in the SMR, it is not queryable. There is no escape hatch to raw SQL.
 
 **Consequences:**
-- The Analytics DSL compiler operates exclusively on SMR-registered identifiers. Any attempt to introduce physical schema references is rejected at the compiler boundary.
+- The Analytical Intent Validator operates exclusively on SMR-registered identifiers. Any attempt to introduce unregistered identifiers is rejected at the validation boundary.
 - Physical query generation is entirely the responsibility of the Federated Query Planner — the LLM has no access to or knowledge of physical schemas.
 - The system prompt injected into the AI model contains metric names, dimension names, and analytical concepts drawn from the SMR — not table schemas, column names, or JOIN paths.
 - Schema leakage — even partial — is a security and governance violation. The platform architecture makes this impossible by design, not by policy enforcement alone.
@@ -21,7 +21,7 @@ The platform never exposes physical storage schemas, table names, column names, 
 Every analytical query passes through the governance pipeline before any physical execution begins. There is no fast path that bypasses the Role-Aware Projection Layer or the Semantic Execution Governance checks. Governance is not a post-processing filter — it is a pre-execution gate.
 
 **Consequences:**
-- The execution sequence is invariant: Intent Resolution → SMR Resolution → Role-Aware Projection → DSL Compilation → Governance Validation → FQP → Execution. No step may be skipped.
+- The execution sequence is invariant: Intent Resolution → SMR Resolution → Role-Aware Projection → Intent Validation → Governance Validation → FQP → Execution. No step may be skipped.
 - Queries that fail governance checks are blocked entirely — they do not partially execute. Partial results from a governance-blocked query are never returned.
 - Governance decisions are logged before the query reaches an execution engine, so the audit trail reflects the governance state at decision time, not at result time.
 - Governance configuration changes (entitlement policies, classification gates, cost limits) take effect on the next query — there is no cache of pre-governance query plans.
@@ -42,7 +42,7 @@ A given metric name must resolve to exactly one governed definition for a given 
 
 ## P4 — Complete analytical lineage
 
-Every analytical result has a complete, queryable lineage chain: the user's natural language intent, the resolved analytical intent, the DSL expression, the Logical Query Plan, the physical engine sub-plans, the execution engine responses, the assembled result set, and the applied governance decisions. This lineage is a first-class artefact.
+Every analytical result has a complete, queryable lineage chain: the user's natural language intent, the resolved analytical intent, the validated tool call parameters, the Logical Query Plan, the physical backend sub-plans, the execution backend responses, the assembled result set, and the applied governance decisions. This lineage is a first-class artefact.
 
 **Consequences:**
 - Lineage records are written atomically with the result — a result with no lineage record is a platform defect.

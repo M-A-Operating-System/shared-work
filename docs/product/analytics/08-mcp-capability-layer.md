@@ -12,7 +12,7 @@ The MCP Capability Layer does not expose raw query interfaces. Every capability 
 
 Each MCP capability is a named analytical operation with:
 - A typed input schema (parameters the AI agent provides)
-- A governed execution path (routes through DSL compiler, projection layer, governance, FQP)
+- A governed execution path (routes through Analytical Intent Validator, projection layer, governance, FQP)
 - A typed output contract (the result schema the agent can expect)
 - A semantic description (the context injected into the AI model when this capability is available)
 
@@ -295,8 +295,8 @@ Every MCP capability invocation passes through the full governance pipeline:
 Capability invocation
 → Input schema validation
 → Capability availability check (feature flags + role)
-→ DSL expression construction from capability inputs
-→ DSL compiler (SMR resolution + role-aware projection)
+→ Analytical intent construction from capability inputs
+→ Analytical Intent Validator (SMR resolution + role-aware projection)
 → Semantic Execution Governance
 → Federated Query Planner
 → Result assembly

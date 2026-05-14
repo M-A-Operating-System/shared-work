@@ -22,7 +22,7 @@ Each entry in the Visualisation Ontology is a **chart contract** — a named, ve
 
 ## Intent pattern taxonomy
 
-The ontology classifies every analytical result into one of seven intent patterns, derived from the DSL expression and result schema:
+The ontology classifies every analytical result into one of seven intent patterns, derived from the analytical intent and result schema:
 
 | Intent pattern | Description | Typical trigger phrases |
 |---------------|-------------|------------------------|
@@ -54,15 +54,13 @@ The ontology classifies every analytical result into one of seven intent pattern
 - Colour encoding: metric series (for multi-metric) OR secondary dimension if present
 - Tooltip: all metrics for the hovered category
 
-**Example Vega-Lite contract (abbreviated):**
+**Example SCL contract (abbreviated):**
 ```json
 {
   "contract_id":    "BAR_MULTI_SERIES_COMPARISON",
   "version":        "1.2.0",
   "chart_type":     "bar",
-  "library":        "vega-lite",
   "spec_template": {
-    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
     "mark":    { "type": "bar", "tooltip": true },
     "encoding": {
       "x": {
@@ -106,7 +104,7 @@ The ontology classifies every analytical result into one of seven intent pattern
 - X-axis: temporal dimension
 - Y-axis: metric value
 - Colour: metric series or secondary categorical dimension
-- Reference line: injected if `COMPARE TO BENCHMARK` present in DSL
+- Reference line: injected if comparison target (`compare_to`) is present in the query
 
 **Interaction semantics:**
 - Hover: crosshair tooltip showing all series values at hovered date
@@ -260,7 +258,7 @@ After the ontology selects a chart contract, the rendering pipeline:
 1. Populates the contract's `spec_template` with values derived from the result schema (field names, metric formats, axis labels from SMR labels)
 2. Applies the tenant's colour palette and number format settings
 3. Injects benchmark reference lines or threshold markers if present in the LQP
-4. Produces a final chart spec (Vega-Lite, Plotly, or ECharts JSON) ready for client rendering
+4. Produces a final SCL display specification ready to return to the consumer
 5. Produces a data table as a secondary view for all chart types (always available via a "Show as table" toggle)
 
 ---

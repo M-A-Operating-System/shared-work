@@ -68,13 +68,13 @@ Cost units are estimated from the LQP before execution. The estimation model use
 Query: `portfolio_return, tracking_error BY portfolio, asset_class FOR YEAR_TO_DATE`
 
 ```
-portfolio_return:   50 (metric base)
-tracking_error:     50 (metric base)
-snowflake engine:  100 (standard cost tier)
-dbt engine:         50 (low cost tier)
-asset_class:       1.5× cardinality multiplier (medium)
-YEAR_TO_DATE:      4.0× period multiplier
-2 sub-plans:       100 (federation overhead)
+portfolio_return:        50 (metric base)
+tracking_error:          50 (metric base)
+SQL warehouse backend:  100 (standard cost tier)
+semantic layer backend:  50 (low cost tier)
+asset_class:            1.5× cardinality multiplier (medium)
+YEAR_TO_DATE:           4.0× period multiplier
+2 sub-plans:            100 (federation overhead)
 —————————————————————————————
 Base: (50+50) × 1.5 × 4.0 = 600
 Engines: 100+50 = 150
@@ -150,7 +150,7 @@ Named compliance profiles pre-configure governance behaviour for specific regula
 | Additional rule | Implementation |
 |----------------|---------------|
 | All queries involving client-identifiable data must be logged with the business justification | Prompt user for business justification before queries on `client_name`, `account_number`, or similar PII-adjacent dimensions |
-| Best execution metrics must be queried with explicit timeframe | DSL compilation error if `date` dimension not specified for best-execution metrics |
+| Best execution metrics must be queried with explicit timeframe | Validation error if `date` dimension not specified for best-execution metrics |
 | Transaction reporting queries must generate a TRACE record | Additional lineage record written to `analytics.mifid2_trace` table |
 
 ### Basel III/IV mode

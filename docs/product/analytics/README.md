@@ -12,9 +12,9 @@
 
 ## What is this?
 
-The **AI Analytics Platform** is a governed, embeddable analytical intelligence layer that any application can adopt. Host applications bring their own semantic metric registries, role-aware entitlement models, analytical domain configurations, and rendering preferences. The platform provides the semantic query engine, analytics DSL compiler, federated query planner, visualisation ontology, MCP capability layer, and multi-tenant governed execution infrastructure.
+The **AI Analytics Platform** is a governed, headless analytical intelligence layer that any application can adopt via its MCP Capability Layer. Host applications bring their own semantic metric registries, role-aware entitlement models, analytical domain configurations, and execution backends. The platform provides the semantic query engine, Analytical Intent Validator, federated query planner, visualisation ontology, MCP capability layer, and multi-tenant governed execution infrastructure.
 
-A host application registers as a **tenant**, provides a **JSON application config**, and drops an `<ai-analytics>` web component into their UI. Their users get a governed, explainable, role-aware analytical assistant that exposes business semantics — never raw SQL — enforces entitlements at the semantic layer, and produces deterministic, auditable analytical outputs.
+A host application registers as a **tenant**, provides a **JSON application config**, and connects any MCP-compatible consumer to the platform's `POST /v1/mcp` endpoint. Their users get a governed, explainable, role-aware analytical assistant that exposes business semantics — never raw SQL — enforces entitlements at the semantic layer, and produces deterministic, auditable analytical outputs.
 
 The platform is designed specifically for environments where governance, explainability, and semantic consistency are non-negotiable: wealth management, banking, investment management, institutional analytics, and regulated financial services.
 
@@ -53,17 +53,17 @@ Start at `00` and read through in sequence. Each document assumes you have read 
 | 02 | [02-personas-and-journeys.md](./02-personas-and-journeys.md) | Platform-level and financial-services-specific user archetypes and journeys |
 | 03 | [03-design-principles.md](./03-design-principles.md) | Nine governing principles that take precedence over any feature decision |
 | 04 | [04-semantic-metrics-registry.md](./04-semantic-metrics-registry.md) | Semantic metric definitions, dimensions, hierarchies, governance, lineage |
-| 05 | [05-analytics-dsl.md](./05-analytics-dsl.md) | The platform analytical DSL — grammar, compiler, query planning |
+| 05 | [05-analytical-intent.md](./05-analytical-intent.md) | Analytical intent format, validation pipeline, and LQP generation |
 | 06 | [06-federated-query-planning.md](./06-federated-query-planning.md) | Logical query DAG, federation, distributed execution, caching |
 | 07 | [07-visualization-ontology.md](./07-visualization-ontology.md) | Rendering ontology, chart contracts, interaction semantics, drilldown |
 | 08 | [08-mcp-capability-layer.md](./08-mcp-capability-layer.md) | MCP analytical capabilities, capability negotiation, semantic contracts |
 | 09 | [09-role-aware-projections.md](./09-role-aware-projections.md) | Entitlement model, role-aware execution, data masking, row/column filtering |
-| 10 | [10-content-rendering.md](./10-content-rendering.md) | Rendering decision rules, chart types, narrative synthesis, streaming |
+| 10 | [10-analytical-output-format.md](./10-analytical-output-format.md) | Output format, display spec structure, narrative synthesis, error responses |
 | 11 | [11-audit-and-storage.md](./11-audit-and-storage.md) | Multi-tenant storage, execution audit trail, lineage, retention |
 | 12 | [12-governed-execution.md](./12-governed-execution.md) | Semantic execution governance, circuit breakers, cost controls, compliance |
 | 13 | [13-financial-services-model.md](./13-financial-services-model.md) | Reference semantic model for wealth management and financial services |
 | 14 | [14-success-metrics.md](./14-success-metrics.md) | Platform-level and application-level metrics, definitions, and targets |
-| 15 | [15-embedding-and-web-component.md](./15-embedding-and-web-component.md) | `<ai-analytics>` web component API: attributes, events, authentication bridge |
+| 15 | [15-consumer-integration.md](./15-consumer-integration.md) | MCP endpoint, JWT authentication, response handling, agentic consumer patterns |
 | 16 | [16-complementary-services.md](./16-complementary-services.md) | Semantic Registry Service, Benchmark Data Service, Regulatory Reference Service |
 | — | [ROADMAP.md](./ROADMAP.md) | Planned enhancements beyond the current release |
 
@@ -76,8 +76,8 @@ Start at `00` and read through in sequence. Each document assumes you have read 
 | **Host application** | A product team's application that embeds the AI Analytics Platform |
 | **Tenant** | A registered host application instance on the platform; identified by `tenant_id` |
 | **Semantic Metrics Registry (SMR)** | The governed catalogue of metrics, dimensions, hierarchies, and aggregation rules that defines all resolvable analytical concepts for a tenant |
-| **Analytics DSL** | The platform's constrained query language — expresses analytical intent without exposing physical storage |
-| **Logical Query Plan (LQP)** | The structured, engine-agnostic representation of an analytical query, produced by the DSL compiler before federation |
+| **Analytical Intent Validator** | The platform component that validates MCP tool call parameters against the SMR, applies role projection, and compiles a Logical Query Plan — the MCP JSON parameter format is the query interface, no custom query language |
+| **Logical Query Plan (LQP)** | The structured, backend-agnostic representation of a validated analytical request, produced by the Analytical Intent Validator before federation |
 | **Federated Query Planner (FQP)** | The component that routes LQP fragments to appropriate execution engines and assembles results |
 | **Visualisation Ontology** | The governed schema of chart types, interaction contracts, and rendering semantics used to deterministically select and parameterise visualisations |
 | **MCP Capability Layer** | The MCP-style interface that exposes bounded analytical operations to AI orchestrators |
@@ -92,13 +92,13 @@ Start at `00` and read through in sequence. Each document assumes you have read 
 
 | ID | Decision |
 |----|---------|
-| **A1** | The platform never exposes physical schema to AI models. All AI interaction is mediated through the Semantic Metrics Registry and Analytics DSL. |
-| **A2** | Raw SQL generation by LLMs is not a permitted execution path on this platform. All queries are compiled from governed DSL or pre-defined analytical operations. |
+| **A1** | The platform never exposes physical schema to AI models. All AI interaction is mediated through the Semantic Metrics Registry and Analytical Intent Validator. |
+| **A2** | Raw query generation by LLMs is not a permitted execution path on this platform. All queries are expressed as validated MCP tool call parameters resolved against the SMR. |
 | **A3** | Every metric must be registered in the SMR before it is resolvable. Unregistered metrics cannot be queried. |
 | **A4** | Entitlements are enforced at the semantic layer — before the logical query plan is compiled and before any execution engine is contacted. |
 | **A5** | All analytical execution produces a lineage record linking analytical intent → semantic plan → logical query plan → execution engine call → result. |
 | **A6** | Visualisation type selection is deterministic and governed by the Visualisation Ontology — not inferred ad hoc by the LLM per query. |
-| **A7** | The Analytics DSL compiler produces a Logical Query Plan that is engine-agnostic. Physical execution is the responsibility of the Federated Query Planner. |
+| **A7** | The Analytical Intent Validator produces a Logical Query Plan that is backend-agnostic. Physical execution is the responsibility of the Federated Query Planner. |
 | **A8** | Cost and execution circuit breakers are applied at the semantic layer. No query reaches a physical execution engine without passing governance checks. |
 | **A9** | The platform is multi-tenant. One deployment serves many host applications, each fully isolated by `tenant_id` with row-level security. |
 | **A10** | Narrative synthesis (prose explanation of analytical results) is always anchored to the governed metric values returned — the LLM may not introduce metric values not present in the execution result. |
@@ -110,10 +110,10 @@ Start at `00` and read through in sequence. Each document assumes you have read 
 ### In scope
 
 - Multi-tenant platform with per-tenant application config
-- Embeddable `<ai-analytics>` web component with host branding token support
+- Headless MCP API (`POST /v1/mcp`) — sole entry point; returns structured JSON result sets and SCL display specifications
 - Semantic Metrics Registry — governed catalogue of metrics, dimensions, hierarchies, aggregation rules, and lineage
-- Analytics DSL — constrained query language compiled to engine-agnostic Logical Query Plans
-- Federated Query Planner — routes LQP fragments to appropriate execution engines
+- Analytical Intent Validator — validates MCP tool call parameters against the SMR, applies role projection, compiles to engine-agnostic Logical Query Plans
+- Federated Query Planner — routes LQP fragments to appropriate execution backends (SQL warehouses, OpenData APIs, Graph Data APIs, semantic layers, OLAP engines)
 - Role-Aware Projection Layer — semantic-layer entitlement enforcement before execution
 - Semantic Execution Governance — circuit breakers, cost controls, compliance checks
 - Visualisation Ontology — deterministic chart selection and parameterisation

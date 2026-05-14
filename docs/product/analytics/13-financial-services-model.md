@@ -1,8 +1,8 @@
-# 13 — Financial Services Semantic Model
+# 13 — Example Industry Model: Financial Services
 
 ## Overview
 
-The platform ships a **Financial Services Reference Semantic Model** — a pre-built set of metric definitions, dimensions, hierarchies, and measure groups covering the principal analytical domains of wealth management, banking, investment management, and regulatory reporting.
+The platform ships a **Financial Services Reference Semantic Model** — an example industry model demonstrating how pre-built metric definitions, dimensions, hierarchies, and measure groups can be packaged for a specific domain. This model covers the principal analytical domains of wealth management, banking, investment management, and regulatory reporting.
 
 Host applications seeding their SMR from `analyticalDomain: "wealth_management"`, `"banking"`, or `"investment_management"` receive the relevant subset of this reference model as their baseline. Definitions may be customised, extended, or superseded by tenant-specific definitions via the Admin API.
 
