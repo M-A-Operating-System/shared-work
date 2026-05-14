@@ -16,9 +16,9 @@ The platform serves multiple consumer types simultaneously: human users querying
 
 | It is | It is not |
 |-------|-----------|
-| A white-label governed semantic analytics layer any application can embed as a web component | A general-purpose SQL query interface or BI tool replacement |
+| A headless MCP API service — it returns structured JSON result sets and optional Vega-Lite chart specifications; any application or agent can consume it regardless of their UI stack | A general-purpose SQL query interface, BI tool replacement, or UI-rendering layer |
 | A platform where all AI-accessible metrics are registered, governed, and version-controlled in a Semantic Metrics Registry | A system that allows LLMs to generate arbitrary SQL against physical schemas |
-| A federated query engine that routes governed analytical plans to appropriate execution backends | A single-engine analytics layer coupled to one database or warehouse |
+| A federated query planner that routes governed analytical plans to appropriate execution backends — SQL data warehouses, OpenData APIs, Graph Data APIs, semantic layers, or any registered retrieval mechanism | A single-engine analytics layer coupled to one database or query technology |
 | A role-aware entitlement enforcement layer applied at the semantic tier before execution | A system that relies on database-level access controls as the primary security boundary for AI queries |
 | A headless chart specification layer — the Visualisation Ontology selects chart contracts and produces Vega-Lite specs; rendering is always the consumer's responsibility | A system that allows LLMs to select chart types ad hoc without a governing contract, or that renders charts directly |
 | A complete analytical lineage trail from business question to execution result | A black-box analytics system with no explainability mechanism |
@@ -44,14 +44,14 @@ The platform serves multiple consumer types simultaneously: human users querying
 
 ### In scope
 
-- Embeddable `<ai-analytics>` web component with full branding token support
+- Headless MCP API (`POST /v1/mcp`) — the sole entry point for all consumers; returns structured JSON result sets and SCL display specifications; no rendering layer
 - Multi-tenant architecture with complete per-tenant data isolation
 - Semantic Metrics Registry (SMR) — the governing catalogue of all resolvable metrics, dimensions, hierarchies, aggregation rules, ownership assignments, and lineage metadata
 - Analytics DSL — a constrained, AI-readable query language that exposes business semantics and compiles to engine-agnostic Logical Query Plans
-- Federated Query Planner — routes Logical Query Plan fragments to registered execution engines and assembles results
+- Federated Query Planner — routes Logical Query Plan fragments to registered execution backends and assembles results; backends may be SQL-based data warehouses, OpenData APIs, Graph Data APIs, semantic layers, or any other registered retrieval mechanism
 - Role-Aware Projection Layer — applies entitlement filters (row restrictions, column masks, metric visibility rules) at the semantic tier before plan compilation
-- Semantic Execution Governance — circuit breakers, cost controls, query complexity limits, and compliance classification checks applied before any physical engine call
-- Visualisation Ontology — a governed schema of chart contracts, interaction semantics, drilldown definitions, and chart contract parameters; produces Vega-Lite specifications returned to the consumer — the platform does not render charts
+- Semantic Execution Governance — circuit breakers, cost controls, query complexity limits, and compliance classification checks applied before any backend call
+- Visualisation Ontology — a governed schema of chart contracts, interaction semantics, drilldown definitions, and chart contract parameters; produces a Semantic Charting Language (SCL) display specification returned to the consumer — the platform does not render charts
 - MCP Capability Layer — exposes bounded, pre-defined analytical operations to AI orchestrators via MCP-compatible interfaces
 - Narrative synthesis — LLM-generated prose explanations anchored to execution results, governed to prohibit metric hallucination
 - Analytical lineage trail — complete, queryable lineage from intent resolution through semantic planning, execution, and result delivery
@@ -61,9 +61,11 @@ The platform serves multiple consumer types simultaneously: human users querying
 
 ### Out of scope
 
-- Direct SQL execution against host databases
-- Physical schema exposure to AI model context
-- Ad hoc LLM-generated SQL at any layer
+- Chart or table rendering of any kind — consumers are responsible for all display
+- Web component or UI embedding layer — any such component is a separate consumer product
+- Direct query execution against host data sources — all queries are expressed as Logical Query Plans and executed via registered backends
+- Exposure of physical data source schemas, endpoints, or query languages to AI model context
+- Ad hoc query generation against unregistered data sources at any layer
 - Real-time streaming data ingestion (v1)
 - General-purpose BI authoring beyond governed narrative synthesis
 - Cross-tenant metric federation
@@ -75,14 +77,14 @@ The platform serves multiple consumer types simultaneously: human users querying
 
 ```
 ┌────────────────────────────────────────────────────────────────────┐
-│                        Host Application                             │
+│                   Consumer (any MCP-compatible caller)              │
 │                                                                    │
-│   ┌──────────────────────────────────────────────┐                │
-│   │         <ai-analytics> web component          │                │
-│   │    (embedded in host application UI)          │                │
-│   └───────────────────┬──────────────────────────┘                │
-│                        │  Authentication bridge (JWT + role claims) │
-└────────────────────────┼───────────────────────────────────────────┘
+│   AI Chat Platform · autonomous agent · custom application         │
+│   — presents user JWT with role claims                             │
+│                                                                    │
+└────────────────────────────────────────────────────────────────────┘
+                         │
+                         │  POST /v1/mcp  (JWT + MCP tool call)
                          │
 ┌────────────────────────▼───────────────────────────────────────────┐
 │                   AI Analytics Platform                             │
@@ -120,8 +122,8 @@ The platform serves multiple consumer types simultaneously: human users querying
 │                         │                                          │
 │  ┌──────────────────────▼──────────────────────────────────────┐  │
 │  │             Visualisation Ontology                           │  │
-│  │  (deterministic chart contract selection; Vega-Lite spec     │  │
-│  │   generation — no rendering; spec returned to consumer)      │  │
+│  │  (deterministic chart contract selection; SCL display spec   │  │
+│  │   generated — no rendering; returned to consumer)            │  │
 │  └──────────────────────┬──────────────────────────────────────┘  │
 │                         │                                          │
 │  ┌──────────────────────▼──────────────────────────────────────┐  │
@@ -139,9 +141,9 @@ The platform serves multiple consumer types simultaneously: human users querying
          │               │                   │
 ┌────────▼───────┐ ┌─────▼──────────┐ ┌─────▼──────────────┐
 │ Execution      │ │ Execution       │ │ Execution           │
-│ Engine A       │ │ Engine B        │ │ Engine C            │
-│ (e.g. Snowflake│ │ (e.g. Databricks│ │ (e.g. dbt Semantic  │
-│  / BigQuery)   │ │  / Trino)       │ │  Layer / Cube)      │
+│ Backend A      │ │ Backend B       │ │ Backend C           │
+│ (SQL data      │ │ (OpenData API / │ │ (Graph Data API /   │
+│  warehouse)    │ │  semantic layer)│ │  OLAP engine)       │
 └────────────────┘ └────────────────┘ └────────────────────┘
 ```
 
@@ -155,11 +157,11 @@ The platform serves multiple consumer types simultaneously: human users querying
 
 **Analytics DSL Compiler** translates the projected analytical intent into an engine-agnostic Logical Query Plan (LQP) expressed in the platform's Analytics DSL. The LQP is a directed acyclic graph (DAG) of analytical operations with no physical engine references.
 
-**Semantic Execution Governance** validates the LQP against circuit breakers (cost estimates, complexity limits, data classification compliance) before releasing it to the Federated Query Planner.
+**Semantic Execution Governance** validates the LQP against circuit breakers (cost estimates, complexity limits, data classification compliance) before releasing it to the Federated Query Planner. Governance applies regardless of which backend type will execute the plan.
 
-**Federated Query Planner (FQP)** decomposes the LQP into engine-specific sub-plans, routes them to registered execution engines, handles result assembly, and manages caching and materialisation.
+**Federated Query Planner (FQP)** decomposes the LQP into backend-specific sub-plans, routes them to registered execution backends, handles result assembly, and manages caching and materialisation. Registered backends may include SQL-based data warehouses, OpenData APIs, Graph Data APIs, semantic layers, OLAP engines, or any other data retrieval mechanism the host has registered — the LQP is backend-agnostic and the FQP owns the translation to each backend's query or request protocol.
 
-**Visualisation Ontology** receives the assembled result set and applies the governing Visualisation Ontology to select a chart contract and parameterise it from the result schema. It produces a **Vega-Lite specification** — a structured JSON chart description — that is returned to the consumer as part of the MCP tool response. The Analytics Platform does not render charts; rendering is always the consumer's responsibility (e.g., the `<ai-analytics>` web component, the AI Chat Platform's Vega-Lite renderer, or the optional `vite2img` service for static image generation).
+**Visualisation Ontology** receives the assembled result set and applies the governing Visualisation Ontology to select a chart contract and parameterise it from the result schema. It produces a **Semantic Charting Language (SCL)** display specification — a governed `display_spec` JSON object — that is returned to the consumer as part of the MCP tool response. The Analytics Platform does not render charts; rendering is always the consumer's responsibility.
 
 **Narrative Synthesis Engine** generates governed prose explanations of the result, anchored exclusively to the values present in the execution result — LLM hallucination of metric values is architecturally prohibited.
 
@@ -174,25 +176,63 @@ The AI Analytics Platform is a **headless service**. It has no rendering layer a
 | Output field | Type | Description |
 |-------------|------|-------------|
 | `result_id` | string | Unique identifier for this execution result, linking to the full lineage record |
-| `result` | JSON array | Tabular result set — rows and typed columns |
-| `vega_lite_spec` | JSON object (optional) | Vega-Lite chart specification governed by the Visualisation Ontology — present when the result schema maps to a registered chart contract |
+| `display_spec` | JSON object | A Semantic Charting Language (SCL) display specification — always present. Either a governed chart specification (`type: "chart"`) or a tabular specification (`type: "table"`), both in a consistent JSON envelope (see below). Consumers render from this object regardless of result shape. |
 | `narrative` | string (optional) | Governed prose explanation produced by the Narrative Synthesis Engine — present when the host has enabled narrative synthesis for the tenant |
+
+### Display spec format — Semantic Charting Language (SCL)
+
+The platform defines a **Semantic Charting Language (SCL)** as its output format for display specifications. SCL is a declarative JSON format with two types, both in a consistent envelope. The specific implementation library that satisfies the SCL contract is defined in the technical specification.
+
+The platform returns a single `display_spec` JSON object for every result, using a `type` discriminator so consumers always render from one consistent structure:
+
+**Chart result** — an SCL chart specification:
+
+```json
+{
+  "type": "chart",
+  "mark": "bar",
+  "data": { "values": [ ... ] },
+  "encoding": {
+    "x": { "field": "portfolio",      "type": "nominal"      },
+    "y": { "field": "tracking_error", "type": "quantitative" }
+  }
+}
+```
+
+**Tabular result** — an SCL table specification (a minimal, platform-defined extension using the same JSON envelope):
+
+```json
+{
+  "type": "table",
+  "columns": [
+    { "field": "portfolio",      "label": "Portfolio",      "type": "string"  },
+    { "field": "tracking_error", "label": "Tracking Error", "type": "number", "format": ".2%" },
+    { "field": "limit",          "label": "Limit",          "type": "number", "format": ".2%" },
+    { "field": "breached",       "label": "Breached",       "type": "boolean" }
+  ],
+  "data": [ ... ]
+}
+```
+
+The `type: "table"` spec is a deliberate, minimal extension of the SCL convention — it carries the same `data` array and typed column definitions, but signals to the consumer that a grid layout is the appropriate presentation rather than a chart. It fills the gap that chart grammar formats leave for pure tabular results without introducing a second output contract.
+
+The Visualisation Ontology determines which shape is returned based on the result schema and the registered chart contract for the query type. Consumers always render from `display_spec.type` — they do not need to inspect the raw result to decide how to display it.
 
 **Rendering is always the consumer's responsibility:**
 
-| Consumer | Renders Vega-Lite spec using |
+| Consumer | How they render |
 |---------|------------------------------|
-| `<ai-analytics>` web component | Built-in Vega-Lite renderer embedded in the component |
-| AI Chat Platform | Native Vega-Lite content rendering pipeline (priority 5 in the content rendering stack) |
-| Agentic consumers producing PDF/email reports | Optional `vite2img` static image service — consumes the Vega-Lite spec and returns a PNG or SVG for embedding in non-interactive output |
-| Custom consumers | Any Vega-Lite-compatible rendering library |
+| Custom analytics UI (host-built) | Inspect `display_spec.type`; render chart specs with a compatible chart rendering library and table specs with a grid component — both choices are the host's |
+| AI Chat Platform | Native content rendering pipeline handles both chart and table spec types |
+| Agentic consumers producing PDF/email reports | Pass `display_spec` to a static image rendering service (see complementary services), which converts chart and table specs to PNG or SVG for embedding in non-interactive output |
+| Custom consumers | Any chart-grammar-compatible library for chart specs; any grid component for table specs |
 
-The optional **`vite2img` service** accepts a Vega-Lite specification and returns a static image (PNG or SVG). It is a separate, independently deployable service intended for use cases where interactive chart rendering is unavailable — automated report generation, email delivery, PDF document production, and batch analytical pipelines. It does not interact with the Analytics Platform's governance pipeline; it receives only the already-produced Vega-Lite spec.
+An optional **static image rendering service** accepts a `display_spec` JSON object and returns a static image (PNG or SVG). It is independently deployable and intended for use cases where interactive rendering is unavailable — automated report generation, email delivery, PDF production, and batch pipelines. It does not interact with the Analytics Platform's governance pipeline; it receives only the already-produced display spec.
 
 This headless design means:
 - The Analytics Platform can serve any consumer regardless of their UI stack.
-- Consumers can substitute alternative Vega-Lite renderers or post-process specs without any change to the Analytics Platform.
-- The governed chart contract (which chart type, which axes, which colours by semantic meaning) is always enforced at the spec-generation level — rendering libraries cannot override it.
+- A single `display_spec` field is always present — consumers never need to branch on whether a chart or table was produced.
+- The governed chart contract (chart type, axis semantics, colour by meaning) is enforced at spec-generation time — consumer rendering libraries cannot override it.
 
 ---
 
@@ -202,11 +242,11 @@ This headless design means:
 |------------|------|
 | **AI provider** | Provider-agnostic abstraction used by the Semantic Intent Layer and Narrative Synthesis Engine. The platform maps tiers to the tenant's configured provider's current models. |
 | **Platform storage** | Relational database with RLS for SMR records, lineage records, and configuration; object storage for cached result sets and artefacts. |
-| **Platform edge function** | JWT handling, intent resolution API, DSL compilation, governance checks, FQP orchestration, result assembly, Vega-Lite spec generation. |
+| **Platform edge function** | JWT handling, intent resolution API, DSL compilation, governance checks, FQP orchestration, result assembly, SCL display spec generation. |
 | **Host authentication** | The host application issues JWTs for its users, including role claims used by the Role-Aware Projection Layer. |
-| **Host execution engines** | The host's registered analytical backends (data warehouses, semantic layers, OLAP engines) that execute physical query plans. |
+| **Host execution backends** | The host's registered data retrieval backends — SQL data warehouses, OpenData APIs, Graph Data APIs, semantic layers, OLAP engines, or any other mechanism the host registers. The FQP translates Logical Query Plan fragments into each backend's native request protocol. |
 | **AI Chat Platform** | The primary conversational consumer of the Analytics Platform's MCP Capability Layer. See [Role in the AI-Enablement Product Ecosystem](#role-in-the-ai-enablement-product-ecosystem) below. |
-| **`vite2img` static image service** | Optional complementary service — accepts a Vega-Lite specification and returns a static PNG or SVG. Used by agentic consumers, report pipelines, and email delivery workflows where interactive rendering is unavailable. |
+| **Static image rendering service** | Optional complementary service — accepts a `display_spec` JSON object and returns a static image (PNG or SVG). Used by agentic consumers, report pipelines, and email delivery workflows where interactive rendering is unavailable. |
 | **Semantic Registry Service** | Complementary ecosystem service — a curated library of pre-built metric definitions for financial services domains. |
 | **Regulatory Reference Service** | Complementary ecosystem service — regulatory metric definitions for compliance reporting (Basel III/IV, IFRS 9, MiFID II, etc.). |
 | **Benchmark Data Service** | Complementary ecosystem service — market benchmark and index data integrated as dimensional reference data. |
@@ -222,7 +262,7 @@ The AI Analytics Platform and the **AI Chat Platform** form a complementary two-
 | Layer | Product | Responsibility |
 |-------|---------|---------------|
 | **Conversational surface** | AI Chat Platform | Generative chat interface, conversation management, multi-modal content rendering, tool call transparency, shared conversations, memory, and audit trail. Provides the user's entry point for all interaction. Has no built-in analytical capability. |
-| **Analytical backend** | AI Analytics Platform | Governed semantic metric resolution, large-scale federated query execution, role-aware entitlement enforcement, deterministic visualisation, and lineage-backed result delivery. Has no conversational surface of its own in this configuration. |
+| **Analytical backend** | AI Analytics Platform | Governed semantic metric resolution, large-scale federated query execution, role-aware entitlement enforcement, Vega-Lite chart specification generation, and lineage-backed result delivery. Headless — returns structured data and chart specs; has no rendering layer and no conversational surface. |
 
 The AI Chat Platform is **one consumer** of the Analytics Platform's capabilities, not the only one. The Analytics Platform's MCP Capability Layer (see [08-mcp-capability-layer.md](./08-mcp-capability-layer.md)) is an MCP-compatible interface designed to be consumed by any AI orchestrator — the AI Chat Platform today, and additional agentic consumers in the future.
 
@@ -238,7 +278,7 @@ The AI Analytics Platform is designed for three modes of consumption, which may 
 
 | Mode | Consumer | When to use |
 |------|---------|-------------|
-| **Standalone** | `<ai-analytics>` web component embedded directly in a host application page | Dedicated analytics views, dashboards, analytical workbooks — where the user is in an explicitly analytical context and the full analytics surface is the primary UI |
+| **Direct API consumer** | A custom application calling `POST /v1/mcp` directly — rendering the returned JSON result sets and Vega-Lite specs using their own UI stack | Dedicated analytics views, dashboards, analytical workbooks built by the host team — where the application owns the rendering layer entirely |
 | **Conversational backend** | AI Chat Platform, registered via `mcpServers` config | Conversational analytics — where the user asks quantitative questions in natural language; the AI Chat Platform routes tool calls to the Analytics Platform's MCP endpoint |
 | **Agentic consumer** | Autonomous AI agents, scheduled pipelines, event-triggered workflows | Any AI orchestrator that needs to query large datasets, monitor metrics, generate governed reports, or trigger analytical workflows without a human in the loop — all via the same MCP Capability Layer |
 
@@ -255,9 +295,9 @@ The following diagram shows all three consumption modes operating against the sa
 │                              Host Application                               │
 │                                                                            │
 │  ┌───────────────────────┐  ┌─────────────────────┐  ┌───────────────────┐ │
-│  │  <ai-chat> component  │  │ <ai-analytics>       │  │ Agentic consumers │ │
-│  │  (conversational UI)  │  │  component           │  │ (scheduled agents,│ │
-│  └──────────┬────────────┘  │  (standalone views)  │  │  event monitors,  │ │
+│  │  <ai-chat> component  │  │ Custom analytics UI  │  │ Agentic consumers │ │
+│  │  (conversational UI)  │  │ (host-built; renders │  │ (scheduled agents,│ │
+│  └──────────┬────────────┘  │  returned JSON/spec) │  │  event monitors,  │ │
 │             │ JWT           └──────────┬────────────┘  │  report pipelines)│ │
 └─────────────┼──────────────────────────┼───────────────┴────────┬──────────┘
               │                          │ JWT                     │ JWT
@@ -284,7 +324,7 @@ The following diagram shows all three consumption modes operating against the sa
 │                        ──►  Analytics DSL Compiler                            │
 │                        ──►  Semantic Execution Governance                     │
 │                        ──►  Federated Query Planner (FQP)                     │
-│                        ──►  Visualisation Ontology (Vega-Lite spec generation) │
+│                        ──►  Visualisation Ontology (SCL display spec generation)│
 │                        ──►  Narrative Synthesis Engine                        │
 │                        ──►  Analytical Lineage Store                          │
 └─────────────────────────────────┬─────────────────────────────────────────────┘
@@ -293,9 +333,10 @@ The following diagram shows all three consumption modes operating against the sa
                   │               │               │
            ┌──────▼──────┐ ┌──────▼──────┐ ┌─────▼───────────┐
            │ Execution   │ │ Execution   │ │ Execution        │
-           │ Engine A    │ │ Engine B    │ │ Engine C          │
-           │ (Snowflake  │ │ (Databricks │ │ (dbt / Cube)     │
-           │  / BigQuery)│ │  / Trino)   │ │                  │
+           │ Backend A   │ │ Backend B   │ │ Backend C         │
+           │ (SQL data   │ │ (OpenData   │ │ (Graph Data API / │
+           │  warehouse) │ │  API /      │ │  OLAP engine)     │
+           │             │ │  sem. layer)│ │                   │
            └─────────────┘ └─────────────┘ └──────────────────┘
 ```
 
@@ -361,10 +402,14 @@ AI Analytics Platform — governance pipeline:
 
   ↓  Returns governed MCP tool response to AI Chat Platform:
      {
-       "result_id":     "res_...",
-       "result":        [ /* tabular result rows */ ],
-       "vega_lite_spec": { /* governed Vega-Lite chart specification */ },
-       "narrative":     null   ← narrative generated in step below
+       "result_id":    "res_...",
+       "display_spec": {
+         "type":     "chart",
+         "mark":     "bar",
+         "data":     { "values": [ ... ] },
+         "encoding": { ... }
+       },
+       "narrative": null   ← narrative generated in step below
      }
 
 AI Chat Platform:
@@ -396,7 +441,7 @@ At no point in this flow does the AI model construct SQL, access a physical sche
 | **Large-scale, multi-engine data analytics from a conversation** | Analytics Platform FQP routes governed plans to Snowflake, Databricks, Trino, or any registered engine — irrespective of result set size |
 | **Role-aware results without any configuration in the chat layer** | Analytics Platform's Role-Aware Projection Layer enforces entitlements before results leave the analytical backend; the AI Chat Platform surfaces only what the authenticated user is permitted to see |
 | **Governed metric vocabulary, not ad hoc SQL** | The AI model calls named, registered capabilities (`analyse_metric`, `risk_breakdown`, etc.) — the Analytics Platform's SMR ensures metric definitions are consistent, versioned, and owned |
-| **Deterministic chart specification** | The Analytics Platform's Visualisation Ontology selects chart types based on the result schema and metric semantics and returns a Vega-Lite spec — the AI Chat Platform renders that spec, not a chart chosen ad hoc by the LLM |
+| **Deterministic chart specification** | The Analytics Platform's Visualisation Ontology selects chart types based on the result schema and metric semantics, returning a governed SCL display spec — the AI Chat Platform renders that spec, not a chart chosen ad hoc by the LLM |
 | **Governed narrative synthesis** | The Narrative Synthesis Engine produces prose explanations anchored exclusively to execution result values; metric hallucination is architecturally prohibited |
 | **Full analytical lineage from every conversation turn** | Every tool call disclosure card in the AI Chat Platform carries a `result_id` that maps to a complete lineage record — from natural-language intent through SMR resolution, projection, plan compilation, execution, and result delivery |
 | **Complex institutional workflows as simple conversational queries** | Performance attribution, issuer concentration, risk decomposition, regulatory compliance checks — exposed as simple tool calls the AI model can compose in response to natural-language questions |
@@ -424,7 +469,7 @@ Beyond the AI Chat Platform, the Analytics Platform's MCP Capability Layer is de
 |-----------|-----------------|
 | **Scheduled analytical agents** | Nightly portfolio risk summary generated against the SMR and delivered as a governed narrative; daily regulatory metric check run before market open |
 | **Event-triggered monitors** | An agent that runs `risk_breakdown` automatically when a tracking error threshold is breached, producing a governed analysis for the investment committee |
-| **Report-generation pipelines** | Automated investment committee pack generation — `performance_attribution`, `compare_portfolios`, and `regulatory_metric` composed into a governed narrative document; Vega-Lite specs converted to static images via the `vite2img` service for PDF embedding |
+| **Report-generation pipelines** | Automated investment committee pack generation — `performance_attribution`, `compare_portfolios`, and `regulatory_metric` composed into a governed narrative document; SCL display specs converted to static images via the static image rendering service for PDF embedding |
 | **Compliance review agents** | Periodic mandate compliance checks using `issuer_concentration` and `regulatory_metric`, with results written to an audit log |
 | **Research augmentation agents** | Agents that combine web search (current news) with governed `analyse_metric` results to produce investment research anchored to verified portfolio data |
 
