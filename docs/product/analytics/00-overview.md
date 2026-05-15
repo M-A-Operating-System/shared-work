@@ -121,7 +121,7 @@ The following sequence diagram traces a single analytical request from consumer 
 ```mermaid
 sequenceDiagram
     autonumber
-    participant C as Consumer
+    participant C as Consumer (ChatEngine or direct API caller)
     participant MCP as MCP Capability Layer
     participant SIL as Semantic Intent Layer
     participant RAPL as Role-Aware Projection Layer
@@ -133,6 +133,7 @@ sequenceDiagram
     participant VO as Visualisation Ontology
     participant NSE as Narrative Synthesis Engine
     participant LS as Analytical Lineage Store
+    participant vite2img as vite2img
 
     C->>MCP: POST /v1/mcp (JWT + MCP tool call)
     par
@@ -140,10 +141,13 @@ sequenceDiagram
     and
         MCP->>RAPL: JWT claims
     end
-    SIL->>SMC: metric name resolution
-    SMC-->>SIL: metric definitions
-    SIL->>AIV: structured intent
-    RAPL->>AIV: row predicates + column masks
+    par
+        SIL->>SMC: metric name resolution
+        SMC-->>SIL: metric definitions
+        SIL->>AIV: structured intent
+    and
+        RAPL->>AIV: row predicates + column masks
+    end
     AIV->>SMC: validate metric + dimension IDs
     SMC-->>AIV: definitions + aggregation rules
     AIV->>SEG: Logical Query Plan (LQP)
@@ -159,9 +163,16 @@ sequenceDiagram
     and
         FQP->>NSE: assembled result
     end
-    VO-->>MCP: SCL display spec
-    NSE-->>MCP: narrative
+    par
+        VO-->>MCP: SCL display spec
+    and
+        NSE-->>MCP: narrative
+    end
     MCP-->>C: display_spec + narrative + result_id
+    opt Consumer cannot natively render SCL spec
+        C->>vite2img: render tool call (display_spec)
+        vite2img-->>C: SVG / PNG
+    end
 ```
 
 ### Components
