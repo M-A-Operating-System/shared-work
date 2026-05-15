@@ -52,7 +52,7 @@ Start at `00` and read through in sequence. Each document assumes you have read 
 | 01 | [01-data-source-registration.md](./01-data-source-registration.md) | Data source catalog, entitlement model, and platform administration |
 | 02 | [02-personas-and-journeys.md](./02-personas-and-journeys.md) | Platform-level and financial-services-specific user archetypes and journeys |
 | 03 | [03-design-principles.md](./03-design-principles.md) | Nine governing principles that take precedence over any feature decision |
-| 04 | [04-semantic-metrics-registry.md](./04-semantic-metrics-registry.md) | Semantic metric definitions, dimensions, hierarchies, governance, lineage |
+| 04 | [04-semantic-metrics-context.md](./04-semantic-metrics-context.md) | Semantic metric definition schema — dimensions, hierarchies, governance, lineage |
 | 05 | [05-analytical-intent.md](./05-analytical-intent.md) | Analytical intent format, validation pipeline, and LQP generation |
 | 06 | [06-federated-query-planning.md](./06-federated-query-planning.md) | Logical query DAG, federation, distributed execution, caching |
 | 07 | [07-visualization-ontology.md](./07-visualization-ontology.md) | Rendering ontology, chart contracts, interaction semantics, drilldown |
