@@ -22,6 +22,8 @@ flowchart TD
         VO["Visualisation Ontology\nSCL generation · Vega-Lite v5"]
         NSE["Narrative Synthesis Engine\nAnthropic Claude · Haiku / Sonnet"]
         LS[("Analytical Lineage Store\nPostgreSQL + S3")]
+        vite2img["vite2img (optional)\nRender tool · SCL → SVG / PNG\nConsumer calls as second MCP tool if unable to render SCL"]
+        Result(["MCP tool response\ndisplay_spec + narrative + result_id"])
     end
 
     subgraph dcr["Data Context Repository"]
@@ -35,9 +37,6 @@ flowchart TD
         ODA["OpenData API\nREST / OData"]
         GDA["Graph Data API\nNeo4j · Neptune / SPARQL"]
     end
-
-    vite2img["vite2img (optional)\nSCL → SVG / PNG · MCP tool surface"]
-    Result(["MCP tool response\ndisplay_spec + narrative + result_id\nreturned to consumer"])
 
     Consumer -->|"POST /v1/mcp (JWT + MCP tool call)"| MCP
     MCP -->|"natural language query"| SIL
@@ -56,6 +55,7 @@ flowchart TD
     FQP -->|"assembled result"| NSE
     VO -->|"SCL display spec"| Result
     NSE -->|"narrative"| Result
+    MCP -. "render tool call\n(if consumer cannot render SCL)" .-> vite2img
     VO -. "SCL spec" .-> vite2img
     vite2img -. "SVG / PNG" .-> Result
 ```
