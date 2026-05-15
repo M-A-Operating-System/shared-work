@@ -2,6 +2,8 @@
 
 One reference implementation of the AI Analytics Platform. Stack choices are concrete but not prescriptive — the product specification is intentionally stack-agnostic. Any conformant implementation that satisfies the specified behaviours, governance guarantees, and interface contracts is valid. Technology substitutions at any layer require no changes to the product spec.
 
+This document assumes the existence of a **Semantic Data Context Store (DCS)** — a pre-existing platform component that maintains the authoritative store of semantic definitions across the organisation. The Analytics Platform extends the DCS to also manage analytical metric definitions, making the DCS the single authoritative source for the SMR rather than introducing a separate definition store.
+
 ---
 
 ## Architecture overview
@@ -21,8 +23,7 @@ One reference implementation of the AI Analytics Platform. Stack choices are con
                              │
 ┌────────────────────────────▼────────────────────────────────────┐
 │               Semantic Metrics Registry (SMR)                    │
-│           PostgreSQL (primary store, RLS enforced)              │
-│           + Elasticsearch (metric search index)                 │
+│     Governance workflow + metric schema — extends DCS           │
 └────────────────────────────┬────────────────────────────────────┘
                              │
 ┌────────────────────────────▼────────────────────────────────────┐
@@ -70,7 +71,106 @@ One reference implementation of the AI Analytics Platform. Stack choices are con
 │  BigQuery /        │ │  endpoints    │ │  / SPARQL         │
 │  Databricks        │ │               │ │                   │
 └────────────────────┘ └───────────────┘ └───────────────────┘
+
+ ╔══════════════════════════════════════════════════════════════╗
+ ║              Pre-existing components (external)              ║
+ ║  ┌──────────────────────────────────────────────────────┐   ║
+ ║  │         Semantic Data Context Store (DCS)             │   ║
+ ║  │  Authoritative semantic definition store              │   ║
+ ║  │  Extended by SMR to manage analytical metric defs     │   ║
+ ║  └──────────────────────────────────────────────────────┘   ║
+ ╚══════════════════════════════════════════════════════════════╝
 ```
+
+---
+
+## Pre-existing components
+
+### Semantic Data Context Store (DCS)
+
+The DCS is a pre-existing platform component and is not built or owned by the Analytics Platform. It is the organisation's authoritative store for semantic definitions — entities, data products, business glossary terms, and domain concepts. The Analytics Platform extends it by registering `analytical_metric` as a new definition type, making the DCS the single source of truth for metric definitions rather than maintaining a separate store.
+
+| Capability provided by DCS | How the Analytics Platform uses it |
+|---------------------------|-----------------------------------|
+| Definition document storage (versioned, typed) | Metric definitions stored as `type: "analytical_metric"` documents |
+| Definition versioning and history | SMR reads version history from DCS; superseded versions retained for lineage |
+| Full-text search and fuzzy discovery | `list_metrics` MCP capability queries DCS search index directly |
+| Cross-definition relationships | Dimensions, entities, and benchmarks referenced by metric definitions are resolved as DCS entity links |
+| Tenant-scoped access control | DCS enforces tenant isolation on all definition reads and writes |
+
+The SMR layer adds what the DCS does not provide natively: the **governance workflow** (proposed → approved → deprecated), **metric-specific schema validation** (formula, physicalMapping, costWeight), and the **Admin API surface** for metric authoring. When a metric transitions to `approved`, the canonical definition is written to the DCS via the DCS API. At query time, the Analytical Intent Validator reads definitions directly from the DCS.
+
+#### DCS extension schema (governance tracking — platform-owned PostgreSQL)
+
+The platform maintains a lightweight governance tracking table alongside the DCS. This table holds workflow state and approval metadata that the DCS does not natively manage; the DCS holds the definition document itself.
+
+```sql
+CREATE TABLE analytics.smr_governance (
+  id            UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id     TEXT        NOT NULL,
+  dcs_def_id    TEXT        NOT NULL,  -- DCS definition document ID
+  metric_id     TEXT        NOT NULL,  -- stable identifier, e.g. "portfolio_return"
+  version       INT         NOT NULL,
+  status        TEXT        NOT NULL,  -- "proposed" | "approved" | "deprecated"
+  source        TEXT        NOT NULL DEFAULT 'tenant',  -- "reference" | "tenant"
+  created_by    TEXT        NOT NULL,
+  approved_by   TEXT,
+  approved_at   TIMESTAMPTZ,
+  created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
+  superseded_at TIMESTAMPTZ,
+  CONSTRAINT uq_smr_version UNIQUE (tenant_id, metric_id, version)
+);
+
+-- One approved version per metric per tenant at any time
+CREATE UNIQUE INDEX idx_smr_one_approved
+  ON analytics.smr_governance (tenant_id, metric_id)
+  WHERE status = 'approved';
+```
+
+#### Metric definition document (stored in DCS as `type: "analytical_metric"`)
+
+```json
+{
+  "dcsType":     "analytical_metric",
+  "metricId":    "portfolio_return",
+  "version":     2,
+  "displayName": "Portfolio Return",
+  "description": "Time-weighted return for the portfolio over the selected period, expressed as a percentage.",
+  "category":    "performance",
+  "dataAffinity": ["portfolio"],
+  "formula": {
+    "type":        "time_weighted_return",
+    "inputs":      ["daily_return", "market_value"],
+    "aggregation": "chain_link"
+  },
+  "dimensions": [
+    { "id": "portfolio",   "required": true  },
+    { "id": "date",        "required": true  },
+    { "id": "asset_class", "required": false },
+    { "id": "currency",    "required": false }
+  ],
+  "timePeriods": ["day","week","month","quarter_to_date","year_to_date","trailing_12m"],
+  "physicalMapping": {
+    "backendId":   "snowflake-primary",
+    "table":       "fact_portfolio_daily",
+    "valueColumn": "portfolio_return",
+    "dateColumn":  "price_date",
+    "joinKeys":    { "portfolio": "portfolio_id" }
+  },
+  "formatting": { "unit": "percent", "decimalPlaces": 2, "suffix": "%" },
+  "governance": {
+    "costWeight":          1.0,
+    "classificationLevel": "internal",
+    "entitledRoles":       ["portfolio_manager", "analyst", "risk_officer"],
+    "complianceNotes":     "For MiFID II cost disclosure use cost_adjusted_return."
+  },
+  "narrativeTemplate": "{{portfolio_name}} returned {{value}}% {{period_label}}, {{direction}} its benchmark by {{tracking_error}}%.",
+  "aliases": ["return", "twr", "portfolio_twr"],
+  "tags":    ["performance", "core", "reference-model"]
+}
+```
+
+`governance.costWeight` feeds the Semantic Execution Governance estimator: `estimated_cost = Σ(metric.costWeight × dimensionCardinality × timeRangeMultiplier)`.
 
 ---
 
@@ -246,90 +346,20 @@ The FQP filters by `data_affinity @> ARRAY[requiredAffinity]` and selects the lo
 
 ### Semantic Metrics Registry (SMR)
 
+The SMR is not a standalone store. It is a governance and administration layer built on top of the DCS (see Pre-existing components above). The DCS provides definition storage, versioning, and search; the SMR adds the governance workflow, metric-specific schema validation, and the Admin API surface for metric authoring.
+
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
-| **Primary store** | PostgreSQL with RLS | ACID; per-tenant isolation at database layer |
-| **Search index** | Elasticsearch | Fast fuzzy search by name, description, aliases |
-| **Version control** | Append-only versioning in PostgreSQL | No external dependency |
+| **Definition storage** | DCS (pre-existing) | Avoids a duplicate semantic definition store; DCS already provides versioning, search, and tenant isolation |
+| **Governance tracking** | PostgreSQL (`analytics.smr_governance`) | Lightweight workflow state table owned by the platform; DCS does not manage approval workflows |
+| **Runtime reads** | Direct DCS API query by Analytical Intent Validator | Definitions are read from the authoritative source at resolution time |
+| **Search** | DCS native search index | `list_metrics` queries DCS directly; no separate Elasticsearch instance required |
 
 | Alternative | Why not chosen |
 |------------|---------------|
-| MongoDB | Schema-less is a disadvantage for governed metric definitions |
+| Standalone PostgreSQL + Elasticsearch | Duplicates the DCS's storage and search capabilities; two sources of truth for semantic definitions |
 | dbt + Git | Poor UX for business owners; no runtime query path |
-| Apache Atlas | Heavy; integration complexity not justified |
-
-#### `analytics.metric_definitions` (DDL)
-
-```sql
-CREATE TABLE analytics.metric_definitions (
-  id            UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id     TEXT        NOT NULL,
-  metric_id     TEXT        NOT NULL,  -- e.g. "portfolio_return"
-  version       INT         NOT NULL DEFAULT 1,
-  status        TEXT        NOT NULL,  -- "proposed" | "approved" | "deprecated"
-  source        TEXT        NOT NULL DEFAULT 'tenant',  -- "reference" | "tenant"
-  definition    JSONB       NOT NULL,
-  created_by    TEXT        NOT NULL,
-  approved_by   TEXT,
-  approved_at   TIMESTAMPTZ,
-  created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
-  superseded_at TIMESTAMPTZ,
-  CONSTRAINT uq_metric_version UNIQUE (tenant_id, metric_id, version)
-);
-
--- Enforces one approved version per metric per tenant
-CREATE UNIQUE INDEX idx_one_approved_version
-  ON analytics.metric_definitions (tenant_id, metric_id)
-  WHERE status = 'approved';
-
-CREATE INDEX idx_metric_definitions_gin ON analytics.metric_definitions USING GIN (definition);
-```
-
-Elasticsearch mirrors `metric_id`, `displayName`, `description`, `aliases`, and `tags` from each approved definition; rebuilt on status transitions.
-
-#### Metric definition document (the `definition` JSONB column)
-
-```json
-{
-  "metricId":    "portfolio_return",
-  "version":     2,
-  "displayName": "Portfolio Return",
-  "description": "Time-weighted return for the portfolio over the selected period, expressed as a percentage.",
-  "category":    "performance",
-  "dataAffinity": ["portfolio"],
-  "formula": {
-    "type":        "time_weighted_return",
-    "inputs":      ["daily_return", "market_value"],
-    "aggregation": "chain_link"
-  },
-  "dimensions": [
-    { "id": "portfolio",   "required": true  },
-    { "id": "date",        "required": true  },
-    { "id": "asset_class", "required": false },
-    { "id": "currency",    "required": false }
-  ],
-  "timePeriods": ["day","week","month","quarter_to_date","year_to_date","trailing_12m"],
-  "physicalMapping": {
-    "backendId":   "snowflake-primary",
-    "table":       "fact_portfolio_daily",
-    "valueColumn": "portfolio_return",
-    "dateColumn":  "price_date",
-    "joinKeys":    { "portfolio": "portfolio_id" }
-  },
-  "formatting": { "unit": "percent", "decimalPlaces": 2, "suffix": "%" },
-  "governance": {
-    "costWeight":          1.0,
-    "classificationLevel": "internal",
-    "entitledRoles":       ["portfolio_manager", "analyst", "risk_officer"],
-    "complianceNotes":     "For MiFID II cost disclosure use cost_adjusted_return."
-  },
-  "narrativeTemplate": "{{portfolio_name}} returned {{value}}% {{period_label}}, {{direction}} its benchmark by {{tracking_error}}%.",
-  "aliases": ["return", "twr", "portfolio_twr"],
-  "tags":    ["performance", "core", "reference-model"]
-}
-```
-
-`governance.costWeight` feeds the Semantic Execution Governance estimator: `estimated_cost = Σ(metric.costWeight × dimensionCardinality × timeRangeMultiplier)`.
+| Apache Atlas | Heavy; DCS already fulfils this role |
 
 ---
 
