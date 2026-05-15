@@ -8,78 +8,55 @@ This document assumes the existence of a **Semantic Data Context Store (DCS)** �
 
 ## Architecture overview
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                     MCP Capability Layer                         │
-│        Cloudflare Workers / Fastly Compute @ Edge               │
-│        MCP Streamable HTTP transport                            │
-└────────────────────────────┬────────────────────────────────────┘
-                             │
-┌────────────────────────────▼────────────────────────────────────┐
-│                   Semantic Intent Layer                          │
-│     Anthropic Claude (Sonnet for intent resolution;             │
-│     Opus for complex multi-metric queries)                      │
-└────────────────────────────┬────────────────────────────────────┘
-                             │
-┌────────────────────────────▼────────────────────────────────────┐
-│               Semantic Metrics Registry (SMR)                    │
-│     Governance workflow + metric schema — extends DCS           │
-└────────────────────────────┬────────────────────────────────────┘
-                             │
-┌────────────────────────────▼────────────────────────────────────┐
-│              Role-Aware Projection Layer                         │
-│              Custom middleware (TypeScript)                     │
-└────────────────────────────┬────────────────────────────────────┘
-                             │
-┌────────────────────────────▼────────────────────────────────────┐
-│              Analytical Intent Validator                          │
-│    MCP JSON params → SMR validation → LQP generator             │
-│    TypeScript — JSON schema validation + SMR resolution          │
-└────────────────────────────┬────────────────────────────────────┘
-                             │
-┌────────────────────────────▼────────────────────────────────────┐
-│              Semantic Execution Governance                       │
-│    Cost estimation, classification gating, circuit breakers     │
-│    Custom rules engine (TypeScript)                             │
-└────────────────────────────┬────────────────────────────────────┘
-                             │
-┌────────────────────────────▼────────────────────────────────────┐
-│               Federated Query Planner (FQP)                      │
-│   Apache Calcite + custom backend adapter layer                 │
-└────────────────────────────┬────────────────────────────────────┘
-                             │
-┌────────────────────────────▼────────────────────────────────────┐
-│              Visualisation Ontology (SCL generation)             │
-│   Vega-Lite v5 + platform-defined table spec extension          │
-└────────────────────────────┬────────────────────────────────────┘
-                             │
-┌────────────────────────────▼────────────────────────────────────┐
-│               Narrative Synthesis Engine                         │
-│   Anthropic Claude (Haiku default; Sonnet for complex)          │
-└────────────────────────────┬────────────────────────────────────┘
-                             │
-┌────────────────────────────▼────────────────────────────────────┐
-│               Analytical Lineage Store                           │
-│   PostgreSQL + S3-compatible object storage                     │
-└─────────────────────────────────────────────────────────────────┘
-                             │
-         ┌───────────────────┼───────────────────┐
-         │                   │                   │
-┌────────▼──────────┐ ┌──────▼────────┐ ┌────────▼──────────┐
-│  SQL Warehouse     │ │ OpenData API  │ │  Graph Data API   │
-│  Snowflake /       │ │  REST / OData │ │  Neo4j / Neptune  │
-│  BigQuery /        │ │  endpoints    │ │  / SPARQL         │
-│  Databricks        │ │               │ │                   │
-└────────────────────┘ └───────────────┘ └───────────────────┘
+```mermaid
+flowchart TD
+    Consumer["Consumer\nAI Chat Platform · autonomous agent · custom application"]
 
- ╔══════════════════════════════════════════════════════════════╗
- ║              Pre-existing components (external)              ║
- ║  ┌──────────────────────────────────────────────────────┐   ║
- ║  │         Semantic Data Context Store (DCS)             │   ║
- ║  │  Authoritative semantic definition store              │   ║
- ║  │  Extended by SMR to manage analytical metric defs     │   ║
- ║  └──────────────────────────────────────────────────────┘   ║
- ╚══════════════════════════════════════════════════════════════╝
+    subgraph analytics["AI Analytics Platform"]
+        MCP["MCP Capability Layer\nCloudflare Workers · MCP Streamable HTTP"]
+        SIL["Semantic Intent Layer\nAnthropic Claude · Sonnet / Opus"]
+        RAPL["Role-Aware Projection Layer\nCustom middleware · TypeScript"]
+        AIV["Analytical Intent Validator\nJSON schema + SMR resolution → LQP · TypeScript"]
+        SEG["Semantic Execution Governance\nCost estimation · classification · circuit breakers"]
+        FQP["Federated Query Planner\nApache Calcite + backend adapters"]
+        VO["Visualisation Ontology\nSCL generation · Vega-Lite v5"]
+        NSE["Narrative Synthesis Engine\nAnthropic Claude · Haiku / Sonnet"]
+        LS[("Analytical Lineage Store")]
+        Result(["MCP tool response\ndisplay_spec + narrative + result_id"])
+    end
+
+    vite2img["vite2img (optional)\nStandalone MCP render service · SCL → SVG / PNG\nRegistered directly with consumers — not part of Analytics Platform"]
+
+    subgraph dcr["Data Context Repository"]
+        SMC["Semantic Metrics Context\nGovernance workflow + metric schema · extends DCS"]
+        DCS[("Semantic Data Context Store\nPre-existing · general-purpose common registry")]
+        SMC -. backed by .-> DCS
+    end
+
+    subgraph backends["Execution Backends"]
+        SQL["SQL Warehouse\nSnowflake · BigQuery · Databricks · Starburst"]
+        ODA["OpenData API\nREST / OData"]
+        GDA["Graph Data API\nNeo4j · Neptune / SPARQL"]
+    end
+
+    Consumer -->|"POST /v1/mcp (JWT + MCP tool call)"| MCP
+    Consumer -->|"MCP tool call + user JWT"| vite2img
+    MCP -->|"natural language query"| SIL
+    MCP -->|"JWT claims"| RAPL
+    SIL -->|"metric name resolution"| SMC
+    SIL -->|"structured intent"| AIV
+    RAPL -->|"row predicates + column masks"| AIV
+    AIV -->|"metric + dimension validation"| SMC
+    AIV -->|"Logical Query Plan"| SEG
+    SEG -->|"approved LQP"| FQP
+    SEG -->|"governance decision"| LS
+    FQP -->|"physicalMapping lookup"| SMC
+    FQP --> SQL & ODA & GDA
+    FQP -->|"execution record"| LS
+    FQP -->|"assembled result"| VO
+    FQP -->|"assembled result"| NSE
+    VO -->|"SCL display spec"| Result
+    NSE -->|"narrative"| Result
 ```
 
 ---
@@ -831,13 +808,17 @@ Both runtime services are routed via `dataAffinity` matching with no FQP special
 
 ### Static image rendering (vite2img)
 
+vite2img is a **standalone MCP render service** — it is not part of the AI Analytics Platform. Consumers that need static image output (the AI Chat Platform for PDF/export workflows, agentic report pipelines) register vite2img as a peer MCP server alongside the Analytics Platform, using the same `mcpServers` registration pattern. It receives a `display_spec` JSON object directly from the consumer and returns SVG or PNG. It has no connection to the Analytics Platform's governance pipeline.
+
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
+| **Integration pattern** | Standalone MCP server registered directly with consumers | Keeps rendering concerns outside the Analytics Platform; consumers decide when to call it |
 | **Implementation** | Vite + vega-embed + headless Chromium (Playwright) | Pixel-accurate SVG/PNG from Vega-Lite specs; handles charts and tables |
 | **Table rendering** | Custom HTML template | Styled HTML table via Playwright screenshot |
 
 | Alternative | Why not chosen |
 |------------|---------------|
+| Analytics Platform MCP tool | Rendering is a consumer concern — the platform returns governed SCL specs; static image conversion is outside its governance scope |
 | Node.js vega-lite CLI | No browser rendering; limited CSS for table specs |
 | Puppeteer | Viable; Playwright preferred for API ergonomics |
 
@@ -847,13 +828,13 @@ Both runtime services are routed via `dataAffinity` matching with no FQP special
 
 The platform does not mandate a rendering library. Reference implementations:
 
-| Consumer | Chart | Table |
-|---------|-------|-------|
-| AI Chat Platform | vega-embed | Native data table |
-| Custom UI | vega-embed (recommended) or any Vega-Lite-compatible library | Host's own grid |
-| Static export | vite2img | vite2img |
+| Consumer | Chart | Table | Static image |
+|---------|-------|-------|------|
+| AI Chat Platform | vega-embed | Native data table | vite2img (direct MCP call) |
+| Custom UI | vega-embed (recommended) or any Vega-Lite-compatible library | Host's own grid | vite2img |
+| Agentic consumers | vite2img | vite2img | vite2img |
 
-vega-embed is the only library with direct Vega-Lite v5 compatibility. ECharts, Plotly.js, and D3 all require a translation layer.
+vega-embed is the only library with direct Vega-Lite v5 compatibility. ECharts, Plotly.js, and D3 all require a translation layer. For static image output, vite2img is the reference implementation regardless of consumer type.
 
 ---
 

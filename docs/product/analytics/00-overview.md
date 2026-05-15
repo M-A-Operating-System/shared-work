@@ -114,78 +114,54 @@ Natural language is a convenience layer over a computation engine. The computati
 
 ---
 
-## Platform architecture
+## Request flow
 
-```
-┌────────────────────────────────────────────────────────────────────┐
-│                   Consumer (any MCP-compatible caller)              │
-│                                                                    │
-│   AI Chat Platform · autonomous agent · custom application         │
-│   — presents user JWT with role claims                             │
-│                                                                    │
-└────────────────────────────────────────────────────────────────────┘
-                         │
-                         │  POST /v1/mcp  (JWT + MCP tool call)
-                         │
-┌────────────────────────▼───────────────────────────────────────────┐
-│                   AI Analytics Platform                             │
-│                                                                    │
-│  ┌─────────────────────────────────────────────────────────────┐  │
-│  │                  Semantic Intent Layer                       │  │
-│  │  (LLM resolves natural language → analytical intent)        │  │
-│  └─────────────────────┬───────────────────────────────────────┘  │
-│                         │                                          │
-│  ┌──────────────────────▼──────────────────────────────────────┐  │
-│  │             Semantic Metrics Registry (SMR)                  │  │
-│  │  (governed metric definitions, dimensions, hierarchies,      │  │
-│  │   aggregation rules, lineage, ownership, access policies)    │  │
-│  └──────────────────────┬──────────────────────────────────────┘  │
-│                         │                                          │
-│  ┌──────────────────────▼──────────────────────────────────────┐  │
-│  │              Role-Aware Projection Layer                     │  │
-│  │  (entitlement enforcement — rows, columns, metrics)          │  │
-│  └──────────────────────┬──────────────────────────────────────┘  │
-│                         │                                          │
-│  ┌──────────────────────▼──────────────────────────────────────┐  │
-│  │              Analytical Intent Validator                     │  │
-│  │  (MCP JSON params → SMR validation → LQP)                   │  │
-│  └──────────────────────┬──────────────────────────────────────┘  │
-│                         │                                          │
-│  ┌──────────────────────▼──────────────────────────────────────┐  │
-│  │            Semantic Execution Governance                     │  │
-│  │  (circuit breakers, cost limits, compliance classification)  │  │
-│  └──────────────────────┬──────────────────────────────────────┘  │
-│                         │                                          │
-│  ┌──────────────────────▼──────────────────────────────────────┐  │
-│  │               Federated Query Planner (FQP)                  │  │
-│  │  (routes LQP fragments to registered execution backends)     │  │
-│  └──────────────────────┬──────────────────────────────────────┘  │
-│                         │                                          │
-│  ┌──────────────────────▼──────────────────────────────────────┐  │
-│  │             Visualisation Ontology                           │  │
-│  │  (deterministic chart contract selection; SCL display spec   │  │
-│  │   generated — no rendering; returned to consumer)            │  │
-│  └──────────────────────┬──────────────────────────────────────┘  │
-│                         │                                          │
-│  ┌──────────────────────▼──────────────────────────────────────┐  │
-│  │                Narrative Synthesis Engine                    │  │
-│  │  (governed LLM prose anchored to execution result values)    │  │
-│  └──────────────────────┬──────────────────────────────────────┘  │
-│                         │                                          │
-│  ┌──────────────────────▼──────────────────────────────────────┐  │
-│  │               Analytical Lineage Store                       │  │
-│  │  (intent → plan → execution → result, queryable)            │  │
-│  └─────────────────────────────────────────────────────────────┘  │
-└────────────────────────────────────────────────────────────────────┘
-                         │
-         ┌───────────────┼───────────────────┐
-         │               │                   │
-┌────────▼───────┐ ┌─────▼──────────┐ ┌─────▼──────────────┐
-│ Execution      │ │ Execution       │ │ Execution           │
-│ Backend A      │ │ Backend B       │ │ Backend C           │
-│ (SQL data      │ │ (OpenData API / │ │ (Graph Data API /   │
-│  warehouse)    │ │  semantic layer)│ │  OLAP engine)       │
-└────────────────┘ └────────────────┘ └────────────────────┘
+The following sequence diagram traces a single analytical request from consumer to response, showing which component calls which:
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant C as Consumer
+    participant MCP as MCP Capability Layer
+    participant SIL as Semantic Intent Layer
+    participant RAPL as Role-Aware Projection Layer
+    participant SMC as Semantic Metrics Context
+    participant AIV as Analytical Intent Validator
+    participant SEG as Semantic Execution Governance
+    participant FQP as Federated Query Planner
+    participant BE as Execution Backend(s)
+    participant VO as Visualisation Ontology
+    participant NSE as Narrative Synthesis Engine
+    participant LS as Analytical Lineage Store
+
+    C->>MCP: POST /v1/mcp (JWT + MCP tool call)
+    par
+        MCP->>SIL: natural language query
+    and
+        MCP->>RAPL: JWT claims
+    end
+    SIL->>SMC: metric name resolution
+    SMC-->>SIL: metric definitions
+    SIL->>AIV: structured intent
+    RAPL->>AIV: row predicates + column masks
+    AIV->>SMC: validate metric + dimension IDs
+    SMC-->>AIV: definitions + aggregation rules
+    AIV->>SEG: Logical Query Plan (LQP)
+    SEG->>LS: governance decision record
+    SEG->>FQP: approved LQP
+    FQP->>SMC: physicalMapping lookup
+    SMC-->>FQP: physical source mapping
+    FQP->>BE: sub-plan execution
+    BE-->>FQP: raw result sets
+    FQP->>LS: execution record
+    par
+        FQP->>VO: assembled result
+    and
+        FQP->>NSE: assembled result
+    end
+    VO-->>MCP: SCL display spec
+    NSE-->>MCP: narrative
+    MCP-->>C: display_spec + narrative + result_id
 ```
 
 ### Components
@@ -264,11 +240,11 @@ The Visualisation Ontology determines which shape is returned based on the resul
 | Consumer | How they render |
 |---------|------------------------------|
 | Custom analytics UI (host-built) | Inspect `display_spec.type`; render chart specs with a compatible chart rendering library and table specs with a grid component — both choices are the host's |
-| AI Chat Platform | Native content rendering pipeline handles both chart and table spec types |
-| Agentic consumers producing PDF/email reports | Pass `display_spec` to a static image rendering service (see complementary services), which converts chart and table specs to PNG or SVG for embedding in non-interactive output |
-| Custom consumers | Any chart-grammar-compatible library for chart specs; any grid component for table specs |
+| AI Chat Platform | Native content rendering pipeline handles chart and table spec types; when static image output is needed (export, PDF), calls **vite2img** directly as a registered MCP tool |
+| Agentic consumers producing PDF/email reports | Call **vite2img** directly as a registered MCP tool, passing the `display_spec` — receives SVG or PNG for embedding in non-interactive output |
+| Custom consumers | Any chart-grammar-compatible library for chart specs; any grid component for table specs; vite2img for static image export |
 
-An optional **static image rendering service** accepts a `display_spec` JSON object and returns a static image (PNG or SVG). It is independently deployable and intended for use cases where interactive rendering is unavailable — automated report generation, email delivery, PDF production, and batch pipelines. It does not interact with the Analytics Platform's governance pipeline; it receives only the already-produced display spec.
+**vite2img** is a standalone MCP render service — independently deployable, registered directly with consumers (the AI Chat Platform, agentic consumers) as a peer MCP server, in the same way the Analytics Platform itself is registered. It accepts a `display_spec` JSON object and returns a static image (SVG or PNG). It does not interact with the Analytics Platform's governance pipeline and is not part of the Analytics Platform — it receives only the already-produced display spec.
 
 This headless design means:
 - The Analytics Platform can serve any consumer regardless of their UI stack.
@@ -288,7 +264,7 @@ This headless design means:
 | **Host execution backends** | The host's registered data retrieval backends — SQL data warehouses, OpenData APIs, Graph Data APIs, semantic layers, OLAP engines, or any other mechanism the host registers. The FQP translates Logical Query Plan fragments into each backend's native request protocol. |
 | **Semantic Data Context Store (DCS)** | Pre-existing external component — the organisation's general-purpose common registry for semantic definitions of all kinds (data entities, data products, business glossary, domain concepts). The Analytics Platform reuses the DCS to store analytical metric definitions alongside existing data definitions, avoiding a parallel semantic registry. |
 | **AI Chat Platform** | The primary conversational consumer of the Analytics Platform's MCP Capability Layer. See [Role in the AI-Enablement Product Ecosystem](#role-in-the-ai-enablement-product-ecosystem) below. |
-| **Static image rendering service** | Optional complementary service — accepts a `display_spec` JSON object and returns a static image (PNG or SVG). Used by agentic consumers, report pipelines, and email delivery workflows where interactive rendering is unavailable. |
+| **vite2img** | Optional standalone MCP render service — accepts a `display_spec` JSON object and returns a static image (SVG or PNG). Registered directly with the AI Chat Platform and agentic consumers as a peer MCP server. Not part of the Analytics Platform — used for static image output (PDF export, email, batch reports) when interactive rendering is unavailable. |
 | **Semantic Registry Service** | Complementary ecosystem service — a curated library of pre-built metric definitions for financial services domains. |
 | **Regulatory Reference Service** | Complementary ecosystem service — regulatory metric definitions for compliance reporting (Basel III/IV, IFRS 9, MiFID II, etc.). |
 | **Benchmark Data Service** | Complementary ecosystem service — market benchmark and index data integrated as dimensional reference data. |
@@ -328,58 +304,70 @@ All three modes route through the same governance pipeline. A portfolio manager 
 
 ---
 
-### Combined platform architecture
+### Platform architecture
 
-The following diagram shows all three consumption modes operating against the same Analytics Platform backend:
+The following diagram shows all three consumption modes operating against the same Analytics Platform backend, with each platform component as a distinct node and all inter-component interactions labelled:
 
-```
-┌────────────────────────────────────────────────────────────────────────────┐
-│                           Consuming Organisation                            │
-│                                                                            │
-│  ┌───────────────────────┐  ┌─────────────────────┐  ┌───────────────────┐ │
-│  │  <ai-chat> component  │  │ Custom analytics UI  │  │ Agentic consumers │ │
-│  │  (conversational UI)  │  │ (host-built; renders │  │ (scheduled agents,│ │
-│  └──────────┬────────────┘  │  returned JSON/spec) │  │  event monitors,  │ │
-│             │ JWT           └──────────┬────────────┘  │  report pipelines)│ │
-└─────────────┼──────────────────────────┼───────────────┴────────┬──────────┘
-              │                          │ JWT                     │ JWT
-┌─────────────▼──────────────────────────▼─────────────────────────▼──────────┐
-│                             AI Chat Platform                                 │
-│                                                                              │
-│   Conversation engine · Content rendering · Tool call routing                │
-│   Audit trail · Memory · Shared conversations                                │
-│                                                                              │
-│   mcpServers:  [ { "id": "analytics-platform",                               │
-│                    "endpoint": "…/v1/mcp",                                   │
-│                    "accessTier": "always-on" } ]                             │
-└─────────────────────────────────┬────────────────────────────────────────────┘
-                                  │                         │
-                    MCP tool call │                         │ MCP tool call
-                    (Chat Platform│                         │ (Agentic consumer,
-                     + user JWT)  │                         │  agent JWT)
-┌─────────────────────────────────▼─────────────────────────▼──────────────────┐
-│                          AI Analytics Platform                                │
-│                                                                               │
-│  MCP Capability Layer  ──►  Semantic Intent Layer                             │
-│                        ──►  Semantic Metrics Registry (SMR)                  │
-│                        ──►  Role-Aware Projection Layer                       │
-│                        ──►  Analytical Intent Validator                       │
-│                        ──►  Semantic Execution Governance                     │
-│                        ──►  Federated Query Planner (FQP)                     │
-│                        ──►  Visualisation Ontology (SCL display spec generation)│
-│                        ──►  Narrative Synthesis Engine                        │
-│                        ──►  Analytical Lineage Store                          │
-└─────────────────────────────────┬─────────────────────────────────────────────┘
-                                  │
-                  ┌───────────────┼───────────────┐
-                  │               │               │
-           ┌──────▼──────┐ ┌──────▼──────┐ ┌─────▼───────────┐
-           │ Execution   │ │ Execution   │ │ Execution        │
-           │ Backend A   │ │ Backend B   │ │ Backend C         │
-           │ (SQL data   │ │ (OpenData   │ │ (Graph Data API / │
-           │  warehouse) │ │  API /      │ │  OLAP engine)     │
-           │             │ │  sem. layer)│ │                   │
-           └─────────────┘ └─────────────┘ └──────────────────┘
+```mermaid
+flowchart TD
+    subgraph org["Consuming Organisation"]
+        ChatComp["&lt;ai-chat&gt; component\nconversational UI"]
+        CustomUI["Custom analytics UI\nhost-built · renders JSON / SCL"]
+        Agents["Agentic consumers\nscheduled agents · event monitors · report pipelines"]
+    end
+
+    subgraph aichat["AI Chat Platform"]
+        ChatEngine["Conversation engine\nContent rendering · Tool call routing\nAudit trail · Memory · Shared conversations"]
+    end
+
+    subgraph analytics["AI Analytics Platform"]
+        MCP["MCP Capability Layer\nCloudflare Workers · JWT validation"]
+        SIL["Semantic Intent Layer\nAnthropic Claude · Sonnet / Opus"]
+        RAPL["Role-Aware Projection Layer\nJWT claims · row predicates · column masks"]
+        AIV["Analytical Intent Validator\nMetric + dimension validation · LQP generation"]
+        SEG["Semantic Execution Governance\nCost estimation · classification · circuit breakers"]
+        FQP["Federated Query Planner\nApache Calcite + backend adapters"]
+        VO["Visualisation Ontology\nSCL display spec · Vega-Lite v5"]
+        NSE["Narrative Synthesis Engine\nAnthropic Claude · Haiku / Sonnet"]
+        LS[("Analytical Lineage Store")]
+        Result(["MCP tool response\ndisplay_spec + narrative + result_id"])
+    end
+
+    vite2img["vite2img (optional)\nStandalone MCP render service · SCL → SVG / PNG\nRegistered directly with consumers — not part of Analytics Platform"]
+
+    subgraph dcr["Data Context Repository"]
+        SMC["Semantic Metrics Context\nMetric definitions · dimensions · hierarchies\naggregation rules · governance · access policies"]
+        DCS[("Semantic Data Context Store\nPre-existing · general-purpose common registry")]
+        SMC -. backed by .-> DCS
+    end
+
+    subgraph backends["Execution Backends"]
+        SQL["SQL Warehouse\nSnowflake · BigQuery · Databricks · Starburst"]
+        ODA["OpenData API\nREST / OData"]
+        GDA["Graph Data API\nNeo4j · Neptune / SPARQL"]
+    end
+
+    ChatComp -->|"JWT"| ChatEngine
+    CustomUI -->|"JWT + MCP tool call"| MCP
+    Agents -->|"agent JWT + MCP tool call"| MCP
+    ChatEngine -->|"MCP tool call + user JWT"| MCP
+    ChatEngine -->|"MCP tool call + user JWT"| vite2img
+    MCP -->|"natural language query"| SIL
+    MCP -->|"JWT claims"| RAPL
+    SIL -->|"metric name resolution"| SMC
+    SIL -->|"structured intent"| AIV
+    RAPL -->|"row predicates + column masks"| AIV
+    AIV -->|"metric + dimension validation"| SMC
+    AIV -->|"Logical Query Plan"| SEG
+    SEG -->|"approved LQP"| FQP
+    SEG -->|"governance decision"| LS
+    FQP -->|"physicalMapping lookup"| SMC
+    FQP --> SQL & ODA & GDA
+    FQP -->|"execution record"| LS
+    FQP -->|"assembled result"| VO
+    FQP -->|"assembled result"| NSE
+    VO -->|"SCL display spec"| Result
+    NSE -->|"narrative"| Result
 ```
 
 No consumer — AI Chat Platform, `<ai-analytics>` component, or agentic agent — has a path to execution backends, physical schemas, or raw SQL. Every analytical request routes through the MCP Capability Layer and the full governance pipeline. The Analytical Lineage Store records every invocation, regardless of which consumer initiated it.
