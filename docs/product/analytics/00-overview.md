@@ -345,6 +345,7 @@ flowchart TD
     end
 
     vite2img["vite2img (optional)\nSCL → SVG / PNG · MCP tool surface"]
+    Result(["MCP tool response\ndisplay_spec + narrative + result_id\nreturned to consumer"])
 
     ChatComp -->|"JWT"| ChatEngine
     CustomUI -->|"JWT + MCP tool call"| MCP
@@ -364,13 +365,10 @@ flowchart TD
     FQP -->|"execution record"| LS
     FQP -->|"assembled result"| VO
     FQP -->|"assembled result"| NSE
-    VO -->|"SCL display spec"| MCP
-    NSE -->|"narrative"| MCP
-    MCP -->|"display_spec + narrative + result_id"| ChatEngine
-    MCP -->|"display_spec + narrative + result_id"| CustomUI
-    MCP -->|"display_spec + narrative + result_id"| Agents
+    VO -->|"SCL display spec"| Result
+    NSE -->|"narrative"| Result
     VO -. "SCL spec" .-> vite2img
-    vite2img -. "SVG / PNG" .-> Agents
+    vite2img -. "SVG / PNG" .-> Result
 ```
 
 No consumer — AI Chat Platform, `<ai-analytics>` component, or agentic agent — has a path to execution backends, physical schemas, or raw SQL. Every analytical request routes through the MCP Capability Layer and the full governance pipeline. The Analytical Lineage Store records every invocation, regardless of which consumer initiated it.

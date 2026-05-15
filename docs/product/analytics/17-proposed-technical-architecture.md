@@ -37,6 +37,7 @@ flowchart TD
     end
 
     vite2img["vite2img (optional)\nSCL → SVG / PNG · MCP tool surface"]
+    Result(["MCP tool response\ndisplay_spec + narrative + result_id\nreturned to consumer"])
 
     Consumer -->|"POST /v1/mcp (JWT + MCP tool call)"| MCP
     MCP -->|"natural language query"| SIL
@@ -53,11 +54,10 @@ flowchart TD
     FQP -->|"execution record"| LS
     FQP -->|"assembled result"| VO
     FQP -->|"assembled result"| NSE
-    VO -->|"SCL display spec"| MCP
-    NSE -->|"narrative"| MCP
-    MCP -->|"display_spec + narrative + result_id"| Consumer
+    VO -->|"SCL display spec"| Result
+    NSE -->|"narrative"| Result
     VO -. "SCL spec" .-> vite2img
-    vite2img -. "SVG / PNG" .-> Consumer
+    vite2img -. "SVG / PNG" .-> Result
 ```
 
 ---
