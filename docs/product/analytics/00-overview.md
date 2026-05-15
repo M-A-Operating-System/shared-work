@@ -114,38 +114,54 @@ Natural language is a convenience layer over a computation engine. The computati
 
 ---
 
-## Platform architecture
+## Request flow
+
+The following sequence diagram traces a single analytical request from consumer to response, showing which component calls which:
 
 ```mermaid
-flowchart TD
-    Consumer["Consumer\nAI Chat Platform · autonomous agent · custom application\nPresents user JWT with role claims"]
+sequenceDiagram
+    autonumber
+    participant C as Consumer
+    participant MCP as MCP Capability Layer
+    participant SIL as Semantic Intent Layer
+    participant RAPL as Role-Aware Projection Layer
+    participant SMC as Semantic Metrics Context
+    participant AIV as Analytical Intent Validator
+    participant SEG as Semantic Execution Governance
+    participant FQP as Federated Query Planner
+    participant BE as Execution Backend(s)
+    participant VO as Visualisation Ontology
+    participant NSE as Narrative Synthesis Engine
+    participant LS as Analytical Lineage Store
 
-    subgraph platform["AI Analytics Platform"]
-        SIL["Semantic Intent Layer\nNatural language → analytical intent"]
-        SMC["Semantic Metrics Context\nGoverned metric definitions · dimensions · hierarchies\naggregation rules · lineage · ownership · access policies"]
-        RAPL["Role-Aware Projection Layer\nEntitlement enforcement — rows · columns · metrics"]
-        AIV["Analytical Intent Validator\nMCP JSON params → SMR validation → LQP"]
-        SEG["Semantic Execution Governance\nCircuit breakers · cost limits · compliance classification"]
-        FQP["Federated Query Planner\nRoutes LQP fragments to registered execution backends"]
-        VO["Visualisation Ontology\nDeterministic SCL display spec — no rendering"]
-        NSE["Narrative Synthesis Engine\nGoverned LLM prose anchored to result values"]
-        LS[("Analytical Lineage Store\nIntent → plan → execution → result · queryable")]
+    C->>MCP: POST /v1/mcp (JWT + MCP tool call)
+    par
+        MCP->>SIL: natural language query
+    and
+        MCP->>RAPL: JWT claims
     end
-
-    subgraph backends["Execution Backends"]
-        BEA["Backend A — SQL data warehouse"]
-        BEB["Backend B — OpenData API / semantic layer"]
-        BEC["Backend C — Graph Data API / OLAP engine"]
+    SIL->>SMC: metric name resolution
+    SMC-->>SIL: metric definitions
+    SIL->>AIV: structured intent
+    RAPL->>AIV: row predicates + column masks
+    AIV->>SMC: validate metric + dimension IDs
+    SMC-->>AIV: definitions + aggregation rules
+    AIV->>SEG: Logical Query Plan (LQP)
+    SEG->>LS: governance decision record
+    SEG->>FQP: approved LQP
+    FQP->>SMC: physicalMapping lookup
+    SMC-->>FQP: physical source mapping
+    FQP->>BE: sub-plan execution
+    BE-->>FQP: raw result sets
+    FQP->>LS: execution record
+    par
+        FQP->>VO: assembled result
+    and
+        FQP->>NSE: assembled result
     end
-
-    subgraph external["Pre-existing — external"]
-        DCS["Semantic Data Context Store\nGeneral-purpose common semantic registry"]
-    end
-
-    Consumer -->|"POST /v1/mcp  (JWT + MCP tool call)"| SIL
-    SIL --> SMC --> RAPL --> AIV --> SEG --> FQP --> VO --> NSE --> LS
-    FQP --> BEA & BEB & BEC
-    SMC -. extends .-> DCS
+    VO-->>MCP: SCL display spec
+    NSE-->>MCP: narrative
+    MCP-->>C: display_spec + narrative + result_id
 ```
 
 ### Components
@@ -288,39 +304,73 @@ All three modes route through the same governance pipeline. A portfolio manager 
 
 ---
 
-### Combined platform architecture
+### Platform architecture
 
-The following diagram shows all three consumption modes operating against the same Analytics Platform backend:
+The following diagram shows all three consumption modes operating against the same Analytics Platform backend, with each platform component as a distinct node and all inter-component interactions labelled:
 
 ```mermaid
 flowchart TD
     subgraph org["Consuming Organisation"]
         ChatComp["&lt;ai-chat&gt; component\nconversational UI"]
-        CustomUI["Custom analytics UI\nhost-built · renders returned JSON/spec"]
+        CustomUI["Custom analytics UI\nhost-built · renders JSON / SCL"]
         Agents["Agentic consumers\nscheduled agents · event monitors · report pipelines"]
     end
 
     subgraph aichat["AI Chat Platform"]
-        ChatEngine["Conversation engine · Content rendering · Tool call routing\nAudit trail · Memory · Shared conversations"]
+        ChatEngine["Conversation engine\nContent rendering · Tool call routing\nAudit trail · Memory · Shared conversations"]
     end
 
     subgraph analytics["AI Analytics Platform"]
-        MCP["MCP Capability Layer"]
-        Pipeline["Semantic Intent Layer → Semantic Metrics Context\n→ Role-Aware Projection Layer → Analytical Intent Validator\n→ Semantic Execution Governance → Federated Query Planner\n→ Visualisation Ontology → Narrative Synthesis Engine\n→ Analytical Lineage Store"]
-        MCP --> Pipeline
+        MCP["MCP Capability Layer\nCloudflare Workers · JWT validation"]
+        SIL["Semantic Intent Layer\nAnthropic Claude · Sonnet / Opus"]
+        RAPL["Role-Aware Projection Layer\nJWT claims · row predicates · column masks"]
+        AIV["Analytical Intent Validator\nMetric + dimension validation · LQP generation"]
+        SEG["Semantic Execution Governance\nCost estimation · classification · circuit breakers"]
+        FQP["Federated Query Planner\nApache Calcite + backend adapters"]
+        VO["Visualisation Ontology\nSCL display spec · Vega-Lite v5"]
+        NSE["Narrative Synthesis Engine\nAnthropic Claude · Haiku / Sonnet"]
+        LS[("Analytical Lineage Store\nPostgreSQL + S3")]
+    end
+
+    subgraph dcr["Data Context Repository"]
+        SMC["Semantic Metrics Context\nMetric definitions · dimensions · hierarchies\naggregation rules · governance · access policies"]
+        DCS[("Semantic Data Context Store\nPre-existing · general-purpose common registry")]
+        SMC -. backed by .-> DCS
     end
 
     subgraph backends["Execution Backends"]
-        BEA["Backend A — SQL data warehouse"]
-        BEB["Backend B — OpenData API / semantic layer"]
-        BEC["Backend C — Graph Data API / OLAP engine"]
+        SQL["SQL Warehouse\nSnowflake · BigQuery · Databricks · Starburst"]
+        ODA["OpenData API\nREST / OData"]
+        GDA["Graph Data API\nNeo4j · Neptune / SPARQL"]
     end
 
-    ChatComp -->|JWT| ChatEngine
-    CustomUI -->|JWT| ChatEngine
+    vite2img["vite2img (optional)\nSCL → SVG / PNG · MCP tool surface"]
+
+    ChatComp -->|"JWT"| ChatEngine
+    CustomUI -->|"JWT + MCP tool call"| MCP
     Agents -->|"agent JWT + MCP tool call"| MCP
     ChatEngine -->|"MCP tool call + user JWT"| MCP
-    Pipeline --> BEA & BEB & BEC
+    MCP -->|"natural language query"| SIL
+    MCP -->|"JWT claims"| RAPL
+    SIL -->|"metric name resolution"| SMC
+    SIL -->|"structured intent"| AIV
+    RAPL -->|"row predicates + column masks"| AIV
+    AIV -->|"metric + dimension validation"| SMC
+    AIV -->|"Logical Query Plan"| SEG
+    SEG -->|"approved LQP"| FQP
+    SEG -->|"governance decision"| LS
+    FQP -->|"physicalMapping lookup"| SMC
+    FQP --> SQL & ODA & GDA
+    FQP -->|"execution record"| LS
+    FQP -->|"assembled result"| VO
+    FQP -->|"assembled result"| NSE
+    VO -->|"SCL display spec"| MCP
+    NSE -->|"narrative"| MCP
+    MCP -->|"display_spec + narrative + result_id"| ChatEngine
+    MCP -->|"display_spec + narrative + result_id"| CustomUI
+    MCP -->|"display_spec + narrative + result_id"| Agents
+    VO -. "SCL spec" .-> vite2img
+    vite2img -. "SVG / PNG" .-> Agents
 ```
 
 No consumer — AI Chat Platform, `<ai-analytics>` component, or agentic agent — has a path to execution backends, physical schemas, or raw SQL. Every analytical request routes through the MCP Capability Layer and the full governance pipeline. The Analytical Lineage Store records every invocation, regardless of which consumer initiated it.

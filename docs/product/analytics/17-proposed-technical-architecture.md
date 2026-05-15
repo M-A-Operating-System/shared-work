@@ -10,16 +10,25 @@ This document assumes the existence of a **Semantic Data Context Store (DCS)** �
 
 ```mermaid
 flowchart TD
-    MCP["MCP Capability Layer\nCloudflare Workers · MCP Streamable HTTP"]
-    SIL["Semantic Intent Layer\nAnthropic Claude · Sonnet / Opus"]
-    SMC["Semantic Metrics Context\nGovernance workflow + metric schema · extends DCS"]
-    RAPL["Role-Aware Projection Layer\nCustom middleware · TypeScript"]
-    AIV["Analytical Intent Validator\nJSON schema + SMR resolution → LQP · TypeScript"]
-    SEG["Semantic Execution Governance\nCost estimation · classification · circuit breakers"]
-    FQP["Federated Query Planner\nApache Calcite + backend adapters"]
-    VO["Visualisation Ontology\nSCL generation · Vega-Lite v5"]
-    NSE["Narrative Synthesis Engine\nAnthropic Claude · Haiku / Sonnet"]
-    LS[("Analytical Lineage Store\nPostgreSQL + S3")]
+    Consumer["Consumer\nAI Chat Platform · autonomous agent · custom application"]
+
+    subgraph analytics["AI Analytics Platform"]
+        MCP["MCP Capability Layer\nCloudflare Workers · MCP Streamable HTTP"]
+        SIL["Semantic Intent Layer\nAnthropic Claude · Sonnet / Opus"]
+        RAPL["Role-Aware Projection Layer\nCustom middleware · TypeScript"]
+        AIV["Analytical Intent Validator\nJSON schema + SMR resolution → LQP · TypeScript"]
+        SEG["Semantic Execution Governance\nCost estimation · classification · circuit breakers"]
+        FQP["Federated Query Planner\nApache Calcite + backend adapters"]
+        VO["Visualisation Ontology\nSCL generation · Vega-Lite v5"]
+        NSE["Narrative Synthesis Engine\nAnthropic Claude · Haiku / Sonnet"]
+        LS[("Analytical Lineage Store\nPostgreSQL + S3")]
+    end
+
+    subgraph dcr["Data Context Repository"]
+        SMC["Semantic Metrics Context\nGovernance workflow + metric schema · extends DCS"]
+        DCS[("Semantic Data Context Store\nPre-existing · general-purpose common registry")]
+        SMC -. backed by .-> DCS
+    end
 
     subgraph backends["Execution Backends"]
         SQL["SQL Warehouse\nSnowflake · BigQuery · Databricks · Starburst"]
@@ -27,14 +36,28 @@ flowchart TD
         GDA["Graph Data API\nNeo4j · Neptune / SPARQL"]
     end
 
-    subgraph external["Pre-existing — external"]
-        DCS["Semantic Data Context Store\nGeneral-purpose common semantic registry"]
-    end
+    vite2img["vite2img (optional)\nSCL → SVG / PNG · MCP tool surface"]
 
-    MCP --> SIL --> SMC --> RAPL --> AIV --> SEG --> FQP --> VO --> NSE
+    Consumer -->|"POST /v1/mcp (JWT + MCP tool call)"| MCP
+    MCP -->|"natural language query"| SIL
+    MCP -->|"JWT claims"| RAPL
+    SIL -->|"metric name resolution"| SMC
+    SIL -->|"structured intent"| AIV
+    RAPL -->|"row predicates + column masks"| AIV
+    AIV -->|"metric + dimension validation"| SMC
+    AIV -->|"Logical Query Plan"| SEG
+    SEG -->|"approved LQP"| FQP
+    SEG -->|"governance decision"| LS
+    FQP -->|"physicalMapping lookup"| SMC
     FQP --> SQL & ODA & GDA
-    FQP --> LS
-    SMC -. extends .-> DCS
+    FQP -->|"execution record"| LS
+    FQP -->|"assembled result"| VO
+    FQP -->|"assembled result"| NSE
+    VO -->|"SCL display spec"| MCP
+    NSE -->|"narrative"| MCP
+    MCP -->|"display_spec + narrative + result_id"| Consumer
+    VO -. "SCL spec" .-> vite2img
+    vite2img -. "SVG / PNG" .-> Consumer
 ```
 
 ---
