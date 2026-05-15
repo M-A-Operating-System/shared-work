@@ -1,0 +1,50 @@
+name: Generate PDFs
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'docs/**'
+      - 'generate_pdf.py'
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get install -y libpango-1.0-0 libpangoft2-1.0-0
+          pip install markdown weasyprint
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Generate and commit analytics PDF
+        run: |
+          python generate_pdf.py analytics
+          git add docs/product/analytics/analytics_product_design.pdf
+          git diff --cached --quiet || git commit -m "docs(analytics): regenerate PDF [skip ci]"
+
+      - name: Generate and commit assistant PDF
+        run: |
+          python generate_pdf.py assistant
+          git add docs/product/assistant/assistant_product_design.pdf
+          git diff --cached --quiet || git commit -m "docs(assistant): regenerate PDF [skip ci]"
+
+      - name: Push
+        run: git push
