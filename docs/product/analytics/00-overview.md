@@ -329,7 +329,7 @@ flowchart TD
         FQP["Federated Query Planner\nApache Calcite + backend adapters"]
         VO["Visualisation Ontology\nSCL display spec · Vega-Lite v5"]
         NSE["Narrative Synthesis Engine\nAnthropic Claude · Haiku / Sonnet"]
-        LS[("Analytical Lineage Store\nPostgreSQL + S3")]
+        LS[("Analytical Lineage Store")]
         vite2img["vite2img (optional)\nRender tool · SCL → SVG / PNG\nConsumer calls as second MCP tool if unable to render SCL"]
         Result(["MCP tool response\ndisplay_spec + narrative + result_id"])
     end
