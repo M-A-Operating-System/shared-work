@@ -368,7 +368,6 @@ flowchart TD
     FQP -->|"assembled result"| NSE
     VO -->|"SCL display spec"| Result
     NSE -->|"narrative"| Result
-    VO -. "SCL spec" .-> vite2img
 ```
 
 No consumer — AI Chat Platform, `<ai-analytics>` component, or agentic agent — has a path to execution backends, physical schemas, or raw SQL. Every analytical request routes through the MCP Capability Layer and the full governance pipeline. The Analytical Lineage Store records every invocation, regardless of which consumer initiated it.
