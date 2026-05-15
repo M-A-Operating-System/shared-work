@@ -88,17 +88,16 @@ This document assumes the existence of a **Semantic Data Context Store (DCS)** �
 
 ### Semantic Data Context Store (DCS)
 
-The DCS is a pre-existing platform component and is not built or owned by the Analytics Platform. It is the organisation's authoritative store for semantic definitions — entities, data products, business glossary terms, and domain concepts. The Analytics Platform extends it by registering `analytical_metric` as a new definition type, making the DCS the single source of truth for metric definitions rather than maintaining a separate store.
+The DCS is a pre-existing, general-purpose platform component — not built or owned by the Analytics Platform. It is the organisation's common registry for semantic definitions of all kinds: data entities, data products, business glossary terms, domain concepts, and data source schemas. The Analytics Platform reuses the DCS as the authoritative store for analytical metric definitions, registering them as a new definition type (`analytical_metric`) alongside the data definitions already managed there. This avoids a parallel semantic registry and keeps metric definitions discoverable alongside the data they describe.
 
 | Capability provided by DCS | How the Analytics Platform uses it |
 |---------------------------|-----------------------------------|
-| Definition document storage (versioned, typed) | Metric definitions stored as `type: "analytical_metric"` documents |
-| Definition versioning and history | SMR reads version history from DCS; superseded versions retained for lineage |
-| Full-text search and fuzzy discovery | `list_metrics` MCP capability queries DCS search index directly |
-| Cross-definition relationships | Dimensions, entities, and benchmarks referenced by metric definitions are resolved as DCS entity links |
+| Versioned definition document storage | Metric definitions stored as `type: "analytical_metric"` documents, versioned by the DCS natively |
+| Full-text search and fuzzy discovery | `list_metrics` MCP capability queries the DCS search index; no separate Elasticsearch needed |
+| Cross-definition relationships | Dimensions, entities, and benchmarks referenced by metric definitions resolve as DCS entity links to existing data definitions |
 | Tenant-scoped access control | DCS enforces tenant isolation on all definition reads and writes |
 
-The SMR layer adds what the DCS does not provide natively: the **governance workflow** (proposed → approved → deprecated), **metric-specific schema validation** (formula, physicalMapping, costWeight), and the **Admin API surface** for metric authoring. When a metric transitions to `approved`, the canonical definition is written to the DCS via the DCS API. At query time, the Analytical Intent Validator reads definitions directly from the DCS.
+The SMR layer adds what the DCS does not natively provide: the **governance workflow** (proposed → approved → deprecated), **metric-specific schema validation** (formula, physicalMapping, costWeight), and the **Admin API surface** for metric authoring. When a metric transitions to `approved`, the canonical definition is written to the DCS. At query time, the Analytical Intent Validator reads definitions directly from the DCS.
 
 #### DCS extension schema (governance tracking — platform-owned PostgreSQL)
 
@@ -346,18 +345,35 @@ The FQP filters by `data_affinity @> ARRAY[requiredAffinity]` and selects the lo
 
 ### Semantic Metrics Registry (SMR)
 
-The SMR is not a standalone store. It is a governance and administration layer built on top of the DCS (see Pre-existing components above). The DCS provides definition storage, versioning, and search; the SMR adds the governance workflow, metric-specific schema validation, and the Admin API surface for metric authoring.
+The SMR is the Analytics Platform's governed catalogue of all resolvable analytical concepts — what metrics can be queried, how they are computed, what dimensions are permissible, and who owns each definition. It is not a standalone store: definition documents live in the DCS, and the SMR is the governance and administration layer on top of it.
+
+#### What a metric semantic definition contains
+
+Each metric definition registered in the DCS captures the full semantic contract for that metric:
+
+| Field group | Purpose |
+|-------------|---------|
+| **Identity** — `metricId`, `displayName`, `description`, `aliases`, `tags` | Stable identifier, human-readable labels, and search terms used by the Semantic Intent Layer for name resolution |
+| **Formula** — `formula.type`, `formula.inputs`, `formula.aggregation` | The computation rule (time-weighted return, ratio, standard deviation, etc.) — what the metric means, independent of any backend |
+| **Dimensions** — `dimensions[]` with `required` flag | Which groupings the metric supports; required dimensions are enforced by the Analytical Intent Validator |
+| **Time periods** — `timePeriods[]` | Which time granularities the metric can be resolved at |
+| **Physical mapping** — `physicalMapping` | How the formula maps to a specific backend: which `backendId`, table, column, date column, and join keys to use. Resolved by the FQP; never exposed to AI or consumers |
+| **Formatting** — `unit`, `decimalPlaces`, `suffix` | How values should be presented — passed through to the SCL display spec |
+| **Governance** — `costWeight`, `classificationLevel`, `entitledRoles`, `complianceNotes` | Controls query cost estimation, access control, and compliance mode routing |
+| **Narrative template** | A parameterised prose template used by the Narrative Synthesis Engine when summarising this metric |
+
+The full definition document structure is shown in the [Pre-existing components — DCS](#semantic-data-context-store-dcs) section above.
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
-| **Definition storage** | DCS (pre-existing) | Avoids a duplicate semantic definition store; DCS already provides versioning, search, and tenant isolation |
-| **Governance tracking** | PostgreSQL (`analytics.smr_governance`) | Lightweight workflow state table owned by the platform; DCS does not manage approval workflows |
-| **Runtime reads** | Direct DCS API query by Analytical Intent Validator | Definitions are read from the authoritative source at resolution time |
-| **Search** | DCS native search index | `list_metrics` queries DCS directly; no separate Elasticsearch instance required |
+| **Definition storage** | DCS (pre-existing) | Metric definitions live alongside data definitions in the common registry; no duplicate semantic store |
+| **Governance tracking** | PostgreSQL (`analytics.smr_governance`) | Lightweight approval workflow state owned by the platform; the DCS does not manage approval workflows |
+| **Runtime reads** | Direct DCS API query by Analytical Intent Validator | Definitions read from the authoritative source at resolution time |
+| **Search** | DCS native search index | `list_metrics` queries DCS directly; no separate search infrastructure needed |
 
 | Alternative | Why not chosen |
 |------------|---------------|
-| Standalone PostgreSQL + Elasticsearch | Duplicates the DCS's storage and search capabilities; two sources of truth for semantic definitions |
+| Standalone PostgreSQL + Elasticsearch | Duplicates DCS capabilities; creates two sources of truth for semantic definitions |
 | dbt + Git | Poor UX for business owners; no runtime query path |
 | Apache Atlas | Heavy; DCS already fulfils this role |
 
