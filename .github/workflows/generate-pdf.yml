@@ -1,0 +1,36 @@
+name: Generate PDFs
+
+on:
+  pull_request:
+    paths:
+      - 'docs/**'
+      - 'generate_pdf.py'
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get install -y libpango-1.0-0 libpangoft2-1.0-0
+          pip install markdown weasyprint
+
+      - name: Generate PDFs
+        run: python generate_pdf.py
+
+      - name: Upload PDFs
+        uses: actions/upload-artifact@v4
+        with:
+          name: product-specs-pr${{ github.event.pull_request.number }}
+          path: docs/product/**/*.pdf
+          retention-days: 30
