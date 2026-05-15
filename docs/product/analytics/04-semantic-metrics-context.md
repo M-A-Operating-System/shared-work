@@ -1,8 +1,8 @@
-# 04 — Semantic Metrics Registry
+# 04 — Semantic Metrics Context
 
 ## Overview
 
-The **Semantic Metrics Registry (SMR)** is the governing catalogue of every analytical concept resolvable on the platform. It is the single source of truth for what can be queried, how metrics are defined, what dimensions are available, how hierarchies are structured, who owns each definition, and what lineage metadata applies.
+The **Semantic Metrics Context (SMC)** defines the governing catalogue of every analytical concept resolvable on the platform — what can be queried, how metrics are computed, what dimensions are available, how hierarchies are structured, who owns each definition, and what lineage metadata applies. This document describes the metric definition schema and semantic model. The physical store that holds these definitions is the Semantic Data Context Store (DCS), a pre-existing general-purpose registry; see [17-proposed-technical-architecture.md](./17-proposed-technical-architecture.md) for how the SMC is implemented on top of the DCS.
 
 Nothing is queryable that is not registered in the SMR. This is an architectural constraint, not a policy. The Analytical Intent Validator rejects any metric identifier not present in the SMR for the active tenant.
 

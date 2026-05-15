@@ -192,7 +192,7 @@ Natural language is a convenience layer over a computation engine. The computati
 
 **Semantic Intent Layer** receives natural language from the user or AI orchestrator, resolves it against the SMR, and produces a structured analytical intent representation — the set of metrics, dimensions, filters, and hierarchy traversals being requested.
 
-**Semantic Metrics Registry (SMR)** is the governing catalogue of all resolvable analytical concepts. It defines what can be queried, how metrics are computed, what dimensions are permissible, and who owns each definition. It is the single source of truth for metric semantics across the platform.
+**Semantic Metrics Registry (SMR)** is the governing catalogue of all resolvable analytical concepts. It defines what can be queried, how metrics are computed, what dimensions are permissible, and who owns each definition. Metric definitions are stored in the Semantic Data Context Store (DCS) — a pre-existing external component — which the Analytics Platform extends to hold `analytical_metric` definition types. The SMR layer adds the governance workflow (propose → approve → deprecate), metric schema validation, and the Admin API authoring surface on top of the DCS.
 
 **Role-Aware Projection Layer** applies the authenticated user's entitlement claims against the resolved intent. It filters the metric set to what the user is permitted to see, injects row-level security predicates, and applies column-level masking rules — before any query plan is compiled.
 
@@ -282,10 +282,11 @@ This headless design means:
 | Dependency | Role |
 |------------|------|
 | **AI provider** | Provider-agnostic abstraction used by the Semantic Intent Layer and Narrative Synthesis Engine. The platform maps tiers to the tenant's configured provider's current models. |
-| **Platform storage** | Relational database with RLS for SMR records, lineage records, and configuration; object storage for cached result sets and artefacts. |
+| **Platform storage** | Relational database with RLS for lineage records, governance tracking, and configuration; object storage for cached result sets and artefacts. |
 | **Platform edge function** | JWT handling, intent resolution API, intent validation and LQP compilation, governance checks, FQP orchestration, result assembly, SCL display spec generation. |
 | **Consumer authentication** | The organisation's identity provider issues JWTs for users and service accounts, including the role claims used by the Role-Aware Projection Layer. |
 | **Host execution backends** | The host's registered data retrieval backends — SQL data warehouses, OpenData APIs, Graph Data APIs, semantic layers, OLAP engines, or any other mechanism the host registers. The FQP translates Logical Query Plan fragments into each backend's native request protocol. |
+| **Semantic Data Context Store (DCS)** | Pre-existing external component — the organisation's general-purpose common registry for semantic definitions of all kinds (data entities, data products, business glossary, domain concepts). The Analytics Platform reuses the DCS to store analytical metric definitions alongside existing data definitions, avoiding a parallel semantic registry. |
 | **AI Chat Platform** | The primary conversational consumer of the Analytics Platform's MCP Capability Layer. See [Role in the AI-Enablement Product Ecosystem](#role-in-the-ai-enablement-product-ecosystem) below. |
 | **Static image rendering service** | Optional complementary service — accepts a `display_spec` JSON object and returns a static image (PNG or SVG). Used by agentic consumers, report pipelines, and email delivery workflows where interactive rendering is unavailable. |
 | **Semantic Registry Service** | Complementary ecosystem service — a curated library of pre-built metric definitions for financial services domains. |
