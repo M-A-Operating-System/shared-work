@@ -8,78 +8,33 @@ This document assumes the existence of a **Semantic Data Context Store (DCS)** �
 
 ## Architecture overview
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                     MCP Capability Layer                         │
-│        Cloudflare Workers / Fastly Compute @ Edge               │
-│        MCP Streamable HTTP transport                            │
-└────────────────────────────┬────────────────────────────────────┘
-                             │
-┌────────────────────────────▼────────────────────────────────────┐
-│                   Semantic Intent Layer                          │
-│     Anthropic Claude (Sonnet for intent resolution;             │
-│     Opus for complex multi-metric queries)                      │
-└────────────────────────────┬────────────────────────────────────┘
-                             │
-┌────────────────────────────▼────────────────────────────────────┐
-│               Semantic Metrics Registry (SMR)                    │
-│     Governance workflow + metric schema — extends DCS           │
-└────────────────────────────┬────────────────────────────────────┘
-                             │
-┌────────────────────────────▼────────────────────────────────────┐
-│              Role-Aware Projection Layer                         │
-│              Custom middleware (TypeScript)                     │
-└────────────────────────────┬────────────────────────────────────┘
-                             │
-┌────────────────────────────▼────────────────────────────────────┐
-│              Analytical Intent Validator                          │
-│    MCP JSON params → SMR validation → LQP generator             │
-│    TypeScript — JSON schema validation + SMR resolution          │
-└────────────────────────────┬────────────────────────────────────┘
-                             │
-┌────────────────────────────▼────────────────────────────────────┐
-│              Semantic Execution Governance                       │
-│    Cost estimation, classification gating, circuit breakers     │
-│    Custom rules engine (TypeScript)                             │
-└────────────────────────────┬────────────────────────────────────┘
-                             │
-┌────────────────────────────▼────────────────────────────────────┐
-│               Federated Query Planner (FQP)                      │
-│   Apache Calcite + custom backend adapter layer                 │
-└────────────────────────────┬────────────────────────────────────┘
-                             │
-┌────────────────────────────▼────────────────────────────────────┐
-│              Visualisation Ontology (SCL generation)             │
-│   Vega-Lite v5 + platform-defined table spec extension          │
-└────────────────────────────┬────────────────────────────────────┘
-                             │
-┌────────────────────────────▼────────────────────────────────────┐
-│               Narrative Synthesis Engine                         │
-│   Anthropic Claude (Haiku default; Sonnet for complex)          │
-└────────────────────────────┬────────────────────────────────────┘
-                             │
-┌────────────────────────────▼────────────────────────────────────┐
-│               Analytical Lineage Store                           │
-│   PostgreSQL + S3-compatible object storage                     │
-└─────────────────────────────────────────────────────────────────┘
-                             │
-         ┌───────────────────┼───────────────────┐
-         │                   │                   │
-┌────────▼──────────┐ ┌──────▼────────┐ ┌────────▼──────────┐
-│  SQL Warehouse     │ │ OpenData API  │ │  Graph Data API   │
-│  Snowflake /       │ │  REST / OData │ │  Neo4j / Neptune  │
-│  BigQuery /        │ │  endpoints    │ │  / SPARQL         │
-│  Databricks        │ │               │ │                   │
-└────────────────────┘ └───────────────┘ └───────────────────┘
+```mermaid
+flowchart TD
+    MCP["MCP Capability Layer\nCloudflare Workers · MCP Streamable HTTP"]
+    SIL["Semantic Intent Layer\nAnthropic Claude · Sonnet / Opus"]
+    SMC["Semantic Metrics Context\nGovernance workflow + metric schema · extends DCS"]
+    RAPL["Role-Aware Projection Layer\nCustom middleware · TypeScript"]
+    AIV["Analytical Intent Validator\nJSON schema + SMR resolution → LQP · TypeScript"]
+    SEG["Semantic Execution Governance\nCost estimation · classification · circuit breakers"]
+    FQP["Federated Query Planner\nApache Calcite + backend adapters"]
+    VO["Visualisation Ontology\nSCL generation · Vega-Lite v5"]
+    NSE["Narrative Synthesis Engine\nAnthropic Claude · Haiku / Sonnet"]
+    LS[("Analytical Lineage Store\nPostgreSQL + S3")]
 
- ╔══════════════════════════════════════════════════════════════╗
- ║              Pre-existing components (external)              ║
- ║  ┌──────────────────────────────────────────────────────┐   ║
- ║  │         Semantic Data Context Store (DCS)             │   ║
- ║  │  Authoritative semantic definition store              │   ║
- ║  │  Extended by SMR to manage analytical metric defs     │   ║
- ║  └──────────────────────────────────────────────────────┘   ║
- ╚══════════════════════════════════════════════════════════════╝
+    subgraph backends["Execution Backends"]
+        SQL["SQL Warehouse\nSnowflake · BigQuery · Databricks · Starburst"]
+        ODA["OpenData API\nREST / OData"]
+        GDA["Graph Data API\nNeo4j · Neptune / SPARQL"]
+    end
+
+    subgraph external["Pre-existing — external"]
+        DCS["Semantic Data Context Store\nGeneral-purpose common semantic registry"]
+    end
+
+    MCP --> SIL --> SMC --> RAPL --> AIV --> SEG --> FQP --> VO --> NSE
+    FQP --> SQL & ODA & GDA
+    FQP --> LS
+    SMC -. extends .-> DCS
 ```
 
 ---
