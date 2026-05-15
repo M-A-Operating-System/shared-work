@@ -27,7 +27,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get install -y libpango-1.0-0 libpangoft2-1.0-0
-          pip install markdown weasyprint
+          pip install -r requirements.txt
 
       - name: Configure git
         run: |
