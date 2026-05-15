@@ -240,11 +240,11 @@ The Visualisation Ontology determines which shape is returned based on the resul
 | Consumer | How they render |
 |---------|------------------------------|
 | Custom analytics UI (host-built) | Inspect `display_spec.type`; render chart specs with a compatible chart rendering library and table specs with a grid component — both choices are the host's |
-| AI Chat Platform | Native content rendering pipeline handles both chart and table spec types |
-| Agentic consumers producing PDF/email reports | Pass `display_spec` to a static image rendering service (see complementary services), which converts chart and table specs to PNG or SVG for embedding in non-interactive output |
-| Custom consumers | Any chart-grammar-compatible library for chart specs; any grid component for table specs |
+| AI Chat Platform | Native content rendering pipeline handles chart and table spec types; when static image output is needed (export, PDF), calls **vite2img** directly as a registered MCP tool |
+| Agentic consumers producing PDF/email reports | Call **vite2img** directly as a registered MCP tool, passing the `display_spec` — receives SVG or PNG for embedding in non-interactive output |
+| Custom consumers | Any chart-grammar-compatible library for chart specs; any grid component for table specs; vite2img for static image export |
 
-An optional **static image rendering service** accepts a `display_spec` JSON object and returns a static image (PNG or SVG). It is independently deployable and intended for use cases where interactive rendering is unavailable — automated report generation, email delivery, PDF production, and batch pipelines. It does not interact with the Analytics Platform's governance pipeline; it receives only the already-produced display spec.
+**vite2img** is a standalone MCP render service — independently deployable, registered directly with consumers (the AI Chat Platform, agentic consumers) as a peer MCP server, in the same way the Analytics Platform itself is registered. It accepts a `display_spec` JSON object and returns a static image (SVG or PNG). It does not interact with the Analytics Platform's governance pipeline and is not part of the Analytics Platform — it receives only the already-produced display spec.
 
 This headless design means:
 - The Analytics Platform can serve any consumer regardless of their UI stack.
@@ -264,7 +264,7 @@ This headless design means:
 | **Host execution backends** | The host's registered data retrieval backends — SQL data warehouses, OpenData APIs, Graph Data APIs, semantic layers, OLAP engines, or any other mechanism the host registers. The FQP translates Logical Query Plan fragments into each backend's native request protocol. |
 | **Semantic Data Context Store (DCS)** | Pre-existing external component — the organisation's general-purpose common registry for semantic definitions of all kinds (data entities, data products, business glossary, domain concepts). The Analytics Platform reuses the DCS to store analytical metric definitions alongside existing data definitions, avoiding a parallel semantic registry. |
 | **AI Chat Platform** | The primary conversational consumer of the Analytics Platform's MCP Capability Layer. See [Role in the AI-Enablement Product Ecosystem](#role-in-the-ai-enablement-product-ecosystem) below. |
-| **Static image rendering service** | Optional complementary service — accepts a `display_spec` JSON object and returns a static image (PNG or SVG). Used by agentic consumers, report pipelines, and email delivery workflows where interactive rendering is unavailable. |
+| **vite2img** | Optional standalone MCP render service — accepts a `display_spec` JSON object and returns a static image (SVG or PNG). Registered directly with the AI Chat Platform and agentic consumers as a peer MCP server. Not part of the Analytics Platform — used for static image output (PDF export, email, batch reports) when interactive rendering is unavailable. |
 | **Semantic Registry Service** | Complementary ecosystem service — a curated library of pre-built metric definitions for financial services domains. |
 | **Regulatory Reference Service** | Complementary ecosystem service — regulatory metric definitions for compliance reporting (Basel III/IV, IFRS 9, MiFID II, etc.). |
 | **Benchmark Data Service** | Complementary ecosystem service — market benchmark and index data integrated as dimensional reference data. |
@@ -333,7 +333,7 @@ flowchart TD
         Result(["MCP tool response\ndisplay_spec + narrative + result_id"])
     end
 
-    vite2img["vite2img (optional)\nRender tool · SCL → SVG / PNG\nConsumer calls as second MCP tool if unable to render SCL"]
+    vite2img["vite2img (optional)\nStandalone MCP render service · SCL → SVG / PNG\nRegistered directly with consumers — not part of Analytics Platform"]
 
     subgraph dcr["Data Context Repository"]
         SMC["Semantic Metrics Context\nMetric definitions · dimensions · hierarchies\naggregation rules · governance · access policies"]
