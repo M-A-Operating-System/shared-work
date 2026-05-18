@@ -1278,25 +1278,3 @@ Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 The MCP Capability Layer validates the JWT, dispatches the query to the SIL and the JWT claims to the RAPL in parallel, and begins the governance pipeline. 1,243ms later, the portfolio manager receives a grouped bar chart and a governed narrative — with no exposure to SQL, physical schema, backend connection details, or metric definition IDs. Every step is recorded in the Analytical Lineage Store under `result_id: res-20260518-093247-wk4n`.
-
-### Example
-
-The chat engine registered the Analytics Platform as an MCP server at startup. When the portfolio manager submits their question, the chat engine calls `analyse_metric` with the natural language query and the user's JWT. This is the entry point for the entire pipeline traced through sections 3.1–3.8:
-
-```json
-POST /v1/mcp   Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...
-
-{
-  "jsonrpc": "2.0",
-  "id":      "req-8a3f2c",
-  "method":  "tools/call",
-  "params": {
-    "name": "analyse_metric",
-    "arguments": {
-      "query": "Show me portfolio returns versus benchmark for my equity portfolios this quarter"
-    }
-  }
-}
-```
-
-The `analyse_metric` tool is the appropriate choice here: the input is natural language, the intent spans two metrics across multiple portfolios, and no explicit metric IDs are provided. The MCP Capability Layer validates the JWT, dispatches the query to the SIL and the claims to the RAPL in parallel, and begins the governance pipeline. The portfolio manager receives a grouped bar chart and a governed narrative — with no exposure to SQL, physical schema, or backend routing details — 1,243ms later.
