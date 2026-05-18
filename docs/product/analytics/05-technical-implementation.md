@@ -311,6 +311,87 @@ Each tenant has one governance config document. The Semantic Execution Governanc
 
 The FQP splits the LQP by `dataAffinity`, assigns each sub-plan to the matching registered backend, translates to the backend's native protocol (SQL, OData, SPARQL, etc.), fans out execution in parallel, and assembles results. Each execution backend implements a two-method adapter contract: `ping()` for health checking and `executeSubPlan()` for receiving a sub-plan fragment and returning a typed result set.
 
+#### FQP input — approved LQP
+
+The FQP receives the governance-approved LQP produced by the Semantic Intent Layer. It reads `data_affinity` on each metric node to determine which backend to route each sub-plan to:
+
+```json
+{
+  "lqp_id": "lqp-20260514-093241-xyz",
+  "tenant_id": "acme-wealth",
+  "nodes": [
+    {
+      "id": "node-1", "op": "metric_scan",
+      "metric_id": "portfolio_return", "metric_version": "2.1.0",
+      "aggregation": "value_weighted_average",
+      "data_affinity": "portfolio",
+      "physical_mapping": { "source": "primary-warehouse", "table": "fact_portfolio_daily" }
+    },
+    {
+      "id": "node-2", "op": "metric_scan",
+      "metric_id": "tracking_error", "metric_version": "1.3.0",
+      "aggregation": "value_weighted_average",
+      "data_affinity": "risk_metrics",
+      "physical_mapping": { "source": "risk-semantic-layer", "cube": "risk_cube" }
+    },
+    { "id": "node-3", "op": "join",   "inputs": ["node-1", "node-2"], "join_keys": ["portfolio_id", "date"] },
+    { "id": "node-4", "op": "filter", "input": "node-3",
+      "predicates": ["portfolio_id IN ('GLOB_EQ_OPP', 'UK_CORE_INC')", "asset_class = 'EQUITY'"] },
+    { "id": "node-5", "op": "time_expand", "input": "node-4",
+      "period": "quarter_to_date", "resolved_range": { "from": "2026-04-01", "to": "2026-05-14" } },
+    { "id": "node-6", "op": "sort", "input": "node-5",
+      "by": [{ "field": "portfolio_return", "direction": "desc" }] }
+  ],
+  "cost_estimate": 850,
+  "governance_approved": true,
+  "row_predicates_applied": true,
+  "column_masks": []
+}
+```
+
+The FQP decomposes this into two sub-plans — one routed to `primary-warehouse` (nodes 1, 4, 5, 6) and one to `risk-semantic-layer` (node 2) — executes them in parallel, and joins on `portfolio_id` and `date` at assembly.
+
+#### FQP output — assembled result
+
+After execution and result assembly the FQP returns a typed result envelope to the Visualisation Ontology and Narrative Synthesis Engine:
+
+```json
+{
+  "result_id":      "res_20260514_093247_a1b2c3",
+  "lqp_id":        "lqp-20260514-093241-xyz",
+  "tenant_id":     "acme-wealth",
+  "cache_hit":     false,
+  "latency_ms":    1243,
+  "cost_units":    850,
+  "backends_used": ["primary-warehouse", "risk-semantic-layer"],
+  "schema": [
+    { "field": "portfolio_id",     "type": "string"  },
+    { "field": "portfolio_return", "type": "number", "unit": "percentage", "decimals": 2 },
+    { "field": "tracking_error",   "type": "number", "unit": "percentage", "decimals": 2 }
+  ],
+  "rows": [
+    { "portfolio_id": "GLOB_EQ_OPP", "portfolio_return": 4.21, "tracking_error": 3.18 },
+    { "portfolio_id": "UK_CORE_INC", "portfolio_return": 2.87, "tracking_error": 1.94 }
+  ],
+  "sub_plans": [
+    {
+      "backend":    "primary-warehouse",
+      "dialect":    "snowflake_sql",
+      "query":      "SELECT portfolio_id, AVG(portfolio_return) AS portfolio_return FROM fact_portfolio_daily WHERE portfolio_id IN ('GLOB_EQ_OPP','UK_CORE_INC') AND asset_class = 'EQUITY' AND date BETWEEN '2026-04-01' AND '2026-05-14' GROUP BY portfolio_id ORDER BY portfolio_return DESC",
+      "latency_ms": 980,
+      "row_count":  2
+    },
+    {
+      "backend":    "risk-semantic-layer",
+      "dialect":    "metricflow",
+      "query":      { "metrics": ["tracking_error"], "group_by": ["portfolio_id"], "where": "portfolio_id IN ('GLOB_EQ_OPP','UK_CORE_INC')" },
+      "latency_ms": 620,
+      "row_count":  2
+    }
+  ]
+}
+```
+
 #### Supported backend adapters
 
 | Backend type | Adapter | Protocols |
