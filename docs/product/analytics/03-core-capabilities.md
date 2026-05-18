@@ -329,19 +329,29 @@ issuer_concentration = SAFE_DIVIDE(
 rolling_90d_return = CUMULATIVE_RETURN(daily_return, WINDOW(90, 'days'))
 ```
 
-### SMR API
+### SMR MCP Surface
 
-```
-GET  /v1/smr/metrics              — list all approved metrics
-GET  /v1/smr/metrics/{id}         — get metric definition by ID
-GET  /v1/smr/metrics/{id}/lineage — get full lineage graph for metric
-GET  /v1/smr/dimensions           — list all approved dimensions
-GET  /v1/smr/hierarchies          — list all approved hierarchies
-GET  /v1/smr/measure-groups       — list all measure groups
-POST /v1/smr/metrics              — propose a new metric definition
-PUT  /v1/smr/metrics/{id}         — propose a change to an existing metric
-POST /v1/smr/metrics/{id}/approve — approve a proposed metric (Application Admin only)
-```
+The SMR is exposed to AI models and agents as MCP resources and tools — not as a raw REST API. Resources cover read access; tools cover the write operations required for metric governance.
+
+**Resources** — readable by any authenticated user within their entitlement scope:
+
+| URI | Description |
+|---|---|
+| `smr://metrics` | All approved metrics available to the caller's role — IDs, labels, descriptions, required dimensions |
+| `smr://metrics/{metric_id}` | Full definition for a single metric: formula, aggregation rules, governance metadata, lineage |
+| `smr://dimensions` | All approved dimensions |
+| `smr://hierarchies` | All approved drilldown hierarchies |
+
+**Tools** — query and governance operations:
+
+| Tool | Access | Description |
+|---|---|---|
+| `list_metrics` | All query roles | List metrics with optional filter by domain, measure group, or search term |
+| `get_metric_definition` | All query roles | Retrieve the full SMR definition for a specific metric ID |
+| `propose_metric` | Metric Owner, Application Admin | Submit a new metric definition or a change to an existing one for review |
+| `approve_metric` | Application Admin | Approve a proposed metric, making it resolvable from the next refresh cycle |
+
+The internal resolution calls made by the Semantic Intent Layer and Federated Query Planner use the same resource URIs — there is no separate internal API. The SMR's governance workflow (propose → review → approve → deprecate → retire) is entirely managed through the `propose_metric` and `approve_metric` tools.
 
 ### Example
 
