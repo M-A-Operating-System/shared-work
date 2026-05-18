@@ -11,10 +11,9 @@ flowchart TD
     Consumer["Consumer\nAI Chat Platform · autonomous agent · custom application"]
 
     subgraph analytics["AI Analytics Platform"]
-        MCP["MCP Capability Layer\nCloudflare Workers · MCP Streamable HTTP"]
+        MCP["MCP Capability Layer\nPython · FastMCP + Uvicorn · MCP Streamable HTTP"]
         SIL["Semantic Intent Layer\nAnthropic Claude · Sonnet / Opus"]
-        RAPL["Role-Aware Projection Layer\nCustom middleware · TypeScript"]
-        AIV["Analytical Intent Validator\nJSON schema + SMR resolution → LQP · TypeScript"]
+        RAPL["Role-Aware Projection Layer\nCustom middleware · Python"]
         SEG["Semantic Execution Governance\nCost estimation · classification · circuit breakers"]
         FQP["Federated Query Planner\nApache Calcite + backend adapters"]
         VO["Visualisation Ontology\nSCL generation · Vega-Lite v5"]
@@ -26,9 +25,9 @@ flowchart TD
     vite2img["vite2img (optional)\nStandalone MCP render service · SCL → SVG / PNG\nRegistered directly with consumers — not part of Analytics Platform"]
 
     subgraph dcr["Data Context Repository"]
-        SMC["Semantic Metrics Context\nGovernance workflow + metric schema · extends DCS"]
+        SMR["Semantic Metrics Registry\nGovernance workflow + metric schema · extends DCS"]
         DCS[("Semantic Data Context Store\nPre-existing · general-purpose common registry")]
-        SMC -. backed by .-> DCS
+        SMR -. backed by .-> DCS
     end
 
     subgraph backends["Execution Backends"]
@@ -41,14 +40,12 @@ flowchart TD
     Consumer -->|"MCP tool call + user JWT"| vite2img
     MCP -->|"natural language query"| SIL
     MCP -->|"JWT claims"| RAPL
-    SIL -->|"metric name resolution"| SMC
-    SIL -->|"structured intent"| AIV
-    RAPL -->|"row predicates + column masks"| AIV
-    AIV -->|"metric + dimension validation"| SMC
-    AIV -->|"Logical Query Plan"| SEG
+    RAPL -->|"row predicates + column masks"| SIL
+    SIL -->|"metric resolution + validation"| SMR
+    SIL -->|"Logical Query Plan"| SEG
     SEG -->|"approved LQP"| FQP
     SEG -->|"governance decision"| LS
-    FQP -->|"physicalMapping lookup"| SMC
+    FQP -->|"physicalMapping lookup"| SMR
     FQP --> SQL & ODA & GDA
     FQP -->|"execution record"| LS
     FQP -->|"assembled result"| VO
@@ -67,11 +64,41 @@ The Semantic Data Context Store (DCS) is a pre-existing platform component — t
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
-| **Runtime** | Cloudflare Workers | Sub-10ms cold start; global anycast; ideal for the platform's edge API pattern |
+| **Runtime** | Python · FastMCP + Uvicorn | Lightweight ASGI service; minimal dependencies; deploys as a Kubernetes pod or serverless container |
 | **Protocol** | MCP Streamable HTTP | Standard MCP interoperability; supports request/response and streaming |
-| **Auth** | JWT validation at edge | Stateless; validated before any platform computation begins |
+| **Auth** | JWT validation at request ingress | Stateless; validated before any platform computation begins |
 
-`analyse_metric` accepts: `metrics` (required, array of SMR metric IDs), `dimensions` (array of dimension IDs), `time` (period enum or custom date range), `filters` (dimension/operator/values), `sort` (metric + direction), `limit` (1–1000, default 100).
+FastMCP (`pip install fastmcp`) provides the `@mcp.tool()` decorator and handles MCP Streamable HTTP transport. Each analytical capability is a decorated Python function; the framework serialises tool schemas and routes calls automatically.
+
+```python
+from fastmcp import FastMCP
+from pydantic import BaseModel
+
+mcp = FastMCP("Analytics Platform")
+
+class AnalyseMetricInput(BaseModel):
+    metrics: list[str]
+    dimensions: list[str] = []
+    time_period: str
+    filters: list[dict] = []
+    order_by: str | None = None
+    limit: int = 1000
+
+@mcp.tool()
+async def analyse_metric(input: AnalyseMetricInput, jwt: str) -> dict:
+    """Execute a governed query against one or more registered metrics."""
+    claims = validate_jwt(jwt)                  # reject before any processing
+    lqp    = await sil.resolve(input, claims)   # Semantic Intent Layer
+    lqp    = rapl.project(lqp, claims)          # Role-Aware Projection
+    lqp    = await seg.approve(lqp)             # Governance gate
+    result = await fqp.execute(lqp)             # Federated Query Planner
+    return await assemble_response(result)
+
+if __name__ == "__main__":
+    mcp.run(transport="streamable-http", host="0.0.0.0", port=8000)
+```
+
+`analyse_metric` accepts: `metrics` (required, array of SMR metric IDs), `dimensions` (array of dimension IDs), `time_period` (period enum or custom date range), `filters` (dimension/operator/values), `order_by` (metric + direction), `limit` (1–1000, default 1000).
 
 ---
 
@@ -90,44 +117,44 @@ The Semantic Data Context Store (DCS) is a pre-existing platform component — t
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
 | **Definition storage** | DCS (pre-existing) | Metric definitions alongside data definitions — no duplicate semantic store |
-| **Governance tracking** | PostgreSQL (`analytics.smr_governance`) | Lightweight approval workflow state; the DCS does not manage approval workflows |
-| **Runtime reads** | Direct DCS API query by Analytical Intent Validator | Definitions from the authoritative source at resolution time |
+| **Governance tracking** | DCS document store — `smr_governance` document type | Approval workflow state stored as JSON documents in the same store as metric definitions |
+| **Runtime reads** | Direct DCS API query by Semantic Intent Layer | Definitions from the authoritative source at resolution time |
 | **Search** | DCS native search index | `list_metrics` queries DCS directly; no separate search infrastructure |
 
-#### DCS governance extension schema
+#### DCS governance extension — document schema
 
-```sql
-CREATE TABLE analytics.smr_governance (
-  id            UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id     TEXT        NOT NULL,
-  dcs_def_id    TEXT        NOT NULL,
-  metric_id     TEXT        NOT NULL,
-  version       INT         NOT NULL,
-  status        TEXT        NOT NULL,  -- "proposed" | "approved" | "deprecated"
-  source        TEXT        NOT NULL DEFAULT 'tenant',
-  created_by    TEXT        NOT NULL,
-  approved_by   TEXT,
-  approved_at   TIMESTAMPTZ,
-  created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
-  superseded_at TIMESTAMPTZ,
-  CONSTRAINT uq_smr_version UNIQUE (tenant_id, metric_id, version)
-);
+Each metric version in the SMR has a corresponding governance document stored in the DCS. The document records the approval lifecycle for that version:
 
-CREATE UNIQUE INDEX idx_smr_one_approved
-  ON analytics.smr_governance (tenant_id, metric_id)
-  WHERE status = 'approved';
+```json
+{
+  "id":           "smr-gov-a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "type":         "smr_governance",
+  "tenant_id":    "acme-wealth",
+  "dcs_def_id":   "dcs://analytical_metric/portfolio_return",
+  "metric_id":    "portfolio_return",
+  "version":      3,
+  "status":       "approved",
+  "source":       "tenant",
+  "created_by":   "alice@acme.com",
+  "approved_by":  "cdo@acme.com",
+  "approved_at":  "2026-05-14T09:00:00Z",
+  "created_at":   "2026-05-13T14:32:00Z",
+  "superseded_at": null
+}
 ```
+
+`status` is one of `"proposed"` | `"in_review"` | `"approved"` | `"deprecated"` | `"retired"`. The DCS enforces a uniqueness constraint: at most one document per `(tenant_id, metric_id)` may carry `"status": "approved"` at any point in time. All prior versions are retained as `"deprecated"` documents for lineage reconstruction.
 
 ---
 
-### Analytical Intent Validator and LQP Generator
+### Semantic Intent Layer and LQP Generator
 
 No custom query language. The MCP tool call JSON (metric IDs, dimension IDs, time period, filters) is the analytical intent representation — consistent with Cube.js and MetricFlow conventions.
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
 | **Intent format** | MCP tool call JSON | Standard AI tool-use format; no separate language needed |
-| **Implementation** | TypeScript (JSON schema + SMR resolution) | Lightweight; no grammar or parser |
+| **Implementation** | Python (JSON schema + SMR resolution via DCS API) | Lightweight; no grammar or parser |
 | **LQP format** | Custom DAG (JSON) | Engine-agnostic across SQL, OpenData, and Graph backends |
 
 #### MCP input example
@@ -145,7 +172,68 @@ No custom query language. The MCP tool call JSON (metric IDs, dimension IDs, tim
 }
 ```
 
-The validator resolves metric IDs against the SMR, injects role predicates from the RAPL, and emits an engine-agnostic LQP carrying resolved `physicalMapping` references, time range expansion, role-injected filters, and a cost estimate for governance validation.
+The Semantic Intent Layer resolves metric IDs against the SMR, merges in role predicates from the RAPL, and emits an engine-agnostic LQP. The LQP carries resolved `physicalMapping` references, expanded time ranges, role-injected filters, and a cost estimate for governance validation.
+
+#### LQP output example
+
+```json
+{
+  "lqp_id": "lqp-20260514-093241-xyz",
+  "tenant_id": "acme-wealth",
+  "nodes": [
+    {
+      "id": "node-1",
+      "op": "metric_scan",
+      "metric_id": "portfolio_return",
+      "metric_version": "2.1.0",
+      "aggregation": "value_weighted_average",
+      "data_affinity": "portfolio",
+      "physical_mapping": { "source": "primary-warehouse", "table": "fact_portfolio_daily" }
+    },
+    {
+      "id": "node-2",
+      "op": "metric_scan",
+      "metric_id": "tracking_error",
+      "metric_version": "1.3.0",
+      "aggregation": "value_weighted_average",
+      "data_affinity": "risk_metrics",
+      "physical_mapping": { "source": "risk-semantic-layer", "cube": "risk_cube" }
+    },
+    {
+      "id": "node-3",
+      "op": "join",
+      "inputs": ["node-1", "node-2"],
+      "join_keys": ["portfolio_id", "date"]
+    },
+    {
+      "id": "node-4",
+      "op": "filter",
+      "input": "node-3",
+      "predicates": [
+        "portfolio_id IN ('GLOB_EQ_OPP', 'UK_CORE_INC')",
+        "asset_class = 'EQUITY'"
+      ]
+    },
+    {
+      "id": "node-5",
+      "op": "time_expand",
+      "input": "node-4",
+      "period": "quarter_to_date",
+      "as_of_date": "2026-05-14",
+      "resolved_range": { "from": "2026-04-01", "to": "2026-05-14" }
+    },
+    {
+      "id": "node-6",
+      "op": "sort",
+      "input": "node-5",
+      "by": [{ "field": "portfolio_return", "direction": "desc" }]
+    }
+  ],
+  "cost_estimate": 850,
+  "column_masks": [],
+  "row_predicates_applied": true
+}
+```
 
 ---
 
@@ -153,7 +241,7 @@ The validator resolves metric IDs against the SMR, injects role predicates from 
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
-| **Implementation** | Custom middleware (TypeScript) | Thin, stateless; operates on the LQP before any backend query is generated |
+| **Implementation** | Custom middleware (Python) | Thin, stateless; operates on the LQP before any backend query is generated |
 | **Role resolution** | JWT claim extraction + PostgreSQL role config | Role claim field name is configurable per tenant |
 | **Row predicates** | `{{user.claim_name}}` template interpolation at LQP build time | Resolved from JWT claims; injected into LQP `filters` |
 | **Column masking** | Applied post-assembly in FQP result assembler | Post-assembly supports cross-backend result sets |
@@ -186,12 +274,30 @@ The validator resolves metric IDs against the SMR, injects role predicates from 
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
-| **Implementation** | Custom rules engine (TypeScript) | Deterministic; config-driven; no ML inference |
+| **Implementation** | Custom rules engine (Python) | Deterministic; config-driven; no ML inference |
 | **Cost estimation** | `Σ(metric.costWeight × dimensionCardinality × timeRangeMultiplier)` | Pre-execution; calibrated against actual cost data |
 | **Circuit breaker** | Per-request ceiling + per-user hourly budget | Hard ceiling prevents runaway queries |
-| **Config store** | PostgreSQL (`analytics.governance_config`) | Per-tenant thresholds; not hardcoded |
+| **Config store** | DCS document store — `governance_config` document type | Per-tenant thresholds stored as a JSON document alongside SMR documents |
 
-`analytics.governance_config` — per-tenant thresholds: `cost_ceiling_per_query` (default 2000), `cost_budget_per_user_hourly` (default 10000), `max_concurrent_queries` (default 20), `max_metrics_per_query` (default 10), `max_dimensions` (default 5), `classification_gate`, `compliance_modes` array.
+Each tenant has one governance config document. The Semantic Execution Governance layer reads it at startup and refreshes it on change events from the DCS:
+
+```json
+{
+  "type":                       "governance_config",
+  "tenant_id":                  "acme-wealth",
+  "cost_ceiling_per_query":     1000,
+  "cost_budget_per_user_hourly": 10000,
+  "max_concurrent_queries":     20,
+  "max_metrics_per_query":      10,
+  "max_dimensions":             5,
+  "classification_gate":        true,
+  "blocked_classifications":    ["TOP_SECRET", "RESTRICTED"],
+  "query_timeout_seconds":      60,
+  "compliance_modes":           ["mifid2"],
+  "require_lineage_for_export": true,
+  "audit_all_queries":          true
+}
+```
 
 ---
 
@@ -201,7 +307,7 @@ The validator resolves metric IDs against the SMR, injects role predicates from 
 |----------|--------|-----------|
 | **Plan optimiser** | Apache Calcite | Battle-tested SQL plan optimisation; used by Trino, Flink, Beam |
 | **Backend adapters** | Custom adapter per backend type | Calcite handles SQL; custom adapters cover REST/OpenData/GraphQL/SPARQL |
-| **Result assembly** | Custom (TypeScript) | Fan-out/fan-in; no off-the-shelf library needed |
+| **Result assembly** | Custom (Python) | Fan-out/fan-in; no off-the-shelf library needed |
 
 The FQP splits the LQP by `dataAffinity`, assigns each sub-plan to the matching registered backend, translates to the backend's native protocol (SQL, OData, SPARQL, etc.), fans out execution in parallel, and assembles results. Each execution backend implements a two-method adapter contract: `ping()` for health checking and `executeSubPlan()` for receiving a sub-plan fragment and returning a typed result set.
 
@@ -301,7 +407,7 @@ Lineage records are immutable. Post-hoc compliance annotations are written to `a
 
 | Component | Choice | Rationale |
 |-----------|--------|-----------|
-| Edge runtime | Cloudflare Workers | Global low-latency MCP surface |
+| MCP service | Python · FastMCP + Uvicorn | Lightweight ASGI MCP surface; deploys as Kubernetes pod |
 | Backend services | Kubernetes (cloud-agnostic) | FQP, governance, SMR as independently scalable pods |
 | Primary database | PostgreSQL (Neon or RDS) | SMR, lineage, tenant config, governance config |
 | Search | Elasticsearch / OpenSearch | SMR metric search index |
