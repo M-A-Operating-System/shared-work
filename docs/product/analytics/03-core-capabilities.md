@@ -138,14 +138,27 @@ The combined effect of this architecture is a platform in which analytical acces
 
 ---
 
-The following query is used as a running example throughout this chapter. Each section shows exactly what that component does when processing it.
+The following query is used as a running example throughout each section below.
 
-**User (portfolio manager, AI chat):** "Show me portfolio returns versus benchmark for my equity portfolios this quarter"
+---
 
-**Incoming MCP tool call:**
+## AI Chat Platform
+
+The AI Chat Platform is the conversational layer through which users interact with the analytics engine. It is not part of the Analytics Platform — it is an AI orchestration system that calls the Analytics Platform as a registered MCP tool provider.
+
+At session start, the conversation engine loads the Analytics Platform's MCP manifest and makes the full tool catalogue available to the AI model. When a user asks an analytical question, the model selects the appropriate tool, constructs the call, and submits it to the Analytics Platform endpoint with the user's JWT forwarded unmodified.
+
+The AI Chat Platform has no knowledge of metric definitions, backend routing, or entitlement rules. It does not validate, filter, or interpret the query — it passes the user's question through as-is. All governance, entitlement enforcement, and computation are the Analytics Platform's responsibility.
+
+When the tool response returns, the conversation engine surfaces the `narrative` field as the assistant's reply text and renders the `display_spec` (SCL) inline in the conversation. The `result_id` is retained; if the user follows up with a drilldown or asks to inspect lineage, the next tool call references it.
+
+### Example
+
+The portfolio manager types their question into the chat interface. The conversation engine selects `analyse_metric` — the query is natural language, spans multiple metrics, and contains no explicit metric IDs:
 
 ```json
-POST /v1/mcp   Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...
+POST /v1/mcp
+Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...
 
 {
   "jsonrpc": "2.0",
@@ -160,7 +173,7 @@ POST /v1/mcp   Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...
 }
 ```
 
-**JWT claims:**
+**JWT claims forwarded:**
 ```json
 {
   "sub":                    "pm-jane-smith",
@@ -171,9 +184,11 @@ POST /v1/mcp   Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...
 }
 ```
 
+The conversation engine does not parse the query, resolve metrics, or check entitlements. It passes the question through as-is. When the Analytics Platform responds 1,243ms later, the conversation engine renders the grouped bar chart from the SCL specification and surfaces the narrative as the assistant's reply.
+
 ---
 
-## 3.1 Semantic Metrics Registry
+## Semantic Metrics Registry
 
 The Semantic Metrics Registry (SMR) is the governing catalogue of every analytical concept resolvable on the platform. Before any query can be planned or executed, every identifier in that query — metrics, dimensions, hierarchies — must be registered in the SMR. This is an architectural constraint, not a policy: the Semantic Intent Layer rejects any identifier not present in the SMR for the active tenant, and nothing is queryable that is not registered.
 
@@ -334,7 +349,7 @@ The SIL asks the SMR to resolve `portfolio_return` and `benchmark_return`. The S
 
 ---
 
-## 3.2 Semantic Intent Layer
+## Semantic Intent Layer
 
 The Semantic Intent Layer receives a structured MCP tool call and produces a validated, engine-agnostic Logical Query Plan (LQP). Its purpose is to ensure that before any query reaches a physical execution backend, every identifier has been resolved against the SMR, every entitlement has been applied, and every semantic constraint has been satisfied. The output of this layer — the LQP — contains no backend references, no SQL, and no physical schema identifiers: only analytical operations expressed against SMR-registered concepts.
 
@@ -471,7 +486,7 @@ Node `n3` is the RAPL row predicate — part of the plan, not a post-execution f
 
 ---
 
-## 3.3 Role-Aware Projection Layer
+## Role-Aware Projection Layer
 
 The Role-Aware Projection Layer applies the authenticated user's entitlement model to the resolved analytical intent before any query plan is compiled. It is the semantic-layer enforcement of data access controls — operating above physical execution, before any query reaches a backend. Projection is not optional and not bypassable: every request, whether from a human user or an AI orchestrator, passes through it.
 
@@ -577,7 +592,7 @@ No column masks apply — the `portfolio_manager` role has no masking rules for 
 
 ---
 
-## 3.4 Semantic Execution Governance
+## Semantic Execution Governance
 
 The Semantic Execution Governance (SEG) layer applies a suite of circuit breakers, cost controls, complexity limits, and compliance classification checks to every query before it is released to the Federated Query Planner. It is the final gate before physical execution. Governance applies to every query without exception — there is no privileged user, trusted agent, or internal path that bypasses SEG checks.
 
@@ -693,7 +708,7 @@ All checks pass. SEG writes a governance decision record to the lineage store �
 
 ---
 
-## 3.5 Federated Query Planner
+## Federated Query Planner
 
 The Federated Query Planner (FQP) is the only component in the platform that has knowledge of physical execution backends. No other component — not the Semantic Intent Layer, not the AI model, not the MCP Capability Layer — has access to backend connection details or physical schema information. The FQP receives a validated, governance-approved LQP, decomposes it into backend-specific sub-plans, routes those sub-plans to registered execution backends in parallel, assembles the results, and writes a complete execution record to the lineage store.
 
@@ -793,7 +808,7 @@ The FQP writes an execution record to the lineage store and passes the assembled
 
 ---
 
-## 3.6 Visualisation Ontology
+## Visualisation Ontology
 
 The Visualisation Ontology is the governing schema that maps result characteristics and analytical intent patterns to specific, parameterised chart contracts. It exists to make chart selection deterministic: the same analytical pattern produces the same chart type across all users, sessions, and AI model versions, regardless of how the question was phrased. The AI model does not select chart types. Intent signals from the query are treated as inputs to the ontology evaluation algorithm, but the ontology makes the final binding decision.
 
@@ -877,7 +892,7 @@ The ontology produces the following SCL display specification:
 
 ---
 
-## 3.7 Analytical Output Format
+## Analytical Output Format
 
 The platform is headless: it produces no rendered output. Every successful analytical request returns a structured MCP tool response containing three output elements that together provide a complete, self-describing analytical result.
 
@@ -1036,7 +1051,7 @@ The chat engine renders the grouped bar chart inline and displays the narrative 
 
 ---
 
-## 3.8 Analytical Lineage Store
+## Analytical Lineage Store
 
 The Analytical Lineage Store provides computation provenance: a complete, queryable record of how every result was calculated. Analytical lineage, as defined on this platform, is distinct from data lineage. Data lineage tracks how data moves between systems. Analytical lineage records how the analytics engine used specific metric definitions, entitlement rules, and execution backends to compute a specific result. The lineage record is not a log — it is a first-class data structure. A regulator, auditor, or internal reviewer must be able to reconstruct exactly how a specific number was calculated, by whom, under what entitlements, from which backends, and with what result — without re-running the query.
 
@@ -1158,7 +1173,7 @@ Both records are immutable from the moment of writing. The full chain — origin
 
 ---
 
-## 3.9 MCP Capability Layer
+## MCP Capability Layer
 
 The MCP Capability Layer exposes the platform's governed analytical operations to AI orchestrators via MCP Streamable HTTP transport. Each capability is a bounded, named operation with a typed input schema, a governed execution path through the full platform pipeline (Semantic Intent Layer → Role-Aware Projection → SEG → FQP), and a typed output contract. AI agents interact with capabilities, not databases. There is no privileged API path — AI agents receive the same governance-validated results as human users.
 
@@ -1258,23 +1273,4 @@ The `roles: []` value indicates that capability availability is determined dynam
 
 ### Example
 
-The chat engine registered the Analytics Platform as an MCP server at session start. When the portfolio manager submits their question, the chat engine calls `analyse_metric` — the correct tool for a natural language query spanning multiple metrics and portfolios. This single tool call is the entry point for the entire pipeline traced through sections 3.1–3.8:
-
-```json
-POST /v1/mcp
-Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...
-
-{
-  "jsonrpc": "2.0",
-  "id":      "req-8a3f2c",
-  "method":  "tools/call",
-  "params": {
-    "name": "analyse_metric",
-    "arguments": {
-      "query": "Show me portfolio returns versus benchmark for my equity portfolios this quarter"
-    }
-  }
-}
-```
-
-The MCP Capability Layer validates the JWT, dispatches the query to the SIL and the JWT claims to the RAPL in parallel, and begins the governance pipeline. 1,243ms later, the portfolio manager receives a grouped bar chart and a governed narrative — with no exposure to SQL, physical schema, backend connection details, or metric definition IDs. Every step is recorded in the Analytical Lineage Store under `result_id: res-20260518-093247-wk4n`.
+The `analyse_metric` tool call arrives from the AI Chat Platform (see the AI Chat Platform section above). The MCP Capability Layer validates the JWT signature against the `acme-wealth` tenant key, confirms the token has not expired, and extracts the claims. It then dispatches two parallel operations: the natural language query text to the Semantic Intent Layer, and the JWT claims to the Role-Aware Projection Layer. Both operations run concurrently — the governance pipeline is now running. The MCP Capability Layer does not interpret the query or make any analytical decisions; it validates, routes, and waits.
