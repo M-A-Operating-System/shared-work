@@ -49,8 +49,7 @@ flowchart TD
     ChatComp -->|"JWT"| ChatEngine
     CustomUI -->|"JWT + MCP tool call"| MCP
     Agents -->|"agent JWT + MCP tool call"| MCP
-    ChatEngine -->|"MCP tool call + user JWT"| MCP
-    ChatEngine -->|"MCP resource read + user JWT"| SMR
+    ChatEngine -->|"MCP tool call / resource read + user JWT"| MCP
     ChatEngine -->|"MCP tool call + user JWT"| vite2img
     MCP -->|"natural language query"| SIL
     MCP -->|"JWT claims"| RAPL
@@ -68,9 +67,7 @@ flowchart TD
     NSE -->|"narrative"| Result
 ```
 
-The architecture enforces a strict separation between the governance pipeline and the execution backends. No consumer — whether conversational, direct API, or agentic — has a path to execution backends, physical schemas, or raw SQL. Every analytical query, without exception, enters through the MCP Capability Layer and traverses the full governance pipeline: Semantic Intent Layer, Role-Aware Projection Layer, Semantic Execution Governance, and Federated Query Planner, in that order. There is no mechanism to bypass or short-circuit this pipeline.
-
-The AI Chat Platform has one additional direct connection: it reads SMR resources via MCP to load the metric catalogue into the conversation engine's context before query execution. This allows the model to understand what metrics are available and how to describe them to users — without going through the analytical query pipeline. The same entitlement rules apply: the SMR returns only metrics the authenticated user is entitled to see.
+The Analytics Platform is a single MCP server. Consumers register one endpoint and receive access to both the analytical tools (`analyse_metric`, `risk_breakdown`, etc.) and the SMR resources (`smr://metrics`, `smr://dimensions`, etc.) through the same MCP Capability Layer. Everything inside the platform — the Semantic Intent Layer, Role-Aware Projection Layer, Semantic Execution Governance, Federated Query Planner, Visualisation Ontology, Narrative Synthesis Engine, Semantic Metrics Registry, and Analytical Lineage Store — is internal implementation. No consumer has a direct connection to any of these components. The MCP surface is the only interface.
 
 The `vite2img` service is shown separately from the Analytics Platform boundary because it is an optional, independently registered MCP render service. Consumers that cannot natively render the SCL display specification — for example, an agentic pipeline that requires static image output — register `vite2img` directly and call it as a separate tool invocation using the `result_id` returned by the Analytics Platform. It is not part of the core analytics pipeline.
 
