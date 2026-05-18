@@ -348,4 +348,4 @@ Governed Analytical Core (lineage store with indexed search, SMR service read AP
 
 ---
 
-*This is a proposed delivery sequence, not a committed plan. For the product specification, see [README.md](./README.md) and the numbered specification documents. For the proposed reference implementation stack, see [17-proposed-technical-architecture.md](./17-proposed-technical-architecture.md).*
+*This is a proposed delivery sequence, not a committed plan. For the product specification, see [README.md](./README.md) and the numbered chapter documents. For the proposed reference implementation stack, see [05-technical-implementation.md](./05-technical-implementation.md).*
