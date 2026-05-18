@@ -32,23 +32,23 @@ The AI Analytics Platform is the alternative architecture: one that constrains g
 
 ## Platform Vision
 
-The AI Analytics Platform is a **deterministic semantic computation engine**. Given a structured analytical query — metric identifiers, dimensions, time period, and filters resolved against the Semantic Metrics Registry — it always computes the same answer from the same data with the same entitlements in force. No probability, no sampling, no generation.
+The platform comprises two separately deployable MCP servers. The **Analytics Engine** is a deterministic semantic computation engine: given explicit metric identifiers, dimensions, time period, and filters resolved against the Semantic Metrics Registry, it always computes the same answer from the same data with the same entitlements in force. No probability, no sampling, no generation — no AI runs inside it. The **Narrative Synthesis Engine** is a bounded AI service that generates governed prose from a computed result, constrained strictly to values present in that result.
 
-Generative AI has exactly two bounded roles. On the input side, the Semantic Intent Layer translates a natural-language question into a structured set of MCP tool call parameters — metric identifiers, dimension identifiers, time period, and filters — and outputs a validated JSON object. No metric values are produced at this step. On the output side, the Narrative Synthesis Engine writes a prose description of a computed result, constrained strictly to values present in the execution result. Every number in the response is the product of computation, not generation.
+AI has two roles in the end-to-end flow, and both live in the consuming AI client — not inside either MCP server. On the input side, the AI client reads the metric catalogue from the Analytics Engine's SMR resources, then translates a natural-language question into explicit, structured MCP tool call parameters. On the output side, after receiving the structured result from the Analytics Engine, the AI client calls the Narrative Synthesis Engine to produce prose. Every number in that prose is the product of computation, not generation.
 
-This architecture supports three consumer types, all served by the same governance pipeline. Conversational AI assistants reach the analytics engine via the MCP Capability Layer when a user asks a quantitative question in natural language. Autonomous agents and scheduled pipelines submit structured MCP tool calls directly, bypassing the natural-language translation layer and running pure deterministic code from first contact. Custom applications call the headless `POST /v1/mcp` endpoint directly, owning their own rendering and embedding governed results in purpose-built interfaces. The distinction between consumer types is irrelevant to the governance pipeline; entitlements, lineage, and semantic abstraction apply equally to all three.
+This architecture supports three consumer types. Conversational AI assistants load the metric catalogue, translate natural language to structured parameters, and call both MCP servers in sequence. Autonomous agents and scheduled pipelines submit structured tool calls directly to the Analytics Engine — no natural language translation needed — and call the NSE only if narrative output is required. Custom applications call the Analytics Engine directly and own their own narrative generation or omit it entirely. The Analytics Engine's governance pipeline is identical for all three; entitlements, lineage, and semantic abstraction apply unconditionally.
 
-The following table defines the platform's scope and nature precisely:
+The following table defines the Analytics Engine's scope precisely:
 
 | It is | It is not |
 |-------|-----------|
-| A deterministic semantic computation engine — same query + data + entitlements → same result | A generative AI product — AI narrates results, the engine computes them |
-| A headless MCP API returning structured JSON result sets and SCL display specifications | A general-purpose SQL interface, BI tool replacement, or rendering layer |
-| A governed Semantic Metrics Registry — all AI-accessible metrics are registered, versioned, and owned | A system that allows LLMs to generate arbitrary SQL against physical schemas |
+| A deterministic semantic computation engine — same query + data + entitlements → same result | An AI product — no AI model runs inside it |
+| A headless MCP server returning structured result sets and SCL display specifications | A general-purpose SQL interface, BI tool replacement, or rendering layer |
+| A governed Semantic Metrics Registry — all queryable metrics are registered, versioned, and owned | A system that accepts natural language or allows LLMs to generate arbitrary SQL |
 | A federated query planner routing governed plans to SQL warehouses, OpenData APIs, Graph APIs, and any registered backend | A single-engine analytics layer |
 | A role-aware entitlement layer enforced at the semantic tier before execution | A system relying on database-level access controls as the primary AI security boundary |
 
-The platform's architecture is explicitly headless. Every analytical request returns a structured JSON result set, an SCL display specification, and optionally a governed narrative. Rendering is a consumer responsibility. This design reflects a deliberate judgment: rendering is best done close to the user interface, where the consuming application controls layout, branding, accessibility, and interaction model. The governance pipeline ends at the API boundary; what follows is the consumer's domain.
+The Analytics Engine is explicitly headless. Every request returns a structured result set and SCL display specification. Narrative prose, rendering, and natural language translation are all consumer responsibilities — handled by the AI client and, optionally, the Narrative Synthesis Engine.
 
 ---
 
