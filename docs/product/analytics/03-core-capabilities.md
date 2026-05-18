@@ -1,6 +1,6 @@
 # 3. Core Platform Capabilities
 
-This chapter describes the Analytics Engine — a single, deterministic MCP server — and the AI Chat Platform that calls it. The Analytics Engine validates structured queries, enforces entitlements, plans and executes against registered backends, and returns a display specification with structured results. No AI runs inside it. The AI Chat Platform hosts the conversational layer: it reads the metric catalogue from the Analytics Engine, translates natural language to structured parameters, calls the Analytics Engine, and assembles the response.
+This chapter describes the Analytics Engine — a single MCP server — and the AI Chat Platform that calls it. The Analytics Engine validates structured queries, enforces entitlements, plans and executes against registered backends, and returns a display specification, structured results, and an optional governed narrative. The computation pipeline is entirely deterministic. The one AI step inside the Analytics Engine, the Narrative Synthesis Engine, runs after computation completes and is constrained strictly to summarising computed values — it cannot introduce metric values, comparisons, or interpretations not present in the result set. The AI Chat Platform hosts the conversational layer: it reads the metric catalogue from the Analytics Engine, translates natural language to structured parameters, and calls the Analytics Engine.
 
 ---
 
@@ -27,8 +27,9 @@ flowchart TD
         SEG["Semantic Execution Governance\nCost estimation · classification · circuit breakers"]
         FQP["Federated Query Planner\nApache Calcite + backend adapters"]
         VO["Visualisation Ontology\nSCL display spec · Vega-Lite v5"]
+        NSE["Narrative Synthesis Engine\nClaude Haiku / Sonnet · post-computation\nanchored to result values · P6 governed"]
         LS[("Analytical Lineage Store")]
-        Result(["MCP tool response\ndisplay_spec + structured result + result_id"])
+        Result(["MCP tool response\ndisplay_spec + data + narrative + result_id"])
     end
 
     vite2img["vite2img (optional)\nStandalone MCP render service · SCL → SVG / PNG\nRegistered directly with consumers — not part of Analytics Engine"]
@@ -61,12 +62,14 @@ flowchart TD
     FQP --> SQL & ODA & GDA
     FQP -->|"execution record"| LS
     FQP -->|"assembled result"| VO
-    VO -->|"SCL display spec + structured result"| Result
+    FQP -->|"assembled result"| NSE
+    VO -->|"SCL display spec"| Result
+    NSE -->|"narrative summary"| Result
 ```
 
-The Analytics Engine is a single MCP server. It exposes both the analytical tools (`analyse_metric`, `risk_breakdown`, etc.) and the SMR resources (`smr://metrics`, `smr://dimensions`, etc.) through a single MCP Capability Layer endpoint. It is entirely deterministic — no AI model runs inside it.
+The Analytics Engine is a single MCP server. It exposes both the analytical tools (`analyse_metric`, `risk_breakdown`, etc.) and the SMR resources (`smr://metrics`, `smr://dimensions`, etc.) through a single MCP Capability Layer endpoint. The computation pipeline — SIL, RAPL, SEG, FQP — is entirely deterministic. The Narrative Synthesis Engine runs as a post-computation step: after the FQP assembles the result, the NSE makes a targeted call to a secondary language model to summarise the data in plain text; its prompt is constructed from the result set only and its output is validated against computed values before being returned.
 
-The AI Chat Platform reads the SMR resources from the Analytics Engine to load the entitled metric catalogue into its model context — this is how the AI model understands what metrics and dimensions are available. It translates the user's natural language question into explicit, structured parameters and calls the Analytics Engine's tools. When the structured result and display specification return, the AI model generates any narrative directly from the result in its own reasoning loop.
+The AI Chat Platform reads the SMR resources from the Analytics Engine to load the entitled metric catalogue into its model context — this is how the AI model understands what metrics and dimensions are available. It translates the user's natural language question into explicit, structured parameters and calls the Analytics Engine's tools. The Analytics Engine returns the display specification, structured data, and governed narrative; the AI Chat Platform renders the result.
 
 The `vite2img` service is shown separately from the Analytics Platform boundary because it is an optional, independently registered MCP render service. Consumers that cannot natively render the SCL display specification — for example, an agentic pipeline that requires static image output — register `vite2img` directly and call it as a separate tool invocation using the `result_id` returned by the Analytics Platform. It is not part of the core analytics pipeline.
 
@@ -88,6 +91,7 @@ sequenceDiagram
     participant FQP as Federated Query Planner
     participant BE as Execution Backend(s)
     participant VO as Visualisation Ontology
+    participant NSE as Narrative Synthesis Engine
     participant LS as Analytical Lineage Store
     participant vite2img as vite2img
 
@@ -114,17 +118,21 @@ sequenceDiagram
     FQP->>BE: sub-plan execution
     BE-->>FQP: raw result sets
     FQP->>LS: execution record
-    FQP->>VO: assembled result
-    VO-->>AE: SCL display spec + structured result
-    AE-->>C: display_spec + structured result + result_id
-    note over C: AI model generates any narrative from the structured result
+    par
+        FQP->>VO: assembled result
+        VO-->>AE: SCL display spec
+    and
+        FQP->>NSE: assembled result
+        NSE-->>AE: narrative summary
+    end
+    AE-->>C: display_spec + data + narrative + result_id
     opt Consumer cannot natively render SCL spec
         C->>vite2img: render tool call (display_spec)
         vite2img-->>C: SVG / PNG
     end
 ```
 
-The Analytics Engine receives structured parameters — not natural language — and returns structured results. No AI runs inside it. The natural language translation (step 3) happens in the AI Chat Platform's reasoning loop, grounded by the metric catalogue loaded in step 1. The Analytical Lineage Store receives two writes per query: a governance decision record before execution and an execution record after — ensuring the audit trail is complete regardless of whether the query ultimately succeeds.
+The Analytics Engine receives structured parameters — not natural language — and returns structured results. The computation pipeline contains no AI; the Narrative Synthesis Engine runs after computation completes, in parallel with the Visualisation Ontology, making a targeted secondary model call constrained to the assembled result. The natural language translation (step 3) happens in the AI Chat Platform's reasoning loop, grounded by the metric catalogue loaded in step 1. The Analytical Lineage Store receives two writes per query: a governance decision record before execution and an execution record after — ensuring the audit trail is complete regardless of whether the query ultimately succeeds.
 
 ---
 
@@ -134,7 +142,7 @@ The following query is used as a running example throughout each section below.
 
 ## AI Chat Platform
 
-The AI Chat Platform is the conversational layer through which users interact with the two MCP servers. It hosts the AI model, orchestrates calls to the Analytics Engine and the Narrative Synthesis Engine, and renders the assembled result to the user. Both AI steps in the end-to-end flow — natural language translation and narrative synthesis — happen here. Neither MCP server contains an AI model.
+The AI Chat Platform is the conversational layer through which users interact with the Analytics Engine. It hosts the AI model responsible for natural language translation, orchestrates calls to the Analytics Engine, and renders the assembled result to the user. Natural language translation — the only AI step the AI Chat Platform performs — happens here, grounded by the SMR metric catalogue. Narrative synthesis is performed inside the Analytics Engine as a secondary, post-computation step.
 
 **Metric catalogue loading.** Before the AI model can translate a user's question into structured parameters, it needs to know what metrics and dimensions exist. The conversation engine reads the `smr://metrics` and `smr://dimensions` resources from the Analytics Engine's MCP endpoint. The response is the authenticated user's entitled metric catalogue — only metrics the user can query are returned. This catalogue is injected into the model's context and serves as the controlled vocabulary for intent translation.
 
@@ -142,7 +150,7 @@ The AI Chat Platform is the conversational layer through which users interact wi
 
 **Analytics Engine call.** The structured tool call is submitted to the Analytics Engine with the user's JWT forwarded unmodified. The Analytics Engine validates, plans, executes, and returns a structured result and SCL display specification. Entitlement enforcement, query planning, and execution are entirely the Analytics Engine's responsibility.
 
-**Response assembly.** The conversation engine renders the SCL display specification inline. Any narrative is generated by the AI model directly from the structured result in its own reasoning loop — the Analytics Engine does not produce prose. The `result_id` is retained for any follow-up drilldown or lineage inspection.
+**Response assembly.** The conversation engine renders the SCL display specification inline. When narrative synthesis is enabled, the `narrative` object in the response contains the governed summary produced by the Analytics Engine's NSE — the conversation engine surfaces this directly. The `result_id` is retained for any follow-up drilldown or lineage inspection.
 
 ### Example
 
@@ -894,16 +902,66 @@ The ontology produces the following SCL display specification:
 
 ---
 
+## Narrative Synthesis Engine
+
+The Narrative Synthesis Engine (NSE) is a secondary AI component inside the Analytics Engine. It runs after the computation pipeline completes — after the FQP has assembled the result and the Visualisation Ontology has selected the chart contract — making a single, tightly-scoped call to a language model with one purpose: summarise the structured result in plain language, anchored strictly to the computed values.
+
+The NSE is not a general-purpose AI model with access to the query, the user's intent, or the SMR. Its prompt is constructed entirely from the assembled result: metric labels, row values, units, and dimension names. It is told what the data shows; it is not told what the user asked. This constraint is intentional — it prevents the narrative from interpreting, recommending, or inferring beyond what was computed.
+
+### Anchoring and Validation
+
+The NSE produces two output fields:
+
+| Field | Description |
+|---|---|
+| `narrative.lead` | A single sentence summarising the top-level finding (e.g. "3 of your 4 equity portfolios outperformed their benchmark this quarter.") |
+| `narrative.detail` | Two to four sentences covering the most significant data points, one per dimension value or notable comparison |
+| `narrative.anchoredTo` | An array of dimension value identifiers from the result that the narrative references — used for post-generation validation |
+
+After generation, the NSE runs a validation pass: every numeric value in the narrative must be present in the result set. If any value in the narrative cannot be matched to a result row, the narrative is rejected and a single regeneration is attempted. If the second attempt also fails validation, the `narrative` field is omitted from the response and the failure is recorded in the lineage record. This constraint enforces P6 (governed narrative) at the component level.
+
+### Model Selection
+
+| Query type | Model | Rationale |
+|---|---|---|
+| Standard queries (≤ 5 metrics, ≤ 3 dimensions) | Claude Haiku | Low latency; sufficient for concise, anchored summaries |
+| Complex queries (attribution, multi-portfolio, regulatory) | Claude Sonnet | Richer result structure requires more precise prose |
+
+The model used is recorded in `narrative_status` in the lineage record.
+
+### Feature Flag
+
+Narrative synthesis is controlled by the `features.narrativeSynthesis` tenant configuration flag. When disabled, the NSE is not invoked and no `narrative` field is included in the response. The default is enabled. Disabling narrative synthesis has no effect on computation, lineage, or display spec generation.
+
+### Example
+
+The portfolio manager's query returns four rows. The NSE receives the assembled result and produces:
+
+```json
+{
+  "narrative": {
+    "lead":       "3 of your 4 equity portfolios outperformed their benchmark this quarter.",
+    "detail":     "Global Equity Opportunities returned 4.21% against a benchmark of 3.85%. UK Core Income returned 2.87% against its benchmark of 2.54%. Asia Pacific Growth underperformed at 3.67% versus a benchmark of 3.90%.",
+    "anchoredTo": ["GLOB_EQ_OPP", "UK_CORE_INC", "ASIA_PAC_GRW"]
+  }
+}
+```
+
+Post-generation validation confirms every numeric value (4.21, 3.85, 2.87, 2.54, 3.67, 3.90) is present in the assembled result rows. Validation passes. The narrative is included in the MCP response alongside `display_spec` and `data`.
+
+---
+
 ## Analytical Output Format
 
-The Analytics Engine is headless: it produces no rendered output and generates no narrative. Every successful analytical request returns a structured MCP tool response containing three output elements. Narrative prose is produced separately by the Narrative Synthesis Engine and is not part of this response.
+The Analytics Engine is headless: it produces no rendered output. Every successful analytical request returns a structured MCP tool response. When narrative synthesis is enabled (`features.narrativeSynthesis: true`), the response contains four elements; when disabled, three.
 
-### Three Output Elements
+### Output Elements
 
 | Element | Field | Always present | Description |
 |---|---|---|---|
 | Display specification | `display_spec` | Yes | A Semantic Charting Language (SCL) JSON object — either a chart or table specification. Consumers render from this. |
-| Structured result | `data` | Yes | The computed rows and schema — metric values, dimension values, and units. Available to the consuming AI model for narrative generation. |
+| Structured result | `data` | Yes | The computed rows and schema — metric values, dimension values, and units. |
+| Governed narrative | `narrative` | No (feature-flag controlled) | A governed summary produced by the NSE — `lead` (one sentence), `detail` (2–4 sentences), `anchoredTo` (result row references). Present when `features.narrativeSynthesis` is enabled. |
 | Lineage reference | `result_id` + `lineage_url` | Yes | A unique result identifier and the URL of the full lineage record |
 
 ### Full MCP Response Structure
@@ -921,11 +979,16 @@ The Analytics Engine is headless: it produces no rendered output and generates n
     "schema": [ ... ],
     "rows":   [ ... ]
   },
+  "narrative": {
+    "lead":       "3 of your 4 equity portfolios outperformed their benchmark this quarter.",
+    "detail":     "Global Equity Opportunities returned 4.21% against a benchmark of 3.85%. UK Core Income returned 2.87% against its benchmark of 2.54%. Asia Pacific Growth underperformed at 3.67% versus a benchmark of 3.90%.",
+    "anchoredTo": ["GLOB_EQ_OPP", "UK_CORE_INC", "ASIA_PAC_GRW"]
+  },
   "meta": {
     "latencyMs":    1285,
     "cacheHit":     false,
-    "rowCount":     14,
-    "backendsUsed": ["primary-warehouse", "semantic-layer"],
+    "rowCount":     4,
+    "backendsUsed": ["primary-warehouse"],
     "costUnits":    500
   }
 }

@@ -26,7 +26,7 @@ Phase boundaries and sequencing should be revisited as implementation proceeds, 
 
 ## MVP — Governed Analytical Core
 
-> **What this achieves:** Any MCP-compatible consumer — a conversational AI assistant, a custom application, or an autonomous agent — can submit a governed analytical query against registered metrics and receive a computed result with a chart specification and complete lineage record. The result uses only metrics registered in the SMR, is scoped to exactly what the user's role entitles them to see, and every step from intent to result is auditable.
+> **What this achieves:** Any MCP-compatible consumer — a conversational AI assistant, a custom application, or an autonomous agent — can submit a governed analytical query against registered metrics and receive a computed result with a chart specification, a governed narrative summary, and a complete lineage record. The result uses only metrics registered in the SMR, is scoped to exactly what the user's role entitles them to see, and every step from intent to result is auditable.
 
 ### Shippable components
 
@@ -42,6 +42,7 @@ Phase boundaries and sequencing should be revisited as implementation proceeds, 
 | **Semantic Execution Governance** | Cost estimation before any backend call. Classification gate checks against metric data sensitivity levels. Circuit breakers: query complexity limit, per-tenant cost budget, per-user rate limit. All governance decisions logged with the lineage record before execution. Governance-blocked queries receive a structured error with the governance decision reason. |
 | **Federated Query Planner (FQP)** | Apache Calcite plan optimiser for SQL sub-plan generation. SQL warehouse adapter (Snowflake, BigQuery, Databricks, Redshift, Trino, PostgreSQL). Semantic layer adapter (dbt MetricFlow, Cube.js). OpenData REST/OData adapter. Fan-out to multiple backends; result assembly in-memory. Per-tenant result cache (SHA-256 keyed; configurable TTL per metric refresh cadence). |
 | **Visualisation Ontology** | Eight chart contracts: multi-series bar (comparison), time-series line (trend), heatmap (metric-vs-threshold), treemap (composition/concentration), scatter (relationship), waterfall (attribution/decomposition), stacked bar (composition over time), ranked bar (top-N). SCL display specification generation (Vega-Lite v5 JSON). Platform-defined `type: "table"` extension for tabular results. Chart contract selection is deterministic — governed by result schema and intent pattern, not inferred by LLM. |
+| **Narrative Synthesis Engine** | Claude Haiku (default) for standard queries (≤ 5 metrics, ≤ 3 dimensions). Claude Sonnet for attribution, multi-portfolio, and regulatory narratives. Prompt constructed from result set only — no user query, no physical schema. `narrative.lead`, `narrative.detail`, and `narrative.anchoredTo` fields in response. Post-generation validation rejects any numeric value not present in the result set; single regeneration attempted on failure. Controlled by `features.narrativeSynthesis` tenant flag. |
 | **Analytical Lineage Store** | PostgreSQL structured lineage records. One record per executed query: intent, SMR definition versions used, tool call parameters, role projection record, LQP, per-backend sub-plans and raw responses, assembled result, governance decisions, SCL display spec. Lineage inspector API — retrieve full lineage by `result_id`. Result artefacts (CSV downloads, large datasets) in S3-compatible object storage; URL referenced in lineage record. 7-year default retention for regulated deployments. |
 | **vite2img rendering service** | Vite + vega-embed + headless Chromium (Playwright). Renders any Vega-Lite v5 SCL spec to SVG or PNG. Renders `type: "table"` display specs via styled HTML table template. Used by report pipelines and agentic consumers that need static images for PDF embedding. |
 
@@ -60,7 +61,7 @@ Phase boundaries and sequencing should be revisited as implementation proceeds, 
 
 ### Acceptance criteria
 
-- A structured tool call resolves to a governed result with an SCL display spec and lineage record in under 3 seconds (p95)
+- A structured tool call resolves to a governed result with an SCL display spec, narrative, and lineage record in under 3 seconds (p95)
 - An unregistered metric ID in a tool call returns a structured METRIC_NOT_FOUND error — no partial execution
 - A user with no matching role claim receives ENTITLEMENT_DENIED before any query reaches an execution backend
 - Every executed query — successful or governance-blocked — has a complete lineage record (lineage completeness: 100%)
@@ -233,7 +234,7 @@ Governed Analytical Core (Data Source Catalog, FQP backend adapter layer, `POST 
 | **Compliance Mode Framework** | `complianceMode` tenant configuration field accepting `"mifid2"`, `"basel3"`, or `"sec_reg_bi"`. Compliance mode is evaluated as step 5 of the governance pipeline — after classification gate, before concurrency check. Compliance mode configuration changes take effect on the next query; no caching of pre-compliance query plans. Multiple modes may be enabled simultaneously for multi-jurisdictional deployments. |
 | **MiFID II compliance mode** | Business justification prompt: queries touching `client_name`, `account_number`, or other PII-adjacent dimensions surface a mandatory justification step before execution. Best execution validation: queries on best-execution metrics require an explicit `date` dimension — rejected with a structured validation error if absent. Transaction reporting trace: all queries involving client-related metrics produce an additional lineage record written to the `analytics.mifid2_trace` table for regulatory reporting. |
 | **Basel III/IV compliance mode** | Entity dimension requirement: all regulatory capital metric queries (LCR, NSFR, leverage ratio, capital ratio) require the `entity` dimension — rejected with a structured error if absent. Regulatory snapshot writes: LCR and NSFR queries trigger an automatic snapshot write to the `analytics.regulatory_snapshots` table. Stress scenario classification enforcement: stress scenario metrics are automatically classified at `RESTRICTED` regardless of their SMR classification setting, ensuring they cannot be returned to roles without RESTRICTED access. |
-| **SEC Regulation BI compliance mode** | Suitability record requirement: advisory queries require a `suitability_record_id` parameter; queries without it are blocked with a structured error before execution. |
+| **SEC Regulation BI compliance mode** | Narrative synthesis constraint: an additional prompt-level instruction is injected into the NSE prohibiting investment recommendations in narrative output — even when result values might suggest one. Post-generation validation rejects narratives containing recommendation language and triggers regeneration. Suitability record requirement: advisory queries require a `suitability_record_id` parameter; queries without it are blocked with a structured error before execution. |
 | **Compliance mode audit trail** | `analytics.mifid2_trace` table: per-query record for MiFID II transaction reporting queries (query ID, user, entity, timestamp, business justification text, result ID). `analytics.regulatory_snapshots` table: per-query daily snapshot for Basel III/IV regulatory metric queries (entity ID, metric ID, value, regulatory minimum, compliance status, as-of date). Both tables are append-only and retained per the tenant's compliance mode retention policy. |
 
 ### Acceptance criteria
@@ -241,6 +242,7 @@ Governed Analytical Core (Data Source Catalog, FQP backend adapter layer, `POST 
 - Enabling `complianceMode: "mifid2"` causes every query on a PII-adjacent dimension to require a business justification — no bypass path
 - A Basel III LCR query without the `entity` dimension returns a structured `REQUIRED_DIMENSION_MISSING` error — no partial execution
 - `analytics.mifid2_trace` and `analytics.regulatory_snapshots` records are written atomically with the query lineage record — a query result with no compliance trace record is a platform defect
+- SEC Reg BI narrative synthesis constraint is enforced via post-generation validation — narratives containing investment recommendation language are rejected and regenerated
 - A SEC Reg BI advisory query without a `suitability_record_id` parameter is blocked with a structured error before any execution begins
 
 ### Depends on
@@ -342,7 +344,7 @@ Governed Analytical Core (lineage store with indexed search, SMR service read AP
 | **Unauthenticated analytical access** | Violates P2 and P5 (role-aware by default). JWT validation at the edge is non-negotiable. Not planned. |
 | **LLM chart type selection outside Visualisation Ontology** | Violates P7 (deterministic visualisation). Chart selection is always governed by registered chart contracts. LLM intent signals are inputs to the ontology — not direct rendering instructions. Not planned. |
 | **Cross-tenant result federation** | Tenant boundary is a non-configurable isolation guarantee (A9). Not planned. |
-| **Metric value generation by AI model** | Violates P10. Every number in a result is computed from a registered definition applied to data from a registered backend. The Analytics Engine produces no AI-generated content — intent translation and narrative are responsibilities of the consuming AI client. Not planned. |
+| **Metric value generation by AI model** | Violates P10. Every number in a result is computed from a registered definition applied to data from a registered backend. The Narrative Synthesis Engine produces prose descriptions of these computed values — not the values themselves. Not planned. |
 
 ---
 
