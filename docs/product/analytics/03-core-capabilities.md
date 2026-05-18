@@ -161,47 +161,16 @@ The Semantic Intent Layer receives a structured MCP tool call and produces a val
 
 Every MCP tool call passes through five sequential validation stages:
 
-```
-┌─────────────────────────────────────────┐
-│  Stage 1: Schema validation              │
-│  JSON parameters conform to tool schema  │
-│  Required fields present and typed       │
-└────────────────┬────────────────────────┘
-                 │
-┌────────────────▼────────────────────────┐
-│  Stage 2: SMR resolution                 │
-│  Resolve metric IDs → definitions        │
-│  Resolve dimension IDs → definitions     │
-│  Resolve hierarchy refs → definitions    │
-│  Reject unregistered IDs                 │
-└────────────────┬────────────────────────┘
-                 │
-┌────────────────▼────────────────────────┐
-│  Stage 3: Role-Aware Projection          │
-│  Filter metric set to entitled scope     │
-│  Filter dimension set to entitled scope  │
-│  Inject row predicates from role config  │
-│  Apply column masks                      │
-│  Reject entitlement violations           │
-└────────────────┬────────────────────────┘
-                 │
-┌────────────────▼────────────────────────┐
-│  Stage 4: Semantic validation            │
-│  Required dimensions present per metric  │
-│  Aggregation rules compatible            │
-│  Time granularity compatible per metric  │
-│  Filter predicates reference valid fields│
-└────────────────┬────────────────────────┘
-                 │
-┌────────────────▼────────────────────────┐
-│  Stage 5: LQP generation                 │
-│  Produce engine-agnostic DAG             │
-│  Assign data affinity hints per metric   │
-│  Estimate result cardinality             │
-│  Estimate execution cost units           │
-└────────────────┬────────────────────────┘
-                 │
-        Logical Query Plan (LQP)
+```mermaid
+flowchart TD
+    S1["**Stage 1: Schema validation**\nJSON parameters conform to tool schema\nRequired fields present and typed"]
+    S2["**Stage 2: SMR resolution**\nResolve metric IDs → definitions\nResolve dimension IDs → definitions\nResolve hierarchy refs → definitions\nReject unregistered IDs"]
+    S3["**Stage 3: Role-Aware Projection**\nFilter metric set to entitled scope\nFilter dimension set to entitled scope\nInject row predicates from role config\nApply column masks · Reject entitlement violations"]
+    S4["**Stage 4: Semantic validation**\nRequired dimensions present per metric\nAggregation rules compatible\nTime granularity compatible per metric\nFilter predicates reference valid fields"]
+    S5["**Stage 5: LQP generation**\nProduce engine-agnostic DAG\nAssign data affinity hints per metric\nEstimate result cardinality and execution cost"]
+    LQP(["Logical Query Plan (LQP)"])
+
+    S1 --> S2 --> S3 --> S4 --> S5 --> LQP
 ```
 
 ### Intent Parameter Schema
@@ -290,38 +259,19 @@ The projection layer applies four categories of restriction:
 
 ### Projection Lifecycle
 
-```
-Authenticated request arrives with JWT
-│
-├── 1. JWT validation (signature, expiry, tenant claim)
-│
-├── 2. Role claim extraction
-│       roleClaimField: "analytics_roles"
-│       extracted roles: ["portfolio_manager"]
-│
-├── 3. Entitlement profile construction
-│       Merge all role definitions for the user's roles
-│       Produce: metric_access_set, dimension_access_set,
-│               row_predicates[], column_masks[]
-│
-├── 4. Metric access filter
-│       Intersect requested metrics with metric_access_set
-│       Unentitled metrics → METRIC_NOT_ENTITLED error (per metric)
-│
-├── 5. Dimension access filter
-│       Intersect requested dimensions with dimension_access_set
-│       Unentitled dimensions → DIMENSION_NOT_ENTITLED error (per dimension)
-│
-├── 6. Row predicate construction
-│       Resolve predicate templates: {{user.managed_portfolios}}
-│       → "portfolio_id IN ('GLOB_EQ_OPP', 'UK_CORE_INC', 'STRAT_BAL')"
-│       Predicates stored in LQP for FQP injection at execution time
-│
-├── 7. Column mask registration
-│       Register masked columns in LQP metadata
-│       FQP applies masks during result assembly
-│
-└── 8. Projected LQP produced → proceeds to governance validation
+```mermaid
+flowchart TD
+    START(["Authenticated request arrives with JWT"])
+    S1["**1. JWT validation**\nsignature · expiry · tenant claim"]
+    S2["**2. Role claim extraction**\nroleClaimField: 'analytics_roles'\nextracted roles: ['portfolio_manager']"]
+    S3["**3. Entitlement profile construction**\nMerge all role definitions for the user's roles\nProduce: metric_access_set, dimension_access_set,\nrow_predicates[], column_masks[]"]
+    S4["**4. Metric access filter**\nIntersect requested metrics with metric_access_set\nUnentitled metrics → METRIC_NOT_ENTITLED error"]
+    S5["**5. Dimension access filter**\nIntersect requested dimensions with dimension_access_set\nUnentitled dimensions → DIMENSION_NOT_ENTITLED error"]
+    S6["**6. Row predicate construction**\nResolve predicate templates: user.managed_portfolios\nPredicates stored in LQP for FQP injection at execution time"]
+    S7["**7. Column mask registration**\nRegister masked columns in LQP metadata\nFQP applies masks during result assembly"]
+    S8(["**8. Projected LQP produced**\n→ proceeds to governance validation"])
+
+    START --> S1 --> S2 --> S3 --> S4 --> S5 --> S6 --> S7 --> S8
 ```
 
 ### Multi-Role Merging
@@ -386,41 +336,19 @@ The Semantic Execution Governance (SEG) layer applies a suite of circuit breaker
 
 ### Governance Pipeline
 
-```
-Validated LQP (post role-aware projection)
-│
-├── 1. Cost estimation
-│       Estimate execution cost units from LQP metadata
-│       (cardinality estimate × engine cost tier × complexity factor)
-│
-├── 2. Cost circuit breaker
-│       Compare estimated cost to maxQueryCostUnits
-│       BLOCK if exceeded → user prompted to narrow scope
-│
-├── 3. Complexity limit check
-│       Evaluate LQP node count, join depth, sub-plan count
-│       BLOCK if exceeds complexity threshold
-│
-├── 4. Classification gate
-│       For each metric: retrieve data.classification from SMR
-│       Compare against blockedClassifications list
-│       BLOCK if any metric's classification is in blocked list
-│
-├── 5. Regulatory compliance mode check
-│       If complianceMode is set: apply compliance-specific rules
-│       (e.g. MiFID II: log all queries involving client-related metrics)
-│
-├── 6. Concurrency limit check
-│       Count active queries for this user
-│       BLOCK (with wait) if exceeds maxConcurrentQueries
-│
-├── 7. Timeout budget assignment
-│       Assign queryTimeoutSeconds to the FQP execution context
-│
-└── 8. Governance approval record written
-        Governance event record written before FQP is invoked
-        (ensures governance decisions are auditable even if FQP fails)
-        → Release to FQP
+```mermaid
+flowchart TD
+    START(["Validated LQP\npost role-aware projection"])
+    S1["**1. Cost estimation**\nEstimate execution cost units from LQP metadata\ncardinality estimate × engine cost tier × complexity factor"]
+    S2["**2. Cost circuit breaker**\nCompare estimated cost to maxQueryCostUnits\nBLOCK if exceeded → user prompted to narrow scope"]
+    S3["**3. Complexity limit check**\nEvaluate LQP node count, join depth, sub-plan count\nBLOCK if exceeds complexity threshold"]
+    S4["**4. Classification gate**\nRetrieve data.classification from SMR per metric\nBLOCK if any metric classification is in blocked list"]
+    S5["**5. Regulatory compliance mode check**\nIf complianceMode set: apply compliance-specific rules\ne.g. MiFID II: log all queries involving client-related metrics"]
+    S6["**6. Concurrency limit check**\nCount active queries for this user\nBLOCK with wait if exceeds maxConcurrentQueries"]
+    S7["**7. Timeout budget assignment**\nAssign queryTimeoutSeconds to FQP execution context"]
+    S8(["**8. Governance approval record written**\nGovernance event written before FQP is invoked\n→ Release to FQP"])
+
+    START --> S1 --> S2 --> S3 --> S4 --> S5 --> S6 --> S7 --> S8
 ```
 
 ### Cost Estimation Model
@@ -500,37 +428,24 @@ The Federated Query Planner (FQP) is the only component in the platform that has
 
 ### Nine-Step FQP Pipeline
 
-```
-┌──────────────────────────────────────────────────────────────────┐
-│                    Federated Query Planner                        │
-│                                                                  │
-│  1. LQP Reception & Governance Validation                        │
-│     (validates cost estimate, complexity, classification)        │
-│                          │                                       │
-│  2. Cache Check                                                  │
-│     (exact match and approximate match on LQP signature)         │
-│                          │ cache miss                            │
-│  3. Sub-plan Decomposition                                       │
-│     (split LQP into sub-plans by data affinity)                  │
-│                          │                                       │
-│  4. Backend Selection & Routing                                  │
-│     (match sub-plans to backends by affinity + capability)       │
-│                          │                                       │
-│  5. Physical Query Generation                                    │
-│     (translate sub-plans to engine-specific query dialect)       │
-│                          │                                       │
-│  6. Parallel Execution & Coordination                            │
-│     (execute sub-plans concurrently; handle timeouts)            │
-│                          │                                       │
-│  7. Result Assembly & Reconciliation                             │
-│     (join sub-results by shared dimensions; apply masks)         │
-│                          │                                       │
-│  8. Result Caching & Materialisation                             │
-│     (write result to cache; update materialisation index)        │
-│                          │                                       │
-│  9. Lineage Record Writing                                       │
-│     (write complete execution trace to lineage store)            │
-└──────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    S1["**1. LQP Reception & Governance Validation**\nvalidates cost estimate · complexity · classification"]
+    S2["**2. Cache Check**\nexact match and approximate match on LQP signature"]
+    CACHED(["Cached result returned"])
+    S3["**3. Sub-plan Decomposition**\nsplit LQP into sub-plans by data affinity"]
+    S4["**4. Backend Selection & Routing**\nmatch sub-plans to backends by affinity + capability"]
+    S5["**5. Physical Query Generation**\ntranslate sub-plans to engine-specific query dialect"]
+    S6["**6. Parallel Execution & Coordination**\nexecute sub-plans concurrently · handle timeouts"]
+    S7["**7. Result Assembly & Reconciliation**\njoin sub-results by shared dimensions · apply column masks"]
+    S8["**8. Result Caching & Materialisation**\nwrite result to cache · update materialisation index"]
+    S9["**9. Lineage Record Writing**\nwrite complete execution trace to lineage store"]
+    RESULT(["Assembled result + lineage record"])
+
+    S1 --> S2
+    S2 -->|cache hit| CACHED
+    S2 -->|cache miss| S3
+    S3 --> S4 --> S5 --> S6 --> S7 --> S8 --> S9 --> RESULT
 ```
 
 ### Sub-Plan Decomposition
