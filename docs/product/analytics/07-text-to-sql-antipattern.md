@@ -1,8 +1,6 @@
-# 18 — Why Not Text-to-SQL? The GenAI Analytics Antipattern
+# Appendix: Why Not Text-to-SQL? The GenAI Analytics Antipattern
 
-## What this document is
-
-This document describes the Text-to-SQL approach to AI-powered analytics — what it is, why it is appealing, why it is commonly the first thing teams reach for, and why it is not an appropriate long-term foundation for governed analytical intelligence in a regulated environment. It is intended as a reference for teams evaluating their options and as context for why the AI Analytics Platform was designed the way it was.
+This appendix describes the Text-to-SQL approach to AI-powered analytics — what it is, why it is appealing, why it is commonly the first thing teams reach for, and why it is not an appropriate long-term foundation for governed analytical intelligence in a regulated environment. It is intended as a reference for teams evaluating their options and as context for why the AI Analytics Platform was designed the way it was.
 
 The Text-to-SQL pattern is not wrong everywhere. For exploratory data work, internal tooling, and low-stakes analytical sandboxes, it is a legitimate option. The argument here is narrower: for production analytical systems serving regulated business processes, it is the wrong foundation — and the structural defects compound over time rather than resolve.
 
@@ -105,4 +103,3 @@ The AI Analytics Platform inverts the relationship between GenAI and data access
 | Multi-source federation is not supported | FQP routes LQP fragments to any registered backend type |
 
 The LLM's role is constrained to what it is reliable at: translating natural language into structured intent. The computation — resolving metric definitions, enforcing entitlements, executing against data, assembling results — is handled by deterministic components that do not generate.
-
