@@ -412,7 +412,59 @@ After execution and result assembly the FQP returns a typed result envelope to t
 | **Chart spec** | Vega-Lite v5 JSON | Industry-standard chart grammar; wide ecosystem for web, server-side, and image rendering |
 | **Table spec** | Platform-defined `type: "table"` extension | Vega-Lite has no native table mark; same `data` + `columns` convention |
 
-SCL format examples are shown in Section 3.7 (Analytical Output Format). Full spec is in Section 3.6 (Visualisation Ontology).
+#### Visualisation Ontology input
+
+The ontology evaluator receives the FQP assembled result alongside the resolved intent pattern. It uses the result schema and intent pattern to select the best-matching chart contract:
+
+```json
+{
+  "intent_pattern": "COMPARISON",
+  "schema": [
+    { "field": "portfolio_id",     "type": "string"  },
+    { "field": "portfolio_return", "type": "number", "unit": "percentage" },
+    { "field": "tracking_error",   "type": "number", "unit": "percentage" }
+  ],
+  "rows": [
+    { "portfolio_id": "GLOB_EQ_OPP", "portfolio_return": 4.21, "tracking_error": 3.18 },
+    { "portfolio_id": "UK_CORE_INC", "portfolio_return": 2.87, "tracking_error": 1.94 }
+  ],
+  "sort": { "field": "portfolio_return", "direction": "desc" },
+  "allowed_chart_types": ["bar", "line", "scatter", "heatmap", "treemap", "table"]
+}
+```
+
+#### Visualisation Ontology output — SCL display spec
+
+The evaluator matches the `COMPARISON` intent pattern and two-metric schema to the `BAR_MULTI_SERIES_COMPARISON` contract and emits a Vega-Lite v5 SCL display spec:
+
+```json
+{
+  "type": "chart",
+  "contract": "BAR_MULTI_SERIES_COMPARISON",
+  "mark": "bar",
+  "data": {
+    "values": [
+      { "portfolio_id": "GLOB_EQ_OPP", "metric": "Portfolio Return", "value": 4.21 },
+      { "portfolio_id": "GLOB_EQ_OPP", "metric": "Tracking Error",   "value": 3.18 },
+      { "portfolio_id": "UK_CORE_INC", "metric": "Portfolio Return", "value": 2.87 },
+      { "portfolio_id": "UK_CORE_INC", "metric": "Tracking Error",   "value": 1.94 }
+    ]
+  },
+  "encoding": {
+    "x":      { "field": "portfolio_id", "type": "nominal",      "title": "Portfolio",     "sort": "-y" },
+    "y":      { "field": "value",        "type": "quantitative", "title": "Value (%)",     "axis": { "format": ".2f" } },
+    "color":  { "field": "metric",       "type": "nominal",      "title": "Metric" }
+  },
+  "colorScheme": ["#003f5c", "#bc5090"],
+  "formatHints": {
+    "portfolio_return": { "format": ".2%", "unit": "%" },
+    "tracking_error":   { "format": ".2%", "unit": "%" }
+  },
+  "interactions": ["click:drilldown", "hover:tooltip", "select:multi-point"]
+}
+```
+
+Full SCL examples including the `type: "table"` spec are in Section 3.7 (Analytical Output Format). Full chart contract definitions are in Section 3.6 (Visualisation Ontology).
 
 ---
 
