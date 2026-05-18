@@ -102,7 +102,6 @@ flowchart TB
         B1["MCP Capability Layer"]
         B2["Semantic Metrics Registry"]
         B3["Governance Pipeline\nRALP · SEG · FQP"]
-        B4["Lineage Store"]
     end
 
     subgraph data["Data Sources"]
@@ -114,7 +113,6 @@ flowchart TB
     clients -->|"MCP tool call\n+ JWT"| B1
     B1 --> B2
     B2 --> B3
-    B3 --> B4
     B3 --> data
 ```
 
