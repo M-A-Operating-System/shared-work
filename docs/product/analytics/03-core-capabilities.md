@@ -184,7 +184,7 @@ Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...
 }
 ```
 
-The conversation engine does not parse the query, resolve metrics, or check entitlements. It passes the question through as-is. When the Analytics Platform responds 1,243ms later, the conversation engine renders the grouped bar chart from the SCL specification and surfaces the narrative as the assistant's reply.
+The conversation engine does not parse the query, resolve metrics, or check entitlements. It passes the question through as-is. When the Analytics Platform responds, the conversation engine renders the grouped bar chart from the SCL specification and surfaces the narrative as the assistant's reply.
 
 ---
 
