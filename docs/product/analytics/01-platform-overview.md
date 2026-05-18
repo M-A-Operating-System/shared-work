@@ -91,7 +91,7 @@ The first and last entries in this table are the most consequential. The tension
 ## The Architecture in Practice
 
 ```mermaid
-flowchart LR
+flowchart TB
     subgraph clients["AI-Enabled Clients"]
         A1["Conversational\nAssistant"]
         A2["Autonomous\nAgent"]
