@@ -90,6 +90,34 @@ The first and last entries in this table are the most consequential. The tension
 
 ## The Architecture in Practice
 
+```mermaid
+flowchart LR
+    subgraph clients["AI-Enabled Clients"]
+        A1["Conversational\nAssistant"]
+        A2["Autonomous\nAgent"]
+        A3["Custom\nApplication"]
+    end
+
+    subgraph platform["Analytics Capability"]
+        B1["MCP Capability Layer"]
+        B2["Semantic Metrics Registry"]
+        B3["Governance Pipeline\nRALP · SEG · FQP"]
+        B4["Lineage Store"]
+    end
+
+    subgraph data["Data Sources"]
+        C1["SQL Warehouse"]
+        C2["OpenData API"]
+        C3["Graph Data API"]
+    end
+
+    clients -->|"MCP tool call\n+ JWT"| B1
+    B1 --> B2
+    B2 --> B3
+    B3 --> B4
+    B3 --> data
+```
+
 These principles converge on a single architectural outcome: no consumer — conversational assistant, autonomous agent, or custom application — has a path to execution backends, physical schemas, or raw SQL that bypasses the governance pipeline. Every analytical request routes through the MCP Capability Layer and traverses the invariant sequence described in P2. The Analytical Lineage Store records every invocation regardless of consumer type, consumer identity, or whether the request originated in natural language or as a pre-structured tool call.
 
 The ten principles described in this chapter are not independent. P1 (semantic abstraction) and P10 (deterministic computation) jointly define the boundary between what generative AI does and what the computation engine does. P2 (governance before execution) and P5 (role-aware by default) jointly define when and how entitlements are enforced. P3 (deterministic metric resolution) and P4 (complete analytical lineage) jointly define the auditability guarantee — consistent definitions across queries, and a complete record of which definition at which version produced each result. P6 (governed narrative) and P7 (deterministic visualisation) jointly define how the output side of the pipeline constrains generative AI to roles where it cannot introduce non-determinism into results.
