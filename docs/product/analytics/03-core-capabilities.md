@@ -4,6 +4,145 @@ This chapter provides complete specifications for the nine platform components t
 
 ---
 
+## Platform Architecture
+
+The platform exposes its capability through three consumption modes. The first is direct API access, where a host-built custom analytics UI calls the MCP Capability Layer directly with a structured tool invocation, supplying a JWT for entitlement resolution and receiving a structured response containing a display specification and narrative. The second is conversational backend access, where the AI Chat Platform's conversation engine calls the Analytics Platform as a tool provider, mediating between a conversational UI component and the governed query pipeline. The third is agentic access, where scheduled agents, event monitors, and automated report pipelines call the MCP Capability Layer with machine-issued JWTs to perform periodic or event-driven analytical tasks without human-in-the-loop interaction. These three modes share a single entry point and a single governance pipeline; the consumption mode affects only the caller's interaction pattern, not the trust model applied.
+
+```mermaid
+flowchart TD
+    subgraph org["Consuming Organisation"]
+        ChatComp["&lt;ai-chat&gt; component\nconversational UI"]
+        CustomUI["Custom analytics UI\nhost-built · renders JSON / SCL"]
+        Agents["Agentic consumers\nscheduled agents · event monitors · report pipelines"]
+    end
+
+    subgraph aichat["AI Chat Platform"]
+        ChatEngine["Conversation engine\nContent rendering · Tool call routing\nAudit trail · Memory · Shared conversations"]
+    end
+
+    subgraph analytics["AI Analytics Platform"]
+        MCP["MCP Capability Layer\nCloudflare Workers · JWT validation"]
+        SIL["Semantic Intent Layer\nAnthropic Claude · Sonnet / Opus"]
+        RAPL["Role-Aware Projection Layer\nJWT claims · row predicates · column masks"]
+        AIV["Analytical Intent Validator\nMetric + dimension validation · LQP generation"]
+        SEG["Semantic Execution Governance\nCost estimation · classification · circuit breakers"]
+        FQP["Federated Query Planner\nApache Calcite + backend adapters"]
+        VO["Visualisation Ontology\nSCL display spec · Vega-Lite v5"]
+        NSE["Narrative Synthesis Engine\nAnthropic Claude · Haiku / Sonnet"]
+        LS[("Analytical Lineage Store")]
+        Result(["MCP tool response\ndisplay_spec + narrative + result_id"])
+    end
+
+    vite2img["vite2img (optional)\nStandalone MCP render service · SCL → SVG / PNG\nRegistered directly with consumers — not part of Analytics Platform"]
+
+    subgraph dcr["Data Context Repository"]
+        SMC["Semantic Metrics Context\nMetric definitions · dimensions · hierarchies\naggregation rules · governance · access policies"]
+        DCS[("Semantic Data Context Store\nPre-existing · general-purpose common registry")]
+        SMC -. backed by .-> DCS
+    end
+
+    subgraph backends["Execution Backends"]
+        SQL["SQL Warehouse\nSnowflake · BigQuery · Databricks · Starburst"]
+        ODA["OpenData API\nREST / OData"]
+        GDA["Graph Data API\nNeo4j · Neptune / SPARQL"]
+    end
+
+    ChatComp -->|"JWT"| ChatEngine
+    CustomUI -->|"JWT + MCP tool call"| MCP
+    Agents -->|"agent JWT + MCP tool call"| MCP
+    ChatEngine -->|"MCP tool call + user JWT"| MCP
+    ChatEngine -->|"MCP tool call + user JWT"| vite2img
+    MCP -->|"natural language query"| SIL
+    MCP -->|"JWT claims"| RAPL
+    SIL -->|"metric name resolution"| SMC
+    SIL -->|"structured intent"| AIV
+    RAPL -->|"row predicates + column masks"| AIV
+    AIV -->|"metric + dimension validation"| SMC
+    AIV -->|"Logical Query Plan"| SEG
+    SEG -->|"approved LQP"| FQP
+    SEG -->|"governance decision"| LS
+    FQP -->|"physicalMapping lookup"| SMC
+    FQP --> SQL & ODA & GDA
+    FQP -->|"execution record"| LS
+    FQP -->|"assembled result"| VO
+    FQP -->|"assembled result"| NSE
+    VO -->|"SCL display spec"| Result
+    NSE -->|"narrative"| Result
+```
+
+The architecture enforces a strict separation between the governance pipeline and the execution backends. No consumer — whether conversational, direct API, or agentic — has a path to execution backends, physical schemas, or raw SQL. Every request, without exception, enters through the MCP Capability Layer and traverses the full governance pipeline: Semantic Intent Layer, Role-Aware Projection Layer, Analytical Intent Validator, Semantic Execution Governance, and Federated Query Planner, in that order. There is no mechanism to bypass or short-circuit this pipeline. The governance guarantees described throughout this specification are structural properties of the architecture, not policy configurations that could be disabled at runtime.
+
+The `vite2img` service is shown separately from the Analytics Platform boundary because it is an optional, independently registered MCP render service. Consumers that cannot natively render the SCL display specification — for example, an agentic pipeline that requires static image output — register `vite2img` directly and call it as a separate tool invocation using the `result_id` returned by the Analytics Platform. It is not part of the core analytics pipeline.
+
+---
+
+## Request Flow
+
+The following sequence diagram traces a single analytical query from initial consumer invocation through to the structured response, illustrating the precise ordering and parallelism of component interactions. Steps 2–3 and 4–5 are intentionally parallel: JWT claim extraction and natural language processing proceed simultaneously, as do metric resolution and projection constraint computation. This parallelism is architecturally significant because it means that governance constraints — derived from the JWT — are computed in parallel with intent resolution rather than applied as a sequential post-processing step.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant C as Consumer (ChatEngine or direct API caller)
+    participant MCP as MCP Capability Layer
+    participant SIL as Semantic Intent Layer
+    participant RAPL as Role-Aware Projection Layer
+    participant SMC as Semantic Metrics Context
+    participant AIV as Analytical Intent Validator
+    participant SEG as Semantic Execution Governance
+    participant FQP as Federated Query Planner
+    participant BE as Execution Backend(s)
+    participant VO as Visualisation Ontology
+    participant NSE as Narrative Synthesis Engine
+    participant LS as Analytical Lineage Store
+    participant vite2img as vite2img
+
+    C->>MCP: POST /v1/mcp (JWT + MCP tool call)
+    par
+        MCP->>SIL: natural language query
+    and
+        MCP->>RAPL: JWT claims
+    end
+    par
+        SIL->>SMC: metric name resolution
+        SMC-->>SIL: metric definitions
+        SIL->>AIV: structured intent
+    and
+        RAPL->>AIV: row predicates + column masks
+    end
+    AIV->>SMC: validate metric + dimension IDs
+    SMC-->>AIV: definitions + aggregation rules
+    AIV->>SEG: Logical Query Plan (LQP)
+    SEG->>LS: governance decision record
+    SEG->>FQP: approved LQP
+    FQP->>SMC: physicalMapping lookup
+    SMC-->>FQP: physical source mapping
+    FQP->>BE: sub-plan execution
+    BE-->>FQP: raw result sets
+    FQP->>LS: execution record
+    par
+        FQP->>VO: assembled result
+    and
+        FQP->>NSE: assembled result
+    end
+    par
+        VO-->>MCP: SCL display spec
+    and
+        NSE-->>MCP: narrative
+    end
+    MCP-->>C: display_spec + narrative + result_id
+    opt Consumer cannot natively render SCL spec
+        C->>vite2img: render tool call (display_spec)
+        vite2img-->>C: SVG / PNG
+    end
+```
+
+The sequence diagram makes several governance properties explicit that are not visible from the architecture diagram alone. First, the Analytical Lineage Store receives two distinct writes per query: a governance decision record at step 12 — before execution — and an execution record at step 17 — after the Federated Query Planner has received results from the backends. This two-phase lineage recording ensures that the audit trail captures both the governance outcome and the precise execution details, irrespective of whether the query ultimately succeeds. Second, display specification and narrative synthesis are produced in parallel from the same assembled result set; neither depends on the other, and both are assembled into the single MCP tool response. Third, the `vite2img` render path is explicitly optional and occurs entirely outside the Analytics Platform boundary — the `result_id` in the MCP response is what enables the consumer to request rendering without re-executing the query.
+
+The combined effect of this architecture is a platform in which analytical access is comprehensively mediated, every result is traceable to its governance decisions and physical sources, and the separation between the semantic layer and the execution layer is maintained by design rather than by convention.
+
+---
+
 ## 3.1 Semantic Metrics Registry
 
 The Semantic Metrics Registry (SMR) is the governing catalogue of every analytical concept resolvable on the platform. Before any query can be planned or executed, every identifier in that query — metrics, dimensions, hierarchies — must be registered in the SMR. This is an architectural constraint, not a policy: the Analytical Intent Validator rejects any identifier not present in the SMR for the active tenant, and nothing is queryable that is not registered.
