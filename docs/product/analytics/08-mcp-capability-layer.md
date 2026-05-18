@@ -2,19 +2,9 @@
 
 ## Overview
 
-The **MCP Capability Layer** exposes the AI Analytics Platform's governed analytical operations to AI orchestrators via an MCP-compatible interface. It is the primary integration point for AI agents — including the platform's own Semantic Intent Layer — that need to compose analytical queries programmatically.
+The **MCP Capability Layer** exposes the platform's governed analytical operations to AI orchestrators via an MCP-compatible interface. Each capability is a bounded, named operation enforcing the same governance pipeline as natural-language queries — AI agents interact with capabilities, not databases.
 
-The MCP Capability Layer does not expose raw query interfaces. Every capability is a bounded, named analytical operation that enforces the same governance pipeline as natural-language queries. AI agents interact with analytical capabilities, not with databases.
-
----
-
-## Capability model
-
-Each MCP capability is a named analytical operation with:
-- A typed input schema (parameters the AI agent provides)
-- A governed execution path (routes through Analytical Intent Validator, projection layer, governance, FQP)
-- A typed output contract (the result schema the agent can expect)
-- A semantic description (the context injected into the AI model when this capability is available)
+Each capability has a typed input schema, a governed execution path (Analytical Intent Validator → projection → governance → FQP), a typed output contract, and a semantic description injected into the AI model's context.
 
 ---
 
@@ -22,63 +12,23 @@ Each MCP capability is a named analytical operation with:
 
 ### `analyse_metric`
 
-Execute a governed analytical query against one or more registered metrics.
+Execute a governed query against one or more registered metrics.
 
-```json
-{
-  "name":        "analyse_metric",
-  "description": "Execute a governed analytical query against one or more registered metrics from the Semantic Metrics Registry. Use this to answer quantitative questions about portfolio performance, risk, or other financial metrics. Always specify the metric IDs you need — do not attempt to construct SQL or use unregistered identifiers.",
-  "inputSchema": {
-    "type": "object",
-    "properties": {
-      "metrics": {
-        "type":        "array",
-        "items":       { "type": "string" },
-        "description": "Array of metric IDs from the Semantic Metrics Registry (e.g. ['portfolio_return', 'tracking_error'])"
-      },
-      "dimensions": {
-        "type":        "array",
-        "items":       { "type": "string" },
-        "description": "Dimension IDs to slice by (e.g. ['portfolio', 'asset_class'])"
-      },
-      "time_period": {
-        "type":        "string",
-        "description": "Time expression. Accepted: 'quarter_to_date', 'year_to_date', 'last_N_months', 'since_inception', 'today', or 'RANGE:YYYY-MM-DD:YYYY-MM-DD'"
-      },
-      "filters": {
-        "type":        "array",
-        "items": {
-          "type":      "object",
-          "properties": {
-            "dimension": { "type": "string" },
-            "operator":  { "type": "string", "enum": ["eq", "neq", "gt", "lt", "gte", "lte", "in", "not_in"] },
-            "value":     {}
-          }
-        }
-      },
-      "order_by": {
-        "type":        "string",
-        "description": "metric_id ASC|DESC"
-      },
-      "limit": {
-        "type":        "integer",
-        "description": "Maximum rows to return. Default: 1000."
-      }
-    },
-    "required": ["metrics", "time_period"]
-  }
-}
-```
+| Parameter | Required | Type | Notes |
+|-----------|----------|------|-------|
+| `metrics` | Yes | string[] | SMR metric IDs |
+| `dimensions` | No | string[] | Dimension IDs to slice by |
+| `time_period` | Yes | string | `quarter_to_date`, `year_to_date`, `last_N_months`, `since_inception`, `today`, `RANGE:YYYY-MM-DD:YYYY-MM-DD` |
+| `filters` | No | array | `{dimension, operator, value}` — operators: `eq neq gt lt gte lte in not_in` |
+| `order_by` | No | string | `metric_id ASC\|DESC` |
+| `limit` | No | integer | Default: 1000 |
 
-**Example invocation:**
 ```json
 {
   "metrics":     ["portfolio_return", "tracking_error"],
   "dimensions":  ["portfolio"],
   "time_period": "quarter_to_date",
-  "filters": [
-    { "dimension": "asset_class", "operator": "eq", "value": "EQUITY" }
-  ],
+  "filters": [{ "dimension": "asset_class", "operator": "eq", "value": "EQUITY" }],
   "order_by":    "tracking_error DESC"
 }
 ```
@@ -87,180 +37,97 @@ Execute a governed analytical query against one or more registered metrics.
 
 ### `compare_portfolios`
 
-Compare a set of metrics across two or more portfolios, optionally against a benchmark.
+Compare metrics across two or more portfolios, optionally against a benchmark.
 
-```json
-{
-  "name":        "compare_portfolios",
-  "description": "Compare governed metrics across multiple portfolios. Optionally includes benchmark comparison. Returns a structured comparison result suitable for tabular or chart rendering.",
-  "inputSchema": {
-    "type": "object",
-    "properties": {
-      "portfolio_ids": {
-        "type":  "array",
-        "items": { "type": "string" },
-        "description": "Portfolio identifiers to compare"
-      },
-      "metrics": {
-        "type":  "array",
-        "items": { "type": "string" }
-      },
-      "time_period": { "type": "string" },
-      "benchmark_id": {
-        "type":        "string",
-        "description": "Benchmark ID to compare against (optional)"
-      }
-    },
-    "required": ["portfolio_ids", "metrics", "time_period"]
-  }
-}
-```
+| Parameter | Required | Notes |
+|-----------|----------|-------|
+| `portfolio_ids` | Yes | Array of portfolio IDs |
+| `metrics` | Yes | SMR metric IDs |
+| `time_period` | Yes | Same format as `analyse_metric` |
+| `benchmark_id` | No | Optional benchmark comparison |
 
 ---
 
 ### `issuer_concentration`
 
-Calculate issuer concentration metrics across specified portfolios.
+Issuer-level exposure, concentration % of AUM, and limit utilisation where limits are defined.
 
-```json
-{
-  "name":        "issuer_concentration",
-  "description": "Calculate issuer concentration risk metrics. Returns issuer-level exposure, concentration percentage of total AUM, and limit utilisation where limits are defined. Use for regulatory concentration checks and investment committee reporting.",
-  "inputSchema": {
-    "type": "object",
-    "properties": {
-      "portfolio_ids":      { "type": "array", "items": { "type": "string" } },
-      "asset_class_filter": { "type": "string", "description": "Optional asset class filter" },
-      "threshold_pct":      { "type": "number",  "description": "Highlight issuers above this concentration percentage (0–1)" },
-      "as_of_date":         { "type": "string",  "format": "date" }
-    },
-    "required": ["portfolio_ids", "as_of_date"]
-  }
-}
-```
+| Parameter | Required | Notes |
+|-----------|----------|-------|
+| `portfolio_ids` | Yes | |
+| `as_of_date` | Yes | `date` |
+| `asset_class_filter` | No | |
+| `threshold_pct` | No | Highlight issuers above this concentration (0–1) |
 
 ---
 
 ### `risk_breakdown`
 
-Decompose risk metrics into contributing factors.
+Decompose a risk metric (VaR, tracking error, beta) into factor contributions by dimension.
 
-```json
-{
-  "name":        "risk_breakdown",
-  "description": "Decompose a risk metric (VaR, tracking error, beta) into factor contributions. Returns a structured attribution of the total risk figure to its contributing dimensions. Use for risk reporting and limit breach investigation.",
-  "inputSchema": {
-    "type": "object",
-    "properties": {
-      "portfolio_id":  { "type": "string" },
-      "risk_metric":   { "type": "string", "description": "Risk metric ID (e.g. 'var_95', 'tracking_error')" },
-      "attribution_by": {
-        "type":        "string",
-        "enum":        ["asset_class", "factor", "issuer", "geography", "currency"],
-        "description": "Dimension to attribute risk contribution to"
-      },
-      "as_of_date": { "type": "string", "format": "date" }
-    },
-    "required": ["portfolio_id", "risk_metric", "attribution_by", "as_of_date"]
-  }
-}
-```
+| Parameter | Required | Notes |
+|-----------|----------|-------|
+| `portfolio_id` | Yes | |
+| `risk_metric` | Yes | e.g. `var_95`, `tracking_error` |
+| `attribution_by` | Yes | `asset_class \| factor \| issuer \| geography \| currency` |
+| `as_of_date` | Yes | `date` |
 
 ---
 
 ### `performance_attribution`
 
-Brinson-Hood-Beebower (or Brinson-Fachler) performance attribution decomposition.
+BHB or Brinson-Fachler attribution decomposition — returns allocation, selection, and interaction effects.
 
-```json
-{
-  "name":        "performance_attribution",
-  "description": "Run a governed performance attribution decomposition (BHB or BF model) for a portfolio versus its benchmark. Returns allocation effect, selection effect, and interaction effect by dimension. Use for investment committee reporting and mandate compliance.",
-  "inputSchema": {
-    "type": "object",
-    "properties": {
-      "portfolio_id":    { "type": "string" },
-      "benchmark_id":    { "type": "string" },
-      "attribution_by":  { "type": "string", "enum": ["asset_class", "geography", "sector", "currency"] },
-      "time_period":     { "type": "string" },
-      "model":           { "type": "string", "enum": ["bhb", "bf"], "description": "Attribution model. Default: bhb" }
-    },
-    "required": ["portfolio_id", "benchmark_id", "attribution_by", "time_period"]
-  }
-}
-```
+| Parameter | Required | Notes |
+|-----------|----------|-------|
+| `portfolio_id` | Yes | |
+| `benchmark_id` | Yes | |
+| `attribution_by` | Yes | `asset_class \| geography \| sector \| currency` |
+| `time_period` | Yes | |
+| `model` | No | `bhb` (default) or `bf` |
 
 ---
 
 ### `regulatory_metric`
 
-Query a regulatory compliance metric.
+Query a regulatory compliance metric (LCR, NSFR, leverage ratio). Requires `regulatory_reporting` feature flag and appropriate role. Returns metric value, regulatory minimum, and compliance status.
 
-```json
-{
-  "name":        "regulatory_metric",
-  "description": "Query a regulatory compliance metric (LCR, NSFR, leverage ratio, etc.). Requires the regulatory_reporting feature flag and appropriate role. Returns the metric value, regulatory minimum, and compliance status.",
-  "inputSchema": {
-    "type": "object",
-    "properties": {
-      "metric_id":   { "type": "string", "description": "Regulatory metric ID from the SMR" },
-      "entity_ids":  { "type": "array", "items": { "type": "string" } },
-      "as_of_date":  { "type": "string", "format": "date" },
-      "trend_days":  { "type": "integer", "description": "Number of trailing days to include as trend. 0 for current only." }
-    },
-    "required": ["metric_id", "entity_ids", "as_of_date"]
-  }
-}
-```
+| Parameter | Required | Notes |
+|-----------|----------|-------|
+| `metric_id` | Yes | |
+| `entity_ids` | Yes | |
+| `as_of_date` | Yes | `date` |
+| `trend_days` | No | Trailing days as trend; `0` for current only |
 
 ---
 
 ### `list_metrics`
 
-Retrieve the list of metrics available to the current user from the SMR.
+List all SMR metrics available to the current user's role, with IDs, labels, descriptions, and required dimensions.
 
-```json
-{
-  "name":        "list_metrics",
-  "description": "List all metrics in the Semantic Metrics Registry available to the current user based on their role. Use this to understand what analytical concepts are resolvable before attempting a query. Returns metric IDs, labels, descriptions, and required dimensions.",
-  "inputSchema": {
-    "type": "object",
-    "properties": {
-      "domain_filter":    { "type": "string", "description": "Optional: filter to a specific data domain" },
-      "measure_group":    { "type": "string", "description": "Optional: filter to a named measure group" },
-      "include_deprecated": { "type": "boolean", "default": false }
-    }
-  }
-}
-```
+| Parameter | Required | Notes |
+|-----------|----------|-------|
+| `domain_filter` | No | Filter by data domain |
+| `measure_group` | No | Filter by measure group |
+| `include_deprecated` | No | Default: `false` |
 
 ---
 
 ### `drilldown`
 
-Navigate into a dimension hierarchy from a previous result.
+Navigate into a dimension hierarchy from a prior result; parent-level filters are preserved.
 
-```json
-{
-  "name":        "drilldown",
-  "description": "Navigate into an analytical hierarchy from a prior result. Takes the result set ID and a dimension to drill into, and returns a new result at the next hierarchy level with the parent-level filters preserved.",
-  "inputSchema": {
-    "type": "object",
-    "properties": {
-      "result_id":       { "type": "string", "description": "The result set ID from a prior analyse_metric call" },
-      "drilldown_into":  { "type": "string", "description": "Hierarchy ID to traverse into" },
-      "selected_value":  { "description": "The dimension value to anchor the drilldown to (e.g. 'EQUITY')" }
-    },
-    "required": ["result_id", "drilldown_into"]
-  }
-}
-```
+| Parameter | Required | Notes |
+|-----------|----------|-------|
+| `result_id` | Yes | Result set ID from a prior `analyse_metric` call |
+| `drilldown_into` | Yes | Hierarchy ID to traverse |
+| `selected_value` | No | Dimension value to anchor the drilldown |
 
 ---
 
-## Capability manifest
+## Capability negotiation
 
-The MCP Capability Layer exposes a capability manifest that AI orchestrators retrieve to understand what operations are available for the authenticated user and tenant:
+Capabilities are declared in the MCP manifest. Consumers call `list_capabilities` to discover available tools. Capability availability is gated by feature flags and role entitlements — a capability not enabled by a feature flag or accessible to the user's role appears as `available: false` with a reason.
 
 ```json
 {
@@ -278,8 +145,8 @@ The MCP Capability Layer exposes a capability manifest that AI orchestrators ret
     { "name": "drilldown",               "available": true,  "reason": null }
   ],
   "entitlement_summary": {
-    "role":            "portfolio_manager",
-    "accessible_metrics": 42,
+    "role":                  "portfolio_manager",
+    "accessible_metrics":    42,
     "accessible_dimensions": 12
   }
 }
@@ -289,28 +156,11 @@ The MCP Capability Layer exposes a capability manifest that AI orchestrators ret
 
 ## Capability invocation governance
 
-Every MCP capability invocation passes through the full governance pipeline:
-
-```
-Capability invocation
-→ Input schema validation
-→ Capability availability check (feature flags + role)
-→ Analytical intent construction from capability inputs
-→ Analytical Intent Validator (SMR resolution + role-aware projection)
-→ Semantic Execution Governance
-→ Federated Query Planner
-→ Result assembly
-→ Lineage record writing
-→ Result returned to AI agent
-```
-
-AI agents receive the same lineage-backed, role-aware, governance-validated results as human users. There is no privileged API path.
+Every invocation passes through: input schema validation → capability availability check (feature flags + role) → Analytical Intent Validator → Semantic Execution Governance → FQP → result assembly → lineage record write. AI agents receive the same governance-validated results as human users. There is no privileged API path.
 
 ---
 
 ## MCP endpoint
-
-The MCP Capability Layer is exposed at:
 
 ```
 POST https://api.analytics-platform.io/v1/mcp
