@@ -138,6 +138,326 @@ The combined effect of this architecture is a platform in which analytical acces
 
 ---
 
+## Worked Example: From Chat Question to Governed Response
+
+This section traces a single user query end-to-end through every platform layer. Each step shows the exact payload passed between components, making the abstract sequence diagram concrete.
+
+**User**: A portfolio manager types into the AI chat interface:
+> "Show me portfolio returns versus benchmark for my equity portfolios this quarter"
+
+---
+
+### Step 1 — Chat engine calls the Analytics Platform
+
+The conversation engine in the AI Chat Platform recognises the user's message as an analytical query and routes it to the Analytics Platform via MCP. The user's JWT is forwarded without modification; the chat engine does not inspect or filter it.
+
+```json
+POST /v1/mcp
+Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...
+
+{
+  "jsonrpc": "2.0",
+  "id":      "req-8a3f2c",
+  "method":  "tools/call",
+  "params": {
+    "name": "analyse_metric",
+    "arguments": {
+      "query": "Show me portfolio returns versus benchmark for my equity portfolios this quarter"
+    }
+  }
+}
+```
+
+The `analyse_metric` tool is the primary analytical entry point. Because the input is natural language, the MCP Capability Layer routes it to the Semantic Intent Layer. If the caller had supplied explicit `metric_ids` instead of `query`, the SIL translation step would be skipped entirely.
+
+---
+
+### Step 2 — MCP Capability Layer: JWT validation and parallel dispatch
+
+The MCP Capability Layer validates the JWT signature against the tenant's key, extracts claims, and dispatches two parallel operations: sending the natural language query to the Semantic Intent Layer and sending the JWT claims to the Role-Aware Projection Layer.
+
+**JWT claims extracted:**
+
+```json
+{
+  "sub":           "pm-jane-smith",
+  "tenant_id":     "acme-wealth",
+  "roles":         ["portfolio_manager"],
+  "portfolio_scope": ["GLOB_EQ_OPP", "UK_CORE_INC", "ASIA_PAC_GRW", "EUR_BAL_INC"],
+  "classification_ceiling": "INTERNAL",
+  "exp":           1747612800
+}
+```
+
+---
+
+### Step 3 — Semantic Intent Layer: natural language → structured intent
+
+The SIL sends the query text and the user's SMR-visible metric catalogue to Claude (Sonnet). The model returns a structured intent object — no metric values are generated at this step, only parameter extraction.
+
+**SIL output — resolved intent parameters:**
+
+```json
+{
+  "intent_id":  "int-20260518-093241-pk7m",
+  "tool":       "analyse_metric",
+  "metrics":    ["portfolio_return", "benchmark_return"],
+  "dimensions": ["portfolio_id"],
+  "filters": [
+    { "field": "asset_class", "operator": "eq", "value": "EQUITY" }
+  ],
+  "time_period": {
+    "granularity": "quarterly",
+    "anchor":      "current"
+  },
+  "sort": {
+    "field":     "portfolio_return",
+    "direction": "desc"
+  },
+  "confidence": 0.97,
+  "unresolved":  []
+}
+```
+
+Both `portfolio_return` and `benchmark_return` are validated as approved metric IDs in the tenant's SMR. `asset_class` is validated as a registered dimension. If any identifier were absent from the SMR, the SIL would return a resolution error at this point — no query planning would proceed.
+
+---
+
+### Step 4 — Role-Aware Projection Layer: entitlement constraints
+
+Concurrently with Step 3, the RAPL converts the JWT claims into concrete query constraints. The `portfolio_scope` claim becomes a row predicate; the `classification_ceiling` claim is recorded for the SEG classification gate.
+
+**RAPL output — projection constraints:**
+
+```json
+{
+  "row_predicates": [
+    {
+      "dimension":  "portfolio_id",
+      "operator":   "in",
+      "values":     ["GLOB_EQ_OPP", "UK_CORE_INC", "ASIA_PAC_GRW", "EUR_BAL_INC"]
+    }
+  ],
+  "column_masks":            [],
+  "classification_ceiling":  "INTERNAL",
+  "projection_basis":        "jwt_claim:portfolio_scope"
+}
+```
+
+The RAPL injects these constraints into the Logical Query Plan before it is submitted to SEG. The row predicate is not a post-execution filter — it becomes part of the physical query sent to the execution backend.
+
+---
+
+### Step 5 — Semantic Intent Layer: Logical Query Plan
+
+With the resolved intent and projection constraints both available, the SIL constructs the Logical Query Plan — an engine-agnostic representation of the required computation.
+
+**LQP:**
+
+```json
+{
+  "lqp_id":    "lqp-20260518-093243-r9xq",
+  "intent_id": "int-20260518-093241-pk7m",
+  "tenant_id": "acme-wealth",
+  "nodes": [
+    {
+      "id":      "n1",
+      "type":    "metric_scan",
+      "metrics": ["portfolio_return", "benchmark_return"],
+      "dimensions": ["portfolio_id"],
+      "time_period": { "granularity": "quarterly", "anchor": "current" }
+    },
+    {
+      "id":       "n2",
+      "type":     "filter",
+      "input":    "n1",
+      "predicate": { "field": "asset_class", "operator": "eq", "value": "EQUITY" }
+    },
+    {
+      "id":       "n3",
+      "type":     "filter",
+      "input":    "n2",
+      "predicate": {
+        "field":    "portfolio_id",
+        "operator": "in",
+        "values":   ["GLOB_EQ_OPP", "UK_CORE_INC", "ASIA_PAC_GRW", "EUR_BAL_INC"]
+      }
+    },
+    {
+      "id":        "n4",
+      "type":      "sort",
+      "input":     "n3",
+      "field":     "portfolio_return",
+      "direction": "desc"
+    }
+  ],
+  "output_node":        "n4",
+  "estimated_cost":     620,
+  "classification_required": "INTERNAL"
+}
+```
+
+The `portfolio_id IN (...)` predicate at node `n3` is the materialised row projection from the RAPL. It is part of the plan, not a wrapper applied after results are returned.
+
+---
+
+### Step 6 — Semantic Execution Governance: approval
+
+SEG evaluates the LQP against the tenant's governance configuration before any backend is contacted.
+
+| Check | Value | Threshold | Result |
+|---|---|---|---|
+| Estimated cost | 620 | 1,000 ceiling | Pass |
+| Metrics per query | 2 | 10 max | Pass |
+| Dimensions | 1 | 5 max | Pass |
+| Data classification | INTERNAL | INTERNAL ceiling | Pass |
+| Compliance mode | none required | — | Pass |
+
+**SEG writes a governance decision record to the Analytical Lineage Store:**
+
+```json
+{
+  "lqp_id":    "lqp-20260518-093243-r9xq",
+  "decision":  "approved",
+  "timestamp": "2026-05-18T09:32:44Z",
+  "checks":    ["cost_ceiling", "metric_count", "dimension_count", "classification_gate"],
+  "result":    "all_passed"
+}
+```
+
+SEG then forwards the approved LQP to the Federated Query Planner.
+
+---
+
+### Step 7 — Federated Query Planner: backend routing and execution
+
+The FQP reads the `dataAffinity` field on each SMR metric definition to determine which backend to target. Both `portfolio_return` and `benchmark_return` map to the primary SQL warehouse. The FQP generates and executes the physical query:
+
+```sql
+SELECT
+    p.portfolio_id,
+    AVG(f.portfolio_return)  AS portfolio_return,
+    AVG(f.benchmark_return)  AS benchmark_return
+FROM fact_portfolio_daily f
+JOIN dim_portfolio p ON f.portfolio_id = p.portfolio_id
+WHERE p.asset_class    = 'EQUITY'
+  AND f.portfolio_id   IN ('GLOB_EQ_OPP', 'UK_CORE_INC', 'ASIA_PAC_GRW', 'EUR_BAL_INC')
+  AND f.date           BETWEEN '2026-04-01' AND '2026-06-30'
+GROUP BY p.portfolio_id
+ORDER BY portfolio_return DESC
+```
+
+**FQP assembled result:**
+
+```json
+{
+  "result_id":      "res-20260518-093247-wk4n",
+  "lqp_id":        "lqp-20260518-093243-r9xq",
+  "latency_ms":    1187,
+  "cost_units":    580,
+  "backends_used": ["primary-warehouse"],
+  "schema": [
+    { "field": "portfolio_id",     "type": "string" },
+    { "field": "portfolio_return", "type": "number", "unit": "percentage", "decimals": 2 },
+    { "field": "benchmark_return", "type": "number", "unit": "percentage", "decimals": 2 }
+  ],
+  "rows": [
+    { "portfolio_id": "GLOB_EQ_OPP",   "portfolio_return": 4.21, "benchmark_return": 3.85 },
+    { "portfolio_id": "ASIA_PAC_GRW",  "portfolio_return": 3.67, "benchmark_return": 3.90 },
+    { "portfolio_id": "UK_CORE_INC",   "portfolio_return": 2.87, "benchmark_return": 2.54 },
+    { "portfolio_id": "EUR_BAL_INC",   "portfolio_return": 1.93, "benchmark_return": 2.31 }
+  ]
+}
+```
+
+The FQP writes an execution record to the Analytical Lineage Store, then passes the assembled result to the Visualisation Ontology and Narrative Synthesis Engine in parallel.
+
+---
+
+### Step 8 — Visualisation Ontology: chart selection
+
+The Visualisation Ontology evaluates the assembled result against its intent pattern registry. Two metrics across multiple named entities, with a natural comparison relationship between them, matches the `multi_metric_comparison` pattern. The selected chart contract is `grouped_bar`.
+
+**VO output — SCL display specification:**
+
+```json
+{
+  "type":   "chart",
+  "spec": {
+    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+    "mark":   "bar",
+    "data": { "name": "result" },
+    "transform": [
+      {
+        "fold":  ["portfolio_return", "benchmark_return"],
+        "as":    ["metric", "value"]
+      }
+    ],
+    "encoding": {
+      "x":      { "field": "portfolio_id", "type": "nominal",      "title": "Portfolio" },
+      "y":      { "field": "value",        "type": "quantitative", "title": "Return (%)", "axis": { "format": ".2f" } },
+      "color":  { "field": "metric",       "type": "nominal",      "title": "Metric",
+                  "scale": { "domain": ["portfolio_return", "benchmark_return"],
+                             "range":  ["#0057B8", "#A8C8F0"] } },
+      "xOffset": { "field": "metric", "type": "nominal" }
+    },
+    "title": "Portfolio Return vs Benchmark — Q2 2026"
+  }
+}
+```
+
+---
+
+### Step 9 — Narrative Synthesis Engine: governed narrative
+
+The NSE receives the same assembled result and generates a prose summary. Every number in the output is drawn from the result set; post-generation validation confirms no value appears in the narrative that is not present in the result.
+
+**NSE output:**
+
+> "Across your 4 equity portfolios this quarter, 2 outperformed their benchmark. Global Equity Opportunities led with a return of 4.21% against a benchmark of 3.85% (+36bps). UK Core Income also outperformed at 2.87% versus 2.54% (+33bps). Asia Pacific Growth and European Balanced Income both underperformed, with Asia Pacific Growth showing the largest shortfall at -23bps (3.67% vs 3.90%)."
+
+---
+
+### Step 10 — MCP response returned to the chat engine
+
+The MCP Capability Layer assembles the display specification, narrative, and result metadata into a single structured MCP tool response:
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id":      "req-8a3f2c",
+  "result": {
+    "content": [
+      {
+        "type": "text",
+        "text": "Across your 4 equity portfolios this quarter, 2 outperformed their benchmark. Global Equity Opportunities led with a return of 4.21% against a benchmark of 3.85% (+36bps). UK Core Income also outperformed at 2.87% versus 2.54% (+33bps). Asia Pacific Growth and European Balanced Income both underperformed, with Asia Pacific Growth showing the largest shortfall at -23bps (3.67% vs 3.90%)."
+      },
+      {
+        "type": "resource",
+        "resource": {
+          "uri":      "analytics://result/res-20260518-093247-wk4n",
+          "mimeType": "application/vnd.analytics.scl+json",
+          "text":     "{ ... SCL display specification ... }"
+        }
+      }
+    ],
+    "result_id":   "res-20260518-093247-wk4n",
+    "latency_ms":  1243,
+    "cost_units":  580
+  }
+}
+```
+
+The chat engine renders the grouped bar chart inline in the conversation using the SCL specification and displays the narrative as the assistant's reply. The `result_id` is retained; if the user clicks a bar to drill down, the next tool call references this ID to continue the governed analytical session.
+
+---
+
+### What the user sees
+
+The portfolio manager sees the assistant's narrative response with a grouped bar chart rendered inline. They have not been exposed to SQL, table names, backend routing details, or metric definition IDs. The result is scoped to exactly the four portfolios in their JWT entitlement — no others were evaluated. Every step of this interaction, from governance decision to physical query, is recorded in the Analytical Lineage Store under `result_id: res-20260518-093247-wk4n`.
+
+---
+
 ## 3.1 Semantic Metrics Registry
 
 The Semantic Metrics Registry (SMR) is the governing catalogue of every analytical concept resolvable on the platform. Before any query can be planned or executed, every identifier in that query — metrics, dimensions, hierarchies — must be registered in the SMR. This is an architectural constraint, not a policy: the Semantic Intent Layer rejects any identifier not present in the SMR for the active tenant, and nothing is queryable that is not registered.
