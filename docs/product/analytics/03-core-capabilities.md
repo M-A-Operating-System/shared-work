@@ -22,9 +22,8 @@ flowchart TD
 
     subgraph analytics["AI Analytics Platform"]
         MCP["MCP Capability Layer\nCloudflare Workers · JWT validation"]
-        SIL["Semantic Intent Layer\nAnthropic Claude · Sonnet / Opus"]
+        SIL["Semantic Intent Layer\nAnthropic Claude · Sonnet / Opus\nSMR resolution · LQP generation"]
         RAPL["Role-Aware Projection Layer\nJWT claims · row predicates · column masks"]
-        AIV["Analytical Intent Validator\nMetric + dimension validation · LQP generation"]
         SEG["Semantic Execution Governance\nCost estimation · classification · circuit breakers"]
         FQP["Federated Query Planner\nApache Calcite + backend adapters"]
         VO["Visualisation Ontology\nSCL display spec · Vega-Lite v5"]
@@ -36,9 +35,9 @@ flowchart TD
     vite2img["vite2img (optional)\nStandalone MCP render service · SCL → SVG / PNG\nRegistered directly with consumers — not part of Analytics Platform"]
 
     subgraph dcr["Data Context Repository"]
-        SMC["Semantic Metrics Context\nMetric definitions · dimensions · hierarchies\naggregation rules · governance · access policies"]
+        SMR["Semantic Metrics Registry\nMetric definitions · dimensions · hierarchies\naggregation rules · governance · access policies"]
         DCS[("Semantic Data Context Store\nPre-existing · general-purpose common registry")]
-        SMC -. backed by .-> DCS
+        SMR -. backed by .-> DCS
     end
 
     subgraph backends["Execution Backends"]
@@ -54,14 +53,12 @@ flowchart TD
     ChatEngine -->|"MCP tool call + user JWT"| vite2img
     MCP -->|"natural language query"| SIL
     MCP -->|"JWT claims"| RAPL
-    SIL -->|"metric name resolution"| SMC
-    SIL -->|"structured intent"| AIV
-    RAPL -->|"row predicates + column masks"| AIV
-    AIV -->|"metric + dimension validation"| SMC
-    AIV -->|"Logical Query Plan"| SEG
+    RAPL -->|"row predicates + column masks"| SIL
+    SIL -->|"metric resolution + validation"| SMR
+    SIL -->|"Logical Query Plan"| SEG
     SEG -->|"approved LQP"| FQP
     SEG -->|"governance decision"| LS
-    FQP -->|"physicalMapping lookup"| SMC
+    FQP -->|"physicalMapping lookup"| SMR
     FQP --> SQL & ODA & GDA
     FQP -->|"execution record"| LS
     FQP -->|"assembled result"| VO
@@ -70,7 +67,7 @@ flowchart TD
     NSE -->|"narrative"| Result
 ```
 
-The architecture enforces a strict separation between the governance pipeline and the execution backends. No consumer — whether conversational, direct API, or agentic — has a path to execution backends, physical schemas, or raw SQL. Every request, without exception, enters through the MCP Capability Layer and traverses the full governance pipeline: Semantic Intent Layer, Role-Aware Projection Layer, Analytical Intent Validator, Semantic Execution Governance, and Federated Query Planner, in that order. There is no mechanism to bypass or short-circuit this pipeline. The governance guarantees described throughout this specification are structural properties of the architecture, not policy configurations that could be disabled at runtime.
+The architecture enforces a strict separation between the governance pipeline and the execution backends. No consumer — whether conversational, direct API, or agentic — has a path to execution backends, physical schemas, or raw SQL. Every request, without exception, enters through the MCP Capability Layer and traverses the full governance pipeline: Semantic Intent Layer, Role-Aware Projection Layer, Semantic Execution Governance, and Federated Query Planner, in that order. There is no mechanism to bypass or short-circuit this pipeline. The governance guarantees described throughout this specification are structural properties of the architecture, not policy configurations that could be disabled at runtime.
 
 The `vite2img` service is shown separately from the Analytics Platform boundary because it is an optional, independently registered MCP render service. Consumers that cannot natively render the SCL display specification — for example, an agentic pipeline that requires static image output — register `vite2img` directly and call it as a separate tool invocation using the `result_id` returned by the Analytics Platform. It is not part of the core analytics pipeline.
 
@@ -78,7 +75,7 @@ The `vite2img` service is shown separately from the Analytics Platform boundary 
 
 ## Request Flow
 
-The following sequence diagram traces a single analytical query from initial consumer invocation through to the structured response, illustrating the precise ordering and parallelism of component interactions. Steps 2–3 and 4–5 are intentionally parallel: JWT claim extraction and natural language processing proceed simultaneously, as do metric resolution and projection constraint computation. This parallelism is architecturally significant because it means that governance constraints — derived from the JWT — are computed in parallel with intent resolution rather than applied as a sequential post-processing step.
+The following sequence diagram traces a single analytical query from initial consumer invocation through to the structured response, illustrating the precise ordering and parallelism of component interactions. Steps 2–3 are intentionally parallel: JWT claim extraction and natural language processing proceed simultaneously. Steps 4–5 are also parallel: SMR metric name resolution and Role-Aware Projection constraint computation proceed concurrently, so that governance constraints derived from the JWT are available to the Semantic Intent Layer before it submits the Logical Query Plan. This means entitlement enforcement is computed in parallel with intent resolution rather than applied as a sequential post-processing step.
 
 ```mermaid
 sequenceDiagram
@@ -87,8 +84,7 @@ sequenceDiagram
     participant MCP as MCP Capability Layer
     participant SIL as Semantic Intent Layer
     participant RAPL as Role-Aware Projection Layer
-    participant SMC as Semantic Metrics Context
-    participant AIV as Analytical Intent Validator
+    participant SMR as Semantic Metrics Registry
     participant SEG as Semantic Execution Governance
     participant FQP as Federated Query Planner
     participant BE as Execution Backend(s)
@@ -104,19 +100,18 @@ sequenceDiagram
         MCP->>RAPL: JWT claims
     end
     par
-        SIL->>SMC: metric name resolution
-        SMC-->>SIL: metric definitions
-        SIL->>AIV: structured intent
+        SIL->>SMR: metric name resolution
+        SMR-->>SIL: metric definitions
     and
-        RAPL->>AIV: row predicates + column masks
+        RAPL->>SIL: row predicates + column masks
     end
-    AIV->>SMC: validate metric + dimension IDs
-    SMC-->>AIV: definitions + aggregation rules
-    AIV->>SEG: Logical Query Plan (LQP)
+    SIL->>SMR: validate metric + dimension IDs
+    SMR-->>SIL: definitions + aggregation rules
+    SIL->>SEG: Logical Query Plan (LQP)
     SEG->>LS: governance decision record
     SEG->>FQP: approved LQP
-    FQP->>SMC: physicalMapping lookup
-    SMC-->>FQP: physical source mapping
+    FQP->>SMR: physicalMapping lookup
+    SMR-->>FQP: physical source mapping
     FQP->>BE: sub-plan execution
     BE-->>FQP: raw result sets
     FQP->>LS: execution record
@@ -137,7 +132,7 @@ sequenceDiagram
     end
 ```
 
-The sequence diagram makes several governance properties explicit that are not visible from the architecture diagram alone. First, the Analytical Lineage Store receives two distinct writes per query: a governance decision record at step 12 — before execution — and an execution record at step 17 — after the Federated Query Planner has received results from the backends. This two-phase lineage recording ensures that the audit trail captures both the governance outcome and the precise execution details, irrespective of whether the query ultimately succeeds. Second, display specification and narrative synthesis are produced in parallel from the same assembled result set; neither depends on the other, and both are assembled into the single MCP tool response. Third, the `vite2img` render path is explicitly optional and occurs entirely outside the Analytics Platform boundary — the `result_id` in the MCP response is what enables the consumer to request rendering without re-executing the query.
+The sequence diagram makes several governance properties explicit that are not visible from the architecture diagram alone. First, the Analytical Lineage Store receives two distinct writes per query: a governance decision record before execution and an execution record after the Federated Query Planner has received results from the backends. This two-phase lineage recording ensures that the audit trail captures both the governance outcome and the precise execution details, irrespective of whether the query ultimately succeeds. Second, display specification and narrative synthesis are produced in parallel from the same assembled result set; neither depends on the other, and both are assembled into the single MCP tool response. Third, the `vite2img` render path is explicitly optional and occurs entirely outside the Analytics Platform boundary — the `result_id` in the MCP response is what enables the consumer to request rendering without re-executing the query.
 
 The combined effect of this architecture is a platform in which analytical access is comprehensively mediated, every result is traceable to its governance decisions and physical sources, and the separation between the semantic layer and the execution layer is maintained by design rather than by convention.
 
@@ -145,7 +140,7 @@ The combined effect of this architecture is a platform in which analytical acces
 
 ## 3.1 Semantic Metrics Registry
 
-The Semantic Metrics Registry (SMR) is the governing catalogue of every analytical concept resolvable on the platform. Before any query can be planned or executed, every identifier in that query — metrics, dimensions, hierarchies — must be registered in the SMR. This is an architectural constraint, not a policy: the Analytical Intent Validator rejects any identifier not present in the SMR for the active tenant, and nothing is queryable that is not registered.
+The Semantic Metrics Registry (SMR) is the governing catalogue of every analytical concept resolvable on the platform. Before any query can be planned or executed, every identifier in that query — metrics, dimensions, hierarchies — must be registered in the SMR. This is an architectural constraint, not a policy: the Semantic Intent Layer rejects any identifier not present in the SMR for the active tenant, and nothing is queryable that is not registered.
 
 ### Concept Types
 
