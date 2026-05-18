@@ -2,7 +2,7 @@
 
 ## Consumer Personas
 
-The platform is designed to serve a heterogeneous population of users whose needs range from conversational analytics access to deep governance administration. Identifying these personas precisely is prerequisite to reasoning about access control, feature scope, and the trust model that governs each interaction. The six primary personas below represent distinct relationships with the platform, each carrying different entitlement profiles and interaction patterns.
+The platform is designed to serve a heterogeneous population of users whose needs range from conversational analytics access to deep governance administration. These personas define the platform's access model: who can query what, with what constraints. The six personas below have different levels of access and interact with the platform in different ways.
 
 | Persona | Role | Primary need |
 |---------|------|--------------|
@@ -15,23 +15,23 @@ The platform is designed to serve a heterogeneous population of users whose need
 
 The distinctions between these personas are not merely organisational — they directly inform the platform's trust boundaries. The Analytical End User interacts exclusively through natural language and receives rendered, role-constrained results; they are deliberately shielded from physical schema details, metric identifiers, and backend routing. The Power Analyst extends this interface with drilldown navigation, lineage inspection, and export capability, but remains within the same governed query pipeline. The Compliance Analyst, while not a separate row in this taxonomy, is a specialised instantiation of the Power Analyst role with additional governance constraints applied at both column masking and export lineage levels.
 
-The Application Admin occupies a structurally distinct position. This role is the platform equivalent of a Chief Data Officer within the tenant. It must exist before go-live and is responsible for SMR integrity — what can be queried, how metrics are defined, and who can access what. Without a configured Application Admin, the Semantic Metrics Registry contains no governed metric definitions, entitlement policies cannot be established, and the platform cannot serve any analytical query. The Application Admin owns the lifecycle of metric definitions, approves registry changes, and maintains the entitlement policies that the Role-Aware Projection Layer enforces at query time.
+The Application Admin must be configured before go-live. This role controls what can be queried, how metrics are defined, and who can access what. Without one, the Semantic Metrics Registry contains no governed metric definitions and the platform cannot serve any analytical query. The Application Admin owns the lifecycle of metric definitions, approves registry changes, and maintains the entitlement policies that the Role-Aware Projection Layer enforces at query time.
 
-The Metric Owner is a delegation mechanism within that governance model: the Application Admin assigns ownership of individual metrics to subject-matter experts who then serve as the authoritative reviewers for definition changes, aggregation rule modifications, and documentation accuracy. This separation ensures that governance responsibility is distributed appropriately across domain expertise boundaries without concentrating all approval authority in a single administrator.
+Metric Owners let the Application Admin distribute review responsibility to subject-matter experts. Each Metric Owner serves as the authoritative reviewer for definition changes, aggregation rule modifications, and documentation accuracy on their assigned metrics — distributing governance responsibility across domain expertise without concentrating all approval authority in a single administrator.
 
-The Integration Engineer operates at the infrastructure boundary. Their concern is backend registration, connection configuration, and the physical mapping declarations that the Federated Query Planner resolves at execution time. They interact primarily through configuration interfaces rather than the conversational query path. The Platform Admin sits above the tenant boundary entirely, responsible for infrastructure health, tenant onboarding, and cross-tenant governance audit — this persona has no ordinary query interface into tenant data.
+The Integration Engineer operates at the infrastructure boundary, handling backend registration, connection configuration, and the physical mapping declarations that the Federated Query Planner resolves at execution time. They interact through configuration interfaces rather than the conversational query path. The Platform Admin sits above the tenant boundary entirely, responsible for infrastructure health, tenant onboarding, and cross-tenant governance audit — this persona has no query interface into tenant data.
 
-These personas are not mutually exclusive in practice. A single individual may hold both the Power Analyst and Metric Owner roles within a given tenant; the platform evaluates entitlements based on the combined claims present in the JWT at query time. However, the conceptual separation is maintained throughout the design to ensure that feature scope, permission model, and audit trail are reasoned about with precision.
+These personas are not mutually exclusive. A single individual may hold multiple roles within a tenant; the platform evaluates entitlements from the combined JWT claims present at query time.
 
 ## Illustrative Use Cases
 
-The following journeys demonstrate how the platform's architectural components compose to serve substantively different analytical needs. Each journey has been selected to highlight a different cluster of platform features and to illustrate the governance guarantees that apply uniformly across all query types.
+The following journeys show how the platform handles three different types of query. Each highlights a different cluster of platform features and the governance guarantees that apply across all query types.
 
 ### Journey A: Wealth Management — Portfolio Morning Briefing
 
 A portfolio manager begins their morning with a natural language query: "Show me portfolio returns versus benchmark across all my portfolios for the current quarter, sorted by tracking error."
 
-The Semantic Intent Layer resolves the natural language request to three metric identifiers — `portfolio_return`, `benchmark_return`, and `tracking_error` — against the Semantic Metrics Registry. The Role-Aware Projection Layer simultaneously extracts the manager's portfolio scope from the JWT claims and constructs a row-level predicate that restricts result sets to portfolios within the manager's authorised coverage. This predicate is injected into the Logical Query Plan before any execution backend is contacted; it is not a post-hoc filter applied to a full dataset.
+The Semantic Intent Layer resolves the natural language request to three metric identifiers — `portfolio_return`, `benchmark_return`, and `tracking_error` — against the Semantic Metrics Registry. The Role-Aware Projection Layer extracts the manager's portfolio scope from the JWT claims and constructs a row-level predicate restricting results to portfolios within the manager's authorised coverage. This predicate is injected into the Logical Query Plan before any execution backend is contacted — it is not a post-hoc filter applied to a full dataset.
 
 The Visualisation Ontology examines the assembled result pattern — multiple metrics across multiple portfolio entities, sorted by a continuous measure — and selects a multi-series bar chart as the appropriate display specification. The Narrative Synthesis Engine produces: "Across 14 portfolios, 9 outperformed their benchmark. Global Equity Opportunities has the highest tracking error at 3.2%..." This narrative is returned alongside the display specification as a single structured MCP tool response.
 
@@ -79,6 +79,6 @@ The matrix below maps each major platform feature to the personas for whom it is
 | Backend registration | | | | | | ✓ |
 | Governance audit trail | | | ✓ | ✓ | | ✓ |
 
-The matrix reveals two distinct operational planes. The analytical plane — natural language query through result export — is accessible to all query-facing personas and is the interface through which business value is delivered. The governance plane — SMR management, entitlement policy, backend registration, and audit trail — is restricted to the personas whose responsibilities require it. These planes are not independently accessible: the governance plane is what makes the analytical plane safe to operate at enterprise scale.
+The matrix reveals two distinct operational planes. The analytical plane — natural language query through result export — is accessible to all query-facing personas. The governance plane — SMR management, entitlement policy, backend registration, and audit trail — is restricted to the personas whose responsibilities require it.
 
 The full platform architecture diagram and request flow sequence are in [Chapter 3 — Core Platform Capabilities](./03-core-capabilities.md).
