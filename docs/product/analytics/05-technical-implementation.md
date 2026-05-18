@@ -68,37 +68,226 @@ The Semantic Data Context Store (DCS) is a pre-existing platform component — t
 | **Protocol** | MCP Streamable HTTP | Standard MCP interoperability; supports request/response and streaming |
 | **Auth** | JWT validation at request ingress | Stateless; validated before any platform computation begins |
 
-FastMCP (`pip install fastmcp`) provides the `@mcp.tool()` decorator and handles MCP Streamable HTTP transport. Each analytical capability is a decorated Python function; the framework serialises tool schemas and routes calls automatically.
+FastMCP (`pip install fastmcp`) provides the `@mcp.tool()`, `@mcp.resource()`, and `@mcp.prompt()` decorators and handles MCP Streamable HTTP transport. Each analytical capability is a decorated Python function; the framework serialises schemas and routes calls automatically.
+
+#### Tools
+
+All eight tools follow the same pattern: JWT validation → Semantic Intent Layer → Role-Aware Projection → Semantic Execution Governance → FQP → response assembly.
 
 ```python
 from fastmcp import FastMCP
 from pydantic import BaseModel
+from typing import Literal
 
-mcp = FastMCP("Analytics Platform")
+mcp = FastMCP(
+    name="Analytics Platform",
+    instructions=(
+        "Governed analytical query engine for portfolio performance, risk, and regulatory metrics. "
+        "All queries are validated against the Semantic Metrics Registry, subject to role-based "
+        "entitlement projection, and governed by cost and compliance circuit breakers before execution."
+    ),
+)
+
+# ── Shared pipeline helper ────────────────────────────────────────────────────
+
+async def run_pipeline(payload: BaseModel, jwt: str) -> dict:
+    claims = validate_jwt(jwt)
+    lqp    = await sil.resolve(payload, claims)
+    lqp    = rapl.project(lqp, claims)
+    lqp    = await seg.approve(lqp)
+    result = await fqp.execute(lqp)
+    return await assemble_response(result)
+
+# ── Tool input models ─────────────────────────────────────────────────────────
+
+class Filter(BaseModel):
+    dimension: str
+    operator: Literal["eq", "neq", "gt", "lt", "gte", "lte", "in", "not_in"]
+    value: str | list[str]
 
 class AnalyseMetricInput(BaseModel):
-    metrics: list[str]
-    dimensions: list[str] = []
+    metrics:     list[str]
+    dimensions:  list[str] = []
     time_period: str
-    filters: list[dict] = []
-    order_by: str | None = None
-    limit: int = 1000
+    filters:     list[Filter] = []
+    order_by:    str | None = None
+    limit:       int = 1000
+    compare_to:  dict | None = None
+
+class RiskBreakdownInput(BaseModel):
+    portfolio_id:   str
+    risk_metric:    Literal["var_95", "var_99", "tracking_error", "expected_shortfall", "beta"]
+    attribution_by: Literal["asset_class", "factor", "issuer", "geography", "currency"]
+    as_of_date:     str  # ISO date
+
+class ComparePortfoliosInput(BaseModel):
+    portfolio_ids: list[str]
+    metrics:       list[str]
+    time_period:   str
+    benchmark_id:  str | None = None
+
+class PerformanceAttributionInput(BaseModel):
+    portfolio_id:   str
+    benchmark_id:   str
+    attribution_by: Literal["asset_class", "geography", "sector", "currency"]
+    time_period:    str
+    model:          Literal["bhb", "bf"] = "bhb"
+
+class RegulatoryMetricInput(BaseModel):
+    metric_id:      str
+    entity_id:      str
+    reporting_date: str  # ISO date
+    jurisdiction:   str
+
+class DrilldownInput(BaseModel):
+    result_id:      str
+    hierarchy:      str
+    selected_value: str | None = None
+
+class ListMetricsInput(BaseModel):
+    domain:      str | None = None
+    category:    str | None = None
+    search_term: str | None = None
+
+class GetMetricDefinitionInput(BaseModel):
+    metric_id: str
+
+# ── Tool declarations ─────────────────────────────────────────────────────────
 
 @mcp.tool()
 async def analyse_metric(input: AnalyseMetricInput, jwt: str) -> dict:
-    """Execute a governed query against one or more registered metrics."""
-    claims = validate_jwt(jwt)                  # reject before any processing
-    lqp    = await sil.resolve(input, claims)   # Semantic Intent Layer
-    lqp    = rapl.project(lqp, claims)          # Role-Aware Projection
-    lqp    = await seg.approve(lqp)             # Governance gate
-    result = await fqp.execute(lqp)             # Federated Query Planner
-    return await assemble_response(result)
+    """Execute a governed query against one or more registered metrics.
+    Returns a display spec (chart or table), an optional narrative, and a lineage reference."""
+    return await run_pipeline(input, jwt)
+
+@mcp.tool()
+async def risk_breakdown(input: RiskBreakdownInput, jwt: str) -> dict:
+    """Decompose a risk metric into factor contributions by the specified dimension.
+    Returns an attribution waterfall display spec and narrative."""
+    return await run_pipeline(input, jwt)
+
+@mcp.tool()
+async def compare_portfolios(input: ComparePortfoliosInput, jwt: str) -> dict:
+    """Compare one or more metrics across two or more portfolios, optionally against a benchmark.
+    Returns a multi-series bar or table display spec."""
+    return await run_pipeline(input, jwt)
+
+@mcp.tool()
+async def performance_attribution(input: PerformanceAttributionInput, jwt: str) -> dict:
+    """Run a BHB or Brinson-Fachler attribution decomposition for a portfolio versus its benchmark.
+    Returns a waterfall display spec broken down by the specified dimension."""
+    return await run_pipeline(input, jwt)
+
+@mcp.tool()
+async def regulatory_metric(input: RegulatoryMetricInput, jwt: str) -> dict:
+    """Query a regulatory compliance metric such as LCR, NSFR, or leverage ratio.
+    Requires the regulatory_reporting feature flag and an appropriate compliance role."""
+    return await run_pipeline(input, jwt)
+
+@mcp.tool()
+async def drilldown(input: DrilldownInput, jwt: str) -> dict:
+    """Navigate into a dimension hierarchy from a prior result.
+    All filters, role predicates, and entitlement context from the original result are preserved."""
+    return await run_pipeline(input, jwt)
+
+@mcp.tool()
+async def list_metrics(input: ListMetricsInput, jwt: str) -> dict:
+    """List all SMR metrics available to the current user's role.
+    Returns metric IDs, labels, descriptions, domains, and required dimensions."""
+    claims = validate_jwt(jwt)
+    return await smr.list_metrics(input, claims)
+
+@mcp.tool()
+async def get_metric_definition(input: GetMetricDefinitionInput, jwt: str) -> dict:
+    """Retrieve the full SMR definition for a specific metric, including its formula,
+    aggregation rules, required dimensions, governance status, and version history."""
+    claims = validate_jwt(jwt)
+    return await smr.get_definition(input.metric_id, claims)
+```
+
+#### Resources
+
+Resources expose read-only SMR content to AI consumers that want to browse or cache metric definitions before constructing tool calls.
+
+```python
+@mcp.resource("smr://metrics")
+async def smr_metric_list(jwt: str) -> list[dict]:
+    """All approved metrics available to the authenticated user.
+    Use this to discover metric IDs before calling analyse_metric."""
+    claims = validate_jwt(jwt)
+    return await smr.list_approved(claims)
+
+@mcp.resource("smr://metrics/{metric_id}")
+async def smr_metric_definition(metric_id: str, jwt: str) -> dict:
+    """Full SMR definition for a single metric — formula, aggregation rules,
+    required dimensions, data domain, governance status."""
+    claims = validate_jwt(jwt)
+    return await smr.get_definition(metric_id, claims)
+
+@mcp.resource("smr://dimensions")
+async def smr_dimension_list(jwt: str) -> list[dict]:
+    """All approved dimensions available to the authenticated user."""
+    claims = validate_jwt(jwt)
+    return await smr.list_dimensions(claims)
+
+@mcp.resource("smr://hierarchies")
+async def smr_hierarchy_list(jwt: str) -> list[dict]:
+    """All approved drilldown hierarchies, with their ordered dimension levels."""
+    claims = validate_jwt(jwt)
+    return await smr.list_hierarchies(claims)
+
+@mcp.resource("lineage://{result_id}")
+async def lineage_record(result_id: str, jwt: str) -> dict:
+    """Full lineage record for a prior result — intent, resolved definitions,
+    role projection, governance decisions, sub-plans, and execution metadata."""
+    claims = validate_jwt(jwt)
+    return await lineage_store.get(result_id, claims)
+```
+
+#### Prompts
+
+Prompts provide pre-built instruction templates that AI consumers can load to anchor their analytical behaviour before making tool calls.
+
+```python
+@mcp.prompt()
+async def analytical_assistant(jwt: str) -> str:
+    """System prompt for an AI assistant using the Analytics Platform.
+    Injects the tenant's available metrics and governance constraints."""
+    claims  = validate_jwt(jwt)
+    metrics = await smr.list_approved_summary(claims)   # id + label + description
+    return f"""You are a governed analytical assistant. You answer quantitative questions
+by calling the Analytics Platform tools — never by estimating or generating numbers.
+
+Available metrics (call list_metrics or get_metric_definition for full detail):
+{metrics}
+
+Rules:
+- Only reference metric IDs that appear in the list above.
+- Do not invent metric values. Every number must come from a tool result.
+- When a result includes a narrative field, use it as your response — do not paraphrase.
+- When a result includes a result_id, offer to drilldown or inspect lineage if relevant.
+- If a metric is not in the list, tell the user it is not registered and suggest list_metrics."""
+
+@mcp.prompt()
+async def regulatory_reporting_assistant(jwt: str) -> str:
+    """System prompt for a compliance-focused assistant operating under MiFID II or Basel III/IV.
+    Adds regulatory framing and prohibits investment recommendations."""
+    claims  = validate_jwt(jwt)
+    metrics = await smr.list_approved_summary(claims, domain="regulatory")
+    return f"""You are a regulatory reporting assistant operating under strict compliance constraints.
+
+Available regulatory metrics:
+{metrics}
+
+Additional rules beyond the standard analytical assistant:
+- Do not generate investment recommendations under any circumstances.
+- For client-related queries, remind the user that a business justification will be required.
+- Cite the result_id and lineage_url in every response that references a computed metric value.
+- If a compliance mode error is returned, explain the constraint in plain English before retrying."""
 
 if __name__ == "__main__":
     mcp.run(transport="streamable-http", host="0.0.0.0", port=8000)
 ```
-
-`analyse_metric` accepts: `metrics` (required, array of SMR metric IDs), `dimensions` (array of dimension IDs), `time_period` (period enum or custom date range), `filters` (dimension/operator/values), `order_by` (metric + direction), `limit` (1–1000, default 1000).
 
 ---
 
