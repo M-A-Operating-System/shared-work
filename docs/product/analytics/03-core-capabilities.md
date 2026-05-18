@@ -158,48 +158,56 @@ The SMR is composed of five interconnected concept types:
 
 Every metric in the SMR conforms to the following schema. This is the authoritative reference for metric registration and validation:
 
-```yaml
-metric:
-  id:               "portfolio_return"
-  version:          "2.1.0"
-  label:            "Portfolio Return"
-  description:      "Total return of a portfolio over the specified period, net of fees, expressed as a percentage."
-  formula:          "(end_market_value - start_market_value + cash_flows) / start_market_value"
-  unit:             "percentage"
-  aggregation:
-    default:        "value_weighted_average"
-    allowed:        ["value_weighted_average", "equal_weighted_average", "sum"]
-    granularity:    ["daily", "monthly", "quarterly", "annual", "since_inception"]
-  dimensions:
-    required:       ["portfolio", "date"]
-    optional:       ["asset_class", "currency", "benchmark"]
-  data:
-    domain:         "portfolio"
-    sub_domain:     "performance"
-    source_tables:  ["fact_portfolio_daily", "dim_portfolio"]
-    refresh_cadence: "daily"
-    latency_sla:    "T+1"
-  governance:
-    owner:          "head_of_performance_analytics"
-    steward:        "performance_analytics_team"
-    classification: "INTERNAL"
-    approved:       true
-    approved_by:    "cdo_office"
-    approved_at:    "2025-11-15T09:00:00Z"
-    effective_from: "2025-11-15"
-    deprecated:     false
-  lineage:
-    upstream_metrics: []
-    upstream_sources: ["positions_service", "pricing_service", "cash_flow_service"]
-    downstream_metrics: ["active_return", "information_ratio"]
-  access:
-    roles:          ["portfolio_manager", "risk_officer", "application_admin"]
-    public:         false
-  display:
-    format:         "percentage"
-    decimals:       2
-    sign_convention: "positive_is_gain"
-    benchmark_comparison: true
+```json
+{
+  "id":          "portfolio_return",
+  "version":     "2.1.0",
+  "label":       "Portfolio Return",
+  "description": "Total return of a portfolio over the specified period, net of fees, expressed as a percentage.",
+  "formula":     "(end_market_value - start_market_value + cash_flows) / start_market_value",
+  "unit":        "percentage",
+  "aggregation": {
+    "default":     "value_weighted_average",
+    "allowed":     ["value_weighted_average", "equal_weighted_average", "sum"],
+    "granularity": ["daily", "monthly", "quarterly", "annual", "since_inception"]
+  },
+  "dimensions": {
+    "required": ["portfolio", "date"],
+    "optional": ["asset_class", "currency", "benchmark"]
+  },
+  "data": {
+    "domain":          "portfolio",
+    "sub_domain":      "performance",
+    "source_tables":   ["fact_portfolio_daily", "dim_portfolio"],
+    "refresh_cadence": "daily",
+    "latency_sla":     "T+1"
+  },
+  "governance": {
+    "owner":          "head_of_performance_analytics",
+    "steward":        "performance_analytics_team",
+    "classification": "INTERNAL",
+    "approved":       true,
+    "approved_by":    "cdo_office",
+    "approved_at":    "2025-11-15T09:00:00Z",
+    "effective_from": "2025-11-15",
+    "deprecated":     false
+  },
+  "lineage": {
+    "upstream_metrics":   [],
+    "upstream_sources":   ["positions_service", "pricing_service", "cash_flow_service"],
+    "downstream_metrics": ["active_return", "information_ratio"]
+  },
+  "access": {
+    "roles":  ["portfolio_manager", "risk_officer", "application_admin"],
+    "public": false
+  },
+  "display": {
+    "format":               "percentage",
+    "decimals":             2,
+    "sign_convention":      "positive_is_gain",
+    "benchmark_comparison": true
+  }
+}
 ```
 
 ### Metric Schema Field Reference
