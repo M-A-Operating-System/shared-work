@@ -12,14 +12,13 @@ flowchart TD
 
     subgraph analytics["AI Analytics Platform"]
         MCP["MCP Capability Layer\nPython · FastMCP + Uvicorn · MCP Streamable HTTP"]
-        SIL["Semantic Intent Layer\nAnthropic Claude · Sonnet / Opus"]
+        SIL["Semantic Intent Layer\nParameter validation · SMR resolution · LQP generation"]
         RAPL["Role-Aware Projection Layer\nCustom middleware · Python"]
         SEG["Semantic Execution Governance\nCost estimation · classification · circuit breakers"]
         FQP["Federated Query Planner\nApache Calcite + backend adapters"]
         VO["Visualisation Ontology\nSCL generation · Vega-Lite v5"]
-        NSE["Narrative Synthesis Engine\nAnthropic Claude · Haiku / Sonnet"]
         LS[("Analytical Lineage Store")]
-        Result(["MCP tool response\ndisplay_spec + narrative + result_id"])
+        Result(["MCP tool response\ndisplay_spec + structured result + result_id"])
     end
 
     vite2img["vite2img (optional)\nStandalone MCP render service · SCL → SVG / PNG\nRegistered directly with consumers — not part of Analytics Platform"]
@@ -38,7 +37,7 @@ flowchart TD
 
     Consumer -->|"POST /v1/mcp (JWT + MCP tool call)"| MCP
     Consumer -->|"MCP tool call + user JWT"| vite2img
-    MCP -->|"natural language query"| SIL
+    MCP -->|"validated tool call parameters"| SIL
     MCP -->|"JWT claims"| RAPL
     RAPL -->|"row predicates + column masks"| SIL
     SIL -->|"metric resolution + validation"| SMR
@@ -49,9 +48,7 @@ flowchart TD
     FQP --> SQL & ODA & GDA
     FQP -->|"execution record"| LS
     FQP -->|"assembled result"| VO
-    FQP -->|"assembled result"| NSE
-    VO -->|"SCL display spec"| Result
-    NSE -->|"narrative"| Result
+    VO -->|"SCL display spec + structured result"| Result
 ```
 
 The Semantic Data Context Store (DCS) is a pre-existing platform component — the organisation's general-purpose registry for semantic definitions. The Analytics Platform registers metric definitions as a new `analytical_metric` type in the DCS, reusing its versioned storage, full-text search, cross-definition relationships, and tenant-scoped access control. The SMR governance layer adds the approval workflow, metric-specific schema validation, and the Admin API surface on top.
@@ -157,13 +154,13 @@ class GetMetricDefinitionInput(BaseModel):
 @mcp.tool()
 async def analyse_metric(input: AnalyseMetricInput, jwt: str) -> dict:
     """Execute a governed query against one or more registered metrics.
-    Returns a display spec (chart or table), an optional narrative, and a lineage reference."""
+    Returns a display spec (chart or table), a structured result set, and a lineage reference."""
     return await run_pipeline(input, jwt)
 
 @mcp.tool()
 async def risk_breakdown(input: RiskBreakdownInput, jwt: str) -> dict:
     """Decompose a risk metric into factor contributions by the specified dimension.
-    Returns an attribution waterfall display spec and narrative."""
+    Returns an attribution waterfall display spec and a structured result set."""
     return await run_pipeline(input, jwt)
 
 @mcp.tool()
@@ -264,7 +261,6 @@ Available metrics (call list_metrics or get_metric_definition for full detail):
 Rules:
 - Only reference metric IDs that appear in the list above.
 - Do not invent metric values. Every number must come from a tool result.
-- When a result includes a narrative field, use it as your response — do not paraphrase.
 - When a result includes a result_id, offer to drilldown or inspect lineage if relevant.
 - If a metric is not in the list, tell the user it is not registered and suggest list_metrics."""
 
@@ -295,9 +291,9 @@ if __name__ == "__main__":
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
-| **Provider** | Anthropic Claude | Strong instruction following and tool-use reliability for constrained analytical domains |
-| **Intent resolution** | Sonnet | Good speed/accuracy balance for metric name resolution |
-| **Complex queries** | Opus | Multi-metric attribution and ambiguous intent |
+| **Parameter validation** | JSON Schema + Pydantic | Strict schema enforcement against MCP tool input models; structured error responses |
+| **SMR resolution** | Direct SMR service call | Synchronous lookup against the metric registry; rejects unregistered IDs before LQP generation |
+| **LQP generation** | Custom Python | Backend-agnostic DAG construction from validated parameters; deterministic for any given input |
 
 ---
 
@@ -542,7 +538,7 @@ The FQP decomposes this into two sub-plans — one routed to `primary-warehouse`
 
 #### FQP output — assembled result
 
-After execution and result assembly the FQP returns a typed result envelope to the Visualisation Ontology and Narrative Synthesis Engine:
+After execution and result assembly the FQP returns a typed result envelope to the Visualisation Ontology:
 
 ```json
 {
@@ -672,16 +668,6 @@ vite2img is a **standalone MCP render service** — not part of the Analytics Pl
 | AI Chat Platform | vega-embed | Native data table | vite2img (direct MCP call) |
 | Custom UI | vega-embed (recommended) | Host's own grid | vite2img |
 | Agentic consumers | vite2img | vite2img | vite2img |
-
----
-
-### Narrative Synthesis Engine
-
-| Decision | Choice | Rationale |
-|----------|--------|-----------|
-| **Provider** | Anthropic Claude | Consistent with intent layer; strong constrained prose generation |
-| **Default tier** | Haiku | Low latency; sufficient quality for narrative prose |
-| **Complex narratives** | Sonnet | Multi-portfolio attribution; complex regulatory narratives |
 
 ---
 
