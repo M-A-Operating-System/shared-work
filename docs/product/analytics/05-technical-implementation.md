@@ -211,42 +211,66 @@ async def get_metric_definition(input: GetMetricDefinitionInput, jwt: str) -> di
 
 #### Resources
 
-Resources expose read-only SMR content to AI consumers that want to browse or cache metric definitions before constructing tool calls.
+Resources are used for **knowledge artifacts** — static reference material, skills definitions, and workflow guides that AI consumers embed in their context to understand how to use the platform effectively. Dynamic data lookups (metric definitions, lineage records, dimension catalogues) are handled by tools, not resources.
 
 ```python
-@mcp.resource("smr://metrics")
-async def smr_metric_list(jwt: str) -> list[dict]:
-    """All approved metrics available to the authenticated user.
-    Use this to discover metric IDs before calling analyse_metric."""
-    claims = validate_jwt(jwt)
-    return await smr.list_approved(claims)
+@mcp.resource("guide://analytics/platform-overview")
+async def guide_platform_overview() -> str:
+    """What the Analytics Platform does, how it governs queries, and when to use
+    each analytical capability. Load this before helping a user with any analytical task."""
+    return knowledge_store.get("guide/platform-overview")
 
-@mcp.resource("smr://metrics/{metric_id}")
-async def smr_metric_definition(metric_id: str, jwt: str) -> dict:
-    """Full SMR definition for a single metric — formula, aggregation rules,
-    required dimensions, data domain, governance status."""
-    claims = validate_jwt(jwt)
-    return await smr.get_definition(metric_id, claims)
+@mcp.resource("guide://analytics/analytical-domains")
+async def guide_analytical_domains() -> str:
+    """Reference guide to the six analytical domains (portfolio, performance, risk,
+    regulatory, counterparty, benchmarks) — what each covers, which metrics belong
+    to it, and the governance constraints that apply."""
+    return knowledge_store.get("guide/analytical-domains")
 
-@mcp.resource("smr://dimensions")
-async def smr_dimension_list(jwt: str) -> list[dict]:
-    """All approved dimensions available to the authenticated user."""
-    claims = validate_jwt(jwt)
-    return await smr.list_dimensions(claims)
+@mcp.resource("guide://analytics/query-patterns")
+async def guide_query_patterns() -> str:
+    """Common analytical query patterns with worked examples: time-period comparisons,
+    benchmark-relative performance, risk attribution, regulatory ratio queries.
+    Use this to choose the right tool and parameter structure for a given user request."""
+    return knowledge_store.get("guide/query-patterns")
 
-@mcp.resource("smr://hierarchies")
-async def smr_hierarchy_list(jwt: str) -> list[dict]:
-    """All approved drilldown hierarchies, with their ordered dimension levels."""
-    claims = validate_jwt(jwt)
-    return await smr.list_hierarchies(claims)
+@mcp.resource("skills://analytics/portfolio-performance-review")
+async def skills_portfolio_performance() -> str:
+    """Step-by-step skills definition for conducting a portfolio performance review:
+    which metrics to query, which dimensions to apply, how to interpret the results,
+    and when to drilldown. Designed for AI assistants supporting portfolio managers."""
+    return knowledge_store.get("skills/portfolio-performance-review")
 
-@mcp.resource("lineage://{result_id}")
-async def lineage_record(result_id: str, jwt: str) -> dict:
-    """Full lineage record for a prior result — intent, resolved definitions,
-    role projection, governance decisions, sub-plans, and execution metadata."""
-    claims = validate_jwt(jwt)
-    return await lineage_store.get(result_id, claims)
+@mcp.resource("skills://analytics/risk-analysis")
+async def skills_risk_analysis() -> str:
+    """Skills definition for risk metric analysis: VaR, tracking error, expected
+    shortfall, issuer concentration. Covers query construction, result interpretation,
+    threshold context, and escalation patterns."""
+    return knowledge_store.get("skills/risk-analysis")
+
+@mcp.resource("skills://analytics/regulatory-reporting")
+async def skills_regulatory_reporting() -> str:
+    """Skills definition for regulatory metric queries under MiFID II and Basel III/IV:
+    required dimensions, compliance mode constraints, business justification requirements,
+    and how to surface lineage references in regulatory responses."""
+    return knowledge_store.get("skills/regulatory-reporting")
+
+@mcp.resource("guide://compliance/mifid2")
+async def guide_mifid2() -> str:
+    """MiFID II compliance mode reference: which query types require a business
+    justification, best-execution dimension requirements, what the mifid2_trace
+    record captures, and how to explain compliance constraints to users."""
+    return knowledge_store.get("guide/compliance-mifid2")
+
+@mcp.resource("guide://compliance/basel3")
+async def guide_basel3() -> str:
+    """Basel III/IV compliance mode reference: entity dimension requirements,
+    regulatory snapshot writes, stress scenario classification rules, and
+    how to structure LCR and NSFR queries correctly."""
+    return knowledge_store.get("guide/compliance-basel3")
 ```
+
+Knowledge artifacts are stored in a versioned content store (`knowledge_store`) managed via the Admin API. Tenant administrators can extend or override the default guides and skills definitions. Resources do not require JWT authentication — they contain no user data — but are scoped to the platform's public knowledge surface.
 
 #### Prompts
 
