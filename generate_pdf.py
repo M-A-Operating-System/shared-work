@@ -242,7 +242,7 @@ def build_html(files: list[Path], title: str, meta: str,
 
 CSS = """
 @page {
-    size: A4;
+    size: letter;
     margin: 22mm 24mm 26mm 24mm;
     @bottom-right {
         content: counter(page);
@@ -262,7 +262,7 @@ CSS = """
     page: cover-page;
     page-break-after: always;
     background-color: #ffffff;
-    min-height: 297mm;
+    min-height: 279.4mm;
     display: flex;
     align-items: center;
     padding: 0 28mm;
@@ -420,11 +420,11 @@ tr          { page-break-inside: avoid; }
     text-align: center;
 }
 .mermaid-img {
-    /* A4 content area: 162mm wide × 249mm tall (after margins).
+    /* US Letter content area: 168mm wide × 231mm tall (after margins).
        Cap at 80% of each dimension so diagrams never overflow the page. */
     width: 80%;
-    max-width: 130mm;
-    max-height: 199mm;
+    max-width: 134mm;
+    max-height: 185mm;
     height: auto;
     display: block;
     margin: 0 auto;
