@@ -330,6 +330,10 @@ def generate_product(name: str, config: dict) -> None:
 
 def generate_page(file_path: Path) -> None:
     """Generate a PDF for a single .md file, placed next to it."""
+    if file_path.is_symlink():
+        print(f"  [error] symlinks are not supported: {file_path}")
+        sys.exit(1)
+
     file_path = file_path.resolve()
 
     if file_path.suffix != '.md':
