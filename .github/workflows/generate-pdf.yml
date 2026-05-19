@@ -34,6 +34,7 @@ jobs:
         run: |
           sudo apt-get install -y libpango-1.0-0 libpangoft2-1.0-0
           pip install -r requirements.txt
+          npm install -g @mermaid-js/mermaid-cli
 
       - name: Configure git
         run: |

@@ -15,9 +15,12 @@ Requirements:
 """
 
 import html as _html
+import json
 import os
 import re
+import subprocess
 import sys
+import tempfile
 
 # fontTools raises ValueError when it encounters OS/2 Unicode range bit 123 (out of
 # spec, 0–122 valid). Some system fonts on Linux carry this invalid bit. Patch the
@@ -74,6 +77,99 @@ def strip_md_links(text: str) -> str:
     return re.sub(r"\(\./[\w-]+\.md(?:#[\w-]*)?\)", "()", text)
 
 
+# ---------- mermaid rendering ----------
+
+def _mmdc_available() -> bool:
+    try:
+        subprocess.run(["mmdc", "--version"], capture_output=True, timeout=10)
+        return True
+    except (FileNotFoundError, subprocess.SubprocessError):
+        return False
+
+
+_MMDC_PRESENT: bool | None = None  # cached after first check
+
+
+def _render_mermaid_svg(source: str) -> str | None:
+    """Render a Mermaid diagram to an SVG string via mmdc. Returns None on failure."""
+    global _MMDC_PRESENT
+    if _MMDC_PRESENT is None:
+        _MMDC_PRESENT = _mmdc_available()
+        if not _MMDC_PRESENT:
+            print("  [warn] mmdc not found — Mermaid diagrams will render as code blocks")
+    if not _MMDC_PRESENT:
+        return None
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        in_path  = Path(tmpdir) / "diagram.mmd"
+        out_path = Path(tmpdir) / "diagram.svg"
+        cfg_path = Path(tmpdir) / "puppeteer.json"
+
+        in_path.write_text(source, encoding="utf-8")
+        # --no-sandbox is required in restricted CI environments (GitHub Actions)
+        cfg_path.write_text(json.dumps({"args": ["--no-sandbox"]}))
+
+        try:
+            result = subprocess.run(
+                ["mmdc", "-i", str(in_path), "-o", str(out_path),
+                 "--puppeteerConfigFile", str(cfg_path)],
+                capture_output=True,
+                timeout=60,
+            )
+        except subprocess.SubprocessError as e:
+            print(f"  [warn] mmdc failed: {e}")
+            return None
+
+        if result.returncode != 0 or not out_path.exists():
+            print(f"  [warn] mmdc error: {result.stderr.decode().strip()}")
+            return None
+
+        svg = out_path.read_text(encoding="utf-8")
+
+    # Scale SVG to container width; viewBox preserves aspect ratio
+    svg = re.sub(r'(<svg\b[^>]*?)\s+width="[^"]*"',  r'\1 width="100%"',  svg)
+    svg = re.sub(r'(<svg\b[^>]*?)\s+height="[^"]*"', r'\1',               svg)
+    return svg
+
+
+def extract_mermaid_blocks(text: str) -> tuple[str, dict[str, str]]:
+    """
+    Replace ```mermaid blocks with unique placeholders before markdown conversion,
+    returning the modified text and a map of placeholder → rendered HTML.
+    Placeholders survive markdown conversion as bare <p> text nodes.
+    """
+    placeholders: dict[str, str] = {}
+    counter = 0
+
+    def replace(match: re.Match) -> str:
+        nonlocal counter
+        source = match.group(1).strip()
+        key = f"MERMAID_BLOCK_{counter}_END"
+        counter += 1
+        svg = _render_mermaid_svg(source)
+        if svg:
+            placeholders[key] = f'<div class="mermaid-diagram">{svg}</div>'
+        else:
+            escaped = _html.escape(source)
+            placeholders[key] = (
+                f'<div class="mermaid-fallback">'
+                f'<p class="mermaid-fallback-label">Diagram (mmdc unavailable)</p>'
+                f'<pre><code>{escaped}</code></pre></div>'
+            )
+        return f"\n\n{key}\n\n"
+
+    modified = re.sub(r"```mermaid[ \t]*\n(.*?)\n[ \t]*```", replace, text, flags=re.DOTALL)
+    return modified, placeholders
+
+
+def inject_mermaid(html: str, placeholders: dict[str, str]) -> str:
+    """Substitute mermaid placeholders back into converted HTML."""
+    for key, rendered in placeholders.items():
+        html = html.replace(f"<p>{key}</p>", rendered)
+        html = html.replace(key, rendered)  # fallback if not wrapped in <p>
+    return html
+
+
 def build_html(files: list[Path], title: str, meta: str,
                subs: dict[str, str] | None = None) -> str:
     import markdown
@@ -88,8 +184,21 @@ def build_html(files: list[Path], title: str, meta: str,
         if subs:
             for key, val in subs.items():
                 raw = raw.replace(key, val)
+        raw, mermaid_map = extract_mermaid_blocks(raw)
         body = md.convert(raw)
+        body = inject_mermaid(body, mermaid_map)
         md.reset()
+
+        # Fail fast if any mermaid block slipped through unextracted.
+        # fenced_code marks un-extracted blocks with class="language-mermaid".
+        leaked = body.count('language-mermaid')
+        if leaked:
+            raise RuntimeError(
+                f"{leaked} mermaid block(s) in {path.name} were not extracted "
+                f"before markdown conversion — they will render as raw text. "
+                f"Check extract_mermaid_blocks() regex."
+            )
+
         extra_class = " first-section" if i == 0 else ""
         sections.append(f'<section class="doc-section{extra_class}">{body}</section>')
 
@@ -290,6 +399,32 @@ a { color: #1d4ed8; text-decoration: none; }
 /* Pagination hints */
 h1, h2, h3 { page-break-after: avoid; }
 tr          { page-break-inside: avoid; }
+
+/* Mermaid diagrams */
+.mermaid-diagram {
+    margin: 4mm 0;
+    page-break-inside: avoid;
+    text-align: center;
+}
+.mermaid-diagram svg {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
+.mermaid-fallback {
+    background-color: #f9fafb;
+    border: 1px dashed #d1d5db;
+    border-radius: 3pt;
+    padding: 6pt 10pt;
+    margin: 4mm 0;
+}
+.mermaid-fallback-label {
+    font-size: 7.5pt;
+    color: #9ca3af;
+    margin: 0 0 2mm;
+    font-style: italic;
+}
 """
 
 # ---------- per-product generation ----------
