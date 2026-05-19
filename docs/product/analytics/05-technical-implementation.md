@@ -123,29 +123,33 @@ class AnalyseMetricInput(BaseModel):
     limit:       int = 1000
     compare_to:  dict | None = None
 
-class RiskBreakdownInput(BaseModel):
+class PortfolioRiskInput(BaseModel):
+    operation_id:   str        # SMR operation ID — e.g. "risk_breakdown", "var_analysis"
     portfolio_id:   str
-    risk_metric:    str   # SMR metric ID — e.g. "var_95", "tracking_error"
-    attribution_by: str   # SMR dimension ID — e.g. "asset_class", "geography"
-    as_of_date:     str   # ISO date
+    metrics:        list[str]  # SMR metric IDs — e.g. "var_95", "tracking_error"
+    attribution_by: str        # SMR dimension ID — e.g. "asset_class", "geography"
+    as_of_date:     str        # ISO date
 
-class ComparePortfoliosInput(BaseModel):
+class PortfolioComparisonInput(BaseModel):
+    operation_id:  str        # SMR operation ID — e.g. "compare_portfolios"
     portfolio_ids: list[str]
-    metrics:       list[str]
+    metrics:       list[str]  # SMR metric IDs
     time_period:   str
     benchmark_id:  str | None = None
 
-class PerformanceAttributionInput(BaseModel):
+class PerformanceAnalysisInput(BaseModel):
+    operation_id:   str        # SMR operation ID — e.g. "performance_attribution"
     portfolio_id:   str
     benchmark_id:   str
     attribution_by: str                  # SMR dimension ID — e.g. "asset_class", "sector"
     time_period:    str
     model:          Literal["bhb", "bf"] = "bhb"  # computation algorithm, not SMR data
 
-class RegulatoryMetricInput(BaseModel):
-    metric_id:      str
+class RegulatoryReportInput(BaseModel):
+    operation_id:   str   # SMR operation ID — e.g. "regulatory_report", "capital_adequacy"
+    metric_id:      str   # SMR metric ID
     entity_id:      str
-    reporting_date: str  # ISO date
+    reporting_date: str   # ISO date
     jurisdiction:   str
 
 class DrilldownInput(BaseModel):
@@ -170,30 +174,33 @@ async def analyse_metric(input: AnalyseMetricInput, jwt: str) -> dict:
     return await run_pipeline(input, jwt)
 
 @mcp.tool()
-async def risk_breakdown(input: RiskBreakdownInput, jwt: str) -> dict:
-    """Decompose a risk metric into factor contributions by the specified dimension.
-    risk_metric and attribution_by must be SMR-registered IDs — use list_metrics and
-    list_dimensions to discover valid values for the authenticated user's role.
+async def risk_breakdown(input: PortfolioRiskInput, jwt: str) -> dict:
+    """Decompose risk metrics into factor contributions by the specified dimension.
+    operation_id must be an SMR-registered analytical operation — use list_operations to discover valid values.
+    metrics and attribution_by must be SMR-registered IDs — use list_metrics and list_dimensions for valid values.
     Returns an attribution waterfall display spec, a structured result set, and a governed narrative."""
     return await run_pipeline(input, jwt)
 
 @mcp.tool()
-async def compare_portfolios(input: ComparePortfoliosInput, jwt: str) -> dict:
+async def compare_portfolios(input: PortfolioComparisonInput, jwt: str) -> dict:
     """Compare one or more metrics across two or more portfolios, optionally against a benchmark.
+    operation_id must be an SMR-registered analytical operation — use list_operations to discover valid values.
     Returns a multi-series bar or table display spec."""
     return await run_pipeline(input, jwt)
 
 @mcp.tool()
-async def performance_attribution(input: PerformanceAttributionInput, jwt: str) -> dict:
-    """Run a BHB or Brinson-Fachler attribution decomposition for a portfolio versus its benchmark.
+async def performance_attribution(input: PerformanceAnalysisInput, jwt: str) -> dict:
+    """Run a performance attribution decomposition for a portfolio versus its benchmark.
+    operation_id must be an SMR-registered analytical operation — use list_operations to discover valid values.
     attribution_by must be an SMR-registered dimension ID — use list_dimensions to discover valid values.
     model selects the computation algorithm: 'bhb' (Brinson-Hood-Beebower) or 'bf' (Brinson-Fachler).
     Returns a waterfall display spec broken down by the specified dimension."""
     return await run_pipeline(input, jwt)
 
 @mcp.tool()
-async def regulatory_metric(input: RegulatoryMetricInput, jwt: str) -> dict:
-    """Query a regulatory compliance metric such as LCR, NSFR, or leverage ratio.
+async def regulatory_report(input: RegulatoryReportInput, jwt: str) -> dict:
+    """Generate a regulatory compliance report for a specific metric and entity.
+    operation_id must be an SMR-registered analytical operation — use list_operations to discover valid values.
     Requires the regulatory_reporting feature flag and an appropriate compliance role."""
     return await run_pipeline(input, jwt)
 
@@ -216,6 +223,15 @@ async def get_metric_definition(input: GetMetricDefinitionInput, jwt: str) -> di
     aggregation rules, required dimensions, governance status, and version history."""
     claims = validate_jwt(jwt)
     return await smr.get_definition(input.metric_id, claims)
+
+@mcp.tool()
+async def list_operations(jwt: str) -> dict:
+    """List all SMR analytical operations available to the current user's role.
+    Returns operation IDs, display names, required parameters, supported metrics, and supported dimensions.
+    Call this before constructing a risk_breakdown, compare_portfolios, performance_attribution,
+    or regulatory_report call to discover valid operation_id values."""
+    claims = validate_jwt(jwt)
+    return await smr.list_operations(claims)
 ```
 
 #### Resources
@@ -389,6 +405,60 @@ Each metric version in the SMR has a corresponding governance document stored in
 ```
 
 `status` is one of `"proposed"` | `"in_review"` | `"approved"` | `"deprecated"` | `"retired"`. The DCS enforces a uniqueness constraint: at most one document per `(tenant_id, metric_id)` may carry `"status": "approved"` at any point in time. All prior versions are retained as `"deprecated"` documents for lineage reconstruction.
+
+#### DCS analytical operation catalogue — document schema
+
+Analytical operations are also stored as DCS documents (`type: "analytical_operation"`). Each document defines a parameterised operation that the Semantic Intent Layer accepts via the `operation_id` field on tool inputs. The `list_operations` tool queries this catalogue.
+
+```json
+[
+  {
+    "type":                 "analytical_operation",
+    "operation_id":         "risk_breakdown",
+    "display_name":         "Risk Breakdown",
+    "tool":                 "risk_breakdown",
+    "description":          "Decompose a risk metric into factor contributions by the specified dimension.",
+    "required_params":      ["portfolio_id", "metrics", "attribution_by", "as_of_date"],
+    "supported_metrics":    ["var_95", "var_99", "tracking_error", "beta", "duration", "convexity"],
+    "supported_dimensions": ["asset_class", "geography", "sector", "currency", "issuer"],
+    "default_visualization":"attribution_waterfall"
+  },
+  {
+    "type":                 "analytical_operation",
+    "operation_id":         "compare_portfolios",
+    "display_name":         "Portfolio Comparison",
+    "tool":                 "compare_portfolios",
+    "description":          "Compare one or more metrics across two or more portfolios, optionally against a benchmark.",
+    "required_params":      ["portfolio_ids", "metrics", "time_period"],
+    "optional_params":      ["benchmark_id"],
+    "supported_metrics":    ["portfolio_return", "tracking_error", "sharpe_ratio", "volatility", "beta"],
+    "default_visualization":"bar_multi_series_comparison"
+  },
+  {
+    "type":                 "analytical_operation",
+    "operation_id":         "performance_attribution",
+    "display_name":         "Performance Attribution",
+    "tool":                 "performance_attribution",
+    "description":          "BHB or Brinson-Fachler attribution decomposition for a portfolio versus its benchmark.",
+    "required_params":      ["portfolio_id", "benchmark_id", "attribution_by", "time_period"],
+    "supported_dimensions": ["asset_class", "sector", "geography", "currency"],
+    "default_visualization":"attribution_waterfall"
+  },
+  {
+    "type":                    "analytical_operation",
+    "operation_id":            "regulatory_report",
+    "display_name":            "Regulatory Compliance Report",
+    "tool":                    "regulatory_report",
+    "description":             "Entity-level regulatory compliance metric report under MiFID II or Basel III/IV.",
+    "required_params":         ["metric_id", "entity_id", "reporting_date", "jurisdiction"],
+    "compliance_modes":        ["mifid2", "basel3"],
+    "required_feature_flag":   "regulatory_reporting",
+    "default_visualization":   "table"
+  }
+]
+```
+
+New operations are added via `POST /v1/smr/operations` through the Admin API and follow the same approval workflow as metric definitions. The `supported_metrics` and `supported_dimensions` lists are enforced by the Semantic Intent Layer — an operation call referencing a metric not in its catalogue is rejected before LQP generation.
 
 ---
 
