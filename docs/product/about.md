@@ -8,9 +8,26 @@ This is a living specification. It reflects design intent at the time of publica
 
 ## About M&A Operating System
 
-M&A Operating System is building the AI-native operating layer for mergers and acquisitions. Our platform combines intelligent workflows, structured data, and governed AI to help deal teams move faster — with more confidence — on the transactions that matter most.
+M&A Operating System is a boutique advisory firm focused on helping organizations modernize the operational foundations required for scalable analytics, trusted enterprise information, and practical AI adoption.
 
-From due diligence and document analysis through to integration tracking and stakeholder reporting, M&A Operating System brings together the tools and intelligence that deal teams need in one governed, auditable platform.
+Our work sits at the intersection of enterprise data strategy, information architecture, operating model modernization, and transformation execution. We specialize in helping organizations design practical, business-aligned approaches to enterprise information management that support operational scalability, analytics enablement, governance, and modern AI capabilities.
+
+A core part of our approach is the recognition that successful data and AI initiatives are not driven solely by technology platforms. Long-term success depends on how well organizations structure, model, govern, operationalize, and align information with real business processes and decision-making.
+
+Our Product Design document series reflects this philosophy. These documents are intended to provide practical frameworks, methodologies, architectural concepts, and implementation guidance that help organizations move beyond theoretical strategy into executable operational design.
+
+M&A Operating System's approach combines:
+- Enterprise data and AI strategy
+- Subject-based data modeling and information architecture
+- Semantic and operational data design
+- Governance and organizational alignment
+- Operating model modernization
+- Transformation execution and delivery leadership
+- Practical AI operationalization and readiness
+
+Our engagements are led directly by experienced operators and transformation leaders with deep experience across investment banking, asset management, financial services, travel technology, and regulated industries.
+
+Our goal is simple: help organizations build practical, scalable, and trusted information foundations that improve operational effectiveness, accelerate analytics and AI adoption, and support better business outcomes.
 
 ---
 
