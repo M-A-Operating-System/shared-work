@@ -102,6 +102,9 @@ class RunAnalyticsInput(BaseModel):
     operation_id: str   # SMR operation ID — discover via list_operations
     params:       dict  # operation parameters; validated against SMR operation schema by SIL
 
+class ListOperationsInput(BaseModel):
+    domain: str | None = None  # optional filter by analytical domain
+
 class DrilldownInput(BaseModel):
     result_id:      str
     hierarchy:      str
@@ -122,12 +125,12 @@ async def run_analytics(input: RunAnalyticsInput, jwt: str) -> dict:
     return await pipeline_executor.run(lqp, operation["execution_profile"])
 
 @mcp.tool()
-async def list_operations(domain: str | None = None, jwt: str = ...) -> dict:
+async def list_operations(input: ListOperationsInput, jwt: str) -> dict:
     """List all SMR-registered operations available to the current user's role.
     Returns operation IDs, display names, required parameters, supported metrics,
     supported dimensions, and execution profiles."""
     claims = validate_jwt(jwt)
-    return await smr.list_operations(claims, domain=domain)
+    return await smr.list_operations(claims, domain=input.domain)
 
 @mcp.tool()
 async def drilldown(input: DrilldownInput, jwt: str) -> dict:
