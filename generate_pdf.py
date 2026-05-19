@@ -37,16 +37,14 @@ PRODUCTS_DIR = Path(__file__).parent / "docs" / "product"
 
 PRODUCTS = {
     "assistant": {
-        "title":    "AI Chat Platform",
-        "subtitle": "Product Design Specification",
-        "meta":     "Draft v1.0 · May 2026",
-        "output":   "assistant_product_design.pdf",
+        "title":  "AI Chat Platform",
+        "meta":   "Draft v1.0 · May 2026",
+        "output": "assistant_product_design.pdf",
     },
     "analytics": {
-        "title":    "AI Analytics Platform",
-        "subtitle": "Product Design Specification",
-        "meta":     "Draft v1.0 · May 2026",
-        "output":   "analytics_product_design.pdf",
+        "title":  "AI Analytics Platform",
+        "meta":   "Draft v1.0 · May 2026",
+        "output": "analytics_product_design.pdf",
     },
 }
 
@@ -73,7 +71,8 @@ def strip_md_links(text: str) -> str:
     return re.sub(r"\(\./[\w-]+\.md(?:#[\w-]*)?\)", "()", text)
 
 
-def build_html(files: list[Path], title: str, subtitle: str, meta: str) -> str:
+def build_html(files: list[Path], title: str, meta: str,
+               subs: dict[str, str] | None = None) -> str:
     import markdown
 
     md = markdown.Markdown(
@@ -83,6 +82,9 @@ def build_html(files: list[Path], title: str, subtitle: str, meta: str) -> str:
     sections = []
     for i, path in enumerate(files):
         raw = strip_md_links(path.read_text(encoding="utf-8"))
+        if subs:
+            for key, val in subs.items():
+                raw = raw.replace(key, val)
         body = md.convert(raw)
         md.reset()
         extra_class = " first-section" if i == 0 else ""
@@ -91,9 +93,9 @@ def build_html(files: list[Path], title: str, subtitle: str, meta: str) -> str:
     cover = f"""
 <div class="cover-page">
   <div class="cover-inner">
-    <p class="cover-eyebrow">Confidential · Internal</p>
+    <p class="cover-eyebrow">M&amp;A Operating System</p>
+    <p class="cover-category">Product Design</p>
     <h1 class="cover-title">{title}</h1>
-    <p class="cover-subtitle">{subtitle}</p>
     <hr class="cover-rule">
     <p class="cover-meta">{meta}</p>
   </div>
@@ -101,7 +103,7 @@ def build_html(files: list[Path], title: str, subtitle: str, meta: str) -> str:
 
     return f"""<!DOCTYPE html>
 <html lang="en">
-<head><meta charset="utf-8"><title>{title} — {subtitle}</title></head>
+<head><meta charset="utf-8"><title>{title}</title></head>
 <body>
 {cover}
 {"".join(sections)}
@@ -131,39 +133,40 @@ CSS = """
 .cover-page {
     page: cover-page;
     page-break-after: always;
-    background-color: #1e3a6e;
+    background-color: #ffffff;
     min-height: 297mm;
     display: flex;
     align-items: center;
     padding: 0 28mm;
     box-sizing: border-box;
 }
-.cover-inner  { color: #ffffff; max-width: 130mm; }
+.cover-inner { max-width: 130mm; }
 .cover-eyebrow {
     font-size: 8pt;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
-    opacity: 0.55;
-    margin: 0 0 14mm;
+    color: #6b7280;
+    margin: 0 0 4mm;
+}
+.cover-category {
+    font-size: 11pt;
+    color: #374151;
+    font-weight: 400;
+    margin: 0 0 5mm;
 }
 .cover-title {
     font-size: 30pt;
     font-weight: 700;
     line-height: 1.1;
-    margin: 0 0 5mm;
-}
-.cover-subtitle {
-    font-size: 13pt;
-    opacity: 0.75;
+    color: #1e3a6e;
     margin: 0 0 12mm;
-    font-weight: 400;
 }
 .cover-rule {
     border: none;
-    border-top: 1px solid rgba(255,255,255,0.25);
+    border-top: 2px solid #1e3a6e;
     margin: 0 0 8mm;
 }
-.cover-meta { font-size: 9pt; opacity: 0.5; margin: 0; }
+.cover-meta { font-size: 9pt; color: #9ca3af; margin: 0; }
 
 /* Document sections */
 .doc-section           { page-break-before: always; }
@@ -292,7 +295,8 @@ def generate_product(name: str, config: dict) -> None:
         return
 
     output = docs_dir / config["output"]
-    files = get_ordered_files(docs_dir)
+    about = PRODUCTS_DIR / "about.md"
+    files = ([about] if about.exists() else []) + get_ordered_files(docs_dir)
 
     if not files:
         print(f"  [skip] {name}: no markdown files found in {docs_dir}")
@@ -304,7 +308,8 @@ def generate_product(name: str, config: dict) -> None:
         print(f"  {f.name}")
 
     print("Building HTML…")
-    html = build_html(files, config["title"], config["subtitle"], config["meta"])
+    html = build_html(files, config["title"], config["meta"],
+                      subs={"{{PRODUCT_NAME}}": name})
 
     print("Rendering PDF (this may take a moment)…")
     from weasyprint import HTML, CSS as WeasyprintCSS
@@ -340,7 +345,7 @@ def generate_page(file_path: Path) -> None:
 
     print(f"\n── page: {file_path.name} ──────────────────────────────────────────")
     print("Building HTML…")
-    html = build_html([file_path], page_title, config["subtitle"], config["meta"])
+    html = build_html([file_path], page_title, config["meta"])
 
     print("Rendering PDF…")
     from weasyprint import HTML, CSS as WeasyprintCSS
