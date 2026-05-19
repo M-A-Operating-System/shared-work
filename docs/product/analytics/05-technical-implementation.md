@@ -360,65 +360,93 @@ class NarrativeSynthesisEngine:
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
-| **Definition storage** | DCS (pre-existing) | Metric definitions alongside data definitions — no duplicate semantic store |
-| **Governance tracking** | DCS document store — `smr_governance` document type | Approval workflow state stored as JSON documents in the same store as metric definitions |
+| **Definition storage** | DCS (pre-existing) | Metric and operation definitions stored alongside existing data definitions — no duplicate semantic store |
+| **Authoring and approval** | DCS native capabilities | Document creation, versioning, and approval workflow are handled by the existing DCS tooling — no new write layer needed |
 | **Runtime reads** | Direct DCS API query by Semantic Intent Layer | Definitions from the authoritative source at resolution time |
-| **Search** | DCS native search index | `list_metrics` queries DCS directly; no separate search infrastructure |
+| **Search** | DCS native search index | `list_operations` and `list_metrics` query DCS directly — no separate search infrastructure |
 
-#### DCS governance extension — document schema
+The SMR is implemented as two new document types registered in the DCS. The DCS manages the full document lifecycle (draft → in review → approved → deprecated) for both types using its existing authoring and approval capabilities.
 
-Each metric version in the SMR has a corresponding governance document stored in the DCS. The document records the approval lifecycle for that version:
+#### New DCS document type: `analytical_metric`
+
+The core metric definition. One document per approved metric version per tenant. The `status` field follows the DCS approval lifecycle; the Semantic Intent Layer only resolves documents with `"status": "approved"`.
 
 ```json
 {
-  "id":           "smr-gov-a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-  "type":         "smr_governance",
-  "tenant_id":    "acme-wealth",
-  "dcs_def_id":   "dcs://analytical_metric/portfolio_return",
-  "metric_id":    "portfolio_return",
-  "version":      3,
-  "status":       "approved",
-  "source":       "tenant",
-  "created_by":   "alice@acme.com",
-  "approved_by":  "cdo@acme.com",
-  "approved_at":  "2026-05-14T09:00:00Z",
-  "created_at":   "2026-05-13T14:32:00Z",
-  "superseded_at": null
+  "type":                 "analytical_metric",
+  "tenant_id":            "acme-wealth",
+  "metric_id":            "var_95",
+  "version":              2,
+  "status":               "approved",
+  "source":               "platform",
+  "display_name":         "Value at Risk (95%)",
+  "description":          "Maximum expected portfolio loss over a 1-day horizon at 95% confidence.",
+  "domain":               "risk",
+  "category":             "market_risk",
+  "unit":                 "percentage",
+  "decimals":             2,
+  "aggregation":          "value_weighted_average",
+  "cost_weight":          3,
+  "classification_level": "internal",
+  "data_affinity":        "risk_metrics",
+  "physical_mapping": {
+    "source":  "risk-semantic-layer",
+    "cube":    "risk_cube",
+    "measure": "var_95_daily"
+  },
+  "required_dimensions":  ["portfolio_id", "as_of_date"],
+  "optional_dimensions":  ["asset_class", "geography", "sector", "currency"],
+  "compliance_modes":     [],
+  "approved_by":          "cdo@acme.com",
+  "approved_at":          "2026-05-14T09:00:00Z",
+  "created_at":           "2026-05-13T14:32:00Z"
 }
 ```
 
-`status` is one of `"proposed"` | `"in_review"` | `"approved"` | `"deprecated"` | `"retired"`. The DCS enforces a uniqueness constraint: at most one document per `(tenant_id, metric_id)` may carry `"status": "approved"` at any point in time. All prior versions are retained as `"deprecated"` documents for lineage reconstruction.
+`status` is one of `"proposed"` | `"in_review"` | `"approved"` | `"deprecated"` | `"retired"`. The DCS enforces a uniqueness constraint: at most one document per `(tenant_id, metric_id)` may carry `"status": "approved"` at any point in time. All prior versions are retained as `"deprecated"` for lineage reconstruction. `source` is `"platform"` for Financial Services Reference Model entries and `"tenant"` for customised definitions.
 
-#### DCS analytical operation catalogue — document schema
+#### New DCS document type: `analytical_operation`
 
-Analytical operations are also stored as DCS documents (`type: "analytical_operation"`). Each document defines a parameterised operation that the Semantic Intent Layer accepts via the `operation_id` field on tool inputs. The `list_operations` tool queries this catalogue.
+The operation catalogue. One document per approved operation per tenant. The `execution_profile` field tells the pipeline executor which stages to invoke. The `supported_metrics` and `supported_dimensions` lists are enforced by the Semantic Intent Layer — a `run_analytics` call referencing an out-of-catalogue value is rejected before LQP generation.
 
 ```json
 [
   {
     "type":                 "analytical_operation",
+    "tenant_id":            "acme-wealth",
     "operation_id":         "get_positions",
+    "version":              1,
+    "status":               "approved",
+    "source":               "platform",
     "display_name":         "Portfolio Positions",
-    "execution_profile":    "data_retrieval",
     "description":          "Fetch current or historical position data for a portfolio.",
+    "execution_profile":    "data_retrieval",
     "required_params":      ["portfolio_id"],
     "optional_params":      ["as_of_date", "asset_class"]
   },
   {
     "type":                 "analytical_operation",
+    "tenant_id":            "acme-wealth",
     "operation_id":         "portfolio_return",
+    "version":              1,
+    "status":               "approved",
+    "source":               "platform",
     "display_name":         "Portfolio Return",
+    "description":          "Total return for a portfolio over a specified period.",
     "execution_profile":    "metric_query",
-    "description":          "Retrieve the total return for a portfolio over a specified period.",
     "required_params":      ["portfolio_id", "time_period"],
     "supported_metrics":    ["portfolio_return"]
   },
   {
     "type":                 "analytical_operation",
+    "tenant_id":            "acme-wealth",
     "operation_id":         "risk_breakdown",
+    "version":              1,
+    "status":               "approved",
+    "source":               "platform",
     "display_name":         "Risk Breakdown",
-    "execution_profile":    "full_analytical",
     "description":          "Decompose a risk metric into factor contributions by the specified dimension.",
+    "execution_profile":    "full_analytical",
     "required_params":      ["portfolio_id", "metrics", "attribution_by", "as_of_date"],
     "supported_metrics":    ["var_95", "var_99", "tracking_error", "beta", "duration", "convexity"],
     "supported_dimensions": ["asset_class", "geography", "sector", "currency", "issuer"],
@@ -426,10 +454,14 @@ Analytical operations are also stored as DCS documents (`type: "analytical_opera
   },
   {
     "type":                 "analytical_operation",
+    "tenant_id":            "acme-wealth",
     "operation_id":         "compare_portfolios",
+    "version":              1,
+    "status":               "approved",
+    "source":               "platform",
     "display_name":         "Portfolio Comparison",
-    "execution_profile":    "full_analytical",
     "description":          "Compare one or more metrics across two or more portfolios, optionally against a benchmark.",
+    "execution_profile":    "full_analytical",
     "required_params":      ["portfolio_ids", "metrics", "time_period"],
     "optional_params":      ["benchmark_id"],
     "supported_metrics":    ["portfolio_return", "tracking_error", "sharpe_ratio", "volatility", "beta"],
@@ -437,29 +469,35 @@ Analytical operations are also stored as DCS documents (`type: "analytical_opera
   },
   {
     "type":                 "analytical_operation",
+    "tenant_id":            "acme-wealth",
     "operation_id":         "performance_attribution",
+    "version":              1,
+    "status":               "approved",
+    "source":               "platform",
     "display_name":         "Performance Attribution",
-    "execution_profile":    "full_analytical",
     "description":          "BHB or Brinson-Fachler attribution decomposition for a portfolio versus its benchmark.",
+    "execution_profile":    "full_analytical",
     "required_params":      ["portfolio_id", "benchmark_id", "attribution_by", "time_period"],
     "supported_dimensions": ["asset_class", "sector", "geography", "currency"],
     "default_visualization":"attribution_waterfall"
   },
   {
-    "type":                    "analytical_operation",
-    "operation_id":            "regulatory_report",
-    "display_name":            "Regulatory Compliance Report",
-    "execution_profile":       "full_analytical",
-    "description":             "Entity-level regulatory compliance metric report under MiFID II or Basel III/IV.",
-    "required_params":         ["metric_id", "entity_id", "reporting_date", "jurisdiction"],
-    "compliance_modes":        ["mifid2", "basel3"],
-    "required_feature_flag":   "regulatory_reporting",
-    "default_visualization":   "table"
+    "type":                  "analytical_operation",
+    "tenant_id":             "acme-wealth",
+    "operation_id":          "regulatory_report",
+    "version":               1,
+    "status":                "approved",
+    "source":                "platform",
+    "display_name":          "Regulatory Compliance Report",
+    "description":           "Entity-level regulatory compliance metric report under MiFID II or Basel III/IV.",
+    "execution_profile":     "full_analytical",
+    "required_params":       ["metric_id", "entity_id", "reporting_date", "jurisdiction"],
+    "compliance_modes":      ["mifid2", "basel3"],
+    "required_feature_flag": "regulatory_reporting",
+    "default_visualization": "table"
   }
 ]
 ```
-
-New operations are added via `POST /v1/smr/operations` through the Admin API and follow the same approval workflow as metric definitions. The `supported_metrics`, `supported_dimensions`, and `execution_profile` are enforced by the Semantic Intent Layer — an operation call referencing an unknown metric or profile mismatch is rejected before LQP generation.
 
 ```python
 class SemanticMetricsRegistry:
