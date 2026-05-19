@@ -52,14 +52,19 @@ jobs:
           fi
 
       - name: Generate single-page PDF
+        id: gen_page
         if: github.event_name == 'workflow_dispatch' && inputs.page != ''
         env:
           PAGE_INPUT: ${{ inputs.page }}
+        run: python generate_pdf.py --page "$PAGE_INPUT"
+
+      - name: Commit single-page PDF
+        if: github.event_name == 'workflow_dispatch' && inputs.page != ''
+        env:
+          PDF_PATH: ${{ steps.gen_page.outputs.pdf_path }}
         run: |
-          python generate_pdf.py --page "$PAGE_INPUT"
-          PDF="${PAGE_INPUT%.md}.pdf"
-          git add "$PDF"
-          git diff --cached --quiet || git commit -m "docs: regenerate PDF for ${PAGE_INPUT} [skip ci]"
+          git add "$PDF_PATH"
+          git diff --cached --quiet || git commit -m "docs: regenerate PDF for ${PDF_PATH} [skip ci]"
 
       # ── Full regeneration mode ───────────────────────────────────────────────
       - name: Generate and commit analytics PDF

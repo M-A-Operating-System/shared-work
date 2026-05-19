@@ -15,6 +15,7 @@ Requirements:
 """
 
 import html as _html
+import os
 import re
 import sys
 
@@ -399,6 +400,13 @@ def generate_page(file_path: Path) -> None:
 
     size_mb = output.stat().st_size / 1_000_000
     print(f"Done → {output}  ({size_mb:.1f} MB)")
+
+    # Publish the output path for GitHub Actions step chaining
+    github_output = os.environ.get("GITHUB_OUTPUT")
+    if github_output:
+        repo_root = Path(__file__).parent
+        with open(github_output, "a") as f:
+            f.write(f"pdf_path={output.relative_to(repo_root)}\n")
 
 # ---------- main ----------
 
