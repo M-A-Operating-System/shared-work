@@ -66,7 +66,7 @@ This document describes one proposed sequence of deliverables for the AI Analyti
 </tr>
 <tr>
 <td>Analytical Lineage Store</td>
-<td>Create <code>lineage_records</code> table in PostgreSQL with JSONB columns for intent, SMR definition version snapshots, role projection record, LQP, per-backend sub-plans and raw responses, assembled result, governance decisions, and SCL display spec; implement S3-compatible object storage integration for result artefacts &gt;10 MB; add lineage inspector API endpoint; configure 7-year retention policy for regulated deployments</td>
+<td>Provision S3-compatible object store bucket with date-partitioned key structure (<code>lineage/{tenant_id}/{yyyy}/{mm}/{dd}/{result_id}.json</code>); implement write-once JSON document serialiser covering the full query record (request payload, resolved metric versions, governance decision, sub-plans, assembled result, SCL display spec, compliance metadata); implement write path called by the Semantic Execution Governance service before any backend execution and by the FQP on completion; create lightweight <code>analytics.lineage_index</code> PostgreSQL table (scalar fields only — no JSON payloads) for future search queries; configure object lifecycle policy for 7-year default retention; post-hoc compliance annotations written as sibling amendment documents, never mutating the original record</td>
 </tr>
 <tr>
 <td>vite2img Rendering Service</td>
@@ -268,7 +268,7 @@ This document describes one proposed sequence of deliverables for the AI Analyti
 </tr>
 <tr>
 <td>Lineage Query REST API</td>
-<td>Add new read-only API surface to the Analytical Lineage Store service: <code>GET /v1/lineage/{result_id}</code> for full record retrieval; <code>POST /v1/lineage/search</code> with filterable fields (<code>user_sub</code>, <code>metric_id</code>, <code>time_range</code>, <code>backend_id</code>, <code>governance_decision</code>) backed by PostgreSQL indexed queries; <code>GET /v1/lineage/{result_id}/sub-plans</code> for per-backend sub-plans; enforce JWT scoping so users retrieve only their own records; extend to tenant-wide search for Platform Admin role</td>
+<td>Add new read-only API surface to the Analytical Lineage Store service: <code>GET /v1/lineage/{result_id}</code> fetches the full JSON document from the object store by key; <code>POST /v1/lineage/search</code> queries the <code>analytics.lineage_index</code> PostgreSQL table for matching <code>result_id</code>s (filterable by <code>user_sub</code>, <code>time_range</code>, <code>compliance_mode</code>, <code>error_code</code>), then fetches full documents from the object store for each match; <code>GET /v1/lineage/{result_id}/sub-plans</code> returns the <code>sub_plans</code> field from the fetched object store document; enforce JWT scoping so users retrieve only their own records; extend to tenant-wide search for Platform Admin role</td>
 </tr>
 <tr>
 <td>GraphQL API Gateway</td>

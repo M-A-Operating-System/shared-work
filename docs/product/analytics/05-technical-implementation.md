@@ -741,39 +741,58 @@ vite2img is a **standalone MCP render service** — not part of the Analytics Pl
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
-| **Lineage records** | PostgreSQL | Structured; queryable; ACID audit integrity |
-| **Result artefacts** | S3-compatible object storage | Large result sets stored as blobs; referenced by URL |
-| **Retention** | Default 7 years (configurable per compliance mode) | MiFID II and equivalent regimes |
+| **Lineage records** | S3-compatible object store — one JSON document per query | Write-once; append-only; cheap at scale; no schema migration required; natural fit for immutable audit records |
+| **Object key** | `lineage/{tenant_id}/{yyyy}/{mm}/{dd}/{result_id}.json` | Date-partitioned; enables prefix-based listing by tenant and time window |
+| **Search index** | Thin PostgreSQL table (scalar fields only, no JSON blobs) | Used by the Lineage Query REST API (Phase 11) for filtered search; full record always fetched from the object store |
+| **Retention** | Object lifecycle policy — default 7 years (configurable per compliance mode) | MiFID II and equivalent regimes; enforced at the storage layer, not application code |
 
-#### `analytics.lineage_records` DDL
+#### Lineage document schema
 
-```sql
-CREATE TABLE analytics.lineage_records (
-  result_id            TEXT        PRIMARY KEY,
-  tenant_id            TEXT        NOT NULL,
-  user_sub             TEXT        NOT NULL,
-  lqp_id               TEXT        NOT NULL,
-  fqp_execution_id     TEXT,
-  cache_hit            BOOLEAN     NOT NULL DEFAULT FALSE,
-  request_payload      JSONB       NOT NULL,
-  resolved_metrics     JSONB       NOT NULL,
-  governance_decision  JSONB       NOT NULL,
-  sub_plans            JSONB,
-  result_summary       JSONB       NOT NULL,
-  error_code           TEXT,
-  compliance_mode      TEXT,
-  compliance_meta      JSONB,
-  result_artefact_url  TEXT,
-  created_at           TIMESTAMPTZ NOT NULL DEFAULT now(),
-  expires_at           TIMESTAMPTZ NOT NULL
-);
+Each completed query writes a single JSON document to the object store at `lineage/{tenant_id}/{yyyy}/{mm}/{dd}/{result_id}.json`:
 
-CREATE INDEX idx_lineage_tenant_user ON analytics.lineage_records (tenant_id, user_sub, created_at DESC);
-CREATE INDEX idx_lineage_tenant_time ON analytics.lineage_records (tenant_id, created_at DESC);
-CREATE INDEX idx_lineage_compliance  ON analytics.lineage_records (tenant_id, compliance_mode) WHERE compliance_mode IS NOT NULL;
+```json
+{
+  "result_id":          "res_20260514_093247_a1b2c3",
+  "tenant_id":          "acme-wealth",
+  "user_sub":           "auth0|user_xyz",
+  "lqp_id":             "lqp-20260514-093241-xyz",
+  "cache_hit":          false,
+  "request_payload":    { "tool": "analyse_metric", "input": { "..." } },
+  "resolved_metrics":   [{ "metric_id": "portfolio_return", "version": "2.1.0" }],
+  "governance_decision":{ "approved": true, "cost_units": 850, "checks_passed": ["cost", "classification", "circuit_breaker"] },
+  "sub_plans":          [{ "backend": "primary-warehouse", "query": "...", "latency_ms": 980 }],
+  "result_summary":     { "row_count": 2, "schema": ["..."], "rows": ["..."] },
+  "display_spec":       { "type": "chart", "contract": "BAR_MULTI_SERIES_COMPARISON", "..." },
+  "error_code":         null,
+  "compliance_mode":    "mifid2",
+  "compliance_meta":    { "justification": "Quarterly review", "trace_id": "mifid2-trace-abc" },
+  "created_at":         "2026-05-14T09:32:47Z",
+  "expires_at":         "2033-05-14T09:32:47Z"
+}
 ```
 
-Lineage records are immutable. Post-hoc compliance annotations are written to `analytics.lineage_amendments` referencing the original `result_id`.
+Records are written once and never mutated. Post-hoc compliance annotations are written as separate sibling documents (`{result_id}_amendment_{n}.json`) referencing the original `result_id`.
+
+#### Search index DDL
+
+A lightweight PostgreSQL table holds only the scalar fields required for the Lineage Query REST API (Phase 11). Full records are always retrieved from the object store; this table is never the source of truth for record content.
+
+```sql
+CREATE TABLE analytics.lineage_index (
+  result_id       TEXT        PRIMARY KEY,
+  tenant_id       TEXT        NOT NULL,
+  user_sub        TEXT        NOT NULL,
+  compliance_mode TEXT,
+  error_code      TEXT,
+  cache_hit       BOOLEAN     NOT NULL,
+  created_at      TIMESTAMPTZ NOT NULL,
+  expires_at      TIMESTAMPTZ NOT NULL
+);
+
+CREATE INDEX idx_lineage_tenant_user ON analytics.lineage_index (tenant_id, user_sub, created_at DESC);
+CREATE INDEX idx_lineage_tenant_time ON analytics.lineage_index (tenant_id, created_at DESC);
+CREATE INDEX idx_lineage_compliance  ON analytics.lineage_index (tenant_id, compliance_mode) WHERE compliance_mode IS NOT NULL;
+```
 
 ---
 
@@ -798,10 +817,10 @@ Each knowledge artifact is a versioned Markdown document identified by a URI pat
 |-----------|--------|-----------|
 | MCP service | Python · FastMCP + Uvicorn | Lightweight ASGI MCP surface; deploys as Kubernetes pod |
 | Backend services | Kubernetes (cloud-agnostic) | FQP, governance, platform services as independently scalable pods |
-| Primary database | PostgreSQL (Neon or RDS) | Lineage records, role policy config, scheduled queries, user preferences, saved queries |
+| Primary database | PostgreSQL (Neon or RDS) | Lineage search index, role policy config, scheduled queries, user preferences, saved queries |
 | Data Context Store (DCS) | Pre-existing platform component | SMR metric definitions, governance config, SMR search — reuses DCS versioned storage and native search |
 | Knowledge Store | S3-compatible object store (versioned Markdown) | MCP resource content — guides, skills definitions, compliance reference |
-| Object storage | S3-compatible | Result artefacts, large cached result sets |
+| Object storage | S3-compatible | Lineage records (one JSON document per query), result artefacts, large cached result sets |
 | Message queue | SQS / Pub/Sub | Async lineage writes, DCS change events |
 | Secrets | HashiCorp Vault or cloud-native | Backend credentials, platform service keys |
 
