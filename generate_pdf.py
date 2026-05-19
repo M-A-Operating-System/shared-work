@@ -15,6 +15,7 @@ Requirements:
 """
 
 import html as _html
+import base64 as _b64
 import json
 import os
 import re
@@ -90,8 +91,13 @@ def _mmdc_available() -> bool:
 _MMDC_PRESENT: bool | None = None  # cached after first check
 
 
-def _render_mermaid_svg(source: str) -> str | None:
-    """Render a Mermaid diagram to an SVG string via mmdc. Returns None on failure."""
+def _render_mermaid(source: str) -> str | None:
+    """
+    Render a Mermaid diagram to a PNG via mmdc and return an <img> tag with a
+    base64 data URI.  PNG avoids WeasyPrint's inline-SVG font rendering issues
+    where <text> elements go missing due to unresolvable font references.
+    Returns None on failure (fallback code block used instead).
+    """
     global _MMDC_PRESENT
     if _MMDC_PRESENT is None:
         _MMDC_PRESENT = _mmdc_available()
@@ -102,17 +108,21 @@ def _render_mermaid_svg(source: str) -> str | None:
 
     with tempfile.TemporaryDirectory() as tmpdir:
         in_path  = Path(tmpdir) / "diagram.mmd"
-        out_path = Path(tmpdir) / "diagram.svg"
+        out_path = Path(tmpdir) / "diagram.png"
         cfg_path = Path(tmpdir) / "puppeteer.json"
 
         in_path.write_text(source, encoding="utf-8")
-        # --no-sandbox is required in restricted CI environments (GitHub Actions)
+        # --no-sandbox required in restricted CI environments (GitHub Actions)
         cfg_path.write_text(json.dumps({"args": ["--no-sandbox"]}))
 
         try:
             result = subprocess.run(
-                ["mmdc", "-i", str(in_path), "-o", str(out_path),
-                 "--puppeteerConfigFile", str(cfg_path)],
+                ["mmdc",
+                 "-i", str(in_path),
+                 "-o", str(out_path),
+                 "--puppeteerConfigFile", str(cfg_path),
+                 "-w", "1600",            # render at 1600 px wide — display size set by CSS
+                 "--backgroundColor", "white"],
                 capture_output=True,
                 timeout=60,
             )
@@ -120,16 +130,19 @@ def _render_mermaid_svg(source: str) -> str | None:
             print(f"  [warn] mmdc failed: {e}")
             return None
 
+        # mmdc occasionally adds a -1 suffix (e.g. diagram-1.png)
+        if not out_path.exists():
+            alt = out_path.parent / f"{out_path.stem}-1{out_path.suffix}"
+            if alt.exists():
+                out_path = alt
+
         if result.returncode != 0 or not out_path.exists():
             print(f"  [warn] mmdc error: {result.stderr.decode().strip()}")
             return None
 
-        svg = out_path.read_text(encoding="utf-8")
+        data = _b64.b64encode(out_path.read_bytes()).decode()
 
-    # Scale SVG to container width; viewBox preserves aspect ratio
-    svg = re.sub(r'(<svg\b[^>]*?)\s+width="[^"]*"',  r'\1 width="100%"',  svg)
-    svg = re.sub(r'(<svg\b[^>]*?)\s+height="[^"]*"', r'\1',               svg)
-    return svg
+    return f'<img src="data:image/png;base64,{data}" class="mermaid-img" alt="Diagram">'
 
 
 def extract_mermaid_blocks(text: str) -> tuple[str, dict[str, str]]:
@@ -146,9 +159,9 @@ def extract_mermaid_blocks(text: str) -> tuple[str, dict[str, str]]:
         source = match.group(1).strip()
         key = f"MERMAID_BLOCK_{counter}_END"
         counter += 1
-        svg = _render_mermaid_svg(source)
-        if svg:
-            placeholders[key] = f'<div class="mermaid-diagram">{svg}</div>'
+        rendered = _render_mermaid(source)
+        if rendered:
+            placeholders[key] = f'<div class="mermaid-diagram">{rendered}</div>'
         else:
             escaped = _html.escape(source)
             placeholders[key] = (
@@ -406,8 +419,12 @@ tr          { page-break-inside: avoid; }
     page-break-inside: avoid;
     text-align: center;
 }
-.mermaid-diagram svg {
-    max-width: 100%;
+.mermaid-img {
+    /* A4 content area: 162mm wide × 249mm tall (after margins).
+       Cap at 80% of each dimension so diagrams never overflow the page. */
+    width: 80%;
+    max-width: 130mm;
+    max-height: 199mm;
     height: auto;
     display: block;
     margin: 0 auto;
