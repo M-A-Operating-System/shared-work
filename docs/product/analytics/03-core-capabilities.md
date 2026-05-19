@@ -32,7 +32,7 @@ flowchart TD
         Result(["MCP tool response\ndisplay_spec + data + narrative + result_id"])
     end
 
-    vite2img["vite2img (optional)\nStandalone MCP render service · SCL → SVG / PNG\nRegistered directly with consumers — not part of Analytics Engine"]
+    vega2img["vega2img (optional)\nStandalone MCP render service · SCL → SVG / PNG\nRegistered directly with consumers — not part of Analytics Engine"]
 
     subgraph dcr["Data Context Repository"]
         SMR["Semantic Metrics Registry\nMetric definitions · dimensions · hierarchies\naggregation rules · governance · access policies"]
@@ -50,7 +50,7 @@ flowchart TD
     CustomUI -->|"JWT + structured MCP tool call"| MCP
     Agents -->|"agent JWT + structured MCP tool call"| MCP
     ChatEngine -->|"MCP resource reads + structured tool calls + user JWT"| MCP
-    ChatEngine -->|"MCP tool call + user JWT"| vite2img
+    ChatEngine -->|"MCP tool call + user JWT"| vega2img
     MCP -->|"structured parameters"| SIL
     MCP -->|"JWT claims"| RAPL
     RAPL -->|"row predicates + column masks"| SIL
@@ -71,7 +71,7 @@ The Analytics Engine is a single MCP server. It exposes three analytical tools (
 
 The AI Chat Platform loads the operation catalogue from the Analytics Engine by calling `list_operations` — this is how the AI model discovers what operations, metrics, and dimensions are available. It translates the user's natural language question into explicit, structured parameters and calls `run_analytics` with the resolved `operation_id` and `params`. The Analytics Engine returns the display specification, structured data, and governed narrative; the AI Chat Platform renders the result.
 
-The `vite2img` service is shown separately from the Analytics Platform boundary because it is an optional, independently registered MCP render service. Consumers that cannot natively render the SCL display specification — for example, an agentic pipeline that requires static image output — register `vite2img` directly and call it as a separate tool invocation using the `result_id` returned by the Analytics Platform. It is not part of the core analytics pipeline.
+The `vega2img` service is shown separately from the Analytics Platform boundary because it is an optional, independently registered MCP render service. Consumers that cannot natively render the SCL display specification — for example, an agentic pipeline that requires static image output — register `vega2img` directly and call it as a separate tool invocation using the `result_id` returned by the Analytics Platform. It is not part of the core analytics pipeline.
 
 ---
 
@@ -93,7 +93,7 @@ sequenceDiagram
     participant VO as Visualisation Ontology
     participant NSE as Narrative Synthesis Engine
     participant LS as Analytical Lineage Store
-    participant vite2img as vite2img
+    participant vega2img as vega2img
 
     C->>AE: list_operations (JWT)
     AE-->>C: operation catalogue (entitled subset)
@@ -127,8 +127,8 @@ sequenceDiagram
     end
     AE-->>C: display_spec + data + narrative + result_id
     opt Consumer cannot natively render SCL spec
-        C->>vite2img: render tool call (display_spec)
-        vite2img-->>C: SVG / PNG
+        C->>vega2img: render tool call (display_spec)
+        vega2img-->>C: SVG / PNG
     end
 ```
 
@@ -450,25 +450,23 @@ The resolved form carries metric versions, aggregation rules, and entitlement-de
 
 ### Example
 
-The MCP Capability Layer forwards the natural language query to the SIL. The SIL sends the query text plus the user's available metric catalogue to Claude Sonnet, which extracts the structured intent:
+The MCP Capability Layer forwards the structured tool call to the SIL. The SIL receives the `operation_id` and `params` from the `run_analytics` invocation:
 
 ```json
 {
-  "intent_id":  "int-20260518-093241-pk7m",
-  "tool":       "analyse_metric",
-  "metrics":    ["portfolio_return", "benchmark_return"],
-  "dimensions": ["portfolio_id"],
-  "filters": [
-    { "field": "asset_class", "operator": "eq", "value": "EQUITY" }
-  ],
-  "time_period": { "granularity": "quarterly", "anchor": "current" },
-  "sort":        { "field": "portfolio_return", "direction": "desc" },
-  "confidence":  0.97,
-  "unresolved":  []
+  "operation_id": "compare_portfolios",
+  "params": {
+    "portfolio_ids": ["GLOB_EQ_OPP", "UK_CORE_INC", "ASIA_PAC_GRW", "EUR_BAL_INC"],
+    "metrics":       ["portfolio_return", "benchmark_return"],
+    "time_period":   "quarter_to_date",
+    "filters": [
+      { "field": "asset_class", "operator": "eq", "value": "EQUITY" }
+    ]
+  }
 }
 ```
 
-After SMR resolution and role projection (Stage 3), the SIL produces the Logical Query Plan:
+The SIL resolves the `compare_portfolios` operation from the SMR DCS catalogue, validates the `params` against the operation's `required_params` schema, resolves each metric ID against `analytical_metric` documents, and applies role predicates from RAPL. After SMR resolution and role projection (Stage 3), the SIL produces the Logical Query Plan:
 
 ```json
 {
@@ -1117,43 +1115,44 @@ The chat engine renders the grouped bar chart inline and displays the narrative 
 
 The Analytical Lineage Store provides computation provenance: a complete, queryable record of how every result was calculated. Analytical lineage, as defined on this platform, is distinct from data lineage. Data lineage tracks how data moves between systems. Analytical lineage records how the analytics engine used specific metric definitions, entitlement rules, and execution backends to compute a specific result. The lineage record is not a log — it is a first-class data structure. A regulator, auditor, or internal reviewer must be able to reconstruct exactly how a specific number was calculated, by whom, under what entitlements, from which backends, and with what result — without re-running the query.
 
+### Storage Design
+
+Lineage records are stored in an S3-compatible object store — one JSON document per query at key `lineage/{tenant_id}/{yyyy}/{mm}/{dd}/{result_id}.json`. Records are write-once and never mutated. Post-hoc compliance annotations are written as sibling documents (`{result_id}_amendment_{n}.json`) referencing the original `result_id`.
+
+A thin PostgreSQL search index holds only scalar fields required for filtered search queries. The full record is always fetched from the object store; the index is never the source of truth for record content.
+
 ### Per-Query Stored Elements
 
-| Element | Table | Content |
+| Element | Storage | Content |
 |---|---|---|
-| Query record | `analytics.queries` | User ID, tenant ID, raw natural language, tool call parameters, intent pattern, timestamp, governance status, execution status, cost units consumed |
-| Lineage record | `analytics.lineage_records` | Complete chain: intent → SMR resolution → projection record → LQP → FQP execution record → result schema → visualisation contract → narrative synthesis status |
-| SMR snapshot | `analytics.lineage_records.metric_versions` | For each metric in the query: metric ID, SMR definition version, formula at query time |
-| Projection record | `analytics.lineage_records.projection_record` | Roles, requested metrics, projected metrics, blocked metrics, row predicates, column masks |
-| FQP execution record | `analytics.lineage_records.fqp_execution` | Sub-plan details, engine IDs, latencies, cost units, cache hit status |
-| Governance decision | `analytics.governance_events` | Circuit breaker decisions, classification gates, cost limit checks — including blocked queries |
-| Result artefact | Object storage + `analytics.result_artefacts` | CSV result set, chart SVG, narrative text — stored per query |
+| Lineage record | Object store — `lineage/{tenant_id}/{yyyy}/{mm}/{dd}/{result_id}.json` | Complete chain: tool call parameters → SMR resolution → projection record → LQP → governance decision → FQP execution record → result schema → visualisation contract → narrative synthesis status |
+| SMR snapshot | Embedded in lineage record (`resolved_metrics`) | For each metric in the query: metric ID, SMR definition version at query time |
+| Projection record | Embedded in lineage record | Roles, requested metrics, projected metrics, blocked metrics, row predicates, column masks |
+| FQP execution record | Embedded in lineage record (`sub_plans`) | Sub-plan details, engine IDs, latencies, cost units, cache hit status |
+| Governance decision | Embedded in lineage record (`governance_decision`) | Circuit breaker decisions, classification gates, cost limit checks — including blocked queries |
+| Search index row | PostgreSQL `analytics.lineage_index` | Scalar fields for filtered search — `result_id`, `tenant_id`, `user_sub`, `compliance_mode`, `error_code`, `cache_hit`, `created_at`, `expires_at` |
+| Result artefact | Object storage | CSV result set, chart SVG, narrative text — stored per query |
 
-### Core DDL: `analytics.lineage_records`
+### Search Index DDL: `analytics.lineage_index`
 
 ```sql
-CREATE TABLE analytics.lineage_records (
-  id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  query_id            UUID NOT NULL REFERENCES analytics.queries(id),
-  tenant_id           TEXT NOT NULL,
-  created_at          TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  -- Structured JSONB fields for each lineage chain element
-  intent_resolution   JSONB NOT NULL,  -- natural language → intent mapping
-  smr_resolution      JSONB NOT NULL,  -- metric/dimension definitions used
-  projection_record   JSONB NOT NULL,  -- entitlement decisions
-  lqp                 JSONB NOT NULL,  -- Logical Query Plan
-  governance_checks   JSONB NOT NULL,  -- governance decisions
-  fqp_execution       JSONB NOT NULL,  -- FQP sub-plans and engine calls
-  visualisation       JSONB,           -- chart contract selected
-  narrative_status    JSONB            -- narrative synthesis outcome
+CREATE TABLE analytics.lineage_index (
+  result_id       TEXT        PRIMARY KEY,
+  tenant_id       TEXT        NOT NULL,
+  user_sub        TEXT        NOT NULL,
+  compliance_mode TEXT,
+  error_code      TEXT,
+  cache_hit       BOOLEAN     NOT NULL,
+  created_at      TIMESTAMPTZ NOT NULL,
+  expires_at      TIMESTAMPTZ NOT NULL
 );
 ```
 
-The JSONB structure allows efficient querying of individual lineage chain elements — for example, finding all queries that used a specific metric version, or all queries where a governance check was blocked — without requiring full record deserialisation.
+The index is used only for search and filter queries (finding all records for a user, within a time window, by compliance mode, etc.). Filtered search results are resolved to full records by fetching each document from the object store using its `result_id`.
 
 ### Multi-Tenant Isolation
 
-Every record in the `analytics` schema carries a `tenant_id` column. Row-Level Security (RLS) in PostgreSQL enforces that users can only access records belonging to their own tenant. No cross-tenant data access is possible through the platform's API at any privilege level.
+Every lineage document is stored under a `tenant_id`-prefixed key in the object store (`lineage/{tenant_id}/...`), and every row in the `analytics.lineage_index` table carries a `tenant_id` column. Row-Level Security (RLS) in PostgreSQL enforces tenant isolation on the index table. Object store access is gated by the platform's API, which validates the JWT tenant claim before resolving any object key. No cross-tenant data access is possible through the platform's API at any privilege level.
 
 ### Retention
 
@@ -1186,52 +1185,59 @@ Audit export packages include query records with timestamps and user identifiers
 
 ### Example
 
-Two lineage records are written for this query. The first is written by SEG before the FQP is invoked — capturing the governance decision regardless of whether execution succeeds. The second is written by the FQP after execution.
+Two writes occur for this query. The first is written by SEG before the FQP is invoked — capturing the governance decision regardless of whether execution succeeds. The second is written by the FQP after execution, producing the full lineage document at `lineage/acme-wealth/2026/05/18/res-20260518-093247-wk4n.json`.
 
-**Governance decision record (written before FQP execution):**
+**Governance decision record (written to object store before FQP execution):**
 ```json
 {
-  "query_id":  "qry-20260518-093241-xm2p",
-  "lqp_id":   "lqp-20260518-093243-r9xq",
-  "tenant_id": "acme-wealth",
-  "event":     "governance_approved",
-  "timestamp": "2026-05-18T09:32:44Z",
-  "checks":    ["cost_ceiling", "metric_count", "dimension_count", "classification_gate"],
-  "result":    "all_passed"
+  "result_id":  "res-20260518-093247-wk4n",
+  "tenant_id":  "acme-wealth",
+  "lqp_id":     "lqp-20260518-093243-r9xq",
+  "event":      "governance_approved",
+  "timestamp":  "2026-05-18T09:32:44Z",
+  "checks":     ["cost_ceiling", "metric_count", "dimension_count", "classification_gate"],
+  "result":     "all_passed"
 }
 ```
 
-**Execution record (written after FQP completes):**
+**Full lineage document (written to object store after FQP completes, at `lineage/acme-wealth/2026/05/18/res-20260518-093247-wk4n.json`):**
 ```json
 {
-  "result_id":       "res-20260518-093247-wk4n",
-  "lqp_id":         "lqp-20260518-093243-r9xq",
-  "fqp_execution": {
-    "sub_plans": [
-      {
-        "backend":    "primary-warehouse",
-        "dialect":    "snowflake_sql",
-        "latency_ms": 1187,
-        "row_count":  4,
-        "cache_hit":  false
-      }
-    ]
+  "result_id":         "res-20260518-093247-wk4n",
+  "tenant_id":         "acme-wealth",
+  "user_sub":          "auth0|user_xyz",
+  "lqp_id":            "lqp-20260518-093243-r9xq",
+  "cache_hit":         false,
+  "governance_decision": {
+    "approved": true,
+    "checks_passed": ["cost_ceiling", "metric_count", "dimension_count", "classification_gate"]
   },
-  "smr_snapshot": [
-    { "metric_id": "portfolio_return",  "version": "2.1.0" },
-    { "metric_id": "benchmark_return",  "version": "1.4.2" }
+  "sub_plans": [
+    {
+      "backend":    "primary-warehouse",
+      "dialect":    "snowflake_sql",
+      "latency_ms": 1187,
+      "row_count":  4,
+      "cache_hit":  false
+    }
+  ],
+  "resolved_metrics": [
+    { "metric_id": "portfolio_return", "version": "2.1.0" },
+    { "metric_id": "benchmark_return", "version": "1.4.2" }
   ],
   "projection_record": {
-    "roles":            ["portfolio_manager"],
-    "row_predicates":   ["portfolio_id IN ('GLOB_EQ_OPP','UK_CORE_INC','ASIA_PAC_GRW','EUR_BAL_INC')"],
-    "column_masks":     []
+    "roles":          ["portfolio_manager"],
+    "row_predicates": ["portfolio_id IN ('GLOB_EQ_OPP','UK_CORE_INC','ASIA_PAC_GRW','EUR_BAL_INC')"],
+    "column_masks":   []
   },
   "visualisation":    { "contract": "BAR_MULTI_SERIES_COMPARISON" },
-  "narrative_status": { "generated": true, "validation": "passed" }
+  "narrative_status": { "generated": true, "validation": "passed" },
+  "created_at":       "2026-05-18T09:32:47Z",
+  "expires_at":       "2033-05-18T09:32:47Z"
 }
 ```
 
-Both records are immutable from the moment of writing. The full chain — original query, governance decision, metric definition versions, entitlements, physical backend call, and chart contract — is queryable under `result_id: res-20260518-093247-wk4n`.
+The document is immutable from the moment of writing. A corresponding row is inserted into `analytics.lineage_index` for search access. The full chain — original query, governance decision, metric definition versions, entitlements, physical backend call, and chart contract — is retrievable from the object store under `result_id: res-20260518-093247-wk4n`.
 
 ---
 
