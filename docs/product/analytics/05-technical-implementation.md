@@ -125,9 +125,9 @@ class AnalyseMetricInput(BaseModel):
 
 class RiskBreakdownInput(BaseModel):
     portfolio_id:   str
-    risk_metric:    Literal["var_95", "var_99", "tracking_error", "expected_shortfall", "beta"]
-    attribution_by: Literal["asset_class", "factor", "issuer", "geography", "currency"]
-    as_of_date:     str  # ISO date
+    risk_metric:    str   # SMR metric ID — e.g. "var_95", "tracking_error"
+    attribution_by: str   # SMR dimension ID — e.g. "asset_class", "geography"
+    as_of_date:     str   # ISO date
 
 class ComparePortfoliosInput(BaseModel):
     portfolio_ids: list[str]
@@ -138,9 +138,9 @@ class ComparePortfoliosInput(BaseModel):
 class PerformanceAttributionInput(BaseModel):
     portfolio_id:   str
     benchmark_id:   str
-    attribution_by: Literal["asset_class", "geography", "sector", "currency"]
+    attribution_by: str                  # SMR dimension ID — e.g. "asset_class", "sector"
     time_period:    str
-    model:          Literal["bhb", "bf"] = "bhb"
+    model:          Literal["bhb", "bf"] = "bhb"  # computation algorithm, not SMR data
 
 class RegulatoryMetricInput(BaseModel):
     metric_id:      str
@@ -172,6 +172,8 @@ async def analyse_metric(input: AnalyseMetricInput, jwt: str) -> dict:
 @mcp.tool()
 async def risk_breakdown(input: RiskBreakdownInput, jwt: str) -> dict:
     """Decompose a risk metric into factor contributions by the specified dimension.
+    risk_metric and attribution_by must be SMR-registered IDs — use list_metrics and
+    list_dimensions to discover valid values for the authenticated user's role.
     Returns an attribution waterfall display spec, a structured result set, and a governed narrative."""
     return await run_pipeline(input, jwt)
 
@@ -184,6 +186,8 @@ async def compare_portfolios(input: ComparePortfoliosInput, jwt: str) -> dict:
 @mcp.tool()
 async def performance_attribution(input: PerformanceAttributionInput, jwt: str) -> dict:
     """Run a BHB or Brinson-Fachler attribution decomposition for a portfolio versus its benchmark.
+    attribution_by must be an SMR-registered dimension ID — use list_dimensions to discover valid values.
+    model selects the computation algorithm: 'bhb' (Brinson-Hood-Beebower) or 'bf' (Brinson-Fachler).
     Returns a waterfall display spec broken down by the specified dimension."""
     return await run_pipeline(input, jwt)
 
