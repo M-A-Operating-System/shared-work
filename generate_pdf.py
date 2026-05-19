@@ -158,7 +158,7 @@ def extract_mermaid_blocks(text: str) -> tuple[str, dict[str, str]]:
             )
         return f"\n\n{key}\n\n"
 
-    modified = re.sub(r"```mermaid\n(.*?)\n```", replace, text, flags=re.DOTALL)
+    modified = re.sub(r"```mermaid[ \t]*\n(.*?)\n[ \t]*```", replace, text, flags=re.DOTALL)
     return modified, placeholders
 
 
@@ -188,6 +188,17 @@ def build_html(files: list[Path], title: str, meta: str,
         body = md.convert(raw)
         body = inject_mermaid(body, mermaid_map)
         md.reset()
+
+        # Fail fast if any mermaid block slipped through unextracted.
+        # fenced_code marks un-extracted blocks with class="language-mermaid".
+        leaked = body.count('language-mermaid')
+        if leaked:
+            raise RuntimeError(
+                f"{leaked} mermaid block(s) in {path.name} were not extracted "
+                f"before markdown conversion — they will render as raw text. "
+                f"Check extract_mermaid_blocks() regex."
+            )
+
         extra_class = " first-section" if i == 0 else ""
         sections.append(f'<section class="doc-section{extra_class}">{body}</section>')
 
