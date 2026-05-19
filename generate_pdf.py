@@ -33,7 +33,7 @@ try:
     def _safe_setUnicodeRanges(self, value):
         _orig(self, {b for b in value if 0 <= b <= 122})
     _Table.setUnicodeRanges = _safe_setUnicodeRanges
-except Exception as _e:
+except (ImportError, AttributeError) as _e:
     import warnings
     warnings.warn(f"fontTools Unicode range patch failed ({_e}); PDF generation may fail on some fonts")
 from pathlib import Path
@@ -112,8 +112,12 @@ def _render_mermaid(source: str) -> str | None:
         cfg_path = Path(tmpdir) / "puppeteer.json"
 
         in_path.write_text(source, encoding="utf-8")
-        # --no-sandbox required in restricted CI environments (GitHub Actions)
-        cfg_path.write_text(json.dumps({"args": ["--no-sandbox"]}))
+        # --no-sandbox and --disable-setuid-sandbox are required in GitHub Actions
+        # (and other container environments) where the runner process lacks the
+        # Linux user-namespace privileges that Chromium's sandbox depends on.
+        # This is safe here because the Mermaid source comes from files inside
+        # the repository — it is not arbitrary untrusted web content.
+        cfg_path.write_text(json.dumps({"args": ["--no-sandbox", "--disable-setuid-sandbox"]}))
 
         try:
             result = subprocess.run(
@@ -137,7 +141,7 @@ def _render_mermaid(source: str) -> str | None:
                 out_path = alt
 
         if result.returncode != 0 or not out_path.exists():
-            print(f"  [warn] mmdc error: {result.stderr.decode().strip()}")
+            print(f"  [warn] mmdc error: {result.stderr.decode('utf-8', errors='replace').strip()}")
             return None
 
         data = _b64.b64encode(out_path.read_bytes()).decode()
@@ -556,9 +560,13 @@ def generate_page(file_path: Path) -> None:
     # Publish the output path for GitHub Actions step chaining
     github_output = os.environ.get("GITHUB_OUTPUT")
     if github_output:
-        repo_root = Path(__file__).parent
-        with open(github_output, "a") as f:
-            f.write(f"pdf_path={output.relative_to(repo_root)}\n")
+        gop = Path(github_output)
+        if not gop.is_absolute() or ".." in gop.parts:
+            print(f"  [warn] GITHUB_OUTPUT path looks unsafe, skipping: {github_output}")
+        else:
+            repo_root = Path(__file__).parent
+            with open(gop, "a") as f:
+                f.write(f"pdf_path={output.relative_to(repo_root)}\n")
 
 # ---------- main ----------
 
