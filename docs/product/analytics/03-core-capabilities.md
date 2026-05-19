@@ -67,9 +67,9 @@ flowchart TD
     NSE -->|"narrative summary"| Result
 ```
 
-The Analytics Engine is a single MCP server. It exposes both the analytical tools (`analyse_metric`, `risk_breakdown`, etc.) and the SMR resources (`smr://metrics`, `smr://dimensions`, etc.) through a single MCP Capability Layer endpoint. The computation pipeline — SIL, RAPL, SEG, FQP — is entirely deterministic. The Narrative Synthesis Engine runs as a post-computation step: after the FQP assembles the result, the NSE makes a targeted call to a secondary language model to summarise the data in plain text; its prompt is constructed from the result set only and its output is validated against computed values before being returned.
+The Analytics Engine is a single MCP server. It exposes three analytical tools (`run_analytics`, `list_operations`, `drilldown`) through a single MCP Capability Layer endpoint. The computation pipeline — SIL, RAPL, SEG, FQP — is entirely deterministic. The Narrative Synthesis Engine runs as a post-computation step: after the FQP assembles the result, the NSE makes a targeted call to a secondary language model to summarise the data in plain text; its prompt is constructed from the result set only and its output is validated against computed values before being returned.
 
-The AI Chat Platform reads the SMR resources from the Analytics Engine to load the entitled metric catalogue into its model context — this is how the AI model understands what metrics and dimensions are available. It translates the user's natural language question into explicit, structured parameters and calls the Analytics Engine's tools. The Analytics Engine returns the display specification, structured data, and governed narrative; the AI Chat Platform renders the result.
+The AI Chat Platform loads the operation catalogue from the Analytics Engine by calling `list_operations` — this is how the AI model discovers what operations, metrics, and dimensions are available. It translates the user's natural language question into explicit, structured parameters and calls `run_analytics` with the resolved `operation_id` and `params`. The Analytics Engine returns the display specification, structured data, and governed narrative; the AI Chat Platform renders the result.
 
 The `vite2img` service is shown separately from the Analytics Platform boundary because it is an optional, independently registered MCP render service. Consumers that cannot natively render the SCL display specification — for example, an agentic pipeline that requires static image output — register `vite2img` directly and call it as a separate tool invocation using the `result_id` returned by the Analytics Platform. It is not part of the core analytics pipeline.
 
@@ -95,10 +95,10 @@ sequenceDiagram
     participant LS as Analytical Lineage Store
     participant vite2img as vite2img
 
-    C->>AE: read smr://metrics + smr://dimensions (JWT)
-    AE-->>C: metric catalogue (entitled subset)
+    C->>AE: list_operations (JWT)
+    AE-->>C: operation catalogue (entitled subset)
     note over C: AI model translates NL → structured parameters
-    C->>AE: structured tool call + JWT
+    C->>AE: run_analytics (operation_id + params + JWT)
     par
         AE->>SIL: structured parameters
     and
@@ -132,7 +132,7 @@ sequenceDiagram
     end
 ```
 
-The Analytics Engine receives structured parameters — not natural language — and returns structured results. The computation pipeline contains no AI; the Narrative Synthesis Engine runs after computation completes, in parallel with the Visualisation Ontology, making a targeted secondary model call constrained to the assembled result. The natural language translation (step 3) happens in the AI Chat Platform's reasoning loop, grounded by the metric catalogue loaded in step 1. The Analytical Lineage Store receives two writes per query: a governance decision record before execution and an execution record after — ensuring the audit trail is complete regardless of whether the query ultimately succeeds.
+The Analytics Engine receives structured parameters — not natural language — and returns structured results. The computation pipeline contains no AI; the Narrative Synthesis Engine runs after computation completes, in parallel with the Visualisation Ontology, making a targeted secondary model call constrained to the assembled result. The natural language translation (step 3) happens in the AI Chat Platform's reasoning loop, grounded by the operation catalogue loaded in step 1 via `list_operations`. The Analytical Lineage Store receives two writes per query: a governance decision record before execution and an execution record after — ensuring the audit trail is complete regardless of whether the query ultimately succeeds.
 
 ---
 
@@ -144,24 +144,25 @@ The following query is used as a running example throughout each section below.
 
 The AI Chat Platform is the conversational layer through which users interact with the Analytics Engine. It hosts the AI model responsible for natural language translation, orchestrates calls to the Analytics Engine, and renders the assembled result to the user. Natural language translation — the only AI step the AI Chat Platform performs — happens here, grounded by the SMR metric catalogue. Narrative synthesis is performed inside the Analytics Engine as a secondary, post-computation step.
 
-**Metric catalogue loading.** Before the AI model can translate a user's question into structured parameters, it needs to know what metrics and dimensions exist. The conversation engine reads the `smr://metrics` and `smr://dimensions` resources from the Analytics Engine's MCP endpoint. The response is the authenticated user's entitled metric catalogue — only metrics the user can query are returned. This catalogue is injected into the model's context and serves as the controlled vocabulary for intent translation.
+**Operation catalogue loading.** Before the AI model can translate a user's question into structured parameters, it needs to know what operations, metrics, and dimensions are available. The conversation engine calls `list_operations` on the Analytics Engine's MCP endpoint with the user's JWT. The response is the authenticated user's entitled operation catalogue — only operations the user can execute are returned, with their `operation_id`, display names, required parameters, supported metrics, supported dimensions, and execution profiles. This catalogue is injected into the model's context and serves as the controlled vocabulary for intent translation.
 
-**NL → structured intent.** When a user asks an analytical question, the AI model maps the natural language to explicit metric IDs, dimension IDs, filters, and a time period — all drawn from the catalogue it loaded. It selects the appropriate tool (`analyse_metric`, `risk_breakdown`, etc.) and constructs a fully typed call. No natural language is sent to the Analytics Engine; it receives structured parameters only.
+**NL → structured intent.** When a user asks an analytical question, the AI model maps the natural language to an `operation_id` and explicit `params` — drawn from the catalogue it loaded. It constructs a `run_analytics` call with the resolved operation and typed parameters. No natural language is sent to the Analytics Engine; it receives structured parameters only.
 
 **Analytics Engine call.** The structured tool call is submitted to the Analytics Engine with the user's JWT forwarded unmodified. The Analytics Engine validates, plans, executes, and returns a structured result and SCL display specification. Entitlement enforcement, query planning, and execution are entirely the Analytics Engine's responsibility.
 
-**Response assembly.** The conversation engine renders the SCL display specification inline. When narrative synthesis is enabled, the `narrative` object in the response contains the governed summary produced by the Analytics Engine's NSE — the conversation engine surfaces this directly. The `result_id` is retained for any follow-up drilldown or lineage inspection.
+**Response assembly.** The conversation engine renders the SCL display specification inline. When narrative synthesis is enabled, the `narrative` object in the response contains the governed summary produced by the Analytics Engine's NSE — the conversation engine surfaces this directly. The `result_id` is retained for any follow-up `drilldown` call or lineage inspection.
 
 ### Example
 
-The portfolio manager types their question. The conversation engine first reads the metric catalogue:
+The portfolio manager types their question. The conversation engine first loads the operation catalogue:
 
 ```
-GET smr://metrics   (via Analytics Engine MCP, JWT forwarded)
-→ returns: portfolio_return, benchmark_return, tracking_error, ... (entitled subset)
+tools/call list_operations   (via Analytics Engine MCP, JWT forwarded)
+→ returns: compare_portfolios, risk_breakdown, portfolio_return, ... (entitled subset)
+          with operation_id, display names, required_params, supported_metrics, execution_profiles
 ```
 
-The AI model reads "Show me portfolio returns versus benchmark for my equity portfolios this quarter" and, using the catalogue, resolves it to explicit parameters. It calls `analyse_metric` with structured arguments — no natural language sent to the Analytics Engine:
+The AI model reads "Show me portfolio returns versus benchmark for my equity portfolios this quarter" and, using the catalogue, resolves it to an operation and explicit parameters. It calls `run_analytics` with structured arguments — no natural language sent to the Analytics Engine:
 
 ```json
 POST /v1/mcp
@@ -172,13 +173,15 @@ Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...
   "id":      "req-8a3f2c",
   "method":  "tools/call",
   "params": {
-    "name": "analyse_metric",
+    "name": "run_analytics",
     "arguments": {
-      "metrics":     ["portfolio_return", "benchmark_return"],
-      "dimensions":  ["portfolio_id"],
-      "filters":     [{ "field": "asset_class", "operator": "eq", "value": "EQUITY" }],
-      "time_period": { "granularity": "quarterly", "anchor": "current" },
-      "order_by":    "portfolio_return DESC"
+      "operation_id": "compare_portfolios",
+      "params": {
+        "portfolio_ids": ["GLOB_EQ_OPP", "UK_CORE_INC", "ASIA_PAC_GRW", "EUR_BAL_INC"],
+        "metrics":       ["portfolio_return", "benchmark_return"],
+        "time_period":   "quarter_to_date",
+        "filters":       [{ "field": "asset_class", "operator": "eq", "value": "EQUITY" }]
+      }
     }
   }
 }
@@ -196,15 +199,13 @@ The Semantic Metrics Registry (SMR) is the governing catalogue of every analytic
 
 ### Concept Types
 
-The SMR is composed of five interconnected concept types:
+The SMR is composed of three DCS document types:
 
-| Concept type | Description |
+| DCS document type | Description |
 |---|---|
-| **Metric** | A quantitative measure with a governed formula, aggregation rule, and unit |
-| **Dimension** | A categorical or temporal attribute by which metrics can be sliced and filtered |
-| **Hierarchy** | An ordered set of dimensions forming a navigable analytical hierarchy (for drilldown) |
-| **Measure Group** | A named collection of related metrics grouped for analytical coherence |
-| **Domain** | A logical grouping of metrics, dimensions, and hierarchies sharing a common business subject area |
+| **`analytical_metric`** | Metric definition — formula, aggregation, `data_affinity`, `physical_mapping`, `required_dimensions`, `cost_weight`, `classification_level`, `compliance_modes` |
+| **`analytical_dimension`** | Dimension definition — `data_affinity`, `physical_mapping`, enumerated values or `hierarchical` flag, `hierarchy_levels` |
+| **`analytical_operation`** | Operation catalogue entry — `execution_profile`, `required_params`, `supported_metrics`, `supported_dimensions`, `default_visualization` |
 
 ### Metric Definition Schema
 
@@ -331,33 +332,17 @@ issuer_concentration = SAFE_DIVIDE(
 rolling_90d_return = CUMULATIVE_RETURN(daily_return, WINDOW(90, 'days'))
 ```
 
-### SMR MCP Surface
+### SMR Authoring and Discovery
 
-The SMR is exposed to AI models and agents as MCP resources and tools — not as a raw REST API. Resources cover read access; tools cover the write operations required for metric governance.
+The SMR is backed by the DCS, which handles document creation, versioning, and the approval workflow natively. There are no custom MCP tools for metric authoring — administrators create, edit, and approve `analytical_metric`, `analytical_dimension`, and `analytical_operation` documents using the DCS's existing authoring capabilities.
 
-**Resources** — readable by any authenticated user within their entitlement scope:
+**Discovery** — AI models and agents discover available operations by calling the `list_operations` MCP tool (defined in the MCP Capability Layer). `list_operations` returns operation IDs, display names, required parameters, supported metrics, supported dimensions, and execution profiles for all approved operations within the caller's entitlement scope. There are no `smr://` MCP resource URIs and no separate `list_metrics`, `get_metric_definition`, `propose_metric`, or `approve_metric` MCP tools.
 
-| URI | Description |
-|---|---|
-| `smr://metrics` | All approved metrics available to the caller's role — IDs, labels, descriptions, required dimensions |
-| `smr://metrics/{metric_id}` | Full definition for a single metric: formula, aggregation rules, governance metadata, lineage |
-| `smr://dimensions` | All approved dimensions |
-| `smr://hierarchies` | All approved drilldown hierarchies |
-
-**Tools** — query and governance operations:
-
-| Tool | Access | Description |
-|---|---|---|
-| `list_metrics` | All query roles | List metrics with optional filter by domain, measure group, or search term |
-| `get_metric_definition` | All query roles | Retrieve the full SMR definition for a specific metric ID |
-| `propose_metric` | Metric Owner, Application Admin | Submit a new metric definition or a change to an existing one for review |
-| `approve_metric` | Application Admin | Approve a proposed metric, making it resolvable from the next refresh cycle |
-
-The internal resolution calls made by the Semantic Intent Layer and Federated Query Planner use the same resource URIs — there is no separate internal API. The SMR's governance workflow (propose → review → approve → deprecate → retire) is entirely managed through the `propose_metric` and `approve_metric` tools.
+The internal resolution calls made by the Semantic Intent Layer and Federated Query Planner query the DCS directly — there is no separate internal API. The SMR's governance workflow (Draft → Proposed → In Review → Approved → Deprecated → Retired) is managed through the DCS's existing authoring capabilities, not by custom MCP tools.
 
 ### Example
 
-The SIL asks the SMR to resolve `portfolio_return` and `benchmark_return`. The SMR confirms both are approved for the `portfolio_manager` role and returns their definitions — including data affinity (`portfolio`), required dimensions (`portfolio_id`, `date`), and allowed aggregation (`value_weighted_average`). `asset_class` resolves as a registered dimension with an approved filter operator (`eq`). If either metric were absent or not approved, the SIL would return `METRIC_NOT_FOUND` and the pipeline would stop here.
+The SIL asks the SMR to resolve the `compare_portfolios` operation, then resolves `portfolio_return` and `benchmark_return` as `analytical_metric` documents. The SMR confirms both are approved for the `portfolio_manager` role and returns their definitions — including `data_affinity` (`portfolio`), `required_dimensions` (`portfolio_id`, `time_period`), and `aggregation` (`value_weighted_average`). `asset_class` resolves as an approved `analytical_dimension` document with an approved filter operator (`eq`). If either metric document were absent or not in `"status": "approved"` state, the SIL would return `METRIC_NOT_FOUND` and the pipeline would stop here.
 
 ---
 
@@ -365,7 +350,7 @@ The SIL asks the SMR to resolve `portfolio_return` and `benchmark_return`. The S
 
 > **Governing principles:** [P2 — Governance before execution](./01-platform-overview.md#design-principles) · [P10 — Deterministic computation, not generation](./01-platform-overview.md#design-principles)
 
-The Semantic Intent Layer receives a structured MCP tool call — explicit metric IDs, dimension IDs, filters, and time period — and produces a validated, engine-agnostic Logical Query Plan (LQP). It is entirely deterministic: no AI model runs inside it. Its purpose is to validate every identifier against the SMR, apply entitlement constraints from the Role-Aware Projection Layer, check semantic compatibility, and compile the validated intent into an executable plan. The output — the LQP — contains no backend references, no SQL, and no physical schema identifiers: only analytical operations expressed against SMR-registered concepts.
+The Semantic Intent Layer receives a structured MCP tool call — an `operation_id` and a `params` dict — and produces a validated, engine-agnostic Logical Query Plan (LQP). It is entirely deterministic: no AI model runs inside it. Its purpose is to: (1) resolve the operation from the SMR DCS catalogue, (2) validate `params` against the operation's `required_params` schema, (3) resolve metric IDs within `params` against `analytical_metric` documents, (4) apply role predicates from RAPL, (5) build the LQP. The output — the LQP — contains no backend references, no SQL, and no physical schema identifiers: only analytical operations expressed against SMR-registered concepts.
 
 ### Five-Stage Validation Pipeline
 
@@ -374,7 +359,7 @@ Every MCP tool call passes through five sequential validation stages:
 ```mermaid
 flowchart TD
     S1["**Stage 1: Schema validation**\nJSON parameters conform to tool schema\nRequired fields present and typed"]
-    S2["**Stage 2: SMR resolution**\nResolve metric IDs → definitions\nResolve dimension IDs → definitions\nResolve hierarchy refs → definitions\nReject unregistered IDs"]
+    S2["**Stage 2: SMR resolution**\nResolve operation_id → analytical_operation document\nValidate params against operation required_params schema\nResolve metric IDs → analytical_metric documents\nResolve dimension IDs → analytical_dimension documents\nReject unregistered or unapproved IDs"]
     S3["**Stage 3: Role-Aware Projection**\nFilter metric set to entitled scope\nFilter dimension set to entitled scope\nInject row predicates from role config\nApply column masks · Reject entitlement violations"]
     S4["**Stage 4: Semantic validation**\nRequired dimensions present per metric\nAggregation rules compatible\nTime granularity compatible per metric\nFilter predicates reference valid fields"]
     S5["**Stage 5: LQP generation**\nProduce engine-agnostic DAG\nAssign data affinity hints per metric\nEstimate result cardinality and execution cost"]
@@ -385,17 +370,28 @@ flowchart TD
 
 ### Intent Parameter Schema
 
-The core parameters shared across all analytical capabilities are:
+All `run_analytics` calls use the same outer envelope. The `params` dict is operation-specific — its valid keys are defined by the `required_params` and `optional_params` fields on the `analytical_operation` document in the SMR DCS catalogue.
 
 | Parameter | Type | Description |
 |---|---|---|
-| `metrics` | `string[]` | Metric IDs from the SMR. Each resolves to its definition, aggregation rule, required dimensions, and data affinity. |
-| `dimensions` | `string[]` | Dimension IDs to slice by. Must be permitted for the requested metrics and within the user's entitlement scope. |
-| `time_period` | string | Semantic time expression: `quarter_to_date`, `year_to_date`, `since_inception`, `today`, `last_N_months`, `fiscal_year_YYYY`, `RANGE:YYYY-MM-DD:YYYY-MM-DD`. |
-| `filters` | object[] | Dimension or metric predicates: `{ dimension, operator, value }`. Operators: `eq neq gt lt gte lte in not_in`. |
-| `order_by` | string | `metric_id ASC\|DESC` |
-| `limit` | integer | Maximum result rows. Default: 1000. |
-| `compare_to` | object | Optional comparison target: benchmark, peer group, or prior period. |
+| `operation_id` | `string` | SMR operation ID — resolved from the `analytical_operation` catalogue via `list_operations`. |
+| `params` | `object` | Operation-specific parameters. Validated by the SIL against the operation's `required_params` schema. May include `metrics` (SMR metric IDs), `dimensions`, `time_period`, `filters`, and operation-specific fields. |
+
+**Example `params` for the `risk_breakdown` operation:**
+
+```json
+{
+  "operation_id": "risk_breakdown",
+  "params": {
+    "portfolio_id":   "GLOB_EQ_OPP",
+    "metrics":        ["var_95", "tracking_error"],
+    "attribution_by": "asset_class",
+    "as_of_date":     "2026-05-14"
+  }
+}
+```
+
+The SIL validates that `portfolio_id`, `metrics`, `attribution_by`, and `as_of_date` are all present (per the operation's `required_params`), resolves each metric ID in `params.metrics` against `analytical_metric` documents, and rejects any unregistered or unapproved ID before LQP generation.
 
 ### MCP Input to Resolved Intent: Example
 
@@ -404,13 +400,15 @@ The following illustrates how raw MCP tool call parameters are transformed throu
 ```json
 // MCP tool call input (what the AI produces)
 {
-  "metrics":     ["portfolio_return", "tracking_error"],
-  "dimensions":  ["portfolio", "asset_class"],
-  "time_period": "quarter_to_date",
-  "filters": [
-    { "dimension": "asset_class", "operator": "eq", "value": "EQUITY" }
-  ],
-  "order_by": "tracking_error DESC"
+  "operation_id": "compare_portfolios",
+  "params": {
+    "portfolio_ids": ["GLOB_EQ_OPP", "UK_CORE_INC"],
+    "metrics":       ["portfolio_return", "tracking_error"],
+    "time_period":   "quarter_to_date",
+    "filters": [
+      { "dimension": "asset_class", "operator": "eq", "value": "EQUITY" }
+    ]
+  }
 }
 ```
 
@@ -1245,75 +1243,41 @@ The MCP Capability Layer exposes the platform's governed analytical operations t
 
 ### Tool Catalogue
 
-**`analyse_metric`** — Execute a governed query against one or more registered metrics.
+The Analytics Engine exposes three tools. All analytical operations are SMR-catalogue driven — the code is the execution engine, not the operation registry. The SMR owns every operation definition: what parameters it needs, what metrics and dimensions it supports, and how deeply it runs through the pipeline via its `execution_profile`.
+
+**`run_analytics(operation_id: str, params: dict, jwt: str)`** — Executes any SMR-registered operation. The operation's `execution_profile` in the DCS determines which pipeline stages run.
 
 | Parameter | Required | Type | Notes |
 |---|---|---|---|
-| `metrics` | Yes | string[] | SMR metric IDs |
-| `dimensions` | No | string[] | Dimension IDs to slice by |
-| `time_period` | Yes | string | `quarter_to_date`, `year_to_date`, `last_N_months`, `since_inception`, `today`, `RANGE:YYYY-MM-DD:YYYY-MM-DD` |
-| `filters` | No | array | `{dimension, operator, value}` — operators: `eq neq gt lt gte lte in not_in` |
-| `order_by` | No | string | `metric_id ASC\|DESC` |
-| `limit` | No | integer | Default: 1000 |
+| `operation_id` | Yes | `string` | SMR operation ID — discover via `list_operations` |
+| `params` | Yes | `object` | Operation-specific parameters; validated by the SIL against the operation's `required_params` schema in the SMR DCS catalogue |
+| `jwt` | Yes | `string` | Bearer token; validated at request ingress before any platform computation begins |
 
-**`risk_breakdown`** — Decompose a risk metric into factor contributions by dimension.
+**`list_operations(domain: str | None, jwt: str)`** — Returns the SMR operation catalogue with operation IDs, display names, required parameters, supported metrics/dimensions, and execution profiles. Only operations the authenticated user is entitled to execute are returned.
 
-| Parameter | Required | Notes |
-|---|---|---|
-| `portfolio_id` | Yes | |
-| `risk_metric` | Yes | e.g. `var_95`, `tracking_error` |
-| `attribution_by` | Yes | `asset_class \| factor \| issuer \| geography \| currency` |
-| `as_of_date` | Yes | ISO date |
+| Parameter | Required | Type | Notes |
+|---|---|---|---|
+| `domain` | No | `string \| None` | Optional filter by analytical domain |
+| `jwt` | Yes | `string` | Bearer token |
 
-**`compare_portfolios`** — Compare metrics across two or more portfolios, optionally against a benchmark.
+**`drilldown(result_id: str, hierarchy: str, selected_value: str | None, jwt: str)`** — Navigates into a dimension hierarchy from a prior result. All filters, role predicates, and entitlement context from the original result are preserved.
 
-| Parameter | Required | Notes |
-|---|---|---|
-| `portfolio_ids` | Yes | Array of portfolio IDs |
-| `metrics` | Yes | SMR metric IDs |
-| `time_period` | Yes | Same format as `analyse_metric` |
-| `benchmark_id` | No | Optional benchmark comparison |
+| Parameter | Required | Type | Notes |
+|---|---|---|---|
+| `result_id` | Yes | `string` | Result ID from a prior `run_analytics` call |
+| `hierarchy` | Yes | `string` | Hierarchy ID to traverse |
+| `selected_value` | No | `string \| None` | Dimension value to anchor the drilldown |
+| `jwt` | Yes | `string` | Bearer token |
 
-**`performance_attribution`** — BHB or Brinson-Fachler attribution decomposition.
+### Execution Profiles
 
-| Parameter | Required | Notes |
-|---|---|---|
-| `portfolio_id` | Yes | |
-| `benchmark_id` | Yes | |
-| `attribution_by` | Yes | `asset_class \| geography \| sector \| currency` |
-| `time_period` | Yes | |
-| `model` | No | `bhb` (default) or `bf` |
+Each SMR operation carries an `execution_profile` defined in its `analytical_operation` DCS document. This tells the pipeline executor which stages to invoke. No execution depth is hardcoded in the MCP layer — it is always determined by the SMR catalogue.
 
-**`regulatory_metric`** — Query a regulatory compliance metric (LCR, NSFR, leverage ratio). Requires `regulatory_reporting` feature flag and appropriate role.
-
-| Parameter | Required | Notes |
-|---|---|---|
-| `metric_id` | Yes | |
-| `entity_id` | Yes | |
-| `reporting_date` | Yes | ISO date |
-| `jurisdiction` | Yes | Regulatory jurisdiction identifier |
-
-**`drilldown`** — Navigate into a dimension hierarchy from a prior result; parent-level filters are preserved.
-
-| Parameter | Required | Notes |
-|---|---|---|
-| `result_id` | Yes | Result ID from a prior analytical capability call |
-| `hierarchy` | Yes | Hierarchy ID to traverse |
-| `selected_value` | No | Dimension value to anchor the drilldown |
-
-**`list_metrics`** — List all SMR metrics available to the current user's role, with IDs, labels, descriptions, and required dimensions.
-
-| Parameter | Required | Notes |
-|---|---|---|
-| `domain` | No | Filter by data domain |
-| `category` | No | Filter by measure group |
-| `search_term` | No | Free-text search against metric labels and descriptions |
-
-**`get_metric_definition`** — Retrieve the full SMR definition for a specific metric, including formula, aggregation rules, and governance metadata.
-
-| Parameter | Required | Notes |
-|---|---|---|
-| `metric_id` | Yes | SMR metric ID |
+| Profile | Pipeline stages |
+|---|---|
+| `data_retrieval` | Auth → RAPL → FQP → Lineage |
+| `metric_query` | Auth → RAPL → SIL → SEG → FQP → Lineage |
+| `full_analytical` | Full pipeline including Visualisation Ontology + Narrative Synthesis Engine |
 
 ### Capability Governance
 
@@ -1339,4 +1303,4 @@ The `roles: []` value indicates that capability availability is determined dynam
 
 ### Example
 
-The structured `analyse_metric` tool call arrives from the AI Chat Platform. The MCP Capability Layer validates the JWT signature, confirms the token has not expired, and extracts the claims. It dispatches two parallel operations: the structured parameters to the Semantic Intent Layer, and the JWT claims to the Role-Aware Projection Layer. The MCP Capability Layer does not interpret the parameters or make any analytical decisions; it validates, routes, and waits.
+A structured `run_analytics` tool call arrives from the AI Chat Platform. The MCP Capability Layer validates the JWT signature, confirms the token has not expired, and extracts the claims. It dispatches two parallel operations: the structured parameters to the Semantic Intent Layer, and the JWT claims to the Role-Aware Projection Layer. The MCP Capability Layer does not interpret the parameters or make any analytical decisions; it validates, routes, and waits.
