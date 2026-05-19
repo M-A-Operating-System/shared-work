@@ -14,6 +14,7 @@ Requirements:
     pip install markdown weasyprint
 """
 
+import html as _html
 import re
 import sys
 
@@ -27,8 +28,9 @@ try:
     def _safe_setUnicodeRanges(self, value):
         _orig(self, {b for b in value if 0 <= b <= 122})
     _Table.setUnicodeRanges = _safe_setUnicodeRanges
-except Exception:
-    pass
+except Exception as _e:
+    import warnings
+    warnings.warn(f"fontTools Unicode range patch failed ({_e}); PDF generation may fail on some fonts")
 from pathlib import Path
 
 # ---------- product registry ----------
@@ -37,16 +39,14 @@ PRODUCTS_DIR = Path(__file__).parent / "docs" / "product"
 
 PRODUCTS = {
     "assistant": {
-        "title":    "AI Chat Platform",
-        "subtitle": "Product Design Specification",
-        "meta":     "Draft v1.0 · May 2026",
-        "output":   "assistant_product_design.pdf",
+        "title":  "AI Chat Platform",
+        "meta":   "Draft v1.0 · May 2026",
+        "output": "assistant_product_design.pdf",
     },
     "analytics": {
-        "title":    "AI Analytics Platform",
-        "subtitle": "Product Design Specification",
-        "meta":     "Draft v1.0 · May 2026",
-        "output":   "analytics_product_design.pdf",
+        "title":  "AI Analytics Platform",
+        "meta":   "Draft v1.0 · May 2026",
+        "output": "analytics_product_design.pdf",
     },
 }
 
@@ -73,7 +73,8 @@ def strip_md_links(text: str) -> str:
     return re.sub(r"\(\./[\w-]+\.md(?:#[\w-]*)?\)", "()", text)
 
 
-def build_html(files: list[Path], title: str, subtitle: str, meta: str) -> str:
+def build_html(files: list[Path], title: str, meta: str,
+               subs: dict[str, str] | None = None) -> str:
     import markdown
 
     md = markdown.Markdown(
@@ -83,25 +84,31 @@ def build_html(files: list[Path], title: str, subtitle: str, meta: str) -> str:
     sections = []
     for i, path in enumerate(files):
         raw = strip_md_links(path.read_text(encoding="utf-8"))
+        if subs:
+            for key, val in subs.items():
+                raw = raw.replace(key, val)
         body = md.convert(raw)
         md.reset()
         extra_class = " first-section" if i == 0 else ""
         sections.append(f'<section class="doc-section{extra_class}">{body}</section>')
 
+    safe_title = _html.escape(title)
+    safe_meta  = _html.escape(meta)
+
     cover = f"""
 <div class="cover-page">
   <div class="cover-inner">
-    <p class="cover-eyebrow">Confidential · Internal</p>
-    <h1 class="cover-title">{title}</h1>
-    <p class="cover-subtitle">{subtitle}</p>
+    <p class="cover-eyebrow">M&amp;A Operating System</p>
+    <p class="cover-category">Product Design</p>
+    <h1 class="cover-title">{safe_title}</h1>
     <hr class="cover-rule">
-    <p class="cover-meta">{meta}</p>
+    <p class="cover-meta">{safe_meta}</p>
   </div>
 </div>"""
 
     return f"""<!DOCTYPE html>
 <html lang="en">
-<head><meta charset="utf-8"><title>{title} — {subtitle}</title></head>
+<head><meta charset="utf-8"><title>{safe_title}</title></head>
 <body>
 {cover}
 {"".join(sections)}
@@ -131,39 +138,40 @@ CSS = """
 .cover-page {
     page: cover-page;
     page-break-after: always;
-    background-color: #1e3a6e;
+    background-color: #ffffff;
     min-height: 297mm;
     display: flex;
     align-items: center;
     padding: 0 28mm;
     box-sizing: border-box;
 }
-.cover-inner  { color: #ffffff; max-width: 130mm; }
+.cover-inner { max-width: 130mm; }
 .cover-eyebrow {
     font-size: 8pt;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
-    opacity: 0.55;
-    margin: 0 0 14mm;
+    color: #6b7280;
+    margin: 0 0 4mm;
+}
+.cover-category {
+    font-size: 11pt;
+    color: #374151;
+    font-weight: 400;
+    margin: 0 0 5mm;
 }
 .cover-title {
     font-size: 30pt;
     font-weight: 700;
     line-height: 1.1;
-    margin: 0 0 5mm;
-}
-.cover-subtitle {
-    font-size: 13pt;
-    opacity: 0.75;
+    color: #1e3a6e;
     margin: 0 0 12mm;
-    font-weight: 400;
 }
 .cover-rule {
     border: none;
-    border-top: 1px solid rgba(255,255,255,0.25);
+    border-top: 2px solid #1e3a6e;
     margin: 0 0 8mm;
 }
-.cover-meta { font-size: 9pt; opacity: 0.5; margin: 0; }
+.cover-meta { font-size: 9pt; color: #9ca3af; margin: 0; }
 
 /* Document sections */
 .doc-section           { page-break-before: always; }
@@ -292,7 +300,8 @@ def generate_product(name: str, config: dict) -> None:
         return
 
     output = docs_dir / config["output"]
-    files = get_ordered_files(docs_dir)
+    about = PRODUCTS_DIR / "about.md"
+    files = ([about] if about.exists() else []) + get_ordered_files(docs_dir)
 
     if not files:
         print(f"  [skip] {name}: no markdown files found in {docs_dir}")
@@ -304,11 +313,60 @@ def generate_product(name: str, config: dict) -> None:
         print(f"  {f.name}")
 
     print("Building HTML…")
-    html = build_html(files, config["title"], config["subtitle"], config["meta"])
+    html = build_html(files, config["title"], config["meta"],
+                      subs={"{{PRODUCT_NAME}}": name})
 
     print("Rendering PDF (this may take a moment)…")
     from weasyprint import HTML, CSS as WeasyprintCSS
     HTML(string=html, base_url=str(docs_dir)).write_pdf(
+        str(output),
+        stylesheets=[WeasyprintCSS(string=CSS)],
+    )
+
+    size_mb = output.stat().st_size / 1_000_000
+    print(f"Done → {output}  ({size_mb:.1f} MB)")
+
+# ---------- single-page generation ----------
+
+def generate_page(file_path: Path) -> None:
+    """Generate a PDF for a single .md file, placed next to it."""
+    if file_path.is_symlink():
+        print(f"  [error] symlinks are not supported: {file_path}")
+        sys.exit(1)
+
+    file_path = file_path.resolve()
+
+    if file_path.suffix != '.md':
+        print(f"  [error] only .md files are supported, got: {file_path.name}")
+        sys.exit(1)
+
+    if not file_path.is_file():
+        print(f"  [error] file not found: {file_path}")
+        sys.exit(1)
+
+    config = None
+    for name, cfg in PRODUCTS.items():
+        if file_path.parent == (PRODUCTS_DIR / name).resolve():
+            config = cfg
+            break
+
+    if config is None:
+        print(f"  [error] {file_path}: not inside a known product directory")
+        sys.exit(1)
+
+    raw = file_path.read_text(encoding="utf-8")
+    h1 = re.search(r'^#\s+(.+)$', raw, re.MULTILINE)
+    page_title = h1.group(1).strip() if h1 else file_path.stem
+
+    output = file_path.with_suffix('.pdf')
+
+    print(f"\n── page: {file_path.name} ──────────────────────────────────────────")
+    print("Building HTML…")
+    html = build_html([file_path], page_title, config["meta"])
+
+    print("Rendering PDF…")
+    from weasyprint import HTML, CSS as WeasyprintCSS
+    HTML(string=html, base_url=str(file_path.parent)).write_pdf(
         str(output),
         stylesheets=[WeasyprintCSS(string=CSS)],
     )
@@ -324,6 +382,14 @@ def main():
     except ImportError:
         print("weasyprint not installed. Run: pip install markdown weasyprint")
         sys.exit(1)
+
+    if len(sys.argv) > 1 and sys.argv[1] == '--page':
+        if len(sys.argv) < 3:
+            print("Usage: python generate_pdf.py --page <path/to/file.md>")
+            sys.exit(1)
+        generate_page(Path(sys.argv[2]))
+        print("\nAll done.")
+        return
 
     requested = sys.argv[1] if len(sys.argv) > 1 else None
 

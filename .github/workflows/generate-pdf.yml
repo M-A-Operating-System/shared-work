@@ -7,6 +7,12 @@ on:
     paths:
       - 'docs/**'
       - 'generate_pdf.py'
+  workflow_dispatch:
+    inputs:
+      page:
+        description: 'Path to a single .md file (e.g. docs/product/analytics/03-core-capabilities.md). Leave blank to regenerate all product PDFs.'
+        required: false
+        type: string
 
 jobs:
   generate:
@@ -34,13 +40,37 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
+      # ── Single-page mode ────────────────────────────────────────────────────
+      - name: Validate page input
+        if: github.event_name == 'workflow_dispatch' && inputs.page != ''
+        env:
+          PAGE_INPUT: ${{ inputs.page }}
+        run: |
+          if [[ "$PAGE_INPUT" != *.md ]]; then
+            echo "Error: page input must end in .md — got: $PAGE_INPUT"
+            exit 1
+          fi
+
+      - name: Generate single-page PDF
+        if: github.event_name == 'workflow_dispatch' && inputs.page != ''
+        env:
+          PAGE_INPUT: ${{ inputs.page }}
+        run: |
+          python generate_pdf.py --page "$PAGE_INPUT"
+          PDF="${PAGE_INPUT%.md}.pdf"
+          git add "$PDF"
+          git diff --cached --quiet || git commit -m "docs: regenerate PDF for ${PAGE_INPUT} [skip ci]"
+
+      # ── Full regeneration mode ───────────────────────────────────────────────
       - name: Generate and commit analytics PDF
+        if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.page == '')
         run: |
           python generate_pdf.py analytics
           git add docs/product/analytics/analytics_product_design.pdf
           git diff --cached --quiet || git commit -m "docs(analytics): regenerate PDF [skip ci]"
 
       - name: Generate and commit assistant PDF
+        if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.page == '')
         run: |
           python generate_pdf.py assistant
           git add docs/product/assistant/assistant_product_design.pdf
