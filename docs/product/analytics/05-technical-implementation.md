@@ -986,6 +986,9 @@ vite2img is a **standalone MCP render service** — not part of the Analytics Pl
 | Agentic consumers | vite2img | vite2img | vite2img |
 
 ```python
+import json
+import base64
+from playwright.async_api import async_playwright
 from fastmcp import FastMCP
 from pydantic import BaseModel
 from typing import Literal
@@ -1010,15 +1013,47 @@ class RenderTableInput(BaseModel):
 async def render_chart(input: RenderChartInput) -> dict:
     """Render a Vega-Lite display spec from the Analytics Platform to a static image.
     Returns a base64-encoded image and MIME type."""
-    # Serve spec via Vite, render with vega-embed, screenshot with Playwright
-    ...
+    html        = _vega_embed_html(input.display_spec, input.width, input.height)
+    image_bytes = await _screenshot(html, input.format, input.width, input.height)
+    return {
+        "image":     base64.b64encode(image_bytes).decode(),
+        "mime_type": "image/png" if input.format == "png" else "image/svg+xml",
+    }
 
 @mcp.tool()
 async def render_table(input: RenderTableInput) -> dict:
     """Render a table display spec from the Analytics Platform to a static image.
     Returns a base64-encoded image and MIME type."""
-    # Apply HTML template, screenshot with Playwright
+    html        = _table_html(input.display_spec, input.width)
+    image_bytes = await _screenshot(html, input.format, input.width, height=600)
+    return {
+        "image":     base64.b64encode(image_bytes).decode(),
+        "mime_type": "image/png" if input.format == "png" else "image/svg+xml",
+    }
+
+def _vega_embed_html(spec: dict, width: int, height: int) -> str:
+    return f"""<!DOCTYPE html><html><body style="margin:0">
+<div id="vis"></div>
+<script src="/vega/vega.min.js"></script>
+<script src="/vega/vega-lite.min.js"></script>
+<script src="/vega/vega-embed.min.js"></script>
+<script>
+  vegaEmbed('#vis', {json.dumps(spec)}, {{width: {width}, height: {height}, actions: false}});
+</script></body></html>"""
+
+def _table_html(spec: dict, width: int) -> str:
+    # Build styled HTML table from spec["columns"] and spec["data"]["values"]
     ...
+
+async def _screenshot(html: str, fmt: str, width: int, height: int) -> bytes:
+    async with async_playwright() as pw:
+        browser = await pw.chromium.launch(args=["--no-sandbox", "--disable-setuid-sandbox"])
+        page    = await browser.new_page(viewport={"width": width, "height": height})
+        await page.set_content(html)
+        await page.wait_for_selector("#vis canvas")   # wait for Vega render to complete
+        image   = await page.locator("#vis").screenshot(type=fmt)
+        await browser.close()
+        return image
 
 if __name__ == "__main__":
     mcp.run(transport="streamable-http", host="0.0.0.0", port=8001)
