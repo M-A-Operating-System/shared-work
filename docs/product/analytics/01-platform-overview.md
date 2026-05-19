@@ -95,18 +95,21 @@ The tension between P9 and P2 is different in kind. There is no internal tooling
 ```mermaid
 flowchart TB
     subgraph clients["AI-Enabled Clients"]
+        direction LR
         A1["Conversational\nAssistant"]
         A2["Autonomous\nAgent"]
         A3["Custom\nApplication"]
     end
 
     subgraph platform["Analytics Capability"]
+        direction LR
         B1["MCP Capability Layer"]
         B2["Semantic Metrics Registry"]
         B3["Governance Pipeline\nRALP · SEG · FQP"]
     end
 
     subgraph data["Data Sources"]
+         direction LR
         C1["SQL Warehouse"]
         C2["OpenData API"]
         C3["Graph Data API"]
