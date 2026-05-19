@@ -97,6 +97,18 @@ For governed financial analytics, correctness is not approximate. An organisatio
 
 LLM-generated SQL is written to satisfy the question semantically, not to execute efficiently. Missing partition filters, full table scans, and unoptimised aggregations are common. In cloud data warehouses billed by query cost — Snowflake, BigQuery, Databricks — a single malformed query can consume significant budget. There is no pre-execution cost estimate, no circuit breaker, and no query cost governance.
 
+### 11. Schema changes create a continuous, untestable maintenance burden
+
+The AI model's ability to generate correct SQL depends entirely on its understanding of the physical schema. That understanding is encoded in the schema context injected into every prompt — table names, column names, relationships, and the business meaning the prompt author has attributed to each. When the schema changes, that context must be updated by hand.
+
+In a production enterprise data environment, schemas change constantly. Tables are refactored during warehouse migrations. Columns are renamed to align with updated naming conventions. New source systems add new tables. Metrics that were once in a single table are decomposed into fact and dimension tables. Views replace raw tables. Partitioning strategies change. Each of these changes invalidates some portion of the schema context — and because the LLM's behaviour is probabilistic, there is no reliable way to know which queries broke until users report wrong answers or auditors find inconsistencies.
+
+This creates a maintenance dependency that does not exist in a semantic layer architecture. In a governed semantic registry, the physical mapping between a metric definition and its source data is declared once, explicitly, by the data engineer who owns the source. When the schema changes, the mapping is updated in one place — the registry — and the change is propagated consistently to every query that uses that metric. The update is testable, versioned, and approved before it reaches production.
+
+In Text-to-SQL, the equivalent of this update is: rewrite the affected portions of the system prompt, re-evaluate every query that might have touched the changed schema element, and accept that you cannot be certain you have found all affected queries. As the data estate grows — more tables, more source systems, more business concepts — the schema context grows with it, approaching context window limits and becoming increasingly difficult for any single prompt author to maintain accurately. Business logic that took months to express correctly in the schema context must be re-expressed after each significant refactor.
+
+The operational consequence is a standing maintenance team whose job is to keep the AI's schema understanding current — a team that grows with the complexity of the data estate and whose output cannot be deterministically verified. This is not a transitional cost; it is a permanent structural cost of the Text-to-SQL architecture.
+
 ---
 
 ## Information Security Risks
@@ -185,6 +197,8 @@ The following scenarios are not hypothetical. They represent the class of incide
 
 **Formula change compliance.** A regulatory update changes the definition of a capital metric. In a governed semantic layer, the definition is updated, approved, versioned, and the change is applied consistently to all future queries — with the prior version preserved in history for retrospective analysis. In Text-to-SQL, the "definition" is whatever the LLM infers. The update is added to the prompt; the LLM does not always apply it; different phrasings of the question may or may not pick up the change. Historical results are indistinguishable from results under the new formula.
 
+**Warehouse migration.** The data engineering team refactors the portfolio data warehouse: a monolithic `portfolio_positions` table is decomposed into `portfolio_holdings`, `position_valuations`, and `instrument_reference`. The schema context in the Text-to-SQL system is now stale. Queries that previously worked start returning incorrect results — or no results — because the LLM is generating SQL against a schema that no longer exists. Identifying which queries are affected requires manually reviewing every question the system has ever been asked. Updating the schema context requires rewriting the business logic that was previously expressed in terms of the old table structure. There is no way to verify the update is complete without exhaustive manual testing — and because the system is probabilistic, a passing test is not a guarantee of correctness.
+
 **Cross-user metric inconsistency.** A portfolio manager and a risk officer both ask for tracking error on the same portfolio on the same day. The LLM infers the tracking error formula differently in each session — one uses a 12-month lookback, one uses a 36-month lookback, one annualises, one does not. Both receive results. Neither result is flagged as non-standard. Both users believe they are working from the same number.
 
 **Entitlement incident.** A prompt injection attack, a WHERE-clause omission, or an aggregation inference attack allows a user to access data outside their authorised scope. In a semantic layer platform, every entitlement decision is logged before any execution backend is contacted — the incident is immediately detectable in the audit trail. In Text-to-SQL, there is no semantic-tier audit trail. The entitlement failure may not be detected until the affected data appears in an unexpected place.
@@ -223,6 +237,7 @@ The alternative architecture separates the AI translation layer from the governe
 | Multi-source federation is not possible | Federated Query Planner routes governed plans to SQL warehouses, OpenData APIs, Graph APIs, and any registered backend |
 | Query cost is uncontrollable | Cost estimated from Logical Query Plan before execution; circuit breaker blocks excess |
 | Cannot be deterministically tested | Deterministic pipeline: given these inputs, the system must produce exactly this output |
+| Schema changes require manual prompt re-engineering with no reliable test coverage | Physical mappings updated once in the SMR; changes versioned, approved, and consistently applied to all dependent metrics |
 
 The LLM's role is constrained to what it performs reliably. The computation — resolving metric definitions, enforcing entitlements, planning and executing queries, assembling results, recording lineage — is performed by deterministic components that do not generate, do not infer, and do not vary with session context.
 
