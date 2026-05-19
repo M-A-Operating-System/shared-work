@@ -579,6 +579,94 @@ Key patterns visible across the sample set:
 | `required_dimensions` | varies — regulatory requires `entity_id` + `jurisdiction` | SIL rejects calls that omit required dimensions |
 | `aggregation` | `value_weighted_average` (flow metrics) vs `last` (point-in-time) | Controls how FQP assembles multi-period results |
 
+#### New DCS document type: `analytical_dimension`
+
+Dimension definitions are the third new document type. They define the valid slicing axes referenced in `supported_dimensions` and `required_dimensions` on metrics and operations. The SIL validates dimension IDs against this catalogue at resolution time.
+
+```json
+[
+  {
+    "type":             "analytical_dimension",
+    "tenant_id":        "acme-wealth",
+    "dimension_id":     "asset_class",
+    "version":          1,
+    "status":           "approved",
+    "source":           "platform",
+    "display_name":     "Asset Class",
+    "description":      "Top-level asset class classification applied to holdings.",
+    "data_affinity":    "portfolio",
+    "physical_mapping": { "source": "primary-warehouse", "table": "dim_asset_classification", "column": "asset_class" },
+    "values":           ["EQUITY", "FIXED_INCOME", "ALTERNATIVES", "CASH", "DERIVATIVES"],
+    "hierarchical":     false,
+    "parent_dimension": null
+  },
+  {
+    "type":             "analytical_dimension",
+    "tenant_id":        "acme-wealth",
+    "dimension_id":     "geography",
+    "version":          1,
+    "status":           "approved",
+    "source":           "platform",
+    "display_name":     "Geography",
+    "description":      "Country of domicile of the issuer. Rolls up to region and continent.",
+    "data_affinity":    "portfolio",
+    "physical_mapping": { "source": "primary-warehouse", "table": "dim_geography", "column": "country_iso2" },
+    "values":           null,
+    "hierarchical":     true,
+    "parent_dimension": null,
+    "hierarchy_levels": ["continent", "region", "country"]
+  },
+  {
+    "type":             "analytical_dimension",
+    "tenant_id":        "acme-wealth",
+    "dimension_id":     "sector",
+    "version":          1,
+    "status":           "approved",
+    "source":           "platform",
+    "display_name":     "Sector (GICS)",
+    "description":      "GICS Level 1 sector classification.",
+    "data_affinity":    "portfolio",
+    "physical_mapping": { "source": "primary-warehouse", "table": "dim_sector", "column": "gics_sector" },
+    "values":           ["ENERGY", "MATERIALS", "INDUSTRIALS", "CONSUMER_DISCRETIONARY", "CONSUMER_STAPLES",
+                         "HEALTH_CARE", "FINANCIALS", "INFORMATION_TECHNOLOGY", "COMMUNICATION_SERVICES",
+                         "UTILITIES", "REAL_ESTATE"],
+    "hierarchical":     true,
+    "parent_dimension": null,
+    "hierarchy_levels": ["sector", "industry_group", "industry", "sub_industry"]
+  },
+  {
+    "type":             "analytical_dimension",
+    "tenant_id":        "acme-wealth",
+    "dimension_id":     "currency",
+    "version":          1,
+    "status":           "approved",
+    "source":           "platform",
+    "display_name":     "Currency",
+    "description":      "Denomination currency of the holding (ISO 4217).",
+    "data_affinity":    "portfolio",
+    "physical_mapping": { "source": "primary-warehouse", "table": "fact_portfolio_daily", "column": "currency_code" },
+    "values":           null,
+    "hierarchical":     false,
+    "parent_dimension": null
+  },
+  {
+    "type":             "analytical_dimension",
+    "tenant_id":        "acme-wealth",
+    "dimension_id":     "issuer",
+    "version":          1,
+    "status":           "approved",
+    "source":           "platform",
+    "display_name":     "Issuer",
+    "description":      "Legal entity name of the security issuer. High cardinality — use with limit.",
+    "data_affinity":    "portfolio",
+    "physical_mapping": { "source": "primary-warehouse", "table": "dim_issuer", "column": "issuer_name" },
+    "values":           null,
+    "hierarchical":     false,
+    "parent_dimension": null
+  }
+]
+```
+
 #### New DCS document type: `analytical_operation`
 
 The operation catalogue. One document per approved operation per tenant. The `execution_profile` field tells the pipeline executor which stages to invoke. The `supported_metrics` and `supported_dimensions` lists are enforced by the Semantic Intent Layer — a `run_analytics` call referencing an out-of-catalogue value is rejected before LQP generation.
