@@ -270,6 +270,41 @@ if __name__ == "__main__":
 | **SMR resolution** | Direct SMR service call | Synchronous lookup against the metric registry; rejects unregistered IDs before LQP generation |
 | **LQP generation** | Custom Python | Backend-agnostic DAG construction from validated parameters; deterministic for any given input |
 
+```python
+class SemanticIntentLayer:
+    def __init__(self, smr: "SemanticMetricsRegistry"):
+        self.smr = smr
+
+    async def resolve(self, operation: dict, params: dict, claims: dict) -> dict:
+        self._validate_params(params, operation["required_params"])
+        resolved_metrics = [
+            await self.smr.get_metric(m, claims)
+            for m in params.get("metrics", [])
+        ]
+        return self._build_lqp(operation, params, resolved_metrics)
+
+    def _validate_params(self, params: dict, required: list[str]) -> None:
+        missing = [k for k in required if k not in params]
+        if missing:
+            raise ValueError(f"Missing required params: {missing}")
+
+    def _build_lqp(self, operation: dict, params: dict, metrics: list[dict]) -> dict:
+        # Construct engine-agnostic DAG; each metric node carries physicalMapping from SMR
+        nodes = []
+        for metric in metrics:
+            nodes.append({
+                "op":               "metric_scan",
+                "metric_id":        metric["metric_id"],
+                "metric_version":   metric["version"],
+                "aggregation":      metric["aggregation"],
+                "data_affinity":    metric["data_affinity"],
+                "physical_mapping": metric["physical_mapping"],
+            })
+        # Append join, filter, time_expand, sort nodes from params
+        ...
+        return {"lqp_id": generate_id(), "nodes": nodes, "tenant_id": claims["tenant_id"]}
+```
+
 ---
 
 ### Narrative Synthesis Engine
@@ -284,6 +319,38 @@ if __name__ == "__main__":
 | **Prompt construction** | Result-only context | Metric labels + row values + units injected; no user query, no physical schema |
 | **Post-generation validation** | Custom Python | Every numeric value in narrative matched against result set; reject and retry once on failure |
 | **Feature flag** | `features.narrativeSynthesis` | Tenant-level on/off; disabled means NSE is never invoked |
+
+```python
+import anthropic
+
+class NarrativeSynthesisEngine:
+    def __init__(self, client: anthropic.AsyncAnthropic):
+        self.client = client
+
+    async def synthesise(self, result: dict, operation: dict) -> str:
+        model    = "claude-haiku-4-5-20251001" if self._is_simple(result) else "claude-sonnet-4-6"
+        prompt   = self._build_prompt(result, operation)
+        response = await self.client.messages.create(
+            model=model, max_tokens=512,
+            messages=[{"role": "user", "content": prompt}],
+        )
+        narrative = response.content[0].text
+        self._validate_numbers(narrative, result["rows"])
+        return narrative
+
+    def _is_simple(self, result: dict) -> bool:
+        return len(result["rows"]) <= 10 and len(result["schema"]) <= 3
+
+    def _build_prompt(self, result: dict, operation: dict) -> str:
+        # Inject metric labels + row values + units; no user query, no physical schema
+        rows_text = "\n".join(str(row) for row in result["rows"])
+        return f"Summarise this {operation['display_name']} result in 2-3 sentences:\n{rows_text}"
+
+    def _validate_numbers(self, narrative: str, rows: list[dict]) -> None:
+        # Every numeric value cited in the narrative must appear in result rows
+        # Raise NarrativeValidationError; caller retries once before propagating
+        ...
+```
 
 ---
 
@@ -393,6 +460,48 @@ Analytical operations are also stored as DCS documents (`type: "analytical_opera
 ```
 
 New operations are added via `POST /v1/smr/operations` through the Admin API and follow the same approval workflow as metric definitions. The `supported_metrics`, `supported_dimensions`, and `execution_profile` are enforced by the Semantic Intent Layer — an operation call referencing an unknown metric or profile mismatch is rejected before LQP generation.
+
+```python
+class SemanticMetricsRegistry:
+    def __init__(self, dcs_client):
+        self.dcs = dcs_client
+
+    async def get_operation(self, operation_id: str, claims: dict) -> dict:
+        doc = await self.dcs.get(
+            document_type="analytical_operation",
+            id=operation_id,
+            tenant_id=claims["tenant_id"],
+        )
+        if doc["status"] != "approved":
+            raise OperationNotAvailableError(operation_id)
+        return doc
+
+    async def list_operations(self, claims: dict, domain: str | None = None) -> list[dict]:
+        return await self.dcs.search(
+            document_type="analytical_operation",
+            tenant_id=claims["tenant_id"],
+            filters={"domain": domain} if domain else {},
+        )
+
+    async def get_metric(self, metric_id: str, claims: dict) -> dict:
+        return await self.dcs.get(
+            document_type="analytical_metric",
+            id=metric_id,
+            tenant_id=claims["tenant_id"],
+        )
+
+    async def list_metrics(self, claims: dict, **filters) -> list[dict]:
+        return await self.dcs.search(
+            document_type="analytical_metric",
+            tenant_id=claims["tenant_id"],
+            filters=filters,
+        )
+
+    async def list_approved_summary(self, claims: dict, domain: str | None = None) -> list[dict]:
+        metrics = await self.list_metrics(claims, status="approved", domain=domain)
+        return [{"id": m["metric_id"], "label": m["display_name"], "description": m["description"]}
+                for m in metrics]
+```
 
 ---
 
@@ -519,6 +628,38 @@ The Semantic Intent Layer resolves metric IDs against the SMR, merges in role pr
 }
 ```
 
+```python
+class RoleAwareProjectionLayer:
+    def __init__(self, pg_pool):
+        self.pg = pg_pool
+
+    async def project(self, lqp: dict, claims: dict) -> dict:
+        policy = await self._load_policy(claims["tenant_id"], claims.get("role"))
+        if policy is None:
+            raise AccessDeniedError("No role policy found — defaultDenyAll")
+
+        lqp = self._inject_row_predicates(lqp, policy, claims)
+        lqp["column_masks"] = policy.get("columnMasks", {})
+        return lqp
+
+    def _inject_row_predicates(self, lqp: dict, policy: dict, claims: dict) -> dict:
+        for dimension, template in policy.get("rowPredicates", {}).items():
+            predicate = self._interpolate(template, claims)
+            lqp["nodes"].append({"op": "filter", "predicates": [predicate]})
+        lqp["row_predicates_applied"] = True
+        return lqp
+
+    def _interpolate(self, template: str, claims: dict) -> str:
+        # Replace {{user.claim_name}} tokens with JWT claim values
+        ...
+
+    async def _load_policy(self, tenant_id: str, role: str | None) -> dict | None:
+        return await self.pg.fetchrow(
+            "SELECT * FROM role_policies WHERE tenant_id=$1 AND role_id=$2",
+            tenant_id, role,
+        )
+```
+
 ---
 
 ### Semantic Execution Governance
@@ -550,6 +691,53 @@ Each tenant has one governance config document. The Semantic Execution Governanc
   "require_lineage_for_export": true,
   "audit_all_queries":          true
 }
+```
+
+```python
+class SemanticExecutionGovernance:
+    def __init__(self, dcs_client, pg_pool):
+        self.dcs = dcs_client
+        self.pg  = pg_pool
+
+    async def approve(self, lqp: dict, claims: dict) -> dict:
+        config = await self._load_config(claims["tenant_id"])
+
+        cost = self._estimate_cost(lqp, config)
+        if cost > config["cost_ceiling_per_query"]:
+            raise CostCeilingExceeded(cost)
+
+        spend = await self._hourly_spend(claims["sub"], claims["tenant_id"])
+        if spend + cost > config["cost_budget_per_user_hourly"]:
+            raise UserBudgetExceeded()
+
+        self._check_classification(lqp, config)
+        self._check_compliance(lqp, config)
+
+        lqp["cost_estimate"]       = cost
+        lqp["governance_approved"] = True
+        return lqp
+
+    def _estimate_cost(self, lqp: dict, config: dict) -> int:
+        # Σ(metric.costWeight × dimensionCardinality × timeRangeMultiplier)
+        ...
+
+    def _check_classification(self, lqp: dict, config: dict) -> None:
+        # Reject if any metric classificationLevel is in blocked_classifications
+        ...
+
+    def _check_compliance(self, lqp: dict, config: dict) -> None:
+        # Enforce compliance mode constraints — MiFID II justification, Basel III entity dims
+        ...
+
+    async def _load_config(self, tenant_id: str) -> dict:
+        return await self.dcs.get(document_type="governance_config", tenant_id=tenant_id)
+
+    async def _hourly_spend(self, user_sub: str, tenant_id: str) -> int:
+        return await self.pg.fetchval(
+            "SELECT COALESCE(SUM(cost_units), 0) FROM analytics.lineage_index "
+            "WHERE user_sub=$1 AND tenant_id=$2 AND created_at > now() - interval '1 hour'",
+            user_sub, tenant_id,
+        )
 ```
 
 ---
@@ -658,6 +846,43 @@ After execution and result assembly the FQP returns a typed result envelope in p
 | **OLAP engine** | OLAP adapter | Apache Druid, ClickHouse, Pinot |
 | **Custom** | Custom adapter interface | Any backend conforming to the `FQPBackendAdapter` contract |
 
+```python
+import asyncio
+
+class FederatedQueryPlanner:
+    def __init__(self, backend_registry: dict, lineage_store: "AnalyticalLineageStore"):
+        self.backends = backend_registry   # data_affinity → FQPBackendAdapter
+        self.lineage  = lineage_store
+
+    async def execute(self, lqp: dict) -> dict:
+        sub_plans = self._split_by_affinity(lqp)
+        results   = await asyncio.gather(*[self._execute_sub_plan(sp) for sp in sub_plans])
+        assembled = self._assemble(results, lqp)
+        await self.lineage.write_execution(lqp, assembled)
+        return assembled
+
+    def _split_by_affinity(self, lqp: dict) -> list[dict]:
+        # Group metric_scan nodes by data_affinity; each group becomes a sub-plan
+        groups: dict[str, list] = {}
+        for node in lqp["nodes"]:
+            if node["op"] == "metric_scan":
+                groups.setdefault(node["data_affinity"], []).append(node)
+        return [{"affinity": aff, "nodes": nodes} for aff, nodes in groups.items()]
+
+    async def _execute_sub_plan(self, sub_plan: dict) -> dict:
+        adapter = self.backends[sub_plan["affinity"]]
+        return await adapter.execute_sub_plan(sub_plan)
+
+    def _assemble(self, results: list[dict], lqp: dict) -> dict:
+        # Fan-in: join on shared keys, apply sort/limit, apply column masks
+        ...
+
+
+class FQPBackendAdapter:
+    async def ping(self) -> bool: ...
+    async def execute_sub_plan(self, sub_plan: dict) -> dict: ...
+```
+
 ---
 
 ### Visualisation Ontology
@@ -723,6 +948,39 @@ The evaluator matches the `COMPARISON` intent pattern and two-metric schema to t
 
 Full SCL examples including the `type: "table"` spec are in Section 3.7 (Analytical Output Format). Full chart contract definitions are in Section 3.6 (Visualisation Ontology).
 
+```python
+INTENT_CONTRACTS = {
+    ("ATTRIBUTION",  1): "ATTRIBUTION_WATERFALL",
+    ("COMPARISON",   2): "BAR_MULTI_SERIES_COMPARISON",
+    ("TREND",        1): "LINE_TIME_SERIES",
+    ("DISTRIBUTION", 1): "HISTOGRAM",
+}
+
+class VisualisationOntology:
+    def evaluate(self, result: dict, operation: dict) -> dict:
+        intent   = self._infer_intent(operation)
+        contract = self._match_contract(intent, result["schema"])
+        return self._build_display_spec(contract, result, operation)
+
+    def _infer_intent(self, operation: dict) -> str:
+        intent_map = {
+            "attribution_waterfall":       "ATTRIBUTION",
+            "bar_multi_series_comparison": "COMPARISON",
+            "line_time_series":            "TREND",
+            "histogram":                   "DISTRIBUTION",
+            "table":                       "TABLE",
+        }
+        return intent_map.get(operation.get("default_visualization", "table"), "TABLE")
+
+    def _match_contract(self, intent: str, schema: list) -> str:
+        num_metrics = sum(1 for f in schema if f["type"] == "number")
+        return INTENT_CONTRACTS.get((intent, num_metrics), "TABLE")
+
+    def _build_display_spec(self, contract: str, result: dict, operation: dict) -> dict:
+        # Emit Vega-Lite v5 SCL display spec conforming to the matched contract
+        ...
+```
+
 ---
 
 ### Static Image Rendering (vite2img)
@@ -740,6 +998,45 @@ vite2img is a **standalone MCP render service** — not part of the Analytics Pl
 | AI Chat Platform | vega-embed | Native data table | vite2img (direct MCP call) |
 | Custom UI | vega-embed (recommended) | Host's own grid | vite2img |
 | Agentic consumers | vite2img | vite2img | vite2img |
+
+```python
+from fastmcp import FastMCP
+from pydantic import BaseModel
+from typing import Literal
+
+mcp = FastMCP(
+    name="vite2img",
+    instructions="Render Vega-Lite display specs and tables to static PNG or SVG images.",
+)
+
+class RenderChartInput(BaseModel):
+    display_spec: dict                      # Vega-Lite v5 SCL spec from Analytics Platform
+    format:       Literal["png", "svg"] = "png"
+    width:        int = 800
+    height:       int = 400
+
+class RenderTableInput(BaseModel):
+    display_spec: dict                      # type: "table" SCL spec from Analytics Platform
+    format:       Literal["png", "svg"] = "png"
+    width:        int = 900
+
+@mcp.tool()
+async def render_chart(input: RenderChartInput) -> dict:
+    """Render a Vega-Lite display spec from the Analytics Platform to a static image.
+    Returns a base64-encoded image and MIME type."""
+    # Serve spec via Vite, render with vega-embed, screenshot with Playwright
+    ...
+
+@mcp.tool()
+async def render_table(input: RenderTableInput) -> dict:
+    """Render a table display spec from the Analytics Platform to a static image.
+    Returns a base64-encoded image and MIME type."""
+    # Apply HTML template, screenshot with Playwright
+    ...
+
+if __name__ == "__main__":
+    mcp.run(transport="streamable-http", host="0.0.0.0", port=8001)
+```
 
 ---
 
@@ -802,6 +1099,49 @@ CREATE INDEX idx_lineage_tenant_time ON analytics.lineage_index (tenant_id, crea
 CREATE INDEX idx_lineage_compliance  ON analytics.lineage_index (tenant_id, compliance_mode) WHERE compliance_mode IS NOT NULL;
 ```
 
+```python
+import json
+
+class AnalyticalLineageStore:
+    def __init__(self, s3_client, pg_pool):
+        self.s3 = s3_client
+        self.pg = pg_pool
+
+    async def write(self, record: dict) -> str:
+        key = self._object_key(record["tenant_id"], record["result_id"], record["created_at"])
+        await self.s3.put_object(Key=key, Body=json.dumps(record).encode())
+        await self._index(record)
+        return record["result_id"]
+
+    async def fetch(self, result_id: str, tenant_id: str) -> dict:
+        row = await self.pg.fetchrow(
+            "SELECT * FROM analytics.lineage_index WHERE result_id=$1 AND tenant_id=$2",
+            result_id, tenant_id,
+        )
+        key = self._object_key(row["tenant_id"], result_id, row["created_at"].isoformat())
+        obj = await self.s3.get_object(Key=key)
+        return json.loads(obj["Body"].read())
+
+    async def write_execution(self, lqp: dict, result: dict) -> None:
+        # Called by FQP post-assembly; enqueued async via SQS to avoid blocking the response
+        ...
+
+    def _object_key(self, tenant_id: str, result_id: str, created_at: str) -> str:
+        date = created_at[:10].replace("-", "/")
+        return f"lineage/{tenant_id}/{date}/{result_id}.json"
+
+    async def _index(self, record: dict) -> None:
+        await self.pg.execute(
+            """INSERT INTO analytics.lineage_index
+               (result_id, tenant_id, user_sub, compliance_mode, error_code,
+                cache_hit, created_at, expires_at)
+               VALUES ($1, $2, $3, $4, $5, $6, $7, $8)""",
+            record["result_id"], record["tenant_id"], record["user_sub"],
+            record.get("compliance_mode"), record.get("error_code"),
+            record["cache_hit"], record["created_at"], record["expires_at"],
+        )
+```
+
 ---
 
 ### Knowledge Store
@@ -816,6 +1156,29 @@ CREATE INDEX idx_lineage_compliance  ON analytics.lineage_index (tenant_id, comp
 | **Defaults** | Bundled at installation alongside the Financial Services Reference Model | Covers platform overview, all six analytical domains, core skills definitions, MiFID II and Basel III/IV compliance guides |
 
 Each knowledge artifact is a versioned Markdown document identified by a URI path that maps directly to its MCP resource address (`guide://analytics/platform-overview` → `guide/analytics/platform-overview.md`). The active version for each artifact is controlled via the Admin API; previous versions are retained for audit purposes. Tenants may add custom skills definitions and workflow guides without modifying the platform defaults.
+
+```python
+class KnowledgeStore:
+    def __init__(self, s3_client, bucket: str):
+        self.s3     = s3_client
+        self.bucket = bucket
+
+    def get(self, artifact_path: str) -> str:
+        key = f"knowledge/{artifact_path}.md"
+        obj = self.s3.get_object(Bucket=self.bucket, Key=key)
+        return obj["Body"].read().decode("utf-8")
+
+    async def put(self, artifact_path: str, content: str, author: str) -> str:
+        # Called via Admin API; previous version retained with version suffix in S3
+        version = generate_version_id()
+        key     = f"knowledge/{artifact_path}.md"
+        await self.s3.put_object(
+            Bucket=self.bucket, Key=key,
+            Body=content.encode("utf-8"),
+            Metadata={"author": author, "version": version},
+        )
+        return version
+```
 
 ---
 
