@@ -316,6 +316,42 @@ def generate_product(name: str, config: dict) -> None:
     size_mb = output.stat().st_size / 1_000_000
     print(f"Done → {output}  ({size_mb:.1f} MB)")
 
+# ---------- single-page generation ----------
+
+def generate_page(file_path: Path) -> None:
+    """Generate a PDF for a single .md file, placed next to it."""
+    file_path = file_path.resolve()
+
+    config = None
+    for name, cfg in PRODUCTS.items():
+        if file_path.parent == (PRODUCTS_DIR / name).resolve():
+            config = cfg
+            break
+
+    if config is None:
+        print(f"  [error] {file_path}: not inside a known product directory")
+        sys.exit(1)
+
+    raw = file_path.read_text(encoding="utf-8")
+    h1 = re.search(r'^#\s+(.+)$', raw, re.MULTILINE)
+    page_title = h1.group(1).strip() if h1 else file_path.stem
+
+    output = file_path.with_suffix('.pdf')
+
+    print(f"\n── page: {file_path.name} ──────────────────────────────────────────")
+    print("Building HTML…")
+    html = build_html([file_path], page_title, config["subtitle"], config["meta"])
+
+    print("Rendering PDF…")
+    from weasyprint import HTML, CSS as WeasyprintCSS
+    HTML(string=html, base_url=str(file_path.parent)).write_pdf(
+        str(output),
+        stylesheets=[WeasyprintCSS(string=CSS)],
+    )
+
+    size_mb = output.stat().st_size / 1_000_000
+    print(f"Done → {output}  ({size_mb:.1f} MB)")
+
 # ---------- main ----------
 
 def main():
@@ -324,6 +360,14 @@ def main():
     except ImportError:
         print("weasyprint not installed. Run: pip install markdown weasyprint")
         sys.exit(1)
+
+    if len(sys.argv) > 1 and sys.argv[1] == '--page':
+        if len(sys.argv) < 3:
+            print("Usage: python generate_pdf.py --page <path/to/file.md>")
+            sys.exit(1)
+        generate_page(Path(sys.argv[2]))
+        print("\nAll done.")
+        return
 
     requested = sys.argv[1] if len(sys.argv) > 1 else None
 
