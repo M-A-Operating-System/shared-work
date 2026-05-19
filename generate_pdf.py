@@ -328,13 +328,39 @@ def generate_product(name: str, config: dict) -> None:
 
 # ---------- single-page generation ----------
 
+def _resolve_page_path(file_path: Path) -> Path:
+    """Resolve a page path, searching product directories if only a filename was given."""
+    if file_path.is_file() and not file_path.is_symlink():
+        return file_path.resolve()
+
+    # Search all product directories for a file with this name
+    candidates = sorted(
+        f for f in PRODUCTS_DIR.rglob(file_path.name)
+        if f.is_file() and not f.is_symlink()
+    )
+    repo_root = Path(__file__).parent
+    if len(candidates) == 1:
+        resolved = candidates[0].relative_to(repo_root)
+        print(f"  [info] resolved '{file_path.name}' → {resolved}")
+        return candidates[0].resolve()
+    if len(candidates) > 1:
+        print(f"  [error] '{file_path.name}' matches multiple files — use the full path:")
+        for c in candidates:
+            print(f"    {c.relative_to(repo_root)}")
+        sys.exit(1)
+    print(f"  [error] '{file_path.name}' not found in any product directory.")
+    print(f"          Provide the path relative to the repo root,")
+    print(f"          e.g.: docs/product/analytics/07-text-to-sql-antipattern.md")
+    sys.exit(1)
+
+
 def generate_page(file_path: Path) -> None:
     """Generate a PDF for a single .md file, placed next to it."""
     if file_path.is_symlink():
         print(f"  [error] symlinks are not supported: {file_path}")
         sys.exit(1)
 
-    file_path = file_path.resolve()
+    file_path = _resolve_page_path(file_path)
 
     if file_path.suffix != '.md':
         print(f"  [error] only .md files are supported, got: {file_path.name}")
