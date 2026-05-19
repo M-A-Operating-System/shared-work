@@ -405,6 +405,180 @@ The core metric definition. One document per approved metric version per tenant.
 
 `status` is one of `"proposed"` | `"in_review"` | `"approved"` | `"deprecated"` | `"retired"`. The DCS enforces a uniqueness constraint: at most one document per `(tenant_id, metric_id)` may carry `"status": "approved"` at any point in time. All prior versions are retained as `"deprecated"` for lineage reconstruction. `source` is `"platform"` for Financial Services Reference Model entries and `"tenant"` for customised definitions.
 
+#### Sample metric definitions
+
+Representative entries across performance, risk, and regulatory domains. These ship as part of the Financial Services Reference Model and are seeded into the DCS in `"proposed"` state at tenant setup.
+
+```json
+[
+  {
+    "type":                 "analytical_metric",
+    "tenant_id":            "acme-wealth",
+    "metric_id":            "portfolio_return",
+    "version":              1,
+    "status":               "approved",
+    "source":               "platform",
+    "display_name":         "Portfolio Return",
+    "description":          "Total return of a portfolio over the specified period, net of fees.",
+    "domain":               "performance",
+    "category":             "total_return",
+    "unit":                 "percentage",
+    "decimals":             2,
+    "aggregation":          "value_weighted_average",
+    "cost_weight":          1,
+    "classification_level": "internal",
+    "data_affinity":        "portfolio",
+    "physical_mapping":     { "source": "primary-warehouse", "table": "fact_portfolio_daily",    "measure": "total_return_net" },
+    "required_dimensions":  ["portfolio_id", "time_period"],
+    "optional_dimensions":  ["benchmark_id", "asset_class"],
+    "compliance_modes":     []
+  },
+  {
+    "type":                 "analytical_metric",
+    "tenant_id":            "acme-wealth",
+    "metric_id":            "sharpe_ratio",
+    "version":              1,
+    "status":               "approved",
+    "source":               "platform",
+    "display_name":         "Sharpe Ratio",
+    "description":          "Annualised excess return divided by annualised standard deviation.",
+    "domain":               "performance",
+    "category":             "risk_adjusted_return",
+    "unit":                 "ratio",
+    "decimals":             2,
+    "aggregation":          "last",
+    "cost_weight":          2,
+    "classification_level": "internal",
+    "data_affinity":        "portfolio",
+    "physical_mapping":     { "source": "primary-warehouse", "table": "fact_portfolio_analytics", "measure": "sharpe_ratio_annualised" },
+    "required_dimensions":  ["portfolio_id", "time_period"],
+    "optional_dimensions":  [],
+    "compliance_modes":     []
+  },
+  {
+    "type":                 "analytical_metric",
+    "tenant_id":            "acme-wealth",
+    "metric_id":            "var_95",
+    "version":              2,
+    "status":               "approved",
+    "source":               "platform",
+    "display_name":         "Value at Risk (95%)",
+    "description":          "Maximum expected portfolio loss over a 1-day horizon at 95% confidence.",
+    "domain":               "risk",
+    "category":             "market_risk",
+    "unit":                 "percentage",
+    "decimals":             2,
+    "aggregation":          "value_weighted_average",
+    "cost_weight":          3,
+    "classification_level": "internal",
+    "data_affinity":        "risk_metrics",
+    "physical_mapping":     { "source": "risk-semantic-layer", "cube": "risk_cube",             "measure": "var_95_daily" },
+    "required_dimensions":  ["portfolio_id", "as_of_date"],
+    "optional_dimensions":  ["asset_class", "geography", "sector", "currency"],
+    "compliance_modes":     []
+  },
+  {
+    "type":                 "analytical_metric",
+    "tenant_id":            "acme-wealth",
+    "metric_id":            "tracking_error",
+    "version":              2,
+    "status":               "approved",
+    "source":               "platform",
+    "display_name":         "Tracking Error",
+    "description":          "Annualised standard deviation of the difference between portfolio and benchmark returns.",
+    "domain":               "risk",
+    "category":             "relative_risk",
+    "unit":                 "percentage",
+    "decimals":             2,
+    "aggregation":          "value_weighted_average",
+    "cost_weight":          2,
+    "classification_level": "internal",
+    "data_affinity":        "risk_metrics",
+    "physical_mapping":     { "source": "risk-semantic-layer", "cube": "risk_cube",             "measure": "tracking_error_annualised" },
+    "required_dimensions":  ["portfolio_id", "benchmark_id", "as_of_date"],
+    "optional_dimensions":  ["asset_class", "sector"],
+    "compliance_modes":     []
+  },
+  {
+    "type":                 "analytical_metric",
+    "tenant_id":            "acme-wealth",
+    "metric_id":            "expected_shortfall",
+    "version":              1,
+    "status":               "approved",
+    "source":               "platform",
+    "display_name":         "Expected Shortfall (CVaR 95%)",
+    "description":          "Average loss in the worst 5% of outcomes over a 1-day horizon.",
+    "domain":               "risk",
+    "category":             "tail_risk",
+    "unit":                 "percentage",
+    "decimals":             2,
+    "aggregation":          "value_weighted_average",
+    "cost_weight":          4,
+    "classification_level": "internal",
+    "data_affinity":        "risk_metrics",
+    "physical_mapping":     { "source": "risk-semantic-layer", "cube": "risk_cube",             "measure": "cvar_95_daily" },
+    "required_dimensions":  ["portfolio_id", "as_of_date"],
+    "optional_dimensions":  ["asset_class", "geography"],
+    "compliance_modes":     []
+  },
+  {
+    "type":                 "analytical_metric",
+    "tenant_id":            "acme-wealth",
+    "metric_id":            "lcr",
+    "version":              1,
+    "status":               "approved",
+    "source":               "platform",
+    "display_name":         "Liquidity Coverage Ratio",
+    "description":          "High-quality liquid assets as a percentage of net cash outflows over a 30-day stress period. Basel III minimum: 100%.",
+    "domain":               "regulatory",
+    "category":             "liquidity",
+    "unit":                 "percentage",
+    "decimals":             1,
+    "aggregation":          "last",
+    "cost_weight":          5,
+    "classification_level": "restricted",
+    "data_affinity":        "regulatory",
+    "physical_mapping":     { "source": "regulatory-data-store", "table": "fact_regulatory_ratios", "measure": "lcr_ratio" },
+    "required_dimensions":  ["entity_id", "reporting_date", "jurisdiction"],
+    "optional_dimensions":  [],
+    "compliance_modes":     ["basel3"]
+  },
+  {
+    "type":                 "analytical_metric",
+    "tenant_id":            "acme-wealth",
+    "metric_id":            "leverage_ratio",
+    "version":              1,
+    "status":               "approved",
+    "source":               "platform",
+    "display_name":         "Leverage Ratio",
+    "description":          "Tier 1 capital as a percentage of total exposure. Basel III minimum: 3%.",
+    "domain":               "regulatory",
+    "category":             "capital_adequacy",
+    "unit":                 "percentage",
+    "decimals":             1,
+    "aggregation":          "last",
+    "cost_weight":          5,
+    "classification_level": "restricted",
+    "data_affinity":        "regulatory",
+    "physical_mapping":     { "source": "regulatory-data-store", "table": "fact_regulatory_ratios", "measure": "leverage_ratio" },
+    "required_dimensions":  ["entity_id", "reporting_date", "jurisdiction"],
+    "optional_dimensions":  [],
+    "compliance_modes":     ["basel3"]
+  }
+]
+```
+
+Key patterns visible across the sample set:
+
+| Field | Variation | Effect |
+|-------|-----------|--------|
+| `cost_weight` | 1 (portfolio_return) → 5 (lcr) | Drives SEG cost estimation; regulatory metrics are most expensive |
+| `classification_level` | `internal` (performance/risk) vs `restricted` (regulatory) | `restricted` triggers SEG classification gate |
+| `data_affinity` | `portfolio`, `risk_metrics`, `regulatory` | Determines which FQP backend adapter handles the sub-plan |
+| `compliance_modes` | empty vs `["basel3"]` | Non-empty activates compliance-mode enforcement in SEG |
+| `required_dimensions` | varies — regulatory requires `entity_id` + `jurisdiction` | SIL rejects calls that omit required dimensions |
+| `aggregation` | `value_weighted_average` (flow metrics) vs `last` (point-in-time) | Controls how FQP assembles multi-period results |
+
 #### New DCS document type: `analytical_operation`
 
 The operation catalogue. One document per approved operation per tenant. The `execution_profile` field tells the pipeline executor which stages to invoke. The `supported_metrics` and `supported_dimensions` lists are enforced by the Semantic Intent Layer — a `run_analytics` call referencing an out-of-catalogue value is rejected before LQP generation.
