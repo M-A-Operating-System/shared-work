@@ -2,6 +2,8 @@
 
 This appendix is a standalone reference for teams evaluating AI-powered analytics architectures. It describes the Text-to-SQL pattern — what it is, why it is the most common first implementation, and why it is not an appropriate foundation for governed analytical intelligence in a regulated enterprise. It can be read independently of the platform specification.
 
+While individual risk-mitigation approaches exist for each of the structural concerns described below, on aggregate the Text-to-SQL pattern is not recommended for large-scale regulated enterprises. Incremental patching reduces individual failure modes but cannot resolve the underlying architectural constraints — the pattern was not designed for governed financial analytics, and every mitigation introduces further engineering complexity without eliminating the root cause. The [Why Incremental Patching Fails](#why-incremental-patching-fails) section examines this dynamic in detail.
+
 The platform's alternative architecture — and why it is designed the way it is — is described in [Chapter 1 — Platform Overview](./01-platform-overview.md) and specified in full in [Chapter 3 — Core Platform Capabilities](./03-core-capabilities.md).
 
 ---
@@ -24,35 +26,41 @@ The argument here is narrower: for production analytical systems serving regulat
 
 ---
 
-## Structural Design Flaws
+## Governance and Regulatory Risk
 
-### 1. Metrics have no single definition
-
-"Portfolio Return" means whatever the LLM infers from the schema at query time. The same question asked in two sessions may produce different SQL and different numbers — because the LLM samples probabilistically, because the schema changed, because a JOIN path was inferred differently, or because the prompt context differed. In institutional analytics, metric definitions must be identical across reports, conversations, and regulatory submissions. There is no concept of a versioned, approved formula — only inference.
-
-This is not a prompt engineering problem. Adding the formula to the system prompt moves the definition into a string that any sufficiently creative prompt can override, ignore, or contradict. The definition must exist in a governed registry that the computation pipeline enforces deterministically — not in a context window.
-
-### 2. Results cannot be audited
+### No audit trail for regulatory review
 
 When a regulator, auditor, or internal reviewer asks "how was this number calculated?", the answer in a Text-to-SQL system is: "A language model generated some SQL and this number came back." There is no versioned metric definition, no record of which formula was applied, no lineage chain from input data to output result, and no guarantee that the same question asked tomorrow would produce the same answer.
 
 This is not an acceptable audit trail for MiFID II, Basel III/IV, AIFMD, EMIR, or SEC Regulation BI. Regulatory frameworks that require reproducible calculations and version-controlled methodologies cannot be satisfied by a system where the calculation method is a probabilistic runtime artefact.
 
-### 3. No entitlement enforcement at the semantic tier
+### No metric versioning or change management
 
-Access control in Text-to-SQL is the database credential. The LLM generates SQL; the database executes it under the credentials supplied. Row-level restrictions depend entirely on the LLM generating correct WHERE clauses — clauses that restrict results to the authenticated user's authorised scope.
+Regulatory metric definitions change — Basel III became Basel IV; LCR calculation rules were updated; SFDR added new disclosure metrics. In a Text-to-SQL system, there is no versioned definition to update, no approval workflow to gate the change, and no audit trail of which formula version produced which historical results.
 
-This boundary is not architecturally guaranteed. An omitted WHERE clause, a misunderstood filter, a maliciously crafted prompt, or a model version change can silently produce data the user should not see. There is no component in the Text-to-SQL stack that enforces "this role may query these metrics, with these row predicates, with these column masks" before execution. The entitlement boundary is the database credential, not the business logic.
+When a metric definition changes, every historical result produced under the prior definition is effectively unverifiable. For regulatory audit purposes, an organisation must be able to demonstrate that results submitted in prior periods used the formula in force at that time. Text-to-SQL provides no mechanism for this.
 
-### 4. Physical schema is exposed to the AI model
+---
 
-SQL generation requires injecting table names, column names, foreign key relationships, and sometimes sample data into the LLM's context. This transmits your organisation's internal data architecture to a third-party AI provider on every query.
+## Data Governance
 
-Even for API-deployed models under appropriate data processing agreements, this represents a continuous leakage of proprietary data architecture that creates regulatory, competitive, and reputational exposure. For organisations operating under data residency constraints or sector-specific regulations, the schema itself may constitute governed data whose transmission is restricted.
+### Metrics have no single definition
 
-Separately, the schema in the context window becomes a reconnaissance surface — covered in detail in the Information Security section below.
+"Portfolio Return" means whatever the LLM infers from the schema at query time. The same question asked in two sessions may produce different SQL and different numbers — because the LLM samples probabilistically, because the schema changed, because a JOIN path was inferred differently, or because the prompt context differed. In institutional analytics, metric definitions must be identical across reports, conversations, and regulatory submissions. There is no concept of a versioned, approved formula — only inference.
 
-### 5. Accuracy degrades on the queries that matter most
+This is not a prompt engineering problem. Adding the formula to the system prompt moves the definition into a string that any sufficiently creative prompt can override, ignore, or contradict. The definition must exist in a governed registry that the computation pipeline enforces deterministically — not in a context window.
+
+### No scope boundary or error for unregistered concepts
+
+A governed semantic layer rejects queries referencing unregistered metric identifiers and returns a structured error. Text-to-SQL has no concept of scope — it attempts to answer any question formulated against the schema. This produces two failure modes: plausible-looking SQL that computes a meaningless result (because the business concept doesn't map cleanly to the schema structure the LLM inferred), and silent misinterpretation of business terms that have precise regulatory definitions.
+
+In regulated contexts, a query that fails visibly is far less dangerous than a query that succeeds incorrectly. Text-to-SQL cannot distinguish the two.
+
+---
+
+## Analytical Reliability
+
+### Accuracy degrades on the queries that matter most
 
 LLM SQL generation is most reliable for simple pattern queries and least reliable for the complex, regulated analytical computations that constitute most of the value in financial services analytics:
 
@@ -69,51 +77,37 @@ LLM SQL generation is most reliable for simple pattern queries and least reliabl
 
 The irony is structural: the questions Text-to-SQL handles best are the ones that needed the least help. The questions that most need AI-mediated access — complex regulated computations, multi-source federation, cross-entity attribution — are exactly where the pattern breaks down.
 
-### 6. No metric versioning or change management
-
-Regulatory metric definitions change — Basel III became Basel IV; LCR calculation rules were updated; SFDR added new disclosure metrics. In a Text-to-SQL system, there is no versioned definition to update, no approval workflow to gate the change, and no audit trail of which formula version produced which historical results.
-
-When a metric definition changes, every historical result produced under the prior definition is effectively unverifiable. For regulatory audit purposes, an organisation must be able to demonstrate that results submitted in prior periods used the formula in force at that time. Text-to-SQL provides no mechanism for this.
-
-### 7. No scope boundary
-
-A governed semantic layer rejects queries referencing unregistered metric identifiers and returns a structured error. Text-to-SQL has no concept of scope — it attempts to answer any question formulated against the schema. This produces two failure modes: plausible-looking SQL that computes a meaningless result (because the business concept doesn't map cleanly to the schema structure the LLM inferred), and silent misinterpretation of business terms that have precise regulatory definitions.
-
-In regulated contexts, a query that fails visibly is far less dangerous than a query that succeeds incorrectly. Text-to-SQL cannot distinguish the two.
-
-### 8. Results are not reproducible across sessions or model versions
+### Results are not reproducible across sessions or model versions
 
 Two analysts asking the same question in different sessions may receive different results. The same analyst asking the same question after a model update may receive a different result. This is a property of probabilistic generation — it is not a bug that can be fixed; it is how the system works.
 
 For regulated analytics, reproducibility is non-negotiable. A result submitted to a regulator must be exactly reproducible from the same data and definitions. A computation that differs based on session context, model temperature, or provider model update is not reproducible.
 
-### 9. The system cannot be deterministically tested
+### The system cannot be deterministically tested
 
 A deterministic computation pipeline can be tested: given these inputs, the system must produce exactly this output. A Text-to-SQL pipeline cannot be tested this way — the SQL generator is probabilistic, so the correct output for a given input is not fixed. Test suites can only assert that generated SQL is "plausible" for a set of sample questions, which is not the same as asserting that it is correct.
 
 For governed financial analytics, correctness is not approximate. An organisation cannot assert to a regulator that its VaR calculation is correct because it "usually" produces reasonable-looking SQL.
 
-### 10. Query cost is uncontrollable
-
-LLM-generated SQL is written to satisfy the question semantically, not to execute efficiently. Missing partition filters, full table scans, and unoptimised aggregations are common. In cloud data warehouses billed by query cost — Snowflake, BigQuery, Databricks — a single malformed query can consume significant budget. There is no pre-execution cost estimate, no circuit breaker, and no query cost governance.
-
-### 11. Schema changes create a continuous, untestable maintenance burden
-
-The AI model's ability to generate correct SQL depends entirely on its understanding of the physical schema. That understanding is encoded in the schema context injected into every prompt — table names, column names, relationships, and the business meaning the prompt author has attributed to each. When the schema changes, that context must be updated by hand.
-
-In a production enterprise data environment, schemas change constantly. Tables are refactored during warehouse migrations. Columns are renamed to align with updated naming conventions. New source systems add new tables. Metrics that were once in a single table are decomposed into fact and dimension tables. Views replace raw tables. Partitioning strategies change. Each of these changes invalidates some portion of the schema context — and because the LLM's behaviour is probabilistic, there is no reliable way to know which queries broke until users report wrong answers or auditors find inconsistencies.
-
-This creates a maintenance dependency that does not exist in a semantic layer architecture. In a governed semantic registry, the physical mapping between a metric definition and its source data is declared once, explicitly, by the data engineer who owns the source. When the schema changes, the mapping is updated in one place — the registry — and the change is propagated consistently to every query that uses that metric. The update is testable, versioned, and approved before it reaches production.
-
-In Text-to-SQL, the equivalent of this update is: rewrite the affected portions of the system prompt, re-evaluate every query that might have touched the changed schema element, and accept that you cannot be certain you have found all affected queries. As the data estate grows — more tables, more source systems, more business concepts — the schema context grows with it, approaching context window limits and becoming increasingly difficult for any single prompt author to maintain accurately. Business logic that took months to express correctly in the schema context must be re-expressed after each significant refactor.
-
-The operational consequence is a standing maintenance team whose job is to keep the AI's schema understanding current — a team that grows with the complexity of the data estate and whose output cannot be deterministically verified. This is not a transitional cost; it is a permanent structural cost of the Text-to-SQL architecture.
-
 ---
 
-## Information Security Risks
+## Information Security
 
 The following risks are structural — they exist because the LLM is simultaneously the query interface and the query generator, receiving user input and producing execution artefacts in the same probabilistic pass. Prompt guardrails, SQL validators, and output filters reduce surface area but cannot eliminate these risks. The only reliable defence is to remove the attack surface by separating the AI translation layer from the physical execution layer.
+
+### Schema Exposure and Reconnaissance
+
+SQL generation requires injecting table names, column names, foreign key relationships, and sometimes sample data into the LLM's context. This transmits your organisation's internal data architecture to a third-party AI provider on every query. Even for API-deployed models under appropriate data processing agreements, this represents a continuous leakage of proprietary data architecture that creates regulatory, competitive, and reputational exposure. For organisations operating under data residency constraints or sector-specific regulations, the schema itself may constitute governed data whose transmission is restricted.
+
+The schema in the prompt context also constitutes an active reconnaissance surface:
+
+**Direct schema enumeration.** Users can ask questions that elicit schema information as part of a "helpful" response: *"What data do you have access to?"*, *"What fields are available for portfolio analysis?"*, *"Why can't you show me the counterparty data?"* Even well-prompted systems frequently surface table and column names in explanations or error messages.
+
+**Error-based schema discovery.** Queries that produce SQL errors often expose structural information through error messages: *"Column 'client_id' not found in table 'risk_positions'"* — a failed query reveals both the column name attempted and the table name. Systematic probing of error conditions can reconstruct significant portions of the schema.
+
+**System prompt extraction.** Techniques for extracting system prompt contents — including schema — from LLMs are well-documented and actively evolved. A schema injected as a system prompt is not reliably confidential.
+
+The consequences of schema exfiltration include: competitive intelligence loss, a complete attack map for further exploitation, potential regulatory breach if the schema itself constitutes governed data, and significant reputational exposure if the breach is disclosed.
 
 ### Prompt Injection
 
@@ -127,19 +121,9 @@ The following risks are structural — they exist because the LLM is simultaneou
 
 Prompt injection is a class of vulnerability with no reliable prompt-level defence. Every proposed mitigation (input sanitisation, intent classification, output validation) has documented bypass techniques.
 
-### Schema Reconnaissance and Exfiltration
-
-Physical database schema — table names, column names, relationships, data types, and sometimes sample values — is injected into the system prompt for SQL generation. This schema is proprietary information: it reflects internal data architecture, business logic, naming conventions, and organisational structure.
-
-**Direct schema enumeration.** Users can ask questions that elicit schema information as part of a "helpful" response: *"What data do you have access to?"*, *"What fields are available for portfolio analysis?"*, *"Why can't you show me the counterparty data?"* Even well-prompted systems frequently surface table and column names in explanations or error messages.
-
-**Error-based schema discovery.** Queries that produce SQL errors often expose structural information through error messages: *"Column 'client_id' not found in table 'risk_positions'"* — a failed query reveals both the column name attempted and the table name. Systematic probing of error conditions can reconstruct significant portions of the schema.
-
-**System prompt extraction.** Techniques for extracting system prompt contents — including schema — from LLMs are well-documented and actively evolved. A schema injected as a system prompt is not reliably confidential.
-
-The consequences of schema exfiltration include: competitive intelligence loss, a complete attack map for further exploitation, potential regulatory breach if the schema itself constitutes governed data, and significant reputational exposure if the breach is disclosed.
-
 ### Entitlement Bypass and Data Exfiltration
+
+Access control in Text-to-SQL is the database credential. The LLM generates SQL; the database executes it under the credentials supplied. Row-level restrictions depend entirely on the LLM generating correct WHERE clauses — clauses that restrict results to the authenticated user's authorised scope. There is no component in the Text-to-SQL stack that enforces "this role may query these metrics, with these row predicates, with these column masks" before execution. The entitlement boundary is the database credential, not the business logic.
 
 **WHERE clause omission.** Row-level restrictions depend on the LLM generating correct, complete filtering predicates. When the LLM omits, weakens, or misplaces a restriction — `portfolio_manager_id = 'user123'` — the query returns data beyond the user's authorised scope. This can happen through:
 
@@ -172,7 +156,7 @@ Even with appropriate data processing agreements in place, transmitting propriet
 
 A crafted query can cause the LLM to generate SQL that executes a full table scan, a cartesian join, or an unoptimised aggregation across a large dataset. In cloud data warehouses billed by compute or data scanned, this is a cost denial-of-service attack. The attacker does not need elevated privileges — they need the ability to craft natural language questions that lead to expensive SQL. There is no pre-execution cost gate, no circuit breaker, and no query budget enforcement in the Text-to-SQL pattern.
 
-### Summary: Why Guardrails Cannot Solve This
+### Why Guardrails Cannot Solve This
 
 Organisations that recognise these risks typically attempt to mitigate them through layered prompt restrictions, input/output validation, SQL analysis, and rate limiting. Each of these layers adds engineering cost and operational complexity while providing incomplete protection:
 
@@ -186,6 +170,26 @@ Organisations that recognise these risks typically attempt to mitigate them thro
 | Rate limiting | Slows aggregation attacks; does not prevent them |
 
 The cumulative effect is a system with a large engineering investment in partial mitigations, each of which has known bypass techniques, providing a false sense of security in a regulated environment where the cost of failure is high.
+
+---
+
+## Operational and Maintenance Risk
+
+### Query cost is uncontrollable
+
+LLM-generated SQL is written to satisfy the question semantically, not to execute efficiently. Missing partition filters, full table scans, and unoptimised aggregations are common. In cloud data warehouses billed by query cost — Snowflake, BigQuery, Databricks — a single malformed query can consume significant budget. There is no pre-execution cost estimate, no circuit breaker, and no query cost governance. The operational consequence is unbounded and unpredictable infrastructure spend whose root cause — the SQL generator — cannot be deterministically constrained.
+
+### Schema changes create a continuous, untestable maintenance burden
+
+The AI model's ability to generate correct SQL depends entirely on its understanding of the physical schema. That understanding is encoded in the schema context injected into every prompt — table names, column names, relationships, and the business meaning the prompt author has attributed to each. When the schema changes, that context must be updated by hand.
+
+In a production enterprise data environment, schemas change constantly. Tables are refactored during warehouse migrations. Columns are renamed to align with updated naming conventions. New source systems add new tables. Metrics that were once in a single table are decomposed into fact and dimension tables. Views replace raw tables. Partitioning strategies change. Each of these changes invalidates some portion of the schema context — and because the LLM's behaviour is probabilistic, there is no reliable way to know which queries broke until users report wrong answers or auditors find inconsistencies.
+
+This creates a maintenance dependency that does not exist in a semantic layer architecture. In a governed semantic registry, the physical mapping between a metric definition and its source data is declared once, explicitly, by the data engineer who owns the source. When the schema changes, the mapping is updated in one place — the registry — and the change is propagated consistently to every query that uses that metric. The update is testable, versioned, and approved before it reaches production.
+
+In Text-to-SQL, the equivalent of this update is: rewrite the affected portions of the system prompt, re-evaluate every query that might have touched the changed schema element, and accept that you cannot be certain you have found all affected queries. As the data estate grows — more tables, more source systems, more business concepts — the schema context grows with it, approaching context window limits and becoming increasingly difficult for any single prompt author to maintain accurately. Business logic that took months to express correctly in the schema context must be re-expressed after each significant refactor.
+
+The operational consequence is a standing maintenance team whose job is to keep the AI's schema understanding current — a team that grows with the complexity of the data estate and whose output cannot be deterministically verified. This is not a transitional cost; it is a permanent structural cost of the Text-to-SQL architecture.
 
 ---
 
@@ -219,7 +223,7 @@ A semantic layer is not a more complex version of Text-to-SQL. It is a different
 
 ## The Correct Pattern
 
-The alternative architecture separates the AI translation layer from the governed computation layer. The LLM does what it is reliable at — translating natural language into structured intent parameters. Everything that must be deterministic — metric definition, entitlement enforcement, query execution, lineage recording — is delegated to deterministic components that do not generate.
+The alternative architecture separates the AI translation layer from the governed computation layer. The LLM does what it is reliable at — translating natural language into structured intent parameters. Everything that must be deterministic — metric definition, entitlement enforcement, query execution, lineage recording — is delegated to deterministic components that do not generate, do not infer, and do not vary with session context.
 
 | Text-to-SQL | Governed Semantic Analytics |
 |---|---|
