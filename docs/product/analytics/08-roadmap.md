@@ -18,11 +18,11 @@ This document describes one proposed sequence of deliverables for the AI Analyti
 
 <!-- ── Phase 1 ── -->
 <tr>
-<td rowspan="13">1</td>
-<td rowspan="13"><strong>Governed Analytical Core</strong></td>
+<td rowspan="14">1</td>
+<td rowspan="14"><strong>Governed Analytical Core</strong></td>
 <td>Platform Admin API</td>
 <td>Create new authenticated REST service; implement CRUD endpoints for the Data Source Catalog, SMR metric definitions, and role entitlement records; add tenant governance settings endpoints for circuit breaker thresholds and feature flags; secure all routes with JWT middleware</td>
-<td rowspan="13">Any MCP-compatible consumer — AI assistant, application, or autonomous agent — can query a registered metric and receive a governed, reproducible result with a chart, a narrative, and an audit-grade lineage record, scoped to exactly the user's entitlements</td>
+<td rowspan="14">Any MCP-compatible consumer — AI assistant, application, or autonomous agent — can query a registered metric and receive a governed, reproducible result with a chart, a narrative, and an audit-grade lineage record, scoped to exactly the user's entitlements</td>
 </tr>
 <tr>
 <td>Admin Console</td>
@@ -38,7 +38,7 @@ This document describes one proposed sequence of deliverables for the AI Analyti
 </tr>
 <tr>
 <td>MCP Capability Layer</td>
-<td>Build new Python service using FastMCP + Uvicorn (ASGI); deploy as a Kubernetes pod; implement JWT validation middleware at request ingress rejecting unauthenticated requests before any platform processing; implement eight <code>@mcp.tool()</code> handlers routing through the shared pipeline (<code>validate_jwt → sil.resolve → rapl.project → seg.approve → fqp.execute → assemble_response</code>); implement MCP resources for SMR metric, dimension, and hierarchy browsing; implement two <code>@mcp.prompt()</code> templates (standard analytical assistant, regulatory reporting assistant); build per-user capability manifest endpoint reflecting feature-flag state and entitlement-gated tool availability</td>
+<td>Build new Python service using FastMCP + Uvicorn (ASGI); deploy as a Kubernetes pod; implement JWT validation middleware at request ingress rejecting unauthenticated requests before any platform processing; implement eight <code>@mcp.tool()</code> handlers routing through the shared pipeline (<code>validate_jwt → sil.resolve → rapl.project → seg.approve → fqp.execute → assemble_response</code>); implement MCP resource handlers serving knowledge artifacts from the Knowledge Store (<code>guide://</code> and <code>skills://</code> URIs — no JWT required, no governance pipeline); implement two <code>@mcp.prompt()</code> templates (standard analytical assistant, regulatory reporting assistant); build per-user capability manifest endpoint reflecting feature-flag state and entitlement-gated tool availability</td>
 </tr>
 <tr>
 <td>Semantic Intent Layer</td>
@@ -71,6 +71,10 @@ This document describes one proposed sequence of deliverables for the AI Analyti
 <tr>
 <td>vite2img Rendering Service</td>
 <td>Build as a standalone MCP server (not part of the Analytics Platform); implement Vite + vega-embed + headless Chromium via Playwright; expose SCL spec rendering (Vega-Lite v5 → SVG or PNG) and <code>type: "table"</code> rendering via styled HTML template as MCP tools; consumers (AI Chat Platform, agentic consumers) register vite2img as a peer MCP server alongside the Analytics Platform — the Analytics Platform does not call vite2img directly</td>
+</tr>
+<tr>
+<td>Knowledge Store</td>
+<td>Provision S3-compatible object store with versioned Markdown artifact storage; author and bundle default content at installation: platform overview guide, analytical domain reference (six domains), query pattern examples, skills definitions for portfolio performance review, risk analysis, and regulatory reporting, and compliance guides for MiFID II and Basel III/IV; implement versioned read path consumed by MCP resource handlers (URI-to-path mapping: <code>guide://analytics/platform-overview</code> → <code>guide/analytics/platform-overview.md</code>); add knowledge artifact CRUD endpoints to the Platform Admin API so tenant administrators can add, update, or override content without modifying platform defaults</td>
 </tr>
 
 <!-- ── Phase 2 ── -->

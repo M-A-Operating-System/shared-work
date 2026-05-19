@@ -71,8 +71,13 @@ The Semantic Data Context Store (DCS) is a pre-existing platform component — t
 | **Runtime** | Python · FastMCP + Uvicorn | Lightweight ASGI service; minimal dependencies; deploys as a Kubernetes pod or serverless container |
 | **Protocol** | MCP Streamable HTTP | Standard MCP interoperability; supports request/response and streaming |
 | **Auth** | JWT validation at request ingress | Stateless; validated before any platform computation begins |
+| **Tools** | All dynamic operations — metric queries, lookups, drilldown, lineage retrieval | Parameterised; universally supported by all MCP clients; go through governance pipeline |
+| **Resources** | Knowledge artifacts only — guides, skills definitions, compliance reference | Static; no user data; embedded in AI consumer context before analytical tasks; no governance pipeline |
+| **Prompts** | Pre-built analytical and regulatory assistant templates | Inject available metrics and governance constraints at session start |
 
 FastMCP (`pip install fastmcp`) provides the `@mcp.tool()`, `@mcp.resource()`, and `@mcp.prompt()` decorators and handles MCP Streamable HTTP transport. Each analytical capability is a decorated Python function; the framework serialises schemas and routes calls automatically.
+
+The separation of tools and resources is intentional. Dynamic data — metric definitions, lineage records, dimension catalogues — is accessed exclusively through tools (`list_metrics`, `get_metric_definition`) so that all requests go through JWT validation and the governance pipeline. Resources expose static knowledge artifacts from the Knowledge Store; they contain no user data and require no governance evaluation.
 
 #### Tools
 
@@ -772,16 +777,32 @@ Lineage records are immutable. Post-hoc compliance annotations are written to `a
 
 ---
 
+### Knowledge Store
+
+> **Used by:** MCP Resource handlers
+
+| Decision | Choice | Rationale |
+|----------|--------|-----------|
+| **Storage** | S3-compatible object store (versioned Markdown or MDX files) | Human-readable; diffable; straightforward Admin API management |
+| **Access** | Read-only at runtime via MCP resource handlers | No user data; no governance pipeline required |
+| **Management** | Admin API — create, update, version knowledge artifacts | Tenant administrators can extend or override default content |
+| **Defaults** | Bundled at installation alongside the Financial Services Reference Model | Covers platform overview, all six analytical domains, core skills definitions, MiFID II and Basel III/IV compliance guides |
+
+Each knowledge artifact is a versioned Markdown document identified by a URI path that maps directly to its MCP resource address (`guide://analytics/platform-overview` → `guide/analytics/platform-overview.md`). The active version for each artifact is controlled via the Admin API; previous versions are retained for audit purposes. Tenants may add custom skills definitions and workflow guides without modifying the platform defaults.
+
+---
+
 ## 5.3 Infrastructure
 
 | Component | Choice | Rationale |
 |-----------|--------|-----------|
 | MCP service | Python · FastMCP + Uvicorn | Lightweight ASGI MCP surface; deploys as Kubernetes pod |
-| Backend services | Kubernetes (cloud-agnostic) | FQP, governance, SMR as independently scalable pods |
-| Primary database | PostgreSQL (Neon or RDS) | SMR, lineage, tenant config, governance config |
-| Search | Elasticsearch / OpenSearch | SMR metric search index |
+| Backend services | Kubernetes (cloud-agnostic) | FQP, governance, platform services as independently scalable pods |
+| Primary database | PostgreSQL (Neon or RDS) | Lineage records, role policy config, scheduled queries, user preferences, saved queries |
+| Data Context Store (DCS) | Pre-existing platform component | SMR metric definitions, governance config, SMR search — reuses DCS versioned storage and native search |
+| Knowledge Store | S3-compatible object store (versioned Markdown) | MCP resource content — guides, skills definitions, compliance reference |
 | Object storage | S3-compatible | Result artefacts, large cached result sets |
-| Message queue | SQS / Pub/Sub | Async lineage writes, catalog change events |
+| Message queue | SQS / Pub/Sub | Async lineage writes, DCS change events |
 | Secrets | HashiCorp Vault or cloud-native | Backend credentials, platform service keys |
 
 ### Financial Services Reference Model
