@@ -227,7 +227,7 @@ async def analytical_assistant(jwt: str) -> str:
     return f"""You are a governed analytical assistant. You answer quantitative questions
 by calling the Analytics Platform tools — never by estimating or generating numbers.
 
-Available metrics (call list_metrics or get_metric_definition for full detail):
+Available operations and metrics (call list_operations for full detail including required parameters):
 {metrics}
 
 Rules:
@@ -235,7 +235,7 @@ Rules:
 - Do not invent metric values. Every number must come from a tool result.
 - When a result includes a narrative field, surface it as the primary response — do not paraphrase or restate.
 - When a result includes a result_id, offer to drilldown or inspect lineage if relevant.
-- If a metric is not in the list, tell the user it is not registered and suggest list_metrics."""
+- If an operation or metric is not available, tell the user it is not registered and suggest list_operations."""
 
 @mcp.prompt()
 async def regulatory_reporting_assistant(jwt: str) -> str:
@@ -363,7 +363,7 @@ class NarrativeSynthesisEngine:
 | **Definition storage** | DCS (pre-existing) | Metric and operation definitions stored alongside existing data definitions — no duplicate semantic store |
 | **Authoring and approval** | DCS native capabilities | Document creation, versioning, and approval workflow are handled by the existing DCS tooling — no new write layer needed |
 | **Runtime reads** | Direct DCS API query by Semantic Intent Layer | Definitions from the authoritative source at resolution time |
-| **Search** | DCS native search index | `list_operations` and `list_metrics` query DCS directly — no separate search infrastructure |
+| **Search** | DCS native search index | `list_operations` queries DCS directly — no separate search infrastructure |
 
 The SMR is implemented as two new document types registered in the DCS. The DCS manages the full document lifecycle (draft → in review → approved → deprecated) for both types using its existing authoring and approval capabilities.
 
@@ -505,13 +505,14 @@ No custom query language. The MCP tool call JSON (metric IDs, dimension IDs, tim
 
 ```json
 {
-  "tool": "analyse_metric",
+  "tool": "run_analytics",
   "input": {
-    "metrics":    ["portfolio_return", "tracking_error"],
-    "dimensions": ["portfolio"],
-    "time":       { "period": "quarter_to_date", "as_of_date": "2026-05-14" },
-    "filters":    [{ "dimension": "portfolio", "operator": "in", "values": ["GLOB_EQ_OPP", "UK_CORE_INC"] }],
-    "sort":       [{ "metric": "portfolio_return", "direction": "desc" }]
+    "operation_id": "compare_portfolios",
+    "params": {
+      "portfolio_ids": ["GLOB_EQ_OPP", "UK_CORE_INC"],
+      "metrics":       ["portfolio_return", "tracking_error"],
+      "time_period":   "quarter_to_date"
+    }
   }
 }
 ```
@@ -1083,7 +1084,7 @@ Each completed query writes a single JSON document to the object store at `linea
   "user_sub":           "auth0|user_xyz",
   "lqp_id":             "lqp-20260514-093241-xyz",
   "cache_hit":          false,
-  "request_payload":    { "tool": "analyse_metric", "input": { "..." } },
+  "request_payload":    { "tool": "run_analytics", "input": { "operation_id": "compare_portfolios", "params": {"..."} } },
   "resolved_metrics":   [{ "metric_id": "portfolio_return", "version": "2.1.0" }],
   "governance_decision":{ "approved": true, "cost_units": 850, "checks_passed": ["cost", "classification", "circuit_breaker"] },
   "sub_plans":          [{ "backend": "primary-warehouse", "query": "...", "latency_ms": 980 }],

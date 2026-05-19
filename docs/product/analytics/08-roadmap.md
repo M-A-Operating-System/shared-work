@@ -30,7 +30,7 @@ This document describes one proposed sequence of deliverables for the AI Analyti
 </tr>
 <tr>
 <td>Semantic Metrics Registry (SMR)</td>
-<td>Extend the pre-existing Semantic Data Context Store (DCS) with a new <code>analytical_metric</code> document type for metric definitions; implement SMR governance workflow as <code>smr_governance</code> documents in the DCS tracking the <code>proposed → in_review → approved → deprecated → retired</code> state machine with one approved version enforced per <code>(tenant_id, metric_id)</code>; reuse the DCS native search index for <code>list_metrics</code> queries — no separate search infrastructure required; expose metric CRUD and governance workflow transitions via the Platform Admin API</td>
+<td>Extend the pre-existing Semantic Data Context Store (DCS) with three new document types — <code>analytical_metric</code>, <code>analytical_dimension</code>, and <code>analytical_operation</code>; status field (<code>proposed → in_review → approved → deprecated → retired</code>) on each document drives the DCS native approval workflow with one approved version enforced per <code>(tenant_id, id)</code>; reuse the DCS native search index for <code>list_operations</code> queries — no separate search infrastructure required; expose document authoring and approval via the Platform Admin API</td>
 </tr>
 <tr>
 <td>Financial Services Reference Model</td>
@@ -69,8 +69,8 @@ This document describes one proposed sequence of deliverables for the AI Analyti
 <td>Provision S3-compatible object store bucket with date-partitioned key structure (<code>lineage/{tenant_id}/{yyyy}/{mm}/{dd}/{result_id}.json</code>); implement write-once JSON document serialiser covering the full query record (request payload, resolved metric versions, governance decision, sub-plans, assembled result, SCL display spec, compliance metadata); implement write path called by the Semantic Execution Governance service before any backend execution and by the FQP on completion; create lightweight <code>analytics.lineage_index</code> PostgreSQL table (scalar fields only — no JSON payloads) for future search queries; configure object lifecycle policy for 7-year default retention; post-hoc compliance annotations written as sibling amendment documents, never mutating the original record</td>
 </tr>
 <tr>
-<td>vite2img Rendering Service</td>
-<td>Build as a standalone MCP server (not part of the Analytics Platform); implement Vite + vega-embed + headless Chromium via Playwright; expose SCL spec rendering (Vega-Lite v5 → SVG or PNG) and <code>type: "table"</code> rendering via styled HTML template as MCP tools; consumers (AI Chat Platform, agentic consumers) register vite2img as a peer MCP server alongside the Analytics Platform — the Analytics Platform does not call vite2img directly</td>
+<td>vega2img Rendering Service</td>
+<td>Build as a standalone MCP server (not part of the Analytics Platform); implement Vite + vega-embed + headless Chromium via Playwright; expose SCL spec rendering (Vega-Lite v5 → SVG or PNG) and <code>type: "table"</code> rendering via styled HTML template as MCP tools; consumers (AI Chat Platform, agentic consumers) register vega2img as a peer MCP server alongside the Analytics Platform — the Analytics Platform does not call vega2img directly</td>
 </tr>
 <tr>
 <td>Knowledge Store</td>
@@ -129,7 +129,7 @@ This document describes one proposed sequence of deliverables for the AI Analyti
 </tr>
 <tr>
 <td>Favourite Metrics Index</td>
-<td>Create <code>user_favourites</code> table in PostgreSQL scoped by <code>tenant_id + sub</code>; extend the <code>list_metrics</code> capability handler to sort favourited metric IDs to the top of results; extend the Semantic Intent Layer disambiguation logic to prefer favourited metrics in tie-breaking; extend the SMR browser to visually distinguish favourited metrics</td>
+<td>Create <code>user_favourites</code> table in PostgreSQL scoped by <code>tenant_id + sub</code>; extend the <code>list_operations</code> response to sort favourited metric IDs to the top of results; extend the Semantic Intent Layer disambiguation logic to prefer favourited metrics in tie-breaking; extend the SMR browser to visually distinguish favourited metrics</td>
 </tr>
 <tr>
 <td>My Workspace UI</td>
@@ -179,7 +179,7 @@ This document describes one proposed sequence of deliverables for the AI Analyti
 </tr>
 <tr>
 <td>Session Export Service</td>
-<td>Create new export service that assembles a complete session into a structured PDF using vite2img for chart rendering and a Pandoc-based document pipeline for layout; implement ZIP export producing PDF + per-result JSON + lineage URL manifest; enforce that every exported result includes its <code>result_id</code> and lineage URL; write an export artefact record to the audit trail</td>
+<td>Create new export service that assembles a complete session into a structured PDF using vega2img for chart rendering and a Pandoc-based document pipeline for layout; implement ZIP export producing PDF + per-result JSON + lineage URL manifest; enforce that every exported result includes its <code>result_id</code> and lineage URL; write an export artefact record to the audit trail</td>
 </tr>
 
 <!-- ── Phase 7 ── -->
