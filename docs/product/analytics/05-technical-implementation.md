@@ -580,6 +580,123 @@ The Semantic Intent Layer resolves metric IDs against the SMR, merges in role pr
 }
 ```
 
+```python
+from datetime import date, timedelta
+
+class LQPGenerator:
+    def build(
+        self,
+        operation:  dict,
+        params:     dict,
+        metrics:    list[dict],
+        dimensions: list[dict],
+        claims:     dict,
+    ) -> dict:
+        nodes    = []
+        node_seq = 0
+
+        def next_id() -> str:
+            nonlocal node_seq
+            node_seq += 1
+            return f"node-{node_seq}"
+
+        # 1. One metric_scan node per resolved metric
+        scan_ids = []
+        for metric in metrics:
+            nid = next_id()
+            nodes.append({
+                "id":               nid,
+                "op":               "metric_scan",
+                "metric_id":        metric["metric_id"],
+                "metric_version":   metric["version"],
+                "aggregation":      metric["aggregation"],
+                "data_affinity":    metric["data_affinity"],
+                "physical_mapping": metric["physical_mapping"],
+            })
+            scan_ids.append(nid)
+
+        # 2. Join if metrics span multiple nodes
+        current = scan_ids[0]
+        if len(scan_ids) > 1:
+            join_id = next_id()
+            nodes.append({
+                "id":        join_id,
+                "op":        "join",
+                "inputs":    scan_ids,
+                "join_keys": self._infer_join_keys(metrics),
+            })
+            current = join_id
+
+        # 3. Filter — from params["filters"] and any role predicates already merged in
+        filters = params.get("filters", [])
+        if filters:
+            filter_id = next_id()
+            nodes.append({
+                "id":         filter_id,
+                "op":         "filter",
+                "input":      current,
+                "predicates": [self._render_predicate(f) for f in filters],
+            })
+            current = filter_id
+
+        # 4. Time expansion — resolve symbolic period to a concrete date range
+        if "time_period" in params or "as_of_date" in params:
+            time_id = next_id()
+            nodes.append({
+                "id":             time_id,
+                "op":             "time_expand",
+                "input":          current,
+                "period":         params.get("time_period"),
+                "as_of_date":     params.get("as_of_date"),
+                "resolved_range": self._resolve_time(params),
+            })
+            current = time_id
+
+        # 5. Sort — from operation default or params override
+        sort_by = params.get("sort") or operation.get("default_sort")
+        if sort_by:
+            sort_id = next_id()
+            nodes.append({"id": sort_id, "op": "sort", "input": current, "by": sort_by})
+            current = sort_id
+
+        return {
+            "lqp_id":    generate_id("lqp"),
+            "tenant_id": claims["tenant_id"],
+            "nodes":     nodes,
+            "output":    current,   # terminal node consumed by FQP
+        }
+
+    def _infer_join_keys(self, metrics: list[dict]) -> list[str]:
+        # Intersection of required_dimensions across all metrics — safe shared join keys
+        key_sets = [set(m.get("required_dimensions", [])) for m in metrics]
+        return list(set.intersection(*key_sets)) if key_sets else []
+
+    def _render_predicate(self, f: dict) -> str:
+        op_map = {
+            "eq": "=", "neq": "!=", "gt": ">", "lt": "<", "gte": ">=", "lte": "<=",
+            "in": "IN", "not_in": "NOT IN",
+        }
+        op  = op_map[f["operator"]]
+        val = f"({', '.join(repr(v) for v in f['value'])})" if isinstance(f["value"], list) \
+              else repr(f["value"])
+        return f"{f['dimension']} {op} {val}"
+
+    def _resolve_time(self, params: dict) -> dict:
+        as_of  = date.fromisoformat(params.get("as_of_date", date.today().isoformat()))
+        period = params.get("time_period", "")
+        if period == "quarter_to_date":
+            start = date(as_of.year, ((as_of.month - 1) // 3) * 3 + 1, 1)
+        elif period == "month_to_date":
+            start = as_of.replace(day=1)
+        elif period == "year_to_date":
+            start = as_of.replace(month=1, day=1)
+        elif period == "trailing_12m":
+            start = as_of.replace(year=as_of.year - 1)
+        else:
+            start = as_of   # point-in-time or caller-supplied range
+        return {"from": start.isoformat(), "to": as_of.isoformat()}
+```
+
 ---
 
 ### Role-Aware Projection Layer
