@@ -15,6 +15,7 @@ Requirements:
 """
 
 import html as _html
+import base64 as _b64
 import json
 import os
 import re
@@ -32,7 +33,7 @@ try:
     def _safe_setUnicodeRanges(self, value):
         _orig(self, {b for b in value if 0 <= b <= 122})
     _Table.setUnicodeRanges = _safe_setUnicodeRanges
-except Exception as _e:
+except (ImportError, AttributeError) as _e:
     import warnings
     warnings.warn(f"fontTools Unicode range patch failed ({_e}); PDF generation may fail on some fonts")
 from pathlib import Path
@@ -90,8 +91,13 @@ def _mmdc_available() -> bool:
 _MMDC_PRESENT: bool | None = None  # cached after first check
 
 
-def _render_mermaid_svg(source: str) -> str | None:
-    """Render a Mermaid diagram to an SVG string via mmdc. Returns None on failure."""
+def _render_mermaid(source: str) -> str | None:
+    """
+    Render a Mermaid diagram to a PNG via mmdc and return an <img> tag with a
+    base64 data URI.  PNG avoids WeasyPrint's inline-SVG font rendering issues
+    where <text> elements go missing due to unresolvable font references.
+    Returns None on failure (fallback code block used instead).
+    """
     global _MMDC_PRESENT
     if _MMDC_PRESENT is None:
         _MMDC_PRESENT = _mmdc_available()
@@ -102,17 +108,25 @@ def _render_mermaid_svg(source: str) -> str | None:
 
     with tempfile.TemporaryDirectory() as tmpdir:
         in_path  = Path(tmpdir) / "diagram.mmd"
-        out_path = Path(tmpdir) / "diagram.svg"
+        out_path = Path(tmpdir) / "diagram.png"
         cfg_path = Path(tmpdir) / "puppeteer.json"
 
         in_path.write_text(source, encoding="utf-8")
-        # --no-sandbox is required in restricted CI environments (GitHub Actions)
-        cfg_path.write_text(json.dumps({"args": ["--no-sandbox"]}))
+        # --no-sandbox and --disable-setuid-sandbox are required in GitHub Actions
+        # (and other container environments) where the runner process lacks the
+        # Linux user-namespace privileges that Chromium's sandbox depends on.
+        # This is safe here because the Mermaid source comes from files inside
+        # the repository — it is not arbitrary untrusted web content.
+        cfg_path.write_text(json.dumps({"args": ["--no-sandbox", "--disable-setuid-sandbox"]}))
 
         try:
             result = subprocess.run(
-                ["mmdc", "-i", str(in_path), "-o", str(out_path),
-                 "--puppeteerConfigFile", str(cfg_path)],
+                ["mmdc",
+                 "-i", str(in_path),
+                 "-o", str(out_path),
+                 "--puppeteerConfigFile", str(cfg_path),
+                 "-w", "1600",            # render at 1600 px wide — display size set by CSS
+                 "--backgroundColor", "white"],
                 capture_output=True,
                 timeout=60,
             )
@@ -120,16 +134,19 @@ def _render_mermaid_svg(source: str) -> str | None:
             print(f"  [warn] mmdc failed: {e}")
             return None
 
+        # mmdc occasionally adds a -1 suffix (e.g. diagram-1.png)
+        if not out_path.exists():
+            alt = out_path.parent / f"{out_path.stem}-1{out_path.suffix}"
+            if alt.exists():
+                out_path = alt
+
         if result.returncode != 0 or not out_path.exists():
-            print(f"  [warn] mmdc error: {result.stderr.decode().strip()}")
+            print(f"  [warn] mmdc error: {result.stderr.decode('utf-8', errors='replace').strip()}")
             return None
 
-        svg = out_path.read_text(encoding="utf-8")
+        data = _b64.b64encode(out_path.read_bytes()).decode()
 
-    # Scale SVG to container width; viewBox preserves aspect ratio
-    svg = re.sub(r'(<svg\b[^>]*?)\s+width="[^"]*"',  r'\1 width="100%"',  svg)
-    svg = re.sub(r'(<svg\b[^>]*?)\s+height="[^"]*"', r'\1',               svg)
-    return svg
+    return f'<img src="data:image/png;base64,{data}" class="mermaid-img" alt="Diagram">'
 
 
 def extract_mermaid_blocks(text: str) -> tuple[str, dict[str, str]]:
@@ -146,9 +163,9 @@ def extract_mermaid_blocks(text: str) -> tuple[str, dict[str, str]]:
         source = match.group(1).strip()
         key = f"MERMAID_BLOCK_{counter}_END"
         counter += 1
-        svg = _render_mermaid_svg(source)
-        if svg:
-            placeholders[key] = f'<div class="mermaid-diagram">{svg}</div>'
+        rendered = _render_mermaid(source)
+        if rendered:
+            placeholders[key] = f'<div class="mermaid-diagram">{rendered}</div>'
         else:
             escaped = _html.escape(source)
             placeholders[key] = (
@@ -229,7 +246,7 @@ def build_html(files: list[Path], title: str, meta: str,
 
 CSS = """
 @page {
-    size: A4;
+    size: letter;
     margin: 22mm 24mm 26mm 24mm;
     @bottom-right {
         content: counter(page);
@@ -249,7 +266,7 @@ CSS = """
     page: cover-page;
     page-break-after: always;
     background-color: #ffffff;
-    min-height: 297mm;
+    min-height: 279.4mm;
     display: flex;
     align-items: center;
     padding: 0 28mm;
@@ -406,8 +423,12 @@ tr          { page-break-inside: avoid; }
     page-break-inside: avoid;
     text-align: center;
 }
-.mermaid-diagram svg {
-    max-width: 100%;
+.mermaid-img {
+    /* US Letter content area: 168mm wide × 231mm tall (after margins).
+       Cap at 80% of each dimension so diagrams never overflow the page. */
+    width: 80%;
+    max-width: 134mm;
+    max-height: 185mm;
     height: auto;
     display: block;
     margin: 0 auto;
@@ -539,9 +560,13 @@ def generate_page(file_path: Path) -> None:
     # Publish the output path for GitHub Actions step chaining
     github_output = os.environ.get("GITHUB_OUTPUT")
     if github_output:
-        repo_root = Path(__file__).parent
-        with open(github_output, "a") as f:
-            f.write(f"pdf_path={output.relative_to(repo_root)}\n")
+        gop = Path(github_output)
+        if not gop.is_absolute() or ".." in gop.parts:
+            print(f"  [warn] GITHUB_OUTPUT path looks unsafe, skipping: {github_output}")
+        else:
+            repo_root = Path(__file__).parent
+            with open(gop, "a") as f:
+                f.write(f"pdf_path={output.relative_to(repo_root)}\n")
 
 # ---------- main ----------
 
