@@ -24,7 +24,7 @@ flowchart TD
         Result(["MCP tool response\ndisplay_spec + narrative + result_id"])
     end
 
-    vite2img["vite2img (optional)\nStandalone MCP render service · SCL → SVG / PNG\nRegistered directly with consumers — not part of Analytics Platform"]
+    vega2img["vega2img (optional)\nStandalone MCP render service · SCL → SVG / PNG\nRegistered directly with consumers — not part of Analytics Platform"]
 
     subgraph dcr["Data Context Repository"]
         SMR["Semantic Metrics Registry\nGovernance workflow + metric schema · extends DCS"]
@@ -39,7 +39,7 @@ flowchart TD
     end
 
     Consumer -->|"POST /v1/mcp (JWT + MCP tool call)"| MCP
-    Consumer -->|"MCP tool call + user JWT"| vite2img
+    Consumer -->|"MCP tool call + user JWT"| vega2img
     MCP -->|"validated tool call parameters"| SIL
     MCP -->|"JWT claims"| RAPL
     RAPL -->|"row predicates + column masks"| SIL
@@ -969,9 +969,9 @@ class VisualisationOntology:
 
 ---
 
-### Static Image Rendering (vite2img)
+### Static Image Rendering (vega2img)
 
-vite2img is a **standalone MCP render service** — not part of the Analytics Platform. Consumers that need static image output register it as a peer MCP server alongside the Analytics Platform.
+vega2img is a **standalone MCP render service** — not part of the Analytics Platform. Consumers that need static image output register it as a peer MCP server alongside the Analytics Platform.
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
@@ -981,9 +981,9 @@ vite2img is a **standalone MCP render service** — not part of the Analytics Pl
 
 | Consumer | Chart | Table | Static image |
 |---------|-------|-------|------|
-| AI Chat Platform | vega-embed | Native data table | vite2img (direct MCP call) |
-| Custom UI | vega-embed (recommended) | Host's own grid | vite2img |
-| Agentic consumers | vite2img | vite2img | vite2img |
+| AI Chat Platform | vega-embed | Native data table | vega2img (direct MCP call) |
+| Custom UI | vega-embed (recommended) | Host's own grid | vega2img |
+| Agentic consumers | vega2img | vega2img | vega2img |
 
 ```python
 import json
@@ -994,7 +994,7 @@ from pydantic import BaseModel
 from typing import Literal
 
 mcp = FastMCP(
-    name="vite2img",
+    name="vega2img",
     instructions="Render Vega-Lite display specs and tables to static PNG or SVG images.",
 )
 
