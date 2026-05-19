@@ -30,7 +30,7 @@ This document describes one proposed sequence of deliverables for the AI Analyti
 </tr>
 <tr>
 <td>Semantic Metrics Registry (SMR)</td>
-<td>Create <code>metric_definitions</code> and <code>metric_versions</code> tables in PostgreSQL with row-level security policies; implement <code>proposed → under_review → approved → deprecated</code> state machine with append-only version records; build Elasticsearch index for fuzzy metric name and description search; expose metric CRUD via the Platform Admin API</td>
+<td>Extend the pre-existing Semantic Data Context Store (DCS) with a new <code>analytical_metric</code> document type for metric definitions; implement SMR governance workflow as <code>smr_governance</code> documents in the DCS tracking the <code>proposed → in_review → approved → deprecated → retired</code> state machine with one approved version enforced per <code>(tenant_id, metric_id)</code>; reuse the DCS native search index for <code>list_metrics</code> queries — no separate search infrastructure required; expose metric CRUD and governance workflow transitions via the Platform Admin API</td>
 </tr>
 <tr>
 <td>Financial Services Reference Model</td>
@@ -38,7 +38,7 @@ This document describes one proposed sequence of deliverables for the AI Analyti
 </tr>
 <tr>
 <td>MCP Capability Layer</td>
-<td>Deploy new Cloudflare Workers service implementing MCP Streamable HTTP transport; implement JWT validation at the edge with rejection of unauthenticated requests before platform processing; implement eight tool handlers routing to downstream platform services; build per-user capability manifest endpoint reflecting feature-flag state and entitlement-gated tool availability</td>
+<td>Build new Python service using FastMCP + Uvicorn (ASGI); deploy as a Kubernetes pod; implement JWT validation middleware at request ingress rejecting unauthenticated requests before any platform processing; implement eight <code>@mcp.tool()</code> handlers routing through the shared pipeline (<code>validate_jwt → sil.resolve → rapl.project → seg.approve → fqp.execute → assemble_response</code>); implement MCP resources for SMR metric, dimension, and hierarchy browsing; implement two <code>@mcp.prompt()</code> templates (standard analytical assistant, regulatory reporting assistant); build per-user capability manifest endpoint reflecting feature-flag state and entitlement-gated tool availability</td>
 </tr>
 <tr>
 <td>Semantic Intent Layer</td>
@@ -50,7 +50,7 @@ This document describes one proposed sequence of deliverables for the AI Analyti
 </tr>
 <tr>
 <td>Semantic Execution Governance</td>
-<td>Build new governance pipeline service with five sequential steps: (1) cost estimation against a configurable cost unit model, (2) classification gate checking the LQP's metric data sensitivity levels against the requesting role's clearance, (3) circuit breaker checks for query complexity score, per-tenant cost budget, and per-user rate limit, (4) governance decision record written to the lineage store before any backend call, (5) pass-through or structured rejection with decision reason; all decisions logged with microsecond timestamps</td>
+<td>Build new governance pipeline service with five sequential steps: (1) cost estimation against a configurable cost unit model, (2) classification gate checking the LQP's metric data sensitivity levels against the requesting role's clearance, (3) circuit breaker checks for query complexity score, per-tenant cost budget, and per-user rate limit, (4) governance decision record written to the lineage store before any backend call, (5) pass-through or structured rejection with decision reason; read per-tenant governance config from a <code>governance_config</code> document in the DCS at startup and refresh on DCS change events — config is not stored in a separate database table; all decisions logged with microsecond timestamps</td>
 </tr>
 <tr>
 <td>Federated Query Planner (FQP)</td>
@@ -70,7 +70,7 @@ This document describes one proposed sequence of deliverables for the AI Analyti
 </tr>
 <tr>
 <td>vite2img Rendering Service</td>
-<td>Create new Kubernetes deployment running Vite + vega-embed + headless Chromium via Playwright; implement <code>POST /render</code> endpoint accepting a Vega-Lite v5 SCL spec and returning SVG or PNG; implement separate <code>POST /render/table</code> endpoint rendering <code>type: "table"</code> display specs via a styled HTML template; expose as an internal service consumed by report pipelines and export services</td>
+<td>Build as a standalone MCP server (not part of the Analytics Platform); implement Vite + vega-embed + headless Chromium via Playwright; expose SCL spec rendering (Vega-Lite v5 → SVG or PNG) and <code>type: "table"</code> rendering via styled HTML template as MCP tools; consumers (AI Chat Platform, agentic consumers) register vite2img as a peer MCP server alongside the Analytics Platform — the Analytics Platform does not call vite2img directly</td>
 </tr>
 
 <!-- ── Phase 2 ── -->
