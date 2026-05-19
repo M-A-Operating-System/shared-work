@@ -184,11 +184,13 @@ Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...
 }
 ```
 
-When the Analytics Engine returns the structured result and display spec, the conversation engine renders the grouped bar chart from the SCL specification. The AI model generates the narrative directly from the structured result rows in its own reasoning loop.
+When the Analytics Engine returns the structured result, display spec, and narrative summary, the conversation engine renders the grouped bar chart from the SCL specification and surfaces the governed narrative produced by the Analytics Engine's Narrative Synthesis Engine.
 
 ---
 
 ## Semantic Metrics Registry
+
+> **Governing principles:** [P1 — Semantic abstraction](./01-platform-overview.md#design-principles) · [P3 — Deterministic metric resolution](./01-platform-overview.md#design-principles) · [P9 — Administrator sovereignty](./01-platform-overview.md#design-principles)
 
 The Semantic Metrics Registry (SMR) is the governing catalogue of every analytical concept resolvable on the platform. Before any query can be planned or executed, every identifier in that query — metrics, dimensions, hierarchies — must be registered in the SMR. This is an architectural constraint, not a policy: the Semantic Intent Layer rejects any identifier not present in the SMR for the active tenant, and nothing is queryable that is not registered.
 
@@ -361,6 +363,8 @@ The SIL asks the SMR to resolve `portfolio_return` and `benchmark_return`. The S
 
 ## Semantic Intent Layer
 
+> **Governing principles:** [P2 — Governance before execution](./01-platform-overview.md#design-principles) · [P10 — Deterministic computation, not generation](./01-platform-overview.md#design-principles)
+
 The Semantic Intent Layer receives a structured MCP tool call — explicit metric IDs, dimension IDs, filters, and time period — and produces a validated, engine-agnostic Logical Query Plan (LQP). It is entirely deterministic: no AI model runs inside it. Its purpose is to validate every identifier against the SMR, apply entitlement constraints from the Role-Aware Projection Layer, check semantic compatibility, and compile the validated intent into an executable plan. The output — the LQP — contains no backend references, no SQL, and no physical schema identifiers: only analytical operations expressed against SMR-registered concepts.
 
 ### Five-Stage Validation Pipeline
@@ -498,6 +502,8 @@ Node `n3` is the RAPL row predicate — part of the plan, not a post-execution f
 
 ## Role-Aware Projection Layer
 
+> **Governing principles:** [P5 — Role-aware by default](./01-platform-overview.md#design-principles) · [P1 — Semantic abstraction](./01-platform-overview.md#design-principles)
+
 The Role-Aware Projection Layer applies the authenticated user's entitlement model to the resolved analytical intent before any query plan is compiled. It is the semantic-layer enforcement of data access controls — operating above physical execution, before any query reaches a backend. Projection is not optional and not bypassable: every request, whether from a human user or an AI orchestrator, passes through it.
 
 ### Restriction Types
@@ -603,6 +609,8 @@ No column masks apply — the `portfolio_manager` role has no masking rules for 
 ---
 
 ## Semantic Execution Governance
+
+> **Governing principles:** [P2 — Governance before execution](./01-platform-overview.md#design-principles) · [P8 — Explainability at every layer](./01-platform-overview.md#design-principles) · [P9 — Administrator sovereignty](./01-platform-overview.md#design-principles)
 
 The Semantic Execution Governance (SEG) layer applies a suite of circuit breakers, cost controls, complexity limits, and compliance classification checks to every query before it is released to the Federated Query Planner. It is the final gate before physical execution. Governance applies to every query without exception — there is no privileged user, trusted agent, or internal path that bypasses SEG checks.
 
@@ -720,6 +728,8 @@ All checks pass. SEG writes a governance decision record to the lineage store �
 
 ## Federated Query Planner
 
+> **Governing principles:** [P1 — Semantic abstraction](./01-platform-overview.md#design-principles) · [P4 — Complete analytical lineage](./01-platform-overview.md#design-principles) · [P10 — Deterministic computation, not generation](./01-platform-overview.md#design-principles)
+
 The Federated Query Planner (FQP) is the only component in the platform that has knowledge of physical execution backends. No other component — not the Semantic Intent Layer, not the AI model, not the MCP Capability Layer — has access to backend connection details or physical schema information. The FQP receives a validated, governance-approved LQP, decomposes it into backend-specific sub-plans, routes those sub-plans to registered execution backends in parallel, assembles the results, and writes a complete execution record to the lineage store.
 
 ### Nine-Step FQP Pipeline
@@ -820,6 +830,8 @@ The FQP writes an execution record to the lineage store and passes the assembled
 
 ## Visualisation Ontology
 
+> **Governing principles:** [P7 — Deterministic visualisation](./01-platform-overview.md#design-principles)
+
 The Visualisation Ontology is the governing schema that maps result characteristics and analytical intent patterns to specific, parameterised chart contracts. It exists to make chart selection deterministic: the same analytical pattern produces the same chart type across all users, sessions, and AI model versions, regardless of how the question was phrased. The AI model does not select chart types. Intent signals from the query are treated as inputs to the ontology evaluation algorithm, but the ontology makes the final binding decision.
 
 ### Intent Pattern Taxonomy
@@ -903,6 +915,8 @@ The ontology produces the following SCL display specification:
 ---
 
 ## Narrative Synthesis Engine
+
+> **Governing principles:** [P6 — Governed narrative](./01-platform-overview.md#design-principles) · [P10 — Deterministic computation, not generation](./01-platform-overview.md#design-principles)
 
 The Narrative Synthesis Engine (NSE) is a secondary AI component inside the Analytics Engine. It runs after the computation pipeline completes — after the FQP has assembled the result and the Visualisation Ontology has selected the chart contract — making a single, tightly-scoped call to a language model with one purpose: summarise the structured result in plain language, anchored strictly to the computed values.
 
@@ -1101,6 +1115,8 @@ The chat engine renders the grouped bar chart inline and displays the narrative 
 
 ## Analytical Lineage Store
 
+> **Governing principles:** [P4 — Complete analytical lineage](./01-platform-overview.md#design-principles) · [P8 — Explainability at every layer](./01-platform-overview.md#design-principles)
+
 The Analytical Lineage Store provides computation provenance: a complete, queryable record of how every result was calculated. Analytical lineage, as defined on this platform, is distinct from data lineage. Data lineage tracks how data moves between systems. Analytical lineage records how the analytics engine used specific metric definitions, entitlement rules, and execution backends to compute a specific result. The lineage record is not a log — it is a first-class data structure. A regulator, auditor, or internal reviewer must be able to reconstruct exactly how a specific number was calculated, by whom, under what entitlements, from which backends, and with what result — without re-running the query.
 
 ### Per-Query Stored Elements
@@ -1222,6 +1238,8 @@ Both records are immutable from the moment of writing. The full chain — origin
 ---
 
 ## MCP Capability Layer
+
+> **Governing principles:** [P2 — Governance before execution](./01-platform-overview.md#design-principles) · [P5 — Role-aware by default](./01-platform-overview.md#design-principles)
 
 The MCP Capability Layer exposes the platform's governed analytical operations to AI orchestrators via MCP Streamable HTTP transport. Each capability is a bounded, named operation with a typed input schema, a governed execution path through the full platform pipeline (Semantic Intent Layer → Role-Aware Projection → SEG → FQP), and a typed output contract. AI agents interact with capabilities, not databases. There is no privileged API path — AI agents receive the same governance-validated results as human users.
 

@@ -4,6 +4,8 @@
 
 The platform is designed to serve a heterogeneous population of users whose needs range from conversational analytics access to deep governance administration. These personas define the platform's access model: who can query what, with what constraints. The six personas below have different levels of access and interact with the platform in different ways.
 
+The platform vision and [Design Principles](./01-platform-overview.md#design-principles) governing these access controls are in [Chapter 1 — Platform Overview](./01-platform-overview.md). Component specifications for the platform features exercised in the journeys below are in [Chapter 3 — Core Platform Capabilities](./03-core-capabilities.md).
+
 | Persona | Role | Primary need |
 |---------|------|--------------|
 | **Analytical End User** | Authenticated user accessing analytics as their primary data interface | Ask governed analytical questions and receive reliable, role-appropriate results without knowledge of data structures |
@@ -31,7 +33,7 @@ The following journeys show how the platform handles three different types of qu
 
 A portfolio manager begins their morning with a natural language query: "Show me portfolio returns versus benchmark across all my portfolios for the current quarter, sorted by tracking error."
 
-The Semantic Intent Layer resolves the natural language request to three metric identifiers — `portfolio_return`, `benchmark_return`, and `tracking_error` — against the Semantic Metrics Registry. The Role-Aware Projection Layer extracts the manager's portfolio scope from the JWT claims and constructs a row-level predicate restricting results to portfolios within the manager's authorised coverage. This predicate is injected into the Logical Query Plan before any execution backend is contacted — it is not a post-hoc filter applied to a full dataset.
+The AI Chat Platform's model maps the portfolio manager's natural language query to three metric identifiers — `portfolio_return`, `benchmark_return`, and `tracking_error` — using the SMR metric catalogue it loaded at session start. These structured parameters are submitted to the Analytics Engine, whose Semantic Intent Layer validates them against the Semantic Metrics Registry and builds a Logical Query Plan. The Role-Aware Projection Layer extracts the manager's portfolio scope from the JWT claims and constructs a row-level predicate restricting results to portfolios within the manager's authorised coverage. This predicate is injected into the Logical Query Plan before any execution backend is contacted — it is not a post-hoc filter applied to a full dataset.
 
 The Visualisation Ontology examines the assembled result pattern — multiple metrics across multiple portfolio entities, sorted by a continuous measure — and selects a multi-series bar chart as the appropriate display specification. The Narrative Synthesis Engine produces: "Across 14 portfolios, 9 outperformed their benchmark. Global Equity Opportunities has the highest tracking error at 3.2%..." This narrative is returned alongside the display specification as a single structured MCP tool response.
 
@@ -43,7 +45,7 @@ Features exercised: natural language intent resolution, role-aware row projectio
 
 A risk officer asks: "Which portfolios are breaching their VaR 95 limit today, and what is the dominant risk factor contribution for each?"
 
-The Semantic Intent Layer resolves three metrics — `var_95`, `var_limit`, and `risk_factor_contribution` — and identifies that this is a threshold-comparison pattern with a contributing-factor breakdown. The Federated Query Planner, informed by the physical mappings registered in the SMR, routes VaR metrics to the risk engine execution backend and portfolio metadata to the primary data warehouse. These sub-plans execute in parallel; the planner assembles the joined result set before passing it downstream.
+The AI Chat Platform's model translates the risk officer's query into three metric identifiers — `var_95`, `var_limit`, and `risk_factor_contribution` — and identifies this as a threshold-comparison pattern with a contributing-factor breakdown. The structured parameters are submitted to the Analytics Engine. The Federated Query Planner, informed by the physical mappings registered in the SMR, routes VaR metrics to the risk engine execution backend and portfolio metadata to the primary data warehouse. These sub-plans execute in parallel; the planner assembles the joined result set before passing it downstream.
 
 The Visualisation Ontology recognises the metric-versus-threshold pattern across multiple entities and selects a heatmap as the display specification. The Narrative Synthesis Engine produces: "3 portfolios are breaching VaR 95 today. Emerging Markets High Yield has the most severe breach at 142% of limit. Dominant risk factor: credit spread widening in BBB-rated corporate bonds (64–71% of excess VaR)."
 

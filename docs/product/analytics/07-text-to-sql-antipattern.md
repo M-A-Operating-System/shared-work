@@ -2,6 +2,8 @@
 
 This appendix describes the Text-to-SQL approach to AI-powered analytics — what it is, why it is appealing, why it is commonly the first thing teams reach for, and why it is not an appropriate long-term foundation for governed analytical intelligence in a regulated environment. It is intended as a reference for teams evaluating their options and as context for why the AI Analytics Platform was designed the way it was.
 
+The platform's alternative architecture is summarised in [Chapter 1 — Platform Overview](./01-platform-overview.md) and specified in full in [Chapter 3 — Core Platform Capabilities](./03-core-capabilities.md). The [Non-Negotiable Platform Decisions](./README.md#non-negotiable-platform-decisions) in the README map each structural property to its governing principle.
+
 The Text-to-SQL pattern is not wrong everywhere. For exploratory data work, internal tooling, and low-stakes analytical sandboxes, it is a legitimate option. The argument here is narrower: for production analytical systems serving regulated business processes, it is the wrong foundation — and the structural defects compound over time rather than resolve.
 
 ---

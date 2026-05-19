@@ -2,6 +2,8 @@
 
 This chapter covers the complete integration surface of the AI Analytics Platform — how consumers authenticate and call it, how platform administrators configure it, the financial services reference model it ships with, and the complementary ecosystem services that extend its capabilities. The platform is deliberately narrow in its external interface: a single MCP endpoint governs all consumer access, and a single Admin API governs all configuration. Complexity lives inside the governance pipeline, not in the integration contract.
 
+Component specifications — SMR, SIL, RAPL, SEG, FQP, VO, NSE, Lineage Store — are in [Chapter 3 — Core Platform Capabilities](./03-core-capabilities.md). The reference implementation stack is in [Chapter 5 — Proposed Technical Implementation](./05-technical-implementation.md).
+
 ---
 
 ## 4.1 Consumer Integration
@@ -184,7 +186,7 @@ The governance block controls the circuit breakers and compliance mode applied t
 
 ### Operational Settings
 
-The scope, model, and feature blocks configure the platform's analytical domain, AI model selection, and feature set:
+The scope, model, and feature blocks configure the platform's analytical domain, narrative synthesis model selection, and feature set:
 
 ```json
 {
@@ -194,7 +196,6 @@ The scope, model, and feature blocks configure the platform's analytical domain,
     "requiresIntentConfirmation": false
   },
   "models": {
-    "intentResolutionModel": "standard",
     "narrativeSynthesisModel": "fast"
   },
   "features": {
@@ -205,7 +206,7 @@ The scope, model, and feature blocks configure the platform's analytical domain,
 }
 ```
 
-`analyticalDomain` scopes the SMR seed template and natural-language intent resolution to the configured domain. `regulatoryJurisdiction` influences compliance mode defaults and regulatory threshold sourcing. `requiresIntentConfirmation` — when `true` — returns a confirmation card to the consumer before executing any query; this is appropriate for high-stakes or irreversible analytical operations. The `models` block selects between available inference tiers for intent resolution and narrative synthesis; `"fast"` reduces latency at the cost of some reasoning depth, `"standard"` is the balanced default. Individual features in the `features` block may be toggled without affecting the governance pipeline — disabling `narrativeSynthesis`, for example, removes the narrative field from responses but has no effect on lineage, entitlement enforcement, or result computation.
+`analyticalDomain` scopes the SMR seed template to the configured domain. `regulatoryJurisdiction` influences compliance mode defaults and regulatory threshold sourcing. `requiresIntentConfirmation` — when `true` — returns a confirmation card to the consumer before executing any query; this is appropriate for high-stakes or irreversible analytical operations. The `models` block selects between available inference tiers for the Narrative Synthesis Engine; `"fast"` maps to Claude Haiku and reduces latency, `"standard"` maps to Claude Sonnet and is the balanced default for complex queries. Intent resolution is performed by the consuming AI client — it is not configured here. Individual features in the `features` block may be toggled without affecting the governance pipeline — disabling `narrativeSynthesis`, for example, removes the narrative field from responses but has no effect on lineage, entitlement enforcement, or result computation.
 
 ### SMR Administration Settings
 

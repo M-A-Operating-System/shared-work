@@ -2,6 +2,8 @@
 
 This chapter describes one reference implementation of the AI Analytics Platform. Stack choices are concrete but not prescriptive — the product specification is intentionally stack-agnostic. Any conformant implementation that satisfies the specified behaviours, governance guarantees, and interface contracts is valid. Technology substitutions at any layer require no changes to the product specification.
 
+The product specification — component behaviours, interface contracts, governance requirements — is in [Chapter 3 — Core Platform Capabilities](./03-core-capabilities.md). The design principles governing every decision are in [Chapter 1 — Platform Overview, §Design Principles](./01-platform-overview.md#design-principles).
+
 ---
 
 ## 5.1 Architecture Overview
@@ -61,6 +63,8 @@ The Semantic Data Context Store (DCS) is a pre-existing platform component — t
 ## 5.2 Layer-by-Layer Stack Decisions
 
 ### MCP Capability Layer
+
+> **Specification:** [§MCP Capability Layer](./03-core-capabilities.md#mcp-capability-layer)
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
@@ -293,6 +297,8 @@ if __name__ == "__main__":
 
 ### Semantic Intent Layer
 
+> **Specification:** [§Semantic Intent Layer](./03-core-capabilities.md#semantic-intent-layer)
+
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
 | **Parameter validation** | JSON Schema + Pydantic | Strict schema enforcement against MCP tool input models; structured error responses |
@@ -302,6 +308,8 @@ if __name__ == "__main__":
 ---
 
 ### Narrative Synthesis Engine
+
+> **Specification:** [§Narrative Synthesis Engine](./03-core-capabilities.md#narrative-synthesis-engine)
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
@@ -315,6 +323,8 @@ if __name__ == "__main__":
 ---
 
 ### Semantic Metrics Registry (SMR)
+
+> **Specification:** [§Semantic Metrics Registry](./03-core-capabilities.md#semantic-metrics-registry)
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
@@ -441,6 +451,8 @@ The Semantic Intent Layer resolves metric IDs against the SMR, merges in role pr
 
 ### Role-Aware Projection Layer
 
+> **Specification:** [§Role-Aware Projection Layer](./03-core-capabilities.md#role-aware-projection-layer)
+
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
 | **Implementation** | Custom middleware (Python) | Thin, stateless; operates on the LQP before any backend query is generated |
@@ -474,6 +486,8 @@ The Semantic Intent Layer resolves metric IDs against the SMR, merges in role pr
 
 ### Semantic Execution Governance
 
+> **Specification:** [§Semantic Execution Governance](./03-core-capabilities.md#semantic-execution-governance)
+
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
 | **Implementation** | Custom rules engine (Python) | Deterministic; config-driven; no ML inference |
@@ -504,6 +518,8 @@ Each tenant has one governance config document. The Semantic Execution Governanc
 ---
 
 ### Federated Query Planner (FQP)
+
+> **Specification:** [§Federated Query Planner](./03-core-capabilities.md#federated-query-planner)
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
@@ -609,6 +625,8 @@ After execution and result assembly the FQP returns a typed result envelope in p
 
 ### Visualisation Ontology
 
+> **Specification:** [§Visualisation Ontology](./03-core-capabilities.md#visualisation-ontology)
+
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
 | **Chart spec** | Vega-Lite v5 JSON | Industry-standard chart grammar; wide ecosystem for web, server-side, and image rendering |
@@ -689,6 +707,8 @@ vite2img is a **standalone MCP render service** — not part of the Analytics Pl
 ---
 
 ### Analytical Lineage Store
+
+> **Specification:** [§Analytical Lineage Store](./03-core-capabilities.md#analytical-lineage-store)
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|

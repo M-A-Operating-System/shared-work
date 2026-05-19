@@ -119,3 +119,5 @@ flowchart TB
 ```
 
 Every consumer type routes through the MCP Capability Layer, traverses the invariant governance sequence, and produces a lineage record. No path to execution backends, physical schemas, or raw SQL exists outside that pipeline. Subsequent chapters describe each component in detail; the principles established here are the reference frame throughout.
+
+Consumer personas and illustrative query journeys are in [Chapter 2 — Consumer Personas and Platform Architecture](./02-personas-and-architecture.md). Component specifications — SMR, SIL, RAPL, SEG, FQP, Visualisation Ontology, NSE, Lineage Store, MCP Capability Layer — are in [Chapter 3 — Core Platform Capabilities](./03-core-capabilities.md). The reference implementation stack is in [Chapter 5 — Proposed Technical Implementation](./05-technical-implementation.md).
