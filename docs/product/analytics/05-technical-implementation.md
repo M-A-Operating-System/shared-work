@@ -71,168 +71,81 @@ The Semantic Data Context Store (DCS) is a pre-existing platform component — t
 | **Runtime** | Python · FastMCP + Uvicorn | Lightweight ASGI service; minimal dependencies; deploys as a Kubernetes pod or serverless container |
 | **Protocol** | MCP Streamable HTTP | Standard MCP interoperability; supports request/response and streaming |
 | **Auth** | JWT validation at request ingress | Stateless; validated before any platform computation begins |
-| **Tools** | All dynamic operations — metric queries, lookups, drilldown, lineage retrieval | Parameterised; universally supported by all MCP clients; go through governance pipeline |
+| **Tools** | Three tools: `run_analytics` (SMR-driven execution), `list_operations` (discovery), `drilldown` (result navigation) | SMR owns all operation definitions; code is the execution engine |
 | **Resources** | Knowledge artifacts only — guides, skills definitions, compliance reference | Static; no user data; embedded in AI consumer context before analytical tasks; no governance pipeline |
 | **Prompts** | Pre-built analytical and regulatory assistant templates | Inject available metrics and governance constraints at session start |
 
 FastMCP (`pip install fastmcp`) provides the `@mcp.tool()`, `@mcp.resource()`, and `@mcp.prompt()` decorators and handles MCP Streamable HTTP transport. Each analytical capability is a decorated Python function; the framework serialises schemas and routes calls automatically.
 
-The separation of tools and resources is intentional. Dynamic data — metric definitions, lineage records, dimension catalogues — is accessed exclusively through tools (`list_metrics`, `get_metric_definition`) so that all requests go through JWT validation and the governance pipeline. Resources expose static knowledge artifacts from the Knowledge Store; they contain no user data and require no governance evaluation.
+The separation of tools and resources is intentional. All analytical execution goes through `run_analytics` — a single tool that delegates to the SMR for every operation definition. Resources expose static knowledge artifacts from the Knowledge Store; they contain no user data and require no governance evaluation. The SMR owns what operations exist, what parameters they require, and how deeply they run through the pipeline. The code owns only the execution engine.
 
 #### Tools
 
-All eight tools follow the same pattern: JWT validation → Semantic Intent Layer → Role-Aware Projection → Semantic Execution Governance → FQP → response assembly.
+Three tools cover the entire analytical surface. The SMR owns every operation definition — what parameters it needs, what metrics and dimensions it supports, and how deeply it runs through the pipeline. No operation type is hardcoded in the execution layer.
 
 ```python
 from fastmcp import FastMCP
 from pydantic import BaseModel
-from typing import Literal
 
 mcp = FastMCP(
     name="Analytics Platform",
     instructions=(
-        "Governed analytical query engine for portfolio performance, risk, and regulatory metrics. "
-        "All queries are validated against the Semantic Metrics Registry, subject to role-based "
-        "entitlement projection, and governed by cost and compliance circuit breakers before execution."
+        "Governed analytical execution engine. All operations are defined in the Semantic Metrics Registry. "
+        "Call list_operations to discover available operations and their required parameters before "
+        "calling run_analytics."
     ),
 )
 
-# ── Shared pipeline helper ────────────────────────────────────────────────────
-
-async def run_pipeline(payload: BaseModel, jwt: str) -> dict:
-    claims = validate_jwt(jwt)
-    lqp    = await sil.resolve(payload, claims)
-    lqp    = rapl.project(lqp, claims)
-    lqp    = await seg.approve(lqp)
-    result = await fqp.execute(lqp)
-    return await assemble_response(result)
-
 # ── Tool input models ─────────────────────────────────────────────────────────
 
-class Filter(BaseModel):
-    dimension: str
-    operator: Literal["eq", "neq", "gt", "lt", "gte", "lte", "in", "not_in"]
-    value: str | list[str]
-
-class AnalyseMetricInput(BaseModel):
-    metrics:     list[str]
-    dimensions:  list[str] = []
-    time_period: str
-    filters:     list[Filter] = []
-    order_by:    str | None = None
-    limit:       int = 1000
-    compare_to:  dict | None = None
-
-class PortfolioRiskInput(BaseModel):
-    operation_id:   str        # SMR operation ID — e.g. "risk_breakdown", "var_analysis"
-    portfolio_id:   str
-    metrics:        list[str]  # SMR metric IDs — e.g. "var_95", "tracking_error"
-    attribution_by: str        # SMR dimension ID — e.g. "asset_class", "geography"
-    as_of_date:     str        # ISO date
-
-class PortfolioComparisonInput(BaseModel):
-    operation_id:  str        # SMR operation ID — e.g. "compare_portfolios"
-    portfolio_ids: list[str]
-    metrics:       list[str]  # SMR metric IDs
-    time_period:   str
-    benchmark_id:  str | None = None
-
-class PerformanceAnalysisInput(BaseModel):
-    operation_id:   str        # SMR operation ID — e.g. "performance_attribution"
-    portfolio_id:   str
-    benchmark_id:   str
-    attribution_by: str                  # SMR dimension ID — e.g. "asset_class", "sector"
-    time_period:    str
-    model:          Literal["bhb", "bf"] = "bhb"  # computation algorithm, not SMR data
-
-class RegulatoryReportInput(BaseModel):
-    operation_id:   str   # SMR operation ID — e.g. "regulatory_report", "capital_adequacy"
-    metric_id:      str   # SMR metric ID
-    entity_id:      str
-    reporting_date: str   # ISO date
-    jurisdiction:   str
+class RunAnalyticsInput(BaseModel):
+    operation_id: str   # SMR operation ID — discover via list_operations
+    params:       dict  # operation parameters; validated against SMR operation schema by SIL
 
 class DrilldownInput(BaseModel):
     result_id:      str
     hierarchy:      str
     selected_value: str | None = None
 
-class ListMetricsInput(BaseModel):
-    domain:      str | None = None
-    category:    str | None = None
-    search_term: str | None = None
-
-class GetMetricDefinitionInput(BaseModel):
-    metric_id: str
-
-# ── Tool declarations ─────────────────────────────────────────────────────────
+# ── Tools ─────────────────────────────────────────────────────────────────────
 
 @mcp.tool()
-async def analyse_metric(input: AnalyseMetricInput, jwt: str) -> dict:
-    """Execute a governed query against one or more registered metrics.
-    Returns a display spec (chart or table), a structured result set, a governed narrative, and a lineage reference."""
-    return await run_pipeline(input, jwt)
+async def run_analytics(input: RunAnalyticsInput, jwt: str) -> dict:
+    """Execute an SMR-registered analytical operation.
+    Call list_operations first to discover valid operation_id values and their required params.
+    The execution pipeline depth — data retrieval, metric query, or full analytical — is determined
+    by the operation's execution_profile in the SMR, not by this tool."""
+    claims    = validate_jwt(jwt)
+    operation = await smr.get_operation(input.operation_id, claims)
+    lqp       = await sil.resolve(operation, input.params, claims)
+    lqp       = rapl.project(lqp, claims)
+    return await pipeline_executor.run(lqp, operation["execution_profile"])
 
 @mcp.tool()
-async def risk_breakdown(input: PortfolioRiskInput, jwt: str) -> dict:
-    """Decompose risk metrics into factor contributions by the specified dimension.
-    operation_id must be an SMR-registered analytical operation — use list_operations to discover valid values.
-    metrics and attribution_by must be SMR-registered IDs — use list_metrics and list_dimensions for valid values.
-    Returns an attribution waterfall display spec, a structured result set, and a governed narrative."""
-    return await run_pipeline(input, jwt)
-
-@mcp.tool()
-async def compare_portfolios(input: PortfolioComparisonInput, jwt: str) -> dict:
-    """Compare one or more metrics across two or more portfolios, optionally against a benchmark.
-    operation_id must be an SMR-registered analytical operation — use list_operations to discover valid values.
-    Returns a multi-series bar or table display spec."""
-    return await run_pipeline(input, jwt)
-
-@mcp.tool()
-async def performance_attribution(input: PerformanceAnalysisInput, jwt: str) -> dict:
-    """Run a performance attribution decomposition for a portfolio versus its benchmark.
-    operation_id must be an SMR-registered analytical operation — use list_operations to discover valid values.
-    attribution_by must be an SMR-registered dimension ID — use list_dimensions to discover valid values.
-    model selects the computation algorithm: 'bhb' (Brinson-Hood-Beebower) or 'bf' (Brinson-Fachler).
-    Returns a waterfall display spec broken down by the specified dimension."""
-    return await run_pipeline(input, jwt)
-
-@mcp.tool()
-async def regulatory_report(input: RegulatoryReportInput, jwt: str) -> dict:
-    """Generate a regulatory compliance report for a specific metric and entity.
-    operation_id must be an SMR-registered analytical operation — use list_operations to discover valid values.
-    Requires the regulatory_reporting feature flag and an appropriate compliance role."""
-    return await run_pipeline(input, jwt)
+async def list_operations(domain: str | None = None, jwt: str = ...) -> dict:
+    """List all SMR-registered operations available to the current user's role.
+    Returns operation IDs, display names, required parameters, supported metrics,
+    supported dimensions, and execution profiles."""
+    claims = validate_jwt(jwt)
+    return await smr.list_operations(claims, domain=domain)
 
 @mcp.tool()
 async def drilldown(input: DrilldownInput, jwt: str) -> dict:
     """Navigate into a dimension hierarchy from a prior result.
     All filters, role predicates, and entitlement context from the original result are preserved."""
-    return await run_pipeline(input, jwt)
-
-@mcp.tool()
-async def list_metrics(input: ListMetricsInput, jwt: str) -> dict:
-    """List all SMR metrics available to the current user's role.
-    Returns metric IDs, labels, descriptions, domains, and required dimensions."""
     claims = validate_jwt(jwt)
-    return await smr.list_metrics(input, claims)
-
-@mcp.tool()
-async def get_metric_definition(input: GetMetricDefinitionInput, jwt: str) -> dict:
-    """Retrieve the full SMR definition for a specific metric, including its formula,
-    aggregation rules, required dimensions, governance status, and version history."""
-    claims = validate_jwt(jwt)
-    return await smr.get_definition(input.metric_id, claims)
-
-@mcp.tool()
-async def list_operations(jwt: str) -> dict:
-    """List all SMR analytical operations available to the current user's role.
-    Returns operation IDs, display names, required parameters, supported metrics, and supported dimensions.
-    Call this before constructing a risk_breakdown, compare_portfolios, performance_attribution,
-    or regulatory_report call to discover valid operation_id values."""
-    claims = validate_jwt(jwt)
-    return await smr.list_operations(claims)
+    return await drilldown_service.execute(input, claims)
 ```
+
+#### Execution profiles
+
+Each SMR operation carries an `execution_profile` that tells the pipeline executor which stages to invoke:
+
+| Profile | Pipeline stages | Typical operations |
+|---------|----------------|-------------------|
+| `data_retrieval` | Auth → RAPL → FQP → Lineage | Raw data fetches — positions, prices, reference data |
+| `metric_query` | Auth → RAPL → SIL → SEG → FQP → Lineage | Single metric value lookups |
+| `full_analytical` | Auth → RAPL → SIL → SEG → FQP → VO → NSE → Lineage | Attribution, comparison, regulatory reports |
 
 #### Resources
 
@@ -414,9 +327,27 @@ Analytical operations are also stored as DCS documents (`type: "analytical_opera
 [
   {
     "type":                 "analytical_operation",
+    "operation_id":         "get_positions",
+    "display_name":         "Portfolio Positions",
+    "execution_profile":    "data_retrieval",
+    "description":          "Fetch current or historical position data for a portfolio.",
+    "required_params":      ["portfolio_id"],
+    "optional_params":      ["as_of_date", "asset_class"]
+  },
+  {
+    "type":                 "analytical_operation",
+    "operation_id":         "portfolio_return",
+    "display_name":         "Portfolio Return",
+    "execution_profile":    "metric_query",
+    "description":          "Retrieve the total return for a portfolio over a specified period.",
+    "required_params":      ["portfolio_id", "time_period"],
+    "supported_metrics":    ["portfolio_return"]
+  },
+  {
+    "type":                 "analytical_operation",
     "operation_id":         "risk_breakdown",
     "display_name":         "Risk Breakdown",
-    "tool":                 "risk_breakdown",
+    "execution_profile":    "full_analytical",
     "description":          "Decompose a risk metric into factor contributions by the specified dimension.",
     "required_params":      ["portfolio_id", "metrics", "attribution_by", "as_of_date"],
     "supported_metrics":    ["var_95", "var_99", "tracking_error", "beta", "duration", "convexity"],
@@ -427,7 +358,7 @@ Analytical operations are also stored as DCS documents (`type: "analytical_opera
     "type":                 "analytical_operation",
     "operation_id":         "compare_portfolios",
     "display_name":         "Portfolio Comparison",
-    "tool":                 "compare_portfolios",
+    "execution_profile":    "full_analytical",
     "description":          "Compare one or more metrics across two or more portfolios, optionally against a benchmark.",
     "required_params":      ["portfolio_ids", "metrics", "time_period"],
     "optional_params":      ["benchmark_id"],
@@ -438,7 +369,7 @@ Analytical operations are also stored as DCS documents (`type: "analytical_opera
     "type":                 "analytical_operation",
     "operation_id":         "performance_attribution",
     "display_name":         "Performance Attribution",
-    "tool":                 "performance_attribution",
+    "execution_profile":    "full_analytical",
     "description":          "BHB or Brinson-Fachler attribution decomposition for a portfolio versus its benchmark.",
     "required_params":      ["portfolio_id", "benchmark_id", "attribution_by", "time_period"],
     "supported_dimensions": ["asset_class", "sector", "geography", "currency"],
@@ -448,7 +379,7 @@ Analytical operations are also stored as DCS documents (`type: "analytical_opera
     "type":                    "analytical_operation",
     "operation_id":            "regulatory_report",
     "display_name":            "Regulatory Compliance Report",
-    "tool":                    "regulatory_report",
+    "execution_profile":       "full_analytical",
     "description":             "Entity-level regulatory compliance metric report under MiFID II or Basel III/IV.",
     "required_params":         ["metric_id", "entity_id", "reporting_date", "jurisdiction"],
     "compliance_modes":        ["mifid2", "basel3"],
@@ -458,7 +389,7 @@ Analytical operations are also stored as DCS documents (`type: "analytical_opera
 ]
 ```
 
-New operations are added via `POST /v1/smr/operations` through the Admin API and follow the same approval workflow as metric definitions. The `supported_metrics` and `supported_dimensions` lists are enforced by the Semantic Intent Layer — an operation call referencing a metric not in its catalogue is rejected before LQP generation.
+New operations are added via `POST /v1/smr/operations` through the Admin API and follow the same approval workflow as metric definitions. The `supported_metrics`, `supported_dimensions`, and `execution_profile` are enforced by the Semantic Intent Layer — an operation call referencing an unknown metric or profile mismatch is rejected before LQP generation.
 
 ---
 
