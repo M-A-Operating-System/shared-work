@@ -41,14 +41,25 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
       # ── Single-page mode ────────────────────────────────────────────────────
+      - name: Validate page input
+        if: github.event_name == 'workflow_dispatch' && inputs.page != ''
+        env:
+          PAGE_INPUT: ${{ inputs.page }}
+        run: |
+          if [[ "$PAGE_INPUT" != *.md ]]; then
+            echo "Error: page input must end in .md — got: $PAGE_INPUT"
+            exit 1
+          fi
+
       - name: Generate single-page PDF
         if: github.event_name == 'workflow_dispatch' && inputs.page != ''
+        env:
+          PAGE_INPUT: ${{ inputs.page }}
         run: |
-          python generate_pdf.py --page "${{ inputs.page }}"
-          PDF="${{ inputs.page }}"
-          PDF="${PDF%.md}.pdf"
+          python generate_pdf.py --page "$PAGE_INPUT"
+          PDF="${PAGE_INPUT%.md}.pdf"
           git add "$PDF"
-          git diff --cached --quiet || git commit -m "docs: regenerate PDF for ${{ inputs.page }} [skip ci]"
+          git diff --cached --quiet || git commit -m "docs: regenerate PDF for ${PAGE_INPUT} [skip ci]"
 
       # ── Full regeneration mode ───────────────────────────────────────────────
       - name: Generate and commit analytics PDF

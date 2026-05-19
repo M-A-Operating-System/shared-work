@@ -14,6 +14,7 @@ Requirements:
     pip install markdown weasyprint
 """
 
+import html as _html
 import re
 import sys
 
@@ -27,8 +28,9 @@ try:
     def _safe_setUnicodeRanges(self, value):
         _orig(self, {b for b in value if 0 <= b <= 122})
     _Table.setUnicodeRanges = _safe_setUnicodeRanges
-except Exception:
-    pass
+except Exception as _e:
+    import warnings
+    warnings.warn(f"fontTools Unicode range patch failed ({_e}); PDF generation may fail on some fonts")
 from pathlib import Path
 
 # ---------- product registry ----------
@@ -90,20 +92,23 @@ def build_html(files: list[Path], title: str, meta: str,
         extra_class = " first-section" if i == 0 else ""
         sections.append(f'<section class="doc-section{extra_class}">{body}</section>')
 
+    safe_title = _html.escape(title)
+    safe_meta  = _html.escape(meta)
+
     cover = f"""
 <div class="cover-page">
   <div class="cover-inner">
     <p class="cover-eyebrow">M&amp;A Operating System</p>
     <p class="cover-category">Product Design</p>
-    <h1 class="cover-title">{title}</h1>
+    <h1 class="cover-title">{safe_title}</h1>
     <hr class="cover-rule">
-    <p class="cover-meta">{meta}</p>
+    <p class="cover-meta">{safe_meta}</p>
   </div>
 </div>"""
 
     return f"""<!DOCTYPE html>
 <html lang="en">
-<head><meta charset="utf-8"><title>{title}</title></head>
+<head><meta charset="utf-8"><title>{safe_title}</title></head>
 <body>
 {cover}
 {"".join(sections)}
@@ -326,6 +331,14 @@ def generate_product(name: str, config: dict) -> None:
 def generate_page(file_path: Path) -> None:
     """Generate a PDF for a single .md file, placed next to it."""
     file_path = file_path.resolve()
+
+    if file_path.suffix != '.md':
+        print(f"  [error] only .md files are supported, got: {file_path.name}")
+        sys.exit(1)
+
+    if not file_path.is_file():
+        print(f"  [error] file not found: {file_path}")
+        sys.exit(1)
 
     config = None
     for name, cfg in PRODUCTS.items():
