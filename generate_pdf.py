@@ -19,6 +19,7 @@ import base64 as _b64
 import json
 import os
 import re
+import struct
 import subprocess
 import sys
 import tempfile
@@ -91,6 +92,37 @@ def _mmdc_available() -> bool:
 _MMDC_PRESENT: bool | None = None  # cached after first check
 
 
+def _png_size(path: Path) -> tuple[int, int]:
+    """Return (width, height) in pixels by reading the PNG IHDR chunk directly."""
+    with open(path, "rb") as f:
+        f.seek(16)  # 8-byte PNG signature + 4-byte chunk length + 4-byte "IHDR"
+        w, h = struct.unpack(">II", f.read(8))
+    return w, h
+
+
+# Content area for US Letter after margins (22mm top, 26mm bottom, 24mm each side):
+#   width  = 215.9mm − 48mm  = 167.9mm  → use 160mm to leave breathing room
+#   height = 279.4mm − 48mm  = 231.4mm  → cap diagrams at 180mm so they sit with text
+_MAX_DIAGRAM_W_MM = 160.0
+_MAX_DIAGRAM_H_MM = 180.0
+
+
+def _diagram_display_size(px_w: int, px_h: int) -> tuple[float, float]:
+    """
+    Scale px_w × px_h to fit within the page content area, preserving aspect ratio.
+    Returns (width_mm, height_mm) as explicit display dimensions for the <img> tag.
+    WeasyPrint does not correctly resolve aspect ratio when both max-width and
+    max-height are active with height:auto — setting explicit dimensions avoids that.
+    """
+    aspect = px_w / px_h if px_h else 1.0
+    w_mm = _MAX_DIAGRAM_W_MM
+    h_mm = w_mm / aspect
+    if h_mm > _MAX_DIAGRAM_H_MM:
+        h_mm = _MAX_DIAGRAM_H_MM
+        w_mm = h_mm * aspect
+    return w_mm, h_mm
+
+
 def _render_mermaid(source: str) -> str | None:
     """
     Render a Mermaid diagram to a PNG via mmdc and return an <img> tag with a
@@ -125,7 +157,7 @@ def _render_mermaid(source: str) -> str | None:
                  "-i", str(in_path),
                  "-o", str(out_path),
                  "--puppeteerConfigFile", str(cfg_path),
-                 "-w", "1600",            # render at 1600 px wide — display size set by CSS
+                 "-w", "1600",            # high-res render; display size set via inline style
                  "--backgroundColor", "white"],
                 capture_output=True,
                 timeout=60,
@@ -144,9 +176,14 @@ def _render_mermaid(source: str) -> str | None:
             print(f"  [warn] mmdc error: {result.stderr.decode('utf-8', errors='replace').strip()}")
             return None
 
-        data = _b64.b64encode(out_path.read_bytes()).decode()
+        px_w, px_h   = _png_size(out_path)
+        w_mm, h_mm   = _diagram_display_size(px_w, px_h)
+        data         = _b64.b64encode(out_path.read_bytes()).decode()
 
-    return f'<img src="data:image/png;base64,{data}" class="mermaid-img" alt="Diagram">'
+    # Inline width/height bypass WeasyPrint's broken max-width+max-height+height:auto
+    # aspect-ratio resolution — explicit dimensions are always honoured correctly.
+    style = f"width:{w_mm:.1f}mm;height:{h_mm:.1f}mm"
+    return f'<img src="data:image/png;base64,{data}" class="mermaid-img" style="{style}" alt="Diagram">'
 
 
 def extract_mermaid_blocks(text: str) -> tuple[str, dict[str, str]]:
@@ -424,12 +461,9 @@ tr          { page-break-inside: avoid; }
     text-align: center;
 }
 .mermaid-img {
-    /* US Letter content area: 168mm wide × 231mm tall (after margins).
-       Cap at 80% of each dimension so diagrams never overflow the page. */
-    width: 80%;
-    max-width: 134mm;
-    max-height: 185mm;
-    height: auto;
+    /* width and height are set inline by generate_pdf.py from PNG intrinsic
+       dimensions — WeasyPrint does not correctly resolve aspect ratio when
+       max-width, max-height, and height:auto are all active simultaneously. */
     display: block;
     margin: 0 auto;
 }
