@@ -166,7 +166,7 @@ The AI model reads "Show me portfolio returns versus benchmark for my equity por
 
 ```json
 POST /v1/mcp
-Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...
+Authorization: Bearer <host-issued-jwt>
 
 {
   "jsonrpc": "2.0",
