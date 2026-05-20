@@ -292,14 +292,17 @@ class SemanticIntentLayer:
         # Construct engine-agnostic DAG; each metric node carries physicalMapping from SMR
         nodes = []
         for metric in metrics:
-            nodes.append({
+            node = {
                 "op":               "metric_scan",
                 "metric_id":        metric["metric_id"],
                 "metric_version":   metric["version"],
                 "aggregation":      metric["aggregation"],
                 "data_affinity":    metric["data_affinity"],
                 "physical_mapping": metric["physical_mapping"],
-            })
+            }
+            if wm := metric.get("weight_metric_id"):
+                node["weight_metric_id"] = wm
+            nodes.append(node)
         # Append join, filter, time_expand, sort nodes from params
         ...
         return {"lqp_id": generate_id(), "nodes": nodes, "tenant_id": claims["tenant_id"]}
@@ -386,6 +389,7 @@ The core metric definition. One document per approved metric version per tenant.
   "unit":                 "percentage",
   "decimals":             2,
   "aggregation":          "value_weighted_average",
+  "weight_metric_id":     "market_value",
   "cost_weight":          3,
   "classification_level": "internal",
   "data_affinity":        "risk_metrics",
@@ -404,6 +408,8 @@ The core metric definition. One document per approved metric version per tenant.
 ```
 
 `status` is one of `"proposed"` | `"in_review"` | `"approved"` | `"deprecated"` | `"retired"`. The DCS enforces a uniqueness constraint: at most one document per `(tenant_id, metric_id)` may carry `"status": "approved"` at any point in time. All prior versions are retained as `"deprecated"` for lineage reconstruction. `source` is `"platform"` for Financial Services Reference Model entries and `"tenant"` for customised definitions.
+
+`weight_metric_id` is required when `aggregation` is `"value_weighted_average"` (or any other weighted aggregation variant) and must reference the `metric_id` of an approved `analytical_metric` in the same tenant's DCS. The SIL resolves and validates this reference at query time — if the weight metric is missing or unapproved, the query is rejected. The field is absent for non-weighted aggregations (`"sum"`, `"last"`, `"count"`, `"min"`, `"max"`, `"mean"`). The LQP generator emits a `weight_metric_id` key on the `metric_scan` node so that the execution backend can fetch the weighting values alongside the primary metric.
 
 #### New DCS document type: `analytical_dimension`
 
@@ -603,8 +609,8 @@ class LQPGenerator:
         # 1. One metric_scan node per resolved metric
         scan_ids = []
         for metric in metrics:
-            nid = next_id()
-            nodes.append({
+            nid  = next_id()
+            node = {
                 "id":               nid,
                 "op":               "metric_scan",
                 "metric_id":        metric["metric_id"],
@@ -612,7 +618,10 @@ class LQPGenerator:
                 "aggregation":      metric["aggregation"],
                 "data_affinity":    metric["data_affinity"],
                 "physical_mapping": metric["physical_mapping"],
-            })
+            }
+            if wm := metric.get("weight_metric_id"):
+                node["weight_metric_id"] = wm   # present only for weighted aggregations
+            nodes.append(node)
             scan_ids.append(nid)
 
         # 2. Join if metrics span multiple nodes
@@ -870,14 +879,14 @@ The FQP receives the governance-approved LQP produced by the Semantic Intent Lay
     {
       "id": "node-1", "op": "metric_scan",
       "metric_id": "portfolio_return", "metric_version": "2.1.0",
-      "aggregation": "value_weighted_average",
+      "aggregation": "value_weighted_average", "weight_metric_id": "market_value",
       "data_affinity": "portfolio",
       "physical_mapping": { "source": "primary-warehouse", "table": "fact_portfolio_daily" }
     },
     {
       "id": "node-2", "op": "metric_scan",
       "metric_id": "tracking_error", "metric_version": "1.3.0",
-      "aggregation": "value_weighted_average",
+      "aggregation": "value_weighted_average", "weight_metric_id": "market_value",
       "data_affinity": "risk_metrics",
       "physical_mapping": { "source": "risk-semantic-layer", "cube": "risk_cube" }
     },
@@ -1440,6 +1449,31 @@ One bundle covers all analytical dimensions. Every domain bundle's metrics and o
   {
     "type":                 "analytical_metric",
     "tenant_id":            "acme-wealth",
+    "metric_id":            "market_value",
+    "version":              1,
+    "status":               "approved",
+    "source":               "platform",
+    "display_name":         "Market Value",
+    "description":          "End-of-period market value of a portfolio or position in the portfolio base currency.",
+    "domain":               "performance",
+    "category":             "valuation",
+    "unit":                 "currency",
+    "decimals":             2,
+    "aggregation":          "sum",
+    "cost_weight":          1,
+    "classification_level": "internal",
+    "data_affinity":        "portfolio",
+    "physical_mapping":     { "source": "primary-warehouse", "table": "fact_portfolio_daily", "measure": "market_value_base_ccy" },
+    "required_dimensions":  ["portfolio_id", "as_of_date"],
+    "optional_dimensions":  ["asset_class", "currency", "sector"],
+    "compliance_modes":     [],
+    "approved_by":          "cdo@acme.com",
+    "approved_at":          "2026-05-14T09:00:00Z",
+    "created_at":           "2026-05-13T14:32:00Z"
+  },
+  {
+    "type":                 "analytical_metric",
+    "tenant_id":            "acme-wealth",
     "metric_id":            "portfolio_return",
     "version":              1,
     "status":               "approved",
@@ -1451,6 +1485,7 @@ One bundle covers all analytical dimensions. Every domain bundle's metrics and o
     "unit":                 "percentage",
     "decimals":             2,
     "aggregation":          "value_weighted_average",
+    "weight_metric_id":     "market_value",
     "cost_weight":          1,
     "classification_level": "internal",
     "data_affinity":        "portfolio",
@@ -1501,6 +1536,7 @@ One bundle covers all analytical dimensions. Every domain bundle's metrics and o
     "unit":                 "percentage",
     "decimals":             2,
     "aggregation":          "value_weighted_average",
+    "weight_metric_id":     "market_value",
     "cost_weight":          2,
     "classification_level": "internal",
     "data_affinity":        "portfolio",
@@ -1575,6 +1611,7 @@ One bundle covers all analytical dimensions. Every domain bundle's metrics and o
     "unit":                 "percentage",
     "decimals":             2,
     "aggregation":          "value_weighted_average",
+    "weight_metric_id":     "market_value",
     "cost_weight":          3,
     "classification_level": "internal",
     "data_affinity":        "risk_metrics",
@@ -1600,6 +1637,7 @@ One bundle covers all analytical dimensions. Every domain bundle's metrics and o
     "unit":                 "percentage",
     "decimals":             2,
     "aggregation":          "value_weighted_average",
+    "weight_metric_id":     "market_value",
     "cost_weight":          4,
     "classification_level": "internal",
     "data_affinity":        "risk_metrics",
@@ -1625,6 +1663,7 @@ One bundle covers all analytical dimensions. Every domain bundle's metrics and o
     "unit":                 "percentage",
     "decimals":             2,
     "aggregation":          "value_weighted_average",
+    "weight_metric_id":     "market_value",
     "cost_weight":          2,
     "classification_level": "internal",
     "data_affinity":        "risk_metrics",
@@ -1650,6 +1689,7 @@ One bundle covers all analytical dimensions. Every domain bundle's metrics and o
     "unit":                 "percentage",
     "decimals":             2,
     "aggregation":          "value_weighted_average",
+    "weight_metric_id":     "market_value",
     "cost_weight":          4,
     "classification_level": "internal",
     "data_affinity":        "risk_metrics",
@@ -1675,6 +1715,7 @@ One bundle covers all analytical dimensions. Every domain bundle's metrics and o
     "unit":                 "ratio",
     "decimals":             2,
     "aggregation":          "value_weighted_average",
+    "weight_metric_id":     "market_value",
     "cost_weight":          2,
     "classification_level": "internal",
     "data_affinity":        "risk_metrics",
@@ -1700,6 +1741,7 @@ One bundle covers all analytical dimensions. Every domain bundle's metrics and o
     "unit":                 "years",
     "decimals":             2,
     "aggregation":          "value_weighted_average",
+    "weight_metric_id":     "market_value",
     "cost_weight":          2,
     "classification_level": "internal",
     "data_affinity":        "risk_metrics",
