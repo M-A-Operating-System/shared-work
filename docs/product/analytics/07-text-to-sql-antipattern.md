@@ -419,16 +419,63 @@ In a 2024 financial services incident documented in OWASP's agentic AI research,
 
 ---
 
-### Confirmed Real-World CVEs and Incidents
+### Selected Attack Examples
 
-| Reference | System | Vulnerability | Impact |
-|---|---|---|---|
-| [Datadog Security Labs, Aug 2025](https://securitylabs.datadoghq.com/articles/mcp-vulnerability-case-study-SQL-injection-in-the-postgresql-mcp-server/) | Anthropic `@modelcontextprotocol/server-postgres` | Stacked query transaction escape via semicolon injection | Read-only bypass; arbitrary SQL execution |
-| [Trend Micro, Jun 2025](https://www.trendmicro.com/en_us/research/25/f/why-a-classic-mcp-server-vulnerability-can-undermine-your-entire-ai-agent.html) | Anthropic SQLite MCP reference server (5,000+ forks) | Direct string concatenation — unsanitised user input | Stored prompt injection; full agent workflow hijack |
-| [CVE-2025-66335 / The Register, May 2026](https://www.theregister.com/security/2026/05/13/bug-hunter-tracks-down-three-serious-mcp-database-flaws-one-left-unpatched/) | Apache Doris MCP Server (< v0.6.1) | Unsanitised `db_name` parameter in `exec_query` function | SQL injection via metadata parameter |
-| [Akamai Research, May 2026](https://www.akamai.com/blog/security-research/one-fluke-3-pattern-mcp-back-end-vulnerabilities) | Apache Pinot MCP; Alibaba RDS MCP | Unsanitised SQL input; missing authentication | Unauthenticated data exposure |
+---
 
-Notably, Anthropic declined to patch the SQLite MCP server vulnerability reported by Trend Micro on 11 June 2025, citing the repository's archived status. As of the date of this briefing, the vulnerable code exists in thousands of downstream forks, many of which are likely in production use.
+#### Example 1 — Transaction Escape via Read-Only Guardrail Bypass
+
+**System:** Anthropic `@modelcontextprotocol/server-postgres` (official reference implementation)
+
+**Exposure / Impact:** An attacker able to supply natural language queries could terminate the server's read-only transaction wrapper and execute arbitrary SQL — including schema modification, data exfiltration via `COPY TO`, and file system reads via `pg_read_file`. The server had approximately 21,000 weekly NPM downloads at the time of disclosure. The vulnerability was present in all versions up to and including v0.6.2.
+
+**Root Cause Assessment:** The server wrapped every query in `BEGIN TRANSACTION READ ONLY ... ROLLBACK` as its primary safety control. However, the underlying node-postgres `client.query()` method accepted multi-statement strings delimited by semicolons. An attacker could inject `COMMIT;` to terminate the protective transaction before appending arbitrary SQL. The root cause is an architectural mismatch between the assumed single-statement execution model and the actual behaviour of the database driver — a control that appears protective but does not hold under adversarial input.
+
+**References:**
+- [Datadog Security Labs — MCP Vulnerability Case Study: SQL Injection in the PostgreSQL MCP Server](https://securitylabs.datadoghq.com/articles/mcp-vulnerability-case-study-SQL-injection-in-the-postgresql-mcp-server/) (August 2025)
+- [PortSwigger — Stacked Queries](https://portswigger.net/web-security/sql-injection/cheat-sheet#stacked-queries)
+
+---
+
+#### Example 2 — Stored Prompt Injection via Unsanitised String Concatenation
+
+**System:** Anthropic SQLite MCP reference server (archived; 5,000+ downstream forks, many in production use)
+
+**Exposure / Impact:** An attacker with write access to any database record the agent was known to query could embed LLM instruction syntax in a data field. When a legitimate user triggered a SELECT on that record, the agent treated the embedded instruction as a system directive and acted on it — demonstrated by Trend Micro as exfiltrating all records in a target table via a chained email MCP tool call. The attack required no SQL expertise and was indistinguishable from normal agent behaviour at the query level. Anthropic declined to patch the vulnerability on 11 June 2025, citing the repository's archived status; the vulnerable code remains in thousands of active forks.
+
+**Root Cause Assessment:** Query construction used direct string concatenation of user-supplied input into SQL, creating a classic injection surface. More fundamentally, the server returned raw database content to the LLM context without sanitisation, making any field that an attacker could write to a potential instruction injection vector. These two weaknesses compound: the first enables SQL injection; the second enables prompt injection via entirely legitimate queries.
+
+**References:**
+- [Trend Micro — Why a Classic MCP Server Vulnerability Can Undermine Your Entire AI Agent](https://www.trendmicro.com/en_us/research/25/f/why-a-classic-mcp-server-vulnerability-can-undermine-your-entire-ai-agent.html) (June 2025)
+- [OWASP LLM Top 10 — LLM01: Prompt Injection](https://owasp.org/www-project-top-10-for-large-language-model-applications/)
+
+---
+
+#### Example 3 — SQL Injection via Metadata Parameter (CVE-2025-66335)
+
+**System:** Apache Doris MCP Server (versions prior to v0.6.1)
+
+**Exposure / Impact:** The `db_name` parameter passed to the `exec_query` function was not sanitised before being interpolated into the query string. An attacker could inject SQL via what appeared to be a routine metadata parameter — a vector that many security reviews would not scrutinise as an injection surface. The vulnerability was identified by an independent researcher; one of three MCP database flaws reported in the same disclosure period was left unpatched at the time of reporting.
+
+**Root Cause Assessment:** Input validation was applied to the query body but not to ancillary parameters used in query construction. This reflects a common pattern in MCP server implementations: developers apply parameterisation to the primary query string while treating configuration and metadata inputs as trusted. Any value incorporated into an executed SQL string must be treated as untrusted, regardless of which parameter it arrives through.
+
+**References:**
+- [The Register — Bug-hunter tracks down three serious MCP database flaws, one left unpatched](https://www.theregister.com/security/2026/05/13/bug-hunter-tracks-down-three-serious-mcp-database-flaws-one-left-unpatched/) (May 2026)
+- [OWASP A03:2021 — Injection](https://owasp.org/Top10/A03_2021-Injection/)
+
+---
+
+#### Example 4 — Unauthenticated Data Exposure Across Multiple Vendor MCP Servers
+
+**System:** Apache Pinot MCP Server; Alibaba Cloud RDS MCP Server
+
+**Exposure / Impact:** Both servers accepted connections and executed queries without requiring authentication. Any network-accessible client — including an attacker with no credentials — could issue arbitrary SELECT queries and receive results. Akamai Research identified these as part of a broader pattern in which MCP servers are deployed with the database query surface fully exposed, on the assumption that network-level controls provide sufficient protection.
+
+**Root Cause Assessment:** Authentication was omitted from the MCP server layer entirely. This is an architectural omission rather than an implementation flaw — the servers were not designed with an authentication model. The pattern reflects the speed at which MCP server implementations have been published, often as developer tooling or reference implementations, without the security baseline expected of production data access services. Network perimeter controls are not a substitute for per-connection authentication: they fail at the boundary of the network and provide no defence against insider threat or lateral movement.
+
+**References:**
+- [Akamai Research — One Fluke, 3 Patterns: MCP Back-End Vulnerabilities](https://www.akamai.com/blog/security-research/one-fluke-3-pattern-mcp-back-end-vulnerabilities) (May 2026)
+- [OWASP API Security Top 10 — Broken Object Level Authorisation](https://owasp.org/www-project-api-security/)
 
 ---
 
