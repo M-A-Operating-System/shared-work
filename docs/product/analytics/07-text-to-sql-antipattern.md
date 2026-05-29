@@ -170,7 +170,7 @@ Even with appropriate data processing agreements in place, transmitting propriet
 
 A crafted query can cause the LLM to generate SQL that executes a full table scan, a cartesian join, or an unoptimised aggregation across a large dataset. In cloud data warehouses billed by compute or data scanned, this is a cost denial-of-service attack. The attacker does not need elevated privileges — they need the ability to craft natural language questions that lead to expensive SQL. There is no pre-execution cost gate, no circuit breaker, and no query budget enforcement in the Text-to-SQL pattern.
 
-### Why Guardrails Cannot Solve This
+## Why Guardrails Cannot Solve This
 
 Organisations that recognise these risks typically attempt to mitigate them through layered prompt restrictions, input/output validation, SQL analysis, and rate limiting. Each of these layers adds engineering cost and operational complexity while providing incomplete protection:
 
