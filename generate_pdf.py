@@ -4,11 +4,16 @@ Generates a PDF for each product in docs/product/, placing the output inside
 the respective product folder.
 
 Usage:
-    python generate_pdf.py [product-name]
+    python generate_pdf.py [product-name] [--nofront]
+    python generate_pdf.py --page <path/to/file.md> [--nofront]
 
-    python generate_pdf.py          → generates all products
-    python generate_pdf.py assistant → generates only the assistant product
-    python generate_pdf.py analytics → generates only the analytics product
+    python generate_pdf.py              → generates all products
+    python generate_pdf.py assistant    → generates only the assistant product
+    python generate_pdf.py analytics    → generates only the analytics product
+    python generate_pdf.py --nofront    → generates all products without branded cover pages
+
+    --nofront   Omit the branded cover page. Useful for distributing content
+                outside the M&A Operating System brand context.
 
 Requirements:
     pip install markdown weasyprint
@@ -227,7 +232,8 @@ def inject_mermaid(html: str, placeholders: dict[str, str]) -> str:
 
 
 def build_html(files: list[Path], title: str, meta: str,
-               author: str = "", subs: dict[str, str] | None = None) -> str:
+               author: str = "", nofront: bool = False,
+               subs: dict[str, str] | None = None) -> str:
     import markdown
 
     md = markdown.Markdown(
@@ -262,9 +268,11 @@ def build_html(files: list[Path], title: str, meta: str,
     safe_meta   = _html.escape(meta)
     safe_author = _html.escape(author)
 
-    author_line = f'\n    <p class="cover-author">{safe_author}</p>' if safe_author else ""
-
-    cover = f"""
+    if nofront:
+        cover = ""
+    else:
+        author_line = f'\n    <p class="cover-author">{safe_author}</p>' if safe_author else ""
+        cover = f"""
 <div class="cover-page">
   <div class="cover-inner">
     <p class="cover-eyebrow">M&amp;A Operating System</p>
@@ -490,7 +498,7 @@ tr          { page-break-inside: avoid; }
 
 # ---------- per-product generation ----------
 
-def generate_product(name: str, config: dict) -> None:
+def generate_product(name: str, config: dict, nofront: bool = False) -> None:
     docs_dir = PRODUCTS_DIR / name
     if not docs_dir.is_dir():
         print(f"  [skip] {name}: directory not found at {docs_dir}")
@@ -512,6 +520,7 @@ def generate_product(name: str, config: dict) -> None:
     print("Building HTML…")
     html = build_html(files, config["title"], config["meta"],
                       author=config.get("author", ""),
+                      nofront=nofront,
                       subs={"{{PRODUCT_NAME}}": name})
 
     print("Rendering PDF (this may take a moment)…")
@@ -552,7 +561,7 @@ def _resolve_page_path(file_path: Path) -> Path:
     sys.exit(1)
 
 
-def generate_page(file_path: Path) -> None:
+def generate_page(file_path: Path, nofront: bool = False) -> None:
     """Generate a PDF for a single .md file, placed next to it."""
     if file_path.is_symlink():
         print(f"  [error] symlinks are not supported: {file_path}")
@@ -587,7 +596,8 @@ def generate_page(file_path: Path) -> None:
     print(f"\n── page: {file_path.name} ──────────────────────────────────────────")
     print("Building HTML…")
     html = build_html([file_path], page_title, config["meta"],
-                      author=config.get("author", ""))
+                      author=config.get("author", ""),
+                      nofront=nofront)
 
     print("Rendering PDF…")
     from weasyprint import HTML, CSS as WeasyprintCSS
@@ -619,15 +629,19 @@ def main():
         print("weasyprint not installed. Run: pip install markdown weasyprint")
         sys.exit(1)
 
-    if len(sys.argv) > 1 and sys.argv[1] == '--page':
-        if len(sys.argv) < 3:
-            print("Usage: python generate_pdf.py --page <path/to/file.md>")
+    args = sys.argv[1:]
+    nofront = "--nofront" in args
+    args = [a for a in args if a != "--nofront"]
+
+    if args and args[0] == '--page':
+        if len(args) < 2:
+            print("Usage: python generate_pdf.py --page <path/to/file.md> [--nofront]")
             sys.exit(1)
-        generate_page(Path(sys.argv[2]))
+        generate_page(Path(args[1]), nofront=nofront)
         print("\nAll done.")
         return
 
-    requested = sys.argv[1] if len(sys.argv) > 1 else None
+    requested = args[0] if args else None
 
     if requested:
         if requested not in PRODUCTS:
@@ -638,7 +652,7 @@ def main():
         targets = PRODUCTS
 
     for name, config in targets.items():
-        generate_product(name, config)
+        generate_product(name, config, nofront=nofront)
 
     print("\nAll done.")
 
