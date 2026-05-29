@@ -1,14 +1,16 @@
-# Appendix: Why Not Text-to-SQL? The GenAI Analytics Anti-Pattern
+# Appendix: Text-to-SQL — Right Tool, Wrong Foundation
 
-This appendix is a standalone reference for teams evaluating AI-powered analytics architectures. It describes the Text-to-SQL pattern — what it is, why it is the most common first implementation, and why it is not an appropriate foundation for governed analytical intelligence in a regulated enterprise. It can be read independently of the platform specification.
+This appendix is a standalone reference for teams evaluating AI-powered analytics architectures. It examines the Text-to-SQL pattern — what it is, where it genuinely adds value, and why it is not an appropriate foundation for governed, critical, or regulated analytical processes. It can be read independently of the platform specification.
 
-Although this document frames the problem as Text-to-SQL, the risks described below apply to any architectural pattern in which: (1) AI is used to generate SQL or SQL-equivalent code that is executed within a query engine without human review; or (2) an SQL-like query language is surfaced as an executable tool — including as an MCP tool callable by an AI agent. The common condition is the same in each case: an AI system produces executable query code that acts directly on data, with no deterministic governance layer interposed between generation and execution. Wherever that condition holds, the governance, security, reliability, and operational risks documented here are structurally present, regardless of the specific interface, vendor, or query language involved.
+Text-to-SQL is a capable and legitimate tool for ad-hoc data exploration, hypothesis testing, and user-driven discovery. The case against it is narrower and more precise than a categorical rejection: it is the wrong execution layer for analytical processes that must be reproducible, auditable, consistently defined, and defensible under regulatory scrutiny. These are different problems with different architectural requirements, and conflating them leads either to unnecessary restriction of a useful capability or — more commonly — to genuine governance failures in processes that demand better.
 
-While individual risk-mitigation approaches exist for each of the structural concerns described below, on aggregate the Text-to-SQL pattern is not recommended for large-scale regulated enterprises. Incremental patching reduces individual failure modes but cannot resolve the underlying architectural constraints — the pattern was not designed for governed financial analytics, and every mitigation introduces further engineering complexity without eliminating the root cause. The [Why Incremental Patching Fails](#why-incremental-patching-fails) section examines this dynamic in detail.
+It is also important to note that most of the risks described in this document are not new problems introduced by Text-to-SQL. Inconsistent metric definitions, opaque SQL logic embedded in scripts, lack of versioning, and entitlement gaps are longstanding challenges in enterprise analytics environments. What Text-to-SQL does is **amplify and democratise** these issues: more users can generate queries, define metrics, and produce analytical outputs without the friction that previously contained the problem. The governance gaps that were manageable at the scale of a data team become unmanageable at the scale of an organisation. That is the risk — not the technology itself, but what it exposes about the absence of a governed foundation beneath it.
 
-Although the primary framing throughout is financial services, the governance failures described here are structurally identical in any sector where analytical outputs must be reproducible, auditable, and tied to versioned, approved definitions — including insurance, healthcare, and public sector analytics. The specific regulatory instruments differ; the architectural defects do not.
+Although this document frames the problem as Text-to-SQL, the risks described below apply to any architectural pattern in which AI is used to generate SQL or SQL-equivalent code that is executed against data without a deterministic governance layer interposed between generation and execution — including SQL-like query languages surfaced as MCP tools callable by an AI agent. Wherever that condition holds for governed analytical processes, the risks documented here are structurally present regardless of interface, vendor, or query language.
 
-The platform's alternative architecture — and why it is designed the way it is — is described in [Chapter 1 — Platform Overview](./01-platform-overview.md) and specified in full in [Chapter 3 — Core Platform Capabilities](./03-core-capabilities.md). For readers encountering this document standalone: the alternative separates the LLM's role (translating natural language into structured intent parameters — metric identifiers, dimensions, filters) from a deterministic governed layer (a Semantic Metrics Registry that holds versioned, approved formula definitions; a Role-Aware Projection that enforces entitlements before any query executes; and a Federated Query Planner that resolves and executes the plan against registered backends). The LLM never generates SQL, never sees the physical schema, and cannot influence entitlement decisions. The [Correct Pattern](#the-correct-pattern) section and accompanying comparison table describe this architecture in summary; the full specification is in Chapter 3.
+Although the primary framing is financial services, the governance failures described here are structurally identical in any sector where analytical outputs must be reproducible, auditable, and tied to versioned, approved definitions — including insurance, healthcare, and public sector analytics. The specific regulatory requirements differ; the architectural constraints do not.
+
+The platform's alternative architecture is described in [Chapter 1 — Platform Overview](./01-platform-overview.md) and specified in full in [Chapter 3 — Core Platform Capabilities](./03-core-capabilities.md). For readers encountering this document standalone: the alternative separates the LLM's role (translating natural language into structured intent parameters — metric identifiers, dimensions, filters) from a deterministic governed layer (a Semantic Metrics Registry that holds versioned, approved formula definitions; a Role-Aware Projection that enforces entitlements before any query executes; and a Federated Query Planner that resolves and executes the plan against registered backends). The LLM never generates SQL, never sees the physical schema, and cannot influence entitlement decisions. Text-to-SQL can coexist within this architecture as an exploration tool; the semantic layer is the execution layer for anything governed. The [Right Tool, Wrong Foundation](#the-right-tool-wrong-foundation) section describes this boundary in detail.
 
 ---
 
@@ -16,17 +18,31 @@ The platform's alternative architecture — and why it is designed the way it is
 
 Text-to-SQL (also called NL2SQL or "chat with your data") feeds a natural language question and a physical database schema to a large language model, which generates SQL that is then executed directly against the database. There is no semantic layer, no metric registry, and no governed definitions. The LLM is both the query interface and the query generator — user intent, data access logic, and physical schema exposure all flow through the same channel.
 
-The pattern is genuinely attractive at first contact. A working demonstration is achievable in hours on a well-structured schema. Simple aggregations — revenue by region, headcount by department — are handled reliably. For exploratory data work, internal tooling, and low-stakes analytical sandboxes, Text-to-SQL is a legitimate option and can accelerate genuine productivity.
+### Where Text-to-SQL Adds Genuine Value
 
-The argument here is narrower: for production analytical systems serving regulated business processes — financial reporting, risk management, compliance analytics, regulatory submissions — it is the wrong foundation. The structural defects are largely invisible at the demonstration stage, tolerable in early deployments, and compounding as the system matures and regulatory scrutiny increases.
+The pattern is genuinely productive in the right context. A working demonstration is achievable in hours on a well-structured schema. For the following use cases it is a legitimate and capable tool:
 
-| Short-term appeal | Long-term reality |
+- **Ad-hoc data exploration** — answering one-off questions that do not feed into governed reports or regulatory submissions
+- **Hypothesis testing and data discovery** — quickly checking whether a pattern exists before deciding whether to invest in a formal metric definition
+- **Analytical prototyping** — exploring what a new metric might look like before it is specified, validated, and registered
+- **Internal tooling and low-stakes sandboxes** — developer and analyst productivity tooling where reproducibility and auditability are not requirements
+- **Accelerating the path to governed metrics** — using natural language queries to identify what questions users actually ask, then formalising the most common ones into the semantic layer
+
+In each of these contexts Text-to-SQL is an accelerator, not a liability. The risks described in the rest of this document arise when this exploration capability is promoted — deliberately or by organisational drift — into the execution layer for processes that require governance.
+
+### Where It Becomes the Wrong Foundation
+
+The argument here is specific: for production analytical processes serving governed business requirements — financial reporting, risk management, compliance analytics, regulatory submissions, critical data mining — Text-to-SQL is the wrong foundation. The structural defects are largely invisible at the demonstration stage, tolerable in early deployments, and compounding as the system matures and regulatory scrutiny increases.
+
+The typical failure path is not a deliberate architectural decision. It is organisational drift: a team uses Text-to-SQL because it is fast and impressive, the use cases expand, the outputs start feeding into processes that were never intended to rely on it, and by the time the governance gap becomes visible it is embedded in workflows, dashboards, and downstream systems. The [Why You Cannot Patch Your Way Out](#why-you-cannot-patch-your-way-out) section examines why this drift is difficult to reverse.
+
+| For exploration | As a governed execution layer |
 |---|---|
-| Working demo in hours on a well-structured schema | Every structural defect compounds as use cases mature |
-| No semantic modelling required upfront | Schema drift, metric inconsistency, and lineage gaps accumulate |
-| Impressive for simple aggregations | Degrades precisely on the complex queries that matter most |
-| Off-the-shelf from numerous vendors | Vendor diversity does not change the underlying architectural constraints |
-| Fast iteration on new questions | Each new question is a new liability for consistency and auditability |
+| Working demo in hours | Every structural defect compounds as use cases mature |
+| No semantic modelling required | Schema drift, metric inconsistency, and lineage gaps accumulate |
+| Effective for simple aggregations | Degrades on the complex regulated computations that matter most |
+| Fast iteration on new questions | Each new governed use case is a new liability for consistency and auditability |
+| Valuable input to metric design | Cannot replace the governed metric registry it feeds into |
 
 ---
 
@@ -215,19 +231,23 @@ The following scenarios are not hypothetical. They represent the class of incide
 
 ---
 
-## Why Incremental Patching Fails
+## Why You Cannot Patch Your Way Out
 
-Teams that recognise these problems often attempt to address them incrementally: add a schema filter, add a prompt guard, add a SQL validator, add a result reconciler, add a metric glossary to the prompt. Each addition reduces one failure mode while introducing engineering complexity, operational brittleness, and a new surface area for adversarial circumvention.
+When teams recognise that Text-to-SQL is producing governance problems in production, the instinct is to fix it incrementally rather than reconsider the foundation: add a schema filter, add a prompt guard, add a SQL validator, add a result reconciler, add a metric glossary to the prompt. Each addition reduces one failure mode while introducing engineering complexity, operational brittleness, and a new surface area for adversarial circumvention.
 
-The endpoint of this incremental process is a prompt-dependent approximation of a semantic layer, built on top of an architecture that was not designed for it, at far greater cost than building the semantic layer correctly from the start. The prompt is now load-bearing — changes to it break the metric definitions that live inside it; model updates change the inferred behaviour of definitions that were never formally specified; tests cannot be deterministic because the output is probabilistic.
+Some of these risks — audit logging, certain access controls — are addressable through engineering effort. But the core reproducibility problem is not: probabilistic SQL generation means the same question can return different answers in different sessions, after model updates, or when phrased differently. That is not an implementation flaw that can be patched; it is how the system works. Similarly, there is no concept of a versioned metric definition to update, no approval workflow to gate a formula change, and no audit record of which calculation produced which historical result. These properties cannot be added to Text-to-SQL — they require a different execution layer.
 
-A semantic layer is not a more complex version of Text-to-SQL. It is a different architecture that solves the governance problem at the right layer — before execution, deterministically, with version control, lineage, and enforced entitlement boundaries. These properties cannot be retrofitted onto a probabilistic SQL generator.
+The endpoint of the incremental patching process is a prompt-dependent approximation of a semantic layer, built on top of an architecture that was not designed for it, at far greater cost than building the semantic layer correctly from the start. The prompt becomes load-bearing — changes to it break the metric definitions that live inside it; model updates change the inferred behaviour of definitions that were never formally specified; tests cannot be deterministic because the output is probabilistic.
+
+A semantic layer is not a more complex version of Text-to-SQL. It is a different architecture that solves the governance problem at the right layer — before execution, deterministically, with version control, lineage, and enforced entitlement boundaries. These properties cannot be retrofitted onto a probabilistic SQL generator. The distinction matters because it determines where engineering effort should be invested: not in hardening Text-to-SQL for governed use, but in building the governed layer and allowing Text-to-SQL to remain what it is good at — fast, flexible, exploratory.
 
 ---
 
-## The Correct Pattern
+## The Right Tool, Wrong Foundation
 
-The alternative architecture separates the AI translation layer from the governed computation layer. The LLM does what it is reliable at — translating natural language into structured intent parameters. Everything that must be deterministic — metric definition, entitlement enforcement, query execution, lineage recording — is delegated to deterministic components that do not generate, do not infer, and do not vary with session context.
+Text-to-SQL has a legitimate role in the analytics ecosystem — as an exploration and acceleration layer for ad-hoc analysis, hypothesis testing, and metric discovery. The argument in this document is not that it should be removed, but that it should not be the execution layer for governed, critical, or regulated analytical processes. Those processes require an architecture with fundamentally different properties.
+
+The governed architecture separates the AI translation layer from the governed computation layer. The LLM does what it is reliable at — translating natural language into structured intent parameters. Everything that must be deterministic — metric definition, entitlement enforcement, query execution, lineage recording — is delegated to deterministic components that do not generate, do not infer, and do not vary with session context. Text-to-SQL can coexist within this architecture: exploratory queries, analyst discovery, and prototype metric definitions can all continue using natural language interfaces — but the outputs of those explorations are validated and promoted into the governed registry before they become the basis for anything critical.
 
 | Text-to-SQL | Governed Semantic Analytics |
 |---|---|
@@ -248,6 +268,8 @@ The alternative architecture separates the AI translation layer from the governe
 | Schema changes require manual prompt re-engineering with no reliable test coverage | Physical mappings updated once in the SMR; changes versioned, approved, and consistently applied to all dependent metrics |
 
 The LLM's role is constrained to what it performs reliably. The computation — resolving metric definitions, enforcing entitlements, planning and executing queries, assembling results, recording lineage — is performed by deterministic components that do not generate, do not infer, and do not vary with session context.
+
+The boundary between these two modes is the governed semantic registry. Anything that crosses that boundary — from exploration into production, from informal query into governed metric — passes through a formal definition, approval, and versioning process. Text-to-SQL remains available on the exploration side of that boundary. It is not available on the governed execution side, because the properties required there cannot be satisfied by probabilistic SQL generation.
 
 For a complete specification of this architecture, see [Chapter 3 — Core Platform Capabilities](./03-core-capabilities.md).
 
