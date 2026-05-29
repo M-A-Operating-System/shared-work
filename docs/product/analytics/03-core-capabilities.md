@@ -1,6 +1,6 @@
 # 3. Core Platform Capabilities
 
-This chapter describes the Analytics Engine — a single MCP server — and the AI Chat Platform that calls it. The Analytics Engine validates structured queries, enforces entitlements, plans and executes against registered backends, and returns a display specification, structured results, and an optional governed narrative. The computation pipeline is entirely deterministic. The one AI step inside the Analytics Engine, the Narrative Synthesis Engine, runs after computation completes and is constrained strictly to summarising computed values — it cannot introduce metric values, comparisons, or interpretations not present in the result set. The AI Chat Platform hosts the conversational layer: it reads the metric catalogue from the Analytics Engine, translates natural language to structured parameters, and calls the Analytics Engine.
+This chapter describes the Analytics Engine (a single MCP server) and the AI Chat Platform that calls it. The Analytics Engine validates structured queries, enforces entitlements, plans and executes against registered backends, and returns a display specification, structured results, and an optional governed narrative. The computation pipeline is entirely deterministic. The one AI step inside the Analytics Engine, the Narrative Synthesis Engine, runs after computation completes and is constrained strictly to summarising computed values. It cannot introduce metric values, comparisons, or interpretations not present in the result set. The AI Chat Platform hosts the conversational layer: it reads the metric catalogue from the Analytics Engine, translates natural language to structured parameters, and calls the Analytics Engine.
 
 ---
 
@@ -67,11 +67,11 @@ flowchart TD
     NSE -->|"narrative summary"| Result
 ```
 
-The Analytics Engine is a single MCP server. It exposes three analytical tools (`run_analytics`, `list_operations`, `drilldown`) through a single MCP Capability Layer endpoint. The computation pipeline — SIL, RAPL, SEG, FQP — is entirely deterministic. The Narrative Synthesis Engine runs as a post-computation step: after the FQP assembles the result, the NSE makes a targeted call to a secondary language model to summarise the data in plain text; its prompt is constructed from the result set only and its output is validated against computed values before being returned.
+The Analytics Engine is a single MCP server. It exposes three analytical tools (`run_analytics`, `list_operations`, `drilldown`) through a single MCP Capability Layer endpoint. The computation pipeline (SIL, RAPL, SEG, FQP) is entirely deterministic. The Narrative Synthesis Engine runs as a post-computation step: after the FQP assembles the result, the NSE makes a targeted call to a secondary language model to summarise the data in plain text; its prompt is constructed from the result set only and its output is validated against computed values before being returned.
 
-The AI Chat Platform loads the operation catalogue from the Analytics Engine by calling `list_operations` — this is how the AI model discovers what operations, metrics, and dimensions are available. It translates the user's natural language question into explicit, structured parameters and calls `run_analytics` with the resolved `operation_id` and `params`. The Analytics Engine returns the display specification, structured data, and governed narrative; the AI Chat Platform renders the result.
+The AI Chat Platform loads the operation catalogue from the Analytics Engine by calling `list_operations`. This is how the AI model discovers what operations, metrics, and dimensions are available. It translates the user's natural language question into explicit, structured parameters and calls `run_analytics` with the resolved `operation_id` and `params`. The Analytics Engine returns the display specification, structured data, and governed narrative; the AI Chat Platform renders the result.
 
-The `vega2img` service is shown separately from the Analytics Platform boundary because it is an optional, independently registered MCP render service. Consumers that cannot natively render the SCL display specification — for example, an agentic pipeline that requires static image output — register `vega2img` directly and call it as a separate tool invocation using the `result_id` returned by the Analytics Platform. It is not part of the core analytics pipeline.
+The `vega2img` service is shown separately from the Analytics Platform boundary because it is an optional, independently registered MCP render service. Consumers that cannot natively render the SCL display specification (for example, an agentic pipeline that requires static image output) register `vega2img` directly and call it as a separate tool invocation using the `result_id` returned by the Analytics Platform. It is not part of the core analytics pipeline.
 
 ---
 
@@ -132,7 +132,7 @@ sequenceDiagram
     end
 ```
 
-The Analytics Engine receives structured parameters — not natural language — and returns structured results. The computation pipeline contains no AI; the Narrative Synthesis Engine runs after computation completes, in parallel with the Visualisation Ontology, making a targeted secondary model call constrained to the assembled result. The natural language translation (step 3) happens in the AI Chat Platform's reasoning loop, grounded by the operation catalogue loaded in step 1 via `list_operations`. The Analytical Lineage Store receives two writes per query: a governance decision record before execution and an execution record after — ensuring the audit trail is complete regardless of whether the query ultimately succeeds.
+The Analytics Engine receives structured parameters, not natural language, and returns structured results. The computation pipeline contains no AI. The Narrative Synthesis Engine runs after computation completes, in parallel with the Visualisation Ontology, making a targeted secondary model call constrained to the assembled result. The natural language translation (step 3) happens in the AI Chat Platform's reasoning loop, grounded by the operation catalogue loaded in step 1 via `list_operations`. The Analytical Lineage Store receives two writes per query: a governance decision record before execution and an execution record after. This ensures the audit trail is complete regardless of whether the query ultimately succeeds.
 
 ---
 
@@ -142,15 +142,15 @@ The following query is used as a running example throughout each section below.
 
 ## AI Chat Platform
 
-The AI Chat Platform is the conversational layer through which users interact with the Analytics Engine. It hosts the AI model responsible for natural language translation, orchestrates calls to the Analytics Engine, and renders the assembled result to the user. Natural language translation — the only AI step the AI Chat Platform performs — happens here, grounded by the SMR metric catalogue. Narrative synthesis is performed inside the Analytics Engine as a secondary, post-computation step.
+The AI Chat Platform is the conversational layer through which users interact with the Analytics Engine. It hosts the AI model responsible for natural language translation, orchestrates calls to the Analytics Engine, and renders the assembled result to the user. Natural language translation is the only AI step the AI Chat Platform performs. It happens here, grounded by the SMR metric catalogue. Narrative synthesis is performed inside the Analytics Engine as a secondary, post-computation step.
 
-**Operation catalogue loading.** Before the AI model can translate a user's question into structured parameters, it needs to know what operations, metrics, and dimensions are available. The conversation engine calls `list_operations` on the Analytics Engine's MCP endpoint with the user's JWT. The response is the authenticated user's entitled operation catalogue — only operations the user can execute are returned, with their `operation_id`, display names, required parameters, supported metrics, supported dimensions, and execution profiles. This catalogue is injected into the model's context and serves as the controlled vocabulary for intent translation.
+**Operation catalogue loading.** Before the AI model can translate a user's question into structured parameters, it needs to know what operations, metrics, and dimensions are available. The conversation engine calls `list_operations` on the Analytics Engine's MCP endpoint with the user's JWT. The response is the authenticated user's entitled operation catalogue. Only operations the user can execute are returned, with their `operation_id`, display names, required parameters, supported metrics, supported dimensions, and execution profiles. This catalogue is injected into the model's context and serves as the controlled vocabulary for intent translation.
 
-**NL → structured intent.** When a user asks an analytical question, the AI model maps the natural language to an `operation_id` and explicit `params` — drawn from the catalogue it loaded. It constructs a `run_analytics` call with the resolved operation and typed parameters. No natural language is sent to the Analytics Engine; it receives structured parameters only.
+**NL → structured intent.** When a user asks an analytical question, the AI model maps the natural language to an `operation_id` and explicit `params`, drawn from the catalogue it loaded. It constructs a `run_analytics` call with the resolved operation and typed parameters. No natural language is sent to the Analytics Engine; it receives structured parameters only.
 
 **Analytics Engine call.** The structured tool call is submitted to the Analytics Engine with the user's JWT forwarded unmodified. The Analytics Engine validates, plans, executes, and returns a structured result and SCL display specification. Entitlement enforcement, query planning, and execution are entirely the Analytics Engine's responsibility.
 
-**Response assembly.** The conversation engine renders the SCL display specification inline. When narrative synthesis is enabled, the `narrative` object in the response contains the governed summary produced by the Analytics Engine's NSE — the conversation engine surfaces this directly. The `result_id` is retained for any follow-up `drilldown` call or lineage inspection.
+**Response assembly.** The conversation engine renders the SCL display specification inline. When narrative synthesis is enabled, the `narrative` object in the response contains the governed summary produced by the Analytics Engine's NSE. The conversation engine surfaces this directly. The `result_id` is retained for any follow-up `drilldown` call or lineage inspection.
 
 ### Example
 
@@ -162,7 +162,7 @@ tools/call list_operations   (via Analytics Engine MCP, JWT forwarded)
           with operation_id, display names, required_params, supported_metrics, execution_profiles
 ```
 
-The AI model reads "Show me portfolio returns versus benchmark for my equity portfolios this quarter" and, using the catalogue, resolves it to an operation and explicit parameters. It calls `run_analytics` with structured arguments — no natural language sent to the Analytics Engine:
+The AI model reads "Show me portfolio returns versus benchmark for my equity portfolios this quarter" and, using the catalogue, resolves it to an operation and explicit parameters. It calls `run_analytics` with structured arguments. No natural language is sent to the Analytics Engine:
 
 ```json
 POST /v1/mcp
@@ -195,7 +195,7 @@ When the Analytics Engine returns the structured result, display spec, and narra
 
 > **Governing principles:** [P1 — Semantic abstraction](./01-platform-overview.md#design-principles) · [P3 — Deterministic metric resolution](./01-platform-overview.md#design-principles) · [P9 — Administrator sovereignty](./01-platform-overview.md#design-principles)
 
-The Semantic Metrics Registry (SMR) is the governing catalogue of every analytical concept resolvable on the platform. Before any query can be planned or executed, every identifier in that query — metrics, dimensions, hierarchies — must be registered in the SMR. This is an architectural constraint, not a policy: the Semantic Intent Layer rejects any identifier not present in the SMR for the active tenant, and nothing is queryable that is not registered.
+The Semantic Metrics Registry (SMR) is the governing catalogue of every analytical concept resolvable on the platform. Before any query can be planned or executed, every identifier in that query (metrics, dimensions, hierarchies) must be registered in the SMR. This is an architectural constraint, not a policy: the Semantic Intent Layer rejects any identifier not present in the SMR for the active tenant, and nothing is queryable that is not registered.
 
 ### Concept Types
 
@@ -334,15 +334,15 @@ rolling_90d_return = CUMULATIVE_RETURN(daily_return, WINDOW(90, 'days'))
 
 ### SMR Authoring and Discovery
 
-The SMR is backed by the DCS, which handles document creation, versioning, and the approval workflow natively. There are no custom MCP tools for metric authoring — administrators create, edit, and approve `analytical_metric`, `analytical_dimension`, and `analytical_operation` documents using the DCS's existing authoring capabilities.
+The SMR is backed by the DCS, which handles document creation, versioning, and the approval workflow natively. There are no custom MCP tools for metric authoring. Administrators create, edit, and approve `analytical_metric`, `analytical_dimension`, and `analytical_operation` documents using the DCS's existing authoring capabilities.
 
 **Discovery** — AI models and agents discover available operations by calling the `list_operations` MCP tool (defined in the MCP Capability Layer). `list_operations` returns operation IDs, display names, required parameters, supported metrics, supported dimensions, and execution profiles for all approved operations within the caller's entitlement scope. There are no `smr://` MCP resource URIs and no separate `list_metrics`, `get_metric_definition`, `propose_metric`, or `approve_metric` MCP tools.
 
-The internal resolution calls made by the Semantic Intent Layer and Federated Query Planner query the DCS directly — there is no separate internal API. The SMR's governance workflow (Draft → Proposed → In Review → Approved → Deprecated → Retired) is managed through the DCS's existing authoring capabilities, not by custom MCP tools.
+The internal resolution calls made by the Semantic Intent Layer and Federated Query Planner query the DCS directly. There is no separate internal API. The SMR's governance workflow (Draft → Proposed → In Review → Approved → Deprecated → Retired) is managed through the DCS's existing authoring capabilities, not by custom MCP tools.
 
 ### Example
 
-The SIL asks the SMR to resolve the `compare_portfolios` operation, then resolves `portfolio_return` and `benchmark_return` as `analytical_metric` documents. The SMR confirms both are approved for the `portfolio_manager` role and returns their definitions — including `data_affinity` (`portfolio`), `required_dimensions` (`portfolio_id`, `time_period`), and `aggregation` (`value_weighted_average`). `asset_class` resolves as an approved `analytical_dimension` document with an approved filter operator (`eq`). If either metric document were absent or not in `"status": "approved"` state, the SIL would return `METRIC_NOT_FOUND` and the pipeline would stop here.
+The SIL asks the SMR to resolve the `compare_portfolios` operation, then resolves `portfolio_return` and `benchmark_return` as `analytical_metric` documents. The SMR confirms both are approved for the `portfolio_manager` role and returns their definitions, including `data_affinity` (`portfolio`), `required_dimensions` (`portfolio_id`, `time_period`), and `aggregation` (`value_weighted_average`). `asset_class` resolves as an approved `analytical_dimension` document with an approved filter operator (`eq`). If either metric document were absent or not in `"status": "approved"` state, the SIL would return `METRIC_NOT_FOUND` and the pipeline would stop here.
 
 ---
 
@@ -350,7 +350,7 @@ The SIL asks the SMR to resolve the `compare_portfolios` operation, then resolve
 
 > **Governing principles:** [P2 — Governance before execution](./01-platform-overview.md#design-principles) · [P10 — Deterministic computation, not generation](./01-platform-overview.md#design-principles)
 
-The Semantic Intent Layer receives a structured MCP tool call — an `operation_id` and a `params` dict — and produces a validated, engine-agnostic Logical Query Plan (LQP). It is entirely deterministic: no AI model runs inside it. Its purpose is to: (1) resolve the operation from the SMR DCS catalogue, (2) validate `params` against the operation's `required_params` schema, (3) resolve metric IDs within `params` against `analytical_metric` documents, (4) apply role predicates from RAPL, (5) build the LQP. The output — the LQP — contains no backend references, no SQL, and no physical schema identifiers: only analytical operations expressed against SMR-registered concepts.
+The Semantic Intent Layer receives a structured MCP tool call (an `operation_id` and a `params` dict) and produces a validated, engine-agnostic Logical Query Plan (LQP). It is entirely deterministic: no AI model runs inside it. Its purpose is to: (1) resolve the operation from the SMR DCS catalogue, (2) validate `params` against the operation's `required_params` schema, (3) resolve metric IDs within `params` against `analytical_metric` documents, (4) apply role predicates from RAPL, (5) build the LQP. The output (the LQP) contains no backend references, no SQL, and no physical schema identifiers: only analytical operations expressed against SMR-registered concepts.
 
 ### Five-Stage Validation Pipeline
 
@@ -370,7 +370,7 @@ flowchart TD
 
 ### Intent Parameter Schema
 
-All `run_analytics` calls use the same outer envelope. The `params` dict is operation-specific — its valid keys are defined by the `required_params` and `optional_params` fields on the `analytical_operation` document in the SMR DCS catalogue.
+All `run_analytics` calls use the same outer envelope. The `params` dict is operation-specific. Its valid keys are defined by the `required_params` and `optional_params` fields on the `analytical_operation` document in the SMR DCS catalogue.
 
 | Parameter | Type | Description |
 |---|---|---|
@@ -500,7 +500,7 @@ Node `n3` is the RAPL row predicate — part of the plan, not a post-execution f
 
 > **Governing principles:** [P5 — Role-aware by default](./01-platform-overview.md#design-principles) · [P1 — Semantic abstraction](./01-platform-overview.md#design-principles)
 
-The Role-Aware Projection Layer applies the authenticated user's entitlement model to the resolved analytical intent before any query plan is compiled. It is the semantic-layer enforcement of data access controls — operating above physical execution, before any query reaches a backend. Projection is not optional and not bypassable: every request, whether from a human user or an AI orchestrator, passes through it.
+The Role-Aware Projection Layer applies the authenticated user's entitlement model to the resolved analytical intent before any query plan is compiled. It is the semantic-layer enforcement of data access controls, operating above physical execution before any query reaches a backend. Projection is not optional and not bypassable: every request, whether from a human user or an AI orchestrator, passes through it.
 
 ### Restriction Types
 
@@ -532,7 +532,7 @@ flowchart TD
 
 ### Multi-Role Merging
 
-Users may hold multiple roles simultaneously. The projection layer merges role entitlements using union semantics for metric and dimension access — a user entitled to a metric via any role may query it. Row predicates and column masks use the inverse strategy: all predicates must be satisfied (most restrictive wins), and a column masked by any role is masked for the user.
+Users may hold multiple roles simultaneously. The projection layer merges role entitlements using union semantics for metric and dimension access. A user entitled to a metric via any role may query it. Row predicates and column masks use the inverse strategy: all predicates must be satisfied (most restrictive wins), and a column masked by any role is masked for the user.
 
 | Entitlement type | Merge strategy | Rationale |
 |---|---|---|
@@ -582,7 +582,7 @@ Column masks are applied during FQP result assembly, after sub-results return fr
 
 ### Entitlement Audit
 
-Every projection decision — including blocked metrics, applied row predicates, and active column masks — is recorded in the lineage store as part of the execution record. The projection record captures the roles active at query time, which metrics were requested, which were projected through, which were blocked and why, and which predicates were injected. This record provides the evidentiary chain required for regulatory entitlement audits.
+Every projection decision (including blocked metrics, applied row predicates, and active column masks) is recorded in the lineage store as part of the execution record. The projection record captures the roles active at query time, which metrics were requested, which were projected through, which were blocked and why, and which predicates were injected. This record provides the evidentiary chain required for regulatory entitlement audits.
 
 ### Example
 
@@ -608,7 +608,7 @@ No column masks apply — the `portfolio_manager` role has no masking rules for 
 
 > **Governing principles:** [P2 — Governance before execution](./01-platform-overview.md#design-principles) · [P8 — Explainability at every layer](./01-platform-overview.md#design-principles) · [P9 — Administrator sovereignty](./01-platform-overview.md#design-principles)
 
-The Semantic Execution Governance (SEG) layer applies a suite of circuit breakers, cost controls, complexity limits, and compliance classification checks to every query before it is released to the Federated Query Planner. It is the final gate before physical execution. Governance applies to every query without exception — there is no privileged user, trusted agent, or internal path that bypasses SEG checks.
+The Semantic Execution Governance (SEG) layer applies a suite of circuit breakers, cost controls, complexity limits, and compliance classification checks to every query before it is released to the Federated Query Planner. It is the final gate before physical execution. Governance applies to every query without exception. There is no privileged user, trusted agent, or internal path that bypasses SEG checks.
 
 ### Governance Pipeline
 
