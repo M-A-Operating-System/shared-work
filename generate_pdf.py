@@ -47,11 +47,13 @@ PRODUCTS = {
     "assistant": {
         "title":  "AI Chat Platform",
         "meta":   "Draft v1.0 · May 2026",
+        "author": "Andrew Bush (www.maoperatingsystem.com/bio-andrew-bush)",
         "output": "assistant_product_design.pdf",
     },
     "analytics": {
         "title":  "AI Analytics Platform",
         "meta":   "Draft v1.0 · May 2026",
+        "author": "Andrew Bush (www.maoperatingsystem.com/bio-andrew-bush)",
         "output": "analytics_product_design.pdf",
     },
 }
@@ -225,7 +227,7 @@ def inject_mermaid(html: str, placeholders: dict[str, str]) -> str:
 
 
 def build_html(files: list[Path], title: str, meta: str,
-               subs: dict[str, str] | None = None) -> str:
+               author: str = "", subs: dict[str, str] | None = None) -> str:
     import markdown
 
     md = markdown.Markdown(
@@ -256,8 +258,11 @@ def build_html(files: list[Path], title: str, meta: str,
         extra_class = " first-section" if i == 0 else ""
         sections.append(f'<section class="doc-section{extra_class}">{body}</section>')
 
-    safe_title = _html.escape(title)
-    safe_meta  = _html.escape(meta)
+    safe_title  = _html.escape(title)
+    safe_meta   = _html.escape(meta)
+    safe_author = _html.escape(author)
+
+    author_line = f'\n    <p class="cover-author">{safe_author}</p>' if safe_author else ""
 
     cover = f"""
 <div class="cover-page">
@@ -266,7 +271,7 @@ def build_html(files: list[Path], title: str, meta: str,
     <p class="cover-category">Product Design</p>
     <h1 class="cover-title">{safe_title}</h1>
     <hr class="cover-rule">
-    <p class="cover-meta">{safe_meta}</p>
+    <p class="cover-meta">{safe_meta}</p>{author_line}
   </div>
 </div>"""
 
@@ -336,6 +341,7 @@ CSS = """
     margin: 0 0 8mm;
 }
 .cover-meta { font-size: 9pt; color: #9ca3af; margin: 0; }
+.cover-author { font-size: 9pt; color: #9ca3af; margin: 4pt 0 0 0; }
 
 /* Document sections */
 .doc-section           { page-break-before: always; }
@@ -505,6 +511,7 @@ def generate_product(name: str, config: dict) -> None:
 
     print("Building HTML…")
     html = build_html(files, config["title"], config["meta"],
+                      author=config.get("author", ""),
                       subs={"{{PRODUCT_NAME}}": name})
 
     print("Rendering PDF (this may take a moment)…")
@@ -579,7 +586,8 @@ def generate_page(file_path: Path) -> None:
 
     print(f"\n── page: {file_path.name} ──────────────────────────────────────────")
     print("Building HTML…")
-    html = build_html([file_path], page_title, config["meta"])
+    html = build_html([file_path], page_title, config["meta"],
+                      author=config.get("author", ""))
 
     print("Rendering PDF…")
     from weasyprint import HTML, CSS as WeasyprintCSS
