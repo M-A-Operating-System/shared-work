@@ -197,19 +197,17 @@ The cumulative effect is a system with a large engineering investment in partial
 
 ### Query cost is uncontrollable
 
-LLM-generated SQL is written to satisfy the question semantically, not to execute efficiently. Missing partition filters, full table scans, and unoptimised aggregations are common. In cloud data warehouses billed by query cost, Snowflake, BigQuery, Databricks, a single malformed query can consume significant budget. There is no pre-execution cost estimate, no circuit breaker, and no query cost governance. The result is unpredictable infrastructure spend with no reliable way to prevent it, because there is no way to put a hard limit on what an LLM will generate.
+LLM-generated SQL is written to satisfy the question semantically, not to execute efficiently. Missing partition filters, full table scans, and unoptimised aggregations are common. In cloud data warehouses billed by query cost (Snowflake, BigQuery, Databricks), a single malformed query can consume significant budget. There is no pre-execution cost estimate, no circuit breaker, and no query cost governance. The result is unpredictable infrastructure spend with no reliable way to prevent it, because there is no way to put a hard limit on what an LLM will generate.
 
 ### Schema changes create a continuous, untestable maintenance burden
 
 The AI model's ability to generate correct SQL depends entirely on its understanding of the physical schema. That understanding is encoded in the schema context injected into every prompt, table names, column names, relationships, and the business meaning the prompt author has attributed to each. When the schema changes, that context must be updated by hand.
 
-In a production enterprise data environment, schemas change constantly. Tables are refactored during warehouse migrations. Columns are renamed to align with updated naming conventions. New source systems add new tables. Metrics that were once in a single table are decomposed into fact and dimension tables. Views replace raw tables. Partitioning strategies change. Each of these changes invalidates some portion of the schema context, and because the LLM's behaviour is probabilistic, there is no reliable way to know which queries broke until users report wrong answers or auditors find inconsistencies.
+In a production data environment, schemas change constantly: tables are refactored, columns renamed, source systems added, partitioning strategies revised. Each change invalidates some portion of the schema context. Because the LLM's behaviour is probabilistic, there is no reliable way to know which queries broke until users report wrong answers or auditors find inconsistencies.
 
-This creates a maintenance dependency that does not exist in a semantic layer architecture. In a governed semantic registry, the physical mapping between a metric definition and its source data is declared once, explicitly, by the data engineer who owns the source. When the schema changes, the mapping is updated in one place, the registry, and the change is propagated consistently to every query that uses that metric. The update is testable, versioned, and approved before it reaches production.
+In a governed semantic registry, the physical mapping between a metric and its source data is declared once. When the schema changes, the mapping is updated in one place, versioned, approved, and propagated consistently to every dependent query. In Text-to-SQL, the equivalent is: rewrite the affected portions of the system prompt, re-evaluate every query that might have touched the changed element, and accept that you cannot be certain you found all of them. As the data estate grows, the schema context grows with it, approaching context window limits and requiring increasing effort to maintain accurately.
 
-In Text-to-SQL, the equivalent of this update is: rewrite the affected portions of the system prompt, re-evaluate every query that might have touched the changed schema element, and accept that you cannot be certain you have found all affected queries. As the data estate grows, more tables, more source systems, more business concepts, the schema context grows with it, approaching context window limits and becoming increasingly difficult for any single prompt author to maintain accurately. Business logic that took months to express correctly in the schema context must be re-expressed after each significant refactor.
-
-The operational consequence is a standing maintenance team whose job is to keep the AI's schema understanding current, a team that grows with the complexity of the data estate and whose output cannot be deterministically verified. This is not a transitional cost; it is a permanent structural cost of the Text-to-SQL architecture.
+The result is a standing maintenance team whose job is to keep the AI's schema understanding current. That team grows with the complexity of the data estate, and its output cannot be deterministically verified. This is not a transitional cost. It is a permanent structural cost of the Text-to-SQL architecture.
 
 ---
 
@@ -297,21 +295,17 @@ The Model Context Protocol (MCP), introduced by Anthropic in late 2024, is desig
 
 Research from multiple independent security firms published in 2025–2026 reveals a systemic pattern of vulnerability. [Hadrian.io (Aug 2025)](https://hadrian.io/blog/the-ai-protocol-under-siege-mcp-server-vulnerabilities-expose-critical-threats) found 43% of tested MCP implementations contained command injection flaws; a [separate survey (Adversa AI, Jul 2025)](https://adversa.ai/blog/mcp-security-digest-july-2025/) identified nearly 500 servers exposed without any authentication. Most critically, Anthropic's own reference SQLite MCP server, forked over 5,000 times before being archived in May 2025, contained a classic SQL injection flaw that the company declined to patch, citing the repository's archived status.
 
-Even a demonstrably read-only SELECT surface is not a security boundary in the MCP context. The attack taxonomy below operates entirely within SELECT semantics, or exploits MCP-layer trust assumptions that bypass database-level read restrictions.
-
 ---
 
 ### The "Bobby Tables" Baseline
 
-The canonical xkcd #327 "Bobby Tables" attack (<https://xkcd.com/327/>) demonstrates a student named `Robert'); DROP TABLE students;--` whose name, when inserted unsanitised into a SQL statement, destroys the school database. This is a **write** operation (DROP TABLE).
+The classic [xkcd #327](https://xkcd.com/327/) injection attack destroys a database via an unsanitised INSERT. The naive response, "we only allow SELECT", is dangerously incomplete in the MCP context:
 
-The naive mitigation, "we only allow SELECT", is dangerously incomplete in the MCP context for the following compounding reasons:
-
-- **UNION operators** allow an attacker to append arbitrary SELECT statements to a legitimate query, retrieving data from any accessible table.
+- **UNION operators** append arbitrary SELECT statements to a legitimate query, retrieving data from any accessible table.
 - **Schema enumeration** via `information_schema` or `pg_catalog` maps the entire database structure before any targeted exfiltration.
-- **Transaction escape** (semicolon stacking) can break out of a wrapping read-only transaction, converting a SELECT surface into an unrestricted execution context.
-- **Out-of-band channels** enable silent data exfiltration via DNS or TCP, invisible to the MCP response layer.
-- **Stored prompt injection** requires no SQL skill: an attacker pre-populates a record with LLM instruction text, which the agent then reads via a completely legitimate SELECT and acts upon.
+- **Transaction escape** (semicolon stacking) breaks out of a wrapping read-only transaction, converting a SELECT surface into an unrestricted execution context.
+- **Out-of-band channels** exfiltrate data via DNS or TCP, invisible to the MCP response layer.
+- **Stored prompt injection** requires no SQL skill: an attacker pre-populates a record with LLM instruction text, which the agent reads via a completely legitimate SELECT and acts upon.
 
 ---
 
@@ -417,10 +411,10 @@ COMMIT; COPY (SELECT * FROM customers) TO '/tmp/exfil.csv';
 
 This attack class has no analogue in traditional web application security. It requires **zero SQL injection skill**, only write access to any record the agent will subsequently SELECT. The SQL itself is entirely legitimate.
 
-1. **Poison**, Attacker writes LLM instruction syntax into any writeable field in any table the agent queries.
-2. **Trigger**, A legitimate user asks a benign question: *"Show me recent support tickets."*
-3. **Execute**, The MCP tool runs `SELECT * FROM tickets WHERE status='open'`. The poisoned record is returned.
-4. **Hijack**, The LLM treats the embedded instruction as a directive and acts on it, e.g., invoking an email MCP to exfiltrate customer data.
+1. **Poison**: Attacker writes LLM instruction syntax into any writeable field in any table the agent queries.
+2. **Trigger**: A legitimate user asks a benign question: *"Show me recent support tickets."*
+3. **Execute**: The MCP tool runs `SELECT * FROM tickets WHERE status='open'`. The poisoned record is returned.
+4. **Hijack**: The LLM treats the embedded instruction as a directive and acts on it, e.g., invoking an email MCP to exfiltrate customer data.
 
 ```sql
 -- No SQL injection required. Attacker only needs normal write access.
@@ -463,7 +457,7 @@ Controls that are highly effective in traditional web application contexts provi
 | Read-only DB role | ✔ Prevents writes | ⚠ Insufficient alone | Transaction escape bypasses; SELECT still enables full exfiltration. |
 | WAF / pattern matching | ✔ Useful layer | ⚠ Weak | LLM-generated SQL obfuscates patterns; NL intermediate layer breaks WAF heuristics. |
 | Error suppression | ✔ Reduces error-based SQLi | ✔ Applicable | Blind SQLi remains possible without error output. |
-| Stored prompt injection |, N/A | ✘ No standard web control | Entirely novel to agentic systems; requires output sanitisation layer, see Recommended Mitigations below. |
+| Stored prompt injection | N/A | ✘ No standard web control | Entirely novel to agentic systems; requires output sanitisation layer, see Recommended Mitigations below. |
 
 The fundamental issue is structural: traditional defences assume a fixed, developer-controlled query surface. In the MCP context, the query surface is dynamic, shaped in real time by LLM reasoning, natural language input, and agentic tool-chaining, making pattern-based controls unreliable as a primary defence.
 
@@ -471,19 +465,19 @@ The fundamental issue is structural: traditional defences assume a fixed, develo
 
 ### Applicable OWASP Standards and References
 
-**OWASP A03:2021, Injection**
+**OWASP A03:2021 — Injection**
 <https://owasp.org/Top10/A03_2021-Injection/>
 The foundational injection vulnerability category covering SQL injection. Fully applicable to MCP query tools.
 
-**OWASP LLM01, Prompt Injection**
+**OWASP LLM01 — Prompt Injection**
 <https://owasp.org/www-project-top-10-for-large-language-model-applications/>
 The primary AI-specific risk. Direct and indirect prompt injection via tool responses.
 
-**OWASP Agentic Top 10, ASI04: Agentic Supply Chain Vulnerabilities**
+**OWASP Agentic Top 10, ASI04 — Agentic Supply Chain Vulnerabilities**
 <https://owasp.org/www-project-top-10-for-agentic-applications/>
 Covers malicious MCP servers, poisoned prompt templates, and compromised tool registries. Published December 2025.
 
-**OWASP API Security Top 10, Broken Object Level Authorisation**
+**OWASP API Security Top 10 — Broken Object Level Authorisation**
 <https://owasp.org/www-project-api-security/>
 MCP tools that expose row-level data without object-level access controls are directly susceptible.
 
@@ -493,7 +487,7 @@ MCP tools that expose row-level data without object-level access controls are di
 
 The following controls are listed in priority order. Controls marked **[MANDATORY]** should be considered non-negotiable for any MCP query tool exposed to untrusted input.
 
-**Priority 1, Parameterised Queries [MANDATORY]**
+**Priority 1: Parameterised Queries [MANDATORY]**
 
 Ensure all MCP tool query construction uses prepared statements / parameterised queries. User-supplied values must be bound as parameters, never concatenated into the query string. This is the single most effective control and eliminates the majority of injection vectors.
 
@@ -508,7 +502,7 @@ cursor.execute(
 )
 ```
 
-**Priority 2, Statement-Level Query Parsing (MCP-Specific)**
+**Priority 2: Statement-Level Query Parsing (MCP-Specific)**
 
 Reject any input containing semicolons, `COMMIT`, `ROLLBACK`, `BEGIN`, or other statement terminators before execution. An MCP query tool should never accept multi-statement input. Parse and validate at the MCP server layer before the query reaches the database driver. Note: regex blocklists are a starting point but are not sufficient alone, they can be bypassed via comment obfuscation and Unicode normalisation. Statement parsing should be combined with a SQL AST parser for robust enforcement.
 
@@ -532,23 +526,23 @@ def validate_query(sql: str) -> None:
             raise ValueError(f"Forbidden pattern detected: {pattern}")
 ```
 
-**Priority 3, Dedicated Read-Only Database Role with Column-Level Grants**
+**Priority 3: Dedicated Read-Only Database Role with Column-Level Grants**
 
 Do not use a superuser or schema-owner connection for the MCP tool. Create a dedicated role with `SELECT` grants only on specific columns of specific tables. Explicitly revoke access to `information_schema`, `pg_catalog`, and system tables where enumeration is not required.
 
-**Priority 4, Disable Dangerous Database Features for the MCP Role**
+**Priority 4: Disable Dangerous Database Features for the MCP Role**
 
 In PostgreSQL: revoke or disable `dblink`, `pg_read_file`, `COPY TO`, and `lo_export` for the MCP database role. These are common out-of-band exfiltration enablers that have no legitimate use in a read-only query context.
 
-**Priority 5, Tool Response Sanitisation (Stored Prompt Injection)**
+**Priority 5: Tool Response Sanitisation (Stored Prompt Injection)**
 
 Sanitise MCP tool results before returning them to the LLM context. Strip or escape any content resembling LLM instruction syntax (`SYSTEM:`, `[INST]`, `<instruction>`, `role: system`, etc.) from database-sourced strings. This is the only effective control against stored prompt injection attacks.
 
-**Priority 6, Output Row Caps and Rate Limiting**
+**Priority 6: Output Row Caps and Rate Limiting**
 
 Limit the number of rows a single tool call can return. A UNION-based exfiltration of a 500,000-row credentials table should be operationally impractical. Apply query-level `LIMIT` enforcement at the MCP server layer, not relying on the database role alone.
 
-**Priority 7, MCP Server Authentication [MANDATORY]**
+**Priority 7: MCP Server Authentication [MANDATORY]**
 
 MCP servers must require authenticated connections. Unauthenticated MCP servers, of which nearly 500 were identified in a 2025–2026 survey, expose the full query surface to any network-accessible client without any identity or entitlement context. Mutual TLS or token-based authentication (e.g., OAuth 2.0 bearer tokens) should be enforced at the MCP transport layer. An unauthenticated MCP server renders all other controls in this list irrelevant: there is no authenticated session against which entitlements can be evaluated or audit records attributed.
 
