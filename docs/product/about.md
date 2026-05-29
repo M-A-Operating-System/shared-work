@@ -4,8 +4,6 @@ This document is part of the **M&A Operating System** product design specificati
 
 This is a living specification. It reflects design intent at the time of publication and will be updated as the product evolves.
 
----
-
 ## About M&A Operating System
 
 M&A Operating System is a boutique advisory firm focused on helping organizations modernize the operational foundations required for scalable analytics, trusted enterprise information, and practical AI adoption.
@@ -25,14 +23,9 @@ M&A Operating System's approach combines:
 - Transformation execution and delivery leadership
 - Practical AI operationalization and readiness
 
-Our engagements are led directly by experienced operators and transformation leaders with deep experience across investment banking, asset management, financial services, travel technology, and regulated industries.
-
 Our goal is simple: help organizations build practical, scalable, and trusted information foundations that improve operational effectiveness, accelerate analytics and AI adoption, and support better business outcomes.
-
----
 
 ## Find Out More
 
 To learn more about M&A Operating System, explore the platform, or speak with our team:
-
 [maoperatingsystem.com](https://maoperatingsystem.com?utm_source=shared_work-{{PRODUCT_NAME}})
