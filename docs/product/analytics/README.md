@@ -12,7 +12,7 @@
 
 ## Abstract
 
-The AI Analytics Platform is a **deterministic semantic computation engine** designed for AI-native enterprise analytics. It exposes governed, role-aware analytical capabilities to any MCP-compatible consumer — conversational AI assistants, autonomous agents, and custom applications — through a headless JSON API backed by a federated query planner, a governed Semantic Metrics Registry, and a complete analytical lineage store.
+The AI Analytics Platform is a **deterministic semantic computation engine** designed for AI-native enterprise analytics. It exposes governed, role-aware analytical capabilities to any MCP-compatible consumer (conversational AI assistants, autonomous agents, and custom applications) through a headless JSON API backed by a federated query planner, a governed Semantic Metrics Registry, and a complete analytical lineage store.
 
 The platform eliminates Text-to-SQL as an architectural pattern for regulated analytics, replacing ad-hoc LLM query generation with a governed semantic layer where every metric is registered, every query is validated, every entitlement is enforced before execution, and every result carries a complete provenance record.
 
