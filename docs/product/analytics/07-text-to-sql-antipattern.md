@@ -6,7 +6,9 @@ Although this document frames the problem as Text-to-SQL, the risks described be
 
 While individual risk-mitigation approaches exist for each of the structural concerns described below, on aggregate the Text-to-SQL pattern is not recommended for large-scale regulated enterprises. Incremental patching reduces individual failure modes but cannot resolve the underlying architectural constraints — the pattern was not designed for governed financial analytics, and every mitigation introduces further engineering complexity without eliminating the root cause. The [Why Incremental Patching Fails](#why-incremental-patching-fails) section examines this dynamic in detail.
 
-The platform's alternative architecture — and why it is designed the way it is — is described in [Chapter 1 — Platform Overview](./01-platform-overview.md) and specified in full in [Chapter 3 — Core Platform Capabilities](./03-core-capabilities.md).
+Although the primary framing throughout is financial services, the governance failures described here are structurally identical in any sector where analytical outputs must be reproducible, auditable, and tied to versioned, approved definitions — including insurance, healthcare, and public sector analytics. The specific regulatory instruments differ; the architectural defects do not.
+
+The platform's alternative architecture — and why it is designed the way it is — is described in [Chapter 1 — Platform Overview](./01-platform-overview.md) and specified in full in [Chapter 3 — Core Platform Capabilities](./03-core-capabilities.md). For readers encountering this document standalone: the alternative separates the LLM's role (translating natural language into structured intent parameters — metric identifiers, dimensions, filters) from a deterministic governed layer (a Semantic Metrics Registry that holds versioned, approved formula definitions; a Role-Aware Projection that enforces entitlements before any query executes; and a Federated Query Planner that resolves and executes the plan against registered backends). The LLM never generates SQL, never sees the physical schema, and cannot influence entitlement decisions. The [Correct Pattern](#the-correct-pattern) section and accompanying comparison table describe this architecture in summary; the full specification is in Chapter 3.
 
 ---
 
@@ -95,7 +97,7 @@ For governed financial analytics, correctness is not approximate. An organisatio
 
 ## Information Security
 
-The following risks are structural — they exist because the LLM is simultaneously the query interface and the query generator, receiving user input and producing execution artefacts in the same probabilistic pass. Prompt guardrails, SQL validators, and output filters reduce surface area but cannot eliminate these risks. The only reliable defence is to remove the attack surface by separating the AI translation layer from the physical execution layer.
+The following risks are structural — they exist because the LLM is simultaneously the query interface and the query generator, receiving user input and producing execution artefacts in the same probabilistic pass. Prompt guardrails, SQL validators, and output filters reduce surface area but cannot eliminate these risks. The only reliable defence is to remove the attack surface by separating the AI translation layer from the physical execution layer. The appendix to this document — [SQL Injection in MCP-Exposed Query Services](#appendix-sql-injection-in-mcp-exposed-query-services) — provides a detailed technical taxonomy of the specific attack vectors that arise when SQL query access is exposed through an MCP tool to an LLM agent, with confirmed CVEs and recommended mitigations.
 
 ### Schema Exposure and Reconnaissance
 
@@ -525,6 +527,10 @@ Sanitise MCP tool results before returning them to the LLM context. Strip or esc
 **Priority 6 — Output Row Caps and Rate Limiting**
 
 Limit the number of rows a single tool call can return. A UNION-based exfiltration of a 500,000-row credentials table should be operationally impractical. Apply query-level `LIMIT` enforcement at the MCP server layer, not relying on the database role alone.
+
+**Priority 7 — MCP Server Authentication [MANDATORY]**
+
+MCP servers must require authenticated connections. Unauthenticated MCP servers — of which nearly 500 were identified in a 2025–2026 survey — expose the full query surface to any network-accessible client without any identity or entitlement context. Mutual TLS or token-based authentication (e.g., OAuth 2.0 bearer tokens) should be enforced at the MCP transport layer. An unauthenticated MCP server renders all other controls in this list irrelevant: there is no authenticated session against which entitlements can be evaluated or audit records attributed.
 
 ---
 
