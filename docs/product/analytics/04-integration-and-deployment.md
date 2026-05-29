@@ -1,8 +1,8 @@
 # 4. Integration and Deployment
 
-This chapter covers the complete integration surface of the AI Analytics Platform — how consumers authenticate and call it, how platform administrators configure it, the financial services reference model it ships with, and the complementary ecosystem services that extend its capabilities. The platform is deliberately narrow in its external interface: a single MCP endpoint governs all consumer access, and a single Admin API governs all configuration. Complexity lives inside the governance pipeline, not in the integration contract.
+This chapter covers the complete integration surface of the AI Analytics Platform: how consumers authenticate and call it, how platform administrators configure it, the financial services reference model it ships with, and the complementary ecosystem services that extend its capabilities. The platform is deliberately narrow in its external interface: a single MCP endpoint governs all consumer access, and a single Admin API governs all configuration. Complexity lives inside the governance pipeline, not in the integration contract.
 
-Component specifications — SMR, SIL, RAPL, SEG, FQP, VO, NSE, Lineage Store — are in [Chapter 3 — Core Platform Capabilities](./03-core-capabilities.md). The reference implementation stack is in [Chapter 5 — Proposed Technical Implementation](./05-technical-implementation.md).
+Component specifications (SMR, SIL, RAPL, SEG, FQP, VO, NSE, Lineage Store) are in [Chapter 3 — Core Platform Capabilities](./03-core-capabilities.md). The reference implementation stack is in [Chapter 5 — Proposed Technical Implementation](./05-technical-implementation.md).
 
 ---
 
@@ -16,7 +16,7 @@ Authorization: Bearer <host-issued-JWT>
 Content-Type: application/json
 ```
 
-There is no embeddable component, no client-side SDK, and no rendering layer. Any MCP-compatible consumer — a conversational AI assistant, an autonomous agent, a report pipeline, or a custom application — integrates identically. The platform is headless by design: it returns structured JSON results and display specifications; rendering is the consumer's responsibility.
+There is no embeddable component, no client-side SDK, and no rendering layer. Any MCP-compatible consumer (a conversational AI assistant, an autonomous agent, a report pipeline, or a custom application) integrates identically. The platform is headless by design: it returns structured JSON results and display specifications; rendering is the consumer's responsibility.
 
 ### Authentication
 
@@ -40,7 +40,7 @@ Every request must carry a host-issued JWT in the `Authorization: Bearer <token>
 | `display_name` | string | User's display name for lineage records and audit trail |
 | Any claim referenced in role `rowPredicates` | any | Any value referenced by `{{user.claim_name}}` in predicate templates |
 
-JWTs expire per the consuming application's standard session policy. When a token approaches expiry, the consuming application issues a refreshed JWT and includes it in the next request header — no platform-side re-authentication step is required. For long-running agentic consumers, the host must supply fresh JWTs before each preceding token's `exp` timestamp.
+JWTs expire per the consuming application's standard session policy. When a token approaches expiry, the consuming application issues a refreshed JWT and includes it in the next request header. No platform-side re-authentication step is required. For long-running agentic consumers, the host must supply fresh JWTs before each preceding token's `exp` timestamp.
 
 ### Response Structure
 
@@ -64,7 +64,7 @@ A successful response returns a JSON object containing the result record, a disp
 }
 ```
 
-Consumers branch on `display_spec.type`. A value of `"chart"` indicates a Semantic Charting Language specification — the consumer renders it using a chart grammar library of its choosing, consuming the `mark`, `data.values`, `encoding`, `colorScheme`, and `formatHints` fields. A value of `"table"` indicates a data grid specification — the consumer renders it with `columns` (including labels and format hints), `data`, and optional `thresholds` for cell highlighting. The platform governs which contract is selected and how it is parameterised; the consumer governs how it is rendered. The `narrative` field is present when `features.narrativeSynthesis` is enabled and the result meets the synthesis threshold — consumers may surface `narrative.lead` and `narrative.detail` as prose or pass them to a downstream document assembly pipeline. The `meta` field is available for consumer telemetry.
+Consumers branch on `display_spec.type`. A value of `"chart"` indicates a Semantic Charting Language specification. The consumer renders it using a chart grammar library of its choosing, consuming the `mark`, `data.values`, `encoding`, `colorScheme`, and `formatHints` fields. A value of `"table"` indicates a data grid specification. The consumer renders it with `columns` (including labels and format hints), `data`, and optional `thresholds` for cell highlighting. The platform governs which contract is selected and how it is parameterised; the consumer governs how it is rendered. The `narrative` field is present when `features.narrativeSynthesis` is enabled and the result meets the synthesis threshold. Consumers may surface `narrative.lead` and `narrative.detail` as prose or pass them to a downstream document assembly pipeline. The `meta` field is available for consumer telemetry.
 
 ### Drilldown Continuity
 
@@ -81,11 +81,11 @@ When a consumer receives a result containing a `result_id`, it may pass that ide
 }
 ```
 
-The platform retrieves the original result's projection scope, role filters, and entitlement context from the Analytical Lineage Store and applies them to the drilldown query. The consumer does not re-specify query parameters, dimensions, or time periods — governance context is fully preserved across the drill chain.
+The platform retrieves the original result's projection scope, role filters, and entitlement context from the Analytical Lineage Store and applies them to the drilldown query. The consumer does not re-specify query parameters, dimensions, or time periods. Governance context is fully preserved across the drill chain.
 
 ### Error Handling
 
-All errors return a structured response with `result_id` always present, ensuring every request — successful or not — appears in the audit trail and is reachable via the lineage API:
+All errors return a structured response with `result_id` always present. This ensures every request, successful or not, appears in the audit trail and is reachable via the lineage API:
 
 ```json
 {
@@ -101,11 +101,11 @@ The `message` field is human-readable and suitable for surfacing directly to end
 
 ### Agentic Consumers
 
-Autonomous agents — scheduled pipelines, event-triggered monitors, report generators — integrate identically to interactive consumers. The host must provision service-level JWTs for agents, scoped to the agent's role rather than a user's identity. The Role-Aware Projection Layer applies identical entitlement enforcement to agent JWTs as to user JWTs — an agent cannot access data that a user with the same role cannot access. Every agent-initiated request is recorded in the Analytical Lineage Store under the agent's `sub` claim, making agent queries distinguishable from user queries via the audit trail.
+Autonomous agents (scheduled pipelines, event-triggered monitors, report generators) integrate identically to interactive consumers. The host must provision service-level JWTs for agents, scoped to the agent's role rather than a user's identity. The Role-Aware Projection Layer applies identical entitlement enforcement to agent JWTs as to user JWTs. An agent cannot access data that a user with the same role cannot access. Every agent-initiated request is recorded in the Analytical Lineage Store under the agent's `sub` claim, making agent queries distinguishable from user queries via the audit trail.
 
 ### vite2img (Optional Rendering Service)
 
-vite2img is a standalone MCP render service that may be registered directly with consumers as a peer MCP server, alongside the Analytics Platform. It accepts `display_spec` JSON and returns SVG or PNG. It is not part of the Analytics Platform and carries no governance or lineage obligations — it is a rendering utility for consumers that require image output rather than a chart grammar payload.
+vite2img is a standalone MCP render service that may be registered directly with consumers as a peer MCP server, alongside the Analytics Platform. It accepts `display_spec` JSON and returns SVG or PNG. It is not part of the Analytics Platform and carries no governance or lineage obligations. It is a rendering utility for consumers that require image output rather than a chart grammar payload.
 
 ---
 
@@ -152,7 +152,7 @@ Execution backends are registered in the Data Source Catalog via the Admin API. 
 | `capabilities` | Yes | Operations the FQP may route to this backend: `aggregate`, `filter`, `join`, `window`, `timeseries`, `metric`, `traverse` |
 | `costTier` | No | Relative execution cost: `minimal`, `low`, `standard`, `high`, `unrestricted` — used by the governance circuit breaker when estimating query cost |
 
-Multiple backends may share the same `dataAffinity` value; the FQP selects among them based on `priority`, `capabilities`, and backend availability. If a backend declares `authType: "bearer"`, the user's own JWT is forwarded — entitlement enforcement at the backend layer is then the consuming system's responsibility, and the platform's row-level predicate injection still applies upstream.
+Multiple backends may share the same `dataAffinity` value; the FQP selects among them based on `priority`, `capabilities`, and backend availability. If a backend declares `authType: "bearer"`, the user's own JWT is forwarded. Entitlement enforcement at the backend layer is then the consuming system's responsibility, and the platform's row-level predicate injection still applies upstream.
 
 ### Governance Settings
 
@@ -206,7 +206,7 @@ The scope, model, and feature blocks configure the platform's analytical domain,
 }
 ```
 
-`analyticalDomain` scopes the SMR seed template to the configured domain. `regulatoryJurisdiction` influences compliance mode defaults and regulatory threshold sourcing. `requiresIntentConfirmation` — when `true` — returns a confirmation card to the consumer before executing any query; this is appropriate for high-stakes or irreversible analytical operations. The `models` block selects between available inference tiers for the Narrative Synthesis Engine; `"fast"` maps to Claude Haiku and reduces latency, `"standard"` maps to Claude Sonnet and is the balanced default for complex queries. Intent resolution is performed by the consuming AI client — it is not configured here. Individual features in the `features` block may be toggled without affecting the governance pipeline — disabling `narrativeSynthesis`, for example, removes the narrative field from responses but has no effect on lineage, entitlement enforcement, or result computation.
+`analyticalDomain` scopes the SMR seed template to the configured domain. `regulatoryJurisdiction` influences compliance mode defaults and regulatory threshold sourcing. When `requiresIntentConfirmation` is `true`, the platform returns a confirmation card to the consumer before executing any query. This is appropriate for high-stakes or irreversible analytical operations. The `models` block selects between available inference tiers for the Narrative Synthesis Engine: `"fast"` maps to Claude Haiku and reduces latency, `"standard"` maps to Claude Sonnet and is the balanced default for complex queries. Intent resolution is performed by the consuming AI client and is not configured here. Individual features in the `features` block may be toggled without affecting the governance pipeline. Disabling `narrativeSynthesis`, for example, removes the narrative field from responses but has no effect on lineage, entitlement enforcement, or result computation.
 
 ### SMR Administration Settings
 
@@ -224,7 +224,7 @@ The `metricRegistry` block configures governance over the Semantic Metrics Regis
 }
 ```
 
-`seedTemplate` specifies one or more reference model domains to seed into the SMR at initialisation — see the Financial Services Reference Model section below. `approvalRequired` gates all new and modified metric definitions behind an Application Admin approval step before they become resolvable. `ownershipRequired` mandates that every metric definition carries an assigned owner — unowned definitions cannot be promoted to `approved` status. `versionControl` enables automatic semantic versioning of all SMR definitions; changes that modify a metric's formula, dimension bindings, or data domain increment the definition's version and preserve the prior version in history. `fiscalYearStartMonth` sets the fiscal calendar anchor for time-relative metric expressions such as `YTD` and `FY`.
+`seedTemplate` specifies one or more reference model domains to seed into the SMR at initialisation (see the Financial Services Reference Model section below). `approvalRequired` gates all new and modified metric definitions behind an Application Admin approval step before they become resolvable. `ownershipRequired` mandates that every metric definition carries an assigned owner. Unowned definitions cannot be promoted to `approved` status. `versionControl` enables automatic semantic versioning of all SMR definitions; changes that modify a metric's formula, dimension bindings, or data domain increment the definition's version and preserve the prior version in history. `fiscalYearStartMonth` sets the fiscal calendar anchor for time-relative metric expressions such as `YTD` and `FY`.
 
 ### Registration Validation
 
@@ -238,7 +238,7 @@ On submission of a backend registration or governance configuration change, the 
 | Metric access references | Any metric definition referencing a backend via `data.domain` is checked for affinity alignment — a metric whose domain has no matching backend generates a resolution warning |
 | Compliance mode compatibility | Where `complianceMode` is set, the platform verifies that the `regulatoryJurisdiction` and `blockedClassifications` configuration is consistent with the compliance mode's requirements |
 
-Validation warnings do not block registration — they are surfaced in the Admin Console and available via the Admin API response. Validation errors (unreachable endpoint, invalid schema) block the registration until resolved.
+Validation warnings do not block registration. They are surfaced in the Admin Console and available via the Admin API response. Validation errors (unreachable endpoint, invalid schema) block the registration until resolved.
 
 ---
 
@@ -257,15 +257,15 @@ The reference model covers six primary domains:
 | **Banking** | NIM, RWA density, provision coverage, cost-to-income, deposit beta | Finance, treasury, credit risk |
 | **ESG** | Carbon intensity, ESG score, engagement coverage, exclusion exposure | Sustainability analysts, client reporting |
 
-All reference model definitions enter the SMR in `proposed` status and require Application Admin approval before they become resolvable. This ensures that no reference definition is served to users before an authorised administrator has confirmed it reflects the organisation's calculation methodology. Definitions that have been approved may subsequently be customised — modified definitions are marked `source: "tenant"` and increment their version, preserving the original reference definition in version history. Tenant-modified definitions are not overwritten by future reference model updates.
+All reference model definitions enter the SMR in `proposed` status and require Application Admin approval before they become resolvable. This ensures that no reference definition is served to users before an authorised administrator has confirmed it reflects the organisation's calculation methodology. Approved definitions may subsequently be customised. Modified definitions are marked `source: "tenant"` and increment their version, preserving the original reference definition in version history. Tenant-modified definitions are not overwritten by future reference model updates.
 
-The hierarchies shipped with the reference model — including the asset class hierarchy (Equity → Developed Market / Emerging Market, Fixed Income → Government / Corporate / Securitised, Alternatives, Cash), geography hierarchy (EMEA / Americas / Asia Pacific), and time hierarchy (Year → Quarter → Month → Week → Day) — are available for governed drilldown immediately upon approval of the associated dimension definitions.
+The hierarchies shipped with the reference model (including the asset class hierarchy, geography hierarchy, and time hierarchy) are available for governed drilldown immediately upon approval of the associated dimension definitions.
 
 ---
 
 ## 4.4 Complementary Ecosystem Services
 
-Three ecosystem services extend the platform's capabilities for financial services deployments. None is a hard dependency for platform operation — the platform functions with any combination of these services present or absent.
+Three ecosystem services extend the platform's capabilities for financial services deployments. None is a hard dependency for platform operation. The platform functions with any combination of these services present or absent.
 
 | Service | Type | Activation | Primary benefit |
 |---------|------|------------|-----------------|
@@ -288,18 +288,18 @@ The service organises content into six domain packages:
 | `fsi-regulatory-v1` | Regulatory reporting (Basel III/IV, MiFID II, AIFMD) | 60 metric definitions |
 | `fsi-esg-v1` | ESG and sustainable investment metrics | 45 metric definitions |
 
-Each package is imported via a single Admin API call referencing the package identifier and version. Imported definitions enter the SMR as `proposed` and follow the normal approval workflow. Administrators may modify imported definitions before or after approval — modifications are tracked under `source: "tenant"`. When the Semantic Registry Service publishes an updated package version, administrators receive a notification and may selectively import the delta.
+Each package is imported via a single Admin API call referencing the package identifier and version. Imported definitions enter the SMR as `proposed` and follow the normal approval workflow. Administrators may modify imported definitions before or after approval. Modifications are tracked under `source: "tenant"`. When the Semantic Registry Service publishes an updated package version, administrators receive a notification and may selectively import the delta.
 
 The `seedTemplate` configuration field seeds the SMR from a snapshot of the relevant Semantic Registry Service package pre-bundled at platform installation. The live Semantic Registry Service provides the most current definitions and access to packages beyond the core seed templates.
 
 ### Regulatory Reference Service
 
-The Regulatory Reference Service is a runtime execution backend registered in the Data Source Catalog with `dataAffinity: ["regulatory"]`. Once registered, the Federated Query Planner routes all sub-plans carrying metrics whose `data.domain` is `regulatory` to the service — ensuring that threshold values for LCR, NSFR, leverage ratio, capital ratios, and equivalent metrics are always sourced from the authoritative service rather than from host-maintained tables that may lag regulatory publication schedules.
+The Regulatory Reference Service is a runtime execution backend registered in the Data Source Catalog with `dataAffinity: ["regulatory"]`. Once registered, the Federated Query Planner routes all sub-plans carrying metrics whose `data.domain` is `regulatory` to the service. This ensures that threshold values for LCR, NSFR, leverage ratio, capital ratios, and equivalent metrics are always sourced from the authoritative service rather than from host-maintained tables that may lag regulatory publication schedules.
 
-The service holds current threshold values for each registered regulatory regime, jurisdiction-specific where required, and publishes update notifications to registered tenants when threshold values change — for example, when a jurisdiction's minimum LCR is revised or a Basel IV transition date is confirmed. If the Regulatory Reference Service is unavailable, the FQP falls back to the next registered backend with `regulatory` data affinity; if no fallback is configured, regulatory sub-plans fail with a structured error. The platform does not fabricate regulatory threshold values when the authoritative source is unavailable.
+The service holds current threshold values for each registered regulatory regime, jurisdiction-specific where required, and publishes update notifications to registered tenants when threshold values change, for example when a jurisdiction's minimum LCR is revised or a Basel IV transition date is confirmed. If the Regulatory Reference Service is unavailable, the FQP falls back to the next registered backend with `regulatory` data affinity; if no fallback is configured, regulatory sub-plans fail with a structured error. The platform does not fabricate regulatory threshold values when the authoritative source is unavailable.
 
 ### Benchmark Data Service
 
 The Benchmark Data Service is a runtime execution backend registered in the Data Source Catalog with `dataAffinity: ["benchmarks"]`. It provides market index and benchmark data across equity indices (MSCI World, MSCI ACWI, S&P 500, FTSE All-World), fixed income indices (Bloomberg Global Aggregate, ICE BofA Investment Grade), multi-asset indices, factor indices (MSCI Minimum Volatility, Value, Quality, Momentum), and administrator-configured custom benchmark blends.
 
-The service operates under data licensing agreements with index providers. Tenants confirm their licensing entitlement per index — the service enforces licensing checks at the tenant level and blocks access to benchmarks for which the tenant has not confirmed entitlement. Custom benchmark blends may be configured by the platform administrator via the Benchmark Data Service Admin API, specifying component benchmark identifiers and weights; blended benchmarks are then accessible within queries using their registered identifier and subject to the same entitlement enforcement as component indices.
+The service operates under data licensing agreements with index providers. Tenants confirm their licensing entitlement per index. The service enforces licensing checks at the tenant level and blocks access to benchmarks for which the tenant has not confirmed entitlement. Custom benchmark blends may be configured by the platform administrator via the Benchmark Data Service Admin API, specifying component benchmark identifiers and weights; blended benchmarks are then accessible within queries using their registered identifier and subject to the same entitlement enforcement as component indices.
