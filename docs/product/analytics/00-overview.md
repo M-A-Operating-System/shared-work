@@ -131,7 +131,6 @@ flowchart LR
     end
     clients --> L
     clients --> M
-    L --> M
     M --> T1
     T1 --> T2
     T2 --> data
@@ -164,7 +163,6 @@ flowchart LR
     end
     clients --> L
     clients --> M
-    L --> M
     M --> P1
     P1 --> P2
     P2 --> P3
