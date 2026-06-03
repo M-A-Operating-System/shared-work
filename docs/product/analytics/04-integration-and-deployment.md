@@ -54,7 +54,7 @@ A successful response returns a JSON object containing the result record, a disp
     "type": "chart" | "table",
     "..."
   },
-  "narrative": { "lead": "...", "detail": "...", "anchoredTo": "..." },
+  "narrative": { "lead": "...", "detail": "...", "anchoredTo": ["..."] },
   "meta": {
     "latencyMs": 1285,
     "cacheHit":  false,
@@ -103,9 +103,9 @@ The `message` field is human-readable and suitable for surfacing directly to end
 
 Autonomous agents (scheduled pipelines, event-triggered monitors, report generators) integrate identically to interactive consumers. The host must provision service-level JWTs for agents, scoped to the agent's role rather than a user's identity. The Role-Aware Projection Layer applies identical entitlement enforcement to agent JWTs as to user JWTs. An agent cannot access data that a user with the same role cannot access. Every agent-initiated request is recorded in the Analytical Lineage Store under the agent's `sub` claim, making agent queries distinguishable from user queries via the audit trail.
 
-### vite2img (Optional Rendering Service)
+### vega2img (Optional Rendering Service)
 
-vite2img is a standalone MCP render service that may be registered directly with consumers as a peer MCP server, alongside the Analytics Platform. It accepts `display_spec` JSON and returns SVG or PNG. It is not part of the Analytics Platform and carries no governance or lineage obligations. It is a rendering utility for consumers that require image output rather than a chart grammar payload.
+vega2img is a standalone MCP render service that may be registered directly with consumers as a peer MCP server, alongside the Analytics Platform. It accepts `display_spec` JSON and returns SVG or PNG. It is not part of the Analytics Platform and carries no governance or lineage obligations. It is a rendering utility for consumers that require image output rather than a chart grammar payload.
 
 ---
 
@@ -182,7 +182,7 @@ The governance block controls the circuit breakers and compliance mode applied t
 | `blockedClassifications` | List of classification labels that trigger blocking when `classificationGating` is enabled. |
 | `requireLineageForExport` | When `true`, result export operations require a complete lineage record. Exports of results with incomplete lineage are blocked. |
 | `auditAllQueries` | When `true`, every query — including governance-blocked and authentication-failed requests — is written to the audit log. Platform-recommended setting is `true`. |
-| `complianceMode` | Activates compliance-specific behaviour: `mifid2` logs all queries involving client-related metrics; additional modes for `basel4`, `aifmd`, and `esg_sfdr` are available. |
+| `complianceMode` | Configures the active regulatory ruleset and trace targets (e.g. `mifid2` writes to `analytics.mifid2_trace`; `basel3` writes LCR/NSFR snapshots to `analytics.regulatory_snapshots`). This setting determines **which** rules and trace tables are applied — it does not trigger the compliance artifact tier. Escalation to the compliance tier is determined at runtime by two signals: `compliance_relevant: true` on the queried metrics AND the SIL classifying query intent as compliance-purpose. See [§Compliance Modes](./03-core-capabilities.md#compliance-modes). |
 
 ### Operational Settings
 

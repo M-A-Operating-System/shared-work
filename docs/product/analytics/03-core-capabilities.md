@@ -193,7 +193,7 @@ When the Analytics Engine returns the structured result, display spec, and narra
 
 ## Semantic Metrics Registry
 
-> **Governing principles:** [P1 — Semantic abstraction](./01-platform-overview.md#design-principles) · [P3 — Deterministic metric resolution](./01-platform-overview.md#design-principles) · [P9 — Administrator sovereignty](./01-platform-overview.md#design-principles)
+> **Governing principles:** [P1 — Semantic abstraction](./00-overview.md#design-principles) · [P3 — Deterministic metric resolution](./00-overview.md#design-principles) · [P9 — Administrator sovereignty](./00-overview.md#design-principles)
 
 The Semantic Metrics Registry (SMR) is the governing catalogue of every analytical concept resolvable on the platform. Before any query can be planned or executed, every identifier in that query (metrics, dimensions, hierarchies) must be registered in the SMR. This is an architectural constraint, not a policy: the Semantic Intent Layer rejects any identifier not present in the SMR for the active tenant, and nothing is queryable that is not registered.
 
@@ -218,6 +218,7 @@ Every metric in the SMR conforms to the following schema. This is the authoritat
   "label":       "Portfolio Return",
   "description": "Total return of a portfolio over the specified period, net of fees, expressed as a percentage.",
   "formula":     "(end_market_value - start_market_value + cash_flows) / start_market_value",
+  "compliance_relevant": false,
   "unit":        "percentage",
   "aggregation": {
     "default":     "value_weighted_average",
@@ -286,6 +287,7 @@ Every metric in the SMR conforms to the following schema. This is the authoritat
 | `lineage.upstream_metrics` | No | Other SMR metrics this metric is derived from. Used for lineage graph construction. |
 | `lineage.downstream_metrics` | No | SMR metrics that depend on this metric. Used for impact analysis when metric definitions change. |
 | `access.roles` | Yes | Role IDs from the entitlement config that may query this metric. |
+| `compliance_relevant` | No | When `true`, this metric's output may be used in regulatory reporting or compliance submissions. When combined with a compliance-purpose query intent (see §Semantic Intent Layer), the platform escalates to the enhanced compliance artifact tier. Set by the metric owner at registration. |
 
 ### Registry Governance Workflow
 
@@ -348,7 +350,7 @@ The SIL asks the SMR to resolve the `compare_portfolios` operation, then resolve
 
 ## Semantic Intent Layer
 
-> **Governing principles:** [P2 — Governance before execution](./01-platform-overview.md#design-principles) · [P10 — Deterministic computation, not generation](./01-platform-overview.md#design-principles)
+> **Governing principles:** [P2 — Governance before execution](./00-overview.md#design-principles) · [P10 — Deterministic computation, not generation](./00-overview.md#design-principles)
 
 The Semantic Intent Layer receives a structured MCP tool call (an `operation_id` and a `params` dict) and produces a validated, engine-agnostic Logical Query Plan (LQP). It is entirely deterministic: no AI model runs inside it. Its purpose is to: (1) resolve the operation from the SMR DCS catalogue, (2) validate `params` against the operation's `required_params` schema, (3) resolve metric IDs within `params` against `analytical_metric` documents, (4) apply role predicates from RAPL, (5) build the LQP. The output (the LQP) contains no backend references, no SQL, and no physical schema identifiers: only analytical operations expressed against SMR-registered concepts.
 
@@ -360,12 +362,13 @@ Every MCP tool call passes through five sequential validation stages:
 flowchart TD
     S1["**Stage 1: Schema validation**\nJSON parameters conform to tool schema\nRequired fields present and typed"]
     S2["**Stage 2: SMR resolution**\nResolve operation_id → analytical_operation document\nValidate params against operation required_params schema\nResolve metric IDs → analytical_metric documents\nResolve dimension IDs → analytical_dimension documents\nReject unregistered or unapproved IDs"]
+    S2b["**Stage 2b: Compliance intent classification**\nScore natural language query for compliance purpose (0–1)\ncomplex_purpose: true if score ≥ complianceIntentThreshold\nRecord score + matched signals in resolved intent"]
     S3["**Stage 3: Role-Aware Projection**\nFilter metric set to entitled scope\nFilter dimension set to entitled scope\nInject row predicates from role config\nApply column masks · Reject entitlement violations"]
     S4["**Stage 4: Semantic validation**\nRequired dimensions present per metric\nAggregation rules compatible\nTime granularity compatible per metric\nFilter predicates reference valid fields"]
     S5["**Stage 5: LQP generation**\nProduce engine-agnostic DAG\nAssign data affinity hints per metric\nEstimate result cardinality and execution cost"]
     LQP(["Logical Query Plan (LQP)"])
 
-    S1 --> S2 --> S3 --> S4 --> S5 --> LQP
+    S1 --> S2 --> S2b --> S3 --> S4 --> S5 --> LQP
 ```
 
 ### Intent Parameter Schema
@@ -436,7 +439,7 @@ The following illustrates how raw MCP tool call parameters are transformed throu
     { "id": "asset_class", "entitled": true }
   ],
   "row_predicates": [
-    "portfolio_id IN ('GLOB_EQ_OPP', 'UK_CORE_INC', 'STRAT_BAL')"
+    "portfolio_id IN ('GLOB_EQ_OPP', 'UK_CORE_INC', 'ASIA_PAC_GRW', 'EUR_BAL_INC')"
   ],
   "filters": [
     { "dimension": "asset_class", "operator": "eq", "value": "EQUITY" }
@@ -498,7 +501,7 @@ Node `n3` is the RAPL row predicate — part of the plan, not a post-execution f
 
 ## Role-Aware Projection Layer
 
-> **Governing principles:** [P5 — Role-aware by default](./01-platform-overview.md#design-principles) · [P1 — Semantic abstraction](./01-platform-overview.md#design-principles)
+> **Governing principles:** [P5 — Role-aware by default](./00-overview.md#design-principles) · [P1 — Semantic abstraction](./00-overview.md#design-principles)
 
 The Role-Aware Projection Layer applies the authenticated user's entitlement model to the resolved analytical intent before any query plan is compiled. It is the semantic-layer enforcement of data access controls, operating above physical execution before any query reaches a backend. Projection is not optional and not bypassable: every request, whether from a human user or an AI orchestrator, passes through it.
 
@@ -606,7 +609,7 @@ No column masks apply — the `portfolio_manager` role has no masking rules for 
 
 ## Semantic Execution Governance
 
-> **Governing principles:** [P2 — Governance before execution](./01-platform-overview.md#design-principles) · [P8 — Explainability at every layer](./01-platform-overview.md#design-principles) · [P9 — Administrator sovereignty](./01-platform-overview.md#design-principles)
+> **Governing principles:** [P2 — Governance before execution](./00-overview.md#design-principles) · [P8 — Explainability at every layer](./00-overview.md#design-principles) · [P9 — Administrator sovereignty](./00-overview.md#design-principles)
 
 The Semantic Execution Governance (SEG) layer applies a suite of circuit breakers, cost controls, complexity limits, and compliance classification checks to every query before it is released to the Federated Query Planner. It is the final gate before physical execution. Governance applies to every query without exception. There is no privileged user, trusted agent, or internal path that bypasses SEG checks.
 
@@ -662,7 +665,27 @@ Against a `maxQueryCostUnits: 1000` limit, this query is approved. Against a `50
 
 ### Compliance Modes
 
-Named compliance profiles pre-configure governance behaviour for specific regulatory environments:
+`complianceMode` sets the active regulatory ruleset and the trace targets used when the compliance artifact tier is active (e.g. `mifid2` writes to `analytics.mifid2_trace`; `basel3` writes LCR/NSFR snapshots to `analytics.regulatory_snapshots`). It does not by itself trigger the compliance artifact tier.
+
+**Compliance artifact tier trigger — two signals, both required (AND logic)**
+
+The platform escalates to the enhanced compliance artifact tier only when both of the following signals are true at runtime:
+
+| Signal | Source | True when |
+|---|---|---|
+| **Signal 1 — metric metadata** | `compliance_relevant` field on `analytical_metric` SMR definition | At least one resolved metric has `compliance_relevant: true`. Set by the metric owner at registration. |
+| **Signal 2 — AI intent classification** | Semantic Intent Layer compliance intent classification (Stage 2b) | `compliance_purpose_score` ≥ tenant-configured `compliance_intent_threshold` (default 0.8). The SIL classifies the natural language query and sets `compliance_purpose: true` if the score meets the threshold. |
+
+**Combined decision:**
+
+| `compliance_relevant` (any metric) | `compliance_purpose` (SIL classification) | Governance output |
+|---|---|---|
+| `true` | `true` | **Enhanced** — full compliance artifact tier active |
+| `true` | `false` | Standard governance output |
+| `false` | `true` | Standard governance output |
+| `false` | `false` | Standard governance output |
+
+The compliance mode rule tables below describe the additional rules and trace targets applied **when the compliance artifact tier is active** under each mode.
 
 **MiFID II mode** (`"complianceMode": "mifid2"`)
 
@@ -724,7 +747,7 @@ All checks pass. SEG writes a governance decision record to the lineage store �
 
 ## Federated Query Planner
 
-> **Governing principles:** [P1 — Semantic abstraction](./01-platform-overview.md#design-principles) · [P4 — Complete analytical lineage](./01-platform-overview.md#design-principles) · [P10 — Deterministic computation, not generation](./01-platform-overview.md#design-principles)
+> **Governing principles:** [P1 — Semantic abstraction](./00-overview.md#design-principles) · [P4 — Complete analytical lineage](./00-overview.md#design-principles) · [P10 — Deterministic computation, not generation](./00-overview.md#design-principles)
 
 The Federated Query Planner (FQP) is the only component in the platform that has knowledge of physical execution backends. No other component — not the Semantic Intent Layer, not the AI model, not the MCP Capability Layer — has access to backend connection details or physical schema information. The FQP receives a validated, governance-approved LQP, decomposes it into backend-specific sub-plans, routes those sub-plans to registered execution backends in parallel, assembles the results, and writes a complete execution record to the lineage store.
 
@@ -775,12 +798,13 @@ The FQP maintains a result cache keyed by the LQP signature — a deterministic 
 
 | Cache property | Specification |
 |---|---|
-| Cache key | SHA-256 of (metric IDs + versions, dimension IDs, filter predicates, time expression, entitlement hash, tenant ID) |
+| Cache key | SHA-256 of (metric IDs + versions, dimension IDs, filter predicates, time expression, entitlement hash, tenant ID). **Entitlement hash** is a SHA-256 of the fully resolved `row_predicates` and `column_masks` from the RAPL projection record for the request, computed after role merging. Two users with different effective predicates always produce different entitlement hashes and are never served each other's cached results. |
 | Cache TTL | Configurable per `data.refresh_cadence` in the metric definition. Default: 3600 seconds. |
 | Cache invalidation | On metric definition version change; on execution backend data refresh signal; on explicit cache clear via Admin API |
 | Cache scope | Per-tenant. Results from one tenant are never served to another. |
 | Cache storage | Platform-managed result cache. Results over 10 MB bypass the cache and are streamed directly. |
 | Cache hit disclosure | Cache hits are disclosed in the lineage record and optionally surfaced to the user as a "Result from cache (data as of [timestamp])" indicator. |
+| Cache bypass | Queries with `compliance_purpose: true` bypass the cache. Compliance artifacts must be freshly generated for each compliance-purpose execution; cached results cannot retroactively produce regulatory trace records. |
 
 ### Adaptive Planning
 
@@ -793,8 +817,8 @@ Both `portfolio_return` and `benchmark_return` have `data_affinity: "portfolio"`
 ```sql
 SELECT
     p.portfolio_id,
-    AVG(f.portfolio_return)  AS portfolio_return,
-    AVG(f.benchmark_return)  AS benchmark_return
+    SUM(f.portfolio_return * f.market_value) / SUM(f.market_value) AS portfolio_return,
+    SUM(f.benchmark_return * f.market_value) / SUM(f.market_value) AS benchmark_return
 FROM fact_portfolio_daily f
 JOIN dim_portfolio p ON f.portfolio_id = p.portfolio_id
 WHERE p.asset_class  = 'EQUITY'
@@ -826,7 +850,7 @@ The FQP writes an execution record to the lineage store and passes the assembled
 
 ## Visualisation Ontology
 
-> **Governing principles:** [P7 — Deterministic visualisation](./01-platform-overview.md#design-principles)
+> **Governing principles:** [P7 — Deterministic visualisation](./00-overview.md#design-principles)
 
 The Visualisation Ontology is the governing schema that maps result characteristics and analytical intent patterns to specific, parameterised chart contracts. It exists to make chart selection deterministic: the same analytical pattern produces the same chart type across all users, sessions, and AI model versions, regardless of how the question was phrased. The AI model does not select chart types. Intent signals from the query are treated as inputs to the ontology evaluation algorithm, but the ontology makes the final binding decision.
 
@@ -912,7 +936,7 @@ The ontology produces the following SCL display specification:
 
 ## Narrative Synthesis Engine
 
-> **Governing principles:** [P6 — Governed narrative](./01-platform-overview.md#design-principles) · [P10 — Deterministic computation, not generation](./01-platform-overview.md#design-principles)
+> **Governing principles:** [P6 — Governed narrative](./00-overview.md#design-principles) · [P10 — Deterministic computation, not generation](./00-overview.md#design-principles)
 
 The Narrative Synthesis Engine (NSE) is a secondary AI component inside the Analytics Engine. It runs after the computation pipeline completes — after the FQP has assembled the result and the Visualisation Ontology has selected the chart contract — making a single, tightly-scoped call to a language model with one purpose: summarise the structured result in plain language, anchored strictly to the computed values.
 
@@ -950,14 +974,14 @@ The portfolio manager's query returns four rows. The NSE receives the assembled 
 ```json
 {
   "narrative": {
-    "lead":       "3 of your 4 equity portfolios outperformed their benchmark this quarter.",
-    "detail":     "Global Equity Opportunities returned 4.21% against a benchmark of 3.85%. UK Core Income returned 2.87% against its benchmark of 2.54%. Asia Pacific Growth underperformed at 3.67% versus a benchmark of 3.90%.",
-    "anchoredTo": ["GLOB_EQ_OPP", "UK_CORE_INC", "ASIA_PAC_GRW"]
+    "lead":       "2 of your 4 equity portfolios outperformed their benchmark this quarter.",
+    "detail":     "Global Equity Opportunities returned 4.21% against a benchmark of 3.85%. UK Core Income returned 2.87% against its benchmark of 2.54%. Asia Pacific Growth and EUR Balanced Income underperformed, returning 3.67% and 1.93% respectively against benchmarks of 3.90% and 2.31%.",
+    "anchoredTo": ["GLOB_EQ_OPP", "UK_CORE_INC", "ASIA_PAC_GRW", "EUR_BAL_INC"]
   }
 }
 ```
 
-Post-generation validation confirms every numeric value (4.21, 3.85, 2.87, 2.54, 3.67, 3.90) is present in the assembled result rows. Validation passes. The narrative is included in the MCP response alongside `display_spec` and `data`.
+Post-generation validation confirms every verbatim numeric value cited in the narrative (4.21, 3.85, 2.87, 2.54, 3.67, 3.90, 1.93, 2.31) is present in the assembled result rows. Validation matches on exact numeric literals extracted from the narrative text — rounding differences or proportional expressions (e.g. "roughly 4.2%") may not be caught; residual hallucination risk applies to non-literal claims. Validation passes. The narrative is included in the MCP response alongside `display_spec` and `data`.
 
 ---
 
@@ -973,6 +997,7 @@ The Analytics Engine is headless: it produces no rendered output. Every successf
 | Structured result | `data` | Yes | The computed rows and schema — metric values, dimension values, and units. |
 | Governed narrative | `narrative` | No (feature-flag controlled) | A governed summary produced by the NSE — `lead` (one sentence), `detail` (2–4 sentences), `anchoredTo` (result row references). Present when `features.narrativeSynthesis` is enabled. |
 | Lineage reference | `result_id` + `lineage_url` | Yes | A unique result identifier and the URL of the full lineage record |
+| Compliance artifacts | `compliance` | No (compliance tier only) | Present when both `compliance_relevant` metrics are queried AND the SIL classifies query intent as compliance-purpose. Contains regulatory trace ID, triggered metrics/modes, classification enforcement flag, and export lineage requirement. |
 
 ### Full MCP Response Structure
 
@@ -990,19 +1015,31 @@ The Analytics Engine is headless: it produces no rendered output. Every successf
     "rows":   [ ... ]
   },
   "narrative": {
-    "lead":       "3 of your 4 equity portfolios outperformed their benchmark this quarter.",
-    "detail":     "Global Equity Opportunities returned 4.21% against a benchmark of 3.85%. UK Core Income returned 2.87% against its benchmark of 2.54%. Asia Pacific Growth underperformed at 3.67% versus a benchmark of 3.90%.",
-    "anchoredTo": ["GLOB_EQ_OPP", "UK_CORE_INC", "ASIA_PAC_GRW"]
+    "lead":       "2 of your 4 equity portfolios outperformed their benchmark this quarter.",
+    "detail":     "Global Equity Opportunities returned 4.21% against a benchmark of 3.85%. UK Core Income returned 2.87% against its benchmark of 2.54%. Asia Pacific Growth and EUR Balanced Income underperformed, returning 3.67% and 1.93% respectively against benchmarks of 3.90% and 2.31%.",
+    "anchoredTo": ["GLOB_EQ_OPP", "UK_CORE_INC", "ASIA_PAC_GRW", "EUR_BAL_INC"]
+  },
+  "compliance": {
+    "compliance_purpose":              true,
+    "intent_score":                    0.94,
+    "triggered_by_metrics":            ["lcr_ratio", "nsfr_ratio"],
+    "triggered_by_modes":              ["basel3"],
+    "regulatory_trace_id":             "trace_20260518_093247_lcr",
+    "artifact_set_version":            "1.0",
+    "export_requires_lineage":         true,
+    "classification_ceiling_applied":  true
   },
   "meta": {
     "latencyMs":    1285,
     "cacheHit":     false,
     "rowCount":     4,
     "backendsUsed": ["primary-warehouse"],
-    "costUnits":    500
+    "costUnits":    620
   }
 }
 ```
+
+The `compliance` block is absent for standard queries. Its presence indicates the full compliance artifact tier was active for this response.
 
 ### Semantic Charting Language (SCL)
 
@@ -1099,7 +1136,7 @@ The MCP Capability Layer assembles the SCL display specification and the NSE nar
       "cacheHit":     false,
       "rowCount":     4,
       "backendsUsed": ["primary-warehouse"],
-      "costUnits":    580
+      "costUnits":    620
     }
   }
 }
@@ -1111,7 +1148,7 @@ The chat engine renders the grouped bar chart inline and displays the narrative 
 
 ## Analytical Lineage Store
 
-> **Governing principles:** [P4 — Complete analytical lineage](./01-platform-overview.md#design-principles) · [P8 — Explainability at every layer](./01-platform-overview.md#design-principles)
+> **Governing principles:** [P4 — Complete analytical lineage](./00-overview.md#design-principles) · [P8 — Explainability at every layer](./00-overview.md#design-principles)
 
 The Analytical Lineage Store provides computation provenance: a complete, queryable record of how every result was calculated. Analytical lineage, as defined on this platform, is distinct from data lineage. Data lineage tracks how data moves between systems. Analytical lineage records how the analytics engine used specific metric definitions, entitlement rules, and execution backends to compute a specific result. The lineage record is not a log — it is a first-class data structure. A regulator, auditor, or internal reviewer must be able to reconstruct exactly how a specific number was calculated, by whom, under what entitlements, from which backends, and with what result — without re-running the query.
 
@@ -1243,7 +1280,7 @@ The document is immutable from the moment of writing. A corresponding row is ins
 
 ## MCP Capability Layer
 
-> **Governing principles:** [P2 — Governance before execution](./01-platform-overview.md#design-principles) · [P5 — Role-aware by default](./01-platform-overview.md#design-principles)
+> **Governing principles:** [P2 — Governance before execution](./00-overview.md#design-principles) · [P5 — Role-aware by default](./00-overview.md#design-principles)
 
 The MCP Capability Layer exposes the platform's governed analytical operations to AI orchestrators via MCP Streamable HTTP transport. Each capability is a bounded, named operation with a typed input schema, a governed execution path through the full platform pipeline (Semantic Intent Layer → Role-Aware Projection → SEG → FQP), and a typed output contract. AI agents interact with capabilities, not databases. There is no privileged API path — AI agents receive the same governance-validated results as human users.
 
@@ -1284,6 +1321,29 @@ Each SMR operation carries an `execution_profile` defined in its `analytical_ope
 | `data_retrieval` | Auth → RAPL → FQP → Lineage |
 | `metric_query` | Auth → RAPL → SIL → SEG → FQP → Lineage |
 | `full_analytical` | Full pipeline including Visualisation Ontology + Narrative Synthesis Engine |
+
+### Intent Confirmation Card
+
+When a tenant has `requiresIntentConfirmation: true` configured, the platform returns a confirmation card before executing any query. The card is returned as the MCP response body in place of the analytical result; the consumer must re-submit with `"confirmed": true` to proceed to execution.
+
+```json
+{
+  "confirmation_required": true,
+  "intent": {
+    "operation_id":   "compare_portfolios",
+    "operation_label": "Compare Portfolios",
+    "resolved_metrics": ["portfolio_return", "benchmark_return"],
+    "resolved_dimensions": ["portfolio_id", "asset_class"],
+    "time_period":    "quarter_to_date",
+    "filters":        [{ "field": "asset_class", "operator": "eq", "value": "EQUITY" }],
+    "estimated_cost": 620,
+    "classification": "INTERNAL"
+  },
+  "confirm_by": "re-submit run_analytics with confirmed: true"
+}
+```
+
+The card surfaces the resolved `operation_id`, metric IDs, dimensions, filters, estimated cost units, and data classification level — everything needed for a user or AI agent to verify the resolved intent before execution proceeds. This is appropriate for high-stakes or compliance-sensitive queries where silent intent misresolution is unacceptable.
 
 ### Capability Governance
 

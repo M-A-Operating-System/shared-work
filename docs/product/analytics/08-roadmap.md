@@ -38,7 +38,7 @@ This document describes one proposed sequence of deliverables for the AI Analyti
 </tr>
 <tr>
 <td>MCP Capability Layer</td>
-<td>Build new Python service using FastMCP + Uvicorn (ASGI); deploy as a Kubernetes pod; implement JWT validation middleware at request ingress rejecting unauthenticated requests before any platform processing; implement eight <code>@mcp.tool()</code> handlers routing through the shared pipeline (<code>validate_jwt → sil.resolve → rapl.project → seg.approve → fqp.execute → assemble_response</code>); implement MCP resource handlers serving knowledge artifacts from the Knowledge Store (<code>guide://</code> and <code>skills://</code> URIs — no JWT required, no governance pipeline); implement two <code>@mcp.prompt()</code> templates (standard analytical assistant, regulatory reporting assistant); build per-user capability manifest endpoint reflecting feature-flag state and entitlement-gated tool availability</td>
+<td>Build new Python service using FastMCP + Uvicorn (ASGI); deploy as a Kubernetes pod; implement JWT validation middleware at request ingress rejecting unauthenticated requests before any platform processing; implement three <code>@mcp.tool()</code> handlers (<code>run_analytics</code>, <code>list_operations</code>, <code>drilldown</code>) routing through the shared pipeline (<code>validate_jwt → sil.resolve → rapl.project → seg.approve → fqp.execute → assemble_response</code>); implement MCP resource handlers serving knowledge artifacts from the Knowledge Store (<code>guide://</code> and <code>skills://</code> URIs — no JWT required, no governance pipeline); implement two <code>@mcp.prompt()</code> templates (standard analytical assistant, regulatory reporting assistant); build per-user capability manifest endpoint reflecting feature-flag state and entitlement-gated tool availability</td>
 </tr>
 <tr>
 <td>Semantic Intent Layer</td>
@@ -108,7 +108,7 @@ This document describes one proposed sequence of deliverables for the AI Analyti
 </tr>
 <tr>
 <td>SMR Consistency Checker</td>
-<td>Build consistency check service invoked automatically on every new draft before it is surfaced for review; implement cosine-similarity comparison of the draft formula and description against all active metric definitions (flag at &gt;0.85); implement naming conflict check against existing <code>id</code> and <code>label</code> fields; implement dimension existence check against the registered dimension catalogue; implement data domain check against the Data Source Catalog; attach findings to the draft record as structured annotations</td>
+<td>Build consistency check service invoked automatically on every new draft before it is surfaced for review; implement cosine-similarity comparison of the concatenated draft <code>formula</code> and <code>description</code> fields against the same fields of all active metric definitions, using the same embedding model configured for platform semantic search; flag matches above a 0.85 similarity threshold (initial value — to be calibrated against a test set of known-duplicate and known-distinct metrics during Phase 3 development); implement naming conflict check against existing <code>id</code> and <code>label</code> fields; implement dimension existence check against the registered dimension catalogue; implement data domain check against the Data Source Catalog; attach findings to the draft record as structured annotations</td>
 </tr>
 <tr>
 <td>Metric Draft Review UI</td>

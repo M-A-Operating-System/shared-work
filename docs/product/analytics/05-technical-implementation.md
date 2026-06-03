@@ -2,7 +2,7 @@
 
 This chapter describes one reference implementation of the AI Analytics Platform. Stack choices are concrete but not prescriptive. The product specification is intentionally stack-agnostic. Any conformant implementation that satisfies the specified behaviours, governance guarantees, and interface contracts is valid. Technology substitutions at any layer require no changes to the product specification.
 
-The product specification (component behaviours, interface contracts, governance requirements) is in [Chapter 3 — Core Platform Capabilities](./03-core-capabilities.md). The design principles governing every decision are in [Chapter 1 — Platform Overview, §Design Principles](./01-platform-overview.md#design-principles).
+The product specification (component behaviours, interface contracts, governance requirements) is in [Chapter 3 — Core Platform Capabilities](./03-core-capabilities.md). The design principles governing every decision are in [Platform Overview — Design Principles](./00-overview.md#design-principles).
 
 ---
 
@@ -142,13 +142,7 @@ async def drilldown(input: DrilldownInput, jwt: str) -> dict:
 
 #### Execution profiles
 
-Each SMR operation carries an `execution_profile` that tells the pipeline executor which stages to invoke:
-
-| Profile | Pipeline stages | Typical operations |
-|---------|----------------|-------------------|
-| `data_retrieval` | Auth → RAPL → FQP → Lineage | Raw data fetches — positions, prices, reference data |
-| `metric_query` | Auth → RAPL → SIL → SEG → FQP → Lineage | Single metric value lookups |
-| `full_analytical` | Auth → RAPL → SIL → SEG → FQP → VO → NSE → Lineage | Attribution, comparison, regulatory reports |
+Each SMR operation carries an `execution_profile` that tells the pipeline executor which stages to invoke. Profile definitions are in [§MCP Capability Layer](./03-core-capabilities.md#mcp-capability-layer).
 
 #### Resources
 
@@ -330,8 +324,12 @@ class NarrativeSynthesisEngine:
     def __init__(self, client: anthropic.AsyncAnthropic):
         self.client = client
 
+    # Update model IDs on deprecation — or read from tenant config models.narrativeSynthesisModel
+    FAST_MODEL     = "claude-haiku-4-5-20251001"
+    STANDARD_MODEL = "claude-sonnet-4-6"
+
     async def synthesise(self, result: dict, operation: dict) -> str:
-        model    = "claude-haiku-4-5-20251001" if self._is_simple(result) else "claude-sonnet-4-6"
+        model    = self.FAST_MODEL if self._is_simple(result) else self.STANDARD_MODEL
         prompt   = self._build_prompt(result, operation)
         response = await self.client.messages.create(
             model=model, max_tokens=512,
@@ -342,7 +340,11 @@ class NarrativeSynthesisEngine:
         return narrative
 
     def _is_simple(self, result: dict) -> bool:
-        return len(result["rows"]) <= 10 and len(result["schema"]) <= 3
+        # Route to Haiku for ≤5 metrics and ≤3 dimensions — matches Ch03 model selection spec
+        schema = result.get("schema", [])
+        metric_count    = sum(1 for f in schema if f.get("type") == "number")
+        dimension_count = len(schema) - metric_count
+        return metric_count <= 5 and dimension_count <= 3
 
     def _build_prompt(self, result: dict, operation: dict) -> str:
         # Inject metric labels + row values + units; no user query, no physical schema
@@ -398,6 +400,8 @@ The core metric definition. One document per approved metric version per tenant.
     "cube":    "risk_cube",
     "measure": "var_95_daily"
   },
+  "formula":              "MAX(losses) WHERE confidence_level = 0.95",
+  "compliance_relevant":  false,
   "required_dimensions":  ["portfolio_id", "as_of_date"],
   "optional_dimensions":  ["asset_class", "geography", "sector", "currency"],
   "compliance_modes":     [],
@@ -410,6 +414,8 @@ The core metric definition. One document per approved metric version per tenant.
 `status` is one of `"proposed"` | `"in_review"` | `"approved"` | `"deprecated"` | `"retired"`. The DCS enforces a uniqueness constraint: at most one document per `(tenant_id, metric_id)` may carry `"status": "approved"` at any point in time. All prior versions are retained as `"deprecated"` for lineage reconstruction. `source` is `"platform"` for Financial Services Reference Model entries and `"tenant"` for customised definitions.
 
 `weight_metric_id` is required when `aggregation` is `"value_weighted_average"` (or any other weighted aggregation variant) and must reference the `metric_id` of an approved `analytical_metric` in the same tenant's DCS. The SIL resolves and validates this reference at query time. If the weight metric is missing or unapproved, the query is rejected. The field is absent for non-weighted aggregations (`"sum"`, `"last"`, `"count"`, `"min"`, `"max"`, `"mean"`). The LQP generator emits a `weight_metric_id` key on the `metric_scan` node so that the execution backend can fetch the weighting values alongside the primary metric.
+
+`formula` stores the business-logic expression defined in the [SMR formula language](./03-core-capabilities.md#formula-language). It is the human-readable and audit-visible definition of what the metric computes. At query time the FQP resolves the formula against the `physical_mapping` to generate the backend-specific query; the formula itself is never executed directly. Metrics backed entirely by a pre-computed measure in a semantic layer (e.g. a Cube.js measure) may leave `formula` as an empty string and rely solely on `physical_mapping`.
 
 #### New DCS document type: `analytical_dimension`
 
@@ -441,15 +447,17 @@ The operation catalogue. One document per approved operation per tenant. The `ex
 {
   "type":              "analytical_operation",
   "tenant_id":         "acme-wealth",
-  "operation_id":      "get_positions",
-  "version":           1,
-  "status":            "approved",
-  "source":            "platform",
-  "display_name":      "Portfolio Positions",
-  "description":       "Fetch current or historical position data for a portfolio.",
-  "execution_profile": "data_retrieval",
-  "required_params":   ["portfolio_id"],
-  "optional_params":   ["as_of_date", "asset_class"]
+  "operation_id":        "get_positions",
+  "version":             1,
+  "status":              "approved",
+  "source":              "platform",
+  "display_name":        "Portfolio Positions",
+  "description":         "Fetch current or historical position data for a portfolio.",
+  "execution_profile":   "data_retrieval",
+  "required_params":     ["portfolio_id"],
+  "optional_params":     ["as_of_date", "asset_class"],
+  "supported_metrics":   [],
+  "supported_dimensions": ["portfolio_id", "asset_class", "currency", "instrument_id", "as_of_date"]
 }
 ```
 
@@ -678,7 +686,14 @@ class LQPGenerator:
     def _infer_join_keys(self, metrics: list[dict]) -> list[str]:
         # Intersection of required_dimensions across all metrics — safe shared join keys
         key_sets = [set(m.get("required_dimensions", [])) for m in metrics]
-        return list(set.intersection(*key_sets)) if key_sets else []
+        keys = list(set.intersection(*key_sets)) if key_sets else []
+        if not keys:
+            raise ValueError(
+                f"No shared required_dimensions across metrics — cannot infer join keys. "
+                f"Ensure all co-queried metrics share at least one canonical dimension name. "
+                f"Metrics: {[m['metric_id'] for m in metrics]}"
+            )
+        return keys
 
     def _render_predicate(self, f: dict) -> str:
         op_map = {
@@ -747,13 +762,35 @@ class RoleAwareProjectionLayer:
         self.pg = pg_pool
 
     async def project(self, lqp: dict, claims: dict) -> dict:
-        policy = await self._load_policy(claims["tenant_id"], claims.get("role"))
-        if policy is None:
+        # analytics_roles is an array claim — users may hold multiple roles
+        # roleClaimField is configurable per tenant (see Ch04 §entitlements config)
+        role_claim_field = self.config.get("roleClaimField", "analytics_roles")
+        roles = claims.get(role_claim_field, [])
+        if isinstance(roles, str):
+            roles = [roles]  # normalise scalar claim to list
+
+        policies = [p for p in [await self._load_policy(claims["tenant_id"], r) for r in roles] if p]
+        if not policies:
             raise AccessDeniedError("No role policy found — defaultDenyAll")
 
-        lqp = self._inject_row_predicates(lqp, policy, claims)
-        lqp["column_masks"] = policy.get("columnMasks", {})
+        # Merge: metric access = union across roles; row predicates = intersection (most restrictive)
+        merged = self._merge_policies(policies)
+        lqp = self._inject_row_predicates(lqp, merged, claims)
+        lqp["column_masks"] = merged.get("columnMasks", {})
         return lqp
+
+    def _merge_policies(self, policies: list[dict]) -> dict:
+        # Row predicates: intersection (AND — most restrictive role wins)
+        # Column masks: union (masked by any role = masked for the user)
+        # Metric access: union (permitted by any role = permitted)
+        row_predicates = policies[0].get("rowPredicates", {})
+        for p in policies[1:]:
+            # Intersection: keep only predicates present in all role policies
+            row_predicates = {k: v for k, v in row_predicates.items() if k in p.get("rowPredicates", {})}
+        column_masks: dict = {}
+        for p in policies:
+            column_masks.update(p.get("columnMasks", {}))
+        return {"rowPredicates": row_predicates, "columnMasks": column_masks}
 
     def _inject_row_predicates(self, lqp: dict, policy: dict, claims: dict) -> dict:
         for dimension, template in policy.get("rowPredicates", {}).items():
@@ -766,7 +803,7 @@ class RoleAwareProjectionLayer:
         # Replace {{user.claim_name}} tokens with JWT claim values
         ...
 
-    async def _load_policy(self, tenant_id: str, role: str | None) -> dict | None:
+    async def _load_policy(self, tenant_id: str, role: str) -> dict | None:
         return await self.pg.fetchrow(
             "SELECT * FROM role_policies WHERE tenant_id=$1 AND role_id=$2",
             tenant_id, role,
@@ -802,7 +839,8 @@ Each tenant has one governance config document. The Semantic Execution Governanc
   "query_timeout_seconds":      60,
   "compliance_modes":           ["mifid2"],
   "require_lineage_for_export": true,
-  "audit_all_queries":          true
+  "audit_all_queries":          true,
+  "compliance_intent_threshold": 0.8
 }
 ```
 
@@ -824,7 +862,7 @@ class SemanticExecutionGovernance:
             raise UserBudgetExceeded()
 
         self._check_classification(lqp, config)
-        self._check_compliance(lqp, config)
+        lqp = self._check_compliance(lqp, claims, config)
 
         lqp["cost_estimate"]       = cost
         lqp["governance_approved"] = True
@@ -838,9 +876,37 @@ class SemanticExecutionGovernance:
         # Reject if any metric classificationLevel is in blocked_classifications
         ...
 
-    def _check_compliance(self, lqp: dict, config: dict) -> None:
-        # Enforce compliance mode constraints — MiFID II justification, Basel III entity dims
-        ...
+    def _check_compliance(self, lqp: dict, claims: dict, config: dict) -> dict:
+        # Two-signal compliance escalation:
+        # Signal 1 — any resolved metric has compliance_relevant: true
+        # Signal 2 — compliance_purpose_score meets tenant threshold
+        compliance_metrics = [
+            m["metric_id"] for m in lqp.get("resolved_metrics", [])
+            if m.get("compliance_relevant", False)
+        ]
+        threshold = config.get("compliance_intent_threshold", 0.8)
+        intent_score = lqp.get("compliance_purpose_score", 0.0)
+        compliance_purpose = intent_score >= threshold
+
+        if compliance_metrics and compliance_purpose:
+            # Escalate to enhanced compliance artifact tier
+            active_modes = [
+                m for m in config.get("compliance_modes", [])
+                if any(cm in m for cm in compliance_metrics)
+            ]
+            lqp["compliance_tier"] = {
+                "active":               True,
+                "intent_score":         intent_score,
+                "triggered_by_metrics": compliance_metrics,
+                "triggered_by_modes":   config.get("compliance_modes", []),
+                "bypass_cache":         True,
+            }
+            # Enforce lineage-gated export regardless of tenant config
+            lqp["require_lineage_for_export"] = True
+        else:
+            lqp["compliance_tier"] = {"active": False}
+
+        return lqp
 
     async def _load_config(self, tenant_id: str) -> dict:
         return await self.dcs.get(document_type="governance_config", tenant_id=tenant_id)
@@ -861,7 +927,7 @@ class SemanticExecutionGovernance:
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
-| **Plan optimiser** | Apache Calcite | Battle-tested SQL plan optimisation; used by Trino, Flink, Beam |
+| **Plan optimiser** | Apache Calcite (within SQL warehouse adapters) | Battle-tested SQL plan optimisation; used by Trino, Flink, Beam. Calcite is invoked inside each SQL warehouse adapter to optimise the physical sub-plan SQL before execution — not at the Python FQP orchestration layer, which handles LQP decomposition and result assembly |
 | **Backend adapters** | Custom adapter per backend type | Calcite handles SQL; custom adapters cover REST/OpenData/GraphQL/SPARQL |
 | **Result assembly** | Custom (Python) | Fan-out/fan-in; no off-the-shelf library needed |
 
@@ -1059,7 +1125,7 @@ The evaluator matches the `COMPARISON` intent pattern and two-metric schema to t
 }
 ```
 
-Full SCL examples including the `type: "table"` spec are in Section 3.7 (Analytical Output Format). Full chart contract definitions are in Section 3.6 (Visualisation Ontology).
+Full SCL examples including the `type: "table"` spec are in [Analytical Output Format](./03-core-capabilities.md#analytical-output-format). Full chart contract definitions are in [Visualisation Ontology](./03-core-capabilities.md#visualisation-ontology).
 
 ```python
 INTENT_CONTRACTS = {
@@ -1196,7 +1262,7 @@ if __name__ == "__main__":
 |----------|--------|-----------|
 | **Lineage records** | S3-compatible object store — one JSON document per query | Write-once; append-only; cheap at scale; no schema migration required; natural fit for immutable audit records |
 | **Object key** | `lineage/{tenant_id}/{yyyy}/{mm}/{dd}/{result_id}.json` | Date-partitioned; enables prefix-based listing by tenant and time window |
-| **Search index** | Thin PostgreSQL table (scalar fields only, no JSON blobs) | Used by the Lineage Query REST API (Phase 11) for filtered search; full record always fetched from the object store |
+| **Search index** | Thin PostgreSQL table (scalar fields only, no JSON blobs) | Used by the Lineage Query REST API (see roadmap) for filtered search; full record always fetched from the object store |
 | **Retention** | Object lifecycle policy — default 7 years (configurable per compliance mode) | MiFID II and equivalent regimes; enforced at the storage layer, not application code |
 
 #### Lineage document schema
@@ -1228,7 +1294,7 @@ Records are written once and never mutated. Post-hoc compliance annotations are 
 
 #### Search index DDL
 
-A lightweight PostgreSQL table holds only the scalar fields required for the Lineage Query REST API (Phase 11). Full records are always retrieved from the object store; this table is never the source of truth for record content.
+A lightweight PostgreSQL table holds only the scalar fields required for the Lineage Query REST API (see roadmap). Full records are always retrieved from the object store; this table is never the source of truth for record content.
 
 ```sql
 CREATE TABLE analytics.lineage_index (
@@ -1352,7 +1418,9 @@ class KnowledgeStore:
 | **Activation** | `analyticalDomain` config triggers SMR import at tenant setup | Bundle documents are written to the DCS in `proposed` state; Application Admin approves before metrics become resolvable |
 | **Customisation** | Full edit/override via Admin API after import | Customised definitions marked `source: "tenant"` in the DCS document |
 
-Each bundle is a JSON array of DCS documents conforming to the schemas defined in Section 3.1. Bundles are seeded into the DCS in `"proposed"` state at tenant setup; the Application Admin approves each document before it becomes resolvable by the Semantic Intent Layer.
+Each bundle is a JSON array of DCS documents conforming to the schemas defined in [§Semantic Metrics Registry](./03-core-capabilities.md#semantic-metrics-registry). Bundles are seeded into the DCS in `"proposed"` state at tenant setup; the Application Admin approves each document before it becomes resolvable by the Semantic Intent Layer.
+
+> **Version format note:** Seed bundle documents use an integer `version` field (starting at `1`) as the bootstrap state. On first tenant activation the platform converts these to semantic versioning (`"1.0.0"`). Subsequent versions follow semver — the `"2.1.0"` form used in Chapter 3 examples reflects a metric that has been through two major revisions post-activation.
 
 #### Dimensions bundle (shared across all domains)
 

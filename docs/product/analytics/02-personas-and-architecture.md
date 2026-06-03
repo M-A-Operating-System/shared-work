@@ -4,7 +4,7 @@
 
 The platform is designed to serve a heterogeneous population of users whose needs range from conversational analytics access to deep governance administration. These personas define the platform's access model: who can query what, with what constraints. The six personas below have different levels of access and interact with the platform in different ways.
 
-The platform vision and [Design Principles](./01-platform-overview.md#design-principles) governing these access controls are in [Chapter 1 — Platform Overview](./01-platform-overview.md). Component specifications for the platform features exercised in the journeys below are in [Chapter 3 — Core Platform Capabilities](./03-core-capabilities.md).
+The platform vision and [Design Principles](./00-overview.md#design-principles) governing these access controls are in [Platform Overview](./00-overview.md). Component specifications for the platform features exercised in the journeys below are in [Chapter 3 — Core Platform Capabilities](./03-core-capabilities.md).
 
 | Persona | Role | Primary need |
 |---------|------|--------------|
@@ -15,7 +15,7 @@ The platform vision and [Design Principles](./01-platform-overview.md#design-pri
 | **Integration Engineer** | Engineer responsible for data source registration and platform configuration | Register execution backends, maintain config, integrate entitlement model |
 | **Platform Admin** | Cross-tenant platform team member | Platform health, tenant onboarding, infrastructure, governance audit |
 
-These persona distinctions are not merely organisational; they directly inform the platform's trust boundaries. The Analytical End User interacts exclusively through natural language and receives rendered, role-constrained results. They are deliberately shielded from physical schema details, metric identifiers, and backend routing. The Power Analyst extends this interface with drilldown navigation, lineage inspection, and export capability, but remains within the same governed query pipeline. The Compliance Analyst is not a separate row in this taxonomy; they are a specialised instance of the Power Analyst role with additional governance constraints applied at both column masking and export lineage levels.
+These persona distinctions are not merely organisational; they directly inform the platform's trust boundaries. The Analytical End User interacts exclusively through natural language and receives rendered, role-constrained results. They are deliberately shielded from physical schema details, metric identifiers, and backend routing. The Power Analyst extends this interface with drilldown navigation, lineage inspection, and export capability, but remains within the same governed query pipeline. The Compliance Analyst is not a separate persona. Any entitled user querying compliance-relevant metrics for a compliance purpose receives the full enhanced governance artifact set automatically — this is determined at runtime by metric metadata and AI intent classification, not by a dedicated role. See the [Compliance Artifact Generation TODO](./TODOS/compliance-artifact-generation.md) for the full design.
 
 The Application Admin must be configured before go-live. This role controls what can be queried, how metrics are defined, and who can access what. Without one, the Semantic Metrics Registry contains no governed metric definitions and the platform cannot serve any analytical query. The Application Admin owns the lifecycle of metric definitions, approves registry changes, and maintains the entitlement policies that the Role-Aware Projection Layer enforces at query time.
 
@@ -33,7 +33,7 @@ The following journeys show how the platform handles three different types of qu
 
 A portfolio manager begins their morning with a natural language query: "Show me portfolio returns versus benchmark across all my portfolios for the current quarter, sorted by tracking error."
 
-The AI Chat Platform's model maps the portfolio manager's natural language query to three metric identifiers — `portfolio_return`, `benchmark_return`, and `tracking_error` — using the SMR metric catalogue it loaded at session start. These structured parameters are submitted to the Analytics Engine, whose Semantic Intent Layer validates them against the Semantic Metrics Registry and builds a Logical Query Plan. The Role-Aware Projection Layer extracts the manager's portfolio scope from the JWT claims and constructs a row-level predicate restricting results to portfolios within the manager's authorised coverage. This predicate is injected into the Logical Query Plan before any execution backend is contacted — it is not a post-hoc filter applied to a full dataset.
+The AI Chat Platform's model maps the portfolio manager's natural language query to three metric identifiers — `portfolio_return`, `benchmark_return`, and `tracking_error` — using the SMR metric catalogue it loaded at session start. `tracking_error` carries `benchmark_id` as a required dimension; the SIL resolves this from the portfolio's registered default benchmark in the SMR dimension catalogue, so the user does not need to specify it explicitly. These structured parameters are submitted to the Analytics Engine, whose Semantic Intent Layer validates them against the Semantic Metrics Registry and builds a Logical Query Plan. The Role-Aware Projection Layer extracts the manager's portfolio scope from the JWT claims and constructs a row-level predicate restricting results to portfolios within the manager's authorised coverage. This predicate is injected into the Logical Query Plan before any execution backend is contacted — it is not a post-hoc filter applied to a full dataset.
 
 The Visualisation Ontology examines the assembled result pattern — multiple metrics across multiple portfolio entities, sorted by a continuous measure — and selects a multi-series bar chart as the appropriate display specification. The Narrative Synthesis Engine produces: "Across 14 portfolios, 9 outperformed their benchmark. Global Equity Opportunities has the highest tracking error at 3.2%..." This narrative is returned alongside the display specification as a single structured MCP tool response.
 
@@ -57,30 +57,35 @@ Features exercised: multi-engine federation, VaR metric domain, heatmap renderin
 
 A compliance analyst asks for LCR and NSFR ratios for all regulated entities with a 30-day trend.
 
-Before any metric resolution occurs, the Semantic Execution Governance component validates that the `regulatory_reporting` feature flag is active for the tenant and that the requesting user's JWT contains the `compliance_analyst` role claim. Both conditions must be satisfied; failure of either terminates the request with a structured governance rejection — not a silent empty result.
+The Semantic Intent Layer classifies the stated intent — "with a 30-day trend" for regulatory reporting — and sets `compliance_purpose: true`. The LCR and NSFR metrics are flagged `compliance_relevant: true` in the SMR. Both signals are true, so the SEG escalates to the enhanced compliance governance tier automatically: no special role claim is required.
 
-Once governance approval is issued, the Role-Aware Projection Layer applies column masks to client name and account number fields, consistent with the entitlement policy associated with this metric domain. A classification gate validates that the data classification level of the assembled result is within the analyst's authorised classification ceiling before the result is assembled. The Visualisation Ontology produces a 30-day trend line chart and a summary table of ratios versus regulatory minima. An export-ready table is prepared with the lineage record attached, required by the `requireLineageForExport: true` governance configuration on this metric domain — the export cannot be issued without it.
+The Role-Aware Projection Layer applies column masks to client name and account number fields, consistent with the entitlement policy associated with this metric domain. A classification gate validates that the assembled result's data classification level is within the requesting user's authorised ceiling. The Visualisation Ontology produces a 30-day trend line chart and a summary table of ratios versus regulatory minima. The response includes the standard result alongside a `compliance` block containing the regulatory trace record and a lineage-gated export — the export cannot be issued without an attached lineage record, enforced automatically by the SEG when the compliance tier is active.
 
-Features exercised: regulatory metric domain, role claim validation, column masking, data classification gating, lineage-gated export, compliance mode governance enforcement.
+> **Note:** The compliance artifact escalation model (metric metadata + AI intent classification) is a pending design change — see [Compliance Artifact Generation TODO](./TODOS/compliance-artifact-generation.md).
+
+Features exercised: regulatory metric domain, compliance intent classification, compliance-relevant metric metadata, column masking, data classification gating, lineage-gated export, Basel III/IV compliance mode governance.
 
 ## Persona × Feature Matrix
 
 The matrix below maps each major platform feature to the personas for whom it is available. Blank cells indicate that the feature is outside the operational scope of that persona, either because it is not needed or because its use would represent a governance violation.
 
-| Feature | End User | Power Analyst | Compliance Analyst | App Admin | Metric Owner | Integration Eng |
-|---------|:--------:|:-------------:|:-----------------:|:---------:|:------------:|:--------------:|
-| Natural language query | ✓ | ✓ | ✓ | ✓ | | |
-| Role-aware results | ✓ | ✓ | ✓ | ✓ | | |
-| Governed drilldown | | ✓ | ✓ | ✓ | | |
-| Lineage inspector | | ✓ | ✓ | ✓ | ✓ | |
-| Narrative synthesis | ✓ | ✓ | ✓ | ✓ | | |
-| Result export | ✓ | ✓ | ✓ | ✓ | | |
-| SMR browsing | | ✓ | ✓ | ✓ | ✓ | |
-| SMR metric management | | | | ✓ | ✓ | |
-| Entitlement management | | | | ✓ | | |
-| Backend registration | | | | | | ✓ |
-| Governance audit trail | | | ✓ | ✓ | | ✓ |
+| Feature | End User | Power Analyst | App Admin | Metric Owner | Integration Eng | Platform Admin |
+|---------|:--------:|:-------------:|:---------:|:------------:|:--------------:|:--------------:|
+| Natural language query | ✓ | ✓ | ✓ | | | |
+| Role-aware results | ✓ | ✓ | ✓ | | | |
+| Governed drilldown | | ✓ | ✓ | | | |
+| Lineage inspector | | ✓ | ✓ | ✓ | | |
+| Narrative synthesis | ✓ | ✓ | ✓ | | | |
+| Result export | ✓ | ✓ | ✓ | | | |
+| SMR browsing | | ✓ | ✓ | ✓ | | |
+| SMR metric management | | | ✓ | ✓ | | |
+| Entitlement management | | | ✓ | | | |
+| Backend registration | | | | | ✓ | |
+| Governance audit trail | | | ✓ | | ✓ | ✓ |
+| Tenant onboarding / infra | | | | | | ✓ |
 
-The matrix reveals two distinct operational planes. The analytical plane — natural language query through result export — is accessible to all query-facing personas. The governance plane — SMR management, entitlement policy, backend registration, and audit trail — is restricted to the personas whose responsibilities require it.
+The matrix reveals two distinct operational planes. The analytical plane — natural language query through result export — is accessible to all query-facing personas. The governance plane — SMR management, entitlement policy, backend registration, and audit trail — is restricted to the personas whose responsibilities require it. Platform Admin has no query interface into tenant data; their access is limited to cross-tenant infrastructure and governance audit.
+
+> **Note:** Compliance-enhanced governance artifacts (regulatory trace, lineage-gated export, classification enforcement) are not a persona feature — they are triggered automatically at runtime when a compliance-relevant metric is queried with a compliance-stated intent. Any entitled user may trigger this path.
 
 The full platform architecture diagram and request flow sequence are in [Chapter 3 — Core Platform Capabilities](./03-core-capabilities.md).
