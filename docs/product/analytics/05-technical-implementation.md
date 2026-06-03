@@ -401,6 +401,7 @@ The core metric definition. One document per approved metric version per tenant.
     "measure": "var_95_daily"
   },
   "formula":              "MAX(losses) WHERE confidence_level = 0.95",
+  "compliance_relevant":  false,
   "required_dimensions":  ["portfolio_id", "as_of_date"],
   "optional_dimensions":  ["asset_class", "geography", "sector", "currency"],
   "compliance_modes":     [],
@@ -838,7 +839,8 @@ Each tenant has one governance config document. The Semantic Execution Governanc
   "query_timeout_seconds":      60,
   "compliance_modes":           ["mifid2"],
   "require_lineage_for_export": true,
-  "audit_all_queries":          true
+  "audit_all_queries":          true,
+  "compliance_intent_threshold": 0.8
 }
 ```
 
@@ -860,7 +862,7 @@ class SemanticExecutionGovernance:
             raise UserBudgetExceeded()
 
         self._check_classification(lqp, config)
-        self._check_compliance(lqp, config)
+        lqp = self._check_compliance(lqp, claims, config)
 
         lqp["cost_estimate"]       = cost
         lqp["governance_approved"] = True
@@ -874,9 +876,37 @@ class SemanticExecutionGovernance:
         # Reject if any metric classificationLevel is in blocked_classifications
         ...
 
-    def _check_compliance(self, lqp: dict, config: dict) -> None:
-        # Enforce compliance mode constraints — MiFID II justification, Basel III entity dims
-        ...
+    def _check_compliance(self, lqp: dict, claims: dict, config: dict) -> dict:
+        # Two-signal compliance escalation:
+        # Signal 1 — any resolved metric has compliance_relevant: true
+        # Signal 2 — compliance_purpose_score meets tenant threshold
+        compliance_metrics = [
+            m["metric_id"] for m in lqp.get("resolved_metrics", [])
+            if m.get("compliance_relevant", False)
+        ]
+        threshold = config.get("compliance_intent_threshold", 0.8)
+        intent_score = lqp.get("compliance_purpose_score", 0.0)
+        compliance_purpose = intent_score >= threshold
+
+        if compliance_metrics and compliance_purpose:
+            # Escalate to enhanced compliance artifact tier
+            active_modes = [
+                m for m in config.get("compliance_modes", [])
+                if any(cm in m for cm in compliance_metrics)
+            ]
+            lqp["compliance_tier"] = {
+                "active":               True,
+                "intent_score":         intent_score,
+                "triggered_by_metrics": compliance_metrics,
+                "triggered_by_modes":   config.get("compliance_modes", []),
+                "bypass_cache":         True,
+            }
+            # Enforce lineage-gated export regardless of tenant config
+            lqp["require_lineage_for_export"] = True
+        else:
+            lqp["compliance_tier"] = {"active": False}
+
+        return lqp
 
     async def _load_config(self, tenant_id: str) -> dict:
         return await self.dcs.get(document_type="governance_config", tenant_id=tenant_id)

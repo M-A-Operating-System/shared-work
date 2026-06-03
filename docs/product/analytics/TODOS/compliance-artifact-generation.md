@@ -1,6 +1,6 @@
 # TODO: Compliance Artifact Generation
 
-**Status:** Design decision made — implementation not yet reflected in documents  
+**Status:** Implemented in Chapters 2, 3, 4, 5. Open questions resolved. Closed.  
 **Affects:** Chapters 2, 3, 4, 5 and SMR metric schema  
 **Priority:** High — current documents describe an incorrect architecture (role-based compliance) that should be replaced with a metadata + intent driven model
 

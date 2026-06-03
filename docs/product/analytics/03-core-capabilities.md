@@ -218,6 +218,7 @@ Every metric in the SMR conforms to the following schema. This is the authoritat
   "label":       "Portfolio Return",
   "description": "Total return of a portfolio over the specified period, net of fees, expressed as a percentage.",
   "formula":     "(end_market_value - start_market_value + cash_flows) / start_market_value",
+  "compliance_relevant": false,
   "unit":        "percentage",
   "aggregation": {
     "default":     "value_weighted_average",
@@ -286,6 +287,7 @@ Every metric in the SMR conforms to the following schema. This is the authoritat
 | `lineage.upstream_metrics` | No | Other SMR metrics this metric is derived from. Used for lineage graph construction. |
 | `lineage.downstream_metrics` | No | SMR metrics that depend on this metric. Used for impact analysis when metric definitions change. |
 | `access.roles` | Yes | Role IDs from the entitlement config that may query this metric. |
+| `compliance_relevant` | No | When `true`, this metric's output may be used in regulatory reporting or compliance submissions. When combined with a compliance-purpose query intent (see §Semantic Intent Layer), the platform escalates to the enhanced compliance artifact tier. Set by the metric owner at registration. |
 
 ### Registry Governance Workflow
 
@@ -360,12 +362,13 @@ Every MCP tool call passes through five sequential validation stages:
 flowchart TD
     S1["**Stage 1: Schema validation**\nJSON parameters conform to tool schema\nRequired fields present and typed"]
     S2["**Stage 2: SMR resolution**\nResolve operation_id → analytical_operation document\nValidate params against operation required_params schema\nResolve metric IDs → analytical_metric documents\nResolve dimension IDs → analytical_dimension documents\nReject unregistered or unapproved IDs"]
+    S2b["**Stage 2b: Compliance intent classification**\nScore natural language query for compliance purpose (0–1)\ncomplex_purpose: true if score ≥ complianceIntentThreshold\nRecord score + matched signals in resolved intent"]
     S3["**Stage 3: Role-Aware Projection**\nFilter metric set to entitled scope\nFilter dimension set to entitled scope\nInject row predicates from role config\nApply column masks · Reject entitlement violations"]
     S4["**Stage 4: Semantic validation**\nRequired dimensions present per metric\nAggregation rules compatible\nTime granularity compatible per metric\nFilter predicates reference valid fields"]
     S5["**Stage 5: LQP generation**\nProduce engine-agnostic DAG\nAssign data affinity hints per metric\nEstimate result cardinality and execution cost"]
     LQP(["Logical Query Plan (LQP)"])
 
-    S1 --> S2 --> S3 --> S4 --> S5 --> LQP
+    S1 --> S2 --> S2b --> S3 --> S4 --> S5 --> LQP
 ```
 
 ### Intent Parameter Schema
@@ -662,7 +665,27 @@ Against a `maxQueryCostUnits: 1000` limit, this query is approved. Against a `50
 
 ### Compliance Modes
 
-Named compliance profiles pre-configure governance behaviour for specific regulatory environments:
+`complianceMode` sets the active regulatory ruleset and the trace targets used when the compliance artifact tier is active (e.g. `mifid2` writes to `analytics.mifid2_trace`; `basel3` writes LCR/NSFR snapshots to `analytics.regulatory_snapshots`). It does not by itself trigger the compliance artifact tier.
+
+**Compliance artifact tier trigger — two signals, both required (AND logic)**
+
+The platform escalates to the enhanced compliance artifact tier only when both of the following signals are true at runtime:
+
+| Signal | Source | True when |
+|---|---|---|
+| **Signal 1 — metric metadata** | `compliance_relevant` field on `analytical_metric` SMR definition | At least one resolved metric has `compliance_relevant: true`. Set by the metric owner at registration. |
+| **Signal 2 — AI intent classification** | Semantic Intent Layer compliance intent classification (Stage 2b) | `compliance_purpose_score` ≥ tenant-configured `compliance_intent_threshold` (default 0.8). The SIL classifies the natural language query and sets `compliance_purpose: true` if the score meets the threshold. |
+
+**Combined decision:**
+
+| `compliance_relevant` (any metric) | `compliance_purpose` (SIL classification) | Governance output |
+|---|---|---|
+| `true` | `true` | **Enhanced** — full compliance artifact tier active |
+| `true` | `false` | Standard governance output |
+| `false` | `true` | Standard governance output |
+| `false` | `false` | Standard governance output |
+
+The compliance mode rule tables below describe the additional rules and trace targets applied **when the compliance artifact tier is active** under each mode.
 
 **MiFID II mode** (`"complianceMode": "mifid2"`)
 
@@ -781,6 +804,7 @@ The FQP maintains a result cache keyed by the LQP signature — a deterministic 
 | Cache scope | Per-tenant. Results from one tenant are never served to another. |
 | Cache storage | Platform-managed result cache. Results over 10 MB bypass the cache and are streamed directly. |
 | Cache hit disclosure | Cache hits are disclosed in the lineage record and optionally surfaced to the user as a "Result from cache (data as of [timestamp])" indicator. |
+| Cache bypass | Queries with `compliance_purpose: true` bypass the cache. Compliance artifacts must be freshly generated for each compliance-purpose execution; cached results cannot retroactively produce regulatory trace records. |
 
 ### Adaptive Planning
 
@@ -973,6 +997,7 @@ The Analytics Engine is headless: it produces no rendered output. Every successf
 | Structured result | `data` | Yes | The computed rows and schema — metric values, dimension values, and units. |
 | Governed narrative | `narrative` | No (feature-flag controlled) | A governed summary produced by the NSE — `lead` (one sentence), `detail` (2–4 sentences), `anchoredTo` (result row references). Present when `features.narrativeSynthesis` is enabled. |
 | Lineage reference | `result_id` + `lineage_url` | Yes | A unique result identifier and the URL of the full lineage record |
+| Compliance artifacts | `compliance` | No (compliance tier only) | Present when both `compliance_relevant` metrics are queried AND the SIL classifies query intent as compliance-purpose. Contains regulatory trace ID, triggered metrics/modes, classification enforcement flag, and export lineage requirement. |
 
 ### Full MCP Response Structure
 
@@ -994,6 +1019,16 @@ The Analytics Engine is headless: it produces no rendered output. Every successf
     "detail":     "Global Equity Opportunities returned 4.21% against a benchmark of 3.85%. UK Core Income returned 2.87% against its benchmark of 2.54%. Asia Pacific Growth and EUR Balanced Income underperformed, returning 3.67% and 1.93% respectively against benchmarks of 3.90% and 2.31%.",
     "anchoredTo": ["GLOB_EQ_OPP", "UK_CORE_INC", "ASIA_PAC_GRW", "EUR_BAL_INC"]
   },
+  "compliance": {
+    "compliance_purpose":              true,
+    "intent_score":                    0.94,
+    "triggered_by_metrics":            ["lcr_ratio", "nsfr_ratio"],
+    "triggered_by_modes":              ["basel3"],
+    "regulatory_trace_id":             "trace_20260518_093247_lcr",
+    "artifact_set_version":            "1.0",
+    "export_requires_lineage":         true,
+    "classification_ceiling_applied":  true
+  },
   "meta": {
     "latencyMs":    1285,
     "cacheHit":     false,
@@ -1003,6 +1038,8 @@ The Analytics Engine is headless: it produces no rendered output. Every successf
   }
 }
 ```
+
+The `compliance` block is absent for standard queries. Its presence indicates the full compliance artifact tier was active for this response.
 
 ### Semantic Charting Language (SCL)
 
