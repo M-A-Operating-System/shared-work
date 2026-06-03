@@ -113,15 +113,22 @@ The two diagrams below contrast the Text-to-SQL approach with the AI-Enabled Ana
 
 ```mermaid
 flowchart TB
-    T1["User or AI Client"]
-    T2["LLM\n(SQL Generation)"]
-    T3["Raw Database Schema\nexposed directly to AI"]
-    T4["Generated SQL\nexecuted against database"]
-    T5["Result\nNo governed metrics\nNo lineage · No entitlement guarantee"]
+    subgraph clients["AI-Enabled Clients"]
+        direction LR
+        C1["Conversational\nAssistant"]
+        C2["Autonomous Agent\n& Data Mining"]
+        C3["Custom\nApplication"]
+    end
+    L["LLM"]
+    M["API / Protocol Layer\n(MCP)"]
+    T1["Raw Database Schema\nexposed directly to AI"]
+    T2["Generated SQL\nexecuted against database"]
+    T3["Result\nNo governed metrics\nNo lineage · No entitlement guarantee"]
+    clients --> L
+    L --> M
+    M --> T1
     T1 --> T2
     T2 --> T3
-    T3 --> T4
-    T4 --> T5
 ```
 
 </td>
@@ -131,28 +138,30 @@ flowchart TB
 flowchart TB
     subgraph clients["AI-Enabled Clients"]
         direction LR
-        A1["Conversational\nAssistant"]
-        A2["Autonomous Agent\n& Data Mining"]
-        A3["Custom\nApplication"]
+        C1["Conversational\nAssistant"]
+        C2["Autonomous Agent\n& Data Mining"]
+        C3["Custom\nApplication"]
     end
+    L["LLM"]
+    M["API / Protocol Layer\n(MCP)"]
     subgraph platform["Analytics Capability"]
         direction LR
-        B1["API Layer (MCP)"]
-        B2["Intent & Metric Resolution\nApproved Semantic Layer"]
-        B3["Governance Pipeline\nEntitlement · Compliance · Cost"]
-        B4["Federated Query Engine"]
+        P1["Intent & Metric Resolution\nApproved Semantic Layer"]
+        P2["Governance Pipeline\nEntitlement · Compliance · Cost"]
+        P3["Federated Query Engine"]
     end
     subgraph data["Data Sources"]
         direction LR
-        C1["SQL Warehouse"]
-        C2["OpenData API"]
-        C3["Graph Data API"]
+        D1["SQL Warehouse"]
+        D2["OpenData API"]
+        D3["Graph Data API"]
     end
-    clients -->|"structured request\n+ identity token"| B1
-    B1 --> B2
-    B2 --> B3
-    B3 --> B4
-    B4 --> data
+    clients --> L
+    L --> M
+    M --> P1
+    P1 --> P2
+    P2 --> P3
+    P3 --> data
 ```
 
 </td>
