@@ -30,6 +30,8 @@ The structural problems are architectural, not incidental:
 - **No reproducible calculation record** — SQL is generated fresh each time, so no two identical queries are guaranteed to produce identical results
 - **No guaranteed entitlement enforcement** — access controls depend on the reliability of AI-generated query predicates rather than a guaranteed enforcement layer
 
+Teams can invest significant effort in training or fine-tuning LLMs to better understand their specific schemas, and this can improve query accuracy in early trials. However, this approach addresses the symptom — the model's knowledge of table structures — rather than the underlying problem. No amount of schema training produces approved metric definitions, a reproducible calculation record, or a guaranteed entitlement enforcement layer. The governance gap remains, regardless of how well the model has learned the schema.
+
 In a regulated environment, none of these properties is acceptable. The [Text-to-SQL appendix](./07-text-to-sql-antipattern.md) examines the failure modes in detail and describes the complementary architecture where both tools coexist.
 
 ### The financial services challenge
