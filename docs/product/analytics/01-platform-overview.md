@@ -130,7 +130,7 @@ Every consumer type routes through the MCP Capability Layer, traverses the invar
 
 ### End-to-End Examples
 
-Two queries traced through every stage illustrate what the architecture does in practice. The first is a routine business question. The second is a regulatory submission request — the same pipeline, but with compliance artifact escalation triggered automatically.
+Three queries traced through every stage illustrate what the architecture does in practice. The first is a routine business analytics question. The second is a data mining request from an autonomous agent — showing governed large dataset retrieval rather than metric computation. The third is a regulatory submission request — the same pipeline, but with compliance artifact escalation triggered automatically.
 
 ---
 
@@ -169,7 +169,47 @@ The FQP routes the plan to the registered SQL warehouse adapter (e.g. Snowflake)
 
 ---
 
-#### Example 2 — Regulatory LCR submission (compliance query)
+#### Example 2 — Fixed income position extraction (data mining query)
+
+**1 · Natural language request**
+A quantitative research pipeline submits: *"Extract daily position and PnL data for all fixed income portfolios over the past 12 months for factor model retraining."*
+
+This request originates from an autonomous agent, not a conversational user. No natural language translation is required; the agent submits a structured `data_retrieval` tool call directly. The Semantic Intent Layer is bypassed at the NL translation stage, but all subsequent governance stages remain fully active.
+
+**2 · Semantic request**
+The agent specifies the operation (`retrieve_dataset`), the registered dataset identifier (`fixed_income_daily_positions`), the time range (trailing 12 months), and pagination parameters (page size: 10,000 rows). The dataset identifier resolves against the SMR — only registered, governed datasets are retrievable. There is no mechanism to request an arbitrary table or raw schema object.
+
+**3 · Logical analytics model**
+The SMR resolves `fixed_income_daily_positions` to its registered field set: portfolio identifier, instrument identifier, asset class, daily PnL, market value, duration, and currency. Fields not in the registered set are not returned. Entitlements are projected: the agent's JWT carries the `fixed_income_read` role; row predicates restrict results to portfolios within the agent's authorised coverage scope. Fields carrying a higher classification than the agent's authorised ceiling are excluded from the projection.
+
+**4 · Logical data model**
+The Federated Query Planner constructs a paginated retrieval plan against the `positions_warehouse` data source. Cost is estimated across the full result set — not just the first page — and validated against the tenant's data extraction governance threshold before any execution begins.
+
+**5 · Platform-agnostic query**
+```sql
+SELECT   p.portfolio_id,
+         p.instrument_id,
+         p.asset_class,
+         p.daily_pnl,
+         p.market_value,
+         p.duration,
+         p.currency,
+         p.position_date
+FROM     positions_fact p
+WHERE    p.asset_class   = 'fixed_income'
+  AND    p.position_date BETWEEN :start_date AND :end_date
+  AND    p.portfolio_id  IN (/* entitlement predicate */)
+ORDER BY p.portfolio_id, p.position_date
+LIMIT    :page_size
+OFFSET   :page_offset
+```
+
+**6 · Federated execution**
+The adapter executes the paginated query against the warehouse. Each page of results is returned to the agent under the same entitlement and lineage governance as a metric query: a lineage record is written for the retrieval, the dataset's provenance is recorded, and the agent receives a structured payload with a continuation token for the next page. The full extraction — potentially millions of rows across hundreds of pages — completes under continuous governance, with a lineage record confirming exactly which data was returned to which agent under which entitlements.
+
+---
+
+#### Example 3 — Regulatory LCR submission (compliance query)
 
 **1 · Natural language request**
 A treasury analyst asks: *"Prepare our LCR figures for the Basel III submission."*
