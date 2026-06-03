@@ -1,5 +1,51 @@
 # 10 — Content Rendering
 
+## Working assumption — the LLM output contract
+
+The platform's rendering pipeline is built on a single foundational assumption:
+
+> **The LLM always produces raw text or JSON. It never produces rendered output. Every structured output is delivered as plain content wrapped in a fenced block, with the rendering target name as the language tag.**
+
+````
+```<rendering-target>
+<raw content — plain text, JSON, Mermaid source, LaTeX, CSV, Vega-Lite spec, etc.>
+```
+````
+
+Examples:
+
+````
+```mermaid
+flowchart LR
+    A --> B --> C
+```
+````
+
+````
+```vega-lite
+{ "$schema": "...", "mark": "bar", "encoding": { ... } }
+```
+````
+
+````
+```document
+# Quarterly Risk Summary
+...
+```
+````
+
+The platform intercepts these fenced blocks before displaying them, identifies the target from the language tag, and hands the raw content to the appropriate renderer. The LLM has no knowledge of how the content will be displayed — it only knows what tag to use and what format the content inside the block must be.
+
+This contract has three important consequences:
+
+1. **The system prompt is the only configuration surface.** The LLM learns which tags are available and what format each expects solely from the system prompt injected at session start. If a renderer is registered, its `systemPromptGuidance` must fully specify the tag name and content format.
+
+2. **Raw content is always available.** Because the LLM always emits the unrendered source, every rendered block can switch to a raw view without any re-fetching or reprocessing — the source is already buffered.
+
+3. **Rendering failures are recoverable.** If a renderer fails, the platform falls back to displaying the raw content as a syntax-highlighted code block. The user always sees something meaningful.
+
+---
+
 ## Rendering decision rules
 
 The rendering engine evaluates each content block in an assistant response in priority order. **The first matching rule wins.**
