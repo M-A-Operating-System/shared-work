@@ -14,25 +14,25 @@ The risks below apply to any approach where AI generates and executes SQL withou
 
 Text-to-SQL feeds a natural language question and a physical database schema to an LLM, which generates SQL executed directly against the database. There is no semantic layer, no metric registry, and no governed definitions.
 
-### Where Text-to-SQL Adds Genuine Value
+---
 
-For the following use cases it is a legitimate and capable tool:
+## Text-to-SQL: A Strong Starting Point
 
-- **Ad-hoc data exploration**: answering one-off questions that do not feed into governed reports or regulatory submissions
-- **Hypothesis testing and data discovery**: quickly checking whether a pattern exists before deciding whether to invest in a formal metric definition
-- **Analytical prototyping**: exploring what a new metric might look like before it is specified, validated, and registered
-- **Internal tooling and low-stakes sandboxes**: developer and analyst productivity tooling where reproducibility and auditability are not requirements
-- **Accelerating the path to governed metrics**: using natural language queries to identify what questions users actually ask, then formalising the most common ones into the semantic layer
+Text-to-SQL is a legitimate and often valuable starting point for organisations beginning their AI analytics journey. Standing up a working prototype takes hours. It requires no prior investment in semantic modelling, no metric registry, no governed definitions. For a team that does not yet know what questions its users will actually ask, that speed is genuinely useful: exploratory queries surface real user intent, simple aggregations work reliably, and the feedback loop between question and result is fast enough to drive rapid learning.
 
-In each of these contexts Text-to-SQL is an accelerator, not a liability.
+Early wins are real. The demo is impressive. And iterative prompt refinement keeps extending coverage — each tweak fixes the last failure case and the system visibly improves. This creates a specific kind of false confidence: teams measure progress by the number of questions the system now handles correctly, not by whether the architecture can ever satisfy the governance requirements that matter.
+
+The experimentation phase has a natural conclusion. Once the team understands which questions matter, which metrics are used repeatedly, and which outputs feed consequential decisions, that is the point at which the semantic layer investment pays off. The natural language queries produced during exploration become direct input to the metric definition process: a well-run experimentation phase accelerates formal metric design rather than replacing it.
+
+**Text-to-SQL has a permanent role in the long-term architecture — as the exploration and discovery layer.** Analysts continue to use it for ad-hoc queries, hypothesis testing, and prototyping new metric ideas. The semantic layer handles everything that needs to be reproducible, auditable, and governed. Neither replaces the other; the experimentation capability is preserved, and its outputs feed the governed registry as needed.
+
+The risks described in the rest of this document are not about experimentation. They are about the failure to transition: organisations that continue to rely on Text-to-SQL for governed, critical, and regulated processes long after the experimental phase should have concluded. The sections below explain why that architecture cannot be patched into suitability.
 
 ### Where It Becomes the Wrong Foundation
 
-Text-to-SQL is a genuinely compelling starting point for early AI analytics work. A working demo appears in hours, simple queries produce accurate results, and iterative prompt refinement keeps extending coverage — each tweak fixes the last failure case and the system visibly improves. This creates a specific kind of false confidence: teams measure progress by the number of questions the system now handles correctly, not by whether the architecture can ever satisfy the governance requirements that matter.
-
 The failure mode is rarely a deliberate decision. A team uses Text-to-SQL because it is fast, use cases expand, and outputs start feeding processes they were never intended to support. By the time the governance gap is visible it is embedded in workflows, dashboards, and downstream systems — and the prompt has become load-bearing. The [Why You Cannot Patch Your Way Out](#why-you-cannot-patch-your-way-out) section examines why this is hard to reverse.
 
-| For exploration | As a governed execution layer |
+| As an early experiment | As a governed execution layer |
 |---|---|
 | Working demo in hours | Every structural defect compounds as use cases mature |
 | No semantic modelling required | Schema drift, metric inconsistency, and lineage gaps accumulate |
