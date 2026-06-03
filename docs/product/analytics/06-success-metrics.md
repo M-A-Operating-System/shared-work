@@ -11,7 +11,7 @@ Component definitions referenced in the metrics below (SMR, FQP, RAPL, SEG, NSE,
 | Metric | Definition | Target |
 |--------|-----------|--------|
 | **Active tenants** | Tenants with at least one successful query execution in the 7-day window | Growth metric — tracked weekly |
-| **Platform uptime** | API availability (p99 latency < 2s; error rate < 0.1%) | 99.9% |
+| **Platform uptime** | API availability (p99 end-to-end latency < 2s including FQP backend execution; error rate < 0.1%) | 99.9% |
 | **Governance block rate** | Queries blocked by governance checks ÷ total queries | Monitor — sustained > 30% may indicate misconfigured cost limits or entitlements |
 | **FQP error rate** | Queries with FQP execution errors ÷ total executed queries | < 2% |
 | **Cache hit rate** | Queries served from result cache ÷ total executed queries | ≥ 35% by month 2 |

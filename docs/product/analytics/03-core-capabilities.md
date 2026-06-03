@@ -793,8 +793,8 @@ Both `portfolio_return` and `benchmark_return` have `data_affinity: "portfolio"`
 ```sql
 SELECT
     p.portfolio_id,
-    AVG(f.portfolio_return)  AS portfolio_return,
-    AVG(f.benchmark_return)  AS benchmark_return
+    SUM(f.portfolio_return * f.market_value) / SUM(f.market_value) AS portfolio_return,
+    SUM(f.benchmark_return * f.market_value) / SUM(f.market_value) AS benchmark_return
 FROM fact_portfolio_daily f
 JOIN dim_portfolio p ON f.portfolio_id = p.portfolio_id
 WHERE p.asset_class  = 'EQUITY'
@@ -950,14 +950,14 @@ The portfolio manager's query returns four rows. The NSE receives the assembled 
 ```json
 {
   "narrative": {
-    "lead":       "3 of your 4 equity portfolios outperformed their benchmark this quarter.",
-    "detail":     "Global Equity Opportunities returned 4.21% against a benchmark of 3.85%. UK Core Income returned 2.87% against its benchmark of 2.54%. Asia Pacific Growth underperformed at 3.67% versus a benchmark of 3.90%.",
-    "anchoredTo": ["GLOB_EQ_OPP", "UK_CORE_INC", "ASIA_PAC_GRW"]
+    "lead":       "2 of your 4 equity portfolios outperformed their benchmark this quarter.",
+    "detail":     "Global Equity Opportunities returned 4.21% against a benchmark of 3.85%. UK Core Income returned 2.87% against its benchmark of 2.54%. Asia Pacific Growth and EUR Balanced Income underperformed, returning 3.67% and 1.93% respectively against benchmarks of 3.90% and 2.31%.",
+    "anchoredTo": ["GLOB_EQ_OPP", "UK_CORE_INC", "ASIA_PAC_GRW", "EUR_BAL_INC"]
   }
 }
 ```
 
-Post-generation validation confirms every numeric value (4.21, 3.85, 2.87, 2.54, 3.67, 3.90) is present in the assembled result rows. Validation passes. The narrative is included in the MCP response alongside `display_spec` and `data`.
+Post-generation validation confirms every verbatim numeric value cited in the narrative (4.21, 3.85, 2.87, 2.54, 3.67, 3.90, 1.93, 2.31) is present in the assembled result rows. Validation matches on exact numeric literals extracted from the narrative text — rounding differences or proportional expressions (e.g. "roughly 4.2%") may not be caught; residual hallucination risk applies to non-literal claims. Validation passes. The narrative is included in the MCP response alongside `display_spec` and `data`.
 
 ---
 
@@ -990,16 +990,16 @@ The Analytics Engine is headless: it produces no rendered output. Every successf
     "rows":   [ ... ]
   },
   "narrative": {
-    "lead":       "3 of your 4 equity portfolios outperformed their benchmark this quarter.",
-    "detail":     "Global Equity Opportunities returned 4.21% against a benchmark of 3.85%. UK Core Income returned 2.87% against its benchmark of 2.54%. Asia Pacific Growth underperformed at 3.67% versus a benchmark of 3.90%.",
-    "anchoredTo": ["GLOB_EQ_OPP", "UK_CORE_INC", "ASIA_PAC_GRW"]
+    "lead":       "2 of your 4 equity portfolios outperformed their benchmark this quarter.",
+    "detail":     "Global Equity Opportunities returned 4.21% against a benchmark of 3.85%. UK Core Income returned 2.87% against its benchmark of 2.54%. Asia Pacific Growth and EUR Balanced Income underperformed, returning 3.67% and 1.93% respectively against benchmarks of 3.90% and 2.31%.",
+    "anchoredTo": ["GLOB_EQ_OPP", "UK_CORE_INC", "ASIA_PAC_GRW", "EUR_BAL_INC"]
   },
   "meta": {
     "latencyMs":    1285,
     "cacheHit":     false,
     "rowCount":     4,
     "backendsUsed": ["primary-warehouse"],
-    "costUnits":    500
+    "costUnits":    620
   }
 }
 ```

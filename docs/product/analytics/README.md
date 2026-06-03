@@ -48,7 +48,7 @@ Read sequentially from Chapter 1. Each chapter assumes the previous. The appendi
 | **[Semantic Charting Language (SCL)](./03-core-capabilities.md#analytical-output-format)** | Platform output format for display specifications. Two types in a consistent JSON envelope: `type: "chart"` (Vega-Lite v5) and `type: "table"`. |
 | **[Analytical Lineage](./03-core-capabilities.md#analytical-lineage-store)** | Computation provenance — not data lineage. A complete, queryable record of which metric definitions, aggregation rules, role projections, and backend sub-results produced each analytical result. |
 | **Application Admin** | Privileged tenant user responsible for SMR integrity, entitlement policies, and governance configuration. Equivalent to a Chief Data Officer within the platform context. Must exist before go-live. |
-| **vite2img** | Standalone MCP render service for static image output. Registered directly with consumers as a peer server. Not part of the Analytics Platform. |
+| **vega2img** | Standalone MCP render service for static image output. Registered directly with consumers as a peer server. Not part of the Analytics Platform. |
 
 ---
 
@@ -66,7 +66,7 @@ These decisions are non-negotiable architectural constraints. Each maps to one o
 | **A6** | Chart selection is deterministic and governed by the Visualisation Ontology — not inferred by the LLM per query. | [P7](./01-platform-overview.md#design-principles) |
 | **A7** | The LQP is backend-agnostic. Physical execution translation is the FQP's responsibility. | [P10](./01-platform-overview.md#design-principles) |
 | **A8** | Governance circuit breakers are applied at the semantic tier. No query reaches a physical backend without passing governance checks. | [P2](./01-platform-overview.md#design-principles) |
-| **A9** | A single shared platform instance serves all consumers — isolation is enforced exclusively by the entitlement model and JWT role claims. | [P5](./01-platform-overview.md#design-principles) |
+| **A9** | A single shared platform instance serves all consumers — isolation is enforced by: (1) RAPL/SEG entitlement checks on every request; (2) row-level security on the lineage index; (3) tenant-scoped key prefixes on all object store access; (4) tenant_id scoping on all DCS queries. No cross-tenant data access is possible at any privilege level. | [P5](./01-platform-overview.md#design-principles) |
 | **A10** | Narrative synthesis is anchored to governed metric values in the execution result. The LLM may not introduce metric values not present in the result. | [P6](./01-platform-overview.md#design-principles) |
 
 ---

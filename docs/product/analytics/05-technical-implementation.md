@@ -398,6 +398,7 @@ The core metric definition. One document per approved metric version per tenant.
     "cube":    "risk_cube",
     "measure": "var_95_daily"
   },
+  "formula":              "MAX(losses) WHERE confidence_level = 0.95",
   "required_dimensions":  ["portfolio_id", "as_of_date"],
   "optional_dimensions":  ["asset_class", "geography", "sector", "currency"],
   "compliance_modes":     [],
@@ -410,6 +411,8 @@ The core metric definition. One document per approved metric version per tenant.
 `status` is one of `"proposed"` | `"in_review"` | `"approved"` | `"deprecated"` | `"retired"`. The DCS enforces a uniqueness constraint: at most one document per `(tenant_id, metric_id)` may carry `"status": "approved"` at any point in time. All prior versions are retained as `"deprecated"` for lineage reconstruction. `source` is `"platform"` for Financial Services Reference Model entries and `"tenant"` for customised definitions.
 
 `weight_metric_id` is required when `aggregation` is `"value_weighted_average"` (or any other weighted aggregation variant) and must reference the `metric_id` of an approved `analytical_metric` in the same tenant's DCS. The SIL resolves and validates this reference at query time. If the weight metric is missing or unapproved, the query is rejected. The field is absent for non-weighted aggregations (`"sum"`, `"last"`, `"count"`, `"min"`, `"max"`, `"mean"`). The LQP generator emits a `weight_metric_id` key on the `metric_scan` node so that the execution backend can fetch the weighting values alongside the primary metric.
+
+`formula` stores the business-logic expression defined in the [SMR formula language](./03-core-capabilities.md#formula-language). It is the human-readable and audit-visible definition of what the metric computes. At query time the FQP resolves the formula against the `physical_mapping` to generate the backend-specific query; the formula itself is never executed directly. Metrics backed entirely by a pre-computed measure in a semantic layer (e.g. a Cube.js measure) may leave `formula` as an empty string and rely solely on `physical_mapping`.
 
 #### New DCS document type: `analytical_dimension`
 
@@ -678,7 +681,14 @@ class LQPGenerator:
     def _infer_join_keys(self, metrics: list[dict]) -> list[str]:
         # Intersection of required_dimensions across all metrics — safe shared join keys
         key_sets = [set(m.get("required_dimensions", [])) for m in metrics]
-        return list(set.intersection(*key_sets)) if key_sets else []
+        keys = list(set.intersection(*key_sets)) if key_sets else []
+        if not keys:
+            raise ValueError(
+                f"No shared required_dimensions across metrics — cannot infer join keys. "
+                f"Ensure all co-queried metrics share at least one canonical dimension name. "
+                f"Metrics: {[m['metric_id'] for m in metrics]}"
+            )
+        return keys
 
     def _render_predicate(self, f: dict) -> str:
         op_map = {
@@ -747,13 +757,35 @@ class RoleAwareProjectionLayer:
         self.pg = pg_pool
 
     async def project(self, lqp: dict, claims: dict) -> dict:
-        policy = await self._load_policy(claims["tenant_id"], claims.get("role"))
-        if policy is None:
+        # analytics_roles is an array claim — users may hold multiple roles
+        # roleClaimField is configurable per tenant (see Ch04 §entitlements config)
+        role_claim_field = self.config.get("roleClaimField", "analytics_roles")
+        roles = claims.get(role_claim_field, [])
+        if isinstance(roles, str):
+            roles = [roles]  # normalise scalar claim to list
+
+        policies = [p for p in [await self._load_policy(claims["tenant_id"], r) for r in roles] if p]
+        if not policies:
             raise AccessDeniedError("No role policy found — defaultDenyAll")
 
-        lqp = self._inject_row_predicates(lqp, policy, claims)
-        lqp["column_masks"] = policy.get("columnMasks", {})
+        # Merge: metric access = union across roles; row predicates = intersection (most restrictive)
+        merged = self._merge_policies(policies)
+        lqp = self._inject_row_predicates(lqp, merged, claims)
+        lqp["column_masks"] = merged.get("columnMasks", {})
         return lqp
+
+    def _merge_policies(self, policies: list[dict]) -> dict:
+        # Row predicates: intersection (AND — most restrictive role wins)
+        # Column masks: union (masked by any role = masked for the user)
+        # Metric access: union (permitted by any role = permitted)
+        row_predicates = policies[0].get("rowPredicates", {})
+        for p in policies[1:]:
+            # Intersection: keep only predicates present in all role policies
+            row_predicates = {k: v for k, v in row_predicates.items() if k in p.get("rowPredicates", {})}
+        column_masks: dict = {}
+        for p in policies:
+            column_masks.update(p.get("columnMasks", {}))
+        return {"rowPredicates": row_predicates, "columnMasks": column_masks}
 
     def _inject_row_predicates(self, lqp: dict, policy: dict, claims: dict) -> dict:
         for dimension, template in policy.get("rowPredicates", {}).items():
@@ -766,7 +798,7 @@ class RoleAwareProjectionLayer:
         # Replace {{user.claim_name}} tokens with JWT claim values
         ...
 
-    async def _load_policy(self, tenant_id: str, role: str | None) -> dict | None:
+    async def _load_policy(self, tenant_id: str, role: str) -> dict | None:
         return await self.pg.fetchrow(
             "SELECT * FROM role_policies WHERE tenant_id=$1 AND role_id=$2",
             tenant_id, role,
