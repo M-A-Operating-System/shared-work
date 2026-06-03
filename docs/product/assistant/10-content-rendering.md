@@ -18,6 +18,8 @@ The rendering engine evaluates each content block in an assistant response in pr
 | 10 | Inline `$...$` within prose | **Inline math** — KaTeX rendered inline |
 | 11 | All other content | **Rich markdown prose** — GFM |
 
+> **Note — priority 1 is event-driven, not fenced-block matching.** Tool call disclosures are triggered by `mcp_tool_use` / `mcp_tool_result` streaming events, which arrive outside content blocks entirely. Priorities 2–11 are evaluated against the fenced block tag of each content block. The two mechanisms do not compete — tool call events are always rendered as disclosure cards regardless of block content.
+
 The system prompt (injected by the platform) instructs the model to:
 - Prefer structured outputs — Vega-Lite for metrics and trends, Mermaid for relationships and flows, data tables for entity lists — over prose equivalents when the data supports it
 - Use `document` blocks for substantial prose outputs (reports, summaries, plans, policy drafts, analyses) where the user is likely to iterate across multiple turns rather than simply read once
@@ -59,6 +61,11 @@ interface HostRenderer {
 
   // Optional — called when the rendered element is removed from the DOM.
   dispose?(): void;
+
+  // Optional — if present, called by the platform when the user downloads from the
+  // artefact tray. The returned Blob is used instead of the raw fenced block source,
+  // allowing the renderer to export a rendered image, PDF, or structured file.
+  getExportBlob?(): Promise<Blob>;
 }
 
 interface RendererContext {
@@ -70,7 +77,7 @@ interface RendererContext {
 }
 ```
 
-The platform instantiates the renderer class once per content block, passes the full fenced block content as a string to `render()`, and calls `dispose()` when the block leaves the DOM (e.g. conversation navigation, component unmount).
+The platform loads the module once per session (cached for the session lifetime) but instantiates the renderer class once per content block. Each block gets its own renderer instance. The platform passes the full fenced block content as a string to `render()`, and calls `dispose()` when the block leaves the DOM (e.g. conversation navigation, component unmount).
 
 ### Isolation
 
@@ -96,7 +103,7 @@ All registered renderer guidance blocks are appended together in the order they 
 If the renderer module fails to load, or if `render()` throws, the platform:
 
 1. Logs the error to the improvement signal pipeline
-2. Renders the fenced block content as a **syntax-highlighted code block** (priority 8)
+2. Renders the fenced block content as a **syntax-highlighted code block** (priority 9)
 3. Shows an inline notice beneath the block: *"[Renderer name] could not render this content. Showing raw output."*
 
 The fallback is transparent to the user and non-blocking — the rest of the response continues rendering normally.
@@ -136,6 +143,28 @@ The platform calls `RiskGaugeRenderer.render(container, content, context)`. The 
 
 ---
 
+## Document canvas
+
+A `document` block opens a persistent right-panel canvas alongside the conversation thread. The canvas is designed for substantial prose outputs — reports, summaries, plans, policy drafts, analyses — that the user is likely to iterate on across multiple turns rather than simply read once.
+
+| Behaviour | Specification |
+|-----------|--------------|
+| Trigger | Fenced block tagged ` ```document ` |
+| Panel | Opens in a right-panel canvas; the conversation thread continues uninterrupted in the left panel |
+| Thread reference | A reference card appears in the thread at the point the document was produced — title, word count, and a *"Open document →"* link |
+| Multiple documents | Each `document` block from the same conversation opens as a tab in the canvas panel. Switching tabs does not navigate the conversation |
+| Iteration | Subsequent turns that produce a revised `document` block replace the active canvas content in-place; the prior version is accessible via the version history control (last 10 revisions retained) |
+| Export | Full document downloadable as Markdown or plain text from the canvas toolbar; PDF export via browser print |
+| Artefact | Document source stored in turn record; added to artefact tray with document title as label |
+| Mobile | Canvas panel opens as a full-screen overlay; a back button returns to the conversation thread |
+| Empty state | If the model produces a `document` block with no content, the canvas shows a *"No content"* placeholder and the thread reference card is omitted |
+
+### Document titles
+
+The platform extracts the document title from the first `# Heading` in the block content. If no heading is present, it defaults to *"Document — [timestamp]"*. Titles are shown in the thread reference card, the canvas tab, and the artefact tray entry.
+
+---
+
 ## Mermaid diagrams
 
 | Behaviour | Specification |
@@ -168,7 +197,7 @@ The platform calls `RiskGaugeRenderer.render(container, content, context)`. The 
 | Responsive sizing | `width: "container"` — adapts to viewport or container |
 | Export | PNG or SVG download from artefact tray |
 | Interactivity | Hover tooltips, click-to-filter where applicable |
-| Mobile | Responsive; minimum bar/point size maintained for touch targets |
+| Mobile | Responsive; minimum bar/point size maintained for touch targets. Hover tooltips activate on tap; click-to-filter activates on double-tap. Pinch-to-zoom is disabled — the chart scales with the viewport instead |
 | Artefact | Vega-Lite spec stored in turn record; added to artefact tray on render complete |
 
 ---
@@ -237,6 +266,21 @@ Non-image documents are **not rendered inline**. When the model references a spe
 
 ---
 
+## Artefact tray
+
+The artefact tray is a persistent UI panel (collapsed by default, expandable from a tray handle at the bottom of the conversation) that collects downloadable outputs from the current conversation. Every non-prose rendered block — Mermaid diagrams, Vega-Lite charts, math expressions, JSON payloads, data tables, document canvas outputs, and custom renderer outputs — is automatically added to the tray when it finishes rendering.
+
+| Element | Specification |
+|---------|--------------|
+| Trigger | Added automatically on render completion of any non-prose block |
+| Entry label | Content type name + block title (where extractable) or timestamp |
+| Download | Clicking an entry downloads the artefact. For custom renderers that implement `getExportBlob()`, the exported blob is used; otherwise the raw fenced block source is downloaded as plain text |
+| Scope | Tray contents are scoped to the current conversation. Navigating to a new conversation clears the tray |
+| Persistence | Artefact tray entries are stored with the turn record and restored when the conversation is reopened |
+| Empty state | Tray handle is hidden when there are no artefacts in the current conversation |
+
+---
+
 ## Inline source citations
 
 When the model's response draws on data returned by an MCP tool call, it should cite the source inline using a numbered superscript that links to the corresponding tool call disclosure card.
@@ -266,10 +310,36 @@ While the model is streaming, the input field is disabled and replaced by a **st
 
 ### Truncated response — continue generating
 
-When the model's response ends without a natural conclusion (detected heuristically: response ends mid-sentence, or the model emits a continuation signal), a **Continue** button appears below the response:
+When the model's response ends without a natural conclusion, a **Continue** button appears below the response. Truncation is detected by either of two signals: (a) the API returns `stop_reason: "max_tokens"`, indicating the output token limit was reached; or (b) heuristic analysis finds the response ends mid-sentence — no terminal punctuation in the last 120 characters and no closing structural element (heading, list item, code block close, or horizontal rule).
 
 > *"Response may be incomplete.* **Continue →***"*
 
 Clicking Continue submits an implicit *"Please continue"* turn, which regenerates from the end of the incomplete response in a new branch. The original truncated response is preserved. This handles output-token-limit cases transparently without requiring the user to know why the response stopped.
 
 The Continue button is shown for a maximum of 60 seconds after the truncated response; after that it is dismissed to avoid polluting old threads.
+
+---
+
+## Raw / rendered toggle
+
+Every non-prose rendered block exposes a **Raw** toggle that switches between the rendered view and the raw source in place. This applies to all structured content types:
+
+| Content type | Rendered view | Raw view |
+|---|---|---|
+| Data table (` ```csv ` / ` ```table `) | Sortable, filterable, paginated table | Raw CSV or JSON source in a syntax-highlighted code block |
+| Vega-Lite chart | Interactive vega-embed chart | Vega-Lite JSON spec in a JSON inspector |
+| Mermaid diagram | Rendered SVG | Mermaid source in a syntax-highlighted code block |
+| Math expression | KaTeX-rendered formula | LaTeX source in a code block |
+| JSON inspector | Collapsible tree | Raw JSON in a syntax-highlighted code block |
+| Document canvas | Right-panel canvas | Markdown source in a code block (in-thread, without opening the canvas) |
+| Custom host renderer | Renderer output | Raw fenced block source in a syntax-highlighted code block |
+
+### Toggle placement and behaviour
+
+The toggle is a **Rendered · Raw** pill control placed in the top-right corner of the content block's bounding box. It appears on hover (desktop) and is always visible on touch devices.
+
+- Switching to Raw does not re-fetch or reprocess content — the raw source is the already-buffered fenced block content.
+- The toggle state is per-block and per-session — it is not persisted across page loads.
+- Switching a Vega-Lite block to Raw shows the JSON inspector rather than a plain code block, since the spec is structured data with navigable nodes.
+- When a block is in Raw view, the artefact tray entry for that block still downloads the rendered export (or raw source if no `getExportBlob()` is available) — the toggle does not affect the download target.
+- Custom renderers that implement `getExportBlob()` are not called while the block is in Raw view.
