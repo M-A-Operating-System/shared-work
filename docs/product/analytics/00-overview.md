@@ -2,6 +2,30 @@
 
 ## The Problem
 
+### The financial services challenge
+
+Large financial services organisations operate on analytically complex, regulation-sensitive data. Portfolio managers compare risk-adjusted returns across hundreds of strategies against regulated benchmarks. Risk officers monitor VaR breaches across multiple entities in real time. Compliance analysts prepare LCR and NSFR submissions under Basel III/IV, MiFID II, and SEC Regulation BI. All of these decisions depend on metrics that are not simple aggregations: they are versioned, regulated, formula-specific computations that must be calculated identically across every report, every system, and every user session. Any deviation is an error.
+
+The consequence is a structural bottleneck. Business users cannot access the data they need without going through a specialist intermediary. Quantitative developers translate business requirements into SQL. Data engineers maintain the pipelines. Analysts mediate between business questions and physical data. This is not a resourcing problem; it is an architectural one. Decision-making slows to the analysts' capacity. Strategic questions queue behind routine reporting. Insight arrives days or weeks after the moment it was needed.
+
+The regulatory dimension sharpens this further. An analytical result in a governed financial services organisation is not just a number: it is an assertion. When a regulator asks how a capital ratio was calculated, the answer must be reproducible, version-controlled, and complete. When the same metric appears in submissions to two regulators across two jurisdictions, it must resolve to exactly the same formula. These are not quality aspirations. They are legal requirements. An organisation that cannot produce computation provenance for its regulatory submissions is not merely technically incomplete. It is legally exposed.
+
+### Where AI analytics stands today
+
+Conversational AI has matured to a point where AI assistants and agents can effectively handle small-scale data access: retrieving individual records, looking up reference data, and calling predefined calculations via MCP (Model Context Protocol) tool integrations. These capabilities are well established and deliver real value — an AI assistant that can pull a client record, check a position, or invoke a pre-built calculation is a meaningful productivity gain.
+
+The natural next step is large-scale analytics and data mining: the portfolio manager who wants returns versus benchmark across all equity strategies, the risk officer who needs VaR exposures aggregated across multiple entities, the data science pipeline that requires 12 months of position data for model retraining. A common starting point is for organisations to explore Text-to-SQL, where they attempt to use LLMs to generate SQL queries against their data platform schemas that are then executed directly against production data. For exploratory, low-stakes, ad hoc work this is a legitimate starting point. For governed large-scale analytics in regulated financial services it is not sufficient or sustainable.
+
+The structural problems are architectural, not incidental:
+
+- **No approved metric definitions** — the AI infers what "Portfolio Return" means at query time, so the same metric can mean different things in different queries and reports
+- **No reproducible calculation record** — SQL is generated fresh each time, so no two identical queries are guaranteed to produce identical results
+- **No guaranteed entitlement enforcement** — access controls depend on the reliability of AI-generated query predicates rather than a guaranteed enforcement layer
+
+Teams can invest significant effort in training or fine-tuning LLMs to better understand their specific schemas, and this can improve query accuracy in early trials. However, this approach addresses the symptom — the model's knowledge of table structures — rather than the underlying problem. No amount of schema training produces approved metric definitions, a reproducible calculation record, or a guaranteed entitlement enforcement layer. The governance gap remains, regardless of how well the model has learned the schema.
+
+In a regulated environment, none of these properties is acceptable. The [Text-to-SQL appendix](./07-text-to-sql-antipattern.md) examines the failure modes in detail and describes the complementary architecture where both tools coexist.
+
 ### Analytics engines: a well-established design pattern
 
 The governed semantic computation engine is not a new idea. The industry has developed and refined it for decades across a broad range of platforms and categories:
@@ -18,30 +42,6 @@ All share a common design pattern. Rather than searching tables and returning ro
 
 The dominant AI narrative has become: *natural language → LLM → SQL → database → answer*. This treats the database as the analytical system. It is not. The analytical system is the governed computation layer that sits above the database. The AI opportunity is to build and expose that layer through natural language and agentic interfaces — not to route around it.
 
-### Where AI analytics stands today
-
-Conversational AI has matured to a point where AI assistants and agents can effectively handle small-scale data access: retrieving individual records, looking up reference data, and calling predefined calculations via MCP (Model Context Protocol) tool integrations. These capabilities are well established and deliver real value — an AI assistant that can pull a client record, check a position, or invoke a pre-built calculation is a meaningful productivity gain.
-
-The natural next step is large-scale analytics and data mining: the portfolio manager who wants returns versus benchmark across all equity strategies, the risk officer who needs VaR exposures aggregated across multiple entities, the data science pipeline that requires 12 months of position data for model retraining. A common starting point is for organisations to explore Text-to-SQL, where they attempt to use LLM models to generate SQL queries against their data platform schemas that are then executed directly against production data. For exploratory, low-stakes, ad hoc work this is a legitimate starting point. For governed large-scale analytics in regulated financial services it is not sufficient or sustainable.
-
-The structural problems are architectural, not incidental:
-
-- **No approved metric definitions** — the AI infers what "Portfolio Return" means at query time, so the same metric can mean different things in different queries and reports
-- **No reproducible calculation record** — SQL is generated fresh each time, so no two identical queries are guaranteed to produce identical results
-- **No guaranteed entitlement enforcement** — access controls depend on the reliability of AI-generated query predicates rather than a guaranteed enforcement layer
-
-Teams can invest significant effort in training or fine-tuning LLMs to better understand their specific schemas, and this can improve query accuracy in early trials. However, this approach addresses the symptom — the model's knowledge of table structures — rather than the underlying problem. No amount of schema training produces approved metric definitions, a reproducible calculation record, or a guaranteed entitlement enforcement layer. The governance gap remains, regardless of how well the model has learned the schema.
-
-In a regulated environment, none of these properties is acceptable. The [Text-to-SQL appendix](./07-text-to-sql-antipattern.md) examines the failure modes in detail and describes the complementary architecture where both tools coexist.
-
-### The financial services challenge
-
-Large financial services organisations operate on analytically complex, regulation-sensitive data. Portfolio managers compare risk-adjusted returns across hundreds of strategies against regulated benchmarks. Risk officers monitor VaR breaches across multiple entities in real time. Compliance analysts prepare LCR and NSFR submissions under Basel III/IV, MiFID II, and SEC Regulation BI. All of these decisions depend on metrics that are not simple aggregations: they are versioned, regulated, formula-specific computations that must be calculated identically across every report, every system, and every user session. Any deviation is an error.
-
-The consequence is a structural bottleneck. Business users cannot access the data they need without going through a specialist intermediary. Quantitative developers translate business requirements into SQL. Data engineers maintain the pipelines. Analysts mediate between business questions and physical data. This is not a resourcing problem; it is an architectural one. Decision-making slows to the analysts' capacity. Strategic questions queue behind routine reporting. Insight arrives days or weeks after the moment it was needed.
-
-The regulatory dimension sharpens this further. An analytical result in a governed financial services organisation is not just a number: it is an assertion. When a regulator asks how a capital ratio was calculated, the answer must be reproducible, version-controlled, and complete. When the same metric appears in submissions to two regulators across two jurisdictions, it must resolve to exactly the same formula. These are not quality aspirations. They are legal requirements. An organisation that cannot produce computation provenance for its regulatory submissions is not merely technically incomplete. It is legally exposed.
-
 ### The platform
 
 We propose an alternative to Text-to-SQL: a dedicated, governed AI-enabled analytics platform that allows AI to correctly execute well-governed, semantically described metrics and return well-defined, structured datasets at scale. Rather than generating SQL against raw schemas, AI interacts exclusively with an approved analytical vocabulary — versioned metric definitions, governed dataset contracts, and enforced entitlements — and the platform handles all deterministic computation, access control, and audit recording.
@@ -57,9 +57,8 @@ The platform addresses the following challenges that Text-to-SQL and small-scale
 | Computation provenance for regulatory review | Full audit record for every result: intent → definitions → entitlements → plan → execution → result |
 | Entitlement enforcement that AI cannot bypass | Enforced at the analytical layer before any database is contacted — not dependent on AI query generation reliability |
 | Metric governance and change management | Every metric definition is version-controlled with an approval workflow and full change history |
-| Query cost governance for enterprise warehouses | Query cost is estimated before execution; a circuit breaker blocks queries that exceed cost thresholds |
 | Multi-source analytical federation | A single governed interface routes queries across SQL warehouses, APIs, graph databases, and any registered data source |
-| Large dataset access for AI agents and data mining pipelines | Large datasets returned to agents and pipelines under the same entitlement, audit, and cost controls as analytical queries |
+| Large dataset access for AI agents and data mining pipelines | Large datasets returned to agents and pipelines under the same entitlement and audit controls as analytical queries |
 
 ---
 
@@ -97,7 +96,7 @@ Ten principles govern all design decisions. Where a proposed feature conflicts w
 | **P9 — Administrator sovereignty within governance bounds** | Platform administrators control data sources, metric definitions, access policies, and governance thresholds — but may not lower governance minimums below platform floors. There is no bypass mode. |
 | **P10 — Deterministic computation, not generation** | Analytical results are computed from approved metric definitions, never generated by an AI model. The same structured request, with the same access permissions and data, always returns the same result. |
 
-Each principle creates natural tensions with product requirements — expressiveness, latency, metric evolution, storage cost — and each tension has a defined resolution. Full discussion is in [Chapter 3](./03-core-capabilities.md).
+Each principle creates natural tensions with product requirements — expressiveness, latency, and metric evolution — and each tension has a defined resolution. Full discussion is in [Chapter 3](./03-core-capabilities.md).
 
 Two tensions are worth noting here. When a business concept cannot be queried, the resolution is to register it in the metric registry: a governed addition subject to approval and version control, not an ad hoc inference. That is a productive tension — it is how the platform's analytical vocabulary grows. The tension between administrator control and governance minimums is different: governance floors are architectural properties of the platform, not configurable thresholds. There is no bypass mode.
 
@@ -105,7 +104,7 @@ Two tensions are worth noting here. When a business concept cannot be queried, t
 
 ## The Architecture in Practice
 
-The two diagrams below contrast the Text-to-SQL approach with the AI-Enabled Analytics Platform. The structural difference is the governed semantic layer: in the platform approach, AI never touches raw schemas or generates SQL — it interacts with an approved analytical vocabulary and the platform handles all computation, governance, and execution.
+In both approaches, AI clients and LLMs are present. The difference is what happens next. In Text-to-SQL, the AI generates queries directly against raw database schemas. In the AI-Enabled Analytics Platform, it submits structured requests to a governed semantic layer — and the platform handles all computation, governance, and execution.
 
 **Text-to-SQL Approach**
 
@@ -149,7 +148,7 @@ flowchart LR
         direction TB
        M["API / Protocol Layer\n(MCP)"]
         P1["Intent & Metric Resolution\nApproved Semantic Layer"]
-        P2["Governance Pipeline\nEntitlement · Compliance · Cost"]
+        P2["Governance Pipeline\nEntitlement · Compliance"]
         P3["Federated Query Engine"]
     end
     subgraph data["Database / Data Sources"]
