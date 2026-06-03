@@ -144,11 +144,10 @@ flowchart LR
         C2["Autonomous Agent\n& Data Mining"]
         C3["Custom\nApplication"]
     end
-
-    M["API / Protocol Layer\n(MCP)"]
+    L["LLM"]
     subgraph platform["Analytics Capability"]
         direction TB
-        L["LLM"]
+       M["API / Protocol Layer\n(MCP)"]
         P1["Intent & Metric Resolution\nApproved Semantic Layer"]
         P2["Governance Pipeline\nEntitlement · Compliance · Cost"]
         P3["Federated Query Engine"]
@@ -160,7 +159,7 @@ flowchart LR
         D3["Graph Data API"]
     end
     clients --> platform
-    clients --> M
+    clients --> L
     M --> P1
     P1 --> P2
     P2 --> P3
