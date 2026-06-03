@@ -130,6 +130,7 @@ flowchart LR
         D3["Graph Data API"]
     end
     clients --> L
+    clients --> M
     L --> M
     M --> T1
     T1 --> T2
@@ -162,6 +163,7 @@ flowchart LR
         D3["Graph Data API"]
     end
     clients --> L
+    clients --> M
     L --> M
     M --> P1
     P1 --> P2
