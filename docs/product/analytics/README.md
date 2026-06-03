@@ -28,7 +28,7 @@ The platform eliminates Text-to-SQL as an architectural pattern for regulated an
 | [4. Integration and Deployment](./04-integration-and-deployment.md) | Integration and Deployment | Consumer integration, platform administration, Financial Services reference model, complementary services |
 | [5. Technical Implementation](./05-technical-implementation.md) | Proposed Technical Implementation | Reference stack with rationale: Cloudflare Workers, Apache Calcite, Vega-Lite, PostgreSQL lineage store, Anthropic Claude |
 | [6. Success Metrics](./06-success-metrics.md) | Success Metrics | Platform and application-level metrics, governance health indicators, review cadence |
-| [Appendix: Text-to-SQL Antipattern](./07-text-to-sql-antipattern.md) | Why Not Text-to-SQL? | Structural failure modes, security risks, and the case for a governed semantic layer |
+| [7. Appendix: Text-to-SQL and Semantic Analytics](./07-text-to-sql-antipattern.md) | Text-to-SQL and Semantic Analytics: Better Together | Structural failure modes, SQL injection risks, and the complementary architecture where both tools coexist |
 | [8. Roadmap](./08-roadmap.md) | Platform Roadmap | Planned enhancements beyond the current release |
 
 Read sequentially from Chapter 1. Each chapter assumes the previous. The appendix may be read independently as a standalone reference for teams evaluating architectural options.

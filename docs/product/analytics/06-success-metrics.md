@@ -57,7 +57,7 @@ Component definitions referenced in the metrics below (SMR, FQP, RAPL, SEG, NSE,
 
 | Metric | Definition | Target |
 |--------|-----------|--------|
-| **Intent resolution accuracy** | Queries where user accepted resolved intent without modification (intent confirmation tenants) | ≥ 85% |
+| **Intent resolution accuracy** | Queries where user accepted resolved intent without modification (intent confirmation tenants only — `requiresIntentConfirmation: true`). For tenants without confirmation enabled, use query reformulation rate as the proxy measure. | ≥ 85% |
 | **Query reformulation rate** | Queries where user rephrased within 2 turns after a resolution error | < 10% |
 | **Narrative validation failure rate** | Narrative synthesis attempts failing post-generation validation | < 2% |
 

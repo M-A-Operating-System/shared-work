@@ -468,7 +468,7 @@ FORBIDDEN_PATTERNS: Final[list[str]] = [
     r';',
     r'\bCOMMIT\b',
     r'\bROLLBACK\b',
-    r'\bBEGIN\b',
+    r'\bBEGIN\s+TRANSACTION\b',  # bare BEGIN would reject PL/pgSQL BEGIN...END blocks
     r'\bEXEC\b',
     r'\bEXECUTE\b',
 ]

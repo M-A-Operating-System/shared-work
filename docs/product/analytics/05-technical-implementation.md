@@ -142,13 +142,7 @@ async def drilldown(input: DrilldownInput, jwt: str) -> dict:
 
 #### Execution profiles
 
-Each SMR operation carries an `execution_profile` that tells the pipeline executor which stages to invoke:
-
-| Profile | Pipeline stages | Typical operations |
-|---------|----------------|-------------------|
-| `data_retrieval` | Auth → RAPL → FQP → Lineage | Raw data fetches — positions, prices, reference data |
-| `metric_query` | Auth → RAPL → SIL → SEG → FQP → Lineage | Single metric value lookups |
-| `full_analytical` | Auth → RAPL → SIL → SEG → FQP → VO → NSE → Lineage | Attribution, comparison, regulatory reports |
+Each SMR operation carries an `execution_profile` that tells the pipeline executor which stages to invoke. Profile definitions are in [§MCP Capability Layer](./03-core-capabilities.md#mcp-capability-layer).
 
 #### Resources
 
@@ -1101,7 +1095,7 @@ The evaluator matches the `COMPARISON` intent pattern and two-metric schema to t
 }
 ```
 
-Full SCL examples including the `type: "table"` spec are in Section 3.7 (Analytical Output Format). Full chart contract definitions are in Section 3.6 (Visualisation Ontology).
+Full SCL examples including the `type: "table"` spec are in [Analytical Output Format](./03-core-capabilities.md#analytical-output-format). Full chart contract definitions are in [Visualisation Ontology](./03-core-capabilities.md#visualisation-ontology).
 
 ```python
 INTENT_CONTRACTS = {
@@ -1238,7 +1232,7 @@ if __name__ == "__main__":
 |----------|--------|-----------|
 | **Lineage records** | S3-compatible object store — one JSON document per query | Write-once; append-only; cheap at scale; no schema migration required; natural fit for immutable audit records |
 | **Object key** | `lineage/{tenant_id}/{yyyy}/{mm}/{dd}/{result_id}.json` | Date-partitioned; enables prefix-based listing by tenant and time window |
-| **Search index** | Thin PostgreSQL table (scalar fields only, no JSON blobs) | Used by the Lineage Query REST API (Phase 11) for filtered search; full record always fetched from the object store |
+| **Search index** | Thin PostgreSQL table (scalar fields only, no JSON blobs) | Used by the Lineage Query REST API (see roadmap) for filtered search; full record always fetched from the object store |
 | **Retention** | Object lifecycle policy — default 7 years (configurable per compliance mode) | MiFID II and equivalent regimes; enforced at the storage layer, not application code |
 
 #### Lineage document schema
@@ -1270,7 +1264,7 @@ Records are written once and never mutated. Post-hoc compliance annotations are 
 
 #### Search index DDL
 
-A lightweight PostgreSQL table holds only the scalar fields required for the Lineage Query REST API (Phase 11). Full records are always retrieved from the object store; this table is never the source of truth for record content.
+A lightweight PostgreSQL table holds only the scalar fields required for the Lineage Query REST API (see roadmap). Full records are always retrieved from the object store; this table is never the source of truth for record content.
 
 ```sql
 CREATE TABLE analytics.lineage_index (
@@ -1394,7 +1388,9 @@ class KnowledgeStore:
 | **Activation** | `analyticalDomain` config triggers SMR import at tenant setup | Bundle documents are written to the DCS in `proposed` state; Application Admin approves before metrics become resolvable |
 | **Customisation** | Full edit/override via Admin API after import | Customised definitions marked `source: "tenant"` in the DCS document |
 
-Each bundle is a JSON array of DCS documents conforming to the schemas defined in Section 3.1. Bundles are seeded into the DCS in `"proposed"` state at tenant setup; the Application Admin approves each document before it becomes resolvable by the Semantic Intent Layer.
+Each bundle is a JSON array of DCS documents conforming to the schemas defined in [§Semantic Metrics Registry](./03-core-capabilities.md#semantic-metrics-registry). Bundles are seeded into the DCS in `"proposed"` state at tenant setup; the Application Admin approves each document before it becomes resolvable by the Semantic Intent Layer.
+
+> **Version format note:** Seed bundle documents use an integer `version` field (starting at `1`) as the bootstrap state. On first tenant activation the platform converts these to semantic versioning (`"1.0.0"`). Subsequent versions follow semver — the `"2.1.0"` form used in Chapter 3 examples reflects a metric that has been through two major revisions post-activation.
 
 #### Dimensions bundle (shared across all domains)
 

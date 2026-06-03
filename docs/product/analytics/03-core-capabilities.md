@@ -1099,7 +1099,7 @@ The MCP Capability Layer assembles the SCL display specification and the NSE nar
       "cacheHit":     false,
       "rowCount":     4,
       "backendsUsed": ["primary-warehouse"],
-      "costUnits":    580
+      "costUnits":    620
     }
   }
 }
@@ -1284,6 +1284,29 @@ Each SMR operation carries an `execution_profile` defined in its `analytical_ope
 | `data_retrieval` | Auth → RAPL → FQP → Lineage |
 | `metric_query` | Auth → RAPL → SIL → SEG → FQP → Lineage |
 | `full_analytical` | Full pipeline including Visualisation Ontology + Narrative Synthesis Engine |
+
+### Intent Confirmation Card
+
+When a tenant has `requiresIntentConfirmation: true` configured, the platform returns a confirmation card before executing any query. The card is returned as the MCP response body in place of the analytical result; the consumer must re-submit with `"confirmed": true` to proceed to execution.
+
+```json
+{
+  "confirmation_required": true,
+  "intent": {
+    "operation_id":   "compare_portfolios",
+    "operation_label": "Compare Portfolios",
+    "resolved_metrics": ["portfolio_return", "benchmark_return"],
+    "resolved_dimensions": ["portfolio_id", "asset_class"],
+    "time_period":    "quarter_to_date",
+    "filters":        [{ "field": "asset_class", "operator": "eq", "value": "EQUITY" }],
+    "estimated_cost": 620,
+    "classification": "INTERNAL"
+  },
+  "confirm_by": "re-submit run_analytics with confirmed: true"
+}
+```
+
+The card surfaces the resolved `operation_id`, metric IDs, dimensions, filters, estimated cost units, and data classification level — everything needed for a user or AI agent to verify the resolved intent before execution proceeds. This is appropriate for high-stakes or compliance-sensitive queries where silent intent misresolution is unacceptable.
 
 ### Capability Governance
 
