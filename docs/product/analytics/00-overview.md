@@ -107,14 +107,12 @@ Two tensions are worth noting here. When a business concept cannot be queried, t
 
 The two diagrams below contrast the Text-to-SQL approach with the AI-Enabled Analytics Platform. The structural difference is the governed semantic layer: in the platform approach, AI never touches raw schemas or generates SQL — it interacts with an approved analytical vocabulary and the platform handles all computation, governance, and execution.
 
-<table>
-<tr>
-<td>
+**Text-to-SQL Approach**
 
 ```mermaid
-flowchart TB
+flowchart LR
     subgraph clients["AI-Enabled Clients"]
-        direction LR
+        direction TB
         C1["Conversational\nAssistant"]
         C2["Autonomous Agent\n& Data Mining"]
         C3["Custom\nApplication"]
@@ -124,7 +122,7 @@ flowchart TB
     T1["Raw Database Schema\nexposed directly to AI"]
     T2["Generated SQL\nNo governed metrics · No lineage\nNo entitlement guarantee"]
     subgraph data["Database / Data Sources"]
-        direction LR
+        direction TB
         D1["SQL Warehouse"]
         D2["OpenData API"]
         D3["Graph Data API"]
@@ -136,13 +134,12 @@ flowchart TB
     T2 --> data
 ```
 
-</td>
-<td>
+**AI-Enabled Analytics Platform**
 
 ```mermaid
-flowchart TB
+flowchart LR
     subgraph clients["AI-Enabled Clients"]
-        direction LR
+        direction TB
         C1["Conversational\nAssistant"]
         C2["Autonomous Agent\n& Data Mining"]
         C3["Custom\nApplication"]
@@ -150,13 +147,13 @@ flowchart TB
     L["LLM"]
     M["API / Protocol Layer\n(MCP)"]
     subgraph platform["Analytics Capability"]
-        direction LR
+        direction TB
         P1["Intent & Metric Resolution\nApproved Semantic Layer"]
         P2["Governance Pipeline\nEntitlement · Compliance · Cost"]
         P3["Federated Query Engine"]
     end
     subgraph data["Database / Data Sources"]
-        direction LR
+        direction TB
         D1["SQL Warehouse"]
         D2["OpenData API"]
         D3["Graph Data API"]
@@ -168,14 +165,6 @@ flowchart TB
     P2 --> P3
     P3 --> data
 ```
-
-</td>
-</tr>
-<tr>
-<td align="center"><strong>Text-to-SQL Approach</strong></td>
-<td align="center"><strong>AI-Enabled Analytics Platform</strong></td>
-</tr>
-</table>
 
 In the platform approach, every request routes through the API layer, traverses the invariant governance sequence, and produces an audit record. No path to execution backends, physical schemas, or raw data exists outside that pipeline.
 
