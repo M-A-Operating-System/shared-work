@@ -129,7 +129,7 @@ The platform loads the module once per session (cached for the session lifetime)
 
 Each rendered block's `container` is the interior of a **shadow root** — the renderer's DOM and styles are isolated from the platform UI and from other rendered blocks. The renderer may use any DOM APIs available to the module. It may not access the platform's internal state, the user's JWT, or other conversations.
 
-#### Streaming behaviour
+#### Block buffering
 
 Custom renderers receive the **full fenced block content** after `content_block_stop` — they cannot stream incrementally. While the block is buffering, the platform shows a loading skeleton in place of the renderer output. The skeleton is replaced by the rendered output on receipt.
 
@@ -321,6 +321,29 @@ When the model references a specific section, it cites by page number (PDF), she
 
 ## Cross-cutting behaviours
 
+### Streaming
+
+| Content type | Streaming behaviour |
+|-------------|-------------------|
+| Prose / markdown | Streams character-by-character; renders incrementally |
+| Non-prose blocks (Mermaid, Vega-Lite, JSON, tables, code) | Buffers internally; renders on `content_block_stop` to prevent hydration errors on partial content |
+| Tool call disclosures | Appear as an in-progress card while the tool is running; update on result receipt |
+| Artefact chips | *"Added to artefacts ↗"* chip appears beneath each completed non-prose block |
+
+While the model is streaming, the input field is disabled and replaced by a **stop-generation button**. Stopping generation saves the partial response to the audit trail as a partial turn — it does not discard it. When stopped, a *"(generation stopped)"* label appears beneath the partial response.
+
+#### Truncated response
+
+When the model's response ends without a natural conclusion, a **Continue** button appears below the response. Truncation is detected by either of two signals: (a) the API returns `stop_reason: "max_tokens"`, indicating the output token limit was reached; or (b) heuristic analysis finds the response ends mid-sentence — no terminal punctuation in the last 120 characters and no closing structural element (heading, list item, code block close, or horizontal rule).
+
+> *"Response may be incomplete.* **Continue →***"*
+
+Clicking Continue submits an implicit *"Please continue"* turn, which regenerates from the end of the incomplete response in a new branch. The original truncated response is preserved. This handles output-token-limit cases transparently without requiring the user to know why the response stopped.
+
+The Continue button is shown for a maximum of 60 seconds after the truncated response; after that it is dismissed to avoid polluting old threads.
+
+---
+
 ### Artefact tray
 
 The artefact tray is a persistent UI panel (collapsed by default, expandable from a tray handle at the bottom of the conversation) that collects downloadable outputs from the current conversation. Every non-prose rendered block — Mermaid diagrams, Vega-Lite charts, math expressions, JSON payloads, data tables, document canvas outputs, and custom renderer outputs — is automatically added to the tray when it finishes rendering.
@@ -339,6 +362,8 @@ The artefact tray is a persistent UI panel (collapsed by default, expandable fro
 ### Raw / rendered toggle
 
 Every non-prose rendered block exposes a **Raw** toggle that switches between the rendered view and the raw source in place.
+
+![Rendered vs raw toggle — pill control switching between a formatted chart and its underlying JSON source](rendered-vs-raw.png)
 
 | Content type | Rendered view | Raw view |
 |---|---|---|
@@ -373,29 +398,6 @@ When the model's response draws on data returned by an MCP tool call, it should 
 | Attached documents | Citations to attached documents use the document's cite format: page number (PDF), sheet name (Excel), heading (Word) |
 
 Citations are rendered as part of the markdown prose block. Superscript numbers reset per response.
-
----
-
-### Streaming
-
-| Content type | Streaming behaviour |
-|-------------|-------------------|
-| Prose / markdown | Streams character-by-character; renders incrementally |
-| Non-prose blocks (Mermaid, Vega-Lite, JSON, tables, code) | Buffers internally; renders on `content_block_stop` to prevent hydration errors on partial content |
-| Tool call disclosures | Appear as an in-progress card while the tool is running; update on result receipt |
-| Artefact chips | *"Added to artefacts ↗"* chip appears beneath each completed non-prose block |
-
-While the model is streaming, the input field is disabled and replaced by a **stop-generation button**. Stopping generation saves the partial response to the audit trail as a partial turn — it does not discard it. When stopped, a *"(generation stopped)"* label appears beneath the partial response.
-
-#### Truncated response
-
-When the model's response ends without a natural conclusion, a **Continue** button appears below the response. Truncation is detected by either of two signals: (a) the API returns `stop_reason: "max_tokens"`, indicating the output token limit was reached; or (b) heuristic analysis finds the response ends mid-sentence — no terminal punctuation in the last 120 characters and no closing structural element (heading, list item, code block close, or horizontal rule).
-
-> *"Response may be incomplete.* **Continue →***"*
-
-Clicking Continue submits an implicit *"Please continue"* turn, which regenerates from the end of the incomplete response in a new branch. The original truncated response is preserved. This handles output-token-limit cases transparently without requiring the user to know why the response stopped.
-
-The Continue button is shown for a maximum of 60 seconds after the truncated response; after that it is dismissed to avoid polluting old threads.
 
 ---
 
