@@ -6,17 +6,13 @@ The central argument here is not that Text-to-SQL should be avoided. It is that 
 
 Most of the governance risks below are not new problems that Text-to-SQL introduced. Inconsistent metric definitions, opaque SQL logic, and entitlement gaps have been longstanding challenges in enterprise analytics. What Text-to-SQL does is **amplify and democratise** them: more people generating queries and outputs, with less friction, against the same ungoverned foundation. Problems manageable at data-team scale become serious at organisational scale. A semantic analytics engine addresses the root cause; Text-to-SQL continues as the exploration layer on top of it.
 
-The risks below apply to any approach where AI generates and executes SQL without a governance layer in between, including SQL tools exposed over MCP to an agent. The examples lean on financial services, but the same issues arise anywhere analytical outputs need to be reproducible, auditable, and tied to approved definitions. The alternative architecture is covered in [Chapter 1](./01-platform-overview.md) and [Chapter 3](./03-core-capabilities.md); the [Right Tool, Wrong Foundation](#the-right-tool-wrong-foundation) section summarises the boundary between the two.
-
----
-
-## What Text-to-SQL Is
-
-Text-to-SQL feeds a natural language question and a physical database schema to an LLM, which generates SQL executed directly against the database. There is no semantic layer, no metric registry, and no governed definitions.
+The risks below apply to any approach where AI generates and executes SQL without a governance layer in between, including SQL tools exposed over MCP to an agent. The examples lean on financial services, but the same issues arise anywhere analytical outputs need to be reproducible, auditable, and tied to approved definitions. The alternative architecture is covered in [Chapter 1](./01-platform-overview.md) and [Chapter 3](./03-core-capabilities.md); the [Right Architecture](#the-right-architecture) section summarises the boundary between the two.
 
 ---
 
 ## Text-to-SQL: A Strong Starting Point
+
+Text-to-SQL feeds a natural language question and a physical database schema to an LLM, which generates SQL executed directly against the database. There is no semantic layer, no metric registry, and no governed definitions.
 
 Text-to-SQL is a legitimate and often valuable starting point for organisations beginning their AI analytics journey. Standing up a working prototype takes hours. It requires no prior investment in semantic modelling, no metric registry, no governed definitions. For a team that does not yet know what questions its users will actually ask, that speed is genuinely useful: exploratory queries surface real user intent, simple aggregations work reliably, and the feedback loop between question and result is fast enough to drive rapid learning.
 
@@ -30,7 +26,7 @@ The risks described in the rest of this document are not about experimentation. 
 
 ### Where It Becomes the Wrong Foundation
 
-The failure mode is rarely a deliberate decision. A team uses Text-to-SQL because it is fast, use cases expand, and outputs start feeding processes they were never intended to support. By the time the governance gap is visible it is embedded in workflows, dashboards, and downstream systems — and the prompt has become load-bearing. The [Why You Cannot Patch Your Way Out](#why-you-cannot-patch-your-way-out) section examines why this is hard to reverse.
+The failure mode is rarely a deliberate decision. A team uses Text-to-SQL because it is fast, use cases expand, and outputs start feeding processes they were never intended to support. By the time the governance gap is visible it is embedded in workflows, dashboards, and downstream systems — and the prompt has become load-bearing. The [Why These Risks Cannot Be Mitigated Away](#why-these-risks-cannot-be-mitigated-away) section examines why this is hard to reverse.
 
 | As an early experiment | As a governed execution layer |
 |---|---|
@@ -42,37 +38,35 @@ The failure mode is rarely a deliberate decision. A team uses Text-to-SQL becaus
 
 ---
 
-## Governance and Regulatory Risk
+## Why Text-to-SQL Cannot Scale to Governed Analytics
 
-### No audit trail for regulatory review
+### Governance and Regulatory Risk
+
+#### No audit trail for regulatory review
 
 When a regulator asks "how was this number calculated?", the answer in a Text-to-SQL system is: "A language model generated some SQL and this number came back." There is no versioned metric definition, no formula record, no lineage chain from input to result, and no guarantee the same question produces the same answer tomorrow. That does not satisfy any regulatory audit requirement.
 
-### No metric versioning or change management
+#### No metric versioning or change management
 
 Regulatory metric definitions change. In a Text-to-SQL system there is no versioned definition to update, no approval workflow to gate the change, and no audit trail of which formula version produced which historical results. An organisation must be able to demonstrate that results submitted in prior periods used the formula in force at that time. Text-to-SQL provides no mechanism for this.
 
----
+### Data Governance
 
-## Data Governance
-
-### Metrics have no single definition
+#### Metrics have no single definition
 
 "Portfolio Return" means whatever the LLM infers from the schema at query time. The same question asked in two sessions may produce different SQL and different numbers, because the LLM samples probabilistically, because the schema changed, because a JOIN path was inferred differently, or because the prompt context differed. In institutional analytics, metric definitions must be identical across reports, conversations, and regulatory submissions. There is no versioned, approved formula. Only inference.
 
 This is not a prompt engineering problem. Putting the formula in the system prompt just moves the definition into a piece of text that a clever query can override or contradict. Metric definitions need to live in a governed registry that the system enforces consistently, not in a prompt.
 
-### No scope boundary or error for unregistered concepts
+#### No scope boundary or error for unregistered concepts
 
 A governed semantic layer rejects queries referencing unregistered metric identifiers and returns a structured error. Text-to-SQL has no concept of scope. It will attempt to answer any question formulated against the schema. This produces two failure modes: plausible-looking SQL that computes a meaningless result (because the business concept doesn't map cleanly to the schema structure the LLM inferred), and silent misinterpretation of business terms that have precise regulatory definitions.
 
 In regulated contexts, a query that fails visibly is far less dangerous than a query that succeeds incorrectly. Text-to-SQL cannot distinguish the two.
 
----
+### Analytical Reliability
 
-## Analytical Reliability
-
-### Accuracy degrades on the queries that matter most
+#### Accuracy degrades on the queries that matter most
 
 LLM SQL generation is most reliable for simple pattern queries and least reliable for the complex, regulated analytical computations that constitute most of the value in financial services analytics:
 
@@ -89,21 +83,19 @@ LLM SQL generation is most reliable for simple pattern queries and least reliabl
 
 The irony is structural: the questions Text-to-SQL handles best are the ones that needed the least help. The questions that most need AI-mediated access, complex regulated computations, multi-source federation, cross-entity attribution, are exactly where the pattern breaks down.
 
-### Results are not reproducible across sessions or model versions
+#### Results are not reproducible across sessions or model versions
 
 Two analysts asking the same question in different sessions may receive different results. The same analyst asking the same question after a model update may receive a different result. This is not a bug; it is a property of probabilistic generation. For regulated analytics, where results must be exactly reproducible from the same data and definitions, this is a structural disqualifier.
 
-### The system cannot be deterministically tested
+#### The system cannot be deterministically tested
 
 A deterministic pipeline can be tested: given these inputs, produce exactly this output. A Text-to-SQL pipeline cannot. Test suites can only assert that generated SQL is "plausible" for a set of sample questions — not that it is correct. An organisation cannot assert to a regulator that its VaR calculation is correct because it "usually" produces reasonable-looking SQL.
 
----
-
-## Information Security
+### Information Security
 
 These risks run deeper than configuration choices. They exist because the LLM is doing two jobs at once: taking user requests and generating executable SQL from them, with no deterministic layer in between. Guardrails, validators, and output filters reduce the surface area but cannot eliminate the underlying exposure. The only reliable fix is to separate the AI from the execution layer entirely. The [SQL Injection in MCP-Exposed Query Services](#sql-injection-in-mcp-exposed-query-services) section covers the specific attack vectors in detail, with confirmed CVEs and recommended mitigations.
 
-### Schema Exposure and Reconnaissance
+#### Schema Exposure and Reconnaissance
 
 SQL generation requires injecting table names, column names, foreign key relationships, and sometimes sample data into the LLM's context. This transmits your organisation's internal data architecture to a third-party AI provider on every query. Even for API-deployed models under appropriate data processing agreements, this represents a continuous leakage of proprietary data architecture that creates regulatory, competitive, and reputational exposure. For organisations operating under data residency constraints or sector-specific regulations, the schema itself may constitute governed data whose transmission is restricted.
 
@@ -117,7 +109,7 @@ The schema in the prompt context also constitutes an active reconnaissance surfa
 
 The consequences of schema exfiltration include: competitive intelligence loss, a complete attack map for further exploitation, potential regulatory breach if the schema itself constitutes governed data, and significant reputational exposure if the breach is disclosed.
 
-### Prompt Injection
+#### Prompt Injection
 
 **Direct injection.** The user's natural language query and the SQL generation instruction share the same LLM context. A user can craft a question designed not to retrieve data, but to override the model's instructions, causing it to generate SQL that ignores access restrictions, return data from other entities, expose configuration details, or alter the system's behaviour. Examples:
 
@@ -129,7 +121,7 @@ The consequences of schema exfiltration include: competitive intelligence loss, 
 
 Prompt injection is a class of vulnerability with no reliable prompt-level defence. Every proposed mitigation (input sanitisation, intent classification, output validation) has documented bypass techniques.
 
-### Entitlement Bypass and Data Exfiltration
+#### Entitlement Bypass and Data Exfiltration
 
 Access control in Text-to-SQL is the database credential. The LLM generates SQL; the database executes it under the credentials supplied. Row-level restrictions depend entirely on the LLM generating correct WHERE clauses, clauses that restrict results to the authenticated user's authorised scope. There is no component in the Text-to-SQL stack that enforces "this role may query these metrics, with these row predicates, with these column masks" before execution. The entitlement boundary is the database credential, not the business logic.
 
@@ -147,19 +139,17 @@ Access control in Text-to-SQL is the database credential. The LLM generates SQL;
 
 **Filter bypass via rephrasing.** Row restrictions are often implemented as prompt instructions: *"Always filter by the authenticated user's portfolio scope."* A user who rephrases the question to appear to request a different operation, *"Summarise all portfolio performance for a market overview"*, may cause the LLM to omit user-specific filtering as inappropriate to the "overview" framing.
 
-### Third-Party Data Exposure
+#### Third-Party Data Exposure
 
 Beyond the schema, every query also transmits the user's natural language question, potentially sample data values, and prior query results in multi-turn sessions. For organisations under data residency constraints or sector-specific data regulations, this continuous transmission to an external AI provider may constitute a regulated data processing event independent of any DPA coverage. In a semantic layer architecture, the physical schema never appears in any external prompt — only registered metric names are visible.
 
----
+### Operational and Maintenance Risk
 
-## Operational and Maintenance Risk
-
-### Query cost is uncontrollable
+#### Query cost is uncontrollable
 
 LLM-generated SQL is written to satisfy the question semantically, not to execute efficiently. Missing partition filters, full table scans, and unoptimised aggregations are common. In cloud data warehouses billed by query cost (Snowflake, BigQuery, Databricks), a single malformed query can consume significant budget. There is no pre-execution cost estimate, no circuit breaker, and no query cost governance. The result is unpredictable infrastructure spend with no reliable way to prevent it, because there is no way to put a hard limit on what an LLM will generate.
 
-### Schema changes create a continuous, untestable maintenance burden
+#### Schema changes create a continuous, untestable maintenance burden
 
 The AI model's ability to generate correct SQL depends entirely on its understanding of the physical schema. That understanding is encoded in the schema context injected into every prompt, table names, column names, relationships, and the business meaning the prompt author has attributed to each. When the schema changes, that context must be updated by hand.
 
@@ -171,7 +161,9 @@ The result is a standing maintenance team whose job is to keep the AI's schema u
 
 ---
 
-## Why Guardrails Cannot Solve This
+## Why These Risks Cannot Be Mitigated Away
+
+### The Limits of Technical Controls
 
 Organisations that recognise these risks typically attempt to mitigate them through layered prompt restrictions, input/output validation, SQL analysis, and rate limiting. Each of these layers adds engineering cost and operational complexity while providing incomplete protection:
 
@@ -186,19 +178,7 @@ Organisations that recognise these risks typically attempt to mitigate them thro
 
 The cumulative effect is a system with a large engineering investment in partial mitigations, each of which has known bypass techniques, providing a false sense of security in a regulated environment where the cost of failure is high.
 
----
-
-## Regulated Financial Services: Failure Scenarios
-
-Two scenarios that are not implied directly by the preceding sections:
-
-**Formula change compliance.** A regulatory update changes the definition of a capital metric. In a governed semantic layer, the prior formula version is preserved, the new version is approved and applied consistently to all future queries, and historical results remain attributable to the formula in force at the time. In Text-to-SQL, the update is added to the prompt; the LLM does not always apply it; different phrasings may or may not pick it up. Historical results are indistinguishable from results under the new formula.
-
-**Warehouse migration.** A monolithic `portfolio_positions` table is decomposed into `portfolio_holdings`, `position_valuations`, and `instrument_reference`. The schema context is now stale. Queries that previously worked return incorrect results silently. Identifying which queries are affected requires reviewing every question ever asked of the system. A passing test after the update is not a correctness guarantee — the output is probabilistic.
-
----
-
-## Why You Cannot Patch Your Way Out
+### Why You Cannot Patch Your Way Out
 
 When teams hit governance problems with Text-to-SQL in production, the natural instinct is to patch rather than reconsider: add a schema filter, add a prompt guard, add a SQL validator, add a result reconciler, add a metric glossary to the prompt. Each fix patches one problem while adding complexity and new ways for attackers or edge cases to get around it.
 
@@ -208,9 +188,21 @@ What teams typically end up with is a rough approximation of a semantic layer he
 
 ---
 
-## The Right Tool, Wrong Foundation
+## Examples in Practice
+
+Two scenarios that illustrate how these risks compound in a regulated production environment:
+
+**Formula change compliance.** A regulatory update changes the definition of a capital metric. In a governed semantic layer, the prior formula version is preserved, the new version is approved and applied consistently to all future queries, and historical results remain attributable to the formula in force at the time. In Text-to-SQL, the update is added to the prompt; the LLM does not always apply it; different phrasings may or may not pick it up. Historical results are indistinguishable from results under the new formula.
+
+**Warehouse migration.** A monolithic `portfolio_positions` table is decomposed into `portfolio_holdings`, `position_valuations`, and `instrument_reference`. The schema context is now stale. Queries that previously worked return incorrect results silently. Identifying which queries are affected requires reviewing every question ever asked of the system. A passing test after the update is not a correctness guarantee — the output is probabilistic.
+
+---
+
+## The Right Architecture
 
 The governed architecture separates the AI translation layer from the governed computation layer. The LLM translates natural language into structured intent parameters. Everything that must be deterministic — metric definition, entitlement enforcement, query execution, lineage recording — is delegated to deterministic components that do not generate, do not infer, and do not vary with session context. Text-to-SQL coexists within this architecture on the exploration side: outputs are validated and promoted into the governed registry before they become the basis for anything critical.
+
+### Two Tools, One Architecture
 
 | Text-to-SQL | Governed Semantic Analytics |
 |---|---|
@@ -229,6 +221,8 @@ The governed architecture separates the AI translation layer from the governed c
 | Query cost is uncontrollable | Cost estimated from Logical Query Plan before execution; circuit breaker blocks excess |
 | Cannot be deterministically tested | Deterministic pipeline: given these inputs, the system must produce exactly this output |
 | Schema changes require manual prompt re-engineering with no reliable test coverage | Physical mappings updated once in the SMR; changes versioned, approved, and consistently applied to all dependent metrics |
+
+### The Boundary Between Exploration and Governance
 
 The boundary is the governed semantic registry. Crossing from exploration into production — from informal query into governed metric — requires a formal definition, approval, and versioning process. Text-to-SQL is available on the exploration side of that boundary. It is not available on the governed execution side.
 
@@ -524,4 +518,3 @@ The pattern observed across all confirmed CVEs is consistent: developers deployi
 
 **Prevention and guidance**
 [builder.ai2sql, SQL Injection Prevention Guide 2026](https://builder.ai2sql.io/blog/sql-injection-prevention-guide)
-
