@@ -107,36 +107,61 @@ Two tensions are worth noting here. When a business concept cannot be queried, t
 
 The two diagrams below contrast the Text-to-SQL approach with the AI-Enabled Analytics Platform. The structural difference is the governed semantic layer: in the platform approach, AI never touches raw schemas or generates SQL — it interacts with an approved analytical vocabulary and the platform handles all computation, governance, and execution.
 
-```mermaid
-flowchart LR
-    subgraph tts["Text-to-SQL Approach"]
-        direction TB
-        T1["User or AI Client"]
-        T2["LLM\n(SQL Generation)"]
-        T3["Raw Database Schema\nexposed directly to AI"]
-        T4["Generated SQL\nexecuted against database"]
-        T5["Result\nNo governed metrics · No lineage\nNo entitlement guarantee"]
-        T1 --> T2
-        T2 --> T3
-        T3 --> T4
-        T4 --> T5
-    end
+<table>
+<tr>
+<td>
 
-    subgraph aia["AI-Enabled Analytics Platform"]
-        direction TB
-        A1["AI-Enabled Clients\nConversational · Agent · Application"]
-        A2["API Layer\n(MCP)"]
-        A3["Intent & Metric Resolution\nApproved Semantic Layer"]
-        A4["Governance Pipeline\nEntitlement · Compliance · Cost"]
-        A5["Federated Query Engine"]
-        A6["Data Sources\nWarehouse · API · Graph"]
-        A1 -->|"structured request\n+ identity token"| A2
-        A2 --> A3
-        A3 --> A4
-        A4 --> A5
-        A5 --> A6
-    end
+```mermaid
+flowchart TB
+    T1["User or AI Client"]
+    T2["LLM\n(SQL Generation)"]
+    T3["Raw Database Schema\nexposed directly to AI"]
+    T4["Generated SQL\nexecuted against database"]
+    T5["Result\nNo governed metrics\nNo lineage · No entitlement guarantee"]
+    T1 --> T2
+    T2 --> T3
+    T3 --> T4
+    T4 --> T5
 ```
+
+</td>
+<td>
+
+```mermaid
+flowchart TB
+    subgraph clients["AI-Enabled Clients"]
+        direction LR
+        A1["Conversational\nAssistant"]
+        A2["Autonomous Agent\n& Data Mining"]
+        A3["Custom\nApplication"]
+    end
+    subgraph platform["Analytics Capability"]
+        direction LR
+        B1["API Layer (MCP)"]
+        B2["Intent & Metric Resolution\nApproved Semantic Layer"]
+        B3["Governance Pipeline\nEntitlement · Compliance · Cost"]
+        B4["Federated Query Engine"]
+    end
+    subgraph data["Data Sources"]
+        direction LR
+        C1["SQL Warehouse"]
+        C2["OpenData API"]
+        C3["Graph Data API"]
+    end
+    clients -->|"structured request\n+ identity token"| B1
+    B1 --> B2
+    B2 --> B3
+    B3 --> B4
+    B4 --> data
+```
+
+</td>
+</tr>
+<tr>
+<td align="center"><strong>Text-to-SQL Approach</strong></td>
+<td align="center"><strong>AI-Enabled Analytics Platform</strong></td>
+</tr>
+</table>
 
 In the platform approach, every request routes through the API layer, traverses the invariant governance sequence, and produces an audit record. No path to execution backends, physical schemas, or raw data exists outside that pipeline.
 
