@@ -149,21 +149,6 @@ Access control in Text-to-SQL is the database credential. The LLM generates SQL;
 
 Beyond the schema, every query also transmits the user's natural language question, potentially sample data values, and prior query results in multi-turn sessions. For organisations under data residency constraints or sector-specific data regulations, this continuous transmission to an external AI provider may constitute a regulated data processing event independent of any DPA coverage. In a semantic layer architecture, the physical schema never appears in any external prompt — only registered metric names are visible.
 
-## Why Guardrails Cannot Solve This
-
-Organisations that recognise these risks typically attempt to mitigate them through layered prompt restrictions, input/output validation, SQL analysis, and rate limiting. Each of these layers adds engineering cost and operational complexity while providing incomplete protection:
-
-| Mitigation approach | Limitation |
-|---|---|
-| Input sanitisation / intent classification | Relies on classifying attacker intent before seeing the payload, attackable by novel phrasing |
-| Prompt injection detection | No reliable detection for indirect injection; direct injection bypass techniques are published and evolving |
-| SQL output validation | Cannot validate semantic correctness, only structural correctness; cannot detect filter omissions by design |
-| Schema filtering (provide only relevant tables) | Requires a prior understanding of query intent that defeats the purpose of the LLM interface; still exposes partial schema |
-| Row-level security at the database | Correct approach for the database tier, but does not address prompt injection, schema exfiltration, or aggregation attacks |
-| Rate limiting | Slows aggregation attacks; does not prevent them |
-
-The cumulative effect is a system with a large engineering investment in partial mitigations, each of which has known bypass techniques, providing a false sense of security in a regulated environment where the cost of failure is high.
-
 ---
 
 ## Operational and Maintenance Risk
@@ -181,6 +166,23 @@ In a production data environment, schemas change constantly: tables are refactor
 In a governed semantic registry, the physical mapping between a metric and its source data is declared once. When the schema changes, the mapping is updated in one place, versioned, approved, and propagated consistently to every dependent query. In Text-to-SQL, the equivalent is: rewrite the affected portions of the system prompt, re-evaluate every query that might have touched the changed element, and accept that you cannot be certain you found all of them. As the data estate grows, the schema context grows with it, approaching context window limits and requiring increasing effort to maintain accurately.
 
 The result is a standing maintenance team whose job is to keep the AI's schema understanding current. That team grows with the complexity of the data estate, and its output cannot be deterministically verified. This is not a transitional cost. It is a permanent structural cost of the Text-to-SQL architecture.
+
+---
+
+## Why Guardrails Cannot Solve This
+
+Organisations that recognise these risks typically attempt to mitigate them through layered prompt restrictions, input/output validation, SQL analysis, and rate limiting. Each of these layers adds engineering cost and operational complexity while providing incomplete protection:
+
+| Mitigation approach | Limitation |
+|---|---|
+| Input sanitisation / intent classification | Relies on classifying attacker intent before seeing the payload, attackable by novel phrasing |
+| Prompt injection detection | No reliable detection for indirect injection; direct injection bypass techniques are published and evolving |
+| SQL output validation | Cannot validate semantic correctness, only structural correctness; cannot detect filter omissions by design |
+| Schema filtering (provide only relevant tables) | Requires a prior understanding of query intent that defeats the purpose of the LLM interface; still exposes partial schema |
+| Row-level security at the database | Correct approach for the database tier, but does not address prompt injection, schema exfiltration, or aggregation attacks |
+| Rate limiting | Slows aggregation attacks; does not prevent them |
+
+The cumulative effect is a system with a large engineering investment in partial mitigations, each of which has known bypass techniques, providing a false sense of security in a regulated environment where the cost of failure is high.
 
 ---
 
@@ -233,7 +235,6 @@ For a complete specification of this architecture, see [Chapter 3, Core Platform
 ---
 
 ## SQL Injection in MCP-Exposed Query Services
-### A SELECT-Focused Threat Research Briefing
 
 | Field | Detail |
 |---|---|
