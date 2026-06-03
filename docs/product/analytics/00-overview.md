@@ -20,7 +20,9 @@ The regulatory dimension sharpens this further. An analytical result in a govern
 
 ### The platform
 
-The AI Analytics Platform is purpose-built for governed large-scale analytics and data mining in regulated environments. A portfolio manager can ask "show me portfolio returns versus benchmark for my equity portfolios this quarter" in plain English and receive a governed, role-constrained, auditable analytical result — with the full computation record attached. A data science pipeline can extract millions of rows of position data under the same entitlement and audit controls. A treasury analyst can produce an LCR figure for a Basel III submission and receive, automatically, a regulator-ready compliance artifact set alongside the result. The analyst bottleneck breaks. Regulatory requirements hold.
+We propose an alternative to Text-to-SQL: a dedicated, governed AI-enabled analytics platform that allows AI to correctly execute well-governed, semantically described metrics and return well-defined, structured datasets at scale. Rather than generating SQL against raw schemas, AI interacts exclusively with an approved analytical vocabulary — versioned metric definitions, governed dataset contracts, and enforced entitlements — and the platform handles all deterministic computation, access control, and audit recording.
+
+In practice: a portfolio manager can ask "show me portfolio returns versus benchmark for my equity portfolios this quarter" in plain English and receive a governed, role-constrained, auditable result with the full computation record attached. A data science pipeline can extract millions of rows of position data under the same entitlement and audit controls. A treasury analyst can produce an LCR figure for a Basel III submission and receive, automatically, a regulator-ready compliance artifact set alongside the result. The analyst bottleneck breaks. Regulatory requirements hold.
 
 The platform addresses the following challenges that Text-to-SQL and small-scale MCP integrations cannot:
 
