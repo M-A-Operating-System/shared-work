@@ -1,6 +1,6 @@
 # 10 — Content Rendering
 
-## Working assumption — the LLM output contract
+## The rendering contract
 
 The platform's rendering pipeline is built on a single foundational assumption:
 
@@ -52,7 +52,7 @@ The rendering engine evaluates each content block in an assistant response in pr
 
 | Priority | Trigger | Rendered as |
 |----------|---------|------------|
-| 1 | Tool call event (`mcp_tool_use` / `mcp_tool_result`) | **Tool Call Disclosure** card |
+| 1 | Tool call event (`mcp_tool_use` / `mcp_tool_result`) | **Tool call disclosure** card |
 | 2 | Fenced block tag matching a registered host renderer (`renderers[].trigger`) | **Custom host renderer** — host-provided ES module; see below |
 | 3 | Fenced block tagged ` ```document ` | **Document canvas** — opens in right panel canvas; reference card in thread |
 | 4 | Fenced block tagged ` ```mermaid ` | **Mermaid diagram** — SVG, expandable, exportable |
@@ -70,9 +70,7 @@ The system prompt (injected by the platform) instructs the model to:
 - Prefer structured outputs — Vega-Lite for metrics and trends, Mermaid for relationships and flows, data tables for entity lists — over prose equivalents when the data supports it
 - Use `document` blocks for substantial prose outputs (reports, summaries, plans, policy drafts, analyses) where the user is likely to iterate across multiple turns rather than simply read once
 
----
-
-## Content type reference
+### Content type quick reference
 
 | Content type | Trigger | Typical use cases |
 |-------------|---------|------------------|
@@ -85,15 +83,17 @@ The system prompt (injected by the platform) instructs the model to:
 | JSON inspector | ` ```json ` | Raw tool results, configuration objects, structured data |
 | Data table | ` ```csv ` / ` ```table ` | Multi-row query results, lists, comparison tables |
 | Tool call disclosure | Automatic | All MCP tool invocations — always visible, collapsed by default |
-| Syntax code | All other fenced blocks | SQL, Python, YAML, shell, TypeScript |
+| Syntax-highlighted code | All other fenced blocks | SQL, Python, YAML, shell, TypeScript |
 
 ---
 
-## Custom host renderers
+## Content types
+
+### Custom host renderer
 
 Host applications may register custom content renderers in the `renderers` section of their application config (see [01-host-application-config.md](./01-host-application-config.md)). When the model produces a fenced block tagged with a registered `trigger`, the platform loads and invokes the host's renderer module.
 
-### Module loading
+#### Module loading
 
 Renderer modules are **ES modules** loaded once per session when the first block matching their trigger arrives. The platform loads the module using a dynamic `import()` from the registered `moduleUrl`. Modules are cached for the session lifetime — they are not re-fetched on each block.
 
@@ -125,15 +125,15 @@ interface RendererContext {
 
 The platform loads the module once per session (cached for the session lifetime) but instantiates the renderer class once per content block. Each block gets its own renderer instance. The platform passes the full fenced block content as a string to `render()`, and calls `dispose()` when the block leaves the DOM (e.g. conversation navigation, component unmount).
 
-### Isolation
+#### Isolation
 
 Each rendered block's `container` is the interior of a **shadow root** — the renderer's DOM and styles are isolated from the platform UI and from other rendered blocks. The renderer may use any DOM APIs available to the module. It may not access the platform's internal state, the user's JWT, or other conversations.
 
-### Streaming behaviour
+#### Streaming behaviour
 
 Custom renderers receive the **full fenced block content** after `content_block_stop` — they cannot stream incrementally. While the block is buffering, the platform shows a loading skeleton in place of the renderer output. The skeleton is replaced by the rendered output on receipt.
 
-### System prompt guidance injection
+#### System prompt guidance injection
 
 For each registered renderer, the platform injects the renderer's `systemPromptGuidance` (or a generated fallback) into the system prompt at session start. This tells the model when and how to produce the custom content type:
 
@@ -144,7 +144,7 @@ For each registered renderer, the platform injects the renderer's `systemPromptG
 
 All registered renderer guidance blocks are appended together in the order they appear in the `renderers` config array. They are injected after tool descriptions and before memory blocks in the assembled system prompt.
 
-### Fallback behaviour
+#### Fallback behaviour
 
 If the renderer module fails to load, or if `render()` throws, the platform:
 
@@ -154,11 +154,7 @@ If the renderer module fails to load, or if `render()` throws, the platform:
 
 The fallback is transparent to the user and non-blocking — the rest of the response continues rendering normally.
 
-### Artefact tray
-
-Custom-rendered blocks are added to the artefact tray as downloadable raw content (the fenced block source, stored as plain text with the trigger name as the format label). The renderer name and trigger are shown in the tray entry. If the renderer exposes a `getExportBlob?(): Promise<Blob>` method, the platform calls it on download and uses the returned blob in preference to the raw source — allowing the renderer to export a rendered image or structured file.
-
-### Example: risk gauge renderer
+#### Example: risk gauge renderer
 
 Given the config:
 
@@ -189,7 +185,7 @@ The platform calls `RiskGaugeRenderer.render(container, content, context)`. The 
 
 ---
 
-## Document canvas
+### Document canvas
 
 A `document` block opens a persistent right-panel canvas alongside the conversation thread. The canvas is designed for substantial prose outputs — reports, summaries, plans, policy drafts, analyses — that the user is likely to iterate on across multiple turns rather than simply read once.
 
@@ -205,13 +201,13 @@ A `document` block opens a persistent right-panel canvas alongside the conversat
 | Mobile | Canvas panel opens as a full-screen overlay; a back button returns to the conversation thread |
 | Empty state | If the model produces a `document` block with no content, the canvas shows a *"No content"* placeholder and the thread reference card is omitted |
 
-### Document titles
+#### Document titles
 
 The platform extracts the document title from the first `# Heading` in the block content. If no heading is present, it defaults to *"Document — [timestamp]"*. Titles are shown in the thread reference card, the canvas tab, and the artefact tray entry.
 
 ---
 
-## Mermaid diagrams
+### Mermaid diagram
 
 | Behaviour | Specification |
 |-----------|--------------|
@@ -223,7 +219,7 @@ The platform extracts the document title from the first `# Heading` in the block
 | Accessibility | Descriptive alt text generated by the model and attached to the SVG |
 | Artefact | Mermaid source stored in turn record; added to artefact tray on render complete |
 
-### Common Mermaid diagram types
+#### Common diagram types
 
 | Diagram type | Mermaid syntax | Typical trigger |
 |-------------|---------------|----------------|
@@ -235,7 +231,7 @@ The platform extracts the document title from the first `# Heading` in the block
 
 ---
 
-## Vega-Lite charts
+### Vega-Lite chart
 
 | Behaviour | Specification |
 |-----------|--------------|
@@ -248,7 +244,7 @@ The platform extracts the document title from the first `# Heading` in the block
 
 ---
 
-## Math expressions
+### Math expression
 
 Mathematical expressions are rendered using **KaTeX** — fast, lightweight, and browser-native.
 
@@ -264,7 +260,7 @@ Mathematical expressions are rendered using **KaTeX** — fast, lightweight, and
 
 ---
 
-## JSON inspector
+### JSON inspector
 
 | Behaviour | Specification |
 |-----------|--------------|
@@ -275,7 +271,7 @@ Mathematical expressions are rendered using **KaTeX** — fast, lightweight, and
 
 ---
 
-## Data tables
+### Data table
 
 | Behaviour | Specification |
 |-----------|--------------|
@@ -288,7 +284,7 @@ Mathematical expressions are rendered using **KaTeX** — fast, lightweight, and
 
 ---
 
-## Syntax-highlighted code
+### Syntax-highlighted code
 
 | Behaviour | Specification |
 |-----------|--------------|
@@ -299,7 +295,7 @@ Mathematical expressions are rendered using **KaTeX** — fast, lightweight, and
 
 ---
 
-## Attached document and image display
+### Attached content
 
 **Non-image documents** (PDF, Excel, Word) appear in the user message bubble as a labelled file card:
 - Format icon
@@ -323,7 +319,9 @@ When the model references a specific section, it cites by page number (PDF), she
 
 ---
 
-## Artefact tray
+## Cross-cutting behaviours
+
+### Artefact tray
 
 The artefact tray is a persistent UI panel (collapsed by default, expandable from a tray handle at the bottom of the conversation) that collects downloadable outputs from the current conversation. Every non-prose rendered block — Mermaid diagrams, Vega-Lite charts, math expressions, JSON payloads, data tables, document canvas outputs, and custom renderer outputs — is automatically added to the tray when it finishes rendering.
 
@@ -338,7 +336,31 @@ The artefact tray is a persistent UI panel (collapsed by default, expandable fro
 
 ---
 
-## Inline source citations
+### Raw / rendered toggle
+
+Every non-prose rendered block exposes a **Raw** toggle that switches between the rendered view and the raw source in place.
+
+| Content type | Rendered view | Raw view |
+|---|---|---|
+| Data table | Sortable, filterable, paginated table | Raw CSV or JSON source in a syntax-highlighted code block |
+| Vega-Lite chart | Interactive vega-embed chart | Vega-Lite JSON spec in a JSON inspector |
+| Mermaid diagram | Rendered SVG | Mermaid source in a syntax-highlighted code block |
+| Math expression | KaTeX-rendered formula | LaTeX source in a code block |
+| JSON inspector | Collapsible tree | Raw JSON in a syntax-highlighted code block |
+| Document canvas | Right-panel canvas | Markdown source in a code block (in-thread, without opening the canvas) |
+| Custom host renderer | Renderer output | Raw fenced block source in a syntax-highlighted code block |
+
+The toggle is a **Rendered · Raw** pill control placed in the top-right corner of the content block's bounding box. It appears on hover (desktop) and is always visible on touch devices.
+
+- Switching to Raw does not re-fetch or reprocess content — the raw source is the already-buffered fenced block content.
+- The toggle state is per-block and per-session — it is not persisted across page loads.
+- Switching a Vega-Lite block to Raw shows the JSON inspector rather than a plain code block, since the spec is structured data with navigable nodes.
+- When a block is in Raw view, the artefact tray entry for that block still downloads the rendered export (or raw source if no `getExportBlob()` is available) — the toggle does not affect the download target.
+- Custom renderers that implement `getExportBlob()` are not called while the block is in Raw view.
+
+---
+
+### Inline source citations
 
 When the model's response draws on data returned by an MCP tool call, it should cite the source inline using a numbered superscript that links to the corresponding tool call disclosure card.
 
@@ -354,7 +376,7 @@ Citations are rendered as part of the markdown prose block. Superscript numbers 
 
 ---
 
-## Streaming behaviour
+### Streaming
 
 | Content type | Streaming behaviour |
 |-------------|-------------------|
@@ -365,7 +387,7 @@ Citations are rendered as part of the markdown prose block. Superscript numbers 
 
 While the model is streaming, the input field is disabled and replaced by a **stop-generation button**. Stopping generation saves the partial response to the audit trail as a partial turn — it does not discard it. When stopped, a *"(generation stopped)"* label appears beneath the partial response.
 
-### Truncated response — continue generating
+#### Truncated response
 
 When the model's response ends without a natural conclusion, a **Continue** button appears below the response. Truncation is detected by either of two signals: (a) the API returns `stop_reason: "max_tokens"`, indicating the output token limit was reached; or (b) heuristic analysis finds the response ends mid-sentence — no terminal punctuation in the last 120 characters and no closing structural element (heading, list item, code block close, or horizontal rule).
 
@@ -377,35 +399,9 @@ The Continue button is shown for a maximum of 60 seconds after the truncated res
 
 ---
 
-## Raw / rendered toggle
+## Implementation
 
-Every non-prose rendered block exposes a **Raw** toggle that switches between the rendered view and the raw source in place. This applies to all structured content types:
-
-| Content type | Rendered view | Raw view |
-|---|---|---|
-| Data table (` ```csv ` / ` ```table `) | Sortable, filterable, paginated table | Raw CSV or JSON source in a syntax-highlighted code block |
-| Vega-Lite chart | Interactive vega-embed chart | Vega-Lite JSON spec in a JSON inspector |
-| Mermaid diagram | Rendered SVG | Mermaid source in a syntax-highlighted code block |
-| Math expression | KaTeX-rendered formula | LaTeX source in a code block |
-| JSON inspector | Collapsible tree | Raw JSON in a syntax-highlighted code block |
-| Document canvas | Right-panel canvas | Markdown source in a code block (in-thread, without opening the canvas) |
-| Custom host renderer | Renderer output | Raw fenced block source in a syntax-highlighted code block |
-
-### Toggle placement and behaviour
-
-The toggle is a **Rendered · Raw** pill control placed in the top-right corner of the content block's bounding box. It appears on hover (desktop) and is always visible on touch devices.
-
-- Switching to Raw does not re-fetch or reprocess content — the raw source is the already-buffered fenced block content.
-- The toggle state is per-block and per-session — it is not persisted across page loads.
-- Switching a Vega-Lite block to Raw shows the JSON inspector rather than a plain code block, since the spec is structured data with navigable nodes.
-- When a block is in Raw view, the artefact tray entry for that block still downloads the rendered export (or raw source if no `getExportBlob()` is available) — the toggle does not affect the download target.
-- Custom renderers that implement `getExportBlob()` are not called while the block is in Raw view.
-
----
-
-## Scalable renderer implementation
-
-### Unified renderer registry
+### Scalable renderer registry
 
 All renderers — built-in and host-registered — are represented as entries in a single **renderer registry configuration file**. Built-in renderers (Mermaid, Vega-Lite, math, JSON, tables, code, document canvas) are pre-populated entries in this file; host-registered renderers are appended to it. There is no architectural distinction between the two categories at runtime.
 
@@ -443,7 +439,7 @@ All renderers — built-in and host-registered — are represented as entries in
 }
 ```
 
-### Adding a renderer without touching existing ones
+#### Adding a renderer
 
 Each renderer is an independently deployed ES module loaded from its own `moduleUrl`. Adding a new renderer requires two steps and touches nothing else in the platform:
 
@@ -452,7 +448,7 @@ Each renderer is an independently deployed ES module loaded from its own `module
 
 The platform picks up the new entry at the next session start. Existing renderers are not reloaded, re-tested, or redeployed. Sessions already in progress continue using their cached module set and gain the new renderer at their next session.
 
-### Independent versioning and zero-impact updates
+#### Independent versioning
 
 Because each renderer module is loaded from a versioned URL, updating a renderer is equally non-disruptive:
 
@@ -461,7 +457,7 @@ Because each renderer module is loaded from a versioned URL, updating a renderer
 
 In-flight sessions continue using the cached `@2.1.0` module for their lifetime. New sessions load `@2.2.0`. No renderer affects any other renderer's availability or performance.
 
-### Library co-deployment
+#### Library co-deployment
 
 Each renderer module bundles its own dependencies. There is no shared renderer dependency tree — a renderer that requires D3, a custom charting library, or a domain-specific SDK bundles it directly. This means:
 
@@ -471,10 +467,8 @@ Each renderer module bundles its own dependencies. There is no shared renderer d
 
 The only shared surface is the `HostRenderer` interface and the `RendererContext` object passed by the platform — these are stable and versioned separately from renderer implementations.
 
-### System prompt assembly
+#### System prompt assembly
 
 At session start, the platform assembles the system prompt guidance block by iterating the registry in order and appending each entry's `systemPromptGuidance`. Built-in renderers come first (they are at the top of the registry), host-registered renderers follow. The LLM receives a complete, current list of available rendering targets with no manual prompt maintenance required — adding a renderer to the registry automatically teaches the LLM to use it.
 
-### Summary
-
-> **Adding a new renderer to the front end requires writing one module and adding one config entry. No existing renderer code, no platform core, and no system prompt template needs to be touched.** The rendering surface scales by addition, not by modification — each new capability is a self-contained deployment that sits alongside everything already running.
+> **Adding a new renderer requires writing one module and adding one config entry. No existing renderer code, no platform core, and no system prompt template needs to be touched.** The rendering surface scales by addition, not by modification — each new capability is a self-contained deployment that sits alongside everything already running.
