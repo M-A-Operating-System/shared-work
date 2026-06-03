@@ -260,7 +260,18 @@ Mathematical expressions are rendered using **KaTeX** — fast, lightweight, and
 - File name
 - Page count (PDF), sheet count (Excel), or section count (Word)
 
-Non-image documents are **not rendered inline**. When the model references a specific section, it cites by page number (PDF), sheet name (Excel), or heading (Word).
+Clicking the file card opens the document in an **inline document viewer** embedded directly in the conversation thread. The viewer renders the full document without leaving the conversation.
+
+| Format | Viewer behaviour |
+|--------|-----------------|
+| PDF | Paginated page-by-page render; page navigation controls; text selection and search within the PDF |
+| Excel | Sheet tabs across the top; each sheet rendered as a scrollable, read-only data table |
+| Word / DOCX | Rendered as formatted prose with heading styles and table layout preserved |
+| CSV | Rendered as a sortable, filterable data table (same component as ` ```csv ` blocks) |
+
+The viewer opens in-line below the file card, expanding the message bubble to accommodate it. A **collapse** control returns to the file card view. The document remains openable for the lifetime of the conversation.
+
+When the model references a specific section, it cites by page number (PDF), sheet name (Excel), or heading (Word). Clicking a citation opens the viewer scrolled to the referenced location.
 
 **Images** (PNG, JPEG, WEBP) are **rendered inline** in the user message bubble at a constrained size (max 320px wide, max 240px tall, maintaining aspect ratio). Multiple images in one turn stack vertically. Clicking an image opens it in a full-screen lightbox overlay. The original file is downloadable from the lightbox and from the artefact tray.
 
