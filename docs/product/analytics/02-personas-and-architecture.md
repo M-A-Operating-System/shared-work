@@ -4,7 +4,7 @@
 
 The platform is designed to serve a heterogeneous population of users whose needs range from conversational analytics access to deep governance administration. These personas define the platform's access model: who can query what, with what constraints. The six personas below have different levels of access and interact with the platform in different ways.
 
-The platform vision and [Design Principles](./01-platform-overview.md#design-principles) governing these access controls are in [Chapter 1 — Platform Overview](./01-platform-overview.md). Component specifications for the platform features exercised in the journeys below are in [Chapter 3 — Core Platform Capabilities](./03-core-capabilities.md).
+The platform vision and [Design Principles](./00-overview.md#design-principles) governing these access controls are in [Platform Overview](./00-overview.md). Component specifications for the platform features exercised in the journeys below are in [Chapter 3 — Core Platform Capabilities](./03-core-capabilities.md).
 
 | Persona | Role | Primary need |
 |---------|------|--------------|

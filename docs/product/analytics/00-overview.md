@@ -1,4 +1,4 @@
-# 1. The Platform
+# Overview: Governed Large-Scale Analytics and Data Mining
 
 ## The Analytics Intelligence Problem
 
