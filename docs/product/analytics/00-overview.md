@@ -178,40 +178,54 @@ Three queries traced through every stage illustrate what the architecture does i
 **1 · Natural language request**
 A portfolio manager asks: *"Show me portfolio returns versus benchmark for my equity portfolios this quarter."*
 
+```
+-- Request
+"Show me portfolio returns versus benchmark for my equity portfolios this quarter"
+```
+
 **2 · Intent resolution**
 The AI client reads the approved metric catalogue and translates the question into a precise, structured request: compare portfolio return against benchmark return, for equity portfolios, current quarter, broken down by portfolio. No database query is generated at this stage — the AI is resolving intent against the approved analytical vocabulary.
+
+```
+-- Semantic Intent Resolution
+operation:   compare_metric_to_benchmark
+metrics:
+  portfolio_return  (unresolved)
+  benchmark_return  (unresolved)
+filters:     asset_class = equity  |  period = current_quarter
+dimensions:  portfolio_id
+```
 
 **3 · Metric and entitlement resolution**
 The platform resolves both metrics against the Metric Registry. Portfolio return resolves to an approved, version-controlled value-weighted return formula. Benchmark return resolves via each portfolio's registered default benchmark. The user's identity token is validated and access permissions are projected, restricting results to portfolios within their coverage scope.
 
+```
+-- Metric & Entitlement Resolution
+portfolio_return  →  definition v2.3: SUM(daily_pnl) / SUM(opening_market_value)
+benchmark_return  →  portfolio.registered_default_benchmark.period_return
+entitlements:        user_scope → [authorised_portfolio_list]
+```
+
 **4 · Query planning, governance, and execution**
 The Query Planner constructs a backend-agnostic plan. The governance layer then constructs a precise, warehouse-neutral query: value-weighted portfolio return joined to each portfolio's registered benchmark, filtered to equity, with access predicates injected at the query level. No raw database schemas have been exposed at any stage. The query executes against the registered warehouse; the Analytics Engine assembles the response: computed values, a chart specification, an optional plain-language summary anchored strictly to the result, and a full audit record.
 
-```
-PLAIN ENGLISH
-  "Show me portfolio returns versus benchmark for my equity portfolios this quarter"
+```sql
+-- Logical Query Plan
+SELECT   p.portfolio_id,
+         SUM(p.daily_pnl) / SUM(p.opening_market_value)  AS portfolio_return,
+         b.period_return                                   AS benchmark_return
+FROM     portfolio_fact        p
+JOIN     benchmark_timeseries  b  ON p.default_benchmark_id = b.benchmark_id
+WHERE    p.asset_class  = 'equity'
+  AND    p.period       = current_quarter()
+  AND    p.portfolio_id IN (/* authorised_portfolio_list */)
+GROUP BY p.portfolio_id, b.period_return;
 
-SEMANTIC INTENT RESOLUTION
-  operation:   compare_metric_to_benchmark
-  metrics:
-    portfolio_return  →  approved definition v2.3: value-weighted return
-    benchmark_return  →  portfolio.registered_default_benchmark.period_return
-  filters:     asset_class = equity  |  period = current_quarter
-  dimensions:  portfolio_id
-  entitlements: user_scope → [authorised portfolio list]
-
-LOGICAL QUERY PLAN
-  join:    portfolio_fact  ×  benchmark_timeseries
-           on portfolio_id → default_benchmark_id
-  compute: portfolio_return = SUM(daily_pnl) / SUM(opening_market_value)
-  filter:  asset_class = equity  |  entitlement_predicate applied
-  group:   portfolio_id
-
-EXECUTION RESPONSE
-  data:      [{ portfolio_id, portfolio_return, benchmark_return }, ...]
-  display:   grouped bar chart
-  narrative: plain-language summary anchored to computed values only
-  audit:     lineage_id, resolved_metric_versions, entitlement_snapshot
+-- Execution Response
+-- data:      [{ portfolio_id, portfolio_return, benchmark_return }, ...]
+-- display:   grouped bar chart
+-- narrative: plain-language summary anchored to computed values only
+-- audit:     lineage_id, resolved_metric_versions, entitlement_snapshot
 ```
 
 ---
@@ -223,40 +237,45 @@ A quantitative research pipeline submits: *"Extract daily position and PnL data 
 
 This request originates from an autonomous agent. The agent submits a structured data retrieval request directly — the natural language translation step is bypassed. All governance stages remain fully active.
 
+```
+-- Structured Request  (agent — no natural language step)
+operation:   retrieve_dataset
+dataset:     fixed_income_daily_positions
+time_range:  trailing 12 months
+pagination:  page_size = 10,000 rows
+```
+
 **2 · Dataset and entitlement resolution**
 The dataset identifier resolves against the Metric Registry — only registered, approved datasets are retrievable. The registry resolves the dataset to its approved field set. The agent's access permissions are projected: results restricted to authorised portfolios, fields exceeding the agent's data classification ceiling excluded.
+
+```
+-- Dataset & Entitlement Resolution
+approved_fields:
+  portfolio_id  |  instrument_id  |  asset_class
+  daily_pnl     |  market_value   |  duration  |  currency  |  position_date
+entitlements:
+  row_scope:     agent authorised portfolio list
+  field_ceiling: agent data classification level applied
+```
 
 **3 · Query planning, governance, and execution**
 The Query Planner constructs a paginated retrieval plan. The governance layer constructs a paginated query across the approved field set, restricted to the agent's authorised portfolios. Each page executes under the same governance controls. An audit record is written for the full retrieval — recording exactly which data was returned to which agent under which access permissions.
 
-```
-STRUCTURED REQUEST (agent — no natural language step)
-  operation:   retrieve_dataset
-  dataset:     fixed_income_daily_positions
-  time_range:  trailing 12 months
-  pagination:  page_size = 10,000 rows
+```sql
+-- Logical Query Plan
+SELECT   portfolio_id, instrument_id, asset_class,
+         daily_pnl, market_value, duration, currency, position_date
+FROM     positions_fact
+WHERE    asset_class   = 'fixed_income'
+  AND    position_date BETWEEN current_date - INTERVAL '12 months' AND current_date
+  AND    portfolio_id  IN (/* agent_authorised_portfolio_list */)
+ORDER BY portfolio_id, position_date
+LIMIT    10000  OFFSET :page_offset;
 
-DATASET RESOLUTION
-  approved_fields:
-    portfolio_id  |  instrument_id  |  asset_class
-    daily_pnl     |  market_value   |  duration  |  currency  |  position_date
-  entitlements:
-    row_scope:    agent authorised portfolio list
-    field_ceiling: agent data classification level applied
-
-LOGICAL QUERY PLAN
-  select:   approved field set
-  from:     positions_fact
-  filter:   asset_class = fixed_income
-            position_date BETWEEN [12m_ago → today]
-            portfolio_id IN [authorised_scope]
-  order:    portfolio_id, position_date
-  paginate: LIMIT 10,000  OFFSET [page_n]
-
-EXECUTION RESPONSE (per page)
-  data:       [{ portfolio_id, instrument_id, daily_pnl, market_value, ... }, ...]
-  pagination: { page: n, total_pages: nnn, continuation_token: "..." }
-  audit:      lineage_id, field_set_version, entitlement_snapshot
+-- Execution Response  (per page)
+-- data:       [{ portfolio_id, instrument_id, daily_pnl, market_value, ... }, ...]
+-- pagination: { page: n, total_pages: nnn, continuation_token: "..." }
+-- audit:      lineage_id, field_set_version, entitlement_snapshot
 ```
 
 ---
@@ -266,46 +285,58 @@ EXECUTION RESPONSE (per page)
 **1 · Natural language request**
 A treasury analyst asks: *"Prepare our LCR figures for the Basel III submission."*
 
+```
+-- Request
+"Prepare our LCR figures for the Basel III submission"
+```
+
 **2 · Intent resolution and compliance classification**
 The AI client resolves the operation and metric. The intent layer classifies the stated purpose: the phrase *"for the Basel III submission"* exceeds the configured compliance intent threshold. Compliance purpose is recorded and carried through the full pipeline.
+
+```
+-- Semantic Intent Resolution
+operation:   retrieve_metric
+metric:      liquidity_coverage_ratio  (unresolved)
+intent_classification:
+  compliance_purpose_score: 0.94  |  threshold: 0.80
+  compliance_purpose: true
+```
 
 **3 · Metric resolution and compliance escalation**
 The liquidity coverage ratio metric resolves to its approved registry definition, which carries a compliance-relevant flag set by the metric owner at registration. Two independent signals are now both active — the metric is marked as compliance-relevant, and the AI has classified the stated intent as compliance-driven. The governance layer escalates automatically to the enhanced compliance artifact tier. No role claim, no manual flag, no special user action is required: escalation is a runtime consequence of what the metric is and what the query is for.
 
+```
+-- Metric Resolution & Compliance Escalation
+liquidity_coverage_ratio  →  definition v1.1: SUM(hqla_value) / SUM(net_outflow_30d)
+compliance_signals:
+  metric.compliance_relevant: true   -- set by metric owner at registration
+  intent.compliance_purpose:  true   -- classified by AI at query time
+escalation: ENHANCED compliance artifact tier  -- both signals required
+```
+
 **4 · Query planning, governance, and execution**
 Compliance-purpose queries are never served from cache — a fresh computation is required for every regulatory submission. The governance layer constructs the query with cache bypass enforced. On completion, it writes a regulatory trace record to the compliance-specific audit store (in addition to the standard lineage record), enforces export controls until the complete lineage record exists, and validates the result's data classification against the user's authorised ceiling. The treasury analyst receives both the governed LCR result and a complete, regulator-ready audit trail — automatically.
 
-```
-PLAIN ENGLISH
-  "Prepare our LCR figures for the Basel III submission"
+```sql
+-- Logical Query Plan  (cache bypass enforced — compliance_purpose = true)
+SELECT   h.entity_id,
+         SUM(h.hqla_value)       AS total_hqla,
+         SUM(c.net_outflow_30d)  AS total_net_outflows,
+         SUM(h.hqla_value) / NULLIF(SUM(c.net_outflow_30d), 0)  AS lcr
+FROM     hqla_inventory         h
+JOIN     net_cash_outflow_30d   c  ON h.entity_id = c.entity_id
+WHERE    h.as_of_date  = :submission_date
+  AND    h.entity_id   IN (/* authorised_scope */)
+GROUP BY h.entity_id;
 
-SEMANTIC INTENT RESOLUTION
-  operation:   retrieve_metric
-  metric:      liquidity_coverage_ratio  →  approved definition v1.1
-  intent_classification:
-    compliance_purpose_score: 0.94  |  threshold: 0.80
-    compliance_purpose: true
-  compliance_signals:
-    metric.compliance_relevant: true       ← set by metric owner at registration
-    intent.compliance_purpose:  true       ← classified by AI at query time
-    escalation: ENHANCED compliance artifact tier  ← both signals required
-
-LOGICAL QUERY PLAN
-  compute:  lcr = SUM(hqla_value) / SUM(net_outflow_30d)
-  from:     hqla_inventory  ×  net_cash_outflow_30d
-  group:    entity_id
-  as_of:    submission_date
-  filter:   entity_id IN [authorised_scope]
-  cache:    bypass  (compliance_purpose = true — fresh computation required)
-
-EXECUTION RESPONSE
-  data:      [{ entity_id, total_hqla, total_net_outflows, lcr }, ...]
-  compliance:
-    regulatory_trace_id:  written to compliance audit store
-    artifact_set_version: "1.0"
-    triggered_by:         [liquidity_coverage_ratio]
-    export_gate:          locked until complete lineage record exists
-  audit:     lineage_id, metric_version, entitlement_snapshot
+-- Execution Response
+-- data:      [{ entity_id, total_hqla, total_net_outflows, lcr }, ...]
+-- compliance:
+--   regulatory_trace_id:  written to compliance audit store
+--   artifact_set_version: "1.0"
+--   triggered_by:         [liquidity_coverage_ratio]
+--   export_gate:          locked until complete lineage record exists
+-- audit:     lineage_id, metric_version, entitlement_snapshot
 ```
 
 ---
