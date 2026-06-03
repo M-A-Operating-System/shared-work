@@ -400,3 +400,81 @@ The toggle is a **Rendered · Raw** pill control placed in the top-right corner 
 - Switching a Vega-Lite block to Raw shows the JSON inspector rather than a plain code block, since the spec is structured data with navigable nodes.
 - When a block is in Raw view, the artefact tray entry for that block still downloads the rendered export (or raw source if no `getExportBlob()` is available) — the toggle does not affect the download target.
 - Custom renderers that implement `getExportBlob()` are not called while the block is in Raw view.
+
+---
+
+## Scalable renderer implementation
+
+### Unified renderer registry
+
+All renderers — built-in and host-registered — are represented as entries in a single **renderer registry configuration file**. Built-in renderers (Mermaid, Vega-Lite, math, JSON, tables, code, document canvas) are pre-populated entries in this file; host-registered renderers are appended to it. There is no architectural distinction between the two categories at runtime.
+
+```json
+{
+  "renderers": [
+    {
+      "id":                   "mermaid",
+      "trigger":              "mermaid",
+      "name":                 "Mermaid Diagram",
+      "moduleUrl":            "/renderers/mermaid@11.4.1/index.js",
+      "version":              "11.4.1",
+      "builtIn":              true,
+      "systemPromptGuidance": "Use a ```mermaid block for relationships, flows, hierarchies, and sequences."
+    },
+    {
+      "id":                   "vega-lite",
+      "trigger":              "vega-lite",
+      "name":                 "Vega-Lite Chart",
+      "moduleUrl":            "/renderers/vega-lite@5.21.0/index.js",
+      "version":              "5.21.0",
+      "builtIn":              true,
+      "systemPromptGuidance": "Use a ```vega-lite block for metrics, trends, distributions, and comparisons. Always set width to 'container'."
+    },
+    {
+      "id":                   "risk-gauge",
+      "trigger":              "risk-gauge",
+      "name":                 "Risk Gauge",
+      "moduleUrl":            "https://cdn.acme.com/ai-renderers/risk-gauge@2.1.0/index.js",
+      "version":              "2.1.0",
+      "builtIn":              false,
+      "systemPromptGuidance": "Use a ```risk-gauge block when asked for a risk score. Content must be JSON: { \"score\": <0–100>, \"label\": \"<text>\", \"breakdown\": [...] }."
+    }
+  ]
+}
+```
+
+### Adding a renderer without touching existing ones
+
+Each renderer is an independently deployed ES module loaded from its own `moduleUrl`. Adding a new renderer requires two steps and touches nothing else in the platform:
+
+1. **Deploy the module** to a versioned URL (`/renderers/<id>@<version>/index.js` or a CDN path).
+2. **Append one entry** to the renderer registry config with the trigger tag, module URL, and system prompt guidance.
+
+The platform picks up the new entry at the next session start. Existing renderers are not reloaded, re-tested, or redeployed. Sessions already in progress continue using their cached module set and gain the new renderer at their next session.
+
+### Independent versioning and zero-impact updates
+
+Because each renderer module is loaded from a versioned URL, updating a renderer is equally non-disruptive:
+
+1. Deploy the new module version to a new URL (e.g. `risk-gauge@2.2.0`).
+2. Update the `moduleUrl` and `version` fields in the registry config.
+
+In-flight sessions continue using the cached `@2.1.0` module for their lifetime. New sessions load `@2.2.0`. No renderer affects any other renderer's availability or performance.
+
+### Library co-deployment
+
+Each renderer module bundles its own dependencies. There is no shared renderer dependency tree — a renderer that requires D3, a custom charting library, or a domain-specific SDK bundles it directly. This means:
+
+- Renderer A using Vega-Lite 5.x and Renderer B using Vega-Lite 4.x can coexist without conflict.
+- Upgrading a library for one renderer does not require coordinating with others.
+- A renderer can be pinned to a specific library version indefinitely without affecting platform upgrades.
+
+The only shared surface is the `HostRenderer` interface and the `RendererContext` object passed by the platform — these are stable and versioned separately from renderer implementations.
+
+### System prompt assembly
+
+At session start, the platform assembles the system prompt guidance block by iterating the registry in order and appending each entry's `systemPromptGuidance`. Built-in renderers come first (they are at the top of the registry), host-registered renderers follow. The LLM receives a complete, current list of available rendering targets with no manual prompt maintenance required — adding a renderer to the registry automatically teaches the LLM to use it.
+
+### Summary
+
+> **Adding a new renderer to the front end requires writing one module and adding one config entry. No existing renderer code, no platform core, and no system prompt template needs to be touched.** The rendering surface scales by addition, not by modification — each new capability is a self-contained deployment that sits alongside everything already running.
