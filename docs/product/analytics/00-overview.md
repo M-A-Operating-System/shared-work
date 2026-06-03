@@ -188,12 +188,13 @@ The AI client reads the approved metric catalogue and translates the question in
 
 ```
 -- Semantic Intent Resolution
-operation:   compare_metric_to_benchmark
+operation:      compare_metric_to_benchmark
 metrics:
   portfolio_return  (unresolved)
   benchmark_return  (unresolved)
-filters:     asset_class = equity  |  period = current_quarter
-dimensions:  portfolio_id
+filters:        asset_class = equity  |  period = current_quarter
+dimensions:     portfolio_id
+display_intent: chart  →  comparative metrics across categorical dimension → grouped_bar
 ```
 
 **3 · Metric and entitlement resolution**
@@ -223,9 +224,30 @@ GROUP BY p.portfolio_id, b.period_return;
 
 -- Execution Response
 -- data:      [{ portfolio_id, portfolio_return, benchmark_return }, ...]
--- display:   grouped bar chart
 -- narrative: plain-language summary anchored to computed values only
 -- audit:     lineage_id, resolved_metric_versions, entitlement_snapshot
+```
+
+**5 · Presentation decision**
+The result schema — two numeric measures compared across a categorical dimension — is matched against the Visualisation Ontology. The ontology resolves a grouped bar chart as the governed display contract for this result shape and intent pattern. A complete Vega-Lite specification is emitted alongside the data; the consuming AI client renders it without making any independent display choice.
+
+```json
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "mark": "bar",
+  "encoding": {
+    "x":      { "field": "portfolio_id", "type": "nominal",      "title": "Portfolio"  },
+    "y":      { "field": "value",        "type": "quantitative", "title": "Return",
+                "axis": { "format": ".1%" } },
+    "color":  { "field": "measure",      "type": "nominal",
+                "scale": { "domain": ["portfolio_return", "benchmark_return"],
+                           "range":  ["#4C78A8", "#F58518"] } },
+    "xOffset":{ "field": "measure",      "type": "nominal" }
+  },
+  "transform": [{ "fold": ["portfolio_return", "benchmark_return"],
+                  "as":   ["measure", "value"] }],
+  "title": "Portfolio Return vs Benchmark — Current Quarter"
+}
 ```
 
 ---
@@ -239,10 +261,11 @@ This request originates from an autonomous agent. The agent submits a structured
 
 ```
 -- Structured Request  (agent — no natural language step)
-operation:   retrieve_dataset
-dataset:     fixed_income_daily_positions
-time_range:  trailing 12 months
-pagination:  page_size = 10,000 rows
+operation:      retrieve_dataset
+dataset:        fixed_income_daily_positions
+time_range:     trailing 12 months
+pagination:     page_size = 10,000 rows
+display_intent: table  →  paginated dataset retrieval → structured table
 ```
 
 **2 · Dataset and entitlement resolution**
@@ -278,6 +301,30 @@ LIMIT    10000  OFFSET :page_offset;
 -- audit:      lineage_id, field_set_version, entitlement_snapshot
 ```
 
+**5 · Presentation decision**
+Bulk data retrieval resolves to a structured paginated table — not a chart. The Visualisation Ontology emits a Vega-Lite table specification defining the approved field set, column types, and formatting rules. The consuming agent receives a typed dataset with a continuation token for subsequent pages.
+
+```json
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "view": { "type": "table" },
+  "columns": [
+    { "field": "portfolio_id",  "type": "nominal",      "title": "Portfolio"      },
+    { "field": "instrument_id", "type": "nominal",      "title": "Instrument"     },
+    { "field": "asset_class",   "type": "nominal",      "title": "Asset Class"    },
+    { "field": "position_date", "type": "temporal",     "title": "Date",
+      "format": "%Y-%m-%d" },
+    { "field": "market_value",  "type": "quantitative", "title": "Market Value",
+      "format": ",.2f" },
+    { "field": "daily_pnl",     "type": "quantitative", "title": "Daily PnL",
+      "format": ",.2f" },
+    { "field": "duration",      "type": "quantitative", "title": "Duration"       },
+    { "field": "currency",      "type": "nominal",      "title": "CCY"            }
+  ],
+  "pagination": { "page_size": 10000, "continuation_token": true }
+}
+```
+
 ---
 
 #### Example 3 — Regulatory LCR submission (compliance analytics query)
@@ -295,11 +342,12 @@ The AI client resolves the operation and metric. The intent layer classifies the
 
 ```
 -- Semantic Intent Resolution
-operation:   retrieve_metric
-metric:      liquidity_coverage_ratio  (unresolved)
+operation:      retrieve_metric
+metric:         liquidity_coverage_ratio  (unresolved)
 intent_classification:
   compliance_purpose_score: 0.94  |  threshold: 0.80
   compliance_purpose: true
+display_intent: table  →  regulatory metric result → structured compliance table
 ```
 
 **3 · Metric resolution and compliance escalation**
@@ -337,6 +385,30 @@ GROUP BY h.entity_id;
 --   triggered_by:         [liquidity_coverage_ratio]
 --   export_gate:          locked until complete lineage record exists
 -- audit:     lineage_id, metric_version, entitlement_snapshot
+```
+
+**5 · Presentation decision**
+A small set of entity-level regulatory ratios resolves to a structured compliance table — not a chart. The Visualisation Ontology emits a Vega-Lite table specification with conditional formatting to highlight ratios below the regulatory minimum. Because compliance artifact mode is active, the specification carries an export contract: output is locked until the complete lineage record is confirmed.
+
+```json
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "view": { "type": "table" },
+  "columns": [
+    { "field": "entity_id",          "type": "nominal",      "title": "Entity"           },
+    { "field": "total_hqla",         "type": "quantitative", "title": "HQLA (m)",
+      "format": ",.1f" },
+    { "field": "total_net_outflows", "type": "quantitative", "title": "Net Outflows (m)",
+      "format": ",.1f" },
+    { "field": "lcr",                "type": "quantitative", "title": "LCR",
+      "format": ".2%",
+      "conditionalStyle": { "if": "datum.lcr < 1.0", "color": "red" } }
+  ],
+  "compliance": {
+    "regulatory_trace_id": true,
+    "export_gate":         "lineage_complete"
+  }
+}
 ```
 
 ---
