@@ -118,9 +118,11 @@ flowchart LR
         C3["Custom\nApplication"]
     end
     L["LLM"]
+
+    subgraph I["Interface"]
     M["API / Protocol Layer\n(MCP)"]
-    T1["Raw Database Schema\nexposed directly to AI"]
-    T2["Generated SQL\nNo governed metrics · No lineage\nNo entitlement guarantee"]
+    end
+
     subgraph data["Database / Data Sources"]
         direction TB
         D1["SQL Warehouse"]
@@ -129,9 +131,7 @@ flowchart LR
     end
     clients --> L
     clients --> M
-    M --> T1
-    T1 --> T2
-    T2 --> data
+    M --> data
 ```
 
 **AI-Enabled Analytics Platform**
