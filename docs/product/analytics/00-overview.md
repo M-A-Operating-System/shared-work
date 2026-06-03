@@ -2,9 +2,9 @@
 
 ## The Problem
 
-### Analytics engines: a decades-old foundation
+### Analytics engines: a well-established design pattern
 
-Organisations have invested decades — and billions — in analytical infrastructure that already does what AI is now being asked to do: encode business definitions, apply semantic meaning, enforce governance rules, execute complex calculations, and produce trusted outputs. These systems sit between raw data and business decisions. The category is broad:
+The governed semantic computation engine is not a new idea. The industry has developed and refined it for decades across a broad range of platforms and categories:
 
 | Category | Examples |
 |---|---|
@@ -14,11 +14,11 @@ Organisations have invested decades — and billions — in analytical infrastru
 | Data virtualisation | Denodo, Starburst |
 | Domain-specific engines | Risk engines, actuarial engines, pricing engines, fraud detection engines |
 
-All share a common architecture. Rather than searching tables and returning rows, they interpret business concepts, apply approved calculations, enforce dimensional hierarchies and access controls, and return governed analytical responses. When a CFO asks *"what was our adjusted EBITDA by region last quarter?"*, a mature analytics engine understands the business concept, applies the approved formula, enforces security, and produces a governed result. That is semantic computation — and it has been running reliably in enterprise environments for decades.
+All share a common design pattern. Rather than searching tables and returning rows, a semantic computation layer interprets business concepts, applies approved calculations, enforces dimensional hierarchies and access controls, and returns governed analytical responses. When a CFO asks *"what was our adjusted EBITDA by region last quarter?"*, the analytical engine understands the business concept, applies the approved formula, enforces security, and produces a governed result — not a set of database rows.
 
-The dominant AI narrative has become: *natural language → LLM → SQL → database → answer*. This assumes the database is the analytical system. It is not. The analytical system is the governed computation layer that sits above the database. The AI opportunity is not to replace that layer with SQL generation — it is to make it accessible through natural language and agentic interfaces.
+Most organisations today do not yet have a fully realised semantic layer in place. Many have fragmented investments across several of these platforms without a unified, governed analytical vocabulary. The argument here is not that the solution already exists and simply needs connecting to AI. It is that the design pattern is proven, the capability is achievable, and pursuing it is the right foundation for AI-enabled analytics — rather than bypassing it through Text-to-SQL.
 
-The analytics engine does not disappear. The interface changes. AI becomes another consumer of governed analytical services — the most flexible and accessible consumer yet.
+The dominant AI narrative has become: *natural language → LLM → SQL → database → answer*. This treats the database as the analytical system. It is not. The analytical system is the governed computation layer that sits above the database. The AI opportunity is to build and expose that layer through natural language and agentic interfaces — not to route around it.
 
 ### Where AI analytics stands today
 
