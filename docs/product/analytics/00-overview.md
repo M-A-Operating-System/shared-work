@@ -112,7 +112,7 @@ The two diagrams below contrast the Text-to-SQL approach with the AI-Enabled Ana
 <td>
 
 ```mermaid
-flowchart TB
+flowchart LR
     subgraph clients["AI-Enabled Clients"]
         direction LR
         C1["Conversational\nAssistant"]
@@ -140,7 +140,7 @@ flowchart TB
 <td>
 
 ```mermaid
-flowchart TB
+flowchart LR
     subgraph clients["AI-Enabled Clients"]
         direction LR
         C1["Conversational\nAssistant"]
