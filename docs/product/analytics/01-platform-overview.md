@@ -42,6 +42,8 @@ The platform scope covers three result types, all produced under the same govern
 
 This architecture supports three consumer types. Conversational AI assistants load the metric catalogue, translate natural language to structured parameters, and call the Analytics Engine. Autonomous agents, scheduled pipelines, and data mining workflows submit structured tool calls directly — including large paginated dataset requests — with no natural language translation needed. Custom applications call the Analytics Engine directly. The governance pipeline is identical for all three; entitlements, lineage, and semantic abstraction apply unconditionally.
 
+The MCP Capability Layer is the single, governed channel through which all AI systems — conversational assistants, autonomous agents, and data mining pipelines — access the organisation's regulated data and analytics. There is no alternative path. Every AI-initiated request, regardless of its origin or form, enters through this channel, traverses the full governance pipeline, and produces a lineage record. This is the architectural guarantee that makes AI-driven analytics safe to operate in a regulated environment.
+
 The following table defines the Analytics Engine's scope precisely:
 
 | It is | It is not |
@@ -125,6 +127,79 @@ flowchart TB
 ```
 
 Every consumer type routes through the MCP Capability Layer, traverses the invariant governance sequence, and produces a lineage record. No path to execution backends, physical schemas, or raw SQL exists outside that pipeline. Subsequent chapters describe each component in detail; the principles established here are the reference frame throughout.
+
+### End-to-End Examples
+
+Two queries traced through every stage illustrate what the architecture does in practice. The first is a routine business question. The second is a regulatory submission request — the same pipeline, but with compliance artifact escalation triggered automatically.
+
+---
+
+#### Example 1 — Portfolio performance (business query)
+
+**1 · Natural language request**
+A portfolio manager asks: *"Show me portfolio returns versus benchmark for my equity portfolios this quarter."*
+
+**2 · Semantic request**
+The AI client reads the metric catalogue and translates the question into a structured operation: `compare_metric_to_benchmark`, metrics `portfolio_return` and `benchmark_return`, filtered to `asset_class = equity`, current quarter, broken down by portfolio. No SQL is generated at this stage. The AI is resolving intent, not writing queries.
+
+**3 · Logical analytics model**
+The Semantic Intent Layer resolves both metric identifiers against the Semantic Metrics Registry. `portfolio_return` resolves to SMR definition v2.3 — a value-weighted return formula, version-controlled and approved. `benchmark_return` resolves via each portfolio's registered default benchmark relationship. The user's JWT is validated; entitlements are projected, restricting results to portfolios within the user's coverage scope.
+
+**4 · Logical data model**
+The Federated Query Planner constructs a backend-agnostic Logical Query Plan: two datasets required (`portfolio_fact`, `benchmark_timeseries`), joined on `portfolio_id → default_benchmark_id`. Query cost is estimated at 420 compute units — within the governance threshold. No execution has occurred yet.
+
+**5 · Platform-agnostic query**
+The Semantic Execution Governance layer validates the plan and emits a governed, warehouse-neutral query:
+
+```sql
+SELECT f.portfolio_id,
+       SUM(f.daily_pnl) / SUM(f.opening_market_value) AS portfolio_return,
+       b.period_return                                 AS benchmark_return
+FROM   portfolio_fact f
+JOIN   benchmark_timeseries b
+         ON f.default_benchmark_id = b.benchmark_id
+WHERE  f.asset_class  = 'equity'
+  AND  f.period       = current_quarter()
+  AND  f.portfolio_id IN (/* entitlement predicate — injected at plan level */)
+GROUP  BY f.portfolio_id, b.period_return
+```
+
+**6 · Federated execution**
+The FQP routes the plan to the registered SQL warehouse adapter (e.g. Snowflake). The adapter renders warehouse-specific SQL, executes it, and returns the result set. The Analytics Engine assembles the response: computed values, SCL display specification (grouped bar chart), optional narrative anchored strictly to the result, and a full lineage record. The portfolio manager receives a governed, auditable result — not a generated one.
+
+---
+
+#### Example 2 — Regulatory LCR submission (compliance query)
+
+**1 · Natural language request**
+A treasury analyst asks: *"Prepare our LCR figures for the Basel III submission."*
+
+**2 · Semantic request**
+The AI client resolves the operation (`retrieve_metric`, metric `liquidity_coverage_ratio`). The Semantic Intent Layer also classifies the stated purpose: the phrase *"for the Basel III submission"* scores 0.94 on the compliance intent classifier against a configured threshold of 0.80. `compliance_purpose: true` is recorded in the resolved intent and will be carried through the full pipeline.
+
+**3 · Logical analytics model**
+`liquidity_coverage_ratio` resolves to SMR definition v1.1, which carries the `compliance_relevant: true` flag set by the metric owner at registration. Both compliance signals are now active — metric metadata and AI-inferred intent. The Semantic Execution Governance layer escalates automatically to the enhanced compliance artifact tier. No role claim, no manual flag: the escalation is a runtime consequence of what the metric is and what the query is for.
+
+**4 · Logical data model**
+Required datasets: `hqla_inventory` (high-quality liquid assets by entity) and `net_cash_outflow_30d`. The FQP marks the plan with `bypass_cache: true` — compliance-purpose queries are never served from cache. A fresh computation is required for every regulatory submission.
+
+**5 · Platform-agnostic query**
+```sql
+SELECT   entity_id,
+         SUM(hqla_value)                                          AS total_hqla,
+         SUM(net_outflow_30d)                                     AS total_net_outflows,
+         SUM(hqla_value) / NULLIF(SUM(net_outflow_30d), 0)       AS lcr
+FROM     hqla_inventory h
+JOIN     net_cash_outflow_30d n USING (entity_id, reporting_date)
+WHERE    reporting_date = :as_of_date
+  AND    entity_id IN (/* entitlement predicate */)
+GROUP BY entity_id
+```
+
+**6 · Federated execution and compliance artifacts**
+The adapter executes the query against the warehouse. On return, the SEG writes a regulatory trace record to `analytics.basel3_regulatory_snapshots` (in addition to the standard lineage record), enforces lineage-gated export (the result cannot be exported until the complete lineage record exists), and validates the result's classification level against the user's authorised ceiling. The MCP response includes the standard result alongside a `compliance` block containing the `regulatory_trace_id`, `artifact_set_version`, and the metric IDs that triggered escalation. The treasury analyst receives both the governed LCR result and a complete, regulator-ready audit trail — automatically, without any additional steps.
+
+---
 
 - [Chapter 2](./02-personas-and-architecture.md) — Consumer personas and illustrative query journeys
 - [Chapter 3](./03-core-capabilities.md) — Component specifications: SMR, SIL, RAPL, SEG, FQP, Visualisation Ontology, NSE, Lineage Store, MCP Capability Layer
