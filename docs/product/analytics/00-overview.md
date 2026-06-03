@@ -122,13 +122,18 @@ flowchart TB
     L["LLM"]
     M["API / Protocol Layer\n(MCP)"]
     T1["Raw Database Schema\nexposed directly to AI"]
-    T2["Generated SQL\nexecuted against database"]
-    T3["Result\nNo governed metrics\nNo lineage · No entitlement guarantee"]
+    T2["Generated SQL\nNo governed metrics · No lineage\nNo entitlement guarantee"]
+    subgraph data["Database / Data Sources"]
+        direction LR
+        D1["SQL Warehouse"]
+        D2["OpenData API"]
+        D3["Graph Data API"]
+    end
     clients --> L
     L --> M
     M --> T1
     T1 --> T2
-    T2 --> T3
+    T2 --> data
 ```
 
 </td>
@@ -150,7 +155,7 @@ flowchart TB
         P2["Governance Pipeline\nEntitlement · Compliance · Cost"]
         P3["Federated Query Engine"]
     end
-    subgraph data["Data Sources"]
+    subgraph data["Database / Data Sources"]
         direction LR
         D1["SQL Warehouse"]
         D2["OpenData API"]
