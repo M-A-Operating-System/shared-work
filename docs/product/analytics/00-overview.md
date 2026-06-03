@@ -167,9 +167,26 @@ flowchart LR
 
 In the platform approach, every request routes through the API layer, traverses the invariant governance sequence, and produces an audit record. No path to execution backends, physical schemas, or raw data exists outside that pipeline.
 
+### Query Space
+
+The platform's scope spans two independent dimensions that together define the full range of governed analytical work.
+
+**Output type — visualisation or dataset**
+Some requests are best answered with a chart or summary: a portfolio manager wants to see returns versus benchmark, not a raw table of numbers. Others require a structured dataset: a data science pipeline needs millions of rows of position data for model retraining, and a chart is irrelevant. Both output types traverse the same governance pipeline. The difference is resolved by the Visualisation Ontology at query time — chart or table is determined by the intent and result shape, not by the user or the AI.
+
+**Governance tier — business analytics or full-provenance**
+Most queries require standard governance: approved metric definitions, entitlement enforcement, and a lineage record. Some queries require more: when a request is for a regulatory submission — or involves a metric that is flagged as compliance-relevant — the platform automatically escalates to the enhanced compliance artifact tier. Two independent signals trigger escalation: the metric's own compliance-relevant flag (set by the metric owner at registration) and the AI's classification of the query's stated purpose. When both signals are present, a regulatory trace record, export controls, and a regulator-ready artifact set are produced automatically. No user action or role claim is required.
+
+These two dimensions define four possible result types. The platform handles all four under the same governed pipeline:
+
+| | Standard governance | Full-provenance (compliance) |
+|---|---|---|
+| **Visualisation** | Business analytics chart — metric query with chart output | Compliance chart with regulatory trace and export controls |
+| **Dataset** | Data mining table — governed large dataset retrieval | Compliance dataset with regulatory trace and export controls |
+
 ### End-to-End Examples
 
-Three queries traced through every stage illustrate what the architecture does in practice. The first is a routine business analytics question. The second is a data mining request from an autonomous agent — governed large dataset retrieval rather than metric computation. The third is a regulatory submission request — the same pipeline, with compliance artifact escalation triggered automatically.
+Three queries traced through every stage illustrate the query space in practice. The first is a routine business analytics question — metric query with visualisation output, standard governance. The second is a data mining request from an autonomous agent — large dataset retrieval with table output, standard governance. The third is a regulatory submission request — the same governance pipeline with compliance artifact escalation triggered automatically by the two-signal model.
 
 ---
 
