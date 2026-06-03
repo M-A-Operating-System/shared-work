@@ -8,7 +8,13 @@ Conversational AI has matured to a point where AI assistants and agents can effe
 
 The natural next step is large-scale analytics and data mining: the portfolio manager who wants returns versus benchmark across all equity strategies, the risk officer who needs VaR exposures aggregated across multiple entities, the data science pipeline that requires 12 months of position data for model retraining. A common starting point is for organisations to explore Text-to-SQL, where they attempt to use LLM models to generate SQL queries against their data platform schemas that are then executed directly against production data. For exploratory, low-stakes, ad hoc work this is a legitimate starting point. For governed large-scale analytics in regulated financial services it is not sufficient or sustainable.
 
-The structural problems are architectural, not incidental: the AI infers metric definitions at query time rather than resolving approved ones, so "Portfolio Return" may mean different things in different queries and reports; there is no reproducible calculation record because the SQL is generated fresh each time; and entitlement enforcement depends on the reliability of AI-generated query predicates rather than a guaranteed enforcement layer. In a regulated environment, none of these properties is acceptable. The [Text-to-SQL appendix](./07-text-to-sql-antipattern.md) examines the failure modes in detail and describes the complementary architecture where both tools coexist.
+The structural problems are architectural, not incidental:
+
+- **No approved metric definitions** — the AI infers what "Portfolio Return" means at query time, so the same metric can mean different things in different queries and reports
+- **No reproducible calculation record** — SQL is generated fresh each time, so no two identical queries are guaranteed to produce identical results
+- **No guaranteed entitlement enforcement** — access controls depend on the reliability of AI-generated query predicates rather than a guaranteed enforcement layer
+
+In a regulated environment, none of these properties is acceptable. The [Text-to-SQL appendix](./07-text-to-sql-antipattern.md) examines the failure modes in detail and describes the complementary architecture where both tools coexist.
 
 ### The financial services challenge
 
@@ -93,7 +99,7 @@ flowchart TB
     subgraph platform["Analytics Capability"]
         direction LR
         B1["API Layer\n(MCP)"]
-        B2["Intent & Metric\nResolution (SMR)"]
+        B2["Intent & Metric\nResolution"]
         B3["Governance Pipeline\nEntitlement · Compliance · Cost"]
     end
 
@@ -158,15 +164,15 @@ A treasury analyst asks: *"Prepare our LCR figures for the Basel III submission.
 The AI client resolves the operation and metric. The intent layer classifies the stated purpose: the phrase *"for the Basel III submission"* exceeds the configured compliance intent threshold. Compliance purpose is recorded and carried through the full pipeline.
 
 **3 · Metric resolution and compliance escalation**
-The liquidity coverage ratio metric resolves to its approved registry definition, which carries a compliance-relevant flag set by the metric owner at registration. Both compliance signals are active — metric metadata and AI-inferred intent. The governance layer escalates automatically to the enhanced compliance artifact tier. No role claim, no manual flag, no special user action is required: escalation is a runtime consequence of what the metric is and what the query is for.
+The liquidity coverage ratio metric resolves to its approved registry definition, which carries a compliance-relevant flag set by the metric owner at registration. Two independent signals are now both active — the metric is marked as compliance-relevant, and the AI has classified the stated intent as compliance-driven. The governance layer escalates automatically to the enhanced compliance artifact tier. No role claim, no manual flag, no special user action is required: escalation is a runtime consequence of what the metric is and what the query is for.
 
 **4 · Query planning, governance, and execution**
 Compliance-purpose queries are never served from cache — a fresh computation is required for every regulatory submission. The governance layer constructs the query with cache bypass enforced. On completion, it writes a regulatory trace record to the compliance-specific audit store (in addition to the standard lineage record), enforces export controls until the complete lineage record exists, and validates the result's data classification against the user's authorised ceiling. The response includes the standard result alongside a compliance block containing the trace identifier and the metrics that triggered escalation. The treasury analyst receives both the governed LCR result and a complete, regulator-ready audit trail — automatically.
 
 ---
 
-- [Chapter 2](./02-personas-and-architecture.md) — Consumer personas and illustrative query journeys
-- [Chapter 3](./03-core-capabilities.md) — Component specifications: SMR, SIL, RAPL, SEG, FQP, Visualisation Ontology, NSE, Lineage Store, MCP Capability Layer
-- [Chapter 4](./04-integration-and-deployment.md) — Integration, deployment, and platform administration
-- [Chapter 5](./05-technical-implementation.md) — Reference implementation stack
+- [Chapter 2](./02-personas-and-architecture.md) — User personas, use cases, and end-to-end query journeys
+- [Chapter 3](./03-core-capabilities.md) — Detailed specifications for each platform component: metric registry, intent layer, entitlement enforcement, governance pipeline, query federation, visualisation, narrative synthesis, lineage store, and API layer
+- [Chapter 4](./04-integration-and-deployment.md) — Integration patterns, deployment models, and platform administration
+- [Chapter 5](./05-technical-implementation.md) — Reference implementation stack with technology rationale
 - [Chapter 6](./06-success-metrics.md) — Platform and governance success metrics
