@@ -16,8 +16,6 @@ The governed semantic computation engine is not a new idea. The industry has dev
 
 All share a common design pattern. Rather than searching tables and returning rows, a semantic computation layer interprets business concepts, applies approved calculations, enforces dimensional hierarchies and access controls, and returns governed analytical responses. When a CFO asks *"what was our adjusted EBITDA by region last quarter?"*, the analytical engine understands the business concept, applies the approved formula, enforces security, and produces a governed result — not a set of database rows.
 
-Most organisations today do not yet have a fully realised semantic layer in place. Many have fragmented investments across several of these platforms without a unified, governed analytical vocabulary. The argument here is not that the solution already exists and simply needs connecting to AI. It is that the design pattern is proven, the capability is achievable, and pursuing it is the right foundation for AI-enabled analytics — rather than bypassing it through Text-to-SQL.
-
 The dominant AI narrative has become: *natural language → LLM → SQL → database → answer*. This treats the database as the analytical system. It is not. The analytical system is the governed computation layer that sits above the database. The AI opportunity is to build and expose that layer through natural language and agentic interfaces — not to route around it.
 
 ### Where AI analytics stands today
