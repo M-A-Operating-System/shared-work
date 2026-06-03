@@ -144,10 +144,11 @@ flowchart LR
         C2["Autonomous Agent\n& Data Mining"]
         C3["Custom\nApplication"]
     end
-    L["LLM"]
+
     M["API / Protocol Layer\n(MCP)"]
     subgraph platform["Analytics Capability"]
         direction TB
+        L["LLM"]
         P1["Intent & Metric Resolution\nApproved Semantic Layer"]
         P2["Governance Pipeline\nEntitlement · Compliance · Cost"]
         P3["Federated Query Engine"]
@@ -158,12 +159,12 @@ flowchart LR
         D2["OpenData API"]
         D3["Graph Data API"]
     end
-    clients --> L
+    clients --> platform
     clients --> M
     M --> P1
     P1 --> P2
     P2 --> P3
-    P3 --> data
+    platform --> data
 ```
 
 In the platform approach, every request routes through the API layer, traverses the invariant governance sequence, and produces an audit record. No path to execution backends, physical schemas, or raw data exists outside that pipeline.
