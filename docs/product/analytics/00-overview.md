@@ -428,6 +428,78 @@ A small set of entity-level regulatory ratios resolves to a structured complianc
 }
 ```
 
+**6 · Compliance provenance generation**
+Once execution completes and the result is verified, the platform seals a compliance provenance record and writes it to the append-only compliance audit store. The record covers the full chain — what was asked, which metric definition and version was used, how the logical field specification mapped to physical tables, what SQL ran against which backend, and the exact entitlement state at execution time. The entire record is signed with the platform's private key using ECDSA. Any party holding the platform's published public key can independently verify that no field has been altered since sealing — without any access to the platform itself. The export gate remains locked until this record is confirmed written; the presentation specification carries the gate status and will not release the output until provenance is complete.
+
+```json
+{
+  "lineage_id":           "lin_9f3a2c81-4d7e-4b1a-bc3f-2e8d1f6a9c04",
+  "regulatory_trace_id":  "reg_basel3_lcr_20260603_ent_007",
+  "artifact_set_version": "1.0",
+  "export_gate":          "locked",
+
+  "intent": {
+    "raw_request":              "Prepare our LCR figures for the Basel III submission",
+    "compliance_purpose_score": 0.94,
+    "compliance_purpose":       true
+  },
+
+  "escalation_signals": [
+    { "signal": "metric.compliance_relevant", "source": "metric_registry",      "value": true },
+    { "signal": "intent.compliance_purpose",  "source": "ai_intent_classifier", "value": true }
+  ],
+
+  "metric": {
+    "id":                  "liquidity_coverage_ratio",
+    "version":             "v1.1",
+    "formula":             "SUM(hqla_value) / SUM(net_outflow_30d)",
+    "compliance_relevant": true,
+    "approved_by":         "Chief Data Officer",
+    "approved_at":         "2025-11-14T09:00:00Z"
+  },
+
+  "logical_field_spec": {
+    "grain":  "entity_id",
+    "as_of":  "2026-06-03",
+    "fields": [
+      { "name": "hqla_value",      "logical_source": "hqla_inventory.hqla_value",           "role": "numerator"   },
+      { "name": "net_outflow_30d", "logical_source": "net_cash_outflow_30d.net_outflow_30d", "role": "denominator" }
+    ],
+    "filters":      { "entity_id": ["ENT_007", "ENT_012"] },
+    "cache_policy": "bypass"
+  },
+
+  "physical_execution": {
+    "tables": [
+      { "logical": "hqla_inventory",      "physical": "fds_prod.liquidity.hqla_daily_position",    "columns": ["entity_id", "as_of_date", "hqla_value"]      },
+      { "logical": "net_cash_outflow_30d", "physical": "fds_prod.liquidity.ncof_30d_stressed_view", "columns": ["entity_id", "as_of_date", "net_outflow_30d"] }
+    ],
+    "executed_sql": "SELECT h.entity_id, SUM(h.hqla_value) AS total_hqla, SUM(c.net_outflow_30d) AS total_net_outflows, SUM(h.hqla_value) / NULLIF(SUM(c.net_outflow_30d), 0) AS lcr FROM fds_prod.liquidity.hqla_daily_position h JOIN fds_prod.liquidity.ncof_30d_stressed_view c ON h.entity_id = c.entity_id WHERE h.as_of_date = '2026-06-03' AND h.entity_id IN ('ENT_007', 'ENT_012') GROUP BY h.entity_id",
+    "query_hash":   "sha256:a3f8c2d1e4b7f09c3a2e1d8b6f4c9a7e2d5b8f1c4a6e3d9b2f7c5a1e8d4b6f3",
+    "backend":      "liquidity_warehouse_primary",
+    "completed_at": "2026-06-03T08:14:29Z",
+    "row_count":    2
+  },
+
+  "entitlement_snapshot": {
+    "user_id":      "usr_treasury_jsmith",
+    "roles":        ["treasury_analyst", "lcr_submitter"],
+    "entity_scope": ["ENT_007", "ENT_012"],
+    "evaluated_at": "2026-06-03T08:14:22Z"
+  },
+
+  "signature": {
+    "algorithm":     "ECDSA-P256-SHA256",
+    "key_id":        "analytics-platform-signing-key-2026-01",
+    "signed_fields": ["intent", "escalation_signals", "metric", "logical_field_spec", "physical_execution", "entitlement_snapshot"],
+    "value":         "MEYCIQDp3f8c2a1e9b4d7f6c5a3e2d1b8f4c9a7e2d5b8f1c4a6e3CIQD9b2f7c5a1e8d4b6f3c9a2e6d4b8f1c5a3e7d2b9f4c6a8e1d3",
+    "sealed_at":     "2026-06-03T08:14:30Z"
+  },
+
+  "export_gate_released_at": null
+}
+```
+
 ---
 
 - [Chapter 2](./02-personas-and-architecture.md) — User personas, use cases, and end-to-end query journeys
