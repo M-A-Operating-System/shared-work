@@ -119,6 +119,7 @@ flowchart TB
         B1["API Layer\n(MCP)"]
         B2["Intent & Metric\nResolution"]
         B3["Governance Pipeline\nEntitlement · Compliance · Cost"]
+        B4["Federated\nQuery Engine"]
     end
 
     subgraph data["Data Sources"]
@@ -131,7 +132,8 @@ flowchart TB
     clients -->|"structured request\n+ identity token"| B1
     B1 --> B2
     B2 --> B3
-    B3 --> data
+    B3 --> B4
+    B4 --> data
 ```
 
 Every consumer type routes through the API layer, traverses the invariant governance sequence, and produces an audit record. No path to execution backends, physical schemas, or raw data exists outside that pipeline.
