@@ -330,8 +330,12 @@ class NarrativeSynthesisEngine:
     def __init__(self, client: anthropic.AsyncAnthropic):
         self.client = client
 
+    # Update model IDs on deprecation — or read from tenant config models.narrativeSynthesisModel
+    FAST_MODEL     = "claude-haiku-4-5-20251001"
+    STANDARD_MODEL = "claude-sonnet-4-6"
+
     async def synthesise(self, result: dict, operation: dict) -> str:
-        model    = "claude-haiku-4-5-20251001" if self._is_simple(result) else "claude-sonnet-4-6"
+        model    = self.FAST_MODEL if self._is_simple(result) else self.STANDARD_MODEL
         prompt   = self._build_prompt(result, operation)
         response = await self.client.messages.create(
             model=model, max_tokens=512,
@@ -342,7 +346,11 @@ class NarrativeSynthesisEngine:
         return narrative
 
     def _is_simple(self, result: dict) -> bool:
-        return len(result["rows"]) <= 10 and len(result["schema"]) <= 3
+        # Route to Haiku for ≤5 metrics and ≤3 dimensions — matches Ch03 model selection spec
+        schema = result.get("schema", [])
+        metric_count    = sum(1 for f in schema if f.get("type") == "number")
+        dimension_count = len(schema) - metric_count
+        return metric_count <= 5 and dimension_count <= 3
 
     def _build_prompt(self, result: dict, operation: dict) -> str:
         # Inject metric labels + row values + units; no user query, no physical schema
@@ -444,15 +452,17 @@ The operation catalogue. One document per approved operation per tenant. The `ex
 {
   "type":              "analytical_operation",
   "tenant_id":         "acme-wealth",
-  "operation_id":      "get_positions",
-  "version":           1,
-  "status":            "approved",
-  "source":            "platform",
-  "display_name":      "Portfolio Positions",
-  "description":       "Fetch current or historical position data for a portfolio.",
-  "execution_profile": "data_retrieval",
-  "required_params":   ["portfolio_id"],
-  "optional_params":   ["as_of_date", "asset_class"]
+  "operation_id":        "get_positions",
+  "version":             1,
+  "status":              "approved",
+  "source":              "platform",
+  "display_name":        "Portfolio Positions",
+  "description":         "Fetch current or historical position data for a portfolio.",
+  "execution_profile":   "data_retrieval",
+  "required_params":     ["portfolio_id"],
+  "optional_params":     ["as_of_date", "asset_class"],
+  "supported_metrics":   [],
+  "supported_dimensions": ["portfolio_id", "asset_class", "currency", "instrument_id", "as_of_date"]
 }
 ```
 
@@ -893,7 +903,7 @@ class SemanticExecutionGovernance:
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
-| **Plan optimiser** | Apache Calcite | Battle-tested SQL plan optimisation; used by Trino, Flink, Beam |
+| **Plan optimiser** | Apache Calcite (within SQL warehouse adapters) | Battle-tested SQL plan optimisation; used by Trino, Flink, Beam. Calcite is invoked inside each SQL warehouse adapter to optimise the physical sub-plan SQL before execution — not at the Python FQP orchestration layer, which handles LQP decomposition and result assembly |
 | **Backend adapters** | Custom adapter per backend type | Calcite handles SQL; custom adapters cover REST/OpenData/GraphQL/SPARQL |
 | **Result assembly** | Custom (Python) | Fan-out/fan-in; no off-the-shelf library needed |
 

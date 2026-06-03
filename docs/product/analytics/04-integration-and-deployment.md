@@ -54,7 +54,7 @@ A successful response returns a JSON object containing the result record, a disp
     "type": "chart" | "table",
     "..."
   },
-  "narrative": { "lead": "...", "detail": "...", "anchoredTo": "..." },
+  "narrative": { "lead": "...", "detail": "...", "anchoredTo": ["..."] },
   "meta": {
     "latencyMs": 1285,
     "cacheHit":  false,
@@ -182,7 +182,7 @@ The governance block controls the circuit breakers and compliance mode applied t
 | `blockedClassifications` | List of classification labels that trigger blocking when `classificationGating` is enabled. |
 | `requireLineageForExport` | When `true`, result export operations require a complete lineage record. Exports of results with incomplete lineage are blocked. |
 | `auditAllQueries` | When `true`, every query — including governance-blocked and authentication-failed requests — is written to the audit log. Platform-recommended setting is `true`. |
-| `complianceMode` | Activates compliance-specific behaviour: `mifid2` logs all queries involving client-related metrics; additional modes for `basel4`, `aifmd`, and `esg_sfdr` are available. |
+| `complianceMode` | Activates compliance-specific behaviour: `mifid2` logs all queries involving client-related metrics; additional modes for `basel3` (covering both Basel III and the Basel IV final reforms), `aifmd`, and `esg_sfdr` are available. |
 
 ### Operational Settings
 

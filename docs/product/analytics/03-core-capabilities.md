@@ -436,7 +436,7 @@ The following illustrates how raw MCP tool call parameters are transformed throu
     { "id": "asset_class", "entitled": true }
   ],
   "row_predicates": [
-    "portfolio_id IN ('GLOB_EQ_OPP', 'UK_CORE_INC', 'STRAT_BAL')"
+    "portfolio_id IN ('GLOB_EQ_OPP', 'UK_CORE_INC', 'ASIA_PAC_GRW', 'EUR_BAL_INC')"
   ],
   "filters": [
     { "dimension": "asset_class", "operator": "eq", "value": "EQUITY" }
@@ -775,7 +775,7 @@ The FQP maintains a result cache keyed by the LQP signature — a deterministic 
 
 | Cache property | Specification |
 |---|---|
-| Cache key | SHA-256 of (metric IDs + versions, dimension IDs, filter predicates, time expression, entitlement hash, tenant ID) |
+| Cache key | SHA-256 of (metric IDs + versions, dimension IDs, filter predicates, time expression, entitlement hash, tenant ID). **Entitlement hash** is a SHA-256 of the fully resolved `row_predicates` and `column_masks` from the RAPL projection record for the request, computed after role merging. Two users with different effective predicates always produce different entitlement hashes and are never served each other's cached results. |
 | Cache TTL | Configurable per `data.refresh_cadence` in the metric definition. Default: 3600 seconds. |
 | Cache invalidation | On metric definition version change; on execution backend data refresh signal; on explicit cache clear via Admin API |
 | Cache scope | Per-tenant. Results from one tenant are never served to another. |

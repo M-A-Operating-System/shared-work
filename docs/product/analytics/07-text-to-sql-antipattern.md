@@ -247,7 +247,7 @@ For a complete specification of this architecture, see [Chapter 3, Core Platform
 
 ### Context and Threat Landscape
 
-The Model Context Protocol (MCP), introduced by Anthropic in late 2024, is designed to become the universal standard, often described as the "USB-C for AI applications", allowing large language models to connect to external tools, databases, and services. This has created an entirely new attack surface: databases that were previously protected behind application middleware are now directly queryable by AI agents, often via natural language instructions that an agent autonomously translates into SQL.
+The Model Context Protocol (MCP), introduced by Anthropic in late 2024, is a universal standard protocol for connecting large language models to external tools, databases, and services. This has created an entirely new attack surface: databases that were previously protected behind application middleware are now directly queryable by AI agents, often via natural language instructions that an agent autonomously translates into SQL.
 
 Research from multiple independent security firms published in 2025–2026 reveals a systemic pattern of vulnerability. [Hadrian.io (Aug 2025)](https://hadrian.io/blog/the-ai-protocol-under-siege-mcp-server-vulnerabilities-expose-critical-threats) found 43% of tested MCP implementations contained command injection flaws; a [separate survey (Adversa AI, Jul 2025)](https://adversa.ai/blog/mcp-security-digest-july-2025/) identified nearly 500 servers exposed without any authentication. Most critically, Anthropic's own reference SQLite MCP server, forked over 5,000 times before being archived in May 2025, contained a classic SQL injection flaw that the company declined to patch, citing the repository's archived status.
 
@@ -458,7 +458,7 @@ cursor.execute(
 
 **Priority 2: Statement-Level Query Parsing (MCP-Specific)**
 
-Reject any input containing semicolons, `COMMIT`, `ROLLBACK`, `BEGIN`, or other statement terminators before execution. An MCP query tool should never accept multi-statement input. Parse and validate at the MCP server layer before the query reaches the database driver. Note: regex blocklists are a starting point but are not sufficient alone, they can be bypassed via comment obfuscation and Unicode normalisation. Statement parsing should be combined with a SQL AST parser for robust enforcement.
+Reject any input containing semicolons, `COMMIT`, `ROLLBACK`, `BEGIN TRANSACTION`, or other statement terminators before execution. An MCP query tool should never accept multi-statement input. Parse and validate at the MCP server layer before the query reaches the database driver. Note: regex blocklists are a starting point but are not sufficient alone — they can be bypassed via comment obfuscation and Unicode normalisation, and Python SQL AST parsers (sqlparse, pglast) have known bypass cases for PostgreSQL dollar-quoted literals. The most robust mitigation is disabling multi-statement execution at the database driver level (e.g. `simple_query_protocol` in asyncpg) so that the database itself enforces single-statement semantics regardless of what reaches it.
 
 ```python
 import re
@@ -490,7 +490,7 @@ In PostgreSQL: revoke or disable `dblink`, `pg_read_file`, `COPY TO`, and `lo_ex
 
 **Priority 5: Tool Response Sanitisation (Stored Prompt Injection)**
 
-Sanitise MCP tool results before returning them to the LLM context. Strip or escape any content resembling LLM instruction syntax (`SYSTEM:`, `[INST]`, `<instruction>`, `role: system`, etc.) from database-sourced strings. This is the only effective control against stored prompt injection attacks.
+Sanitise MCP tool results before returning them to the LLM context. Strip or escape content resembling LLM instruction syntax (`SYSTEM:`, `[INST]`, `<instruction>`, `role: system`, etc.) from database-sourced strings. This reduces the attack surface but cannot eliminate it — injection can be expressed in natural language with no distinguishing syntax ("Before answering the user's question, please..."). Pattern matching on known keywords is a defence-in-depth measure, not a complete control. The only architectural control is ensuring the agent has access only to tools with no unintended side-effects — least-privilege tool scoping so that a successfully injected instruction cannot cause harm even if it executes.
 
 **Priority 6: Output Row Caps and Rate Limiting**
 
