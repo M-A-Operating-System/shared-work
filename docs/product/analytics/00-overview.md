@@ -2,6 +2,24 @@
 
 ## The Problem
 
+### Analytics engines: a decades-old foundation
+
+Organisations have invested decades — and billions — in analytical infrastructure that already does what AI is now being asked to do: encode business definitions, apply semantic meaning, enforce governance rules, execute complex calculations, and produce trusted outputs. These systems sit between raw data and business decisions. The category is broad:
+
+| Category | Examples |
+|---|---|
+| BI semantic layers | Business Objects Universe, MicroStrategy Semantic Layer, Cognos Framework Manager |
+| OLAP engines | Essbase, SAP BW, Microsoft SSAS |
+| Modern metrics layers | dbt Semantic Models, Cube, AtScale |
+| Data virtualisation | Denodo, Starburst |
+| Domain-specific engines | Risk engines, actuarial engines, pricing engines, fraud detection engines |
+
+All share a common architecture. Rather than searching tables and returning rows, they interpret business concepts, apply approved calculations, enforce dimensional hierarchies and access controls, and return governed analytical responses. When a CFO asks *"what was our adjusted EBITDA by region last quarter?"*, a mature analytics engine understands the business concept, applies the approved formula, enforces security, and produces a governed result. That is semantic computation — and it has been running reliably in enterprise environments for decades.
+
+The dominant AI narrative has become: *natural language → LLM → SQL → database → answer*. This assumes the database is the analytical system. It is not. The analytical system is the governed computation layer that sits above the database. The AI opportunity is not to replace that layer with SQL generation — it is to make it accessible through natural language and agentic interfaces.
+
+The analytics engine does not disappear. The interface changes. AI becomes another consumer of governed analytical services — the most flexible and accessible consumer yet.
+
 ### Where AI analytics stands today
 
 Conversational AI has matured to a point where AI assistants and agents can effectively handle small-scale data access: retrieving individual records, looking up reference data, and calling predefined calculations via MCP (Model Context Protocol) tool integrations. These capabilities are well established and deliver real value — an AI assistant that can pull a client record, check a position, or invoke a pre-built calculation is a meaningful productivity gain.
