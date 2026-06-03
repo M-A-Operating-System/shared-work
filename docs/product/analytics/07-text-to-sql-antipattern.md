@@ -28,7 +28,9 @@ In each of these contexts Text-to-SQL is an accelerator, not a liability.
 
 ### Where It Becomes the Wrong Foundation
 
-The failure mode is rarely a deliberate architectural decision. A team uses Text-to-SQL because it is fast, use cases expand, and outputs start feeding processes they were never intended to support. By the time the governance gap is visible it is embedded in workflows, dashboards, and downstream systems. The [Why You Cannot Patch Your Way Out](#why-you-cannot-patch-your-way-out) section examines why this drift is hard to reverse.
+Text-to-SQL is a genuinely compelling starting point for early AI analytics work. A working demo appears in hours, simple queries produce accurate results, and iterative prompt refinement keeps extending coverage — each tweak fixes the last failure case and the system visibly improves. This creates a specific kind of false confidence: teams measure progress by the number of questions the system now handles correctly, not by whether the architecture can ever satisfy the governance requirements that matter.
+
+The failure mode is rarely a deliberate decision. A team uses Text-to-SQL because it is fast, use cases expand, and outputs start feeding processes they were never intended to support. By the time the governance gap is visible it is embedded in workflows, dashboards, and downstream systems — and the prompt has become load-bearing. The [Why You Cannot Patch Your Way Out](#why-you-cannot-patch-your-way-out) section examines why this is hard to reverse.
 
 | For exploration | As a governed execution layer |
 |---|---|
