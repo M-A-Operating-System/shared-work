@@ -10,32 +10,34 @@ The product specification (component behaviours, interface contracts, governance
 
 ```mermaid
 flowchart TD
-    Consumer["Consumer\nAI Chat Platform · autonomous agent · custom application"]
+    Consumer["Consumer\nAI Chat Platform (Claude) · autonomous agent · custom application"]
 
     subgraph analytics["AI Analytics Platform"]
-        MCP["MCP Capability Layer\nPython · FastMCP + Uvicorn · MCP Streamable HTTP"]
-        SIL["Semantic Intent Layer\nParameter validation · SMR resolution · LQP generation"]
-        RAPL["Role-Aware Projection Layer\nCustom middleware · Python"]
-        SCL["Semantic Controls Layer\nPerformance impact assessment · classification · thresholds"]
-        FQE["Federated Query Engine\nApache Calcite + backend adapters"]
-        DVL["Data Visualization Language (DVL)\nontology evaluation · deterministic chart contract selection · Vega-Lite v5"]
-        NSE["Narrative Synthesis Engine\nAnthropic Claude · Haiku / Sonnet"]
-        LS[("Analytical Lineage Store")]
-        Result(["MCP tool response\ndisplay_spec + narrative + result_id"])
+        MCP["MCP Capability Layer\nPython 3.12 · FastMCP 2.x + Uvicorn · MCP Streamable HTTP · port 8000\nJWT validation — python-jose · JWKS endpoint · RS256"]
+        SIL["Semantic Intent Layer\nPython · Pydantic v2 · JSON Schema validation\nSMR resolution · compliance intent scoring · LQP generation"]
+        RAPL["Role-Aware Projection Layer\nPython · asyncpg · PostgreSQL role_policies\nJWT claims → row predicate injection · column masking"]
+        SCL["Semantic Controls Layer\nPython · Redis (concurrency semaphore)\nperformance impact · classification · compliance checks"]
+        FQE["Federated Query Engine\nPython · asyncio fan-out\nApache Calcite (SQL plan optimisation, within adapters)\nSnowflake (primary) · dbt MetricFlow · REST/OData · Neo4j"]
+        DVL["Data Visualization Language (DVL)\nPython · ontology evaluation · Vega-Lite v5\ndeterministic chart contract selection"]
+        NSE["Narrative Synthesis Engine\nAnthropic Claude Haiku 4.5 — simple queries\nAnthropic Claude Sonnet 4.6 — complex queries"]
+        Cache[("Result Cache\nRedis · SHA-256 cache key · 5-min TTL\ncompliance queries bypass")]
+        LS[("Analytical Lineage Store (ALS)\nAWS S3 — JSON record per query\nPostgreSQL lineage_index — scalar search")]
+        Result(["MCP tool response\ndisplay_spec + narrative + result_id\n+ compliance block if Provenance Artifact active"])
     end
 
-    vega2img["vega2img (optional)\nStandalone MCP render service · DVL → SVG / PNG\nRegistered directly with consumers — not part of Analytics Platform"]
+    vega2img["vega2img (optional) · port 8001\nPython · FastMCP · vega-embed · Playwright (headless Chromium)\nStandalone MCP render service — not part of Analytics Platform"]
 
     subgraph dcs["Data Context Store (DCS)"]
-        SMR["Semantic Metrics Repository\nGovernance workflow + metric schema · extends SDR"]
-        SDR[("Semantic Data Repository (SDR)\nPre-existing · general-purpose common registry")]
+        SMR[("Semantic Metrics Repository (SMR)\nJSON documents: analytical_metric · analytical_dimension · analytical_operation\nlifecycle: proposed → in_review → approved → deprecated")]
+        SDR[("Semantic Data Repository (SDR)\nJSON documents: data models · object models\ncritical data elements · physical schemas · data lineage")]
         SDR -->|"SMR extends SDR"| SMR
     end
 
     subgraph backends["Execution Backends"]
-        SQL["SQL Warehouse\nSnowflake · BigQuery · Databricks · Starburst"]
-        ODA["OpenData API\nREST / OData"]
-        GDA["Graph Data API\nNeo4j · Neptune / SPARQL"]
+        SQL["Snowflake — primary SQL warehouse\nBigQuery · Databricks · Redshift (alternatives)"]
+        SemLayer["dbt Semantic Layer — MetricFlow\nCube.js"]
+        ODA["OpenData API\nREST JSON · OData v4"]
+        GDA["Graph Data API\nNeo4j Bolt · Amazon Neptune SPARQL"]
     end
 
     Consumer -->|"POST /v1/mcp (JWT + MCP tool call)"| MCP
@@ -43,17 +45,18 @@ flowchart TD
     MCP -->|"validated tool call parameters"| SIL
     MCP -->|"JWT claims"| RAPL
     RAPL -->|"row predicates + column masks"| SIL
-    SIL -->|"metric resolution + validation"| SMR
-    SIL -->|"Logical Query Plan"| SCL
+    SIL -->|"metric + dimension ID resolution"| SMR
+    SIL -->|"Logical Query Plan (LQP)"| SCL
+    SCL -->|"controls decision record"| LS
     SCL -->|"approved LQP"| FQE
-    SCL -->|"controls decision"| LS
     FQE -->|"physicalMapping lookup"| SMR
-    FQE --> SQL & ODA & GDA
+    FQE <-->|"cache read / write"| Cache
+    FQE --> SQL & SemLayer & ODA & GDA
     FQE -->|"execution record"| LS
     FQE -->|"assembled result"| DVL
     FQE -->|"assembled result"| NSE
     DVL -->|"DVL display spec"| Result
-    NSE -->|"narrative"| Result
+    NSE -->|"governed narrative"| Result
 ```
 
 The Semantic Data Repository (SDR) is a pre-existing platform component: the organisation's general-purpose registry for semantic definitions. The Analytics Platform registers metric definitions as a new `analytical_metric` type in the SDR, reusing its versioned storage, full-text search, cross-definition relationships, and scoped access control. The SMR governance layer adds the approval workflow, metric-specific schema validation, and the Admin API surface on top.
@@ -359,6 +362,46 @@ Additional rules beyond the standard analytical assistant:
 if __name__ == "__main__":
     mcp.run(transport="streamable-http", host="0.0.0.0", port=8000)
 ```
+
+#### Error Handling
+
+All tool call failures return a structured error envelope. The MCP framework serialises Python exceptions as tool error responses; the platform maps exception classes to stable error codes before they leave the service boundary.
+
+```python
+class AnalyticsError(Exception):
+    code:    str   # stable string identifier consumed by AI clients
+    message: str   # human-readable; safe to surface to end users
+
+class AuthenticationError(AnalyticsError):        code = "AUTH_FAILED"
+class AccessDeniedError(AnalyticsError):          code = "ACCESS_DENIED"
+class OperationNotAvailableError(AnalyticsError): code = "OPERATION_NOT_FOUND"
+class MetricNotFoundError(AnalyticsError):        code = "METRIC_NOT_FOUND"
+class PerformanceImpactCeilingExceeded(AnalyticsError): code = "CONTROLS_REJECTED"
+class UserPerformanceImpactBudgetExceeded(AnalyticsError): code = "BUDGET_EXCEEDED"
+class ConcurrentQueryLimitExceeded(AnalyticsError): code = "CAPACITY_LIMIT"
+class NarrativeValidationError(AnalyticsError):   code = "NARRATIVE_FAILED"
+class ClassificationGateError(AnalyticsError):    code = "CLASSIFICATION_BLOCKED"
+
+def handle_tool_error(exc: Exception) -> dict:
+    if isinstance(exc, AnalyticsError):
+        return {"error": {"code": exc.code, "message": str(exc)}}
+    return {"error": {"code": "INTERNAL_ERROR", "message": "An internal error occurred."}}
+```
+
+Error code reference table:
+
+| Code | Raised by | Consumer action |
+|------|-----------|-----------------|
+| `AUTH_FAILED` | JWT validation | Re-authenticate; do not retry with same token |
+| `ACCESS_DENIED` | RAPL | Inform user; do not retry |
+| `OPERATION_NOT_FOUND` | SMR | Call `list_operations` to discover valid operation IDs |
+| `METRIC_NOT_FOUND` | SMR | Call `list_operations` to check available metrics |
+| `CONTROLS_REJECTED` | SCL | Reduce metric count or time range; inform user |
+| `BUDGET_EXCEEDED` | SCL | Inform user their hourly query budget is exhausted |
+| `CAPACITY_LIMIT` | SCL | Retry with exponential back-off |
+| `NARRATIVE_FAILED` | NSE | Return result without narrative; log for operator review |
+| `CLASSIFICATION_BLOCKED` | SCL | Inform user the requested metric requires elevated access |
+| `INTERNAL_ERROR` | Any | Log `result_id` if available; operator investigation required |
 
 ---
 
@@ -1239,6 +1282,65 @@ After execution and result assembly the FQE returns a typed result envelope in p
 | **OLAP engine** | OLAP adapter | Apache Druid, ClickHouse, Pinot |
 | **Custom** | Custom adapter interface | Any backend conforming to the `FQPBackendAdapter` contract |
 
+#### SQL Warehouse Adapter — worked example
+
+```python
+import snowflake.connector    # swap for bigquery / databricks connector per target
+
+class SnowflakeAdapter:
+    def __init__(self, connection_params: dict):
+        self.conn_params = connection_params
+
+    async def ping(self) -> bool:
+        try:
+            conn = snowflake.connector.connect(**self.conn_params)
+            conn.cursor().execute("SELECT 1")
+            return True
+        except Exception:
+            return False
+
+    async def execute_sub_plan(self, sub_plan: dict) -> dict:
+        sql, params = self._render_sql(sub_plan)
+        conn        = snowflake.connector.connect(**self.conn_params)
+        cursor      = conn.cursor()
+        cursor.execute(sql, params)
+        columns = [d[0].lower() for d in cursor.description]
+        rows    = [dict(zip(columns, row)) for row in cursor.fetchall()]
+        return {"affinity": sub_plan["affinity"], "rows": rows, "columns": columns}
+
+    def _render_sql(self, sub_plan: dict) -> tuple[str, list]:
+        # Build parameterised SQL from LQP node list
+        metric_nodes = [n for n in sub_plan["nodes"] if n["op"] == "metric_scan"]
+        filter_nodes = [n for n in sub_plan["nodes"] if n["op"] == "filter"]
+        time_node    = next((n for n in sub_plan["nodes"] if n["op"] == "time_expand"), None)
+        sort_node    = next((n for n in sub_plan["nodes"] if n["op"] == "sort"), None)
+
+        # SELECT clause — one column per metric measure
+        selects = [f"{n['physical_mapping']['measure']} AS {n['metric_id']}" for n in metric_nodes]
+        table   = metric_nodes[0]["physical_mapping"]["table"]
+
+        sql    = f"SELECT {', '.join(selects)} FROM {table}"
+        params = []
+
+        # WHERE clause — from filter node predicates
+        where = []
+        for node in filter_nodes:
+            for pred in node.get("predicates", []):
+                where.append(pred)
+        if time_node:
+            where.append(f"date BETWEEN %s AND %s")
+            params += [time_node["resolved_range"]["from"], time_node["resolved_range"]["to"]]
+        if where:
+            sql += " WHERE " + " AND ".join(where)
+
+        # ORDER BY
+        if sort_node:
+            by  = sort_node["by"][0]
+            sql += f" ORDER BY {by['field']} {by['direction'].upper()}"
+
+        return sql, params
+```
+
 ```python
 import asyncio
 
@@ -1370,8 +1472,52 @@ class DataVisualizationLanguage:
         return INTENT_CONTRACTS.get((intent, num_metrics), "TABLE")
 
     def _build_display_spec(self, contract: str, result: dict, operation: dict) -> dict:
-        # Emit Vega-Lite v5 DVL display spec conforming to the matched contract
-        ...
+        metric_fields = [f["field"] for f in result["schema"] if f["type"] == "number"]
+        dim_field     = next(f["field"] for f in result["schema"] if f["type"] == "string")
+
+        if contract == "TABLE":
+            return {
+                "type":    "table",
+                "columns": [{"field": f["field"], "label": f["field"].replace("_", " ").title(),
+                              "type": f["type"]} for f in result["schema"]],
+                "data":    {"values": result["rows"]},
+            }
+
+        if contract == "BAR_MULTI_SERIES_COMPARISON":
+            # Pivot to long form: one row per (dimension × metric)
+            values = [
+                {dim_field: row[dim_field], "metric": mf.replace("_", " ").title(), "value": row[mf]}
+                for row in result["rows"]
+                for mf in metric_fields
+            ]
+            return {
+                "type":     "chart",
+                "contract": contract,
+                "mark":     "bar",
+                "data":     {"values": values},
+                "encoding": {
+                    "x":     {"field": dim_field,  "type": "nominal",      "sort": "-y"},
+                    "y":     {"field": "value",    "type": "quantitative", "axis": {"format": ".2f"}},
+                    "color": {"field": "metric",   "type": "nominal"},
+                },
+                "formatHints":  {mf: {"format": ".2%"} for mf in metric_fields},
+                "interactions": ["click:drilldown", "hover:tooltip", "select:multi-point"],
+            }
+
+        if contract == "LINE_TIME_SERIES":
+            return {
+                "type":     "chart",
+                "contract": contract,
+                "mark":     "line",
+                "data":     {"values": result["rows"]},
+                "encoding": {
+                    "x":     {"field": "date",              "type": "temporal"},
+                    "y":     {"field": metric_fields[0],    "type": "quantitative"},
+                    "color": {"field": dim_field,           "type": "nominal"},
+                },
+            }
+
+        return {"type": "table", "data": {"values": result["rows"]}}   # safe fallback
 ```
 
 ---
@@ -1512,14 +1658,15 @@ A lightweight PostgreSQL table holds only the scalar fields required for the Lin
 
 ```sql
 CREATE TABLE analytics.lineage_index (
-  result_id       TEXT        PRIMARY KEY,
-  org_id          TEXT        NOT NULL,
-  user_sub        TEXT        NOT NULL,
-  regulatory_frameworks TEXT,
-  error_code      TEXT,
-  cache_hit       BOOLEAN     NOT NULL,
-  created_at      TIMESTAMPTZ NOT NULL,
-  expires_at      TIMESTAMPTZ NOT NULL
+  result_id                 TEXT        PRIMARY KEY,
+  org_id                    TEXT        NOT NULL,
+  user_sub                  TEXT        NOT NULL,
+  regulatory_frameworks     TEXT,
+  performance_impact_units  INTEGER,
+  error_code                TEXT,
+  cache_hit                 BOOLEAN     NOT NULL,
+  created_at                TIMESTAMPTZ NOT NULL,
+  expires_at                TIMESTAMPTZ NOT NULL
 );
 
 CREATE INDEX idx_lineage_org_user    ON analytics.lineage_index (org_id, user_sub, created_at DESC);
@@ -1593,11 +1740,13 @@ class AnalyticalLineageStore:
     async def _index(self, record: dict) -> None:
         await self.pg.execute(
             """INSERT INTO analytics.lineage_index
-               (result_id, org_id, user_sub, regulatory_frameworks, error_code,
-                cache_hit, created_at, expires_at)
-               VALUES ($1, $2, $3, $4, $5, $6, $7, $8)""",
+               (result_id, org_id, user_sub, regulatory_frameworks, performance_impact_units,
+                error_code, cache_hit, created_at, expires_at)
+               VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)""",
             record["result_id"], record["org_id"], record["user_sub"],
-            ",".join(record.get("regulatory_frameworks", [])) or None, record.get("error_code"),
+            ",".join(record.get("regulatory_frameworks", [])) or None,
+            record.get("performance_impact_units"),
+            record.get("error_code"),
             record["cache_hit"], record["created_at"], record["expires_at"],
         )
 ```
@@ -1642,6 +1791,163 @@ class KnowledgeStore:
 
 ---
 
+### Result Cache
+
+| Decision | Choice | Rationale |
+|----------|--------|-----------|
+| **Store** | Redis (cluster mode) | Sub-millisecond read; TTL-native; cluster mode for HA |
+| **Cache key** | SHA-256 of `(org_id + operation_id + canonical_params + role_hash)` | Role hash ensures two users with different entitlements never share a cached result |
+| **TTL** | 5 minutes default; configurable per operation via `cache_ttl_seconds` on `analytical_operation` | Short TTL balances freshness against backend load |
+| **Compliance bypass** | Queries with `compliance_tier.active: true` skip read and write | Provenance Artifact requires a fresh execution record |
+| **Cache-aside pattern** | FQE checks before execution; writes after assembly | Cache is never on the critical governance path |
+
+```python
+import hashlib, json
+
+class ResultCache:
+    def __init__(self, redis_client):
+        self.redis = redis_client
+
+    def _key(self, lqp: dict, claims: dict) -> str:
+        role_hash   = hashlib.sha256(str(sorted(claims.get("analytics_roles", []))).encode()).hexdigest()[:8]
+        payload     = json.dumps({"org": lqp["org_id"], "nodes": lqp["nodes"]}, sort_keys=True)
+        return "arc:" + hashlib.sha256((payload + role_hash).encode()).hexdigest()
+
+    async def get(self, lqp: dict, claims: dict) -> dict | None:
+        if lqp.get("compliance_tier", {}).get("active"):
+            return None                          # compliance queries always bypass cache
+        data = await self.redis.get(self._key(lqp, claims))
+        return json.loads(data) if data else None
+
+    async def set(self, lqp: dict, claims: dict, result: dict, ttl: int = 300) -> None:
+        if lqp.get("compliance_tier", {}).get("active"):
+            return                               # never cache compliance query results
+        await self.redis.setex(self._key(lqp, claims), ttl, json.dumps(result))
+```
+
+The FQE uses a cache-aside pattern: check before execution, write after assembly.
+
+```python
+async def execute(self, lqp: dict, claims: dict) -> dict:
+    cached = await self.cache.get(lqp, claims)
+    if cached:
+        cached["cache_hit"] = True
+        return cached
+
+    sub_plans = self._split_by_affinity(lqp)
+    results   = await asyncio.gather(*[self._execute_sub_plan(sp) for sp in sub_plans])
+    assembled = self._assemble(results, lqp)
+    await self.cache.set(lqp, claims, assembled, ttl=lqp.get("cache_ttl_seconds", 300))
+    await self.lineage.write_execution(lqp, assembled)
+    return assembled
+```
+
+---
+
+### Admin API
+
+The Admin API is a REST service authenticated with a platform service token (Bearer). It is the only write path for DCS documents (metric definitions, controls config, knowledge artifacts) outside of the normal SDR authoring workflow.
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `POST` | `/v1/admin/smr/seed` | Import a Financial Services Reference Model bundle. Body: JSON array of `analytical_metric`, `analytical_dimension`, or `analytical_operation` documents. Idempotent — existing approved documents are skipped. |
+| `GET` | `/v1/admin/smr/metrics` | List all metrics for an org with status filter. Query: `?org_id=&status=proposed\|in_review\|approved\|deprecated` |
+| `POST` | `/v1/admin/smr/metrics/{metric_id}/approve` | Transition a metric from `in_review` to `approved`. Body: `{ "approved_by": "user@example.com" }` |
+| `PUT` | `/v1/admin/controls/config` | Replace the controls config document for an org. Body: `controls_config` JSON document. |
+| `GET` | `/v1/admin/controls/config` | Fetch the current controls config for an org. |
+| `POST` | `/v1/admin/knowledge/{artifact_path}` | Create or update a knowledge artifact. Body: Markdown text. Path maps to MCP resource URI. |
+| `GET` | `/v1/admin/knowledge/{artifact_path}` | Fetch the current active version of a knowledge artifact. |
+| `GET` | `/v1/admin/lineage/{result_id}` | Fetch a full lineage record from the object store by result ID. |
+| `GET` | `/v1/admin/health` | Platform health check — returns status of all registered backends and DCS connectivity. |
+
+```python
+# Pseudo code — Admin API request handler shape
+async def handle_seed_bundle(request: Request) -> Response:
+    token   = verify_platform_token(request.headers["Authorization"])
+    bundle  = await request.json()       # list of DCS documents
+
+    results = {"seeded": [], "skipped": [], "errors": []}
+    for doc in bundle:
+        existing = await dcs.get(doc["type"], doc.get("metric_id") or doc.get("operation_id") or doc.get("dimension_id"), doc["org_id"])
+        if existing and existing["status"] == "approved":
+            results["skipped"].append(doc["metric_id"])
+            continue
+        try:
+            await dcs.put(doc)
+            results["seeded"].append(doc["metric_id"])
+        except Exception as e:
+            results["errors"].append({"id": doc.get("metric_id"), "error": str(e)})
+
+    return JSONResponse(results, status_code=207)
+```
+
+---
+
+### Service Startup and Dependency Wiring
+
+```python
+# app.py — dependency construction and service startup
+import asyncio, asyncpg, boto3, redis.asyncio as aioredis
+from anthropic import AsyncAnthropic
+from fastmcp import FastMCP
+
+async def build_app() -> FastMCP:
+    cfg = load_config()                         # reads from env vars + config file
+
+    # Infrastructure clients
+    pg_pool     = await asyncpg.create_pool(cfg["postgres_dsn"])
+    s3_client   = boto3.client("s3", **cfg["s3"])
+    redis_client = await aioredis.from_url(cfg["redis_url"])
+    dcs_client  = DCSClient(base_url=cfg["dcs_url"], api_key=cfg["dcs_api_key"])
+    llm_client  = AsyncAnthropic(api_key=cfg["anthropic_api_key"])
+
+    # Platform services
+    als    = AnalyticalLineageStore(s3_client, pg_pool, bucket=cfg["lineage_bucket"])
+    cache  = ResultCache(redis_client)
+    smr    = SemanticMetricsRepository(dcs_client)
+    rapl   = RoleAwareProjectionLayer(pg_pool)
+    scl    = SemanticControlsLayer(dcs_client, pg_pool, redis_client)
+    dvl    = DataVisualizationLanguage()
+    nse    = NarrativeSynthesisEngine(llm_client)
+
+    # FQE — register backend adapters by data_affinity name
+    backend_registry = {
+        "portfolio":    SnowflakeAdapter(cfg["backends"]["primary_warehouse"]),
+        "risk_metrics": CubeJSAdapter(cfg["backends"]["risk_semantic_layer"]),
+        "regulatory":   SnowflakeAdapter(cfg["backends"]["regulatory_data_store"]),
+    }
+    fqe = FederatedQueryPlanner(backend_registry, als, cache)
+
+    pipeline = PipelineExecutor(
+        sil=SemanticIntentLayer(smr),
+        rapl=rapl, scl=scl, fqe=fqe, dvl=dvl, nse=nse, als=als,
+    )
+
+    # Wire into MCP app
+    app = build_mcp_app(pipeline, smr, als, cfg)
+    return app
+
+if __name__ == "__main__":
+    app = asyncio.run(build_app())
+    app.run(transport="streamable-http", host="0.0.0.0", port=8000)
+```
+
+Configuration is read from environment variables at startup. Required variables:
+
+| Variable | Description |
+|----------|-------------|
+| `POSTGRES_DSN` | PostgreSQL connection string (lineage index + role policies) |
+| `REDIS_URL` | Redis connection URL (cache + concurrency semaphore) |
+| `DCS_URL` | Data Context Store base URL |
+| `DCS_API_KEY` | DCS service-to-service API key |
+| `S3_LINEAGE_BUCKET` | S3 bucket name for lineage records |
+| `ANTHROPIC_API_KEY` | Anthropic API key for NSE |
+| `JWT_JWKS_URI` | JWKS endpoint for JWT public key retrieval |
+| `JWT_AUDIENCE` | Expected JWT audience claim |
+| `JWT_ISSUER` | Expected JWT issuer claim |
+
+---
+
 ## 4.3 Infrastructure
 
 | Component | Choice | Rationale |
@@ -1655,16 +1961,31 @@ class KnowledgeStore:
 | Message queue | SQS / Pub/Sub | Async lineage writes, SDR change events |
 | Secrets | HashiCorp Vault or cloud-native | Backend credentials, platform service keys |
 
+### Kubernetes Deployment Summary
+
+| Service | Container | Port | Min replicas | CPU request | Memory request | HPA trigger |
+|---------|-----------|------|-------------|-------------|----------------|-------------|
+| Analytics MCP | `analytics-mcp` | 8000 | 2 | 500m | 512Mi | CPU > 60% |
+| vega2img (optional) | `vega2img` | 8001 | 1 | 1000m | 1Gi | CPU > 70% |
+| Admin API | `analytics-admin` | 9000 | 1 | 250m | 256Mi | — |
+| PostgreSQL | Managed (Neon / RDS) | 5432 | — | — | — | — |
+| Redis | Managed (ElastiCache / Upstash) | 6379 | — | — | — | — |
+| Object storage | S3-compatible | — | — | — | — | — |
+
+Health check endpoint: `GET /health` on each container port. Returns `200 OK` with `{"status": "ok", "backends": {...}}` when all registered backends and DCS connectivity are confirmed.
+
+All platform services run in a dedicated Kubernetes namespace (`analytics`). Backend credentials and API keys are injected via Kubernetes Secrets mounted as environment variables — never baked into container images.
+
 ### Financial Services Reference Model
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
 | **Packaging** | Versioned JSON document bundles (one per domain) | Conforms directly to the SDR `analytical_metric` schema; idempotently importable via `POST /v1/smr/seed`; selective per-domain activation |
 | **Distribution** | Bundled at installation; updatable from Semantic Registry Service | Air-gapped deployments supported |
-| **Activation** | `analyticalDomain` config triggers SMR import at initial platform setup | Bundle documents are written to the SDR in `proposed` state; Application Admin approves before metrics become resolvable |
+| **Activation** | `analyticalDomain` config triggers SMR import at initial platform setup | Bundle documents are written to the SDR in `proposed` state; Analytics Governance approves before metrics become resolvable |
 | **Customisation** | Full edit/override via Admin API after import | Customised definitions marked `source: "custom"` in the SDR document |
 
-Each bundle is a JSON array of SDR documents conforming to the schemas defined in [§Semantic Metrics Repository](./02-core-capabilities.md#semantic-metrics-registry). Bundles are seeded into the SDR in `"proposed"` state at initial platform setup; the Application Admin approves each document before it becomes resolvable by the Semantic Intent Layer.
+Each bundle is a JSON array of SDR documents conforming to the schemas defined in [§Semantic Metrics Repository](./02-core-capabilities.md#semantic-metrics-registry). Bundles are seeded into the SDR in `"proposed"` state at initial platform setup; the Analytics Governance approves each document before it becomes resolvable by the Semantic Intent Layer.
 
 > **Version format note:** Seed bundle documents use an integer `version` field (starting at `1`) as the bootstrap state. On first platform activation the platform converts these to semantic versioning (`"1.0.0"`). Subsequent versions follow semver — the `"2.1.0"` form used in Chapter 2 examples reflects a metric that has been through two major revisions post-activation.
 
