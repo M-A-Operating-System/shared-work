@@ -56,18 +56,14 @@ The platform exposes its capability through three consumption modes. The first i
 
 ```mermaid
 flowchart TD
-    subgraph org["Consuming Organisation"]
-        ChatComp["&lt;ai-chat&gt; component\nconversational UI"]
+    subgraph org["AI Consumers"]
+        ChatComp["Conversational AI\nconversational UI \n Content rendering · Tool call routing\nAudit trail · Memory · Shared conversations"]"]
         CustomUI["Custom analytics UI\nhost-built · renders JSON / DVL"]
-        Agents["Agentic consumers\nscheduled agents · event monitors · report pipelines"]
-    end
-
-    subgraph aichat["AI Chat Platform"]
-        ChatEngine["Conversation engine\nNL → structured intent\nContent rendering · Tool call routing\nAudit trail · Memory · Shared conversations"]
+        Agents["Agentic AI\n Independant Agents - event monitors · report pipelines, Anomoloy Dection, Event Prediction, Data Quality, Risk Tollerance, Reviews etc"]
     end
 
     subgraph analytics["Analytics Engine"]
-        MCP["MCP Capability Layer\nMCP server runtime · JWT validation"]
+        MCP["API/MCP Capability Layer\nMCP server runtime · JWT validation"]
         SIL["Semantic Intent Layer\nParameter validation · SMR resolution · LQP generation"]
         RAPL["Role-Aware Projection Layer\nJWT claims · row predicates · column masks"]
         SEG["Semantic Execution Governance\nCost estimation · classification · circuit breakers"]
@@ -92,11 +88,8 @@ flowchart TD
         GDA["Graph Data API"]
     end
 
-    ChatComp -->|"JWT"| ChatEngine
-    CustomUI -->|"JWT + structured MCP tool call"| MCP
-    Agents -->|"agent JWT + structured MCP tool call"| MCP
-    ChatEngine -->|"MCP resource reads + structured tool calls + user JWT"| MCP
-    ChatEngine -->|"MCP tool call + user JWT"| vega2img
+    Org -->|"JWT + structured MCP tool call"| MCP
+    Org -->|"MCP tool call + user JWT"| vega2img
     MCP -->|"structured parameters"| SIL
     MCP -->|"JWT claims"| RAPL
     RAPL -->|"row predicates + column masks"| SIL
