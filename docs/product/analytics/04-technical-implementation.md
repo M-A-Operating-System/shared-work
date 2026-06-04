@@ -920,45 +920,39 @@ class LQPGenerator:
 
 #### Role policies schema
 
-```sql
-CREATE TABLE analytics.role_policies (
-    role_id         TEXT        NOT NULL,
-    org_id          TEXT        NOT NULL,
-    allowed_metrics TEXT[],                      -- NULL = all metrics permitted
-    denied_metrics  TEXT[]      NOT NULL DEFAULT '{}',
-    row_predicates  JSONB       NOT NULL DEFAULT '{}',
-    column_masks    JSONB       NOT NULL DEFAULT '{}',
-    created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
-    PRIMARY KEY (org_id, role_id)
-);
-
--- row_predicates shape: { "dimension_name": "template_predicate_string", ... }
--- column_masks shape:   { "field_name": { "condition": "...", "action": "suppress"|"hash", "replacement": null|"***" }, ... }
-
-CREATE INDEX idx_role_policies_org ON analytics.role_policies (org_id);
-```
-
-#### Role policy example
+Role policy documents are stored in the PostgreSQL `role_policies` table. Each document maps directly to the following JSON shape:
 
 ```json
 {
-  "roleId":   "regional_analyst",
-  "orgId": "acme-wealth",
-  "allowedMetrics": null,
-  "deniedMetrics":  ["var_99", "expected_shortfall"],
-  "rowPredicates": {
+  "role_id":        "regional_analyst",
+  "org_id":         "acme-wealth",
+  "allowed_metrics": null,
+  "denied_metrics":  ["var_99", "expected_shortfall"],
+  "row_predicates": {
     "portfolio": "portfolio_id IN ({{user.managed_portfolios}})"
   },
-  "columnMasks": {
+  "column_masks": {
     "aum": {
       "condition":   "{{user.roles}} NOT CONTAINS 'senior_analyst'",
       "action":      "suppress",
       "replacement": null
     }
-  }
+  },
+  "created_at": "2026-05-14T09:00:00Z",
+  "updated_at": "2026-05-14T09:00:00Z"
 }
 ```
+
+Field reference:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `role_id` | string | Matches the role name in the JWT `analytics_roles` claim |
+| `org_id` | string | Tenant scope — one policy per org per role |
+| `allowed_metrics` | array \| null | Null = all metrics permitted; array = explicit allowlist |
+| `denied_metrics` | array | Metric IDs denied regardless of allowedMetrics |
+| `row_predicates` | object | Key = dimension name; value = `{{user.claim}}` template string |
+| `column_masks` | object | Key = field name; value = mask rule with `action: "suppress"` or `"hash"` |
 
 ```python
 class RoleAwareProjectionLayer:
@@ -1652,27 +1646,39 @@ Each completed query writes a single JSON document to the object store at `linea
 
 Records are written once and never mutated. Post-hoc compliance annotations are written as separate sibling documents (`{result_id}_amendment_{n}.json`) referencing the original `result_id`.
 
-#### Search index DDL
+#### Search index schema
 
-A lightweight PostgreSQL table holds only the scalar fields required for the Lineage Query REST API (see roadmap). Full records are always retrieved from the object store; this table is never the source of truth for record content.
+A lightweight PostgreSQL table (`analytics.lineage_index`) holds only the scalar fields required for the Lineage Query REST API (see roadmap). Full records are always retrieved from the S3 object store; this table is never the source of truth for record content. Each row corresponds to the following JSON shape:
 
-```sql
-CREATE TABLE analytics.lineage_index (
-  result_id                 TEXT        PRIMARY KEY,
-  org_id                    TEXT        NOT NULL,
-  user_sub                  TEXT        NOT NULL,
-  regulatory_frameworks     TEXT,
-  performance_impact_units  INTEGER,
-  error_code                TEXT,
-  cache_hit                 BOOLEAN     NOT NULL,
-  created_at                TIMESTAMPTZ NOT NULL,
-  expires_at                TIMESTAMPTZ NOT NULL
-);
-
-CREATE INDEX idx_lineage_org_user    ON analytics.lineage_index (org_id, user_sub, created_at DESC);
-CREATE INDEX idx_lineage_org_time    ON analytics.lineage_index (org_id, created_at DESC);
-CREATE INDEX idx_lineage_compliance  ON analytics.lineage_index (org_id, regulatory_frameworks) WHERE regulatory_frameworks IS NOT NULL;
+```json
+{
+  "result_id":                "res_20260514_093247_a1b2c3",
+  "org_id":                   "acme-wealth",
+  "user_sub":                 "auth0|user_xyz",
+  "regulatory_frameworks":    "mifid2,basel3",
+  "performance_impact_units": 850,
+  "error_code":               null,
+  "cache_hit":                false,
+  "created_at":               "2026-05-14T09:32:47Z",
+  "expires_at":               "2033-05-14T09:32:47Z"
+}
 ```
+
+Field reference:
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `result_id` | string | Primary key; matches S3 object path |
+| `org_id` | string | Tenant scope |
+| `user_sub` | string | JWT `sub` claim of the requesting user |
+| `regulatory_frameworks` | string \| null | Comma-separated framework tags from triggered metrics; null for non-compliance queries |
+| `performance_impact_units` | integer \| null | Recorded for hourly budget tracking |
+| `error_code` | string \| null | Null for successful queries |
+| `cache_hit` | boolean | True if result was served from Redis cache |
+| `created_at` | ISO 8601 | Query execution timestamp |
+| `expires_at` | ISO 8601 | Computed from retention policy; enforced at S3 lifecycle layer |
+
+Indexed on `(org_id, user_sub, created_at DESC)`, `(org_id, created_at DESC)`, and `(org_id, regulatory_frameworks)` for the compliance-filtered query pattern.
 
 ```python
 import json
