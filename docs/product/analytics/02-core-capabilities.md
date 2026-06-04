@@ -83,7 +83,7 @@ flowchart TD
     end
 
     subgraph dcs["Data Context Store (DCS)"]
-        SMR[("Semantic Metrics Repository(SMR)\nmetric definitions, dimensions, hierarchies, aggregation rules, governance, access policies, compliance rules ")]
+        SMR[("Semantic Metrics Repository(SMR)\nmetric definitions, dimensions, hierarchies, aggregation rules, governance, access policies, compliance metadata")]
         SDR[("Semantic Data Repository (SDR)\n data definitions, data models, object models, critical data elements, quality rules, physical schemas, data lineage,")]
         SMR --> SDR
     end
@@ -256,7 +256,7 @@ The MCP Capability Layer exposes the platform's governed analytical operations t
 
 The Analytics Engine exposes three tools. All analytical operations are SMR-catalogue driven — the code is the execution engine, not the operation registry. The SMR owns every operation definition: what parameters it needs, what metrics and dimensions it supports, and how deeply it runs through the pipeline via its `execution_profile`.
 
-**`run_analytics(operation_id: str, params: dict, jwt: str)`** — Executes any SMR-registered operation. The operation's `execution_profile` in the SDR determines which pipeline stages run.
+**`run_analytics(operation_id: str, params: dict, jwt: str)`** — Executes any SMR-registered operation. The operation's `execution_profile` in the SMR determines which pipeline stages run.
 
 | Parameter | Required | Type | Notes |
 |---|---|---|---|
@@ -461,7 +461,7 @@ Every MCP tool call passes through five sequential validation stages:
 flowchart TD
     S1["**Stage 1: Schema validation**\nJSON parameters conform to tool schema\nRequired fields present and typed"]
     S2["**Stage 2: SMR resolution**\nResolve operation_id → analytical_operation document\nValidate params against operation required_params schema\nResolve metric IDs → analytical_metric documents\nResolve dimension IDs → analytical_dimension documents\nReject unregistered or unapproved IDs"]
-    S2b["**Stage 2b: Compliance intent classification**\nScore natural language query for compliance purpose (0–1)\ncomplex_purpose: true if score ≥ complianceIntentThreshold\nRecord score + matched signals in resolved intent"]
+    S2b["**Stage 2b: Compliance intent classification**\nScore natural language query for compliance purpose (0–1)\ncompliance_purpose: true if score ≥ complianceIntentThreshold\nRecord score + matched signals in resolved intent"]
     S3["**Stage 3: Role-Aware Projection**\nFilter metric set to entitled scope\nFilter dimension set to entitled scope\nInject row predicates from role config\nApply column masks · Reject entitlement violations"]
     S4["**Stage 4: Semantic validation**\nRequired dimensions present per metric\nAggregation rules compatible\nTime granularity compatible per metric\nFilter predicates reference valid fields"]
     S5["**Stage 5: LQP generation**\nProduce platform-agnostic DAG\nAssign data affinity hints per metric\nEstimate result cardinality and execution performance impact"]
@@ -846,7 +846,7 @@ SCL evaluates the LQP (`lqp-20260518-093243-r9xq`) against the `acme-wealth` con
 | Metrics per query | 2 | 10 | Pass |
 | Dimensions | 1 | 5 | Pass |
 | Data classification | INTERNAL | INTERNAL ceiling | Pass |
-| Compliance mode | none required | — | Pass |
+| Compliance | none required | — | Pass |
 
 All checks pass. SCL writes a controls decision record to the Analytical Lineage Store (ALS) — before the FQE is invoked — and releases the LQP to the FQE:
 
@@ -855,7 +855,7 @@ All checks pass. SCL writes a controls decision record to the Analytical Lineage
   "lqp_id":    "lqp-20260518-093243-r9xq",
   "decision":  "approved",
   "timestamp": "2026-05-18T09:32:44Z",
-  "checks":    ["performance_impact_ceiling", "metric_count", "dimension_count", "classification_gate"],
+  "checks":    ["performance_impact_ceiling", "metric_count", "dimension_count", "classification_gate", "compliance_check"],
   "result":    "all_passed"
 }
 ```
@@ -1134,7 +1134,7 @@ A thin relational database search index holds only scalar fields required for fi
 | Projection record | Embedded in lineage record | Roles, requested metrics, projected metrics, blocked metrics, row predicates, column masks |
 | FQE execution record | Embedded in lineage record (`sub_plans`) | Sub-plan details, engine IDs, latencies, performance impact units, cache hit status |
 | Controls decision | Embedded in lineage record (`controls_decision`) | Threshold decisions, classification gates, performance impact limit checks — including blocked queries |
-| Search index row | Relational database `analytics.lineage_index` | Scalar fields for filtered search — `result_id`, `org_id`, `user_sub`, `compliance_mode`, `error_code`, `cache_hit`, `created_at`, `expires_at` |
+| Search index row | Relational database `analytics.lineage_index` | Scalar fields for filtered search — `result_id`, `org_id`, `user_sub`, `regulatory_frameworks`, `error_code`, `cache_hit`, `created_at`, `expires_at` |
 | Result artefact | Object storage | CSV result set, chart SVG, narrative text — stored per query |
 
 ### Search Index DDL: `analytics.lineage_index`
@@ -1144,7 +1144,7 @@ CREATE TABLE analytics.lineage_index (
   result_id       TEXT        PRIMARY KEY,
   org_id          TEXT        NOT NULL,
   user_sub        TEXT        NOT NULL,
-  compliance_mode TEXT,
+  regulatory_frameworks TEXT,
   error_code      TEXT,
   cache_hit       BOOLEAN     NOT NULL,
   created_at      TIMESTAMPTZ NOT NULL,
@@ -1152,7 +1152,7 @@ CREATE TABLE analytics.lineage_index (
 );
 ```
 
-The index is used only for search and filter queries (finding all records for a user, within a time window, by compliance mode, etc.). Filtered search results are resolved to full records by fetching each document from the object store using its `result_id`.
+The index is used only for search and filter queries (finding all records for a user, within a time window, by regulatory framework, etc.). Filtered search results are resolved to full records by fetching each document from the object store using its `result_id`.
 
 ### Data Isolation
 
@@ -1285,7 +1285,7 @@ The Analytics Engine is headless: it produces no rendered output. Every successf
     "compliance_purpose":              true,
     "intent_score":                    0.94,
     "triggered_by_metrics":            ["lcr_ratio", "nsfr_ratio"],
-    "triggered_by_modes":              ["basel3"],
+    "triggered_by_frameworks":         ["basel3"],
     "regulatory_trace_id":             "trace_20260518_093247_lcr",
     "artifact_set_version":            "1.0",
     "export_requires_lineage":         true,
