@@ -27,20 +27,15 @@ All named components, technical terms, abbreviations, and domain concepts used a
 | **Narrative** | — | Governed plain-language summary of a computed result, produced by the **NSE**. Every value in the narrative must be present in the result — unanchored figures are rejected. |
 | **Narrative Synthesis Engine** | NSE | Post-computation component that produces a plain-language summary of a result. Anchored strictly to computed values. Optional — can be disabled. |
 | **Net Interest Margin** | NIM | Net interest income as a percentage of average earning assets. |
-| **Net Stable Funding Ratio** | NSFR | Basel III metric measuring funding stability over a one-year horizon. A compliance-relevant metric by definition. |
-| **Risk-Weighted Assets** | RWA | Assets weighted by credit risk. Used in regulatory capital ratio calculations. |
 | **Role-Aware Projection Layer** | RAPL | Entitlement enforcement component. Applies metric access filters, dimension filters, row predicates, and column masks derived from the user's identity before any query reaches a backend. |
 | **Row predicate** | — | Access condition injected into the query by **RAPL** that restricts which data rows a user can access. Applied at the query level — not as a post-retrieval filter. |
-| **SEC Regulation BI mode** | — | Compliance governance mode for SEC best interest regulation. Blocks investment recommendations in **NSE** narrative output. |
 | **Semantic Data Context Store** | DCS | The document store within the **DCR** that persists all governed analytical definitions — metrics, dimensions, operations, and governance configuration — as versioned documents. |
 | **Semantic Execution Governance** | SEG | Governance gate between **RAPL** and **FQE**. Applies cost estimation, data classification checks, complexity limits, and compliance mode classification. No query reaches a backend without passing all checks. |
 | **Semantic Intent Layer** | SIL | Receives a structured request, resolves every identifier against the approved analytics and metrics definitions in the **SMR**, and produces a validated, platform-agnostic **LQP**. Entirely deterministic — no AI model runs inside it. |
 | **Semantic layer** | — | The abstraction between AI consumers and physical data backends. Exposes governed business concepts — metrics, dimensions, operations — rather than database tables and columns. The **SMR** is the platform's semantic layer. |
 | **Semantic Metrics Repository** | SMR | The governing catalogue of all resolvable analytical concepts for the organisation — metrics, dimensions, hierarchies, measure groups, and domains. Nothing is queryable that is not registered, approved, and versioned here. |
 | **Tracking error** | TE | Annualised standard deviation of the difference between portfolio returns and benchmark returns. Measures portfolio volatility relative to benchmark. |
-| **Two-signal compliance model** | — | The mechanism by which the **compliance artifact tier** is triggered. Both signals must be independently present: (1) the metric's compliance-relevant flag set at registration; (2) the AI's classification of the query's stated purpose as compliance-driven. Either signal alone is insufficient. |
 | **Value at Risk** | VaR | Probabilistic estimate of the maximum loss over a given time horizon at a specified confidence level. Platform supports VaR 95 (95th percentile) and VaR 99 (99th percentile). |
-| **vega2img** | — | Standalone render service that converts **DVL** chart specifications to static images. Registered directly with AI consumers as a peer service. Not part of the **AE**. |
 
 ---
 
