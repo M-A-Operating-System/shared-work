@@ -240,6 +240,103 @@ When the Analytics Engine returns the structured result, display spec, and narra
 
 ---
 
+## MCP Capability Layer (MCP)
+
+> **Governing principles:** [P2 — Controls before execution](./00-overview.md#design-principles) · [P5 — Role-aware by default](./00-overview.md#design-principles)
+
+The MCP Capability Layer exposes the platform's governed analytical operations to AI orchestrators via MCP Streamable HTTP transport. Each capability is a bounded, named operation with a typed input schema, a governed execution path through the full platform pipeline (Semantic Intent Layer → Role-Aware Projection → SCL → FQE), and a typed output contract. AI agents interact with capabilities, not databases. There is no privileged API path — AI agents receive the same controls-validated results as human users.
+
+### Tool Catalogue
+
+The Analytics Engine exposes three tools. All analytical operations are SMR-catalogue driven — the code is the execution engine, not the operation registry. The SMR owns every operation definition: what parameters it needs, what metrics and dimensions it supports, and how deeply it runs through the pipeline via its `execution_profile`.
+
+**`run_analytics(operation_id: str, params: dict, jwt: str)`** — Executes any SMR-registered operation. The operation's `execution_profile` in the SDR determines which pipeline stages run.
+
+| Parameter | Required | Type | Notes |
+|---|---|---|---|
+| `operation_id` | Yes | `string` | SMR operation ID — discover via `list_operations` |
+| `params` | Yes | `object` | Operation-specific parameters; validated by the SIL against the operation's `required_params` schema in the SMR catalogue |
+| `jwt` | Yes | `string` | Bearer token; validated at request ingress before any platform computation begins |
+
+**`list_operations(domain: str | None, jwt: str)`** — Returns the SMR operation catalogue with operation IDs, display names, required parameters, supported metrics/dimensions, and execution profiles. Only operations the authenticated user is entitled to execute are returned.
+
+| Parameter | Required | Type | Notes |
+|---|---|---|---|
+| `domain` | No | `string \| None` | Optional filter by analytical domain |
+| `jwt` | Yes | `string` | Bearer token |
+
+**`drilldown(result_id: str, hierarchy: str, selected_value: str | None, jwt: str)`** — Navigates into a dimension hierarchy from a prior result. All filters, role predicates, and entitlement context from the original result are preserved.
+
+| Parameter | Required | Type | Notes |
+|---|---|---|---|
+| `result_id` | Yes | `string` | Result ID from a prior `run_analytics` call |
+| `hierarchy` | Yes | `string` | Hierarchy ID to traverse |
+| `selected_value` | No | `string \| None` | Dimension value to anchor the drilldown |
+| `jwt` | Yes | `string` | Bearer token |
+
+### Execution Profiles
+
+Each SMR operation carries an `execution_profile` defined in its `analytical_operation` SDR document. This tells the pipeline executor which stages to invoke. No execution depth is hardcoded in the MCP layer — it is always determined by the SMR catalogue.
+
+| Profile | Pipeline stages |
+|---|---|
+| `data_retrieval` | Auth → RAPL → FQE → Lineage |
+| `metric_query` | Auth → RAPL → SIL → SCL → FQE → Lineage |
+| `full_analytical` | Full pipeline including Data Visualization Language (DVL) + Narrative Synthesis Engine |
+
+### Intent Confirmation Card
+
+When `requiresIntentConfirmation: true` is configured, the platform returns a confirmation card before executing any query. The card is returned as the MCP response body in place of the analytical result; the consumer must re-submit with `"confirmed": true` to proceed to execution.
+
+```json
+{
+  "confirmation_required": true,
+  "intent": {
+    "operation_id":   "compare_portfolios",
+    "operation_label": "Compare Portfolios",
+    "resolved_metrics": ["portfolio_return", "benchmark_return"],
+    "resolved_dimensions": ["portfolio_id", "asset_class"],
+    "time_period":    "quarter_to_date",
+    "filters":        [{ "field": "asset_class", "operator": "eq", "value": "EQUITY" }],
+    "estimated_performance_impact": 620,
+    "classification": "INTERNAL"
+  },
+  "confirm_by": "re-submit run_analytics with confirmed: true"
+}
+```
+
+The card surfaces the resolved `operation_id`, metric IDs, dimensions, filters, estimated performance impact units, and data classification level — everything needed for a user or AI agent to verify the resolved intent before execution proceeds. This is appropriate for high-stakes or compliance-sensitive queries where silent intent misresolution is unacceptable.
+
+### Capability Governance
+
+Every capability invocation passes through the full controls pipeline: input schema validation → capability availability check (feature flags and role entitlements) → Semantic Intent Layer → Role-Aware Projection → Semantic Controls Layer → FQE → result assembly → lineage record write. Capability availability is declared in the MCP manifest; a capability not enabled by a feature flag or accessible to the user's role appears as `available: false` with a reason.
+
+### MCP Registration
+
+The following registration JSON declares the Analytics Platform to an AI Chat Platform or orchestration framework:
+
+```json
+{
+  "id":          "analytics-platform",
+  "name":        "Analytics Platform",
+  "description": "Governed analytical query engine for portfolio performance, risk, and regulatory metrics. All queries are validated against the Semantic Metrics Repository, subject to role-based entitlement projection, and subject to performance impact and compliance controls before execution.",
+  "endpoint":    "https://api.analytics-platform.io/v1/mcp",
+  "authType":    "bearer",
+  "accessTier":  "always-on",
+  "roles":       []
+}
+```
+
+The `roles: []` value indicates that capability availability is determined dynamically from the bearer token's role claims at the time of each invocation, rather than being statically restricted at registration time.
+
+### Example
+
+A structured tool call arrives from AI consumers.
+
+A structured `run_analytics` tool call arrives from the AI Chat Platform. The MCP Capability Layer validates the JWT signature, confirms the token has not expired, and extracts the claims. It dispatches two parallel operations: the structured parameters to the Semantic Intent Layer, and the JWT claims to the Role-Aware Projection Layer. The MCP Capability Layer does not interpret the parameters or make any analytical decisions; it validates, routes, and waits.
+
+---
+
 ## Semantic Metrics Repository (SMR)
 
 > **Governing principles:** [P1 — Semantic abstraction](./00-overview.md#design-principles) · [P3 — Deterministic metric resolution](./00-overview.md#design-principles) · [P9 — Administrator sovereignty](./00-overview.md#design-principles)
@@ -1033,6 +1130,140 @@ Post-generation validation confirms every verbatim numeric value cited in the na
 
 ---
 
+## Analytical Lineage Store (ALS)
+
+> **Governing principles:** [P4 — Complete analytical lineage](./00-overview.md#design-principles) · [P8 — Explainability at every layer](./00-overview.md#design-principles)
+
+The Analytical Lineage Store provides computation provenance: a complete, queryable record of how every result was calculated. Analytical lineage, as defined on this platform, is distinct from data lineage. Data lineage tracks how data moves between systems. Analytical lineage records how the analytics engine used specific metric definitions, entitlement rules, and execution backends to compute a specific result. The lineage record is not a log — it is a first-class data structure. A regulator, auditor, or internal reviewer must be able to reconstruct exactly how a specific number was calculated, by whom, under what entitlements, from which backends, and with what result — without re-running the query.
+
+### Storage Design
+
+Lineage records are stored in an object store — one JSON document per query at key `lineage/{org_id}/{yyyy}/{mm}/{dd}/{result_id}.json`. Records are write-once and never mutated. Post-hoc compliance annotations are written as sibling documents (`{result_id}_amendment_{n}.json`) referencing the original `result_id`.
+
+A thin relational database search index holds only scalar fields required for filtered search queries. The full record is always fetched from the object store; the index is never the source of truth for record content.
+
+### Per-Query Stored Elements
+
+| Element | Storage | Content |
+|---|---|---|
+| Lineage record | Object store — `lineage/{org_id}/{yyyy}/{mm}/{dd}/{result_id}.json` | Complete chain: tool call parameters → SMR resolution → projection record → LQP → controls decision → FQE execution record → result schema → visualisation contract → narrative synthesis status |
+| SMR snapshot | Embedded in lineage record (`resolved_metrics`) | For each metric in the query: metric ID, SMR definition version at query time |
+| Projection record | Embedded in lineage record | Roles, requested metrics, projected metrics, blocked metrics, row predicates, column masks |
+| FQE execution record | Embedded in lineage record (`sub_plans`) | Sub-plan details, engine IDs, latencies, performance impact units, cache hit status |
+| Controls decision | Embedded in lineage record (`controls_decision`) | Threshold decisions, classification gates, performance impact limit checks — including blocked queries |
+| Search index row | Relational database `analytics.lineage_index` | Scalar fields for filtered search — `result_id`, `org_id`, `user_sub`, `compliance_mode`, `error_code`, `cache_hit`, `created_at`, `expires_at` |
+| Result artefact | Object storage | CSV result set, chart SVG, narrative text — stored per query |
+
+### Search Index DDL: `analytics.lineage_index`
+
+```sql
+CREATE TABLE analytics.lineage_index (
+  result_id       TEXT        PRIMARY KEY,
+  org_id          TEXT        NOT NULL,
+  user_sub        TEXT        NOT NULL,
+  compliance_mode TEXT,
+  error_code      TEXT,
+  cache_hit       BOOLEAN     NOT NULL,
+  created_at      TIMESTAMPTZ NOT NULL,
+  expires_at      TIMESTAMPTZ NOT NULL
+);
+```
+
+The index is used only for search and filter queries (finding all records for a user, within a time window, by compliance mode, etc.). Filtered search results are resolved to full records by fetching each document from the object store using its `result_id`.
+
+### Data Isolation
+
+Every lineage document is stored under an `org_id`-prefixed key in the object store (`lineage/{org_id}/...`), and every row in the `analytics.lineage_index` table carries an `org_id` column. Row-Level Security (RLS) in the relational database enforces access isolation on the index table. Object store access is gated by the platform's API, which validates the JWT `org_id` claim before resolving any object key.
+
+### Retention
+
+| Rule | Specification |
+|---|---|
+| Query records | Platform default: **2,555 days (7 years)** — covering most regulatory audit look-back periods. Configurable. |
+| Lineage records | Retained at least as long as the corresponding query record. Cannot be deleted independently. |
+| SMR metric versions | Retained indefinitely — metric version history must be preserved for lineage reconstruction. |
+| Controls events | Retained at least as long as query records. |
+| Result artefacts (object storage) | Default: 365 days. Configurable. Lineage record references are preserved even after object storage expiry. |
+| Blocked queries | Retained in full — queries that fail governance checks are as important to retain as successful ones. |
+
+### Immutability
+
+Lineage records are never modified after writing. There is no update or delete path available to any user — including Platform Admin. Corrections to erroneous records produce new records that reference the original via a `supersedes` relationship. This constraint is enforced at the database layer, not only by application logic.
+
+### Regulatory Audit Export
+
+```
+GET /v1/audit/queries
+    ?user_id={user_id}
+    &from={ISO8601}
+    &to={ISO8601}
+    &metric_ids[]={metric_id}
+    &include_lineage=true
+    → Returns all queries matching the filter with full lineage records
+```
+
+Audit export packages include query records with timestamps and user identifiers, lineage records with metric definition versions, controls decisions, role-aware projection records showing entitlements in force at query time, and result artefacts within the retention period. All export packages are digitally signed by the platform using the platform signing key registered at deployment.
+
+### Example
+
+Two lineage writes occur for this query — one before execution, one after.
+
+The first is written by SCL before the FQE is invoked — capturing the controls decision regardless of whether execution succeeds. The second is written by the FQE after execution, producing the full lineage document at `lineage/acme-wealth/2026/05/18/res-20260518-093247-wk4n.json`.
+
+**Controls decision record (written to object store before FQE execution):**
+```json
+{
+  "result_id":  "res-20260518-093247-wk4n",
+  "org_id":  "acme-wealth",
+  "lqp_id":     "lqp-20260518-093243-r9xq",
+  "event":      "controls_approved",
+  "timestamp":  "2026-05-18T09:32:44Z",
+  "checks":     ["performance_impact_ceiling", "metric_count", "dimension_count", "classification_gate"],
+  "result":     "all_passed"
+}
+```
+
+**Full lineage document (written to object store after FQE completes, at `lineage/acme-wealth/2026/05/18/res-20260518-093247-wk4n.json`):**
+```json
+{
+  "result_id":         "res-20260518-093247-wk4n",
+  "org_id":         "acme-wealth",
+  "user_sub":          "idp|user_xyz",
+  "lqp_id":            "lqp-20260518-093243-r9xq",
+  "cache_hit":         false,
+  "controls_decision": {
+    "approved": true,
+    "checks_passed": ["performance_impact_ceiling", "metric_count", "dimension_count", "classification_gate"]
+  },
+  "sub_plans": [
+    {
+      "backend":    "primary-warehouse",
+      "dialect":    "sql",
+      "latency_ms": 1187,
+      "row_count":  4,
+      "cache_hit":  false
+    }
+  ],
+  "resolved_metrics": [
+    { "metric_id": "portfolio_return", "version": "2.1.0" },
+    { "metric_id": "benchmark_return", "version": "1.4.2" }
+  ],
+  "projection_record": {
+    "roles":          ["portfolio_manager"],
+    "row_predicates": ["portfolio_id IN ('GLOB_EQ_OPP','UK_CORE_INC','ASIA_PAC_GRW','EUR_BAL_INC')"],
+    "column_masks":   []
+  },
+  "visualisation":    { "contract": "BAR_MULTI_SERIES_COMPARISON" },
+  "narrative_status": { "generated": true, "validation": "passed" },
+  "created_at":       "2026-05-18T09:32:47Z",
+  "expires_at":       "2033-05-18T09:32:47Z"
+}
+```
+
+The document is immutable from the moment of writing. A corresponding row is inserted into `analytics.lineage_index` for search access. The full chain — original query, controls decision, metric definition versions, entitlements, physical backend call, and chart contract — is retrievable from the object store under `result_id: res-20260518-093247-wk4n`.
+
+---
+
 ## Analytical Output Format
 
 The Analytics Engine is headless: it produces no rendered output. Every successful analytical request returns a structured MCP tool response. When narrative synthesis is enabled (`features.narrativeSynthesis: true`), the response contains four elements; when disabled, three.
@@ -1168,237 +1399,6 @@ The MCP Capability Layer assembles the DVL display specification and the NSE nar
 ```
 
 The chat engine renders the grouped bar chart inline and displays the narrative as the assistant's reply. The `result_id` is retained for any follow-up drilldown.
-
----
-
-## Analytical Lineage Store (ALS)
-
-> **Governing principles:** [P4 — Complete analytical lineage](./00-overview.md#design-principles) · [P8 — Explainability at every layer](./00-overview.md#design-principles)
-
-The Analytical Lineage Store provides computation provenance: a complete, queryable record of how every result was calculated. Analytical lineage, as defined on this platform, is distinct from data lineage. Data lineage tracks how data moves between systems. Analytical lineage records how the analytics engine used specific metric definitions, entitlement rules, and execution backends to compute a specific result. The lineage record is not a log — it is a first-class data structure. A regulator, auditor, or internal reviewer must be able to reconstruct exactly how a specific number was calculated, by whom, under what entitlements, from which backends, and with what result — without re-running the query.
-
-### Storage Design
-
-Lineage records are stored in an object store — one JSON document per query at key `lineage/{org_id}/{yyyy}/{mm}/{dd}/{result_id}.json`. Records are write-once and never mutated. Post-hoc compliance annotations are written as sibling documents (`{result_id}_amendment_{n}.json`) referencing the original `result_id`.
-
-A thin relational database search index holds only scalar fields required for filtered search queries. The full record is always fetched from the object store; the index is never the source of truth for record content.
-
-### Per-Query Stored Elements
-
-| Element | Storage | Content |
-|---|---|---|
-| Lineage record | Object store — `lineage/{org_id}/{yyyy}/{mm}/{dd}/{result_id}.json` | Complete chain: tool call parameters → SMR resolution → projection record → LQP → controls decision → FQE execution record → result schema → visualisation contract → narrative synthesis status |
-| SMR snapshot | Embedded in lineage record (`resolved_metrics`) | For each metric in the query: metric ID, SMR definition version at query time |
-| Projection record | Embedded in lineage record | Roles, requested metrics, projected metrics, blocked metrics, row predicates, column masks |
-| FQE execution record | Embedded in lineage record (`sub_plans`) | Sub-plan details, engine IDs, latencies, performance impact units, cache hit status |
-| Controls decision | Embedded in lineage record (`controls_decision`) | Threshold decisions, classification gates, performance impact limit checks — including blocked queries |
-| Search index row | Relational database `analytics.lineage_index` | Scalar fields for filtered search — `result_id`, `org_id`, `user_sub`, `compliance_mode`, `error_code`, `cache_hit`, `created_at`, `expires_at` |
-| Result artefact | Object storage | CSV result set, chart SVG, narrative text — stored per query |
-
-### Search Index DDL: `analytics.lineage_index`
-
-```sql
-CREATE TABLE analytics.lineage_index (
-  result_id       TEXT        PRIMARY KEY,
-  org_id          TEXT        NOT NULL,
-  user_sub        TEXT        NOT NULL,
-  compliance_mode TEXT,
-  error_code      TEXT,
-  cache_hit       BOOLEAN     NOT NULL,
-  created_at      TIMESTAMPTZ NOT NULL,
-  expires_at      TIMESTAMPTZ NOT NULL
-);
-```
-
-The index is used only for search and filter queries (finding all records for a user, within a time window, by compliance mode, etc.). Filtered search results are resolved to full records by fetching each document from the object store using its `result_id`.
-
-### Data Isolation
-
-Every lineage document is stored under an `org_id`-prefixed key in the object store (`lineage/{org_id}/...`), and every row in the `analytics.lineage_index` table carries an `org_id` column. Row-Level Security (RLS) in the relational database enforces access isolation on the index table. Object store access is gated by the platform's API, which validates the JWT `org_id` claim before resolving any object key.
-
-### Retention
-
-| Rule | Specification |
-|---|---|
-| Query records | Platform default: **2,555 days (7 years)** — covering most regulatory audit look-back periods. Configurable. |
-| Lineage records | Retained at least as long as the corresponding query record. Cannot be deleted independently. |
-| SMR metric versions | Retained indefinitely — metric version history must be preserved for lineage reconstruction. |
-| Controls events | Retained at least as long as query records. |
-| Result artefacts (object storage) | Default: 365 days. Configurable. Lineage record references are preserved even after object storage expiry. |
-| Blocked queries | Retained in full — queries that fail governance checks are as important to retain as successful ones. |
-
-### Immutability
-
-Lineage records are never modified after writing. There is no update or delete path available to any user — including Platform Admin. Corrections to erroneous records produce new records that reference the original via a `supersedes` relationship. This constraint is enforced at the database layer, not only by application logic.
-
-### Regulatory Audit Export
-
-```
-GET /v1/audit/queries
-    ?user_id={user_id}
-    &from={ISO8601}
-    &to={ISO8601}
-    &metric_ids[]={metric_id}
-    &include_lineage=true
-    → Returns all queries matching the filter with full lineage records
-```
-
-Audit export packages include query records with timestamps and user identifiers, lineage records with metric definition versions, controls decisions, role-aware projection records showing entitlements in force at query time, and result artefacts within the retention period. All export packages are digitally signed by the platform using the platform signing key registered at deployment.
-
-### Example
-
-Two lineage writes occur for this query — one before execution, one after.
-
-The first is written by SCL before the FQE is invoked — capturing the controls decision regardless of whether execution succeeds. The second is written by the FQE after execution, producing the full lineage document at `lineage/acme-wealth/2026/05/18/res-20260518-093247-wk4n.json`.
-
-**Controls decision record (written to object store before FQE execution):**
-```json
-{
-  "result_id":  "res-20260518-093247-wk4n",
-  "org_id":  "acme-wealth",
-  "lqp_id":     "lqp-20260518-093243-r9xq",
-  "event":      "controls_approved",
-  "timestamp":  "2026-05-18T09:32:44Z",
-  "checks":     ["performance_impact_ceiling", "metric_count", "dimension_count", "classification_gate"],
-  "result":     "all_passed"
-}
-```
-
-**Full lineage document (written to object store after FQE completes, at `lineage/acme-wealth/2026/05/18/res-20260518-093247-wk4n.json`):**
-```json
-{
-  "result_id":         "res-20260518-093247-wk4n",
-  "org_id":         "acme-wealth",
-  "user_sub":          "idp|user_xyz",
-  "lqp_id":            "lqp-20260518-093243-r9xq",
-  "cache_hit":         false,
-  "controls_decision": {
-    "approved": true,
-    "checks_passed": ["performance_impact_ceiling", "metric_count", "dimension_count", "classification_gate"]
-  },
-  "sub_plans": [
-    {
-      "backend":    "primary-warehouse",
-      "dialect":    "sql",
-      "latency_ms": 1187,
-      "row_count":  4,
-      "cache_hit":  false
-    }
-  ],
-  "resolved_metrics": [
-    { "metric_id": "portfolio_return", "version": "2.1.0" },
-    { "metric_id": "benchmark_return", "version": "1.4.2" }
-  ],
-  "projection_record": {
-    "roles":          ["portfolio_manager"],
-    "row_predicates": ["portfolio_id IN ('GLOB_EQ_OPP','UK_CORE_INC','ASIA_PAC_GRW','EUR_BAL_INC')"],
-    "column_masks":   []
-  },
-  "visualisation":    { "contract": "BAR_MULTI_SERIES_COMPARISON" },
-  "narrative_status": { "generated": true, "validation": "passed" },
-  "created_at":       "2026-05-18T09:32:47Z",
-  "expires_at":       "2033-05-18T09:32:47Z"
-}
-```
-
-The document is immutable from the moment of writing. A corresponding row is inserted into `analytics.lineage_index` for search access. The full chain — original query, controls decision, metric definition versions, entitlements, physical backend call, and chart contract — is retrievable from the object store under `result_id: res-20260518-093247-wk4n`.
-
----
-
-## MCP Capability Layer (MCP)
-
-> **Governing principles:** [P2 — Controls before execution](./00-overview.md#design-principles) · [P5 — Role-aware by default](./00-overview.md#design-principles)
-
-The MCP Capability Layer exposes the platform's governed analytical operations to AI orchestrators via MCP Streamable HTTP transport. Each capability is a bounded, named operation with a typed input schema, a governed execution path through the full platform pipeline (Semantic Intent Layer → Role-Aware Projection → SCL → FQE), and a typed output contract. AI agents interact with capabilities, not databases. There is no privileged API path — AI agents receive the same controls-validated results as human users.
-
-### Tool Catalogue
-
-The Analytics Engine exposes three tools. All analytical operations are SMR-catalogue driven — the code is the execution engine, not the operation registry. The SMR owns every operation definition: what parameters it needs, what metrics and dimensions it supports, and how deeply it runs through the pipeline via its `execution_profile`.
-
-**`run_analytics(operation_id: str, params: dict, jwt: str)`** — Executes any SMR-registered operation. The operation's `execution_profile` in the SDR determines which pipeline stages run.
-
-| Parameter | Required | Type | Notes |
-|---|---|---|---|
-| `operation_id` | Yes | `string` | SMR operation ID — discover via `list_operations` |
-| `params` | Yes | `object` | Operation-specific parameters; validated by the SIL against the operation's `required_params` schema in the SMR catalogue |
-| `jwt` | Yes | `string` | Bearer token; validated at request ingress before any platform computation begins |
-
-**`list_operations(domain: str | None, jwt: str)`** — Returns the SMR operation catalogue with operation IDs, display names, required parameters, supported metrics/dimensions, and execution profiles. Only operations the authenticated user is entitled to execute are returned.
-
-| Parameter | Required | Type | Notes |
-|---|---|---|---|
-| `domain` | No | `string \| None` | Optional filter by analytical domain |
-| `jwt` | Yes | `string` | Bearer token |
-
-**`drilldown(result_id: str, hierarchy: str, selected_value: str | None, jwt: str)`** — Navigates into a dimension hierarchy from a prior result. All filters, role predicates, and entitlement context from the original result are preserved.
-
-| Parameter | Required | Type | Notes |
-|---|---|---|---|
-| `result_id` | Yes | `string` | Result ID from a prior `run_analytics` call |
-| `hierarchy` | Yes | `string` | Hierarchy ID to traverse |
-| `selected_value` | No | `string \| None` | Dimension value to anchor the drilldown |
-| `jwt` | Yes | `string` | Bearer token |
-
-### Execution Profiles
-
-Each SMR operation carries an `execution_profile` defined in its `analytical_operation` SDR document. This tells the pipeline executor which stages to invoke. No execution depth is hardcoded in the MCP layer — it is always determined by the SMR catalogue.
-
-| Profile | Pipeline stages |
-|---|---|
-| `data_retrieval` | Auth → RAPL → FQE → Lineage |
-| `metric_query` | Auth → RAPL → SIL → SCL → FQE → Lineage |
-| `full_analytical` | Full pipeline including Data Visualization Language (DVL) + Narrative Synthesis Engine |
-
-### Intent Confirmation Card
-
-When `requiresIntentConfirmation: true` is configured, the platform returns a confirmation card before executing any query. The card is returned as the MCP response body in place of the analytical result; the consumer must re-submit with `"confirmed": true` to proceed to execution.
-
-```json
-{
-  "confirmation_required": true,
-  "intent": {
-    "operation_id":   "compare_portfolios",
-    "operation_label": "Compare Portfolios",
-    "resolved_metrics": ["portfolio_return", "benchmark_return"],
-    "resolved_dimensions": ["portfolio_id", "asset_class"],
-    "time_period":    "quarter_to_date",
-    "filters":        [{ "field": "asset_class", "operator": "eq", "value": "EQUITY" }],
-    "estimated_performance_impact": 620,
-    "classification": "INTERNAL"
-  },
-  "confirm_by": "re-submit run_analytics with confirmed: true"
-}
-```
-
-The card surfaces the resolved `operation_id`, metric IDs, dimensions, filters, estimated performance impact units, and data classification level — everything needed for a user or AI agent to verify the resolved intent before execution proceeds. This is appropriate for high-stakes or compliance-sensitive queries where silent intent misresolution is unacceptable.
-
-### Capability Governance
-
-Every capability invocation passes through the full controls pipeline: input schema validation → capability availability check (feature flags and role entitlements) → Semantic Intent Layer → Role-Aware Projection → Semantic Controls Layer → FQE → result assembly → lineage record write. Capability availability is declared in the MCP manifest; a capability not enabled by a feature flag or accessible to the user's role appears as `available: false` with a reason.
-
-### MCP Registration
-
-The following registration JSON declares the Analytics Platform to an AI Chat Platform or orchestration framework:
-
-```json
-{
-  "id":          "analytics-platform",
-  "name":        "Analytics Platform",
-  "description": "Governed analytical query engine for portfolio performance, risk, and regulatory metrics. All queries are validated against the Semantic Metrics Repository, subject to role-based entitlement projection, and subject to performance impact and compliance controls before execution.",
-  "endpoint":    "https://api.analytics-platform.io/v1/mcp",
-  "authType":    "bearer",
-  "accessTier":  "always-on",
-  "roles":       []
-}
-```
-
-The `roles: []` value indicates that capability availability is determined dynamically from the bearer token's role claims at the time of each invocation, rather than being statically restricted at registration time.
-
-### Example
-
-A structured tool call arrives from AI consumers.
-
-A structured `run_analytics` tool call arrives from the AI Chat Platform. The MCP Capability Layer validates the JWT signature, confirms the token has not expired, and extracts the claims. It dispatches two parallel operations: the structured parameters to the Semantic Intent Layer, and the JWT claims to the Role-Aware Projection Layer. The MCP Capability Layer does not interpret the parameters or make any analytical decisions; it validates, routes, and waits.
 
 ---
 
