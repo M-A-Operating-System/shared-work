@@ -344,13 +344,13 @@ Draft → Proposed → In Review → Approved (Active) → Deprecated → Retire
 
 | Transition | Trigger | Effect |
 |---|---|---|
-| Draft → Proposed | Metric owner submits a new definition | Visible in admin UI; not resolvable |
-| Proposed → In Review | Application Admin opens for review | Downstream impact analysis runs automatically |
-| In Review → Approved | Application Admin approves | Metric becomes resolvable from next refresh cycle |
-| Approved → Deprecated | Owner or Admin marks deprecated | Metric resolves with a deprecation warning; removed from SMR browsing defaults |
+| Draft → Proposed | Metrics Modeller submits a new definition | Visible in admin UI; not resolvable |
+| Proposed → In Review | Analytics Governance opens for review | Downstream impact analysis runs automatically |
+| In Review → Approved | Analytics Governance approves | Metric becomes resolvable from next refresh cycle |
+| Approved → Deprecated | Metrics Modeller or Analytics Governance marks deprecated | Metric resolves with a deprecation warning; removed from SMR browsing defaults |
 | Deprecated → Retired | Admin retires after deprecation period | Metric no longer resolvable; lineage records preserved |
 
-When a metric definition is proposed for change, the platform automatically runs an impact analysis covering downstream metrics, saved analytical sessions, and dashboards deriving results from the affected metric. Approval of a change with downstream impacts requires the Application Admin to acknowledge the impact report; that acknowledgement is recorded in the lineage store.
+When a metric definition is proposed for change, the platform automatically runs an impact analysis covering downstream metrics, saved analytical sessions, and dashboards deriving results from the affected metric. Approval of a change with downstream impacts requires Analytics Governance to acknowledge the impact report; that acknowledgement is recorded in the lineage store.
 
 ### Formula Language
 
