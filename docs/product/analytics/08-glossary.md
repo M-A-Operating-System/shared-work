@@ -88,20 +88,6 @@ This glossary defines every named component, technical term, abbreviation, and d
 
 ---
 
-## Platform Roles
-
-| Term | Definition |
-|------|------------|
-| **Analytical End User** | Asks governed analytical questions via natural language and receives role-constrained results. Has no knowledge of data structures or metric identifiers. |
-| **Application Admin** | Privileged tenant user responsible for **SMR** integrity, entitlement policies, and governance configuration. Must be configured before go-live — without one, the SMR contains no approved definitions and the platform cannot serve any query. Approves **Semantic Modeller** changes. |
-| **Integration Engineer** | Registers execution backends, maintains connection configuration, and declares the physical mapping that the **FQE** resolves at execution time. Operates through configuration interfaces, not the query path. |
-| **Metric Owner** | Subject-matter expert assigned ownership of one or more registered metrics. Reviews proposed definition changes, approves aggregation rule modifications, and sets the `compliance_relevant` flag. Distributes approval responsibility without concentrating it in the Semantic Modeller or Application Admin. |
-| **Platform Admin** | Cross-tenant platform team responsible for infrastructure health, tenant onboarding, and cross-tenant governance audit. Has no query interface into tenant data. |
-| **Power Analyst** | Multi-dimensional exploration, governed drilldown, lineage inspection, and result export. |
-| **Semantic Modeller** | Defines and maintains the logical semantic layer: metric definitions, dimension hierarchies, aggregation rules, measure groups, and domain structures in the SMR. A specialist data modelling role requiring both domain knowledge (what does this metric mean?) and modelling precision (how is it calculated, from which sources, under which dimensional hierarchies, with which access policies?). The critical pre-condition for everything downstream — no query can be served against a concept that has not been modelled, approved, and registered. |
-
----
-
 ## Analytical Concepts
 
 | Term | Abbrev | Definition |
