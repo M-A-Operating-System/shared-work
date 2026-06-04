@@ -1385,3 +1385,60 @@ The `roles: []` value indicates that capability availability is determined dynam
 A structured tool call arrives from AI consumers.
 
 A structured `run_analytics` tool call arrives from the AI Chat Platform. The MCP Capability Layer validates the JWT signature, confirms the token has not expired, and extracts the claims. It dispatches two parallel operations: the structured parameters to the Semantic Intent Layer, and the JWT claims to the Role-Aware Projection Layer. The MCP Capability Layer does not interpret the parameters or make any analytical decisions; it validates, routes, and waits.
+
+---
+
+## External Components
+
+The following components appear in the architecture diagram and interact with the Analytics Engine but sit outside its boundary. They are not built or owned by the Analytics Engine; they are pre-existing or independently deployed services that the platform integrates with.
+
+---
+
+### Conversational AI — Chat Front End
+
+The AI Chat Platform is the conversational consumer of the Analytics Engine. It is responsible for the one AI step that occurs outside the Analytics Engine: translating a user's natural language question into the structured `operation_id` and `params` that the MCP Capability Layer accepts.
+
+**Responsibilities:**
+
+| Responsibility | Detail |
+|---|---|
+| Operation catalogue loading | Calls `list_operations` with the user's JWT to retrieve the entitled operation catalogue. This catalogue is injected into the AI model's context and provides the controlled vocabulary for intent translation. |
+| NL → structured intent | Maps the user's natural language question to a specific `operation_id` and typed `params` drawn from the catalogue. No natural language is forwarded to the Analytics Engine. |
+| JWT forwarding | Passes the host-issued JWT unmodified with every `run_analytics` call. The Analytics Engine performs its own JWT validation; the AI Chat Platform does not pre-authorise or modify token claims. |
+| Result rendering | Renders the DVL `display_spec` returned by the Analytics Engine. Surfaces the governed `narrative` as the assistant's reply. Retains the `result_id` for follow-up `drilldown` calls. |
+
+The AI Chat Platform has no access to physical schemas, execution backends, or metric definitions beyond the entitled operation catalogue. Entitlement enforcement, query planning, and execution are entirely the Analytics Engine's responsibility.
+
+---
+
+### Semantic Data Repository (SDR)
+
+The Semantic Data Repository is a pre-existing platform component — the organisation's general-purpose versioned document store. It is the persistence layer on which the Semantic Metrics Repository (SMR) is built. The Analytics Platform does not build or own the SDR; it registers new document types within it.
+
+**Role in the platform:**
+
+| Function | Detail |
+|---|---|
+| Document persistence | Stores all governed analytical definitions as versioned documents: `analytical_metric`, `analytical_dimension`, `analytical_operation`, and `controls_config`. |
+| Versioning and approval workflow | Manages the full document lifecycle — Draft → Proposed → In Review → Approved → Deprecated → Retired — using the SDR's native authoring and approval capabilities. No custom workflow tooling is required. |
+| Runtime resolution | The Semantic Intent Layer and Federated Query Engine query the SDR directly at request time to resolve metric definitions, operation schemas, and physical mappings. |
+| Search | The `list_operations` tool queries the SDR's native search index to return the entitled operation catalogue. No separate search infrastructure is required. |
+
+The SDR enforces a uniqueness constraint: at most one document per `(org_id, metric_id)` may carry `"status": "approved"` at any point in time. All prior versions are retained as `"deprecated"` for lineage reconstruction.
+
+---
+
+### vega2img
+
+`vega2img` is an optional, independently deployed MCP render service. It converts the Analytics Engine's DVL display specification (a Vega-Lite v5 JSON object) into a static image — SVG or PNG — for consumers that cannot natively render a chart specification inline.
+
+**Integration model:**
+
+| Property | Detail |
+|---|---|
+| Deployment | Standalone service, deployed and registered independently of the Analytics Engine. |
+| Registration | Registered directly with the AI consumer (AI Chat Platform, agent, or custom application) as a peer MCP server — not as part of the Analytics Engine. |
+| Invocation | The consumer calls `vega2img` as a separate tool invocation, passing the `display_spec` returned by the Analytics Engine's `run_analytics` response. |
+| Scope | Stateless render only. `vega2img` has no access to the Analytics Engine, the SMR, or any execution backend. It receives a self-contained DVL specification and returns an image. |
+
+`vega2img` is not required for consumers that can render Vega-Lite natively (most AI chat platforms and modern front-end frameworks). It is included in the architecture diagram for completeness — agentic pipelines that produce static report output are the primary use case.
