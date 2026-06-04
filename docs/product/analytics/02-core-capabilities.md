@@ -70,7 +70,7 @@ flowchart TD
         RAPL["<b>Role-Aware Projection Layer(RAPL)</b>\nJWT claims · row predicates · column masks"]
         SEG["<b>Semantic Execution Control Layer(SECL)</b>\nCost estimation · classification · circuit breakers"]
         FQE["<b>Federated Query Engine(FQE)</b>\nquery planning engine + backend adapters"]
-        VO["<b>Visualisation Display Language</b>\ndisplay spec · the platform's chart specification format"]
+        VO["<b>Visualisation Display Language (VDL)</b>\ndisplay spec · the platform's chart specification format"]
         NSE["<b>Narrative Synthesis Engine(NSE)</b>\nlanguage model · post-computation\nanchored to result values · P6 governed"]
         LS[("<b>Analytical Lineage Store</b>\nlogical query plan, physical query plan, physical run time statistics")]
         Result(["<b>MCP tool response</b\nwrapped display_spec + data + narrative + provenance artifact(optional) + result_id"])
