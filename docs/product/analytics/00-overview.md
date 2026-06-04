@@ -28,7 +28,7 @@ The AI Analytics Platform is a governed computation engine that gives AI systems
 
 In practice: a portfolio manager asks "show me portfolio returns versus benchmark for my equity portfolios this quarter" in plain English and receives a governed, role-constrained, auditable result with the full computation record attached. A data science pipeline extracts millions of rows of position data under the same entitlement and audit controls. A treasury analyst produces an LCR figure for a Basel III submission and receives, automatically, a regulator-ready compliance artifact set alongside the result. The analyst bottleneck breaks. Regulatory requirements hold.
 
-The platform addresses the following challenges that Text-to-SQL and unstructured MCP integrations cannot:
+The platform addresses the following challenges that Text-to-SQL and MCP implementations that directly expose physical schemas and delegate query execution to AI models cannot:
 
 | Enterprise analytical challenge | Platform response |
 |---|---|
