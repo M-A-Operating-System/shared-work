@@ -317,24 +317,6 @@ The card surfaces the resolved `operation_id`, metric IDs, dimensions, filters, 
 
 Every capability invocation passes through the full controls pipeline: input schema validation → capability availability check (feature flags and role entitlements) → Semantic Intent Layer → Role-Aware Projection → Semantic Controls Layer → FQE → result assembly → lineage record write. Capability availability is declared in the MCP manifest; a capability not enabled by a feature flag or accessible to the user's role appears as `available: false` with a reason.
 
-### MCP Registration
-
-The following registration JSON declares the Analytics Platform to an AI Chat Platform or orchestration framework:
-
-```json
-{
-  "id":          "analytics-platform",
-  "name":        "Analytics Platform",
-  "description": "Governed analytical query engine for portfolio performance, risk, and regulatory metrics. All queries are validated against the Semantic Metrics Repository, subject to role-based entitlement projection, and subject to performance impact and compliance controls before execution.",
-  "endpoint":    "https://api.analytics-platform.io/v1/mcp",
-  "authType":    "bearer",
-  "accessTier":  "always-on",
-  "roles":       []
-}
-```
-
-The `roles: []` value indicates that capability availability is determined dynamically from the bearer token's role claims at the time of each invocation, rather than being statically restricted at registration time.
-
 ### Example
 
 A structured tool call arrives from AI consumers.
