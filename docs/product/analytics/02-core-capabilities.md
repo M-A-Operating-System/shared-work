@@ -57,7 +57,7 @@ The platform exposes its capability through three consumption modes. The first i
 ```mermaid
 flowchart TD
     subgraph org["AI Consumers"]
-        ChatComp["Conversational AI\nconversational UI \n Content rendering · Tool call routing\nAudit trail · Memory · Shared conversations"]"]
+        ChatComp["Conversational AI\nconversational UI \n Content rendering · Tool call routing\nAudit trail · Memory · Shared conversations"]
         CustomUI["Custom analytics UI\nhost-built · renders JSON / DVL"]
         Agents["Agentic AI\n Independant Agents - event monitors · report pipelines, Anomoloy Dection, Event Prediction, Data Quality, Risk Tollerance, Reviews etc"]
     end
