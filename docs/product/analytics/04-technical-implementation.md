@@ -1,4 +1,4 @@
-# 5. Proposed Technical Implementation
+# 4. Proposed Technical Implementation
 
 This chapter describes one reference implementation of the AI Analytics Platform. Stack choices are concrete but not prescriptive. The product specification is intentionally stack-agnostic. Any conformant implementation that satisfies the specified behaviours, governance guarantees, and interface contracts is valid. Technology substitutions at any layer require no changes to the product specification.
 
@@ -6,7 +6,7 @@ The product specification (component behaviours, interface contracts, governance
 
 ---
 
-## 5.1 Architecture Overview
+## 4.1 Architecture Overview
 
 ```mermaid
 flowchart TD
@@ -18,7 +18,7 @@ flowchart TD
         RAPL["Role-Aware Projection Layer\nCustom middleware · Python"]
         SCL["Semantic Controls Layer\nPerformance impact assessment · classification · thresholds"]
         FQE["Federated Query Engine\nApache Calcite + backend adapters"]
-        DVL["Data Visualization Language (DVL)\nSCL generation · Vega-Lite v5"]
+        DVL["Data Visualization Language (DVL)\nontology evaluation · deterministic chart contract selection · Vega-Lite v5"]
         NSE["Narrative Synthesis Engine\nAnthropic Claude · Haiku / Sonnet"]
         LS[("Analytical Lineage Store")]
         Result(["MCP tool response\ndisplay_spec + narrative + result_id"])
@@ -29,7 +29,7 @@ flowchart TD
     subgraph dcs["Data Context Store (DCS)"]
         SMR["Semantic Metrics Repository\nGovernance workflow + metric schema · extends SDR"]
         SDR[("Semantic Data Repository (SDR)\nPre-existing · general-purpose common registry")]
-        SMR -. backed by .-> SDR
+        SDR -->|"SMR extends SDR"| SMR
     end
 
     subgraph backends["Execution Backends"]
@@ -39,7 +39,7 @@ flowchart TD
     end
 
     Consumer -->|"POST /v1/mcp (JWT + MCP tool call)"| MCP
-    Consumer -->|"MCP tool call + user JWT"| vega2img
+    Consumer -->|"render tool call (display_spec)"| vega2img
     MCP -->|"validated tool call parameters"| SIL
     MCP -->|"JWT claims"| RAPL
     RAPL -->|"row predicates + column masks"| SIL
@@ -60,7 +60,7 @@ The Semantic Data Repository (SDR) is a pre-existing platform component: the org
 
 ---
 
-## 5.2 Layer-by-Layer Stack Decisions
+## 4.2 Layer-by-Layer Stack Decisions
 
 ### MCP Capability Layer
 
@@ -402,9 +402,9 @@ The core metric definition. One document per approved metric version. The `statu
   },
   "formula":              "MAX(losses) WHERE confidence_level = 0.95",
   "compliance_relevant":  false,
+  "regulatory_framework": [],
   "required_dimensions":  ["portfolio_id", "as_of_date"],
   "optional_dimensions":  ["asset_class", "geography", "sector", "currency"],
-  "compliance_modes":     [],
   "approved_by":          "cdo@acme.com",
   "approved_at":          "2026-05-14T09:00:00Z",
   "created_at":           "2026-05-13T14:32:00Z"
@@ -531,7 +531,7 @@ No custom query language. The MCP tool call JSON (metric IDs, dimension IDs, tim
 }
 ```
 
-The Semantic Intent Layer resolves metric IDs against the SMR, merges in role predicates from the RAPL, and emits an platform-agnostic LQP. The LQP carries resolved `physicalMapping` references, expanded time ranges, role-injected filters, and a cost estimate for governance validation.
+The Semantic Intent Layer resolves metric IDs against the SMR, merges in role predicates from the RAPL, and emits an platform-agnostic LQP. The LQP carries resolved `physicalMapping` references, expanded time ranges, role-injected filters, and a performance impact estimate for governance validation.
 
 #### LQP output example
 
@@ -588,7 +588,7 @@ The Semantic Intent Layer resolves metric IDs against the SMR, merges in role pr
       "by": [{ "field": "portfolio_return", "direction": "desc" }]
     }
   ],
-  "cost_estimate": 850,
+  "estimated_performance_impact": 850,
   "column_masks": [],
   "row_predicates_applied": true
 }
@@ -837,7 +837,7 @@ The platform has one controls config document. The Semantic Controls Layer reads
   "classification_gate":        true,
   "blocked_classifications":    ["TOP_SECRET", "RESTRICTED"],
   "query_timeout_seconds":      60,
-  "compliance_modes":           ["mifid2"],
+  "compliance_mode_enabled":     true,
   "require_lineage_for_export": true,
   "audit_all_queries":          true,
   "compliance_intent_threshold": 0.8
@@ -853,22 +853,22 @@ class SemanticControlsLayer:
     async def approve(self, lqp: dict, claims: dict) -> dict:
         config = await self._load_config(claims["org_id"])
 
-        cost = self._estimate_cost(lqp, config)
-        if cost > config["performance_impact_ceiling_per_query"]:
-            raise PerformanceImpactCeilingExceeded(cost)
+        performance_impact = self._estimate_performance_impact(lqp, config)
+        if performance_impact > config["performance_impact_ceiling_per_query"]:
+            raise PerformanceImpactCeilingExceeded(performance_impact)
 
         spend = await self._hourly_spend(claims["sub"], claims["org_id"])
-        if spend + cost > config["performance_impact_budget_per_user_hourly"]:
+        if spend + performance_impact > config["performance_impact_budget_per_user_hourly"]:
             raise UserPerformanceImpactBudgetExceeded()
 
         self._check_classification(lqp, config)
         lqp = self._check_compliance(lqp, claims, config)
 
-        lqp["cost_estimate"]       = cost
-        lqp["controls_approved"] = True
+        lqp["estimated_performance_impact"] = performance_impact
+        lqp["controls_approved"]            = True
         return lqp
 
-    def _estimate_cost(self, lqp: dict, config: dict) -> int:
+    def _estimate_performance_impact(self, lqp: dict, config: dict) -> int:
         # Σ(metric.costWeight × dimensionCardinality × timeRangeMultiplier)
         ...
 
@@ -890,16 +890,18 @@ class SemanticControlsLayer:
 
         if compliance_metrics and compliance_purpose:
             # Escalate to Provenance Artifact generation
-            active_modes = [
-                m for m in config.get("compliance_modes", [])
-                if any(cm in m for cm in compliance_metrics)
-            ]
+            triggered_frameworks = list({
+                fw
+                for m in lqp.get("resolved_metrics", [])
+                if m.get("compliance_relevant")
+                for fw in m.get("regulatory_framework", [])
+            })
             lqp["compliance_tier"] = {
-                "active":               True,
-                "intent_score":         intent_score,
-                "triggered_by_metrics": compliance_metrics,
-                "triggered_by_modes":   config.get("compliance_modes", []),
-                "bypass_cache":         True,
+                "active":                  True,
+                "intent_score":            intent_score,
+                "triggered_by_metrics":    compliance_metrics,
+                "triggered_by_frameworks": triggered_frameworks,
+                "bypass_cache":            True,
             }
             # Enforce lineage-gated export regardless of platform config
             lqp["require_lineage_for_export"] = True
@@ -964,7 +966,7 @@ The FQE receives the governance-approved LQP produced by the Semantic Intent Lay
     { "id": "node-6", "op": "sort", "input": "node-5",
       "by": [{ "field": "portfolio_return", "direction": "desc" }] }
   ],
-  "cost_estimate": 850,
+  "estimated_performance_impact": 850,
   "governance_approved": true,
   "row_predicates_applied": true,
   "column_masks": []
@@ -984,7 +986,7 @@ After execution and result assembly the FQE returns a typed result envelope in p
   "org_id":     "acme-wealth",
   "cache_hit":     false,
   "latency_ms":    1243,
-  "cost_units":    850,
+  "performance_impact_units": 850,
   "backends_used": ["primary-warehouse", "risk-semantic-layer"],
   "schema": [
     { "field": "portfolio_id",     "type": "string"  },
@@ -1278,12 +1280,12 @@ Each completed query writes a single JSON document to the object store at `linea
   "cache_hit":          false,
   "request_payload":    { "tool": "run_analytics", "input": { "operation_id": "compare_portfolios", "params": {"..."} } },
   "resolved_metrics":   [{ "metric_id": "portfolio_return", "version": "2.1.0" }],
-  "governance_decision":{ "approved": true, "cost_units": 850, "checks_passed": ["cost", "classification", "circuit_breaker"] },
+  "governance_decision":{ "approved": true, "performance_impact_units": 850, "checks_passed": ["performance_impact_ceiling", "metric_count", "dimension_count", "classification_gate", "compliance_check"] },
   "sub_plans":          [{ "backend": "primary-warehouse", "query": "...", "latency_ms": 980 }],
   "result_summary":     { "row_count": 2, "schema": ["..."], "rows": ["..."] },
   "display_spec":       { "type": "chart", "contract": "BAR_MULTI_SERIES_COMPARISON", "..." },
   "error_code":         null,
-  "compliance_mode":    "mifid2",
+  "regulatory_frameworks": ["mifid2"],
   "compliance_meta":    { "justification": "Quarterly review", "trace_id": "mifid2-trace-abc" },
   "created_at":         "2026-05-14T09:32:47Z",
   "expires_at":         "2033-05-14T09:32:47Z"
@@ -1301,7 +1303,7 @@ CREATE TABLE analytics.lineage_index (
   result_id       TEXT        PRIMARY KEY,
   org_id          TEXT        NOT NULL,
   user_sub        TEXT        NOT NULL,
-  compliance_mode TEXT,
+  regulatory_frameworks TEXT,
   error_code      TEXT,
   cache_hit       BOOLEAN     NOT NULL,
   created_at      TIMESTAMPTZ NOT NULL,
@@ -1310,7 +1312,7 @@ CREATE TABLE analytics.lineage_index (
 
 CREATE INDEX idx_lineage_org_user    ON analytics.lineage_index (org_id, user_sub, created_at DESC);
 CREATE INDEX idx_lineage_org_time    ON analytics.lineage_index (org_id, created_at DESC);
-CREATE INDEX idx_lineage_compliance  ON analytics.lineage_index (org_id, compliance_mode) WHERE compliance_mode IS NOT NULL;
+CREATE INDEX idx_lineage_compliance  ON analytics.lineage_index (org_id, regulatory_frameworks) WHERE regulatory_frameworks IS NOT NULL;
 ```
 
 ```python
@@ -1347,11 +1349,11 @@ class AnalyticalLineageStore:
     async def _index(self, record: dict) -> None:
         await self.pg.execute(
             """INSERT INTO analytics.lineage_index
-               (result_id, org_id, user_sub, compliance_mode, error_code,
+               (result_id, org_id, user_sub, regulatory_frameworks, error_code,
                 cache_hit, created_at, expires_at)
                VALUES ($1, $2, $3, $4, $5, $6, $7, $8)""",
             record["result_id"], record["org_id"], record["user_sub"],
-            record.get("compliance_mode"), record.get("error_code"),
+            ",".join(record.get("regulatory_frameworks", [])) or None, record.get("error_code"),
             record["cache_hit"], record["created_at"], record["expires_at"],
         )
 ```
@@ -1396,7 +1398,7 @@ class KnowledgeStore:
 
 ---
 
-## 5.3 Infrastructure
+## 4.3 Infrastructure
 
 | Component | Choice | Rationale |
 |-----------|--------|-----------|
@@ -1532,9 +1534,10 @@ One bundle covers all analytical dimensions. Every domain bundle's metrics and o
     "classification_level": "internal",
     "data_affinity":        "portfolio",
     "physical_mapping":     { "source": "primary-warehouse", "table": "fact_portfolio_daily", "measure": "market_value_base_ccy" },
+    "compliance_relevant":  false,
+    "regulatory_framework": [],
     "required_dimensions":  ["portfolio_id", "as_of_date"],
     "optional_dimensions":  ["asset_class", "currency", "sector"],
-    "compliance_modes":     [],
     "approved_by":          "cdo@acme.com",
     "approved_at":          "2026-05-14T09:00:00Z",
     "created_at":           "2026-05-13T14:32:00Z"
@@ -1558,9 +1561,10 @@ One bundle covers all analytical dimensions. Every domain bundle's metrics and o
     "classification_level": "internal",
     "data_affinity":        "portfolio",
     "physical_mapping":     { "source": "primary-warehouse", "table": "fact_portfolio_daily", "measure": "total_return_net" },
+    "compliance_relevant":  false,
+    "regulatory_framework": [],
     "required_dimensions":  ["portfolio_id", "time_period"],
     "optional_dimensions":  ["benchmark_id", "asset_class"],
-    "compliance_modes":     [],
     "approved_by":          "cdo@acme.com",
     "approved_at":          "2026-05-14T09:00:00Z",
     "created_at":           "2026-05-13T14:32:00Z"
@@ -1583,9 +1587,10 @@ One bundle covers all analytical dimensions. Every domain bundle's metrics and o
     "classification_level": "internal",
     "data_affinity":        "portfolio",
     "physical_mapping":     { "source": "primary-warehouse", "table": "fact_portfolio_analytics", "measure": "sharpe_ratio_annualised" },
+    "compliance_relevant":  false,
+    "regulatory_framework": [],
     "required_dimensions":  ["portfolio_id", "time_period"],
     "optional_dimensions":  [],
-    "compliance_modes":     [],
     "approved_by":          "cdo@acme.com",
     "approved_at":          "2026-05-14T09:00:00Z",
     "created_at":           "2026-05-13T14:32:00Z"
@@ -1609,9 +1614,10 @@ One bundle covers all analytical dimensions. Every domain bundle's metrics and o
     "classification_level": "internal",
     "data_affinity":        "portfolio",
     "physical_mapping":     { "source": "primary-warehouse", "table": "fact_portfolio_analytics", "measure": "volatility_annualised" },
+    "compliance_relevant":  false,
+    "regulatory_framework": [],
     "required_dimensions":  ["portfolio_id", "time_period"],
     "optional_dimensions":  ["asset_class"],
-    "compliance_modes":     [],
     "approved_by":          "cdo@acme.com",
     "approved_at":          "2026-05-14T09:00:00Z",
     "created_at":           "2026-05-13T14:32:00Z"
@@ -1684,9 +1690,10 @@ One bundle covers all analytical dimensions. Every domain bundle's metrics and o
     "classification_level": "internal",
     "data_affinity":        "risk_metrics",
     "physical_mapping":     { "source": "risk-semantic-layer", "cube": "risk_cube", "measure": "var_95_daily" },
+    "compliance_relevant":  false,
+    "regulatory_framework": [],
     "required_dimensions":  ["portfolio_id", "as_of_date"],
     "optional_dimensions":  ["asset_class", "geography", "sector", "currency"],
-    "compliance_modes":     [],
     "approved_by":          "cdo@acme.com",
     "approved_at":          "2026-05-14T09:00:00Z",
     "created_at":           "2026-05-13T14:32:00Z"
@@ -1710,9 +1717,10 @@ One bundle covers all analytical dimensions. Every domain bundle's metrics and o
     "classification_level": "internal",
     "data_affinity":        "risk_metrics",
     "physical_mapping":     { "source": "risk-semantic-layer", "cube": "risk_cube", "measure": "var_99_daily" },
+    "compliance_relevant":  false,
+    "regulatory_framework": [],
     "required_dimensions":  ["portfolio_id", "as_of_date"],
     "optional_dimensions":  ["asset_class", "geography", "sector", "currency"],
-    "compliance_modes":     [],
     "approved_by":          "cdo@acme.com",
     "approved_at":          "2026-05-14T09:00:00Z",
     "created_at":           "2026-05-13T14:32:00Z"
@@ -1736,9 +1744,10 @@ One bundle covers all analytical dimensions. Every domain bundle's metrics and o
     "classification_level": "internal",
     "data_affinity":        "risk_metrics",
     "physical_mapping":     { "source": "risk-semantic-layer", "cube": "risk_cube", "measure": "tracking_error_annualised" },
+    "compliance_relevant":  false,
+    "regulatory_framework": [],
     "required_dimensions":  ["portfolio_id", "benchmark_id", "as_of_date"],
     "optional_dimensions":  ["asset_class", "sector"],
-    "compliance_modes":     [],
     "approved_by":          "cdo@acme.com",
     "approved_at":          "2026-05-14T09:00:00Z",
     "created_at":           "2026-05-13T14:32:00Z"
@@ -1762,9 +1771,10 @@ One bundle covers all analytical dimensions. Every domain bundle's metrics and o
     "classification_level": "internal",
     "data_affinity":        "risk_metrics",
     "physical_mapping":     { "source": "risk-semantic-layer", "cube": "risk_cube", "measure": "cvar_95_daily" },
+    "compliance_relevant":  false,
+    "regulatory_framework": [],
     "required_dimensions":  ["portfolio_id", "as_of_date"],
     "optional_dimensions":  ["asset_class", "geography"],
-    "compliance_modes":     [],
     "approved_by":          "cdo@acme.com",
     "approved_at":          "2026-05-14T09:00:00Z",
     "created_at":           "2026-05-13T14:32:00Z"
@@ -1788,9 +1798,10 @@ One bundle covers all analytical dimensions. Every domain bundle's metrics and o
     "classification_level": "internal",
     "data_affinity":        "risk_metrics",
     "physical_mapping":     { "source": "risk-semantic-layer", "cube": "risk_cube", "measure": "portfolio_beta" },
+    "compliance_relevant":  false,
+    "regulatory_framework": [],
     "required_dimensions":  ["portfolio_id", "benchmark_id", "as_of_date"],
     "optional_dimensions":  ["asset_class", "sector"],
-    "compliance_modes":     [],
     "approved_by":          "cdo@acme.com",
     "approved_at":          "2026-05-14T09:00:00Z",
     "created_at":           "2026-05-13T14:32:00Z"
@@ -1814,9 +1825,10 @@ One bundle covers all analytical dimensions. Every domain bundle's metrics and o
     "classification_level": "internal",
     "data_affinity":        "risk_metrics",
     "physical_mapping":     { "source": "risk-semantic-layer", "cube": "risk_cube", "measure": "modified_duration" },
+    "compliance_relevant":  false,
+    "regulatory_framework": [],
     "required_dimensions":  ["portfolio_id", "as_of_date"],
     "optional_dimensions":  ["asset_class", "currency"],
-    "compliance_modes":     [],
     "approved_by":          "cdo@acme.com",
     "approved_at":          "2026-05-14T09:00:00Z",
     "created_at":           "2026-05-13T14:32:00Z"
@@ -1854,7 +1866,7 @@ One bundle covers all analytical dimensions. Every domain bundle's metrics and o
 
 #### Regulatory domain bundle (`domain: "regulatory"`)
 
-All regulatory metrics carry `"classification_level": "restricted"` and `"compliance_modes": ["basel3"]`. The SCL classification gate is triggered for every query against these metrics.
+All regulatory metrics carry `"classification_level": "restricted"`, `"compliance_relevant": true`, and `"regulatory_framework": ["basel3"]`. The SCL classification gate is triggered for every query against these metrics.
 
 ```json
 [
@@ -1876,9 +1888,10 @@ All regulatory metrics carry `"classification_level": "restricted"` and `"compli
     "classification_level": "restricted",
     "data_affinity":        "regulatory",
     "physical_mapping":     { "source": "regulatory-data-store", "table": "fact_regulatory_ratios", "measure": "lcr_ratio" },
+    "compliance_relevant":  true,
+    "regulatory_framework": ["basel3"],
     "required_dimensions":  ["entity_id", "reporting_date", "jurisdiction"],
     "optional_dimensions":  [],
-    "compliance_modes":     ["basel3"],
     "approved_by":          "cdo@acme.com",
     "approved_at":          "2026-05-14T09:00:00Z",
     "created_at":           "2026-05-13T14:32:00Z"
@@ -1901,9 +1914,10 @@ All regulatory metrics carry `"classification_level": "restricted"` and `"compli
     "classification_level": "restricted",
     "data_affinity":        "regulatory",
     "physical_mapping":     { "source": "regulatory-data-store", "table": "fact_regulatory_ratios", "measure": "leverage_ratio" },
+    "compliance_relevant":  true,
+    "regulatory_framework": ["basel3"],
     "required_dimensions":  ["entity_id", "reporting_date", "jurisdiction"],
     "optional_dimensions":  [],
-    "compliance_modes":     ["basel3"],
     "approved_by":          "cdo@acme.com",
     "approved_at":          "2026-05-14T09:00:00Z",
     "created_at":           "2026-05-13T14:32:00Z"
@@ -1926,9 +1940,10 @@ All regulatory metrics carry `"classification_level": "restricted"` and `"compli
     "classification_level": "restricted",
     "data_affinity":        "regulatory",
     "physical_mapping":     { "source": "regulatory-data-store", "table": "fact_regulatory_ratios", "measure": "nsfr_ratio" },
+    "compliance_relevant":  true,
+    "regulatory_framework": ["basel3"],
     "required_dimensions":  ["entity_id", "reporting_date", "jurisdiction"],
     "optional_dimensions":  [],
-    "compliance_modes":     ["basel3"],
     "approved_by":          "cdo@acme.com",
     "approved_at":          "2026-05-14T09:00:00Z",
     "created_at":           "2026-05-13T14:32:00Z"
@@ -1945,7 +1960,7 @@ All regulatory metrics carry `"classification_level": "restricted"` and `"compli
     "execution_profile":     "full_analytical",
     "required_params":       ["metric_id", "entity_id", "reporting_date", "jurisdiction"],
     "supported_metrics":     ["lcr", "leverage_ratio", "nsfr"],
-    "compliance_modes":      ["mifid2", "basel3"],
+    "regulatory_framework":  ["mifid2", "basel3"],
     "required_feature_flag": "regulatory_reporting",
     "default_visualization": "table"
   }
