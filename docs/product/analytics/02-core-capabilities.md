@@ -1413,18 +1413,21 @@ The AI Chat Platform has no access to physical schemas, execution backends, or m
 
 ### Semantic Data Repository (SDR)
 
-The Semantic Data Repository is a pre-existing platform component — the organisation's general-purpose versioned document store. It is the persistence layer on which the Semantic Metrics Repository (SMR) is built. The Analytics Platform does not build or own the SDR; it registers new document types within it.
+The Semantic Data Repository is a pre-existing organisational component — the governed store of data definitions that describe the organisation's information assets. It exists independently of the Analytics Platform and is not built or owned by it. Together with the Semantic Metrics Repository (SMR), it forms one of the two datasets within the Data Context Store (DCS).
+
+The SDR contains the organisation's foundational data context: data models, object models, critical data elements, quality rules, physical schemas, and data lineage records. This is the layer that describes *what data exists and how it is structured*. The SMR is built on top of the SDR to add metric context and semantic definitions — the layer that describes *what the data means analytically* and how it should be calculated, aggregated, and governed.
 
 **Role in the platform:**
 
 | Function | Detail |
 |---|---|
-| Document persistence | Stores all governed analytical definitions as versioned documents: `analytical_metric`, `analytical_dimension`, `analytical_operation`, and `controls_config`. |
-| Versioning and approval workflow | Manages the full document lifecycle — Draft → Proposed → In Review → Approved → Deprecated → Retired — using the SDR's native authoring and approval capabilities. No custom workflow tooling is required. |
+| Foundational data context | Provides the data model and schema definitions that SMR metric `physical_mapping` fields reference. The SMR does not duplicate this — it builds upon it. |
+| Persistence and versioning | Hosts the `analytical_metric`, `analytical_dimension`, `analytical_operation`, and `controls_config` document types registered by the Analytics Platform alongside the SDR's existing data definition documents. |
+| Approval workflow | The SMR lifecycle (Draft → Proposed → In Review → Approved → Deprecated → Retired) runs on the SDR's native authoring and approval capabilities. No custom workflow tooling is required. |
 | Runtime resolution | The Semantic Intent Layer and Federated Query Engine query the SDR directly at request time to resolve metric definitions, operation schemas, and physical mappings. |
 | Search | The `list_operations` tool queries the SDR's native search index to return the entitled operation catalogue. No separate search infrastructure is required. |
 
-The SDR enforces a uniqueness constraint: at most one document per `(org_id, metric_id)` may carry `"status": "approved"` at any point in time. All prior versions are retained as `"deprecated"` for lineage reconstruction.
+The SDR and SMR are both contained within the Data Context Store (DCS). The DCS is the outer persistence container for all governed context — the SDR providing the data definition layer and the SMR providing the metric semantic layer above it.
 
 ---
 
