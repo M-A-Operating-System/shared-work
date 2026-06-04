@@ -1,6 +1,6 @@
 # 6. Success Metrics
 
-Metrics are captured from day one at both the platform level (across all tenants) and the application level (per tenant). Governance health metrics are first-class success indicators. A platform that is highly used but poorly governed is not successful.
+Metrics are captured from day one at both the platform level and the application level. Governance health metrics are first-class success indicators. A platform that is highly used but poorly governed is not successful.
 
 Component definitions referenced in the metrics below (SMR, FQE, RAPL, SEG, NSE, Lineage Store) are in [Chapter 2 -- Core Platform Capabilities](./02-core-capabilities.md). [Analytical Lineage Store](./02-core-capabilities.md#analytical-lineage-store) · [Semantic Execution Governance](./02-core-capabilities.md#semantic-execution-governance) · [Narrative Synthesis Engine](./02-core-capabilities.md#narrative-synthesis-engine)
 
@@ -10,7 +10,6 @@ Component definitions referenced in the metrics below (SMR, FQE, RAPL, SEG, NSE,
 
 | Metric | Definition | Target |
 |--------|-----------|--------|
-| **Active tenants** | Tenants with at least one successful query execution in the 7-day window | Growth metric — tracked weekly |
 | **Platform uptime** | API availability (p99 end-to-end latency < 2s including FQE backend execution; error rate < 0.1%) | 99.9% |
 | **Governance block rate** | Queries blocked by governance checks ÷ total queries | Monitor — sustained > 15% warrants investigation; > 30% triggers mandatory configuration review (see §6.3) |
 | **FQE error rate** | Queries with FQE execution errors ÷ total executed queries | < 2% |
@@ -57,7 +56,7 @@ Component definitions referenced in the metrics below (SMR, FQE, RAPL, SEG, NSE,
 
 | Metric | Definition | Target |
 |--------|-----------|--------|
-| **Intent resolution accuracy** | Queries where user accepted resolved intent without modification (intent confirmation tenants only — `requiresIntentConfirmation: true`). For tenants without confirmation enabled, use query reformulation rate as the proxy measure. | ≥ 85% |
+| **Intent resolution accuracy** | Queries where user accepted resolved intent without modification (when `requiresIntentConfirmation: true` is configured). When intent confirmation is not enabled, use query reformulation rate as the proxy measure. | ≥ 85% |
 | **Query reformulation rate** | Queries where user rephrased within 2 turns after a resolution error | < 10% |
 | **Narrative validation failure rate** | Narrative synthesis attempts failing post-generation validation | < 2% |
 
@@ -85,16 +84,16 @@ Component definitions referenced in the metrics below (SMR, FQE, RAPL, SEG, NSE,
 | Cadence | Activity | Owner |
 |---------|----------|-------|
 | **Daily** | Lineage completeness check; FQE error rate; classification gate spike detection | Platform Engineering (automated) |
-| **Weekly** | WAU; governance block rate; SMR approval backlog; engine error rate per tenant | Platform Engineering + Application Admin |
+| **Weekly** | WAU; governance block rate; SMR approval backlog; engine error rate per engine | Platform Engineering + Application Admin |
 | **Monthly** | Full metric review; query quality analysis; SMR health report; narrative validation rate | Platform team + Application Admins |
-| **Day 90 (per tenant)** | WAU adoption assessment (50% target); drilldown adoption; export rate | Application Admin + Platform team |
+| **Day 90** | WAU adoption assessment (50% target); drilldown adoption; export rate | Application Admin + Platform team |
 | **Quarterly** | SMR completeness; metric owner coverage; entitlement policy review | Application Admin + Metric Owners |
 
 ---
 
-## 6.5 Tenant Analytics Dashboard
+## 6.5 Analytics Dashboard
 
-Each tenant's Application Admin has access to a read-only dashboard showing:
+The Application Admin has access to a read-only dashboard showing:
 
 - WAU trend (30-day rolling)
 - Query volume by intent pattern
@@ -106,4 +105,4 @@ Each tenant's Application Admin has access to a read-only dashboard showing:
 - Lineage completeness (always 100% or an active alert)
 - SMR approval backlog count
 
-Platform-level cross-tenant metrics are visible to the Platform team only.
+Platform-level infrastructure metrics are visible to the Platform team only.

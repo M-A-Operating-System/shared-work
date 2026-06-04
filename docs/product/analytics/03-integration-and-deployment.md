@@ -26,8 +26,8 @@ Every request must carry a host-issued JWT in the `Authorization: Bearer <token>
 
 | Claim | Type | Description |
 |-------|------|-------------|
-| `sub` | string | User's unique identifier within the tenant |
-| `tenant_id` | string | Must match the tenant's registered `tenantId` |
+| `sub` | string | User's unique identifier within the organisation |
+| `org_id` | string | Must match the platform's registered `orgId` |
 | `exp` | number | JWT expiry timestamp |
 | Any field matching `entitlements.roleClaimField` | `string[]` | Analytical role array — consumed by the Role-Aware Projection Layer to determine metric, dimension, and row-level access |
 
@@ -257,7 +257,7 @@ The reference model covers six primary domains:
 | **Banking** | NIM, RWA density, provision coverage, cost-to-income, deposit beta | Finance, treasury, credit risk |
 | **ESG** | Carbon intensity, ESG score, engagement coverage, exclusion exposure | Sustainability analysts, client reporting |
 
-All reference model definitions enter the SMR in `proposed` status and require Application Admin approval before they become resolvable. This ensures that no reference definition is served to users before an authorised administrator has confirmed it reflects the organisation's calculation methodology. Approved definitions may subsequently be customised. Modified definitions are marked `source: "tenant"` and increment their version, preserving the original reference definition in version history. Tenant-modified definitions are not overwritten by future reference model updates.
+All reference model definitions enter the SMR in `proposed` status and require Application Admin approval before they become resolvable. This ensures that no reference definition is served to users before an authorised administrator has confirmed it reflects the organisation's calculation methodology. Approved definitions may subsequently be customised. Modified definitions are marked `source: "custom"` and increment their version, preserving the original reference definition in version history. Organisation-modified definitions are not overwritten by future reference model updates.
 
 The hierarchies shipped with the reference model (including the asset class hierarchy, geography hierarchy, and time hierarchy) are available for governed drilldown immediately upon approval of the associated dimension definitions.
 
@@ -288,7 +288,7 @@ The service organises content into six domain packages:
 | `fsi-regulatory-v1` | Regulatory reporting (Basel III/IV, MiFID II, AIFMD) | 60 metric definitions |
 | `fsi-esg-v1` | ESG and sustainable investment metrics | 45 metric definitions |
 
-Each package is imported via a single Admin API call referencing the package identifier and version. Imported definitions enter the SMR as `proposed` and follow the normal approval workflow. Administrators may modify imported definitions before or after approval. Modifications are tracked under `source: "tenant"`. When the Semantic Registry Service publishes an updated package version, administrators receive a notification and may selectively import the delta.
+Each package is imported via a single Admin API call referencing the package identifier and version. Imported definitions enter the SMR as `proposed` and follow the normal approval workflow. Administrators may modify imported definitions before or after approval. Modifications are tracked under `source: "custom"`. When the Semantic Registry Service publishes an updated package version, administrators receive a notification and may selectively import the delta.
 
 The `seedTemplate` configuration field seeds the SMR from a snapshot of the relevant Semantic Registry Service package pre-bundled at platform installation. The live Semantic Registry Service provides the most current definitions and access to packages beyond the core seed templates.
 
@@ -296,10 +296,10 @@ The `seedTemplate` configuration field seeds the SMR from a snapshot of the rele
 
 The Regulatory Reference Service is a runtime execution backend registered in the Data Source Catalog with `dataAffinity: ["regulatory"]`. Once registered, the Federated Query Engine routes all sub-plans carrying metrics whose `data.domain` is `regulatory` to the service. This ensures that threshold values for LCR, NSFR, leverage ratio, capital ratios, and equivalent metrics are always sourced from the authoritative service rather than from host-maintained tables that may lag regulatory publication schedules.
 
-The service holds current threshold values for each registered regulatory regime, jurisdiction-specific where required, and publishes update notifications to registered tenants when threshold values change, for example when a jurisdiction's minimum LCR is revised or a Basel IV transition date is confirmed. If the Regulatory Reference Service is unavailable, the FQE falls back to the next registered backend with `regulatory` data affinity; if no fallback is configured, regulatory sub-plans fail with a structured error. The platform does not fabricate regulatory threshold values when the authoritative source is unavailable.
+The service holds current threshold values for each registered regulatory regime, jurisdiction-specific where required, and publishes update notifications when threshold values change, for example when a jurisdiction's minimum LCR is revised or a Basel IV transition date is confirmed. If the Regulatory Reference Service is unavailable, the FQE falls back to the next registered backend with `regulatory` data affinity; if no fallback is configured, regulatory sub-plans fail with a structured error. The platform does not fabricate regulatory threshold values when the authoritative source is unavailable.
 
 ### Benchmark Data Service
 
 The Benchmark Data Service is a runtime execution backend registered in the Data Source Catalog with `dataAffinity: ["benchmarks"]`. It provides market index and benchmark data across equity indices (MSCI World, MSCI ACWI, S&P 500, FTSE All-World), fixed income indices (Bloomberg Global Aggregate, ICE BofA Investment Grade), multi-asset indices, factor indices (MSCI Minimum Volatility, Value, Quality, Momentum), and administrator-configured custom benchmark blends.
 
-The service operates under data licensing agreements with index providers. Tenants confirm their licensing entitlement per index. The service enforces licensing checks at the tenant level and blocks access to benchmarks for which the tenant has not confirmed entitlement. Custom benchmark blends may be configured by the platform administrator via the Benchmark Data Service Admin API, specifying component benchmark identifiers and weights; blended benchmarks are then accessible within queries using their registered identifier and subject to the same entitlement enforcement as component indices.
+The service operates under data licensing agreements with index providers. The organisation confirms its licensing entitlement per index. The service enforces licensing checks and blocks access to benchmarks for which the organisation has not confirmed entitlement. Custom benchmark blends may be configured by the platform administrator via the Benchmark Data Service Admin API, specifying component benchmark identifiers and weights; blended benchmarks are then accessible within queries using their registered identifier and subject to the same entitlement enforcement as component indices.

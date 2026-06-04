@@ -18,7 +18,7 @@ The platform operates across two distinct planes: an **analytical plane** (query
 | **Power Analyst** | Analytical | Multi-dimensional exploration, governed drilldown, lineage inspection, result export |
 | **Semantic Modeller** | Governance | Define and maintain the logical semantic layer: metric definitions, dimension hierarchies, aggregation rules, measure groups, and domain structures in the Semantic Metrics Repository. This is a specialist data modelling role — the people who know what "Portfolio Return" means precisely enough to write a version-controlled, formula-specific definition that will govern every calculation across every report |
 | **Metric Owner** | Governance | Subject-matter expert assigned ownership of one or more registered metrics. Reviews proposed definition changes, approves aggregation rule modifications, and maintains documentation accuracy for their assigned metrics. Distributes review responsibility without concentrating all approval authority in the Semantic Modeller or Application Admin |
-| **Application Admin** | Governance | Privileged tenant user responsible for SMR integrity, entitlement policies, and governance configuration. Must be configured before go-live — without one, the registry contains no approved analytics and metrics definitions and the platform cannot serve any query. The Application Admin approves Semantic Modeller changes and maintains the entitlement policies that RAPL enforces at query time |
+| **Application Admin** | Governance | Privileged user responsible for SMR integrity, entitlement policies, and governance configuration for the organisation. Must be configured before go-live — without one, the registry contains no approved analytics and metrics definitions and the platform cannot serve any query. The Application Admin approves Semantic Modeller changes and maintains the entitlement policies that RAPL enforces at query time |
 | **Integration Engineer** | Governance | Registers execution backends, maintains connection configuration, and declares the physical mapping that the Federated Query Engine resolves at execution time. Operates through configuration interfaces, not the query path |
 | **Platform Admin** | Infrastructure | Infrastructure and operations team. Responsible for platform health and infrastructure governance. Has no query interface into analytical data |
 
@@ -548,7 +548,7 @@ The projection layer applies four categories of restriction:
 ```mermaid
 flowchart TD
     START(["Authenticated request arrives with JWT"])
-    S1["**1. JWT validation**\nsignature · expiry · tenant claim"]
+    S1["**1. JWT validation**\nsignature · expiry · org claim"]
     S2["**2. Role claim extraction**\nroleClaimField: 'analytics_roles'\nextracted roles: ['portfolio_manager']"]
     S3["**3. Entitlement profile construction**\nMerge all role definitions for the user's roles\nProduce: metric_access_set, dimension_access_set,\nrow_predicates[], column_masks[]"]
     S4["**4. Metric access filter**\nIntersect requested metrics with metric_access_set\nUnentitled metrics → METRIC_NOT_ENTITLED error"]
@@ -825,7 +825,7 @@ When multiple engines are registered for the same data affinity, the FQE selects
 
 ### Caching
 
-The FQE maintains a result cache keyed by the LQP signature — a deterministic SHA-256 hash of the metric IDs and versions, dimension IDs, filter predicates, time expression, entitlement hash, and tenant ID.
+The FQE maintains a result cache keyed by the LQP signature — a deterministic SHA-256 hash of the metric IDs and versions, dimension IDs, filter predicates, time expression, entitlement hash, and org ID.
 
 | Cache property | Specification |
 |---|---|
@@ -1201,19 +1201,19 @@ CREATE TABLE analytics.lineage_index (
 
 The index is used only for search and filter queries (finding all records for a user, within a time window, by compliance mode, etc.). Filtered search results are resolved to full records by fetching each document from the object store using its `result_id`.
 
-### Multi-Tenant Isolation
+### Data Isolation
 
-Every lineage document is stored under a `tenant_id`-prefixed key in the object store (`lineage/{tenant_id}/...`), and every row in the `analytics.lineage_index` table carries a `tenant_id` column. Row-Level Security (RLS) in the relational database enforces tenant isolation on the index table. Object store access is gated by the platform's API, which validates the JWT tenant claim before resolving any object key. No cross-tenant data access is possible through the platform's API at any privilege level.
+Every lineage document is stored under an `org_id`-prefixed key in the object store (`lineage/{org_id}/...`), and every row in the `analytics.lineage_index` table carries an `org_id` column. Row-Level Security (RLS) in the relational database enforces access isolation on the index table. Object store access is gated by the platform's API, which validates the JWT `org_id` claim before resolving any object key.
 
 ### Retention
 
 | Rule | Specification |
 |---|---|
-| Query records | Configurable per tenant. Platform default: **2,555 days (7 years)** — covering most regulatory audit look-back periods. |
+| Query records | Platform default: **2,555 days (7 years)** — covering most regulatory audit look-back periods. Configurable. |
 | Lineage records | Retained at least as long as the corresponding query record. Cannot be deleted independently. |
 | SMR metric versions | Retained indefinitely — metric version history must be preserved for lineage reconstruction. |
 | Governance events | Retained at least as long as query records. |
-| Result artefacts (object storage) | Configurable per tenant. Default: 365 days. Lineage record references are preserved even after object storage expiry. |
+| Result artefacts (object storage) | Default: 365 days. Configurable. Lineage record references are preserved even after object storage expiry. |
 | Blocked queries | Retained in full — queries that fail governance checks are as important to retain as successful ones. |
 
 ### Immutability
@@ -1232,7 +1232,7 @@ GET /v1/audit/queries
     → Returns all queries matching the filter with full lineage records
 ```
 
-Audit export packages include query records with timestamps and user identifiers, lineage records with metric definition versions, governance decisions, role-aware projection records showing entitlements in force at query time, and result artefacts within the retention period. All export packages are digitally signed by the platform using a tenant-specific key registered at onboarding.
+Audit export packages include query records with timestamps and user identifiers, lineage records with metric definition versions, governance decisions, role-aware projection records showing entitlements in force at query time, and result artefacts within the retention period. All export packages are digitally signed by the platform using the platform signing key registered at deployment.
 
 ### Example
 
@@ -1244,7 +1244,7 @@ The first is written by SEG before the FQE is invoked — capturing the governan
 ```json
 {
   "result_id":  "res-20260518-093247-wk4n",
-  "tenant_id":  "acme-wealth",
+  "org_id":  "acme-wealth",
   "lqp_id":     "lqp-20260518-093243-r9xq",
   "event":      "governance_approved",
   "timestamp":  "2026-05-18T09:32:44Z",
@@ -1257,7 +1257,7 @@ The first is written by SEG before the FQE is invoked — capturing the governan
 ```json
 {
   "result_id":         "res-20260518-093247-wk4n",
-  "tenant_id":         "acme-wealth",
+  "org_id":         "acme-wealth",
   "user_sub":          "idp|user_xyz",
   "lqp_id":            "lqp-20260518-093243-r9xq",
   "cache_hit":         false,
@@ -1340,7 +1340,7 @@ Each SMR operation carries an `execution_profile` defined in its `analytical_ope
 
 ### Intent Confirmation Card
 
-When a tenant has `requiresIntentConfirmation: true` configured, the platform returns a confirmation card before executing any query. The card is returned as the MCP response body in place of the analytical result; the consumer must re-submit with `"confirmed": true` to proceed to execution.
+When `requiresIntentConfirmation: true` is configured, the platform returns a confirmation card before executing any query. The card is returned as the MCP response body in place of the analytical result; the consumer must re-submit with `"confirmed": true` to proceed to execution.
 
 ```json
 {

@@ -56,7 +56,7 @@ flowchart TD
     NSE -->|"narrative"| Result
 ```
 
-The Semantic Data Context Store (DCS) is a pre-existing platform component: the organisation's general-purpose registry for semantic definitions. The Analytics Platform registers metric definitions as a new `analytical_metric` type in the DCS, reusing its versioned storage, full-text search, cross-definition relationships, and tenant-scoped access control. The SMR governance layer adds the approval workflow, metric-specific schema validation, and the Admin API surface on top.
+The Semantic Data Context Store (DCS) is a pre-existing platform component: the organisation's general-purpose registry for semantic definitions. The Analytics Platform registers metric definitions as a new `analytical_metric` type in the DCS, reusing its versioned storage, full-text search, cross-definition relationships, and scoped access control. The SMR governance layer adds the approval workflow, metric-specific schema validation, and the Admin API surface on top.
 
 ---
 
@@ -205,7 +205,7 @@ async def guide_basel3() -> str:
     return knowledge_store.get("guide/compliance-basel3")
 ```
 
-Knowledge artifacts are stored in a versioned content store (`knowledge_store`) managed via the Admin API. Tenant administrators can extend or override the default guides and skills definitions. Resources do not require JWT authentication (they contain no user data), but are scoped to the platform's public knowledge surface.
+Knowledge artifacts are stored in a versioned content store (`knowledge_store`) managed via the Admin API. Administrators can extend or override the default guides and skills definitions. Resources do not require JWT authentication (they contain no user data), but are scoped to the platform's public knowledge surface.
 
 #### Prompts
 
@@ -215,7 +215,7 @@ Prompts provide pre-built instruction templates that AI consumers can load to an
 @mcp.prompt()
 async def analytical_assistant(jwt: str) -> str:
     """System prompt for an AI assistant using the Analytics Platform.
-    Injects the tenant's available metrics and governance constraints."""
+    Injects the organisation's available metrics and governance constraints."""
     claims  = validate_jwt(jwt)
     metrics = await smr.list_approved_summary(claims)   # id + label + description
     return f"""You are a governed analytical assistant. You answer quantitative questions
@@ -299,7 +299,7 @@ class SemanticIntentLayer:
             nodes.append(node)
         # Append join, filter, time_expand, sort nodes from params
         ...
-        return {"lqp_id": generate_id(), "nodes": nodes, "tenant_id": claims["tenant_id"]}
+        return {"lqp_id": generate_id(), "nodes": nodes, "org_id": claims["org_id"]}
 ```
 
 ---
@@ -315,7 +315,7 @@ class SemanticIntentLayer:
 | **Complex queries** | Claude Sonnet | Attribution decompositions and multi-portfolio results require richer prose |
 | **Prompt construction** | Result-only context | Metric labels + row values + units injected; no user query, no physical schema |
 | **Post-generation validation** | Custom Python | Every numeric value in narrative matched against result set; reject and retry once on failure |
-| **Feature flag** | `features.narrativeSynthesis` | Tenant-level on/off; disabled means NSE is never invoked |
+| **Feature flag** | `features.narrativeSynthesis` | Platform-level on/off; disabled means NSE is never invoked |
 
 ```python
 import anthropic
@@ -324,7 +324,7 @@ class NarrativeSynthesisEngine:
     def __init__(self, client: anthropic.AsyncAnthropic):
         self.client = client
 
-    # Update model IDs on deprecation — or read from tenant config models.narrativeSynthesisModel
+    # Update model IDs on deprecation — or read from platform config models.narrativeSynthesisModel
     FAST_MODEL     = "claude-haiku-4-5-20251001"
     STANDARD_MODEL = "claude-sonnet-4-6"
 
@@ -374,12 +374,12 @@ The SMR is implemented as two new document types registered in the DCS. The DCS 
 
 #### New DCS document type: `analytical_metric`
 
-The core metric definition. One document per approved metric version per tenant. The `status` field follows the DCS approval lifecycle; the Semantic Intent Layer only resolves documents with `"status": "approved"`.
+The core metric definition. One document per approved metric version. The `status` field follows the DCS approval lifecycle; the Semantic Intent Layer only resolves documents with `"status": "approved"`.
 
 ```json
 {
   "type":                 "analytical_metric",
-  "tenant_id":            "acme-wealth",
+  "org_id":            "acme-wealth",
   "metric_id":            "var_95",
   "version":              2,
   "status":               "approved",
@@ -411,9 +411,9 @@ The core metric definition. One document per approved metric version per tenant.
 }
 ```
 
-`status` is one of `"proposed"` | `"in_review"` | `"approved"` | `"deprecated"` | `"retired"`. The DCS enforces a uniqueness constraint: at most one document per `(tenant_id, metric_id)` may carry `"status": "approved"` at any point in time. All prior versions are retained as `"deprecated"` for lineage reconstruction. `source` is `"platform"` for Financial Services Reference Model entries and `"tenant"` for customised definitions.
+`status` is one of `"proposed"` | `"in_review"` | `"approved"` | `"deprecated"` | `"retired"`. The DCS enforces a uniqueness constraint: at most one document per `(org_id, metric_id)` may carry `"status": "approved"` at any point in time. All prior versions are retained as `"deprecated"` for lineage reconstruction. `source` is `"platform"` for Financial Services Reference Model entries and `"custom"` for organisation-customised definitions.
 
-`weight_metric_id` is required when `aggregation` is `"value_weighted_average"` (or any other weighted aggregation variant) and must reference the `metric_id` of an approved `analytical_metric` in the same tenant's DCS. The SIL resolves and validates this reference at query time. If the weight metric is missing or unapproved, the query is rejected. The field is absent for non-weighted aggregations (`"sum"`, `"last"`, `"count"`, `"min"`, `"max"`, `"mean"`). The LQP generator emits a `weight_metric_id` key on the `metric_scan` node so that the execution backend can fetch the weighting values alongside the primary metric.
+`weight_metric_id` is required when `aggregation` is `"value_weighted_average"` (or any other weighted aggregation variant) and must reference the `metric_id` of an approved `analytical_metric` in the platform's DCS. The SIL resolves and validates this reference at query time. If the weight metric is missing or unapproved, the query is rejected. The field is absent for non-weighted aggregations (`"sum"`, `"last"`, `"count"`, `"min"`, `"max"`, `"mean"`). The LQP generator emits a `weight_metric_id` key on the `metric_scan` node so that the execution backend can fetch the weighting values alongside the primary metric.
 
 `formula` stores the business-logic expression defined in the [SMR formula language](./02-core-capabilities.md#formula-language). It is the human-readable and audit-visible definition of what the metric computes. At query time the FQE resolves the formula against the `physical_mapping` to generate the backend-specific query; the formula itself is never executed directly. Metrics backed entirely by a pre-computed measure in a semantic layer (e.g. a Cube.js measure) may leave `formula` as an empty string and rely solely on `physical_mapping`.
 
@@ -424,7 +424,7 @@ Dimension definitions are the third new document type. They define the valid sli
 ```json
 {
   "type":             "analytical_dimension",
-  "tenant_id":        "acme-wealth",
+  "org_id":        "acme-wealth",
   "dimension_id":     "asset_class",
   "version":          1,
   "status":           "approved",
@@ -441,12 +441,12 @@ Dimension definitions are the third new document type. They define the valid sli
 
 #### New DCS document type: `analytical_operation`
 
-The operation catalogue. One document per approved operation per tenant. The `execution_profile` field tells the pipeline executor which stages to invoke. The `supported_metrics` and `supported_dimensions` lists are enforced by the Semantic Intent Layer. A `run_analytics` call referencing an out-of-catalogue value is rejected before LQP generation.
+The operation catalogue. One document per approved operation. The `execution_profile` field tells the pipeline executor which stages to invoke. The `supported_metrics` and `supported_dimensions` lists are enforced by the Semantic Intent Layer. A `run_analytics` call referencing an out-of-catalogue value is rejected before LQP generation.
 
 ```json
 {
   "type":              "analytical_operation",
-  "tenant_id":         "acme-wealth",
+  "org_id":         "acme-wealth",
   "operation_id":        "get_positions",
   "version":             1,
   "status":              "approved",
@@ -470,7 +470,7 @@ class SemanticMetricsRegistry:
         doc = await self.dcs.get(
             document_type="analytical_operation",
             id=operation_id,
-            tenant_id=claims["tenant_id"],
+            org_id=claims["org_id"],
         )
         if doc["status"] != "approved":
             raise OperationNotAvailableError(operation_id)
@@ -479,7 +479,7 @@ class SemanticMetricsRegistry:
     async def list_operations(self, claims: dict, domain: str | None = None) -> list[dict]:
         return await self.dcs.search(
             document_type="analytical_operation",
-            tenant_id=claims["tenant_id"],
+            org_id=claims["org_id"],
             filters={"domain": domain} if domain else {},
         )
 
@@ -487,13 +487,13 @@ class SemanticMetricsRegistry:
         return await self.dcs.get(
             document_type="analytical_metric",
             id=metric_id,
-            tenant_id=claims["tenant_id"],
+            org_id=claims["org_id"],
         )
 
     async def list_metrics(self, claims: dict, **filters) -> list[dict]:
         return await self.dcs.search(
             document_type="analytical_metric",
-            tenant_id=claims["tenant_id"],
+            org_id=claims["org_id"],
             filters=filters,
         )
 
@@ -538,7 +538,7 @@ The Semantic Intent Layer resolves metric IDs against the SMR, merges in role pr
 ```json
 {
   "lqp_id": "lqp-20260514-093241-xyz",
-  "tenant_id": "acme-wealth",
+  "org_id": "acme-wealth",
   "nodes": [
     {
       "id": "node-1",
@@ -678,7 +678,7 @@ class LQPGenerator:
 
         return {
             "lqp_id":    generate_id("lqp"),
-            "tenant_id": claims["tenant_id"],
+            "org_id": claims["org_id"],
             "nodes":     nodes,
             "output":    current,   # terminal node consumed by FQE
         }
@@ -730,7 +730,7 @@ class LQPGenerator:
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
 | **Implementation** | Custom middleware (Python) | Thin, stateless; operates on the LQP before any backend query is generated |
-| **Role resolution** | JWT claim extraction + PostgreSQL role config | Role claim field name is configurable per tenant |
+| **Role resolution** | JWT claim extraction + PostgreSQL role config | Role claim field name is configurable |
 | **Row predicates** | `{{user.claim_name}}` template interpolation at LQP build time | Resolved from JWT claims; injected into LQP `filters` |
 | **Column masking** | Applied post-assembly in FQE result assembler | Post-assembly supports cross-backend result sets |
 | **Default policy** | `defaultDenyAll: true` | No access unless a matching role is found |
@@ -740,7 +740,7 @@ class LQPGenerator:
 ```json
 {
   "roleId":   "regional_analyst",
-  "tenantId": "acme-wealth",
+  "orgId": "acme-wealth",
   "allowedMetrics": null,
   "deniedMetrics":  ["var_99", "expected_shortfall"],
   "rowPredicates": {
@@ -763,13 +763,13 @@ class RoleAwareProjectionLayer:
 
     async def project(self, lqp: dict, claims: dict) -> dict:
         # analytics_roles is an array claim — users may hold multiple roles
-        # roleClaimField is configurable per tenant (see Ch04 §entitlements config)
+        # roleClaimField is configurable (see Ch04 §entitlements config)
         role_claim_field = self.config.get("roleClaimField", "analytics_roles")
         roles = claims.get(role_claim_field, [])
         if isinstance(roles, str):
             roles = [roles]  # normalise scalar claim to list
 
-        policies = [p for p in [await self._load_policy(claims["tenant_id"], r) for r in roles] if p]
+        policies = [p for p in [await self._load_policy(claims["org_id"], r) for r in roles] if p]
         if not policies:
             raise AccessDeniedError("No role policy found — defaultDenyAll")
 
@@ -803,10 +803,10 @@ class RoleAwareProjectionLayer:
         # Replace {{user.claim_name}} tokens with JWT claim values
         ...
 
-    async def _load_policy(self, tenant_id: str, role: str) -> dict | None:
+    async def _load_policy(self, org_id: str, role: str) -> dict | None:
         return await self.pg.fetchrow(
-            "SELECT * FROM role_policies WHERE tenant_id=$1 AND role_id=$2",
-            tenant_id, role,
+            "SELECT * FROM role_policies WHERE org_id=$1 AND role_id=$2",
+            org_id, role,
         )
 ```
 
@@ -821,14 +821,14 @@ class RoleAwareProjectionLayer:
 | **Implementation** | Custom rules engine (Python) | Deterministic; config-driven; no ML inference |
 | **Cost estimation** | `Σ(metric.costWeight × dimensionCardinality × timeRangeMultiplier)` | Pre-execution; calibrated against actual cost data |
 | **Circuit breaker** | Per-request ceiling + per-user hourly budget | Hard ceiling prevents runaway queries |
-| **Config store** | DCS document store — `governance_config` document type | Per-tenant thresholds stored as a JSON document alongside SMR documents |
+| **Config store** | DCS document store — `governance_config` document type | Platform-level thresholds stored as a JSON document alongside SMR documents |
 
-Each tenant has one governance config document. The Semantic Execution Governance layer reads it at startup and refreshes it on change events from the DCS:
+The platform has one governance config document. The Semantic Execution Governance layer reads it at startup and refreshes it on change events from the DCS:
 
 ```json
 {
   "type":                       "governance_config",
-  "tenant_id":                  "acme-wealth",
+  "org_id":                  "acme-wealth",
   "cost_ceiling_per_query":     1000,
   "cost_budget_per_user_hourly": 10000,
   "max_concurrent_queries":     20,
@@ -851,13 +851,13 @@ class SemanticExecutionGovernance:
         self.pg  = pg_pool
 
     async def approve(self, lqp: dict, claims: dict) -> dict:
-        config = await self._load_config(claims["tenant_id"])
+        config = await self._load_config(claims["org_id"])
 
         cost = self._estimate_cost(lqp, config)
         if cost > config["cost_ceiling_per_query"]:
             raise CostCeilingExceeded(cost)
 
-        spend = await self._hourly_spend(claims["sub"], claims["tenant_id"])
+        spend = await self._hourly_spend(claims["sub"], claims["org_id"])
         if spend + cost > config["cost_budget_per_user_hourly"]:
             raise UserBudgetExceeded()
 
@@ -879,7 +879,7 @@ class SemanticExecutionGovernance:
     def _check_compliance(self, lqp: dict, claims: dict, config: dict) -> dict:
         # Two-signal compliance escalation:
         # Signal 1 — any resolved metric has compliance_relevant: true
-        # Signal 2 — compliance_purpose_score meets tenant threshold
+        # Signal 2 — compliance_purpose_score meets configured threshold
         compliance_metrics = [
             m["metric_id"] for m in lqp.get("resolved_metrics", [])
             if m.get("compliance_relevant", False)
@@ -901,21 +901,21 @@ class SemanticExecutionGovernance:
                 "triggered_by_modes":   config.get("compliance_modes", []),
                 "bypass_cache":         True,
             }
-            # Enforce lineage-gated export regardless of tenant config
+            # Enforce lineage-gated export regardless of platform config
             lqp["require_lineage_for_export"] = True
         else:
             lqp["compliance_tier"] = {"active": False}
 
         return lqp
 
-    async def _load_config(self, tenant_id: str) -> dict:
-        return await self.dcs.get(document_type="governance_config", tenant_id=tenant_id)
+    async def _load_config(self, org_id: str) -> dict:
+        return await self.dcs.get(document_type="governance_config", org_id=org_id)
 
-    async def _hourly_spend(self, user_sub: str, tenant_id: str) -> int:
+    async def _hourly_spend(self, user_sub: str, org_id: str) -> int:
         return await self.pg.fetchval(
             "SELECT COALESCE(SUM(cost_units), 0) FROM analytics.lineage_index "
-            "WHERE user_sub=$1 AND tenant_id=$2 AND created_at > now() - interval '1 hour'",
-            user_sub, tenant_id,
+            "WHERE user_sub=$1 AND org_id=$2 AND created_at > now() - interval '1 hour'",
+            user_sub, org_id,
         )
 ```
 
@@ -940,7 +940,7 @@ The FQE receives the governance-approved LQP produced by the Semantic Intent Lay
 ```json
 {
   "lqp_id": "lqp-20260514-093241-xyz",
-  "tenant_id": "acme-wealth",
+  "org_id": "acme-wealth",
   "nodes": [
     {
       "id": "node-1", "op": "metric_scan",
@@ -981,7 +981,7 @@ After execution and result assembly the FQE returns a typed result envelope in p
 {
   "result_id":      "res_20260514_093247_a1b2c3",
   "lqp_id":        "lqp-20260514-093241-xyz",
-  "tenant_id":     "acme-wealth",
+  "org_id":     "acme-wealth",
   "cache_hit":     false,
   "latency_ms":    1243,
   "cost_units":    850,
@@ -1261,18 +1261,18 @@ if __name__ == "__main__":
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
 | **Lineage records** | S3-compatible object store — one JSON document per query | Write-once; append-only; cheap at scale; no schema migration required; natural fit for immutable audit records |
-| **Object key** | `lineage/{tenant_id}/{yyyy}/{mm}/{dd}/{result_id}.json` | Date-partitioned; enables prefix-based listing by tenant and time window |
+| **Object key** | `lineage/{org_id}/{yyyy}/{mm}/{dd}/{result_id}.json` | Date-partitioned; enables prefix-based listing by time window |
 | **Search index** | Thin PostgreSQL table (scalar fields only, no JSON blobs) | Used by the Lineage Query REST API (see roadmap) for filtered search; full record always fetched from the object store |
 | **Retention** | Object lifecycle policy — default 7 years (configurable per compliance mode) | MiFID II and equivalent regimes; enforced at the storage layer, not application code |
 
 #### Lineage document schema
 
-Each completed query writes a single JSON document to the object store at `lineage/{tenant_id}/{yyyy}/{mm}/{dd}/{result_id}.json`:
+Each completed query writes a single JSON document to the object store at `lineage/{org_id}/{yyyy}/{mm}/{dd}/{result_id}.json`:
 
 ```json
 {
   "result_id":          "res_20260514_093247_a1b2c3",
-  "tenant_id":          "acme-wealth",
+  "org_id":          "acme-wealth",
   "user_sub":           "auth0|user_xyz",
   "lqp_id":             "lqp-20260514-093241-xyz",
   "cache_hit":          false,
@@ -1299,7 +1299,7 @@ A lightweight PostgreSQL table holds only the scalar fields required for the Lin
 ```sql
 CREATE TABLE analytics.lineage_index (
   result_id       TEXT        PRIMARY KEY,
-  tenant_id       TEXT        NOT NULL,
+  org_id          TEXT        NOT NULL,
   user_sub        TEXT        NOT NULL,
   compliance_mode TEXT,
   error_code      TEXT,
@@ -1308,9 +1308,9 @@ CREATE TABLE analytics.lineage_index (
   expires_at      TIMESTAMPTZ NOT NULL
 );
 
-CREATE INDEX idx_lineage_tenant_user ON analytics.lineage_index (tenant_id, user_sub, created_at DESC);
-CREATE INDEX idx_lineage_tenant_time ON analytics.lineage_index (tenant_id, created_at DESC);
-CREATE INDEX idx_lineage_compliance  ON analytics.lineage_index (tenant_id, compliance_mode) WHERE compliance_mode IS NOT NULL;
+CREATE INDEX idx_lineage_org_user    ON analytics.lineage_index (org_id, user_sub, created_at DESC);
+CREATE INDEX idx_lineage_org_time    ON analytics.lineage_index (org_id, created_at DESC);
+CREATE INDEX idx_lineage_compliance  ON analytics.lineage_index (org_id, compliance_mode) WHERE compliance_mode IS NOT NULL;
 ```
 
 ```python
@@ -1322,17 +1322,17 @@ class AnalyticalLineageStore:
         self.pg = pg_pool
 
     async def write(self, record: dict) -> str:
-        key = self._object_key(record["tenant_id"], record["result_id"], record["created_at"])
+        key = self._object_key(record["org_id"], record["result_id"], record["created_at"])
         await self.s3.put_object(Key=key, Body=json.dumps(record).encode())
         await self._index(record)
         return record["result_id"]
 
-    async def fetch(self, result_id: str, tenant_id: str) -> dict:
+    async def fetch(self, result_id: str, org_id: str) -> dict:
         row = await self.pg.fetchrow(
-            "SELECT * FROM analytics.lineage_index WHERE result_id=$1 AND tenant_id=$2",
-            result_id, tenant_id,
+            "SELECT * FROM analytics.lineage_index WHERE result_id=$1 AND org_id=$2",
+            result_id, org_id,
         )
-        key = self._object_key(row["tenant_id"], result_id, row["created_at"].isoformat())
+        key = self._object_key(row["org_id"], result_id, row["created_at"].isoformat())
         obj = await self.s3.get_object(Key=key)
         return json.loads(obj["Body"].read())
 
@@ -1340,17 +1340,17 @@ class AnalyticalLineageStore:
         # Called by FQE post-assembly; enqueued async via SQS to avoid blocking the response
         ...
 
-    def _object_key(self, tenant_id: str, result_id: str, created_at: str) -> str:
+    def _object_key(self, org_id: str, result_id: str, created_at: str) -> str:
         date = created_at[:10].replace("-", "/")
-        return f"lineage/{tenant_id}/{date}/{result_id}.json"
+        return f"lineage/{org_id}/{date}/{result_id}.json"
 
     async def _index(self, record: dict) -> None:
         await self.pg.execute(
             """INSERT INTO analytics.lineage_index
-               (result_id, tenant_id, user_sub, compliance_mode, error_code,
+               (result_id, org_id, user_sub, compliance_mode, error_code,
                 cache_hit, created_at, expires_at)
                VALUES ($1, $2, $3, $4, $5, $6, $7, $8)""",
-            record["result_id"], record["tenant_id"], record["user_sub"],
+            record["result_id"], record["org_id"], record["user_sub"],
             record.get("compliance_mode"), record.get("error_code"),
             record["cache_hit"], record["created_at"], record["expires_at"],
         )
@@ -1366,10 +1366,10 @@ class AnalyticalLineageStore:
 |----------|--------|-----------|
 | **Storage** | S3-compatible object store (versioned Markdown or MDX files) | Human-readable; diffable; straightforward Admin API management |
 | **Access** | Read-only at runtime via MCP resource handlers | No user data; no governance pipeline required |
-| **Management** | Admin API — create, update, version knowledge artifacts | Tenant administrators can extend or override default content |
+| **Management** | Admin API — create, update, version knowledge artifacts | Administrators can extend or override default content |
 | **Defaults** | Bundled at installation alongside the Financial Services Reference Model | Covers platform overview, all six analytical domains, core skills definitions, MiFID II and Basel III/IV compliance guides |
 
-Each knowledge artifact is a versioned Markdown document identified by a URI path that maps directly to its MCP resource address (`guide://analytics/platform-overview` → `guide/analytics/platform-overview.md`). The active version for each artifact is controlled via the Admin API; previous versions are retained for audit purposes. Tenants may add custom skills definitions and workflow guides without modifying the platform defaults.
+Each knowledge artifact is a versioned Markdown document identified by a URI path that maps directly to its MCP resource address (`guide://analytics/platform-overview` → `guide/analytics/platform-overview.md`). The active version for each artifact is controlled via the Admin API; previous versions are retained for audit purposes. Administrators may add custom skills definitions and workflow guides without modifying the platform defaults.
 
 ```python
 class KnowledgeStore:
@@ -1415,12 +1415,12 @@ class KnowledgeStore:
 |----------|--------|-----------|
 | **Packaging** | Versioned JSON document bundles (one per domain) | Conforms directly to the DCS `analytical_metric` schema; idempotently importable via `POST /v1/smr/seed`; selective per-domain activation |
 | **Distribution** | Bundled at installation; updatable from Semantic Registry Service | Air-gapped deployments supported |
-| **Activation** | `analyticalDomain` config triggers SMR import at tenant setup | Bundle documents are written to the DCS in `proposed` state; Application Admin approves before metrics become resolvable |
-| **Customisation** | Full edit/override via Admin API after import | Customised definitions marked `source: "tenant"` in the DCS document |
+| **Activation** | `analyticalDomain` config triggers SMR import at initial platform setup | Bundle documents are written to the DCS in `proposed` state; Application Admin approves before metrics become resolvable |
+| **Customisation** | Full edit/override via Admin API after import | Customised definitions marked `source: "custom"` in the DCS document |
 
-Each bundle is a JSON array of DCS documents conforming to the schemas defined in [§Semantic Metrics Repository](./02-core-capabilities.md#semantic-metrics-registry). Bundles are seeded into the DCS in `"proposed"` state at tenant setup; the Application Admin approves each document before it becomes resolvable by the Semantic Intent Layer.
+Each bundle is a JSON array of DCS documents conforming to the schemas defined in [§Semantic Metrics Repository](./02-core-capabilities.md#semantic-metrics-registry). Bundles are seeded into the DCS in `"proposed"` state at initial platform setup; the Application Admin approves each document before it becomes resolvable by the Semantic Intent Layer.
 
-> **Version format note:** Seed bundle documents use an integer `version` field (starting at `1`) as the bootstrap state. On first tenant activation the platform converts these to semantic versioning (`"1.0.0"`). Subsequent versions follow semver — the `"2.1.0"` form used in Chapter 2 examples reflects a metric that has been through two major revisions post-activation.
+> **Version format note:** Seed bundle documents use an integer `version` field (starting at `1`) as the bootstrap state. On first platform activation the platform converts these to semantic versioning (`"1.0.0"`). Subsequent versions follow semver — the `"2.1.0"` form used in Chapter 2 examples reflects a metric that has been through two major revisions post-activation.
 
 #### Dimensions bundle (shared across all domains)
 
@@ -1430,7 +1430,7 @@ One bundle covers all analytical dimensions. Every domain bundle's metrics and o
 [
   {
     "type":             "analytical_dimension",
-    "tenant_id":        "acme-wealth",
+    "org_id":        "acme-wealth",
     "dimension_id":     "asset_class",
     "version":          1,
     "status":           "approved",
@@ -1445,7 +1445,7 @@ One bundle covers all analytical dimensions. Every domain bundle's metrics and o
   },
   {
     "type":             "analytical_dimension",
-    "tenant_id":        "acme-wealth",
+    "org_id":        "acme-wealth",
     "dimension_id":     "geography",
     "version":          1,
     "status":           "approved",
@@ -1461,7 +1461,7 @@ One bundle covers all analytical dimensions. Every domain bundle's metrics and o
   },
   {
     "type":             "analytical_dimension",
-    "tenant_id":        "acme-wealth",
+    "org_id":        "acme-wealth",
     "dimension_id":     "sector",
     "version":          1,
     "status":           "approved",
@@ -1479,7 +1479,7 @@ One bundle covers all analytical dimensions. Every domain bundle's metrics and o
   },
   {
     "type":             "analytical_dimension",
-    "tenant_id":        "acme-wealth",
+    "org_id":        "acme-wealth",
     "dimension_id":     "currency",
     "version":          1,
     "status":           "approved",
@@ -1494,7 +1494,7 @@ One bundle covers all analytical dimensions. Every domain bundle's metrics and o
   },
   {
     "type":             "analytical_dimension",
-    "tenant_id":        "acme-wealth",
+    "org_id":        "acme-wealth",
     "dimension_id":     "issuer",
     "version":          1,
     "status":           "approved",
@@ -1516,7 +1516,7 @@ One bundle covers all analytical dimensions. Every domain bundle's metrics and o
 [
   {
     "type":                 "analytical_metric",
-    "tenant_id":            "acme-wealth",
+    "org_id":            "acme-wealth",
     "metric_id":            "market_value",
     "version":              1,
     "status":               "approved",
@@ -1541,7 +1541,7 @@ One bundle covers all analytical dimensions. Every domain bundle's metrics and o
   },
   {
     "type":                 "analytical_metric",
-    "tenant_id":            "acme-wealth",
+    "org_id":            "acme-wealth",
     "metric_id":            "portfolio_return",
     "version":              1,
     "status":               "approved",
@@ -1567,7 +1567,7 @@ One bundle covers all analytical dimensions. Every domain bundle's metrics and o
   },
   {
     "type":                 "analytical_metric",
-    "tenant_id":            "acme-wealth",
+    "org_id":            "acme-wealth",
     "metric_id":            "sharpe_ratio",
     "version":              1,
     "status":               "approved",
@@ -1592,7 +1592,7 @@ One bundle covers all analytical dimensions. Every domain bundle's metrics and o
   },
   {
     "type":                 "analytical_metric",
-    "tenant_id":            "acme-wealth",
+    "org_id":            "acme-wealth",
     "metric_id":            "volatility",
     "version":              1,
     "status":               "approved",
@@ -1618,7 +1618,7 @@ One bundle covers all analytical dimensions. Every domain bundle's metrics and o
   },
   {
     "type":              "analytical_operation",
-    "tenant_id":         "acme-wealth",
+    "org_id":         "acme-wealth",
     "operation_id":      "portfolio_return",
     "version":           1,
     "status":            "approved",
@@ -1631,7 +1631,7 @@ One bundle covers all analytical dimensions. Every domain bundle's metrics and o
   },
   {
     "type":                  "analytical_operation",
-    "tenant_id":             "acme-wealth",
+    "org_id":             "acme-wealth",
     "operation_id":          "compare_portfolios",
     "version":               1,
     "status":                "approved",
@@ -1646,7 +1646,7 @@ One bundle covers all analytical dimensions. Every domain bundle's metrics and o
   },
   {
     "type":                  "analytical_operation",
-    "tenant_id":             "acme-wealth",
+    "org_id":             "acme-wealth",
     "operation_id":          "performance_attribution",
     "version":               1,
     "status":                "approved",
@@ -1667,7 +1667,7 @@ One bundle covers all analytical dimensions. Every domain bundle's metrics and o
 [
   {
     "type":                 "analytical_metric",
-    "tenant_id":            "acme-wealth",
+    "org_id":            "acme-wealth",
     "metric_id":            "var_95",
     "version":              2,
     "status":               "approved",
@@ -1693,7 +1693,7 @@ One bundle covers all analytical dimensions. Every domain bundle's metrics and o
   },
   {
     "type":                 "analytical_metric",
-    "tenant_id":            "acme-wealth",
+    "org_id":            "acme-wealth",
     "metric_id":            "var_99",
     "version":              1,
     "status":               "approved",
@@ -1719,7 +1719,7 @@ One bundle covers all analytical dimensions. Every domain bundle's metrics and o
   },
   {
     "type":                 "analytical_metric",
-    "tenant_id":            "acme-wealth",
+    "org_id":            "acme-wealth",
     "metric_id":            "tracking_error",
     "version":              2,
     "status":               "approved",
@@ -1745,7 +1745,7 @@ One bundle covers all analytical dimensions. Every domain bundle's metrics and o
   },
   {
     "type":                 "analytical_metric",
-    "tenant_id":            "acme-wealth",
+    "org_id":            "acme-wealth",
     "metric_id":            "expected_shortfall",
     "version":              1,
     "status":               "approved",
@@ -1771,7 +1771,7 @@ One bundle covers all analytical dimensions. Every domain bundle's metrics and o
   },
   {
     "type":                 "analytical_metric",
-    "tenant_id":            "acme-wealth",
+    "org_id":            "acme-wealth",
     "metric_id":            "beta",
     "version":              1,
     "status":               "approved",
@@ -1797,7 +1797,7 @@ One bundle covers all analytical dimensions. Every domain bundle's metrics and o
   },
   {
     "type":                 "analytical_metric",
-    "tenant_id":            "acme-wealth",
+    "org_id":            "acme-wealth",
     "metric_id":            "duration",
     "version":              1,
     "status":               "approved",
@@ -1823,7 +1823,7 @@ One bundle covers all analytical dimensions. Every domain bundle's metrics and o
   },
   {
     "type":              "analytical_operation",
-    "tenant_id":         "acme-wealth",
+    "org_id":         "acme-wealth",
     "operation_id":      "get_positions",
     "version":           1,
     "status":            "approved",
@@ -1836,7 +1836,7 @@ One bundle covers all analytical dimensions. Every domain bundle's metrics and o
   },
   {
     "type":                  "analytical_operation",
-    "tenant_id":             "acme-wealth",
+    "org_id":             "acme-wealth",
     "operation_id":          "risk_breakdown",
     "version":               1,
     "status":                "approved",
@@ -1860,7 +1860,7 @@ All regulatory metrics carry `"classification_level": "restricted"` and `"compli
 [
   {
     "type":                 "analytical_metric",
-    "tenant_id":            "acme-wealth",
+    "org_id":            "acme-wealth",
     "metric_id":            "lcr",
     "version":              1,
     "status":               "approved",
@@ -1885,7 +1885,7 @@ All regulatory metrics carry `"classification_level": "restricted"` and `"compli
   },
   {
     "type":                 "analytical_metric",
-    "tenant_id":            "acme-wealth",
+    "org_id":            "acme-wealth",
     "metric_id":            "leverage_ratio",
     "version":              1,
     "status":               "approved",
@@ -1910,7 +1910,7 @@ All regulatory metrics carry `"classification_level": "restricted"` and `"compli
   },
   {
     "type":                 "analytical_metric",
-    "tenant_id":            "acme-wealth",
+    "org_id":            "acme-wealth",
     "metric_id":            "nsfr",
     "version":              1,
     "status":               "approved",
@@ -1935,7 +1935,7 @@ All regulatory metrics carry `"classification_level": "restricted"` and `"compli
   },
   {
     "type":                  "analytical_operation",
-    "tenant_id":             "acme-wealth",
+    "org_id":             "acme-wealth",
     "operation_id":          "regulatory_report",
     "version":               1,
     "status":                "approved",
