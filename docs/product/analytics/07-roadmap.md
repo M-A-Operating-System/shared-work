@@ -30,7 +30,7 @@ This document describes one proposed sequence of deliverables for the AI Analyti
 </tr>
 <tr>
 <td>Semantic Metrics Repository (SMR)</td>
-<td>Extend the pre-existing Semantic Data Context Store (DCS) with three new document types — <code>analytical_metric</code>, <code>analytical_dimension</code>, and <code>analytical_operation</code>; status field (<code>proposed → in_review → approved → deprecated → retired</code>) on each document drives the DCS native approval workflow with one approved version enforced per <code>(org_id, id)</code>; reuse the DCS native search index for <code>list_operations</code> queries — no separate search infrastructure required; expose document authoring and approval via the Platform Admin API</td>
+<td>Extend the pre-existing Semantic Data Repository (SDR) with three new document types — <code>analytical_metric</code>, <code>analytical_dimension</code>, and <code>analytical_operation</code>; status field (<code>proposed → in_review → approved → deprecated → retired</code>) on each document drives the SDR native approval workflow with one approved version enforced per <code>(org_id, id)</code>; reuse the SDR native search index for <code>list_operations</code> queries — no separate search infrastructure required; expose document authoring and approval via the Platform Admin API</td>
 </tr>
 <tr>
 <td>Financial Services Reference Model</td>
@@ -50,7 +50,7 @@ This document describes one proposed sequence of deliverables for the AI Analyti
 </tr>
 <tr>
 <td>Semantic Execution Governance</td>
-<td>Build new governance pipeline service with five sequential steps: (1) cost estimation against a configurable cost unit model, (2) classification gate checking the LQP's metric data sensitivity levels against the requesting role's clearance, (3) circuit breaker checks for query complexity score, platform-level cost budget, and per-user rate limit, (4) governance decision record written to the lineage store before any backend call, (5) pass-through or structured rejection with decision reason; read the governance config from a <code>governance_config</code> document in the DCS at startup and refresh on DCS change events — config is not stored in a separate database table; all decisions logged with microsecond timestamps</td>
+<td>Build new governance pipeline service with five sequential steps: (1) cost estimation against a configurable cost unit model, (2) classification gate checking the LQP's metric data sensitivity levels against the requesting role's clearance, (3) circuit breaker checks for query complexity score, platform-level cost budget, and per-user rate limit, (4) governance decision record written to the lineage store before any backend call, (5) pass-through or structured rejection with decision reason; read the governance config from a <code>governance_config</code> document in the SDR at startup and refresh on SDR change events — config is not stored in a separate database table; all decisions logged with microsecond timestamps</td>
 </tr>
 <tr>
 <td>Federated Query Engine (FQE)</td>

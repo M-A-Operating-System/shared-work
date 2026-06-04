@@ -463,11 +463,11 @@ The operation catalogue. One document per approved operation. The `execution_pro
 
 ```python
 class SemanticMetricsRegistry:
-    def __init__(self, dcs_client):
-        self.dcs = dcs_client
+    def __init__(self, sdr_client):
+        self.sdr = sdr_client
 
     async def get_operation(self, operation_id: str, claims: dict) -> dict:
-        doc = await self.dcs.get(
+        doc = await self.sdr.get(
             document_type="analytical_operation",
             id=operation_id,
             org_id=claims["org_id"],
@@ -477,21 +477,21 @@ class SemanticMetricsRegistry:
         return doc
 
     async def list_operations(self, claims: dict, domain: str | None = None) -> list[dict]:
-        return await self.dcs.search(
+        return await self.sdr.search(
             document_type="analytical_operation",
             org_id=claims["org_id"],
             filters={"domain": domain} if domain else {},
         )
 
     async def get_metric(self, metric_id: str, claims: dict) -> dict:
-        return await self.dcs.get(
+        return await self.sdr.get(
             document_type="analytical_metric",
             id=metric_id,
             org_id=claims["org_id"],
         )
 
     async def list_metrics(self, claims: dict, **filters) -> list[dict]:
-        return await self.dcs.search(
+        return await self.sdr.search(
             document_type="analytical_metric",
             org_id=claims["org_id"],
             filters=filters,
@@ -846,8 +846,8 @@ The platform has one governance config document. The Semantic Execution Governan
 
 ```python
 class SemanticExecutionGovernance:
-    def __init__(self, dcs_client, pg_pool):
-        self.dcs = dcs_client
+    def __init__(self, sdr_client, pg_pool):
+        self.sdr = sdr_client
         self.pg  = pg_pool
 
     async def approve(self, lqp: dict, claims: dict) -> dict:
@@ -909,7 +909,7 @@ class SemanticExecutionGovernance:
         return lqp
 
     async def _load_config(self, org_id: str) -> dict:
-        return await self.dcs.get(document_type="governance_config", org_id=org_id)
+        return await self.sdr.get(document_type="governance_config", org_id=org_id)
 
     async def _hourly_spend(self, user_sub: str, org_id: str) -> int:
         return await self.pg.fetchval(
