@@ -207,7 +207,7 @@ The governed architecture separates the AI translation layer from the governed c
 | Text-to-SQL | Governed Semantic Analytics |
 |---|---|
 | LLM generates SQL against the physical schema | LLM translates intent to structured query parameters (metric IDs, dimensions, filters) |
-| Physical schema is the LLM's input surface | Semantic Metrics Registry (business definitions only) is the LLM's input surface |
+| Physical schema is the LLM's input surface | Semantic Metrics Repository (business definitions only) is the LLM's input surface |
 | Query logic is inferred probabilistically at runtime | Metric formulas are registered, versioned, approved, and applied deterministically |
 | Access control is the database credential | Entitlements enforced at the semantic tier before any execution backend is contacted |
 | Row restrictions depend on LLM generating correct WHERE clauses | Row predicates injected deterministically by Role-Aware Projection, LLM cannot omit or alter them |
@@ -217,7 +217,7 @@ The governed architecture separates the AI translation layer from the governed c
 | Unresolvable queries succeed incorrectly or fail opaquely | Unregistered metric references return a structured `METRIC_NOT_FOUND` error |
 | Physical schema exposed to external AI provider | Physical schema never in any prompt; only SMR business definitions are visible |
 | Complex regulated formulas are unreliable | Formulas defined once in the registry; applied identically to every query |
-| Multi-source federation is not possible | Federated Query Planner routes governed plans to SQL warehouses, OpenData APIs, Graph APIs, and any registered backend |
+| Multi-source federation is not possible | Federated Query Engine routes governed plans to SQL warehouses, OpenData APIs, Graph APIs, and any registered backend |
 | Query cost is uncontrollable | Cost estimated from Logical Query Plan before execution; circuit breaker blocks excess |
 | Cannot be deterministically tested | Deterministic pipeline: given these inputs, the system must produce exactly this output |
 | Schema changes require manual prompt re-engineering with no reliable test coverage | Physical mappings updated once in the SMR; changes versioned, approved, and consistently applied to all dependent metrics |

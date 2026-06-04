@@ -82,7 +82,7 @@ When both signals are true, the SEG triggers additional governance outputs as pa
 - **SIL section**: add a compliance intent classification step to the intent resolution pipeline description. The SIL produces `compliance_purpose: boolean` as part of the resolved intent object
 - **SEG section**: document the two-signal AND decision. Replace the current role-claim-based compliance mode description with the metadata + intent model. The `complianceMode` tenant config remains (it determines which trace tables and regulatory rules apply) but it no longer gates on a user role claim
 - **Response format**: add `compliance` block to the MCP response structure, present only when the enhanced artifact tier is triggered
-- **Caching note**: compliance-triggered responses must not be served from cache — the compliance artifact set must be freshly generated for each compliance-purpose query. Add a cache bypass rule to the FQP caching spec
+- **Caching note**: compliance-triggered responses must not be served from cache — the compliance artifact set must be freshly generated for each compliance-purpose query. Add a cache bypass rule to the FQE caching spec
 
 ### Chapter 4 — Integration and Deployment
 

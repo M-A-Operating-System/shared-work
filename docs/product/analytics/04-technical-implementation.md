@@ -17,17 +17,17 @@ flowchart TD
         SIL["Semantic Intent Layer\nParameter validation · SMR resolution · LQP generation"]
         RAPL["Role-Aware Projection Layer\nCustom middleware · Python"]
         SEG["Semantic Execution Governance\nCost estimation · classification · circuit breakers"]
-        FQP["Federated Query Planner\nApache Calcite + backend adapters"]
+        FQE["Federated Query Engine\nApache Calcite + backend adapters"]
         VO["Visualisation Ontology\nSCL generation · Vega-Lite v5"]
         NSE["Narrative Synthesis Engine\nAnthropic Claude · Haiku / Sonnet"]
         LS[("Analytical Lineage Store")]
         Result(["MCP tool response\ndisplay_spec + narrative + result_id"])
     end
 
-    vega2img["vega2img (optional)\nStandalone MCP render service · SCL → SVG / PNG\nRegistered directly with consumers — not part of Analytics Platform"]
+    vega2img["vega2img (optional)\nStandalone MCP render service · DVL → SVG / PNG\nRegistered directly with consumers — not part of Analytics Platform"]
 
     subgraph dcr["Data Context Repository"]
-        SMR["Semantic Metrics Registry\nGovernance workflow + metric schema · extends DCS"]
+        SMR["Semantic Metrics Repository\nGovernance workflow + metric schema · extends DCS"]
         DCS[("Semantic Data Context Store\nPre-existing · general-purpose common registry")]
         SMR -. backed by .-> DCS
     end
@@ -45,14 +45,14 @@ flowchart TD
     RAPL -->|"row predicates + column masks"| SIL
     SIL -->|"metric resolution + validation"| SMR
     SIL -->|"Logical Query Plan"| SEG
-    SEG -->|"approved LQP"| FQP
+    SEG -->|"approved LQP"| FQE
     SEG -->|"governance decision"| LS
-    FQP -->|"physicalMapping lookup"| SMR
-    FQP --> SQL & ODA & GDA
-    FQP -->|"execution record"| LS
-    FQP -->|"assembled result"| VO
-    FQP -->|"assembled result"| NSE
-    VO -->|"SCL display spec"| Result
+    FQE -->|"physicalMapping lookup"| SMR
+    FQE --> SQL & ODA & GDA
+    FQE -->|"execution record"| LS
+    FQE -->|"assembled result"| VO
+    FQE -->|"assembled result"| NSE
+    VO -->|"DVL display spec"| Result
     NSE -->|"narrative"| Result
 ```
 
@@ -90,7 +90,7 @@ from pydantic import BaseModel
 mcp = FastMCP(
     name="Analytics Platform",
     instructions=(
-        "Governed analytical execution engine. All operations are defined in the Semantic Metrics Registry. "
+        "Governed analytical execution engine. All operations are defined in the Semantic Metrics Repository. "
         "Call list_operations to discover available operations and their required parameters before "
         "calling run_analytics."
     ),
@@ -359,9 +359,9 @@ class NarrativeSynthesisEngine:
 
 ---
 
-### Semantic Metrics Registry (SMR)
+### Semantic Metrics Repository (SMR)
 
-> **Specification:** [§Semantic Metrics Registry](./02-core-capabilities.md#semantic-metrics-registry)
+> **Specification:** [§Semantic Metrics Repository](./02-core-capabilities.md#semantic-metrics-registry)
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
@@ -415,7 +415,7 @@ The core metric definition. One document per approved metric version per tenant.
 
 `weight_metric_id` is required when `aggregation` is `"value_weighted_average"` (or any other weighted aggregation variant) and must reference the `metric_id` of an approved `analytical_metric` in the same tenant's DCS. The SIL resolves and validates this reference at query time. If the weight metric is missing or unapproved, the query is rejected. The field is absent for non-weighted aggregations (`"sum"`, `"last"`, `"count"`, `"min"`, `"max"`, `"mean"`). The LQP generator emits a `weight_metric_id` key on the `metric_scan` node so that the execution backend can fetch the weighting values alongside the primary metric.
 
-`formula` stores the business-logic expression defined in the [SMR formula language](./02-core-capabilities.md#formula-language). It is the human-readable and audit-visible definition of what the metric computes. At query time the FQP resolves the formula against the `physical_mapping` to generate the backend-specific query; the formula itself is never executed directly. Metrics backed entirely by a pre-computed measure in a semantic layer (e.g. a Cube.js measure) may leave `formula` as an empty string and rely solely on `physical_mapping`.
+`formula` stores the business-logic expression defined in the [SMR formula language](./02-core-capabilities.md#formula-language). It is the human-readable and audit-visible definition of what the metric computes. At query time the FQE resolves the formula against the `physical_mapping` to generate the backend-specific query; the formula itself is never executed directly. Metrics backed entirely by a pre-computed measure in a semantic layer (e.g. a Cube.js measure) may leave `formula` as an empty string and rely solely on `physical_mapping`.
 
 #### New DCS document type: `analytical_dimension`
 
@@ -680,7 +680,7 @@ class LQPGenerator:
             "lqp_id":    generate_id("lqp"),
             "tenant_id": claims["tenant_id"],
             "nodes":     nodes,
-            "output":    current,   # terminal node consumed by FQP
+            "output":    current,   # terminal node consumed by FQE
         }
 
     def _infer_join_keys(self, metrics: list[dict]) -> list[str]:
@@ -732,7 +732,7 @@ class LQPGenerator:
 | **Implementation** | Custom middleware (Python) | Thin, stateless; operates on the LQP before any backend query is generated |
 | **Role resolution** | JWT claim extraction + PostgreSQL role config | Role claim field name is configurable per tenant |
 | **Row predicates** | `{{user.claim_name}}` template interpolation at LQP build time | Resolved from JWT claims; injected into LQP `filters` |
-| **Column masking** | Applied post-assembly in FQP result assembler | Post-assembly supports cross-backend result sets |
+| **Column masking** | Applied post-assembly in FQE result assembler | Post-assembly supports cross-backend result sets |
 | **Default policy** | `defaultDenyAll: true` | No access unless a matching role is found |
 
 #### Role policy example
@@ -921,21 +921,21 @@ class SemanticExecutionGovernance:
 
 ---
 
-### Federated Query Planner (FQP)
+### Federated Query Engine (FQE)
 
-> **Specification:** [§Federated Query Planner](./02-core-capabilities.md#federated-query-planner)
+> **Specification:** [§Federated Query Engine](./02-core-capabilities.md#federated-query-planner)
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
-| **Plan optimiser** | Apache Calcite (within SQL warehouse adapters) | Battle-tested SQL plan optimisation; used by Trino, Flink, Beam. Calcite is invoked inside each SQL warehouse adapter to optimise the physical sub-plan SQL before execution — not at the Python FQP orchestration layer, which handles LQP decomposition and result assembly |
+| **Plan optimiser** | Apache Calcite (within SQL warehouse adapters) | Battle-tested SQL plan optimisation; used by Trino, Flink, Beam. Calcite is invoked inside each SQL warehouse adapter to optimise the physical sub-plan SQL before execution — not at the Python FQE orchestration layer, which handles LQP decomposition and result assembly |
 | **Backend adapters** | Custom adapter per backend type | Calcite handles SQL; custom adapters cover REST/OpenData/GraphQL/SPARQL |
 | **Result assembly** | Custom (Python) | Fan-out/fan-in; no off-the-shelf library needed |
 
-The FQP splits the LQP by `dataAffinity`, assigns each sub-plan to the matching registered backend, translates to the backend's native protocol (SQL, OData, SPARQL, etc.), fans out execution in parallel, and assembles results. Each execution backend implements a two-method adapter contract: `ping()` for health checking and `executeSubPlan()` for receiving a sub-plan fragment and returning a typed result set.
+The FQE splits the LQP by `dataAffinity`, assigns each sub-plan to the matching registered backend, translates to the backend's native protocol (SQL, OData, SPARQL, etc.), fans out execution in parallel, and assembles results. Each execution backend implements a two-method adapter contract: `ping()` for health checking and `executeSubPlan()` for receiving a sub-plan fragment and returning a typed result set.
 
-#### FQP input — approved LQP
+#### FQE input — approved LQP
 
-The FQP receives the governance-approved LQP produced by the Semantic Intent Layer. It reads `data_affinity` on each metric node to determine which backend to route each sub-plan to:
+The FQE receives the governance-approved LQP produced by the Semantic Intent Layer. It reads `data_affinity` on each metric node to determine which backend to route each sub-plan to:
 
 ```json
 {
@@ -971,11 +971,11 @@ The FQP receives the governance-approved LQP produced by the Semantic Intent Lay
 }
 ```
 
-The FQP decomposes this into two sub-plans (one routed to `primary-warehouse`, nodes 1, 4, 5, 6, and one to `risk-semantic-layer`, node 2), executes them in parallel, and joins on `portfolio_id` and `date` at assembly.
+The FQE decomposes this into two sub-plans (one routed to `primary-warehouse`, nodes 1, 4, 5, 6, and one to `risk-semantic-layer`, node 2), executes them in parallel, and joins on `portfolio_id` and `date` at assembly.
 
-#### FQP output — assembled result
+#### FQE output — assembled result
 
-After execution and result assembly the FQP returns a typed result envelope in parallel to the Visualisation Ontology and Narrative Synthesis Engine:
+After execution and result assembly the FQE returns a typed result envelope in parallel to the Visualisation Ontology and Narrative Synthesis Engine:
 
 ```json
 {
@@ -1075,7 +1075,7 @@ class FQPBackendAdapter:
 
 #### Visualisation Ontology input
 
-The ontology evaluator receives the FQP assembled result alongside the resolved intent pattern. It uses the result schema and intent pattern to select the best-matching chart contract:
+The ontology evaluator receives the FQE assembled result alongside the resolved intent pattern. It uses the result schema and intent pattern to select the best-matching chart contract:
 
 ```json
 {
@@ -1094,9 +1094,9 @@ The ontology evaluator receives the FQP assembled result alongside the resolved 
 }
 ```
 
-#### Visualisation Ontology output — SCL display spec
+#### Visualisation Ontology output — DVL display spec
 
-The evaluator matches the `COMPARISON` intent pattern and two-metric schema to the `BAR_MULTI_SERIES_COMPARISON` contract and emits a Vega-Lite v5 SCL display spec:
+The evaluator matches the `COMPARISON` intent pattern and two-metric schema to the `BAR_MULTI_SERIES_COMPARISON` contract and emits a Vega-Lite v5 DVL display spec:
 
 ```json
 {
@@ -1125,7 +1125,7 @@ The evaluator matches the `COMPARISON` intent pattern and two-metric schema to t
 }
 ```
 
-Full SCL examples including the `type: "table"` spec are in [Analytical Output Format](./02-core-capabilities.md#analytical-output-format). Full chart contract definitions are in [Visualisation Ontology](./02-core-capabilities.md#visualisation-ontology).
+Full DVL examples including the `type: "table"` spec are in [Analytical Output Format](./02-core-capabilities.md#analytical-output-format). Full chart contract definitions are in [Visualisation Ontology](./02-core-capabilities.md#visualisation-ontology).
 
 ```python
 INTENT_CONTRACTS = {
@@ -1156,7 +1156,7 @@ class VisualisationOntology:
         return INTENT_CONTRACTS.get((intent, num_metrics), "TABLE")
 
     def _build_display_spec(self, contract: str, result: dict, operation: dict) -> dict:
-        # Emit Vega-Lite v5 SCL display spec conforming to the matched contract
+        # Emit Vega-Lite v5 DVL display spec conforming to the matched contract
         ...
 ```
 
@@ -1192,13 +1192,13 @@ mcp = FastMCP(
 )
 
 class RenderChartInput(BaseModel):
-    display_spec: dict                      # Vega-Lite v5 SCL spec from Analytics Platform
+    display_spec: dict                      # Vega-Lite v5 DVL spec from Analytics Platform
     format:       Literal["png", "svg"] = "png"
     width:        int = 800
     height:       int = 400
 
 class RenderTableInput(BaseModel):
-    display_spec: dict                      # type: "table" SCL spec from Analytics Platform
+    display_spec: dict                      # type: "table" DVL spec from Analytics Platform
     format:       Literal["png", "svg"] = "png"
     width:        int = 900
 
@@ -1337,7 +1337,7 @@ class AnalyticalLineageStore:
         return json.loads(obj["Body"].read())
 
     async def write_execution(self, lqp: dict, result: dict) -> None:
-        # Called by FQP post-assembly; enqueued async via SQS to avoid blocking the response
+        # Called by FQE post-assembly; enqueued async via SQS to avoid blocking the response
         ...
 
     def _object_key(self, tenant_id: str, result_id: str, created_at: str) -> str:
@@ -1401,7 +1401,7 @@ class KnowledgeStore:
 | Component | Choice | Rationale |
 |-----------|--------|-----------|
 | MCP service | Python · FastMCP + Uvicorn | Lightweight ASGI MCP surface; deploys as Kubernetes pod |
-| Backend services | Kubernetes (cloud-agnostic) | FQP, governance, platform services as independently scalable pods |
+| Backend services | Kubernetes (cloud-agnostic) | FQE, governance, platform services as independently scalable pods |
 | Primary database | PostgreSQL (Neon or RDS) | Lineage search index, role policy config, scheduled queries, user preferences, saved queries |
 | Data Context Store (DCS) | Pre-existing platform component | SMR metric definitions, governance config, SMR search — reuses DCS versioned storage and native search |
 | Knowledge Store | S3-compatible object store (versioned Markdown) | MCP resource content — guides, skills definitions, compliance reference |
@@ -1418,7 +1418,7 @@ class KnowledgeStore:
 | **Activation** | `analyticalDomain` config triggers SMR import at tenant setup | Bundle documents are written to the DCS in `proposed` state; Application Admin approves before metrics become resolvable |
 | **Customisation** | Full edit/override via Admin API after import | Customised definitions marked `source: "tenant"` in the DCS document |
 
-Each bundle is a JSON array of DCS documents conforming to the schemas defined in [§Semantic Metrics Registry](./02-core-capabilities.md#semantic-metrics-registry). Bundles are seeded into the DCS in `"proposed"` state at tenant setup; the Application Admin approves each document before it becomes resolvable by the Semantic Intent Layer.
+Each bundle is a JSON array of DCS documents conforming to the schemas defined in [§Semantic Metrics Repository](./02-core-capabilities.md#semantic-metrics-registry). Bundles are seeded into the DCS in `"proposed"` state at tenant setup; the Application Admin approves each document before it becomes resolvable by the Semantic Intent Layer.
 
 > **Version format note:** Seed bundle documents use an integer `version` field (starting at `1`) as the bootstrap state. On first tenant activation the platform converts these to semantic versioning (`"1.0.0"`). Subsequent versions follow semver — the `"2.1.0"` form used in Chapter 2 examples reflects a metric that has been through two major revisions post-activation.
 

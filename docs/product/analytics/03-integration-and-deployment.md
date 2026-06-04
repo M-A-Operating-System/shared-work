@@ -2,7 +2,7 @@
 
 This chapter covers the complete integration surface of the AI Analytics Platform: how consumers authenticate and call it, how platform administrators configure it, the financial services reference model it ships with, and the complementary ecosystem services that extend its capabilities. The platform is deliberately narrow in its external interface: a single MCP endpoint governs all consumer access, and a single Admin API governs all configuration. Complexity lives inside the governance pipeline, not in the integration contract.
 
-Component specifications (SMR, SIL, RAPL, SEG, FQP, VO, NSE, Lineage Store) are in [Chapter 2 -- Core Platform Capabilities](./02-core-capabilities.md). The reference implementation stack is in [Chapter 4 -- Proposed Technical Implementation](./04-technical-implementation.md).
+Component specifications (SMR, SIL, RAPL, SEG, FQE, VO, NSE, Lineage Store) are in [Chapter 2 -- Core Platform Capabilities](./02-core-capabilities.md). The reference implementation stack is in [Chapter 4 -- Proposed Technical Implementation](./04-technical-implementation.md).
 
 ---
 
@@ -64,7 +64,7 @@ A successful response returns a JSON object containing the result record, a disp
 }
 ```
 
-Consumers branch on `display_spec.type`. A value of `"chart"` indicates a Semantic Charting Language specification. The consumer renders it using a chart grammar library of its choosing, consuming the `mark`, `data.values`, `encoding`, `colorScheme`, and `formatHints` fields. A value of `"table"` indicates a data grid specification. The consumer renders it with `columns` (including labels and format hints), `data`, and optional `thresholds` for cell highlighting. The platform governs which contract is selected and how it is parameterised; the consumer governs how it is rendered. The `narrative` field is present when `features.narrativeSynthesis` is enabled and the result meets the synthesis threshold. Consumers may surface `narrative.lead` and `narrative.detail` as prose or pass them to a downstream document assembly pipeline. The `meta` field is available for consumer telemetry.
+Consumers branch on `display_spec.type`. A value of `"chart"` indicates a Data Visualization Language specification. The consumer renders it using a chart grammar library of its choosing, consuming the `mark`, `data.values`, `encoding`, `colorScheme`, and `formatHints` fields. A value of `"table"` indicates a data grid specification. The consumer renders it with `columns` (including labels and format hints), `data`, and optional `thresholds` for cell highlighting. The platform governs which contract is selected and how it is parameterised; the consumer governs how it is rendered. The `narrative` field is present when `features.narrativeSynthesis` is enabled and the result meets the synthesis threshold. Consumers may surface `narrative.lead` and `narrative.detail` as prose or pass them to a downstream document assembly pipeline. The `meta` field is available for consumer telemetry.
 
 ### Drilldown Continuity
 
@@ -115,7 +115,7 @@ Platform configuration is managed via the **Platform Admin API**, authenticated 
 
 ### Data Source Registration
 
-Execution backends are registered in the Data Source Catalog via the Admin API. Each registration declares the backend's type, endpoint, authentication method, capabilities, and the logical data domains it serves. The Federated Query Planner uses this catalog to route sub-plans to the correct backend for each metric resolution.
+Execution backends are registered in the Data Source Catalog via the Admin API. Each registration declares the backend's type, endpoint, authentication method, capabilities, and the logical data domains it serves. The Federated Query Engine uses this catalog to route sub-plans to the correct backend for each metric resolution.
 
 ```json
 {
@@ -148,11 +148,11 @@ Execution backends are registered in the Data Source Catalog via the Admin API. 
 |-------|----------|-------------|
 | `type` | Yes | Backend adapter class: `sql_warehouse`, `opendata_api`, `graph_api`, `semantic_layer`, `olap_engine`, `custom` |
 | `authType` | Yes | Authentication mode: `service-account` (platform-held credential), `api-key`, or `bearer` (forwards the calling user's JWT to the backend) |
-| `dataAffinity` | Yes | Logical data domains this backend serves — the FQP routes sub-plans whose metric `data.domain` matches one of these values |
-| `capabilities` | Yes | Operations the FQP may route to this backend: `aggregate`, `filter`, `join`, `window`, `timeseries`, `metric`, `traverse` |
+| `dataAffinity` | Yes | Logical data domains this backend serves — the FQE routes sub-plans whose metric `data.domain` matches one of these values |
+| `capabilities` | Yes | Operations the FQE may route to this backend: `aggregate`, `filter`, `join`, `window`, `timeseries`, `metric`, `traverse` |
 | `costTier` | No | Relative execution cost: `minimal`, `low`, `standard`, `high`, `unrestricted` — used by the governance circuit breaker when estimating query cost |
 
-Multiple backends may share the same `dataAffinity` value; the FQP selects among them based on `priority`, `capabilities`, and backend availability. If a backend declares `authType: "bearer"`, the user's own JWT is forwarded. Entitlement enforcement at the backend layer is then the consuming system's responsibility, and the platform's row-level predicate injection still applies upstream.
+Multiple backends may share the same `dataAffinity` value; the FQE selects among them based on `priority`, `capabilities`, and backend availability. If a backend declares `authType: "bearer"`, the user's own JWT is forwarded. Entitlement enforcement at the backend layer is then the consuming system's responsibility, and the platform's row-level predicate injection still applies upstream.
 
 ### Governance Settings
 
@@ -210,7 +210,7 @@ The scope, model, and feature blocks configure the platform's analytical domain,
 
 ### SMR Administration Settings
 
-The `metricRegistry` block configures governance over the Semantic Metrics Registry itself:
+The `metricRegistry` block configures governance over the Semantic Metrics Repository itself:
 
 ```json
 {
@@ -294,9 +294,9 @@ The `seedTemplate` configuration field seeds the SMR from a snapshot of the rele
 
 ### Regulatory Reference Service
 
-The Regulatory Reference Service is a runtime execution backend registered in the Data Source Catalog with `dataAffinity: ["regulatory"]`. Once registered, the Federated Query Planner routes all sub-plans carrying metrics whose `data.domain` is `regulatory` to the service. This ensures that threshold values for LCR, NSFR, leverage ratio, capital ratios, and equivalent metrics are always sourced from the authoritative service rather than from host-maintained tables that may lag regulatory publication schedules.
+The Regulatory Reference Service is a runtime execution backend registered in the Data Source Catalog with `dataAffinity: ["regulatory"]`. Once registered, the Federated Query Engine routes all sub-plans carrying metrics whose `data.domain` is `regulatory` to the service. This ensures that threshold values for LCR, NSFR, leverage ratio, capital ratios, and equivalent metrics are always sourced from the authoritative service rather than from host-maintained tables that may lag regulatory publication schedules.
 
-The service holds current threshold values for each registered regulatory regime, jurisdiction-specific where required, and publishes update notifications to registered tenants when threshold values change, for example when a jurisdiction's minimum LCR is revised or a Basel IV transition date is confirmed. If the Regulatory Reference Service is unavailable, the FQP falls back to the next registered backend with `regulatory` data affinity; if no fallback is configured, regulatory sub-plans fail with a structured error. The platform does not fabricate regulatory threshold values when the authoritative source is unavailable.
+The service holds current threshold values for each registered regulatory regime, jurisdiction-specific where required, and publishes update notifications to registered tenants when threshold values change, for example when a jurisdiction's minimum LCR is revised or a Basel IV transition date is confirmed. If the Regulatory Reference Service is unavailable, the FQE falls back to the next registered backend with `regulatory` data affinity; if no fallback is configured, regulatory sub-plans fail with a structured error. The platform does not fabricate regulatory threshold values when the authoritative source is unavailable.
 
 ### Benchmark Data Service
 

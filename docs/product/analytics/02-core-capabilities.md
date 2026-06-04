@@ -2,7 +2,7 @@
 
 This chapter is the logical architecture reference for the AI Analytics Platform. It covers nine pipeline components in the order a query encounters them, using a single portfolio manager query as a running example throughout. Each section describes what a component does, its governance contract, and where in the pipeline it sits — with no references to specific technology products or vendor implementations.
 
-The pipeline processes every request in this sequence: the **MCP Capability Layer** is the entry point — the governed API through which all consumers access the platform. The **Semantic Metrics Registry** is the governing catalogue — every queryable metric, dimension, and operation must be registered here before it is resolvable. The **Semantic Intent Layer** validates the structured request and produces a backend-agnostic query plan. The **Role-Aware Projection Layer** enforces entitlements before any query reaches a backend. The **Semantic Execution Governance** layer applies circuit breakers and compliance classification before releasing the plan for execution. The **Federated Query Planner** routes the plan to registered backends, executes in parallel, and assembles the result. The **Visualisation Ontology** selects the presentation contract. The **Narrative Synthesis Engine** produces a governed plain-language summary. The **Analytical Lineage Store** records the complete computation provenance.
+The pipeline processes every request in this sequence: the **MCP Capability Layer** is the entry point — the governed API through which all consumers access the platform. The **Semantic Metrics Repository** is the governing catalogue — every queryable metric, dimension, and operation must be registered here before it is resolvable. The **Semantic Intent Layer** validates the structured request and produces a backend-agnostic query plan. The **Role-Aware Projection Layer** enforces entitlements before any query reaches a backend. The **Semantic Execution Governance** layer applies circuit breakers and compliance classification before releasing the plan for execution. The **Federated Query Engine** routes the plan to registered backends, executes in parallel, and assembles the result. The **Visualisation Ontology** selects the presentation contract. The **Narrative Synthesis Engine** produces a governed plain-language summary. The **Analytical Lineage Store** records the complete computation provenance.
 
 Platform roles — who interacts with each component and how — are defined before the component descriptions.
 
@@ -16,10 +16,10 @@ The platform operates across two distinct planes: an **analytical plane** (query
 |------|-------|----------------------|
 | **Analytical End User** | Analytical | Ask governed analytical questions via natural language; receive role-constrained results without knowledge of data structures or metric identifiers |
 | **Power Analyst** | Analytical | Multi-dimensional exploration, governed drilldown, lineage inspection, result export |
-| **Semantic Modeller** | Governance | Define and maintain the logical semantic layer: metric definitions, dimension hierarchies, aggregation rules, measure groups, and domain structures in the Semantic Metrics Registry. This is a specialist data modelling role — the people who know what "Portfolio Return" means precisely enough to write a version-controlled, formula-specific definition that will govern every calculation across every report |
+| **Semantic Modeller** | Governance | Define and maintain the logical semantic layer: metric definitions, dimension hierarchies, aggregation rules, measure groups, and domain structures in the Semantic Metrics Repository. This is a specialist data modelling role — the people who know what "Portfolio Return" means precisely enough to write a version-controlled, formula-specific definition that will govern every calculation across every report |
 | **Metric Owner** | Governance | Subject-matter expert assigned ownership of one or more registered metrics. Reviews proposed definition changes, approves aggregation rule modifications, and maintains documentation accuracy for their assigned metrics. Distributes review responsibility without concentrating all approval authority in the Semantic Modeller or Application Admin |
 | **Application Admin** | Governance | Privileged tenant user responsible for SMR integrity, entitlement policies, and governance configuration. Must be configured before go-live — without one, the registry contains no approved metric definitions and the platform cannot serve any query. The Application Admin approves Semantic Modeller changes and maintains the entitlement policies that RAPL enforces at query time |
-| **Integration Engineer** | Governance | Registers execution backends, maintains connection configuration, and declares the physical mapping that the Federated Query Planner resolves at execution time. Operates through configuration interfaces, not the query path |
+| **Integration Engineer** | Governance | Registers execution backends, maintains connection configuration, and declares the physical mapping that the Federated Query Engine resolves at execution time. Operates through configuration interfaces, not the query path |
 | **Platform Admin** | Infrastructure | Cross-tenant platform team. Responsible for infrastructure health, tenant onboarding, and cross-tenant governance audit. Has no query interface into tenant data |
 
 **Compliance-enhanced governance artifacts are not a role feature.** Any entitled user querying a compliance-relevant metric for a compliance-stated purpose receives the full enhanced artifact set — regulatory trace, export gate, and lineage-locked output — automatically. This is determined at runtime by metric metadata and AI intent classification, not by a dedicated role or claim.
@@ -58,7 +58,7 @@ The platform exposes its capability through three consumption modes. The first i
 flowchart TD
     subgraph org["Consuming Organisation"]
         ChatComp["&lt;ai-chat&gt; component\nconversational UI"]
-        CustomUI["Custom analytics UI\nhost-built · renders JSON / SCL"]
+        CustomUI["Custom analytics UI\nhost-built · renders JSON / DVL"]
         Agents["Agentic consumers\nscheduled agents · event monitors · report pipelines"]
     end
 
@@ -71,17 +71,17 @@ flowchart TD
         SIL["Semantic Intent Layer\nParameter validation · SMR resolution · LQP generation"]
         RAPL["Role-Aware Projection Layer\nJWT claims · row predicates · column masks"]
         SEG["Semantic Execution Governance\nCost estimation · classification · circuit breakers"]
-        FQP["Federated Query Planner\nquery planning engine + backend adapters"]
+        FQE["Federated Query Engine\nquery planning engine + backend adapters"]
         VO["Visualisation Ontology\nSCL display spec · the platform's chart specification format"]
         NSE["Narrative Synthesis Engine\nlanguage model · post-computation\nanchored to result values · P6 governed"]
         LS[("Analytical Lineage Store")]
         Result(["MCP tool response\ndisplay_spec + data + narrative + result_id"])
     end
 
-    vega2img["vega2img (optional)\nStandalone MCP render service · SCL → SVG / PNG\nRegistered directly with consumers — not part of Analytics Engine"]
+    vega2img["vega2img (optional)\nStandalone MCP render service · DVL → SVG / PNG\nRegistered directly with consumers — not part of Analytics Engine"]
 
     subgraph dcr["Data Context Repository"]
-        SMR["Semantic Metrics Registry\nMetric definitions · dimensions · hierarchies\naggregation rules · governance · access policies"]
+        SMR["Semantic Metrics Repository\nMetric definitions · dimensions · hierarchies\naggregation rules · governance · access policies"]
         DCS[("Semantic Data Context Store\nPre-existing · general-purpose common registry")]
         SMR -. backed by .-> DCS
     end
@@ -102,22 +102,22 @@ flowchart TD
     RAPL -->|"row predicates + column masks"| SIL
     SIL -->|"parameter validation + resolution"| SMR
     SIL -->|"Logical Query Plan"| SEG
-    SEG -->|"approved LQP"| FQP
+    SEG -->|"approved LQP"| FQE
     SEG -->|"governance decision"| LS
-    FQP -->|"physicalMapping lookup"| SMR
-    FQP --> SQL & ODA & GDA
-    FQP -->|"execution record"| LS
-    FQP -->|"assembled result"| VO
-    FQP -->|"assembled result"| NSE
-    VO -->|"SCL display spec"| Result
+    FQE -->|"physicalMapping lookup"| SMR
+    FQE --> SQL & ODA & GDA
+    FQE -->|"execution record"| LS
+    FQE -->|"assembled result"| VO
+    FQE -->|"assembled result"| NSE
+    VO -->|"DVL display spec"| Result
     NSE -->|"narrative summary"| Result
 ```
 
-The Analytics Engine is a single MCP server. It exposes three analytical tools (`run_analytics`, `list_operations`, `drilldown`) through a single MCP Capability Layer endpoint. The computation pipeline (SIL, RAPL, SEG, FQP) is entirely deterministic. The Narrative Synthesis Engine runs as a post-computation step: after the FQP assembles the result, the NSE makes a targeted call to a secondary language model to summarise the data in plain text; its prompt is constructed from the result set only and its output is validated against computed values before being returned.
+The Analytics Engine is a single MCP server. It exposes three analytical tools (`run_analytics`, `list_operations`, `drilldown`) through a single MCP Capability Layer endpoint. The computation pipeline (SIL, RAPL, SEG, FQE) is entirely deterministic. The Narrative Synthesis Engine runs as a post-computation step: after the FQE assembles the result, the NSE makes a targeted call to a secondary language model to summarise the data in plain text; its prompt is constructed from the result set only and its output is validated against computed values before being returned.
 
 The AI Chat Platform loads the operation catalogue from the Analytics Engine by calling `list_operations`. This is how the AI model discovers what operations, metrics, and dimensions are available. It translates the user's natural language question into explicit, structured parameters and calls `run_analytics` with the resolved `operation_id` and `params`. The Analytics Engine returns the display specification, structured data, and governed narrative; the AI Chat Platform renders the result.
 
-The `vega2img` service is shown separately from the Analytics Platform boundary because it is an optional, independently registered MCP render service. Consumers that cannot natively render the SCL display specification (for example, an agentic pipeline that requires static image output) register `vega2img` directly and call it as a separate tool invocation using the `result_id` returned by the Analytics Platform. It is not part of the core analytics pipeline.
+The `vega2img` service is shown separately from the Analytics Platform boundary because it is an optional, independently registered MCP render service. Consumers that cannot natively render the DVL display specification (for example, an agentic pipeline that requires static image output) register `vega2img` directly and call it as a separate tool invocation using the `result_id` returned by the Analytics Platform. It is not part of the core analytics pipeline.
 
 ---
 
@@ -130,9 +130,9 @@ sequenceDiagram
     participant AE as Analytics Engine (MCP)
     participant SIL as Semantic Intent Layer
     participant RAPL as Role-Aware Projection Layer
-    participant SMR as Semantic Metrics Registry
+    participant SMR as Semantic Metrics Repository
     participant SEG as Semantic Execution Governance
-    participant FQP as Federated Query Planner
+    participant FQE as Federated Query Engine
     participant BE as Execution Backend(s)
     participant VO as Visualisation Ontology
     participant NSE as Narrative Synthesis Engine
@@ -156,21 +156,21 @@ sequenceDiagram
     end
     SIL->>SEG: Logical Query Plan (LQP)
     SEG->>LS: governance decision record
-    SEG->>FQP: approved LQP
-    FQP->>SMR: physicalMapping lookup
-    SMR-->>FQP: physical source mapping
-    FQP->>BE: sub-plan execution
-    BE-->>FQP: raw result sets
-    FQP->>LS: execution record
+    SEG->>FQE: approved LQP
+    FQE->>SMR: physicalMapping lookup
+    SMR-->>FQE: physical source mapping
+    FQE->>BE: sub-plan execution
+    BE-->>FQE: raw result sets
+    FQE->>LS: execution record
     par
-        FQP->>VO: assembled result
-        VO-->>AE: SCL display spec
+        FQE->>VO: assembled result
+        VO-->>AE: DVL display spec
     and
-        FQP->>NSE: assembled result
+        FQE->>NSE: assembled result
         NSE-->>AE: narrative summary
     end
     AE-->>C: display_spec + data + narrative + result_id
-    opt Consumer cannot natively render SCL spec
+    opt Consumer cannot natively render DVL spec
         C->>vega2img: render tool call (display_spec)
         vega2img-->>C: SVG / PNG
     end
@@ -194,9 +194,9 @@ The AI Chat Platform is the conversational layer through which users interact wi
 
 **NL → structured intent.** When a user asks an analytical question, the AI model maps the natural language to an `operation_id` and explicit `params`, drawn from the catalogue it loaded. It constructs a `run_analytics` call with the resolved operation and typed parameters. No natural language is sent to the Analytics Engine; it receives structured parameters only.
 
-**Analytics Engine call.** The structured tool call is submitted to the Analytics Engine with the user's JWT forwarded unmodified. The Analytics Engine validates, plans, executes, and returns a structured result and SCL display specification. Entitlement enforcement, query planning, and execution are entirely the Analytics Engine's responsibility.
+**Analytics Engine call.** The structured tool call is submitted to the Analytics Engine with the user's JWT forwarded unmodified. The Analytics Engine validates, plans, executes, and returns a structured result and DVL display specification. Entitlement enforcement, query planning, and execution are entirely the Analytics Engine's responsibility.
 
-**Response assembly.** The conversation engine renders the SCL display specification inline. When narrative synthesis is enabled, the `narrative` object in the response contains the governed summary produced by the Analytics Engine's NSE. The conversation engine surfaces this directly. The `result_id` is retained for any follow-up `drilldown` call or lineage inspection.
+**Response assembly.** The conversation engine renders the DVL display specification inline. When narrative synthesis is enabled, the `narrative` object in the response contains the governed summary produced by the Analytics Engine's NSE. The conversation engine surfaces this directly. The `result_id` is retained for any follow-up `drilldown` call or lineage inspection.
 
 ### Example
 
@@ -233,15 +233,15 @@ Authorization: Bearer <host-issued-jwt>
 }
 ```
 
-When the Analytics Engine returns the structured result, display spec, and narrative summary, the conversation engine renders the grouped bar chart from the SCL specification and surfaces the governed narrative produced by the Analytics Engine's Narrative Synthesis Engine.
+When the Analytics Engine returns the structured result, display spec, and narrative summary, the conversation engine renders the grouped bar chart from the DVL specification and surfaces the governed narrative produced by the Analytics Engine's Narrative Synthesis Engine.
 
 ---
 
-## Semantic Metrics Registry
+## Semantic Metrics Repository
 
 > **Governing principles:** [P1 — Semantic abstraction](./00-overview.md#design-principles) · [P3 — Deterministic metric resolution](./00-overview.md#design-principles) · [P9 — Administrator sovereignty](./00-overview.md#design-principles)
 
-The Semantic Metrics Registry (SMR) is the governing catalogue of every analytical concept resolvable on the platform. Before any query can be planned or executed, every identifier in that query (metrics, dimensions, hierarchies) must be registered in the SMR. This is an architectural constraint, not a policy: the Semantic Intent Layer rejects any identifier not present in the SMR for the active tenant, and nothing is queryable that is not registered.
+The Semantic Metrics Repository (SMR) is the governing catalogue of every analytical concept resolvable on the platform. Before any query can be planned or executed, every identifier in that query (metrics, dimensions, hierarchies) must be registered in the SMR. This is an architectural constraint, not a policy: the Semantic Intent Layer rejects any identifier not present in the SMR for the active tenant, and nothing is queryable that is not registered.
 
 ### Concept Types
 
@@ -363,7 +363,7 @@ The SMR is backed by the DCS, which handles document creation, versioning, and t
 
 **Discovery** — AI models and agents discover available operations by calling the `list_operations` MCP tool (defined in the MCP Capability Layer). `list_operations` returns operation IDs, display names, required parameters, supported metrics, supported dimensions, and execution profiles for all approved operations within the caller's entitlement scope. There are no `smr://` MCP resource URIs and no separate `list_metrics`, `get_metric_definition`, `propose_metric`, or `approve_metric` MCP tools.
 
-The internal resolution calls made by the Semantic Intent Layer and Federated Query Planner query the DCS directly. There is no separate internal API. The SMR's governance workflow (Draft → Proposed → In Review → Approved → Deprecated → Retired) is managed through the DCS's existing authoring capabilities, not by custom MCP tools.
+The internal resolution calls made by the Semantic Intent Layer and Federated Query Engine query the DCS directly. There is no separate internal API. The SMR's governance workflow (Draft → Proposed → In Review → Approved → Deprecated → Retired) is managed through the DCS's existing authoring capabilities, not by custom MCP tools.
 
 ### Example
 
@@ -540,8 +540,8 @@ The projection layer applies four categories of restriction:
 |---|---|---|
 | **Metric access filter** | Removes metrics from the resolved intent that the user's role is not entitled to query | Intent validation — Stage 3 |
 | **Dimension access filter** | Removes dimensions the user is not entitled to slice by | Intent validation — Stage 3 |
-| **Row predicate injection** | Injects SQL-like predicates that restrict which data rows the user can access | FQP physical query generation |
-| **Column mask application** | Replaces or nullifies column values the user is not permitted to see in the assembled result | FQP result assembly |
+| **Row predicate injection** | Injects SQL-like predicates that restrict which data rows the user can access | FQE physical query generation |
+| **Column mask application** | Replaces or nullifies column values the user is not permitted to see in the assembled result | FQE result assembly |
 
 ### Projection Lifecycle
 
@@ -553,7 +553,7 @@ flowchart TD
     S3["**3. Entitlement profile construction**\nMerge all role definitions for the user's roles\nProduce: metric_access_set, dimension_access_set,\nrow_predicates[], column_masks[]"]
     S4["**4. Metric access filter**\nIntersect requested metrics with metric_access_set\nUnentitled metrics → METRIC_NOT_ENTITLED error"]
     S5["**5. Dimension access filter**\nIntersect requested dimensions with dimension_access_set\nUnentitled dimensions → DIMENSION_NOT_ENTITLED error"]
-    S6["**6. Row predicate construction**\nResolve predicate templates: user.managed_portfolios\nPredicates stored in LQP for FQP injection at execution time"]
+    S6["**6. Row predicate construction**\nResolve predicate templates: user.managed_portfolios\nPredicates stored in LQP for FQE injection at execution time"]
     S7["**7. Column mask registration**\nRegister masked columns in LQP metadata\nFQP applies masks during result assembly"]
     S8(["**8. Projected LQP produced**\n→ proceeds to governance validation"])
 
@@ -585,14 +585,14 @@ portfolio_id IN ({{user.managed_portfolios}})
 { "managed_portfolios": ["GLOB_EQ_OPP", "UK_CORE_INC", "STRAT_BAL"] }
 ```
 
-**Resolved predicate (injected into FQP physical queries):**
+**Resolved predicate (injected into FQE physical queries):**
 ```sql
 portfolio_id IN ('GLOB_EQ_OPP', 'UK_CORE_INC', 'STRAT_BAL')
 ```
 
 ### Column Masking
 
-Column masks are applied during FQP result assembly, after sub-results return from execution backends but before the result leaves the platform. Three masking modes are supported:
+Column masks are applied during FQE result assembly, after sub-results return from execution backends but before the result leaves the platform. Three masking modes are supported:
 
 | Mode | Masked column representation |
 |---|---|
@@ -640,7 +640,7 @@ No column masks apply — the `portfolio_manager` role has no masking rules for 
 
 > **Governing principles:** [P2 — Governance before execution](./00-overview.md#design-principles) · [P8 — Explainability at every layer](./00-overview.md#design-principles) · [P9 — Administrator sovereignty](./00-overview.md#design-principles)
 
-The Semantic Execution Governance (SEG) layer applies a suite of circuit breakers, cost controls, complexity limits, and compliance classification checks to every query before it is released to the Federated Query Planner. It is the final gate before physical execution. Governance applies to every query without exception. There is no privileged user, trusted agent, or internal path that bypasses SEG checks.
+The Semantic Execution Governance (SEG) layer applies a suite of circuit breakers, cost controls, complexity limits, and compliance classification checks to every query before it is released to the Federated Query Engine. It is the final gate before physical execution. Governance applies to every query without exception. There is no privileged user, trusted agent, or internal path that bypasses SEG checks.
 
 ### Governance Pipeline
 
@@ -653,8 +653,8 @@ flowchart TD
     S4["**4. Classification gate**\nRetrieve data.classification from SMR per metric\nBLOCK if any metric classification is in blocked list"]
     S5["**5. Regulatory compliance mode check**\nIf complianceMode set: apply compliance-specific rules\ne.g. MiFID II: log all queries involving client-related metrics"]
     S6["**6. Concurrency limit check**\nCount active queries for this user\nBLOCK with wait if exceeds maxConcurrentQueries"]
-    S7["**7. Timeout budget assignment**\nAssign queryTimeoutSeconds to FQP execution context"]
-    S8(["**8. Governance approval record written**\nGovernance event written before FQP is invoked\n→ Release to FQP"])
+    S7["**7. Timeout budget assignment**\nAssign queryTimeoutSeconds to FQE execution context"]
+    S8(["**8. Governance approval record written**\nGovernance event written before FQE is invoked\n→ Release to FQE"])
 
     START --> S1 --> S2 --> S3 --> S4 --> S5 --> S6 --> S7 --> S8
 ```
@@ -746,7 +746,7 @@ The compliance mode rule tables below describe the additional rules and trace ta
 | All sub-plans complete within timeout | Normal result assembly and return |
 | One sub-plan times out, others complete | Partial result assembly — missing metrics represented as null with `timeout` provenance marker; user notified |
 | All sub-plans time out | Query failed — error returned to user; governance event written with `timeout` status |
-| Engine cancellation on timeout | FQP sends cancellation signal to timed-out engine (if engine supports cancellation) |
+| Engine cancellation on timeout | FQE sends cancellation signal to timed-out engine (if engine supports cancellation) |
 
 ### Example
 
@@ -762,7 +762,7 @@ SEG evaluates the LQP (`lqp-20260518-093243-r9xq`) against the `acme-wealth` gov
 | Data classification | INTERNAL | INTERNAL ceiling | Pass |
 | Compliance mode | none required | — | Pass |
 
-All checks pass. SEG writes a governance decision record to the lineage store — before the FQP is invoked — and releases the LQP to the FQP:
+All checks pass. SEG writes a governance decision record to the lineage store — before the FQE is invoked — and releases the LQP to the FQE:
 
 ```json
 {
@@ -776,13 +776,13 @@ All checks pass. SEG writes a governance decision record to the lineage store �
 
 ---
 
-## Federated Query Planner
+## Federated Query Engine
 
 > **Governing principles:** [P1 — Semantic abstraction](./00-overview.md#design-principles) · [P4 — Complete analytical lineage](./00-overview.md#design-principles) · [P10 — Deterministic computation, not generation](./00-overview.md#design-principles)
 
-The Federated Query Planner (FQP) is the only component in the platform that has knowledge of physical execution backends. No other component — not the Semantic Intent Layer, not the AI model, not the MCP Capability Layer — has access to backend connection details or physical schema information. The FQP receives a validated, governance-approved LQP, decomposes it into backend-specific sub-plans, routes those sub-plans to registered execution backends in parallel, assembles the results, and writes a complete execution record to the lineage store.
+The Federated Query Engine (FQE) is the only component in the platform that has knowledge of physical execution backends. No other component — not the Semantic Intent Layer, not the AI model, not the MCP Capability Layer — has access to backend connection details or physical schema information. The FQE receives a validated, governance-approved LQP, decomposes it into backend-specific sub-plans, routes those sub-plans to registered execution backends in parallel, assembles the results, and writes a complete execution record to the lineage store.
 
-### Nine-Step FQP Pipeline
+### Nine-Step FQE Pipeline
 
 ```mermaid
 flowchart TD
@@ -806,9 +806,9 @@ flowchart TD
 
 ### Sub-Plan Decomposition
 
-The FQP decomposes an LQP into sub-plans by data affinity — the logical data domain declared by each metric in its SMR definition. Metrics with the same affinity are grouped into a single sub-plan; metrics with different affinities produce separate sub-plans that execute in parallel. Shared dimensions across sub-plans become the join keys for result assembly.
+The FQE decomposes an LQP into sub-plans by data affinity — the logical data domain declared by each metric in its SMR definition. Metrics with the same affinity are grouped into a single sub-plan; metrics with different affinities produce separate sub-plans that execute in parallel. Shared dimensions across sub-plans become the join keys for result assembly.
 
-For a query requesting `portfolio_return` (affinity: `portfolio`) and `var_95` (affinity: `risk_metrics`), the FQP produces two sub-plans routed to different engines, executes them concurrently, and joins the results in memory on `portfolio_id` and `date`.
+For a query requesting `portfolio_return` (affinity: `portfolio`) and `var_95` (affinity: `risk_metrics`), the FQE produces two sub-plans routed to different engines, executes them concurrently, and joins the results in memory on `portfolio_id` and `date`.
 
 ### Backend Adapter Table
 
@@ -821,11 +821,11 @@ For a query requesting `portfolio_return` (affinity: `portfolio`) and `var_95` (
 | OLAP engine | REST/JSON cube query | Pre-aggregated dimensional data |
 | Custom adapter | Platform adapter SDK | Proprietary or specialised data sources |
 
-When multiple engines are registered for the same data affinity, the FQP selects the highest-priority available engine. If the highest-priority engine is unavailable or its p95 latency exceeds twice its baseline over a rolling one-hour window, the FQP automatically routes to the next registered engine for that affinity.
+When multiple engines are registered for the same data affinity, the FQE selects the highest-priority available engine. If the highest-priority engine is unavailable or its p95 latency exceeds twice its baseline over a rolling one-hour window, the FQE automatically routes to the next registered engine for that affinity.
 
 ### Caching
 
-The FQP maintains a result cache keyed by the LQP signature — a deterministic SHA-256 hash of the metric IDs and versions, dimension IDs, filter predicates, time expression, entitlement hash, and tenant ID.
+The FQE maintains a result cache keyed by the LQP signature — a deterministic SHA-256 hash of the metric IDs and versions, dimension IDs, filter predicates, time expression, entitlement hash, and tenant ID.
 
 | Cache property | Specification |
 |---|---|
@@ -839,13 +839,13 @@ The FQP maintains a result cache keyed by the LQP signature — a deterministic 
 
 ### Adaptive Planning
 
-The FQP adapts routing decisions based on observed execution performance. It tracks p50/p95 latency per engine per data affinity over a rolling one-hour window, automatically falls back to the next available engine if performance degrades, and calibrates cost unit estimates based on observed execution data from completed queries. If a sub-plan engine returns a partial result due to timeout, the FQP logs this in the lineage record and surfaces a warning to the user alongside the partial result.
+The FQE adapts routing decisions based on observed execution performance. It tracks p50/p95 latency per engine per data affinity over a rolling one-hour window, automatically falls back to the next available engine if performance degrades, and calibrates cost unit estimates based on observed execution data from completed queries. If a sub-plan engine returns a partial result due to timeout, the FQE logs this in the lineage record and surfaces a warning to the user alongside the partial result.
 
 ### Example
 
-The approved LQP is released to the FQP for physical execution.
+The approved LQP is released to the FQE for physical execution.
 
-Both `portfolio_return` and `benchmark_return` have `data_affinity: "portfolio"`, so the FQP routes a single sub-plan to the primary SQL warehouse:
+Both `portfolio_return` and `benchmark_return` have `data_affinity: "portfolio"`, so the FQE routes a single sub-plan to the primary SQL warehouse:
 
 ```sql
 SELECT
@@ -877,7 +877,7 @@ Assembled result:
 }
 ```
 
-The FQP writes an execution record to the lineage store and passes the assembled result in parallel to the Visualisation Ontology and Narrative Synthesis Engine.
+The FQE writes an execution record to the lineage store and passes the assembled result in parallel to the Visualisation Ontology and Narrative Synthesis Engine.
 
 ---
 
@@ -945,7 +945,7 @@ With the assembled result available, the Visualisation Ontology selects the pres
 
 The ontology evaluator classifies the result: two metrics across four named entities, with a natural comparison relationship between return and benchmark. This matches the `COMPARISON` pattern. The highest-scoring contract is `BAR_MULTI_SERIES_COMPARISON` — a grouped bar chart with portfolios on the X axis and return values on Y, coloured by metric series.
 
-The ontology produces the following SCL display specification:
+The ontology produces the following DVL display specification:
 
 ```json
 {
@@ -973,7 +973,7 @@ The ontology produces the following SCL display specification:
 
 > **Governing principles:** [P6 — Governed narrative](./00-overview.md#design-principles) · [P10 — Deterministic computation, not generation](./00-overview.md#design-principles)
 
-The Narrative Synthesis Engine (NSE) is a secondary AI component inside the Analytics Engine. It runs after the computation pipeline completes — after the FQP has assembled the result and the Visualisation Ontology has selected the chart contract — making a single, tightly-scoped call to a language model with one purpose: summarise the structured result in plain language, anchored strictly to the computed values.
+The Narrative Synthesis Engine (NSE) is a secondary AI component inside the Analytics Engine. It runs after the computation pipeline completes — after the FQE has assembled the result and the Visualisation Ontology has selected the chart contract — making a single, tightly-scoped call to a language model with one purpose: summarise the structured result in plain language, anchored strictly to the computed values.
 
 The NSE is not a general-purpose AI model with access to the query, the user's intent, or the SMR. Its prompt is constructed entirely from the assembled result: metric labels, row values, units, and dimension names. It is told what the data shows; it is not told what the user asked. This constraint is intentional — it prevents the narrative from interpreting, recommending, or inferring beyond what was computed.
 
@@ -1030,7 +1030,7 @@ The Analytics Engine is headless: it produces no rendered output. Every successf
 
 | Element | Field | Always present | Description |
 |---|---|---|---|
-| Display specification | `display_spec` | Yes | A Semantic Charting Language (SCL) JSON object — either a chart or table specification. Consumers render from this. |
+| Display specification | `display_spec` | Yes | A Data Visualization Language (DVL) JSON object — either a chart or table specification. Consumers render from this. |
 | Structured result | `data` | Yes | The computed rows and schema — metric values, dimension values, and units. |
 | Governed narrative | `narrative` | No (feature-flag controlled) | A governed summary produced by the NSE — `lead` (one sentence), `detail` (2–4 sentences), `anchoredTo` (result row references). Present when `features.narrativeSynthesis` is enabled. |
 | Lineage reference | `result_id` + `lineage_url` | Yes | A unique result identifier and the URL of the full lineage record |
@@ -1078,9 +1078,9 @@ The Analytics Engine is headless: it produces no rendered output. Every successf
 
 The `compliance` block is absent for standard queries. Its presence indicates the full compliance artifact tier was active for this response.
 
-### Semantic Charting Language (SCL)
+### Data Visualization Language (DVL)
 
-SCL is the JSON specification language used for the `display_spec` field. Two types share a consistent discriminated envelope.
+DVL is the JSON specification language used for the `display_spec` field. Two types share a consistent discriminated envelope.
 
 **Chart specification** (`type: "chart"`) — produced when a chart contract matches:
 
@@ -1122,7 +1122,7 @@ Column labels in table specifications come from SMR metric and dimension `displa
 
 ### Example
 
-The MCP Capability Layer assembles the SCL display specification and the NSE narrative into the final tool response:
+The MCP Capability Layer assembles the DVL display specification and the NSE narrative into the final tool response:
 
 ```json
 {
@@ -1139,7 +1139,7 @@ The MCP Capability Layer assembles the SCL display specification and the NSE nar
         "resource": {
           "uri":      "analytics://result/res-20260518-093247-wk4n",
           "mimeType": "application/vnd.analytics.scl+json",
-          "text":     "{ ... SCL grouped bar chart specification ... }"
+          "text":     "{ ... DVL grouped bar chart specification ... }"
         }
       }
     ],
@@ -1176,10 +1176,10 @@ A thin relational database search index holds only scalar fields required for fi
 
 | Element | Storage | Content |
 |---|---|---|
-| Lineage record | Object store — `lineage/{tenant_id}/{yyyy}/{mm}/{dd}/{result_id}.json` | Complete chain: tool call parameters → SMR resolution → projection record → LQP → governance decision → FQP execution record → result schema → visualisation contract → narrative synthesis status |
+| Lineage record | Object store — `lineage/{tenant_id}/{yyyy}/{mm}/{dd}/{result_id}.json` | Complete chain: tool call parameters → SMR resolution → projection record → LQP → governance decision → FQE execution record → result schema → visualisation contract → narrative synthesis status |
 | SMR snapshot | Embedded in lineage record (`resolved_metrics`) | For each metric in the query: metric ID, SMR definition version at query time |
 | Projection record | Embedded in lineage record | Roles, requested metrics, projected metrics, blocked metrics, row predicates, column masks |
-| FQP execution record | Embedded in lineage record (`sub_plans`) | Sub-plan details, engine IDs, latencies, cost units, cache hit status |
+| FQE execution record | Embedded in lineage record (`sub_plans`) | Sub-plan details, engine IDs, latencies, cost units, cache hit status |
 | Governance decision | Embedded in lineage record (`governance_decision`) | Circuit breaker decisions, classification gates, cost limit checks — including blocked queries |
 | Search index row | Relational database `analytics.lineage_index` | Scalar fields for filtered search — `result_id`, `tenant_id`, `user_sub`, `compliance_mode`, `error_code`, `cache_hit`, `created_at`, `expires_at` |
 | Result artefact | Object storage | CSV result set, chart SVG, narrative text — stored per query |
@@ -1238,9 +1238,9 @@ Audit export packages include query records with timestamps and user identifiers
 
 Two lineage writes occur for this query — one before execution, one after.
 
-The first is written by SEG before the FQP is invoked — capturing the governance decision regardless of whether execution succeeds. The second is written by the FQP after execution, producing the full lineage document at `lineage/acme-wealth/2026/05/18/res-20260518-093247-wk4n.json`.
+The first is written by SEG before the FQE is invoked — capturing the governance decision regardless of whether execution succeeds. The second is written by the FQE after execution, producing the full lineage document at `lineage/acme-wealth/2026/05/18/res-20260518-093247-wk4n.json`.
 
-**Governance decision record (written to object store before FQP execution):**
+**Governance decision record (written to object store before FQE execution):**
 ```json
 {
   "result_id":  "res-20260518-093247-wk4n",
@@ -1253,7 +1253,7 @@ The first is written by SEG before the FQP is invoked — capturing the governan
 }
 ```
 
-**Full lineage document (written to object store after FQP completes, at `lineage/acme-wealth/2026/05/18/res-20260518-093247-wk4n.json`):**
+**Full lineage document (written to object store after FQE completes, at `lineage/acme-wealth/2026/05/18/res-20260518-093247-wk4n.json`):**
 ```json
 {
   "result_id":         "res-20260518-093247-wk4n",
@@ -1298,7 +1298,7 @@ The document is immutable from the moment of writing. A corresponding row is ins
 
 > **Governing principles:** [P2 — Governance before execution](./00-overview.md#design-principles) · [P5 — Role-aware by default](./00-overview.md#design-principles)
 
-The MCP Capability Layer exposes the platform's governed analytical operations to AI orchestrators via MCP Streamable HTTP transport. Each capability is a bounded, named operation with a typed input schema, a governed execution path through the full platform pipeline (Semantic Intent Layer → Role-Aware Projection → SEG → FQP), and a typed output contract. AI agents interact with capabilities, not databases. There is no privileged API path — AI agents receive the same governance-validated results as human users.
+The MCP Capability Layer exposes the platform's governed analytical operations to AI orchestrators via MCP Streamable HTTP transport. Each capability is a bounded, named operation with a typed input schema, a governed execution path through the full platform pipeline (Semantic Intent Layer → Role-Aware Projection → SEG → FQE), and a typed output contract. AI agents interact with capabilities, not databases. There is no privileged API path — AI agents receive the same governance-validated results as human users.
 
 ### Tool Catalogue
 
@@ -1334,8 +1334,8 @@ Each SMR operation carries an `execution_profile` defined in its `analytical_ope
 
 | Profile | Pipeline stages |
 |---|---|
-| `data_retrieval` | Auth → RAPL → FQP → Lineage |
-| `metric_query` | Auth → RAPL → SIL → SEG → FQP → Lineage |
+| `data_retrieval` | Auth → RAPL → FQE → Lineage |
+| `metric_query` | Auth → RAPL → SIL → SEG → FQE → Lineage |
 | `full_analytical` | Full pipeline including Visualisation Ontology + Narrative Synthesis Engine |
 
 ### Intent Confirmation Card
@@ -1363,7 +1363,7 @@ The card surfaces the resolved `operation_id`, metric IDs, dimensions, filters, 
 
 ### Capability Governance
 
-Every capability invocation passes through the full governance pipeline: input schema validation → capability availability check (feature flags and role entitlements) → Semantic Intent Layer → Role-Aware Projection → Semantic Execution Governance → FQP → result assembly → lineage record write. Capability availability is declared in the MCP manifest; a capability not enabled by a feature flag or accessible to the user's role appears as `available: false` with a reason.
+Every capability invocation passes through the full governance pipeline: input schema validation → capability availability check (feature flags and role entitlements) → Semantic Intent Layer → Role-Aware Projection → Semantic Execution Governance → FQE → result assembly → lineage record write. Capability availability is declared in the MCP manifest; a capability not enabled by a feature flag or accessible to the user's role appears as `available: false` with a reason.
 
 ### MCP Registration
 
@@ -1373,7 +1373,7 @@ The following registration JSON declares the Analytics Platform to an AI Chat Pl
 {
   "id":          "analytics-platform",
   "name":        "Analytics Platform",
-  "description": "Governed analytical query engine for portfolio performance, risk, and regulatory metrics. All queries are validated against the Semantic Metrics Registry, subject to role-based entitlement projection, and governed by cost and compliance circuit breakers before execution.",
+  "description": "Governed analytical query engine for portfolio performance, risk, and regulatory metrics. All queries are validated against the Semantic Metrics Repository, subject to role-based entitlement projection, and governed by cost and compliance circuit breakers before execution.",
   "endpoint":    "https://api.analytics-platform.io/v1/mcp",
   "authType":    "bearer",
   "accessTier":  "always-on",

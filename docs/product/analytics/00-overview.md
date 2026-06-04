@@ -288,7 +288,7 @@ display_intent: chart  →  metric vs threshold across entities with breakdown �
 ```
 
 **3 · Metric and entitlement resolution**
-`var_95` and `risk_factor_contribution` resolve to their approved registry definitions — VaR is a versioned, formula-specific computation that must be calculated identically across every report. The Federated Query Planner identifies that these metrics are served by two independent backends: VaR metrics are registered against the risk engine execution backend; portfolio metadata and limits are registered against the primary data warehouse. The user's entitlement scope is projected, restricting results to portfolios within the risk officer's authorised coverage.
+`var_95` and `risk_factor_contribution` resolve to their approved registry definitions — VaR is a versioned, formula-specific computation that must be calculated identically across every report. The Federated Query Engine identifies that these metrics are served by two independent backends: VaR metrics are registered against the risk engine execution backend; portfolio metadata and limits are registered against the primary data warehouse. The user's entitlement scope is projected, restricting results to portfolios within the risk officer's authorised coverage.
 
 ```
 -- Metric & Entitlement Resolution
@@ -302,7 +302,7 @@ entitlements: user_scope → [authorised_portfolio_list]
 ```
 
 **4 · Query planning, governance, and execution**
-The Federated Query Planner decomposes the Logical Query Plan into two independent sub-plans and routes each to its registered backend. Both sub-plans execute in parallel. The planner assembles the joined result — breach status and dominant contributing factor per portfolio — before passing it downstream. Each sub-plan execution is recorded in the lineage store independently, with the assembled result linked to both records.
+The Federated Query Engine decomposes the Logical Query Plan into two independent sub-plans and routes each to its registered backend. Both sub-plans execute in parallel. The planner assembles the joined result — breach status and dominant contributing factor per portfolio — before passing it downstream. Each sub-plan execution is recorded in the lineage store independently, with the assembled result linked to both records.
 
 ```sql
 -- Sub-plan A  →  risk_engine_backend

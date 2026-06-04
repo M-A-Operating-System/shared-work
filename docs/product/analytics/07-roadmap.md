@@ -29,7 +29,7 @@ This document describes one proposed sequence of deliverables for the AI Analyti
 <td>Create new React web application over the Platform Admin API; build metric definition editor with YAML preview, entitlement policy builder with role-to-metric mapping UI, Data Source Catalog manager, and governance threshold controls</td>
 </tr>
 <tr>
-<td>Semantic Metrics Registry (SMR)</td>
+<td>Semantic Metrics Repository (SMR)</td>
 <td>Extend the pre-existing Semantic Data Context Store (DCS) with three new document types — <code>analytical_metric</code>, <code>analytical_dimension</code>, and <code>analytical_operation</code>; status field (<code>proposed → in_review → approved → deprecated → retired</code>) on each document drives the DCS native approval workflow with one approved version enforced per <code>(tenant_id, id)</code>; reuse the DCS native search index for <code>list_operations</code> queries — no separate search infrastructure required; expose document authoring and approval via the Platform Admin API</td>
 </tr>
 <tr>
@@ -46,19 +46,19 @@ This document describes one proposed sequence of deliverables for the AI Analyti
 </tr>
 <tr>
 <td>Role-Aware Projection Layer</td>
-<td>Build new service implementing JWT claim extraction (<code>roles</code>, <code>managed_portfolios</code>, <code>entity_ids</code>); implement role definition template store in PostgreSQL; build row predicate injector that materialises WHERE clause conditions from role templates and attaches them to the LQP before FQP dispatch; implement column mask registry and apply masks at result assembly; enforce <code>defaultDenyAll: true</code> — return <code>ENTITLEMENT_DENIED</code> for any user with no matching role before any query executes</td>
+<td>Build new service implementing JWT claim extraction (<code>roles</code>, <code>managed_portfolios</code>, <code>entity_ids</code>); implement role definition template store in PostgreSQL; build row predicate injector that materialises WHERE clause conditions from role templates and attaches them to the LQP before FQE dispatch; implement column mask registry and apply masks at result assembly; enforce <code>defaultDenyAll: true</code> — return <code>ENTITLEMENT_DENIED</code> for any user with no matching role before any query executes</td>
 </tr>
 <tr>
 <td>Semantic Execution Governance</td>
 <td>Build new governance pipeline service with five sequential steps: (1) cost estimation against a configurable cost unit model, (2) classification gate checking the LQP's metric data sensitivity levels against the requesting role's clearance, (3) circuit breaker checks for query complexity score, per-tenant cost budget, and per-user rate limit, (4) governance decision record written to the lineage store before any backend call, (5) pass-through or structured rejection with decision reason; read per-tenant governance config from a <code>governance_config</code> document in the DCS at startup and refresh on DCS change events — config is not stored in a separate database table; all decisions logged with microsecond timestamps</td>
 </tr>
 <tr>
-<td>Federated Query Planner (FQP)</td>
+<td>Federated Query Engine (FQE)</td>
 <td>Integrate Apache Calcite as the SQL sub-plan optimiser; implement pluggable backend adapter interface; build SQL warehouse adapter with connection pooling for Snowflake, BigQuery, Databricks, Redshift, Trino, and PostgreSQL; build semantic layer adapter for dbt MetricFlow and Cube.js; build OpenData REST/OData adapter; implement in-process result fan-out, sub-plan execution, and assembly; add per-tenant result cache keyed on SHA-256 of the LQP with TTL configurable per metric refresh cadence</td>
 </tr>
 <tr>
 <td>Visualisation Ontology</td>
-<td>Define eight named chart contracts in a versioned contract registry (multi-series bar, time-series line, heatmap, treemap, scatter, waterfall, stacked bar, ranked bar); implement deterministic chart selector that maps result schema shape and intent pattern to a contract — no LLM invocation; implement SCL display spec generator producing Vega-Lite v5 JSON conforming to the selected contract; add <code>type: "table"</code> extension for tabular results</td>
+<td>Define eight named chart contracts in a versioned contract registry (multi-series bar, time-series line, heatmap, treemap, scatter, waterfall, stacked bar, ranked bar); implement deterministic chart selector that maps result schema shape and intent pattern to a contract — no LLM invocation; implement DVL display spec generator producing Vega-Lite v5 JSON conforming to the selected contract; add <code>type: "table"</code> extension for tabular results</td>
 </tr>
 <tr>
 <td>Narrative Synthesis Engine</td>
@@ -66,11 +66,11 @@ This document describes one proposed sequence of deliverables for the AI Analyti
 </tr>
 <tr>
 <td>Analytical Lineage Store</td>
-<td>Provision S3-compatible object store bucket with date-partitioned key structure (<code>lineage/{tenant_id}/{yyyy}/{mm}/{dd}/{result_id}.json</code>); implement write-once JSON document serialiser covering the full query record (request payload, resolved metric versions, governance decision, sub-plans, assembled result, SCL display spec, compliance metadata); implement write path called by the Semantic Execution Governance service before any backend execution and by the FQP on completion; create lightweight <code>analytics.lineage_index</code> PostgreSQL table (scalar fields only — no JSON payloads) for future search queries; configure object lifecycle policy for 7-year default retention; post-hoc compliance annotations written as sibling amendment documents, never mutating the original record</td>
+<td>Provision S3-compatible object store bucket with date-partitioned key structure (<code>lineage/{tenant_id}/{yyyy}/{mm}/{dd}/{result_id}.json</code>); implement write-once JSON document serialiser covering the full query record (request payload, resolved metric versions, governance decision, sub-plans, assembled result, DVL display spec, compliance metadata); implement write path called by the Semantic Execution Governance service before any backend execution and by the FQE on completion; create lightweight <code>analytics.lineage_index</code> PostgreSQL table (scalar fields only — no JSON payloads) for future search queries; configure object lifecycle policy for 7-year default retention; post-hoc compliance annotations written as sibling amendment documents, never mutating the original record</td>
 </tr>
 <tr>
 <td>vega2img Rendering Service</td>
-<td>Build as a standalone MCP server (not part of the Analytics Platform); implement Vite + vega-embed + headless Chromium via Playwright; expose SCL spec rendering (Vega-Lite v5 → SVG or PNG) and <code>type: "table"</code> rendering via styled HTML template as MCP tools; consumers (AI Chat Platform, agentic consumers) register vega2img as a peer MCP server alongside the Analytics Platform — the Analytics Platform does not call vega2img directly</td>
+<td>Build as a standalone MCP server (not part of the Analytics Platform); implement Vite + vega-embed + headless Chromium via Playwright; expose DVL spec rendering (Vega-Lite v5 → SVG or PNG) and <code>type: "table"</code> rendering via styled HTML template as MCP tools; consumers (AI Chat Platform, agentic consumers) register vega2img as a peer MCP server alongside the Analytics Platform — the Analytics Platform does not call vega2img directly</td>
 </tr>
 <tr>
 <td>Knowledge Store</td>
@@ -87,11 +87,11 @@ This document describes one proposed sequence of deliverables for the AI Analyti
 </tr>
 <tr>
 <td>Alert Threshold Engine</td>
-<td>Create <code>alert_thresholds</code> table in PostgreSQL linked to scheduled queries; implement threshold evaluator service that iterates each result row after FQP assembly and evaluates up to ten conditions per query using <code>gt</code>, <code>lt</code>, <code>gte</code>, <code>lte</code>, <code>eq</code>, <code>pct_change_gt</code> operators; write a breach event record to the lineage store for each triggered condition and enqueue a delivery job</td>
+<td>Create <code>alert_thresholds</code> table in PostgreSQL linked to scheduled queries; implement threshold evaluator service that iterates each result row after FQE assembly and evaluates up to ten conditions per query using <code>gt</code>, <code>lt</code>, <code>gte</code>, <code>lte</code>, <code>eq</code>, <code>pct_change_gt</code> operators; write a breach event record to the lineage store for each triggered condition and enqueue a delivery job</td>
 </tr>
 <tr>
 <td>Push Delivery Service</td>
-<td>Create <code>delivery_endpoints</code> table and delivery job queue; implement three delivery adapters — HTTPS webhook (POST with HMAC signature), SMTP email, and Slack via Slack MCP server; build delivery payload serialiser including <code>result_id</code>, threshold description, SCL display spec, and lineage URL; implement exponential-backoff retry with max attempts configurable per endpoint; log undeliverable events to the audit trail</td>
+<td>Create <code>delivery_endpoints</code> table and delivery job queue; implement three delivery adapters — HTTPS webhook (POST with HMAC signature), SMTP email, and Slack via Slack MCP server; build delivery payload serialiser including <code>result_id</code>, threshold description, DVL display spec, and lineage URL; implement exponential-backoff retry with max attempts configurable per endpoint; log undeliverable events to the audit trail</td>
 </tr>
 <tr>
 <td>Scheduled Query Admin UI</td>
@@ -192,11 +192,11 @@ This document describes one proposed sequence of deliverables for the AI Analyti
 </tr>
 <tr>
 <td>Regulatory Reference Service Adapter</td>
-<td>Implement new FQP backend adapter registering the Regulatory Reference Service with <code>dataAffinity: ["regulatory"]</code>; extend the FQP backend selector to route all sub-plans with <code>regulatory</code> affinity to this adapter first; implement automatic fallback to the next registered <code>regulatory</code> backend with a structured partial-result warning when the service is unavailable; implement threshold update notification handler that triggers an Admin Console alert when the service publishes new regulatory thresholds</td>
+<td>Implement new FQE backend adapter registering the Regulatory Reference Service with <code>dataAffinity: ["regulatory"]</code>; extend the FQE backend selector to route all sub-plans with <code>regulatory</code> affinity to this adapter first; implement automatic fallback to the next registered <code>regulatory</code> backend with a structured partial-result warning when the service is unavailable; implement threshold update notification handler that triggers an Admin Console alert when the service publishes new regulatory thresholds</td>
 </tr>
 <tr>
 <td>Benchmark Data Service Adapter</td>
-<td>Implement new FQP backend adapter registering the Benchmark Data Service with <code>dataAffinity: ["benchmarks"]</code>; add per-tenant licensing record table in PostgreSQL; implement licensing check in the adapter before any index data is returned, returning <code>BENCHMARK_NOT_LICENSED</code> for unlicensed indices; implement custom benchmark blend registration via the Benchmark Data Service Admin API, storing blend IDs accessible through the <code>benchmark</code> dimension field</td>
+<td>Implement new FQE backend adapter registering the Benchmark Data Service with <code>dataAffinity: ["benchmarks"]</code>; add per-tenant licensing record table in PostgreSQL; implement licensing check in the adapter before any index data is returned, returning <code>BENCHMARK_NOT_LICENSED</code> for unlicensed indices; implement custom benchmark blend registration via the Benchmark Data Service Admin API, storing blend IDs accessible through the <code>benchmark</code> dimension field</td>
 </tr>
 
 <!-- ── Phase 8 ── -->
@@ -225,12 +225,12 @@ This document describes one proposed sequence of deliverables for the AI Analyti
 <td rowspan="3">9</td>
 <td rowspan="3"><strong>Cross-Backend Drilldown</strong></td>
 <td>Cross-Backend Affinity Resolver</td>
-<td>Extend the FQP to inspect the <code>dataAffinity</code> of each hierarchy level in a drilldown traversal; implement boundary detection logic that identifies the point at which the traversal crosses from one affinity domain to another; route child-level sub-plans to the backend registered for the child domain, carrying forward the parent result's governance context, projection scope, and row predicates to the child sub-plan dispatcher</td>
+<td>Extend the FQE to inspect the <code>dataAffinity</code> of each hierarchy level in a drilldown traversal; implement boundary detection logic that identifies the point at which the traversal crosses from one affinity domain to another; route child-level sub-plans to the backend registered for the child domain, carrying forward the parent result's governance context, projection scope, and row predicates to the child sub-plan dispatcher</td>
 <td rowspan="3">Analysts drill from a warehouse-sourced aggregate into graph-backed entity relationships in one continuous navigation; the backend boundary is transparent to the consumer and the full cross-backend traversal is captured in a single lineage record</td>
 </tr>
 <tr>
 <td>Drilldown Result Merger</td>
-<td>Extend the FQP result assembly layer to handle multi-backend drilldown results; implement a dimension-key join that matches child rows from the secondary backend back to parent rows using shared dimension keys (e.g. <code>issuer_id</code>); produce a single unified SCL display spec from the merged result; return a structured <code>CHILD_BACKEND_UNAVAILABLE</code> error rather than a partial result with a silent gap if the child-level backend cannot be reached</td>
+<td>Extend the FQE result assembly layer to handle multi-backend drilldown results; implement a dimension-key join that matches child rows from the secondary backend back to parent rows using shared dimension keys (e.g. <code>issuer_id</code>); produce a single unified DVL display spec from the merged result; return a structured <code>CHILD_BACKEND_UNAVAILABLE</code> error rather than a partial result with a silent gap if the child-level backend cannot be reached</td>
 </tr>
 <tr>
 <td>Cross-Backend Drilldown Lineage</td>
@@ -242,16 +242,16 @@ This document describes one proposed sequence of deliverables for the AI Analyti
 <td rowspan="4">10</td>
 <td rowspan="4"><strong>Advanced Query Capabilities</strong></td>
 <td>Ranking and Percentile Parameters</td>
-<td>Extend the Semantic Intent Layer JSON schema to add <code>rank_by</code>, <code>rank_direction</code>, <code>rank_limit</code>, and <code>rank_percentile</code> parameters; extend the FQP result assembly layer to apply ranking after all backend sub-results are assembled into the full result set, ensuring cross-backend results are ranked as a unified dataset rather than per-backend</td>
+<td>Extend the Semantic Intent Layer JSON schema to add <code>rank_by</code>, <code>rank_direction</code>, <code>rank_limit</code>, and <code>rank_percentile</code> parameters; extend the FQE result assembly layer to apply ranking after all backend sub-results are assembled into the full result set, ensuring cross-backend results are ranked as a unified dataset rather than per-backend</td>
 <td rowspan="4">Complex analytical queries — ranking, rolling windows, stress scenario comparisons, and composite benchmarks — are expressible as a single governed call; consumers receive a complete, join-ready result set without requiring multi-call composition</td>
 </tr>
 <tr>
 <td>Window Analytics Parameters</td>
-<td>Extend the Semantic Intent Layer JSON schema to add <code>window_op</code> (<code>moving_average</code>, <code>rolling_sum</code>, <code>period_over_period</code>), <code>window_size</code>, and <code>window_anchor</code> parameters; implement window computation in the FQP result assembly layer — computed against the fully assembled result set, not delegated to individual backends — to guarantee consistent behaviour across all registered backend types</td>
+<td>Extend the Semantic Intent Layer JSON schema to add <code>window_op</code> (<code>moving_average</code>, <code>rolling_sum</code>, <code>period_over_period</code>), <code>window_size</code>, and <code>window_anchor</code> parameters; implement window computation in the FQE result assembly layer — computed against the fully assembled result set, not delegated to individual backends — to guarantee consistent behaviour across all registered backend types</td>
 </tr>
 <tr>
 <td>Scenario Comparison Parameter</td>
-<td>Add <code>scenario_definitions</code> table to the SMR PostgreSQL schema; extend the Platform Admin API with scenario definition CRUD; extend the Semantic Intent Layer JSON schema to add a <code>scenario</code> parameter referencing a registered scenario ID; extend the FQP result assembly layer to perform scenario delta computation, producing a three-column result set (actual value, scenario value, delta) from a single query execution</td>
+<td>Add <code>scenario_definitions</code> table to the SMR PostgreSQL schema; extend the Platform Admin API with scenario definition CRUD; extend the Semantic Intent Layer JSON schema to add a <code>scenario</code> parameter referencing a registered scenario ID; extend the FQE result assembly layer to perform scenario delta computation, producing a three-column result set (actual value, scenario value, delta) from a single query execution</td>
 </tr>
 <tr>
 <td>Inline Composite Benchmark</td>
@@ -276,15 +276,15 @@ This document describes one proposed sequence of deliverables for the AI Analyti
 </tr>
 <tr>
 <td>NDJSON Result Streaming and Progress Events</td>
-<td>Extend the MCP Capability Layer to support a streaming response mode; extend the FQP to emit four ordered progress events during execution (<code>intent_resolved</code>, <code>entitlements_applied</code>, <code>plan_compiled</code>, <code>executing</code>); implement NDJSON frame serialisation delivering each backend sub-result as it arrives followed by a terminal frame containing the complete assembled result, SCL display spec, and lineage URL; maintain backward compatibility with existing non-streaming consumers</td>
+<td>Extend the MCP Capability Layer to support a streaming response mode; extend the FQE to emit four ordered progress events during execution (<code>intent_resolved</code>, <code>entitlements_applied</code>, <code>plan_compiled</code>, <code>executing</code>); implement NDJSON frame serialisation delivering each backend sub-result as it arrives followed by a terminal frame containing the complete assembled result, DVL display spec, and lineage URL; maintain backward compatibility with existing non-streaming consumers</td>
 </tr>
 <tr>
-<td>FQP Adaptive Planning</td>
-<td>Add <code>backend_latency_stats</code> table to PostgreSQL; extend the FQP to record observed p50 and p95 execution latency per backend after every query; implement adaptive routing logic that compares current observed latency against the rolling baseline and reroutes to the next registered backend with matching <code>dataAffinity</code> when degradation exceeds a configurable multiplier; log all routing decisions in the lineage record's <code>meta.backendsUsed</code> field</td>
+<td>FQE Adaptive Planning</td>
+<td>Add <code>backend_latency_stats</code> table to PostgreSQL; extend the FQE to record observed p50 and p95 execution latency per backend after every query; implement adaptive routing logic that compares current observed latency against the rolling baseline and reroutes to the next registered backend with matching <code>dataAffinity</code> when degradation exceeds a configurable multiplier; log all routing decisions in the lineage record's <code>meta.backendsUsed</code> field</td>
 </tr>
 <tr>
 <td>Materialised View Registration</td>
-<td>Create <code>materialised_views</code> table in PostgreSQL storing named pre-computed result templates (metric IDs, dimensions, time expression) with a cron refresh schedule; extend the Scheduled Query Service to execute registered materialised view refreshes and write results to a dedicated cache store; extend the FQP query matcher to detect when an incoming LQP matches a registered materialised view and route to the cache store; extend the Semantic Execution Governance cost estimator to apply an 800-unit cost reduction for matched materialised view queries</td>
+<td>Create <code>materialised_views</code> table in PostgreSQL storing named pre-computed result templates (metric IDs, dimensions, time expression) with a cron refresh schedule; extend the Scheduled Query Service to execute registered materialised view refreshes and write results to a dedicated cache store; extend the FQE query matcher to detect when an incoming LQP matches a registered materialised view and route to the cache store; extend the Semantic Execution Governance cost estimator to apply an 800-unit cost reduction for matched materialised view queries</td>
 </tr>
 
 </tbody>

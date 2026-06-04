@@ -2,7 +2,7 @@
 
 Metrics are captured from day one at both the platform level (across all tenants) and the application level (per tenant). Governance health metrics are first-class success indicators. A platform that is highly used but poorly governed is not successful.
 
-Component definitions referenced in the metrics below (SMR, FQP, RAPL, SEG, NSE, Lineage Store) are in [Chapter 2 -- Core Platform Capabilities](./02-core-capabilities.md). [Analytical Lineage Store](./02-core-capabilities.md#analytical-lineage-store) · [Semantic Execution Governance](./02-core-capabilities.md#semantic-execution-governance) · [Narrative Synthesis Engine](./02-core-capabilities.md#narrative-synthesis-engine)
+Component definitions referenced in the metrics below (SMR, FQE, RAPL, SEG, NSE, Lineage Store) are in [Chapter 2 -- Core Platform Capabilities](./02-core-capabilities.md). [Analytical Lineage Store](./02-core-capabilities.md#analytical-lineage-store) · [Semantic Execution Governance](./02-core-capabilities.md#semantic-execution-governance) · [Narrative Synthesis Engine](./02-core-capabilities.md#narrative-synthesis-engine)
 
 ---
 
@@ -11,9 +11,9 @@ Component definitions referenced in the metrics below (SMR, FQP, RAPL, SEG, NSE,
 | Metric | Definition | Target |
 |--------|-----------|--------|
 | **Active tenants** | Tenants with at least one successful query execution in the 7-day window | Growth metric — tracked weekly |
-| **Platform uptime** | API availability (p99 end-to-end latency < 2s including FQP backend execution; error rate < 0.1%) | 99.9% |
+| **Platform uptime** | API availability (p99 end-to-end latency < 2s including FQE backend execution; error rate < 0.1%) | 99.9% |
 | **Governance block rate** | Queries blocked by governance checks ÷ total queries | Monitor — sustained > 15% warrants investigation; > 30% triggers mandatory configuration review (see §6.3) |
-| **FQP error rate** | Queries with FQP execution errors ÷ total executed queries | < 2% |
+| **FQE error rate** | Queries with FQE execution errors ÷ total executed queries | < 2% |
 | **Cache hit rate** | Queries served from result cache ÷ total executed queries | ≥ 35% by month 2 |
 | **Lineage completeness** | Queries with complete lineage records ÷ total queries | **100%** — any deviation is a platform defect |
 | **SMR registry health** | Metrics with no owner OR not updated in 12 months ÷ total active metrics | < 5% |
@@ -84,7 +84,7 @@ Component definitions referenced in the metrics below (SMR, FQP, RAPL, SEG, NSE,
 
 | Cadence | Activity | Owner |
 |---------|----------|-------|
-| **Daily** | Lineage completeness check; FQP error rate; classification gate spike detection | Platform Engineering (automated) |
+| **Daily** | Lineage completeness check; FQE error rate; classification gate spike detection | Platform Engineering (automated) |
 | **Weekly** | WAU; governance block rate; SMR approval backlog; engine error rate per tenant | Platform Engineering + Application Admin |
 | **Monthly** | Full metric review; query quality analysis; SMR health report; narrative validation rate | Platform team + Application Admins |
 | **Day 90 (per tenant)** | WAU adoption assessment (50% target); drilldown adoption; export rate | Application Admin + Platform team |
