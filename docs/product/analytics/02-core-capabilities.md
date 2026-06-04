@@ -23,29 +23,30 @@ The platform operates across three distinct planes: an **analytical plane** (que
 | **Integration Engineer** | Controls | Registers execution backends, maintains connection configuration, and declares the physical mappings that the Federated Query Engine resolves at execution time. Operates through configuration interfaces only — not the query path |
 | **Platform Admin** | Infrastructure | Infrastructure and operations team. Responsible for platform health, deployment, infrastructure-level governance, and technical platform configuration including controls settings, feature flags, and deployment configuration. Implements the technical policies and settings determined by Analytics Governance. Has no query interface into analytical data |
 
-**Provenance Artifacts are not a role feature.** Any entitled user querying a compliance-relevant metric for a compliance-stated purpose receives the full enhanced artifact set — regulatory trace, export gate, and lineage-locked output — automatically. This is determined at runtime by metric metadata and AI intent classification, not by a dedicated role or claim.
-
 **Roles are not mutually exclusive.** A single individual may hold multiple roles; the platform evaluates entitlements from the combined JWT claims present at query time.
 
 The **Data Modeller** and **Metrics Modeller** are the critical pre-conditions for everything downstream. No analytical query can be served against a metric that has not been modelled, registered, and approved. The Data Modeller establishes the foundational data definitions in the SDR — without accurate data structure definitions, metric definitions cannot be built. The Metrics Modeller builds on that foundation to define the analytical layer in the SMR — without registered, approved metric definitions, the controls pipeline, the entitlement layer, the lineage store, and the Data Visualization Language (DVL) have nothing to operate on. Analytics Governance holds final approval authority over both layers.
 
 ### Role × Feature Access
 
-| Feature | End User | Power Analyst | Semantic Modeller | Metric Owner | App Admin | Integration Eng | Platform Admin |
-|---------|:--------:|:-------------:|:-----------------:|:------------:|:---------:|:---------------:|:--------------:|
-| Natural language query | ✓ | ✓ | ✓ | | ✓ | | |
-| Role-aware results | ✓ | ✓ | ✓ | | ✓ | | |
-| Governed drilldown | | ✓ | ✓ | | ✓ | | |
-| Lineage inspector | | ✓ | ✓ | ✓ | ✓ | | |
-| Result export | ✓ | ✓ | ✓ | | ✓ | | |
-| SMR browsing | | ✓ | ✓ | ✓ | ✓ | | |
-| Metric definition authoring | | | ✓ | | | | |
-| Metric definition approval | | | | ✓ | ✓ | | |
-| Dimension & hierarchy management | | | ✓ | | ✓ | | |
-| Entitlement policy management | | | | | ✓ | | |
-| Backend registration | | | | | | ✓ | |
-| Audit trail | | | | | ✓ | ✓ | ✓ |
-| Platform infrastructure | | | | | | | ✓ |
+| Feature | End User | Power Analyst | Data Modeller | Metrics Modeller | Entitlements Mgr | Analytics Governance | Integration Eng | Platform Admin |
+|---------|:--------:|:-------------:|:-------------:|:----------------:|:----------------:|:--------------------:|:---------------:|:--------------:|
+| Natural language query | ✓ | ✓ | | ✓ | | ✓ | | |
+| Role-aware results | ✓ | ✓ | | ✓ | | ✓ | | |
+| Governed drilldown | | ✓ | | ✓ | | ✓ | | |
+| Lineage inspector | | ✓ | ✓ | ✓ | | ✓ | | |
+| Result export | | ✓ | | ✓ | | ✓ | | |
+| Provenance artifacts | ✓ | ✓ | | ✓ | | ✓ | | |
+| SMR browsing | | ✓ | ✓ | ✓ | ✓ | ✓ | | |
+| SDR management | | | ✓ | | | | | |
+| Metric definition authoring | | | | ✓ | | | | |
+| Metric definition approval | | | | | | ✓ | | |
+| Dimension & hierarchy management | | | | ✓ | | ✓ | | |
+| Entitlement policy management | | | | | ✓ | ✓ | | |
+| Backend registration | | | | | | | ✓ | |
+| Controls configuration | | | | | | | | ✓ |
+| Audit trail | | | | | ✓ | ✓ | ✓ | ✓ |
+| Platform infrastructure | | | | | | | | ✓ |
 
 ---
 
