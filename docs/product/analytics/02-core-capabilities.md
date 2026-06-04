@@ -80,10 +80,10 @@ flowchart TD
             vega2img["vega2img (optional)\nStandalone MCP render service · DVL → SVG / PNG\nRegistered directly with consumers — not part of Analytics Engine"]
     end
 
-    subgraph dcr["Data Context Repository(DCR)"]
+    subgraph dcs["Data Context Store (DCS)"]
         SMR[("Semantic Metrics Repository(SMR)\nmetric definitions, dimensions, hierarchies, aggregation rules, governance, access policies, compliance rules ")]
-        DCS[("Semantic Data Context Store (DCS)\n data definitions, data models, object models, critical data elements, quality rules, physical schemas, data lineage,")]
-        SMR --> DCS
+        SDR[("Semantic Data Repository (SDR)\n data definitions, data models, object models, critical data elements, quality rules, physical schemas, data lineage,")]
+        SMR --> SDR
     end
 
     subgraph backends["Data Sources"]
@@ -242,9 +242,9 @@ The Semantic Metrics Repository (SMR) is the governing catalogue of every analyt
 
 ### Concept Types
 
-The SMR is composed of three DCS document types:
+The SMR is composed of three SDR document types:
 
-| DCS document type | Description |
+| SDR document type | Description |
 |---|---|
 | **`analytical_metric`** | Metric definition — formula, aggregation, `data_affinity`, `physical_mapping`, `required_dimensions`, `cost_weight`, `classification_level`, `compliance_modes` |
 | **`analytical_dimension`** | Dimension definition — `data_affinity`, `physical_mapping`, enumerated values or `hierarchical` flag, `hierarchy_levels` |
@@ -356,11 +356,11 @@ The SMR formula language expresses metric computation logic in terms of other re
 
 ### SMR Authoring and Discovery
 
-The SMR is backed by the DCS, which handles document creation, versioning, and the approval workflow natively. There are no custom MCP tools for metric authoring. Administrators create, edit, and approve `analytical_metric`, `analytical_dimension`, and `analytical_operation` documents using the DCS's existing authoring capabilities.
+The SMR is backed by the SDR, which handles document creation, versioning, and the approval workflow natively. There are no custom MCP tools for metric authoring. Administrators create, edit, and approve `analytical_metric`, `analytical_dimension`, and `analytical_operation` documents using the SDR's existing authoring capabilities.
 
 **Discovery** — AI models and agents discover available operations by calling the `list_operations` MCP tool (defined in the MCP Capability Layer). `list_operations` returns operation IDs, display names, required parameters, supported metrics, supported dimensions, and execution profiles for all approved operations within the caller's entitlement scope. There are no `smr://` MCP resource URIs and no separate `list_metrics`, `get_metric_definition`, `propose_metric`, or `approve_metric` MCP tools.
 
-The internal resolution calls made by the Semantic Intent Layer and Federated Query Engine query the DCS directly. There is no separate internal API. The SMR's governance workflow (Draft → Proposed → In Review → Approved → Deprecated → Retired) is managed through the DCS's existing authoring capabilities, not by custom MCP tools.
+The internal resolution calls made by the Semantic Intent Layer and Federated Query Engine query the SDR directly. There is no separate internal API. The SMR's governance workflow (Draft → Proposed → In Review → Approved → Deprecated → Retired) is managed through the SDR's existing authoring capabilities, not by custom MCP tools.
 
 ### Example
 
@@ -374,7 +374,7 @@ The SIL asks the SMR to resolve the `compare_portfolios` operation, then resolve
 
 > **Governing principles:** [P2 — Governance before execution](./00-overview.md#design-principles) · [P10 — Deterministic computation, not generation](./00-overview.md#design-principles)
 
-The Semantic Intent Layer receives a structured MCP tool call (an `operation_id` and a `params` dict) and produces a validated, platform-agnostic Logical Query Plan (LQP). It is entirely deterministic: no AI model runs inside it. Its purpose is to: (1) resolve the operation from the SMR DCS catalogue, (2) validate `params` against the operation's `required_params` schema, (3) resolve metric IDs within `params` against `analytical_metric` documents, (4) apply role predicates from RAPL, (5) build the LQP. The output (the LQP) contains no backend references, no SQL, and no physical schema identifiers: only analytical operations expressed against SMR-registered concepts.
+The Semantic Intent Layer receives a structured MCP tool call (an `operation_id` and a `params` dict) and produces a validated, platform-agnostic Logical Query Plan (LQP). It is entirely deterministic: no AI model runs inside it. Its purpose is to: (1) resolve the operation from the SMR SDR catalogue, (2) validate `params` against the operation's `required_params` schema, (3) resolve metric IDs within `params` against `analytical_metric` documents, (4) apply role predicates from RAPL, (5) build the LQP. The output (the LQP) contains no backend references, no SQL, and no physical schema identifiers: only analytical operations expressed against SMR-registered concepts.
 
 ### Five-Stage Validation Pipeline
 
@@ -395,7 +395,7 @@ flowchart TD
 
 ### Intent Parameter Schema
 
-All `run_analytics` calls use the same outer envelope. The `params` dict is operation-specific. Its valid keys are defined by the `required_params` and `optional_params` fields on the `analytical_operation` document in the SMR DCS catalogue.
+All `run_analytics` calls use the same outer envelope. The `params` dict is operation-specific. Its valid keys are defined by the `required_params` and `optional_params` fields on the `analytical_operation` document in the SMR SDR catalogue.
 
 | Parameter | Type | Description |
 |---|---|---|
@@ -493,7 +493,7 @@ The MCP Capability Layer forwards the structured tool call to the SIL. The SIL r
 }
 ```
 
-The SIL resolves the `compare_portfolios` operation from the SMR DCS catalogue, validates the `params` against the operation's `required_params` schema, resolves each metric ID against `analytical_metric` documents, and applies role predicates from RAPL. After SMR resolution and role projection (Stage 3), the SIL produces the Logical Query Plan:
+The SIL resolves the `compare_portfolios` operation from the SMR SDR catalogue, validates the `params` against the operation's `required_params` schema, resolves each metric ID against `analytical_metric` documents, and applies role predicates from RAPL. After SMR resolution and role projection (Stage 3), the SIL produces the Logical Query Plan:
 
 ```json
 {
@@ -1301,12 +1301,12 @@ The MCP Capability Layer exposes the platform's governed analytical operations t
 
 The Analytics Engine exposes three tools. All analytical operations are SMR-catalogue driven — the code is the execution engine, not the operation registry. The SMR owns every operation definition: what parameters it needs, what metrics and dimensions it supports, and how deeply it runs through the pipeline via its `execution_profile`.
 
-**`run_analytics(operation_id: str, params: dict, jwt: str)`** — Executes any SMR-registered operation. The operation's `execution_profile` in the DCS determines which pipeline stages run.
+**`run_analytics(operation_id: str, params: dict, jwt: str)`** — Executes any SMR-registered operation. The operation's `execution_profile` in the SDR determines which pipeline stages run.
 
 | Parameter | Required | Type | Notes |
 |---|---|---|---|
 | `operation_id` | Yes | `string` | SMR operation ID — discover via `list_operations` |
-| `params` | Yes | `object` | Operation-specific parameters; validated by the SIL against the operation's `required_params` schema in the SMR DCS catalogue |
+| `params` | Yes | `object` | Operation-specific parameters; validated by the SIL against the operation's `required_params` schema in the SMR SDR catalogue |
 | `jwt` | Yes | `string` | Bearer token; validated at request ingress before any platform computation begins |
 
 **`list_operations(domain: str | None, jwt: str)`** — Returns the SMR operation catalogue with operation IDs, display names, required parameters, supported metrics/dimensions, and execution profiles. Only operations the authenticated user is entitled to execute are returned.
@@ -1327,7 +1327,7 @@ The Analytics Engine exposes three tools. All analytical operations are SMR-cata
 
 ### Execution Profiles
 
-Each SMR operation carries an `execution_profile` defined in its `analytical_operation` DCS document. This tells the pipeline executor which stages to invoke. No execution depth is hardcoded in the MCP layer — it is always determined by the SMR catalogue.
+Each SMR operation carries an `execution_profile` defined in its `analytical_operation` SDR document. This tells the pipeline executor which stages to invoke. No execution depth is hardcoded in the MCP layer — it is always determined by the SMR catalogue.
 
 | Profile | Pipeline stages |
 |---|---|

@@ -26,10 +26,10 @@ flowchart TD
 
     vega2img["vega2img (optional)\nStandalone MCP render service · DVL → SVG / PNG\nRegistered directly with consumers — not part of Analytics Platform"]
 
-    subgraph dcr["Data Context Repository"]
-        SMR["Semantic Metrics Repository\nGovernance workflow + metric schema · extends DCS"]
-        DCS[("Semantic Data Context Store\nPre-existing · general-purpose common registry")]
-        SMR -. backed by .-> DCS
+    subgraph dcs["Data Context Store (DCS)"]
+        SMR["Semantic Metrics Repository\nGovernance workflow + metric schema · extends SDR"]
+        SDR[("Semantic Data Repository (SDR)\nPre-existing · general-purpose common registry")]
+        SMR -. backed by .-> SDR
     end
 
     subgraph backends["Execution Backends"]
@@ -56,7 +56,7 @@ flowchart TD
     NSE -->|"narrative"| Result
 ```
 
-The Semantic Data Context Store (DCS) is a pre-existing platform component: the organisation's general-purpose registry for semantic definitions. The Analytics Platform registers metric definitions as a new `analytical_metric` type in the DCS, reusing its versioned storage, full-text search, cross-definition relationships, and scoped access control. The SMR governance layer adds the approval workflow, metric-specific schema validation, and the Admin API surface on top.
+The Semantic Data Repository (SDR) is a pre-existing platform component: the organisation's general-purpose registry for semantic definitions. The Analytics Platform registers metric definitions as a new `analytical_metric` type in the SDR, reusing its versioned storage, full-text search, cross-definition relationships, and scoped access control. The SMR governance layer adds the approval workflow, metric-specific schema validation, and the Admin API surface on top.
 
 ---
 
@@ -365,16 +365,16 @@ class NarrativeSynthesisEngine:
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
-| **Definition storage** | DCS (pre-existing) | Metric and operation definitions stored alongside existing data definitions — no duplicate semantic store |
-| **Authoring and approval** | DCS native capabilities | Document creation, versioning, and approval workflow are handled by the existing DCS tooling — no new write layer needed |
-| **Runtime reads** | Direct DCS API query by Semantic Intent Layer | Definitions from the authoritative source at resolution time |
-| **Search** | DCS native search index | `list_operations` queries DCS directly — no separate search infrastructure |
+| **Definition storage** | SDR (pre-existing) | Metric and operation definitions stored alongside existing data definitions — no duplicate semantic store |
+| **Authoring and approval** | SDR native capabilities | Document creation, versioning, and approval workflow are handled by the existing SDR tooling — no new write layer needed |
+| **Runtime reads** | Direct SDR API query by Semantic Intent Layer | Definitions from the authoritative source at resolution time |
+| **Search** | SDR native search index | `list_operations` queries SDR directly — no separate search infrastructure |
 
-The SMR is implemented as two new document types registered in the DCS. The DCS manages the full document lifecycle (draft → in review → approved → deprecated) for both types using its existing authoring and approval capabilities.
+The SMR is implemented as two new document types registered in the SDR. The SDR manages the full document lifecycle (draft → in review → approved → deprecated) for both types using its existing authoring and approval capabilities.
 
-#### New DCS document type: `analytical_metric`
+#### New SDR document type: `analytical_metric`
 
-The core metric definition. One document per approved metric version. The `status` field follows the DCS approval lifecycle; the Semantic Intent Layer only resolves documents with `"status": "approved"`.
+The core metric definition. One document per approved metric version. The `status` field follows the SDR approval lifecycle; the Semantic Intent Layer only resolves documents with `"status": "approved"`.
 
 ```json
 {
@@ -411,13 +411,13 @@ The core metric definition. One document per approved metric version. The `statu
 }
 ```
 
-`status` is one of `"proposed"` | `"in_review"` | `"approved"` | `"deprecated"` | `"retired"`. The DCS enforces a uniqueness constraint: at most one document per `(org_id, metric_id)` may carry `"status": "approved"` at any point in time. All prior versions are retained as `"deprecated"` for lineage reconstruction. `source` is `"platform"` for Financial Services Reference Model entries and `"custom"` for organisation-customised definitions.
+`status` is one of `"proposed"` | `"in_review"` | `"approved"` | `"deprecated"` | `"retired"`. The SDR enforces a uniqueness constraint: at most one document per `(org_id, metric_id)` may carry `"status": "approved"` at any point in time. All prior versions are retained as `"deprecated"` for lineage reconstruction. `source` is `"platform"` for Financial Services Reference Model entries and `"custom"` for organisation-customised definitions.
 
-`weight_metric_id` is required when `aggregation` is `"value_weighted_average"` (or any other weighted aggregation variant) and must reference the `metric_id` of an approved `analytical_metric` in the platform's DCS. The SIL resolves and validates this reference at query time. If the weight metric is missing or unapproved, the query is rejected. The field is absent for non-weighted aggregations (`"sum"`, `"last"`, `"count"`, `"min"`, `"max"`, `"mean"`). The LQP generator emits a `weight_metric_id` key on the `metric_scan` node so that the execution backend can fetch the weighting values alongside the primary metric.
+`weight_metric_id` is required when `aggregation` is `"value_weighted_average"` (or any other weighted aggregation variant) and must reference the `metric_id` of an approved `analytical_metric` in the platform's SDR. The SIL resolves and validates this reference at query time. If the weight metric is missing or unapproved, the query is rejected. The field is absent for non-weighted aggregations (`"sum"`, `"last"`, `"count"`, `"min"`, `"max"`, `"mean"`). The LQP generator emits a `weight_metric_id` key on the `metric_scan` node so that the execution backend can fetch the weighting values alongside the primary metric.
 
 `formula` stores the business-logic expression defined in the [SMR formula language](./02-core-capabilities.md#formula-language). It is the human-readable and audit-visible definition of what the metric computes. At query time the FQE resolves the formula against the `physical_mapping` to generate the backend-specific query; the formula itself is never executed directly. Metrics backed entirely by a pre-computed measure in a semantic layer (e.g. a Cube.js measure) may leave `formula` as an empty string and rely solely on `physical_mapping`.
 
-#### New DCS document type: `analytical_dimension`
+#### New SDR document type: `analytical_dimension`
 
 Dimension definitions are the third new document type. They define the valid slicing axes referenced in `supported_dimensions` and `required_dimensions` on metrics and operations. The SIL validates dimension IDs against this catalogue at resolution time.
 
@@ -439,7 +439,7 @@ Dimension definitions are the third new document type. They define the valid sli
 }
 ```
 
-#### New DCS document type: `analytical_operation`
+#### New SDR document type: `analytical_operation`
 
 The operation catalogue. One document per approved operation. The `execution_profile` field tells the pipeline executor which stages to invoke. The `supported_metrics` and `supported_dimensions` lists are enforced by the Semantic Intent Layer. A `run_analytics` call referencing an out-of-catalogue value is rejected before LQP generation.
 
@@ -512,7 +512,7 @@ No custom query language. The MCP tool call JSON (metric IDs, dimension IDs, tim
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
 | **Intent format** | MCP tool call JSON | Standard AI tool-use format; no separate language needed |
-| **Implementation** | Python (JSON schema + SMR resolution via DCS API) | Lightweight; no grammar or parser |
+| **Implementation** | Python (JSON schema + SMR resolution via SDR API) | Lightweight; no grammar or parser |
 | **LQP format** | Custom DAG (JSON) | Engine-agnostic across SQL, OpenData, and Graph backends |
 
 #### MCP input example
@@ -821,9 +821,9 @@ class RoleAwareProjectionLayer:
 | **Implementation** | Custom rules engine (Python) | Deterministic; config-driven; no ML inference |
 | **Cost estimation** | `Σ(metric.costWeight × dimensionCardinality × timeRangeMultiplier)` | Pre-execution; calibrated against actual cost data |
 | **Circuit breaker** | Per-request ceiling + per-user hourly budget | Hard ceiling prevents runaway queries |
-| **Config store** | DCS document store — `governance_config` document type | Platform-level thresholds stored as a JSON document alongside SMR documents |
+| **Config store** | SDR document store — `governance_config` document type | Platform-level thresholds stored as a JSON document alongside SMR documents |
 
-The platform has one governance config document. The Semantic Execution Governance layer reads it at startup and refreshes it on change events from the DCS:
+The platform has one governance config document. The Semantic Execution Governance layer reads it at startup and refreshes it on change events from the SDR:
 
 ```json
 {
@@ -1403,22 +1403,22 @@ class KnowledgeStore:
 | MCP service | Python · FastMCP + Uvicorn | Lightweight ASGI MCP surface; deploys as Kubernetes pod |
 | Backend services | Kubernetes (cloud-agnostic) | FQE, governance, platform services as independently scalable pods |
 | Primary database | PostgreSQL (Neon or RDS) | Lineage search index, role policy config, scheduled queries, user preferences, saved queries |
-| Data Context Store (DCS) | Pre-existing platform component | SMR metric definitions, governance config, SMR search — reuses DCS versioned storage and native search |
+| Data Context Store (DCS) | Pre-existing platform component | SMR metric definitions, governance config, SMR search — reuses SDR versioned storage and native search |
 | Knowledge Store | S3-compatible object store (versioned Markdown) | MCP resource content — guides, skills definitions, compliance reference |
 | Object storage | S3-compatible | Lineage records (one JSON document per query), result artefacts, large cached result sets |
-| Message queue | SQS / Pub/Sub | Async lineage writes, DCS change events |
+| Message queue | SQS / Pub/Sub | Async lineage writes, SDR change events |
 | Secrets | HashiCorp Vault or cloud-native | Backend credentials, platform service keys |
 
 ### Financial Services Reference Model
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
-| **Packaging** | Versioned JSON document bundles (one per domain) | Conforms directly to the DCS `analytical_metric` schema; idempotently importable via `POST /v1/smr/seed`; selective per-domain activation |
+| **Packaging** | Versioned JSON document bundles (one per domain) | Conforms directly to the SDR `analytical_metric` schema; idempotently importable via `POST /v1/smr/seed`; selective per-domain activation |
 | **Distribution** | Bundled at installation; updatable from Semantic Registry Service | Air-gapped deployments supported |
-| **Activation** | `analyticalDomain` config triggers SMR import at initial platform setup | Bundle documents are written to the DCS in `proposed` state; Application Admin approves before metrics become resolvable |
-| **Customisation** | Full edit/override via Admin API after import | Customised definitions marked `source: "custom"` in the DCS document |
+| **Activation** | `analyticalDomain` config triggers SMR import at initial platform setup | Bundle documents are written to the SDR in `proposed` state; Application Admin approves before metrics become resolvable |
+| **Customisation** | Full edit/override via Admin API after import | Customised definitions marked `source: "custom"` in the SDR document |
 
-Each bundle is a JSON array of DCS documents conforming to the schemas defined in [§Semantic Metrics Repository](./02-core-capabilities.md#semantic-metrics-registry). Bundles are seeded into the DCS in `"proposed"` state at initial platform setup; the Application Admin approves each document before it becomes resolvable by the Semantic Intent Layer.
+Each bundle is a JSON array of SDR documents conforming to the schemas defined in [§Semantic Metrics Repository](./02-core-capabilities.md#semantic-metrics-registry). Bundles are seeded into the SDR in `"proposed"` state at initial platform setup; the Application Admin approves each document before it becomes resolvable by the Semantic Intent Layer.
 
 > **Version format note:** Seed bundle documents use an integer `version` field (starting at `1`) as the bootstrap state. On first platform activation the platform converts these to semantic versioning (`"1.0.0"`). Subsequent versions follow semver — the `"2.1.0"` form used in Chapter 2 examples reflects a metric that has been through two major revisions post-activation.
 
