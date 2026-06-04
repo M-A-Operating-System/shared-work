@@ -297,7 +297,7 @@ Every metric in the SMR conforms to the following schema. This is the authoritat
     "downstream_metrics": ["active_return", "information_ratio"]
   },
   "access": {
-    "roles":  ["portfolio_manager", "risk_officer", "application_admin"],
+    "roles":  ["portfolio_manager", "risk_officer", "analytics_governance"],
     "public": false
   },
   "display": {
@@ -332,7 +332,7 @@ Every metric in the SMR conforms to the following schema. This is the authoritat
 | `lineage.upstream_metrics` | No | Other SMR metrics this metric is derived from. Used for lineage graph construction. |
 | `lineage.downstream_metrics` | No | SMR metrics that depend on this metric. Used for impact analysis when metric definitions change. |
 | `access.roles` | Yes | Role IDs from the entitlement config that may query this metric. |
-| `compliance_relevant` | No | When `true`, this metric's output may be used in regulatory reporting or compliance submissions. When combined with a compliance-purpose query intent (see §Semantic Intent Layer), the platform escalates to the enhanced Provenance Artifact. Set by the metric owner at registration. |
+| `compliance_relevant` | No | When `true`, this metric's output may be used in regulatory reporting or compliance submissions. When combined with a compliance-purpose query intent (see §Semantic Intent Layer), the platform escalates to the enhanced Provenance Artifact. Set by the Metrics Modeller at registration. |
 
 ### Registry Governance Workflow
 
@@ -376,7 +376,7 @@ The SIL asks the SMR to resolve the `compare_portfolios` operation, then resolve
 
 > **Governing principles:** [P2 — Controls before execution](./00-overview.md#design-principles) · [P10 — Deterministic computation, not generation](./00-overview.md#design-principles)
 
-The Semantic Intent Layer receives a structured MCP tool call (an `operation_id` and a `params` dict) and produces a validated, platform-agnostic Logical Query Plan (LQP). It is entirely deterministic: no AI model runs inside it. Its purpose is to: (1) resolve the operation from the SMR SDR catalogue, (2) validate `params` against the operation's `required_params` schema, (3) resolve metric IDs within `params` against `analytical_metric` documents, (4) apply role predicates from RAPL, (5) build the LQP. The output (the LQP) contains no backend references, no SQL, and no physical schema identifiers: only analytical operations expressed against SMR-registered concepts.
+The Semantic Intent Layer receives a structured MCP tool call (an `operation_id` and a `params` dict) and produces a validated, platform-agnostic Logical Query Plan (LQP). It is entirely deterministic: no AI model runs inside it. Its purpose is to: (1) resolve the operation from the SMR catalogue, (2) validate `params` against the operation's `required_params` schema, (3) resolve metric IDs within `params` against `analytical_metric` documents, (4) apply role predicates from RAPL, (5) build the LQP. The output (the LQP) contains no backend references, no SQL, and no physical schema identifiers: only analytical operations expressed against SMR-registered concepts.
 
 ### Five-Stage Validation Pipeline
 
@@ -397,7 +397,7 @@ flowchart TD
 
 ### Intent Parameter Schema
 
-All `run_analytics` calls use the same outer envelope. The `params` dict is operation-specific. Its valid keys are defined by the `required_params` and `optional_params` fields on the `analytical_operation` document in the SMR SDR catalogue.
+All `run_analytics` calls use the same outer envelope. The `params` dict is operation-specific. Its valid keys are defined by the `required_params` and `optional_params` fields on the `analytical_operation` document in the SMR catalogue.
 
 | Parameter | Type | Description |
 |---|---|---|
@@ -495,7 +495,7 @@ The MCP Capability Layer forwards the structured tool call to the SIL. The SIL r
 }
 ```
 
-The SIL resolves the `compare_portfolios` operation from the SMR SDR catalogue, validates the `params` against the operation's `required_params` schema, resolves each metric ID against `analytical_metric` documents, and applies role predicates from RAPL. After SMR resolution and role projection (Stage 3), the SIL produces the Logical Query Plan:
+The SIL resolves the `compare_portfolios` operation from the SMR catalogue, validates the `params` against the operation's `required_params` schema, resolves each metric ID against `analytical_metric` documents, and applies role predicates from RAPL. After SMR resolution and role projection (Stage 3), the SIL produces the Logical Query Plan:
 
 ```json
 {
@@ -701,7 +701,7 @@ The platform escalates to the enhanced Provenance Artifact only when both of the
 
 | Signal | Source | True when |
 |---|---|---|
-| **Signal 1 — metric metadata** | `compliance_relevant` field on `analytical_metric` SMR definition | At least one resolved metric has `compliance_relevant: true`. Set by the metric owner at registration. |
+| **Signal 1 — metric metadata** | `compliance_relevant` field on `analytical_metric` SMR definition | At least one resolved metric has `compliance_relevant: true`. Set by the Metrics Modeller at registration. |
 | **Signal 2 — AI intent classification** | Semantic Intent Layer compliance intent classification (Stage 2b) | `compliance_purpose_score` ≥ the platform-level `compliance_intent_threshold` (default 0.8, configurable). The SIL classifies the natural language query and sets `compliance_purpose: true` if the score meets the threshold. |
 
 **Combined decision:**
@@ -755,7 +755,7 @@ SCL evaluates the LQP (`lqp-20260518-093243-r9xq`) against the `acme-wealth` con
 
 | Check | Value | Limit | Result |
 |---|---|---|---|
-| Estimated cost | 620 | 1,000 | Pass |
+| Estimated performance impact | 620 | 1,000 | Pass |
 | Metrics per query | 2 | 10 | Pass |
 | Dimensions | 1 | 5 | Pass |
 | Data classification | INTERNAL | INTERNAL ceiling | Pass |
@@ -1211,13 +1211,13 @@ Every lineage document is stored under an `org_id`-prefixed key in the object st
 | Query records | Platform default: **2,555 days (7 years)** — covering most regulatory audit look-back periods. Configurable. |
 | Lineage records | Retained at least as long as the corresponding query record. Cannot be deleted independently. |
 | SMR metric versions | Retained indefinitely — metric version history must be preserved for lineage reconstruction. |
-| Governance events | Retained at least as long as query records. |
+| Controls events | Retained at least as long as query records. |
 | Result artefacts (object storage) | Default: 365 days. Configurable. Lineage record references are preserved even after object storage expiry. |
 | Blocked queries | Retained in full — queries that fail governance checks are as important to retain as successful ones. |
 
 ### Immutability
 
-Lineage records are never modified after writing. There is no update or delete path available to any user — including Platform Admins. Corrections to erroneous records produce new records that reference the original via a `supersedes` relationship. This constraint is enforced at the database layer, not only by application logic.
+Lineage records are never modified after writing. There is no update or delete path available to any user — including Platform Admin. Corrections to erroneous records produce new records that reference the original via a `supersedes` relationship. This constraint is enforced at the database layer, not only by application logic.
 
 ### Regulatory Audit Export
 
@@ -1308,7 +1308,7 @@ The Analytics Engine exposes three tools. All analytical operations are SMR-cata
 | Parameter | Required | Type | Notes |
 |---|---|---|---|
 | `operation_id` | Yes | `string` | SMR operation ID — discover via `list_operations` |
-| `params` | Yes | `object` | Operation-specific parameters; validated by the SIL against the operation's `required_params` schema in the SMR SDR catalogue |
+| `params` | Yes | `object` | Operation-specific parameters; validated by the SIL against the operation's `required_params` schema in the SMR catalogue |
 | `jwt` | Yes | `string` | Bearer token; validated at request ingress before any platform computation begins |
 
 **`list_operations(domain: str | None, jwt: str)`** — Returns the SMR operation catalogue with operation IDs, display names, required parameters, supported metrics/dimensions, and execution profiles. Only operations the authenticated user is entitled to execute are returned.
