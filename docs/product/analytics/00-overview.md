@@ -16,7 +16,7 @@ AI assistants and agents today handle small-scale data access well: retrieving r
 
 The natural starting point for organisations is Text-to-SQL: use an LLM to generate SQL queries and run them directly against production data. For ad hoc, low-stakes exploration this has merit. For governed large-scale analytics in regulated financial services it has three structural failures that no amount of tuning resolves:
 
-- **No approved metric definitions** — the AI infers what "Portfolio Return" means at query time; the same question can produce a different calculation in a different session
+- **No approved analytics and metrics definitions** — the AI infers what "Portfolio Return" means at query time; the same question can produce a different calculation in a different session
 - **No reproducible calculation record** — SQL is generated fresh each time; two identical queries are not guaranteed to produce identical results
 - **No guaranteed entitlement enforcement** — access controls depend on the reliability of AI-generated query predicates, not a guaranteed enforcement layer
 
@@ -24,7 +24,7 @@ Training LLMs on database schemas improves query accuracy in early trials but ad
 
 ### The platform
 
-The AI Analytics Platform is a governed computation engine that gives AI systems correct, auditable access to an organisation's regulated metrics and datasets — without exposing database schemas, without generating SQL, and without compromising entitlement enforcement. AI interacts exclusively with an approved analytical vocabulary: versioned metric definitions, governed dataset contracts, and enforced entitlements. The platform handles all deterministic computation, access control, and audit recording behind a single governed API.
+The AI Analytics Platform is a governed computation engine that gives AI systems correct, auditable access to an organisation's regulated metrics and datasets — without exposing database schemas, without generating SQL, and without compromising entitlement enforcement. AI interacts exclusively with an approved analytics and metrics definitions in the Semantic Metrics Repository: versioned metric definitions, governed dataset contracts, and enforced entitlements. The platform handles all deterministic computation, access control, and audit recording behind a single governed API.
 
 In practice: a portfolio manager asks "show me portfolio returns versus benchmark for my equity portfolios this quarter" in plain English and receives a governed, role-constrained, auditable result with the full computation record attached. A data science pipeline extracts millions of rows of position data under the same entitlement and audit controls. A treasury analyst produces an LCR figure for a Basel III submission and receives, automatically, a regulator-ready compliance artifact set alongside the result. The analyst bottleneck breaks. Regulatory requirements hold.
 
@@ -33,7 +33,7 @@ The platform addresses the following challenges that Text-to-SQL and unstructure
 | Enterprise analytical challenge | Platform response |
 |---|---|
 | Metric consistency across users, reports, and regulatory submissions | Every metric is registered once, approved, and version-controlled — "Portfolio Return" means the same thing everywhere |
-| Complex regulated formulas (VaR, LCR, BHB attribution) computed at scale | Defined once in the approved metric registry, computed identically every time — never re-inferred from raw data |
+| Complex regulated formulas (VaR, LCR, BHB attribution) computed at scale | Defined once in the approved analytics and metrics definitions in the Semantic Metrics Repository, computed identically every time — never re-inferred from raw data |
 | Computation provenance for regulatory review | Full audit record for every result: intent → definitions → entitlements → plan → execution → result |
 | Entitlement enforcement that AI cannot bypass | Enforced at the analytical layer before any database is contacted — not dependent on AI query generation reliability |
 | Metric governance and change management | Every metric definition is version-controlled with an approval workflow and full change history |
@@ -62,7 +62,7 @@ The dominant AI narrative has become: *natural language → LLM → SQL → data
 
 The **Analytics Engine** is the platform's computation core. Given a precisely specified question — which metrics, which dimensions, which time period, which filters — it always produces the same answer from the same data with the same access permissions in force. No probability, no AI generation, no inference affects the computed values. The computation pipeline contains no AI.
 
-AI has two roles in the analytical pipeline. The first lives in the AI consumer — the assistant, agent, or application that a user interacts with. It reads the approved metric catalogue, translates a natural-language question into a precise, structured request, and submits it to the Analytics Engine. The second lives inside the Analytics Engine itself: after computation completes, the Narrative Synthesis Engine makes a targeted call to a language model to summarise the structured result in plain text, anchored strictly to computed values. It cannot introduce figures, comparisons, or interpretations not present in the result.
+AI has two roles in the analytical pipeline. The first lives in the AI consumer — the assistant, agent, or application that a user interacts with. It reads the approved analytics and metrics definitions in the Semantic Metrics Repository, translates a natural-language question into a precise, structured request, and submits it to the Analytics Engine. The second lives inside the Analytics Engine itself: after computation completes, the Narrative Synthesis Engine makes a targeted call to a language model to summarise the structured result in plain text, anchored strictly to computed values. It cannot introduce figures, comparisons, or interpretations not present in the result.
 
 | It is | It is not |
 |-------|-----------|
@@ -90,7 +90,7 @@ Ten principles govern all design decisions. Where a proposed feature conflicts w
 | **P7 — Deterministic visualisation** | Chart type selection is governed by a registered set of chart contracts. The AI does not select chart types — the same analytical pattern always produces the same chart across users, sessions, and time. |
 | **P8 — Explainability at every layer** | Users and compliance functions can inspect what was queried, why, and with what results at every layer of the stack. An intent confirmation step shows resolved intent before execution; a lineage inspector exposes every step in human-readable form. |
 | **P9 — Administrator sovereignty within governance bounds** | Platform administrators control data sources, metric definitions, access policies, and governance thresholds — but may not lower governance minimums below platform floors. There is no bypass mode. |
-| **P10 — Deterministic computation, not generation** | Analytical results are computed from approved metric definitions, never generated by an AI model. The same structured request, with the same access permissions and data, always returns the same result. |
+| **P10 — Deterministic computation, not generation** | Analytical results are computed from approved analytics and metrics definitions, never generated by an AI model. The same structured request, with the same access permissions and data, always returns the same result. |
 
 Each principle creates natural tensions with product requirements — expressiveness, latency, and metric evolution — and each tension has a defined resolution. Full discussion is in [Chapter 2](./02-core-capabilities.md).
 
@@ -171,7 +171,7 @@ The platform's scope spans two independent dimensions that together define the f
 Some requests are best answered with a chart or summary: a portfolio manager wants to see returns versus benchmark, not a raw table of numbers. Others require a structured dataset: a data science pipeline needs millions of rows of position data for model retraining, and a chart is irrelevant. Both output types traverse the same governance pipeline. The difference is resolved by the Visualisation Ontology at query time — chart or table is determined by the intent and result shape, not by the user or the AI.
 
 **Governance tier — business analytics or full-provenance**
-Most queries require standard governance: approved metric definitions, entitlement enforcement, and a compliance provenance record. Some queries require more: when a request is for a regulatory submission — or involves a metric that is flagged as compliance-relevant — the platform automatically escalates to the enhanced compliance artifact tier. Two independent signals trigger escalation: the metric's own compliance-relevant flag (set by the metric owner at registration) and the AI's classification of the query's stated purpose. When both signals are present, a regulatory trace record, export controls, and a regulator-ready artifact set are produced automatically. No user action or role claim is required.
+Most queries require standard governance: approved analytics and metrics definitions, entitlement enforcement, and a compliance provenance record. Some queries require more: when a request is for a regulatory submission — or involves a metric that is flagged as compliance-relevant — the platform automatically escalates to the enhanced compliance artifact tier. Two independent signals trigger escalation: the metric's own compliance-relevant flag (set by the metric owner at registration) and the AI's classification of the query's stated purpose. When both signals are present, a regulatory trace record, export controls, and a regulator-ready artifact set are produced automatically. No user action or role claim is required.
 
 These two dimensions define four possible result types. The platform handles all four under the same governed pipeline:
 
@@ -197,7 +197,7 @@ A portfolio manager asks: *"Show me portfolio returns versus benchmark for my eq
 ```
 
 **2 · Intent resolution**
-The AI client reads the approved metric catalogue and translates the question into a precise, structured request: compare portfolio return against benchmark return, for equity portfolios, current quarter, broken down by portfolio. No database query is generated at this stage — the AI is resolving intent against the approved analytical vocabulary.
+The AI client reads the approved analytics and metrics definitions in the Semantic Metrics Repository and translates the question into a precise, structured request: compare portfolio return against benchmark return, for equity portfolios, current quarter, broken down by portfolio. No database query is generated at this stage — the AI is resolving intent against the approved analytics and metrics definitions in the Semantic Metrics Repository.
 
 ```
 -- Semantic Intent Resolution
@@ -211,7 +211,7 @@ display_intent: chart  →  comparative metrics across categorical dimension →
 ```
 
 **3 · Metric and entitlement resolution**
-The platform resolves both metrics against the Metric Registry. Portfolio return resolves to an approved, version-controlled value-weighted return formula. Benchmark return resolves via each portfolio's registered default benchmark. The user's identity token is validated and access permissions are projected, restricting results to portfolios within their coverage scope.
+The platform resolves both metrics against the Semantic Metrics Repository. Portfolio return resolves to an approved, version-controlled value-weighted return formula. Benchmark return resolves via each portfolio's registered default benchmark. The user's identity token is validated and access permissions are projected, restricting results to portfolios within their coverage scope.
 
 ```
 -- Metric & Entitlement Resolution
@@ -221,7 +221,7 @@ entitlements:        user_scope → [authorised_portfolio_list]
 ```
 
 **4 · Query planning, governance, and execution**
-The Query Planner constructs a backend-agnostic plan. The governance layer then constructs a precise, warehouse-neutral query: value-weighted portfolio return joined to each portfolio's registered benchmark, filtered to equity, with access predicates injected at the query level. No raw database schemas have been exposed at any stage. The query executes against the registered warehouse; the Analytics Engine assembles the response: computed values, a chart specification, an optional plain-language summary anchored strictly to the result, and a full audit record.
+The Federated Query Engine constructs a platform-agnostic Logical Query Plan (LQP) — The governance layer then constructs a precise, warehouse-neutral query: value-weighted portfolio return joined to each portfolio's registered benchmark, filtered to equity, with access predicates injected at the query level. No raw database schemas have been exposed at any stage. The query executes against the registered warehouse; the Analytics Engine assembles the response: computed values, a chart specification, an optional plain-language summary anchored strictly to the result, and a full audit record.
 
 ```sql
 -- Logical Query Plan
@@ -276,7 +276,7 @@ A risk officer asks: *"Which portfolios are breaching their VaR 95 limit today, 
 ```
 
 **2 · Intent resolution**
-The AI client identifies three metrics — `var_95`, `var_limit`, and `risk_factor_contribution` — and resolves this as a threshold-comparison pattern with a contributing-factor breakdown. `var_limit` is a per-portfolio governance parameter stored in the risk configuration domain; `risk_factor_contribution` carries `portfolio_id` and `factor_bucket` as required dimensions. All three are registered in the Metric Registry and resolve cleanly against the approved analytical vocabulary.
+The AI client identifies three metrics — `var_95`, `var_limit`, and `risk_factor_contribution` — and resolves this as a threshold-comparison pattern with a contributing-factor breakdown. `var_limit` is a per-portfolio governance parameter stored in the risk configuration domain; `risk_factor_contribution` carries `portfolio_id` and `factor_bucket` as required dimensions. All three are registered in the Semantic Metrics Repository and resolve cleanly against the approved analytics and metrics definitions in the Semantic Metrics Repository.
 
 ```
 -- Semantic Intent Resolution
@@ -373,7 +373,7 @@ display_intent: table  →  paginated dataset retrieval → structured table
 ```
 
 **2 · Dataset and entitlement resolution**
-The dataset identifier resolves against the Metric Registry — only registered, approved datasets are retrievable. The registry resolves the dataset to its approved field set. The agent's access permissions are projected: results restricted to authorised portfolios, fields exceeding the agent's data classification ceiling excluded.
+The dataset identifier resolves against the Semantic Metrics Repository — only registered, approved datasets are retrievable. The registry resolves the dataset to its approved field set. The agent's access permissions are projected: results restricted to authorised portfolios, fields exceeding the agent's data classification ceiling excluded.
 
 ```
 -- Dataset & Entitlement Resolution

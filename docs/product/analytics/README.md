@@ -63,7 +63,7 @@ These decisions are non-negotiable architectural constraints. Each maps to one o
 | **A4** | Entitlements are enforced at the semantic tier — before the LQP is compiled and before any execution backend is contacted. | [P5](./00-overview.md#design-principles) |
 | **A5** | Every analytical result has a compliance provenance record linking intent → semantic plan → LQP → backend execution → result. | [P4](./00-overview.md#design-principles) |
 | **A6** | Chart selection is deterministic and governed by the Visualisation Ontology — not inferred by the LLM per query. | [P7](./00-overview.md#design-principles) |
-| **A7** | The LQP is backend-agnostic. Physical execution translation is the FQE's responsibility. | [P10](./00-overview.md#design-principles) |
+| **A7** | The LQP is platform-agnostic. Physical execution translation is the FQE's responsibility. | [P10](./00-overview.md#design-principles) |
 | **A8** | Governance circuit breakers are applied at the semantic tier. No query reaches a physical backend without passing governance checks. | [P2](./00-overview.md#design-principles) |
 | **A9** | A single shared platform instance serves all consumers — isolation is enforced by: (1) RAPL/SEG entitlement checks on every request; (2) row-level security on the lineage index; (3) tenant-scoped key prefixes on all object store access; (4) tenant_id scoping on all DCS queries. No cross-tenant data access is possible at any privilege level. | [P5](./00-overview.md#design-principles) |
 | **A10** | Narrative synthesis is anchored to governed metric values in the execution result. The LLM may not introduce metric values not present in the result. | [P6](./00-overview.md#design-principles) |

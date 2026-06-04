@@ -42,7 +42,7 @@ This document describes one proposed sequence of deliverables for the AI Analyti
 </tr>
 <tr>
 <td>Semantic Intent Layer</td>
-<td>Build new service implementing JSON schema validation for all MCP tool call parameters; implement SMR ID resolver that calls the SMR service to validate metric and dimension references, returning structured <code>METRIC_NOT_FOUND</code> errors for unregistered IDs; build LQP generator producing a backend-agnostic execution DAG from validated parameters; no LLM invocation in this layer</td>
+<td>Build new service implementing JSON schema validation for all MCP tool call parameters; implement SMR ID resolver that calls the SMR service to validate metric and dimension references, returning structured <code>METRIC_NOT_FOUND</code> errors for unregistered IDs; build LQP generator producing a platform-agnostic execution DAG from validated parameters; no LLM invocation in this layer</td>
 </tr>
 <tr>
 <td>Role-Aware Projection Layer</td>

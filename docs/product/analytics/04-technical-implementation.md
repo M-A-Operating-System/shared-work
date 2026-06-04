@@ -283,7 +283,7 @@ class SemanticIntentLayer:
             raise ValueError(f"Missing required params: {missing}")
 
     def _build_lqp(self, operation: dict, params: dict, metrics: list[dict]) -> dict:
-        # Construct engine-agnostic DAG; each metric node carries physicalMapping from SMR
+        # Construct platform-agnostic DAG; each metric node carries physicalMapping from SMR
         nodes = []
         for metric in metrics:
             node = {
@@ -531,7 +531,7 @@ No custom query language. The MCP tool call JSON (metric IDs, dimension IDs, tim
 }
 ```
 
-The Semantic Intent Layer resolves metric IDs against the SMR, merges in role predicates from the RAPL, and emits an engine-agnostic LQP. The LQP carries resolved `physicalMapping` references, expanded time ranges, role-injected filters, and a cost estimate for governance validation.
+The Semantic Intent Layer resolves metric IDs against the SMR, merges in role predicates from the RAPL, and emits an platform-agnostic LQP. The LQP carries resolved `physicalMapping` references, expanded time ranges, role-injected filters, and a cost estimate for governance validation.
 
 #### LQP output example
 
