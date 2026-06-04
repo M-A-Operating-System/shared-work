@@ -60,32 +60,32 @@ The platform exposes its capability through three consumption modes. The first i
 flowchart TD
     subgraph Consumers["AI Consumers"]
         direction LR
-        ChatComp["<b>Conversational AI</b>\nConversational UI, Image/Chart rendering · Tool call routing\nAudit trail · Memory · Shared conversations"]
+        ChatComp["<b>Conversational AI</b>\nConversational UI · Image/Chart rendering · Tool call routing\nMemory · Shared conversations"]
         CustomUI["<b>Custom analytics UI</b>\napplication hosted, embedded analysis, presentations, dashboards, self-service apps"]
-        Agents["<b>Agentic AI</b>\n Independent Agents - event monitors · report pipelines, Anomaly Detection, Event Prediction, Data Quality, Risk Tolerance, Reviews etc"]
+        Agents["<b>Agentic AI</b>\nIndependent Agents - event monitors · report pipelines\nAnomaly Detection · Event Prediction · Data Quality · Risk Tolerance · Reviews etc"]
     end
 
     subgraph analytics["Analytics Engine"]
         direction TB
-        MCP["<b>API/MCP Interface</b>\nMCP server runtime, tool/ resource/ prompt presentation, JWT validation"]
-        SIL["<b>Semantic Intent Layer(SIL)</b>\nParameter validation · SMR resolution · LQP generation"]
-        RAPL["<b>Role-Aware Projection Layer(RAPL)</b>\nJWT claims · row predicates · column masks"]
-        SCL["<b>Semantic Controls Layer(SCL)</b>\nPerformance impact assessment · classification · thresholds"]
-        FQE["<b>Federated Query Engine(FQE)</b>\nquery planning engine + backend adapters"]
-        VO["<b>Data Visualization Language (DVL)</b>\ndisplay spec · the platform's chart specification format"]
-        NSE["<b>Narrative Synthesis Engine(NSE)</b>\nlanguage model · post-computation\nanchored to result values · P6 governed"]
-        LS[("<b>Analytical Lineage Store</b>\nlogical query plan, physical query plan, physical run time statistics")]
-        Result(["<b>MCP tool response</b>\nwrapped display_spec + data + narrative + provenance artifact(optional) + result_id"])
+        MCP["<b>API/MCP Interface</b>\nMCP server runtime · tool/resource/prompt presentation · JWT validation"]
+        SIL["<b>Semantic Intent Layer (SIL)</b>\nSMR resolution · compliance intent classification · LQP generation"]
+        RAPL["<b>Role-Aware Projection Layer (RAPL)</b>\nJWT claims · metric/dimension access sets · row predicates · column masks"]
+        SCL["<b>Semantic Controls Layer (SCL)</b>\nPerformance impact · complexity · classification · compliance checks"]
+        FQE["<b>Federated Query Engine (FQE)</b>\nsub-plan decomposition · backend routing · parallel execution · result assembly"]
+        DVL["<b>Data Visualization Language (DVL)</b>\nontology evaluation · deterministic chart contract selection"]
+        NSE["<b>Narrative Synthesis Engine (NSE)</b>\nsecondary language model · post-computation · anchored to result values"]
+        LS[("<b>Analytical Lineage Store (ALS)</b>\ncomputation provenance records\ntool call · SMR resolution · LQP · controls decision · execution record · narrative status")]
+        Result(["<b>MCP tool response</b>\ndisplay_spec + data + narrative + result_id\n+ compliance block (if Provenance Artifact active)"])
     end
 
-     subgraph Image["Image/Chart Rendering (Optional)"]
-            vega2img["vega2img (optional)\nStandalone MCP render service · DVL → SVG / PNG\nRegistered directly with consumers — not part of Analytics Engine"]
+    subgraph Image["Image/Chart Rendering (Optional)"]
+        vega2img["vega2img (optional)\nStandalone MCP render service · DVL → SVG / PNG\nRegistered directly with consumers — not part of Analytics Engine"]
     end
 
     subgraph dcs["Data Context Store (DCS)"]
-        SMR[("Semantic Metrics Repository(SMR)\nmetric definitions, dimensions, hierarchies, aggregation rules, governance, access policies, compliance metadata")]
-        SDR[("Semantic Data Repository (SDR)\n data definitions, data models, object models, critical data elements, quality rules, physical schemas, data lineage,")]
-        SMR --> SDR
+        SDR[("Semantic Data Repository (SDR)\ndata models · object models · critical data elements\nquality rules · physical schemas · data lineage")]
+        SMR[("Semantic Metrics Repository (SMR)\nmetric definitions · dimensions · hierarchies\naggregation rules · access policies · compliance metadata")]
+        SDR -->|"SMR extends SDR"| SMR
     end
 
     subgraph backends["Data Sources"]
@@ -95,21 +95,21 @@ flowchart TD
     end
 
     Consumers -->|"JWT + structured MCP tool call"| MCP
-    Consumers -->|"MCP tool call + user JWT"| Image
+    Consumers -->|"render tool call (display_spec)"| Image
     MCP -->|"structured parameters"| SIL
     MCP -->|"JWT claims"| RAPL
     RAPL -->|"row predicates + column masks"| SIL
-    SIL -->|"parameter validation + resolution"| SMR
-    SIL -->|"Logical Query Plan"| SCL
+    SIL -->|"metric + dimension ID resolution"| SMR
+    SIL -->|"Logical Query Plan (LQP)"| SCL
+    SCL -->|"controls decision record"| LS
     SCL -->|"approved LQP"| FQE
-    SCL -->|"controls decision"| LS
     FQE -->|"physicalMapping lookup"| SMR
     FQE --> SQL & ODA & GDA
     FQE -->|"execution record"| LS
-    FQE -->|"assembled result"| VO
+    FQE -->|"assembled result"| DVL
     FQE -->|"assembled result"| NSE
-    VO -->|"DVL display spec"| Result
-    NSE -->|"narrative summary"| Result
+    DVL -->|"DVL display spec"| Result
+    NSE -->|"governed narrative"| Result
 ```
 
 The Analytics Engine is a single MCP server. It exposes three analytical tools (`run_analytics`, `list_operations`, `drilldown`) through a single MCP Capability Layer endpoint. The computation pipeline (SIL, RAPL, SCL, FQE) is entirely deterministic. The Narrative Synthesis Engine runs as a post-computation step: after the FQE assembles the result, the NSE makes a targeted call to a secondary language model to summarise the data in plain text; its prompt is constructed from the result set only and its output is validated against computed values before being returned.
@@ -125,57 +125,87 @@ The `vega2img` service is shown separately from the Analytics Platform boundary 
 ```mermaid
 sequenceDiagram
     autonumber
-    participant C as AI Chat Platform
-    participant AE as Analytics Engine (MCP)
+    participant C as AI Consumer
+    participant MCP as MCP Capability Layer
     participant SIL as Semantic Intent Layer
     participant RAPL as Role-Aware Projection Layer
     participant SMR as Semantic Metrics Repository
     participant SCL as Semantic Controls Layer
+    participant ALS as Analytical Lineage Store
     participant FQE as Federated Query Engine
     participant BE as Execution Backend(s)
-    participant VO as Data Visualization Language (DVL)
+    participant DVL as Data Visualization Language
     participant NSE as Narrative Synthesis Engine
-    participant LS as Analytical Lineage Store
-    participant vega2img as vega2img
+    participant vega2img as vega2img (optional)
 
-    C->>AE: list_operations (JWT)
-    AE-->>C: operation catalogue (entitled subset)
-    note over C: AI model translates NL → structured parameters
-    C->>AE: run_analytics (operation_id + params + JWT)
-    par
-        AE->>SIL: structured parameters
-    and
-        AE->>RAPL: JWT claims
+    rect rgb(240, 245, 255)
+        note over C,SMR: Catalogue loading — discover entitled operations
+        C->>MCP: list_operations (JWT)
+        MCP->>SMR: fetch entitled operation catalogue
+        SMR-->>MCP: operation catalogue
+        MCP-->>C: operation IDs · display names · required params · execution profiles
     end
-    par
-        SIL->>SMR: validate metric + dimension IDs
-        SMR-->>SIL: definitions + aggregation rules
-    and
-        RAPL-->>SIL: row predicates + column masks
+
+    note over C: AI model translates natural language → structured parameters
+
+    rect rgb(240, 255, 245)
+        note over C,ALS: Query execution
+        C->>MCP: run_analytics (operation_id + params + JWT)
+        MCP->>MCP: validate JWT signature · expiry · org claim
+
+        par Intent resolution
+            MCP->>SIL: structured parameters
+        and Entitlement projection
+            MCP->>RAPL: JWT claims
+        end
+
+        par
+            SIL->>SMR: resolve operation · metric IDs · dimension IDs
+            SMR-->>SIL: definitions · aggregation rules · performance_impact_weight · compliance metadata
+        and
+            RAPL-->>SIL: metric access set · dimension access set · row predicates · column masks
+        end
+
+        note over SIL: Stage 2b — compliance intent classification<br/>scores query for compliance_purpose (0–1)<br/>sets compliance_purpose: true if score ≥ threshold
+
+        SIL->>SCL: Logical Query Plan (LQP)<br/>— no SQL · no backend refs · SMR concepts only
+
+        note over SCL: Evaluates: performance impact · complexity · classification gate · compliance check<br/>Blocks if any threshold exceeded
+
+        SCL->>ALS: controls decision record (written before FQE is invoked)
+        SCL->>FQE: approved LQP
+
+        FQE->>SMR: physicalMapping lookup
+        SMR-->>FQE: physical source mappings · backend affinity
+
+        FQE->>BE: sub-plan execution (parallel per data affinity)
+        BE-->>FQE: raw result sets
+
+        FQE->>ALS: execution record (sub-plans · latencies · cache hit · backends used)
     end
-    SIL->>SCL: Logical Query Plan (LQP)
-    SCL->>LS: controls decision record
-    SCL->>FQE: approved LQP
-    FQE->>SMR: physicalMapping lookup
-    SMR-->>FQE: physical source mapping
-    FQE->>BE: sub-plan execution
-    BE-->>FQE: raw result sets
-    FQE->>LS: execution record
-    par
-        FQE->>VO: assembled result
-        VO-->>AE: DVL display spec
-    and
-        FQE->>NSE: assembled result
-        NSE-->>AE: narrative summary
+
+    rect rgb(255, 248, 240)
+        note over FQE,NSE: Presentation assembly — parallel
+        par
+            FQE->>DVL: assembled result
+            note over DVL: Ontology evaluation → deterministic chart contract selection<br/>AI does not select chart type
+            DVL-->>MCP: DVL display specification
+        and
+            FQE->>NSE: assembled result
+            note over NSE: Secondary language model call<br/>Anchored strictly to result values · validation pass before inclusion
+            NSE-->>MCP: governed narrative (lead + detail + anchoredTo)
+        end
     end
-    AE-->>C: display_spec + data + narrative + result_id
-    opt Consumer cannot natively render DVL spec
+
+    MCP-->>C: display_spec + data + narrative + result_id + lineage_url<br/>+ compliance block (if Provenance Artifact active)
+
+    opt Consumer cannot natively render DVL specification
         C->>vega2img: render tool call (display_spec)
         vega2img-->>C: SVG / PNG
     end
 ```
 
-The Analytics Engine receives structured parameters, not natural language, and returns structured results. The computation pipeline contains no AI. The Narrative Synthesis Engine runs after computation completes, in parallel with the Data Visualization Language (DVL), making a targeted secondary model call constrained to the assembled result. The natural language translation (step 3) happens in the AI Chat Platform's reasoning loop, grounded by the operation catalogue loaded in step 1 via `list_operations`. The Analytical Lineage Store receives two writes per query: a controls decision record before execution and an execution record after. This ensures the audit trail is complete regardless of whether the query ultimately succeeds.
+The Analytics Engine receives structured parameters — never natural language — and returns structured results. The computation pipeline (SIL → RAPL → SCL → FQE) is entirely deterministic and contains no AI. The only AI steps are: natural language translation (in the consumer, grounded by the operation catalogue) and narrative synthesis (in the NSE, post-computation, constrained to the assembled result). The Analytical Lineage Store receives two writes per query — a controls decision record before the FQE is invoked and a full execution record after — ensuring the audit trail is complete regardless of whether execution succeeds.
 
 ---
 
