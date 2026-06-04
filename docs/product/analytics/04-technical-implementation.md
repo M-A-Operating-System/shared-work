@@ -120,9 +120,8 @@ async def run_analytics(input: RunAnalyticsInput, jwt: str) -> dict:
     by the operation's execution_profile in the SMR, not by this tool."""
     claims    = validate_jwt(jwt)
     operation = await smr.get_operation(input.operation_id, claims)
-    lqp       = await sil.resolve(operation, input.params, claims)
-    lqp       = rapl.project(lqp, claims)
-    return await pipeline_executor.run(lqp, operation["execution_profile"])
+    # RAPL runs after SIL: SIL builds the LQP, RAPL injects role predicates into it before SCL sees it
+    return await pipeline_executor.run(operation, input.params, claims)
 
 @mcp.tool()
 async def list_operations(input: ListOperationsInput, jwt: str) -> dict:
@@ -138,6 +137,115 @@ async def drilldown(input: DrilldownInput, jwt: str) -> dict:
     All filters, role predicates, and entitlement context from the original result are preserved."""
     claims = validate_jwt(jwt)
     return await drilldown_service.execute(input, claims)
+```
+
+#### JWT Validation
+
+Library: `python-jose[cryptography]`. The JWKS endpoint is fetched once at startup and cached with a 1-hour TTL. Required claims: `sub`, `org_id`. Optional but consumed claims: `analytics_roles`, `managed_portfolios`.
+
+```python
+from jose import jwt, JWTError
+
+JWKS_URI     = config["auth"]["jwks_uri"]       # e.g. https://auth.example.com/.well-known/jwks.json
+JWT_AUDIENCE = config["auth"]["audience"]
+JWT_ISSUER   = config["auth"]["issuer"]
+
+jwks_cache = {}  # { "keys": [...], "fetched_at": timestamp }
+
+async def validate_jwt(token: str) -> dict:
+    if not jwks_cache or time.time() - jwks_cache["fetched_at"] > 3600:
+        jwks_cache.update({"keys": await fetch_jwks(JWKS_URI), "fetched_at": time.time()})
+
+    try:
+        claims = jwt.decode(token, jwks_cache["keys"], algorithms=["RS256"],
+                            audience=JWT_AUDIENCE, issuer=JWT_ISSUER)
+    except JWTError as e:
+        raise AuthenticationError(str(e))
+
+    required = ["sub", "org_id"]
+    missing  = [k for k in required if k not in claims]
+    if missing:
+        raise AuthenticationError(f"Missing required JWT claims: {missing}")
+
+    return claims   # { sub, org_id, analytics_roles: [...], managed_portfolios: [...], ... }
+```
+
+#### Pipeline Executor
+
+The MCP layer routes JWT claims to `validate_jwt` and validated parameters to the pipeline; within the pipeline, RAPL operates post-SIL rather than in parallel — SIL must produce a valid LQP before RAPL can inject role predicates into it.
+
+```python
+class PipelineExecutor:
+    def __init__(self, sil, rapl, scl, fqe, dvl, nse, als):
+        ...
+
+    async def run(self, operation: dict, params: dict, claims: dict) -> dict:
+        lqp = await sil.resolve(operation, params, claims)
+        lqp = await rapl.project(lqp, claims)
+
+        profile = operation["execution_profile"]
+
+        if profile == "data_retrieval":
+            result = await fqe.execute(lqp)
+            return {"result_id": result["result_id"], "rows": result["rows"], "schema": result["schema"]}
+
+        if profile == "metric_query":
+            result  = await fqe.execute(lqp)
+            display = dvl.evaluate(result, operation)
+            return {"result_id": result["result_id"], "rows": result["rows"], "display_spec": display}
+
+        if profile == "full_analytical":
+            lqp    = await scl.approve(lqp, claims)
+            await als.write_controls_decision(lqp, claims)
+            result              = await fqe.execute(lqp)
+            display, narrative  = await asyncio.gather(
+                asyncio.to_thread(dvl.evaluate, result, operation),
+                nse.synthesise(result, operation),
+            )
+            return {
+                "result_id":    result["result_id"],
+                "rows":         result["rows"],
+                "schema":       result["schema"],
+                "display_spec": display,
+                "narrative":    narrative,
+                "export_requires_lineage": lqp.get("require_lineage_for_export", False),
+            }
+
+        raise ValueError(f"Unknown execution_profile: {profile}")
+```
+
+DVL is synchronous (CPU-bound ontology evaluation); `asyncio.to_thread` runs it on the thread pool so it does not block the event loop during the concurrent NSE API call.
+
+#### Drilldown Service
+
+```python
+class DrilldownService:
+    def __init__(self, als, fqe, dvl, rapl, smr):
+        ...
+
+    async def execute(self, input: DrilldownInput, claims: dict) -> dict:
+        # Load original lineage record to recover the LQP and governance context
+        lineage   = await als.fetch(input.result_id, claims["org_id"])
+        orig_lqp  = lineage["lqp_id"]
+
+        # Rebuild a refined LQP: add a filter node for the selected hierarchy value
+        refined_lqp = deepcopy(lineage["request_payload"]["lqp"])
+        refined_lqp["lqp_id"] = generate_id("lqp")
+        refined_lqp["nodes"].append({
+            "op":         "filter",
+            "predicates": [f"{input.hierarchy} = {repr(input.selected_value)}"],
+        })
+
+        # Role predicates from original lineage are already embedded — do not re-project
+        # Re-run FQE and DVL only; SCL approval is inherited from the original query
+        result  = await fqe.execute(refined_lqp)
+        display = dvl.evaluate(result, lineage["operation"])
+        return {
+            "result_id":    result["result_id"],
+            "parent_id":    input.result_id,
+            "rows":         result["rows"],
+            "display_spec": display,
+        }
 ```
 
 #### Execution profiles
@@ -302,6 +410,31 @@ class SemanticIntentLayer:
         return {"lqp_id": generate_id(), "nodes": nodes, "org_id": claims["org_id"]}
 ```
 
+#### Stage 2b — Compliance Intent Classification
+
+The SIL scores each resolved query for compliance intent using three independent signals. The score drives the SCL two-signal compliance gate without requiring the caller to declare compliance purpose explicitly.
+
+```python
+def _score_compliance_intent(self, operation: dict, resolved_metrics: list[dict], params: dict) -> float:
+    # Signal sources: operation ID suffix, metric compliance_relevant flags, param keys
+    score = 0.0
+    if any(op in operation["operation_id"] for op in ["regulatory", "compliance", "audit", "report"]):
+        score += 0.5
+    if any(m.get("compliance_relevant") for m in resolved_metrics):
+        score += 0.3
+    if "justification" in params or "regulatory_period" in params:
+        score += 0.2
+    return min(score, 1.0)
+```
+
+`resolve()` attaches this score to the LQP before returning it:
+
+```python
+lqp["compliance_purpose_score"] = self._score_compliance_intent(operation, resolved_metrics, params)
+lqp["resolved_metrics"]         = resolved_metrics   # retained for SCL compliance check
+return lqp
+```
+
 ---
 
 ### Narrative Synthesis Engine
@@ -329,15 +462,22 @@ class NarrativeSynthesisEngine:
     STANDARD_MODEL = "claude-sonnet-4-6"
 
     async def synthesise(self, result: dict, operation: dict) -> str:
-        model    = self.FAST_MODEL if self._is_simple(result) else self.STANDARD_MODEL
-        prompt   = self._build_prompt(result, operation)
-        response = await self.client.messages.create(
-            model=model, max_tokens=512,
-            messages=[{"role": "user", "content": prompt}],
-        )
-        narrative = response.content[0].text
-        self._validate_numbers(narrative, result["rows"])
-        return narrative
+        model  = self.FAST_MODEL if self._is_simple(result) else self.STANDARD_MODEL
+        prompt = self._build_prompt(result, operation)
+
+        for attempt in range(2):
+            response  = await self.client.messages.create(
+                model=model, max_tokens=512,
+                messages=[{"role": "user", "content": prompt}],
+            )
+            narrative = response.content[0].text
+            try:
+                self._validate_numbers(narrative, result["rows"])
+                return narrative
+            except NarrativeValidationError:
+                if attempt == 1:
+                    raise
+        raise NarrativeValidationError("Narrative validation failed after 2 attempts")
 
     def _is_simple(self, result: dict) -> bool:
         # Route to Haiku for ≤5 metrics and ≤3 dimensions — matches Ch03 model selection spec
@@ -735,6 +875,27 @@ class LQPGenerator:
 | **Column masking** | Applied post-assembly in FQE result assembler | Post-assembly supports cross-backend result sets |
 | **Default policy** | `defaultDenyAll: true` | No access unless a matching role is found |
 
+#### Role policies schema
+
+```sql
+CREATE TABLE analytics.role_policies (
+    role_id         TEXT        NOT NULL,
+    org_id          TEXT        NOT NULL,
+    allowed_metrics TEXT[],                      -- NULL = all metrics permitted
+    denied_metrics  TEXT[]      NOT NULL DEFAULT '{}',
+    row_predicates  JSONB       NOT NULL DEFAULT '{}',
+    column_masks    JSONB       NOT NULL DEFAULT '{}',
+    created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+    PRIMARY KEY (org_id, role_id)
+);
+
+-- row_predicates shape: { "dimension_name": "template_predicate_string", ... }
+-- column_masks shape:   { "field_name": { "condition": "...", "action": "suppress"|"hash", "replacement": null|"***" }, ... }
+
+CREATE INDEX idx_role_policies_org ON analytics.role_policies (org_id);
+```
+
 #### Role policy example
 
 ```json
@@ -823,6 +984,8 @@ class RoleAwareProjectionLayer:
 | **Threshold** | Per-request ceiling + per-user hourly performance impact budget | Hard ceiling prevents runaway queries |
 | **Config store** | SDR document store — `controls_config` document type | Platform-level thresholds stored as a JSON document alongside SMR documents |
 
+Concurrent query enforcement uses a Redis-backed semaphore rather than an in-process counter, ensuring the limit applies across all running pods.
+
 The platform has one controls config document. The Semantic Controls Layer reads it at startup and refreshes it on change events from the SDR:
 
 ```json
@@ -846,12 +1009,31 @@ The platform has one controls config document. The Semantic Controls Layer reads
 
 ```python
 class SemanticControlsLayer:
-    def __init__(self, sdr_client, pg_pool):
-        self.sdr = sdr_client
-        self.pg  = pg_pool
+    def __init__(self, sdr_client, pg_pool, redis_client):
+        self.sdr   = sdr_client
+        self.pg    = pg_pool
+        self.redis = redis_client
+
+    async def _acquire_query_slot(self, org_id: str, config: dict) -> None:
+        key     = f"query_slots:{org_id}"
+        ceiling = config["max_concurrent_queries"]
+        count   = await self.redis.incr(key)
+        await self.redis.expire(key, config["query_timeout_seconds"] + 5)
+        if count > ceiling:
+            await self.redis.decr(key)
+            raise ConcurrentQueryLimitExceeded(f"Org {org_id} at concurrent query limit ({ceiling})")
+
+    async def _release_query_slot(self, org_id: str) -> None:
+        await self.redis.decr(f"query_slots:{org_id}")
 
     async def approve(self, lqp: dict, claims: dict) -> dict:
         config = await self._load_config(claims["org_id"])
+        await self._acquire_query_slot(claims["org_id"], config)
+        try:
+            pass  # existing checks below — slot released by FQE after execution completes
+        except Exception:
+            await self._release_query_slot(claims["org_id"])
+            raise
 
         performance_impact = self._estimate_performance_impact(lqp, config)
         if performance_impact > config["performance_impact_ceiling_per_query"]:
@@ -869,8 +1051,38 @@ class SemanticControlsLayer:
         return lqp
 
     def _estimate_performance_impact(self, lqp: dict, config: dict) -> int:
-        # Σ(metric.costWeight × dimensionCardinality × timeRangeMultiplier)
-        ...
+        TIME_MULTIPLIERS = {
+            "month_to_date":    1.0,
+            "quarter_to_date":  2.0,
+            "year_to_date":     4.0,
+            "trailing_12m":     6.0,
+            "trailing_3y":     18.0,
+        }
+        DIMENSION_CARDINALITY = {   # estimated cardinality per dimension type
+            "portfolio_id":  10,
+            "asset_class":    5,
+            "sector":        11,
+            "geography":    200,
+            "currency":      50,
+            "issuer":      5000,
+        }
+
+        metrics    = lqp.get("resolved_metrics", [])
+        dimensions = [n for n in lqp["nodes"] if n["op"] == "filter"]
+        time_node  = next((n for n in lqp["nodes"] if n["op"] == "time_expand"), None)
+
+        time_multiplier = TIME_MULTIPLIERS.get(
+            time_node["period"] if time_node else "", 1.0
+        )
+        dim_cardinality = sum(
+            DIMENSION_CARDINALITY.get(dim, 100)
+            for dim in lqp.get("requested_dimensions", [])
+        ) or 1
+
+        return int(sum(
+            m.get("cost_weight", 1) * dim_cardinality * time_multiplier
+            for m in metrics
+        ))
 
     def _check_classification(self, lqp: dict, config: dict) -> None:
         # Reject if any metric classificationLevel is in blocked_classifications
@@ -1338,9 +1550,41 @@ class AnalyticalLineageStore:
         obj = await self.s3.get_object(Key=key)
         return json.loads(obj["Body"].read())
 
+    async def write_controls_decision(self, lqp: dict, claims: dict) -> None:
+        record = {
+            "record_type":   "controls_decision",
+            "result_id":     lqp["lqp_id"],        # keyed by lqp_id before result_id exists
+            "org_id":        lqp["org_id"],
+            "user_sub":      claims["sub"],
+            "approved":      lqp["controls_approved"],
+            "checks_passed": ["performance_impact_ceiling", "metric_count", "dimension_count",
+                              "classification_gate", "compliance_check"],
+            "estimated_performance_impact": lqp["estimated_performance_impact"],
+            "compliance_tier":              lqp.get("compliance_tier"),
+            "created_at":    utc_now(),
+        }
+        key = f"lineage/{lqp['org_id']}/controls/{lqp['lqp_id']}.json"
+        await self.s3.put_object(Key=key, Body=json.dumps(record).encode())
+
     async def write_execution(self, lqp: dict, result: dict) -> None:
-        # Called by FQE post-assembly; enqueued async via SQS to avoid blocking the response
-        ...
+        record = {
+            "record_type":       "execution",
+            "result_id":         result["result_id"],
+            "lqp_id":            lqp["lqp_id"],
+            "org_id":            lqp["org_id"],
+            "user_sub":          lqp.get("user_sub"),
+            "cache_hit":         result.get("cache_hit", False),
+            "performance_impact_units": lqp.get("estimated_performance_impact"),
+            "regulatory_frameworks":    list({fw for m in lqp.get("resolved_metrics", [])
+                                             if m.get("compliance_relevant")
+                                             for fw in m.get("regulatory_framework", [])}),
+            "sub_plans":         result.get("sub_plans", []),
+            "result_summary":    {"row_count": len(result.get("rows", [])), "schema": result.get("schema")},
+            "error_code":        result.get("error_code"),
+            "created_at":        utc_now(),
+            "expires_at":        compute_expiry(lqp),
+        }
+        await self.write(record)
 
     def _object_key(self, org_id: str, result_id: str, created_at: str) -> str:
         date = created_at[:10].replace("-", "/")
