@@ -20,11 +20,11 @@ The platform operates across two distinct planes: an **analytical plane** (query
 | **Metric Owner** | Governance | Subject-matter expert assigned ownership of one or more registered metrics. Reviews proposed definition changes, approves aggregation rule modifications, and maintains documentation accuracy for their assigned metrics. Distributes review responsibility without concentrating all approval authority in the Semantic Modeller or Application Admin |
 | **Application Admin** | Governance | Privileged tenant user responsible for SMR integrity, entitlement policies, and governance configuration. Must be configured before go-live — without one, the registry contains no approved analytics and metrics definitions and the platform cannot serve any query. The Application Admin approves Semantic Modeller changes and maintains the entitlement policies that RAPL enforces at query time |
 | **Integration Engineer** | Governance | Registers execution backends, maintains connection configuration, and declares the physical mapping that the Federated Query Engine resolves at execution time. Operates through configuration interfaces, not the query path |
-| **Platform Admin** | Infrastructure | Cross-tenant platform team. Responsible for infrastructure health, tenant onboarding, and cross-tenant governance audit. Has no query interface into tenant data |
+| **Platform Admin** | Infrastructure | Infrastructure and operations team. Responsible for platform health and infrastructure governance. Has no query interface into analytical data |
 
 **Compliance-enhanced governance artifacts are not a role feature.** Any entitled user querying a compliance-relevant metric for a compliance-stated purpose receives the full enhanced artifact set — regulatory trace, export gate, and lineage-locked output — automatically. This is determined at runtime by metric metadata and AI intent classification, not by a dedicated role or claim.
 
-**Roles are not mutually exclusive.** A single individual may hold multiple roles within a tenant; the platform evaluates entitlements from the combined JWT claims present at query time.
+**Roles are not mutually exclusive.** A single individual may hold multiple roles; the platform evaluates entitlements from the combined JWT claims present at query time.
 
 The **Semantic Modeller** is the critical pre-condition for everything downstream. No analytical query can be served against a metric that has not been modelled, registered, and approved. The governance pipeline, the entitlement layer, the lineage store, and the visualisation ontology all operate on the semantic definitions the Semantic Modeller produces. In practice this role requires both domain knowledge (what does this metric mean in this business context?) and data modelling precision (how is it calculated, from which sources, under which dimensional hierarchies, with which access policies?).
 
@@ -44,7 +44,7 @@ The **Semantic Modeller** is the critical pre-condition for everything downstrea
 | Entitlement policy management | | | | | ✓ | | |
 | Backend registration | | | | | | ✓ | |
 | Governance audit trail | | | | | ✓ | ✓ | ✓ |
-| Tenant onboarding / infrastructure | | | | | | | ✓ |
+| Platform infrastructure | | | | | | | ✓ |
 
 ---
 
@@ -241,7 +241,7 @@ When the Analytics Engine returns the structured result, display spec, and narra
 
 > **Governing principles:** [P1 — Semantic abstraction](./00-overview.md#design-principles) · [P3 — Deterministic metric resolution](./00-overview.md#design-principles) · [P9 — Administrator sovereignty](./00-overview.md#design-principles)
 
-The Semantic Metrics Repository (SMR) is the governing catalogue of every analytical concept resolvable on the platform. Before any query can be planned or executed, every identifier in that query (metrics, dimensions, hierarchies) must be registered in the SMR. This is an architectural constraint, not a policy: the Semantic Intent Layer rejects any identifier not present in the SMR for the active tenant, and nothing is queryable that is not registered.
+The Semantic Metrics Repository (SMR) is the governing catalogue of every analytical concept resolvable on the platform. Before any query can be planned or executed, every identifier in that query (metrics, dimensions, hierarchies) must be registered in the SMR. This is an architectural constraint, not a policy: the Semantic Intent Layer rejects any identifier not present in the SMR, and nothing is queryable that is not registered.
 
 ### Concept Types
 
@@ -314,7 +314,7 @@ Every metric in the SMR conforms to the following schema. This is the authoritat
 
 | Field | Required | Description |
 |---|---|---|
-| `id` | Yes | Unique metric identifier within the tenant. Lowercase, underscores. Used in MCP tool call parameters. |
+| `id` | Yes | Unique metric identifier. Lowercase, underscores. Used in MCP tool call parameters. |
 | `version` | Yes | Semantic version. Increment on formula changes (major), aggregation changes (minor), documentation changes (patch). |
 | `label` | Yes | Human-readable metric name. Used in UI, narrative synthesis, and chart axis labels. |
 | `description` | Yes | Full prose definition. Must be unambiguous — this definition is injected into the AI model context. |
@@ -502,7 +502,7 @@ The SIL resolves the `compare_portfolios` operation from the SMR DCS catalogue, 
 {
   "lqp_id":    "lqp-20260518-093243-r9xq",
   "intent_id": "int-20260518-093241-pk7m",
-  "tenant_id": "acme-wealth",
+  "org_id": "acme-wealth",
   "nodes": [
     { "id": "n1", "type": "metric_scan",
       "metrics": ["portfolio_return", "benchmark_return"],
@@ -703,7 +703,7 @@ The platform escalates to the enhanced compliance artifact tier only when both o
 | Signal | Source | True when |
 |---|---|---|
 | **Signal 1 — metric metadata** | `compliance_relevant` field on `analytical_metric` SMR definition | At least one resolved metric has `compliance_relevant: true`. Set by the metric owner at registration. |
-| **Signal 2 — AI intent classification** | Semantic Intent Layer compliance intent classification (Stage 2b) | `compliance_purpose_score` ≥ tenant-configured `compliance_intent_threshold` (default 0.8). The SIL classifies the natural language query and sets `compliance_purpose: true` if the score meets the threshold. |
+| **Signal 2 — AI intent classification** | Semantic Intent Layer compliance intent classification (Stage 2b) | `compliance_purpose_score` ≥ the platform-level `compliance_intent_threshold` (default 0.8, configurable). The SIL classifies the natural language query and sets `compliance_purpose: true` if the score meets the threshold. |
 
 **Combined decision:**
 
@@ -829,10 +829,10 @@ The FQE maintains a result cache keyed by the LQP signature — a deterministic 
 
 | Cache property | Specification |
 |---|---|
-| Cache key | SHA-256 of (metric IDs + versions, dimension IDs, filter predicates, time expression, entitlement hash, tenant ID). **Entitlement hash** is a SHA-256 of the fully resolved `row_predicates` and `column_masks` from the RAPL projection record for the request, computed after role merging. Two users with different effective predicates always produce different entitlement hashes and are never served each other's cached results. |
+| Cache key | SHA-256 of (metric IDs + versions, dimension IDs, filter predicates, time expression, entitlement hash, org ID). **Entitlement hash** is a SHA-256 of the fully resolved `row_predicates` and `column_masks` from the RAPL projection record for the request, computed after role merging. Two users with different effective predicates always produce different entitlement hashes and are never served each other's cached results. |
 | Cache TTL | Configurable per `data.refresh_cadence` in the metric definition. Default: 3600 seconds. |
 | Cache invalidation | On metric definition version change; on execution backend data refresh signal; on explicit cache clear via Admin API |
-| Cache scope | Per-tenant. Results from one tenant are never served to another. |
+| Cache scope | Platform-scoped. All results are isolated to the single deployed organisation. |
 | Cache storage | Platform-managed result cache. Results over 10 MB bypass the cache and are streamed directly. |
 | Cache hit disclosure | Cache hits are disclosed in the lineage record and optionally surfaced to the user as a "Result from cache (data as of [timestamp])" indicator. |
 | Cache bypass | Queries with `compliance_purpose: true` bypass the cache. Compliance artifacts must be freshly generated for each compliance-purpose execution; cached results cannot retroactively produce regulatory trace records. |
@@ -937,7 +937,7 @@ The `TABLE_GOVERNED` contract is the unconditional fallback. It is always eligib
 
 ### Override Mechanism
 
-Power Analysts may override the ontology's chart selection for a single result by expressing an explicit chart type preference in their query. Overrides are subject to the requested chart type being in the tenant's `allowedChartTypes` list and the result schema being compatible with the requested chart type. Incompatible overrides are rejected with an explanation. All overrides are logged in the lineage record as analyst-requested deviations from the governing ontology.
+Power Analysts may override the ontology's chart selection for a single result by expressing an explicit chart type preference in their query. Overrides are subject to the requested chart type being in the platform's configured `allowedChartTypes` list and the result schema being compatible with the requested chart type. Incompatible overrides are rejected with an explanation. All overrides are logged in the lineage record as analyst-requested deviations from the governing ontology.
 
 ### Example
 
@@ -1000,7 +1000,7 @@ The model used is recorded in `narrative_status` in the lineage record.
 
 ### Feature Flag
 
-Narrative synthesis is controlled by the `features.narrativeSynthesis` tenant configuration flag. When disabled, the NSE is not invoked and no `narrative` field is included in the response. The default is enabled. Disabling narrative synthesis has no effect on computation, lineage, or display spec generation.
+Narrative synthesis is controlled by the `features.narrativeSynthesis` platform configuration flag. When disabled, the NSE is not invoked and no `narrative` field is included in the response. The default is enabled. Disabling narrative synthesis has no effect on computation, lineage, or display spec generation.
 
 ### Example
 
@@ -1168,7 +1168,7 @@ The Analytical Lineage Store provides computation provenance: a complete, querya
 
 ### Storage Design
 
-Lineage records are stored in an object store — one JSON document per query at key `lineage/{tenant_id}/{yyyy}/{mm}/{dd}/{result_id}.json`. Records are write-once and never mutated. Post-hoc compliance annotations are written as sibling documents (`{result_id}_amendment_{n}.json`) referencing the original `result_id`.
+Lineage records are stored in an object store — one JSON document per query at key `lineage/{org_id}/{yyyy}/{mm}/{dd}/{result_id}.json`. Records are write-once and never mutated. Post-hoc compliance annotations are written as sibling documents (`{result_id}_amendment_{n}.json`) referencing the original `result_id`.
 
 A thin relational database search index holds only scalar fields required for filtered search queries. The full record is always fetched from the object store; the index is never the source of truth for record content.
 
@@ -1176,12 +1176,12 @@ A thin relational database search index holds only scalar fields required for fi
 
 | Element | Storage | Content |
 |---|---|---|
-| Lineage record | Object store — `lineage/{tenant_id}/{yyyy}/{mm}/{dd}/{result_id}.json` | Complete chain: tool call parameters → SMR resolution → projection record → LQP → governance decision → FQE execution record → result schema → visualisation contract → narrative synthesis status |
+| Lineage record | Object store — `lineage/{org_id}/{yyyy}/{mm}/{dd}/{result_id}.json` | Complete chain: tool call parameters → SMR resolution → projection record → LQP → governance decision → FQE execution record → result schema → visualisation contract → narrative synthesis status |
 | SMR snapshot | Embedded in lineage record (`resolved_metrics`) | For each metric in the query: metric ID, SMR definition version at query time |
 | Projection record | Embedded in lineage record | Roles, requested metrics, projected metrics, blocked metrics, row predicates, column masks |
 | FQE execution record | Embedded in lineage record (`sub_plans`) | Sub-plan details, engine IDs, latencies, cost units, cache hit status |
 | Governance decision | Embedded in lineage record (`governance_decision`) | Circuit breaker decisions, classification gates, cost limit checks — including blocked queries |
-| Search index row | Relational database `analytics.lineage_index` | Scalar fields for filtered search — `result_id`, `tenant_id`, `user_sub`, `compliance_mode`, `error_code`, `cache_hit`, `created_at`, `expires_at` |
+| Search index row | Relational database `analytics.lineage_index` | Scalar fields for filtered search — `result_id`, `org_id`, `user_sub`, `compliance_mode`, `error_code`, `cache_hit`, `created_at`, `expires_at` |
 | Result artefact | Object storage | CSV result set, chart SVG, narrative text — stored per query |
 
 ### Search Index DDL: `analytics.lineage_index`
@@ -1189,7 +1189,7 @@ A thin relational database search index holds only scalar fields required for fi
 ```sql
 CREATE TABLE analytics.lineage_index (
   result_id       TEXT        PRIMARY KEY,
-  tenant_id       TEXT        NOT NULL,
+  org_id          TEXT        NOT NULL,
   user_sub        TEXT        NOT NULL,
   compliance_mode TEXT,
   error_code      TEXT,
