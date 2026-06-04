@@ -13,7 +13,7 @@ Component definitions referenced in the metrics below (SMR, FQE, RAPL, SEG, NSE,
 | **Platform uptime** | API availability (p99 end-to-end latency < 2s including FQE backend execution; error rate < 0.1%) | 99.9% |
 | **Governance block rate** | Queries blocked by governance checks ÷ total queries | Monitor — sustained > 15% warrants investigation; > 30% triggers mandatory configuration review (see §6.3) |
 | **FQE error rate** | Queries with FQE execution errors ÷ total executed queries | < 2% |
-| **Cache hit rate** | Queries served from result cache ÷ total executed queries | ≥ 35% by month 2 |
+| **Cache hit rate** | Queries served from the FQE's internal result cache ÷ total executed queries. The result cache is an internal FQE component — this ratio is derived from the `cache_hit` field in the Analytical Lineage Store (ALS). | ≥ 35% by month 2 |
 | **Lineage completeness** | Queries with complete lineage records ÷ total queries | **100%** — any deviation is a platform defect |
 | **SMR registry health** | Metrics with no owner OR not updated in 12 months ÷ total active metrics | < 5% |
 

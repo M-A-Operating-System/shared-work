@@ -145,9 +145,9 @@ Beyond the schema, every query also transmits the user's natural language questi
 
 ### Operational and Maintenance Risk
 
-#### Query cost is uncontrollable
+#### Query performance impact is uncontrollable
 
-LLM-generated SQL is written to satisfy the question semantically, not to execute efficiently. Missing partition filters, full table scans, and unoptimised aggregations are common. In cloud data warehouses billed by query cost (Snowflake, BigQuery, Databricks), a single malformed query can consume significant budget. There is no pre-execution cost estimate, no circuit breaker, and no query cost governance. The result is unpredictable infrastructure spend with no reliable way to prevent it, because there is no way to put a hard limit on what an LLM will generate.
+LLM-generated SQL is written to satisfy the question semantically, not to execute efficiently. Missing partition filters, full table scans, and unoptimised aggregations are common. In cloud data warehouses billed by query performance impact (Snowflake, BigQuery, Databricks), a single malformed query can consume significant budget. There is no pre-execution performance impact assessment, no threshold, and no query performance impact governance. The result is unpredictable infrastructure spend with no reliable way to prevent it, because there is no way to put a hard limit on what an LLM will generate.
 
 #### Schema changes create a continuous, untestable maintenance burden
 
@@ -218,7 +218,7 @@ The governed architecture separates the AI translation layer from the governed c
 | Physical schema exposed to external AI provider | Physical schema never in any prompt; only SMR business definitions are visible |
 | Complex regulated formulas are unreliable | Formulas defined once in the registry; applied identically to every query |
 | Multi-source federation is not possible | Federated Query Engine routes governed plans to SQL warehouses, OpenData APIs, Graph APIs, and any registered backend |
-| Query cost is uncontrollable | Cost estimated from Logical Query Plan before execution; circuit breaker blocks excess |
+| Query performance impact is uncontrollable | Performance impact assessed from LQP before execution; blocked if threshold exceeded |
 | Cannot be deterministically tested | Deterministic pipeline: given these inputs, the system must produce exactly this output |
 | Schema changes require manual prompt re-engineering with no reliable test coverage | Physical mappings updated once in the SMR; changes versioned, approved, and consistently applied to all dependent metrics |
 

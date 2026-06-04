@@ -26,7 +26,7 @@ The platform eliminates Text-to-SQL as an architectural pattern for regulated an
 | [2. Core Capabilities](./02-core-capabilities.md) | Core Platform Capabilities | Platform roles, deep-dive specifications: SMR, Intent Layer, RAPL, Governance, FQE, Data Visualization Language (DVL), Output Format, Analytical Lineage Store (ALS), MCP Layer |
 | [3. Integration and Deployment](./03-integration-and-deployment.md) | Integration and Deployment | Consumer integration, platform administration, Financial Services reference model, complementary services |
 | [4. Technical Implementation](./04-technical-implementation.md) | Proposed Technical Implementation | Reference stack with rationale: Cloudflare Workers, Apache Calcite, Vega-Lite, PostgreSQL lineage store, Anthropic Claude |
-| [5. Success Metrics](./05-success-metrics.md) | Success Metrics | Platform and application-level metrics, governance health indicators, review cadence |
+| [5. Success Metrics](./05-success-metrics.md) | Success Metrics | Platform and application-level metrics, controls health indicators, review cadence |
 | [Appendix](./06-text-to-sql-antipattern.md) | Text-to-SQL and Semantic Analytics: Better Together | Structural failure modes, SQL injection risks, and the complementary architecture where both tools coexist |
 | [Roadmap](./07-roadmap.md) | Platform Roadmap | Planned enhancements beyond the current release |
 | [Glossary](./08-glossary.md) | Glossary | Definitions for all named components, technical terms, abbreviations, and domain concepts used across this specification |
@@ -43,7 +43,7 @@ Start with the Overview for executive and business context, then read Chapters 2
 | **[Logical Query Plan (LQP)](./02-core-capabilities.md#semantic-intent-layer)** | Engine-agnostic DAG of analytical operations produced by the Semantic Intent Layer. No physical backend references. |
 | **[Federated Query Engine (FQE)](./02-core-capabilities.md#federated-query-planner)** | The only component with knowledge of physical backends. Decomposes the LQP into sub-plans, routes by data domain affinity, executes in parallel, assembles results. |
 | **[Role-Aware Projection Layer (RAPL)](./02-core-capabilities.md#role-aware-projection-layer)** | Semantic-tier entitlement enforcement. Applies metric access filters, dimension access filters, row predicates, and column masks — before any query plan is compiled. |
-| **[Semantic Execution Governance (SEG)](./02-core-capabilities.md#semantic-execution-governance)** | Suite of circuit breakers, cost controls, complexity limits, and compliance classification checks applied to every query before FQE release. |
+| **[Semantic Controls Layer (SCL)](./02-core-capabilities.md#semantic-controls-layer)** | Suite of performance impact thresholds, complexity limits, and compliance classification checks applied to every query before FQE release. |
 | **[Data Visualization Language (DVL)](./02-core-capabilities.md#analytical-output-format)** | Platform output format for display specifications. Two types in a consistent JSON envelope: `type: "chart"` (Vega-Lite v5) and `type: "table"`. |
 | **[Analytical Lineage Store (ALS)](./02-core-capabilities.md#analytical-lineage-store)** | Computation provenance — not data lineage. A complete, queryable record of which metric definitions, aggregation rules, role projections, and backend sub-results produced each analytical result. |
 | **Application Admin** | Privileged user responsible for SMR integrity, entitlement policies, and governance configuration. Equivalent to a Chief Data Officer within the platform context. Must exist before go-live. |
@@ -64,8 +64,8 @@ These decisions are non-negotiable architectural constraints. Each maps to one o
 | **A5** | Every analytical result has a Provenance Artifact linking intent → semantic plan → LQP → backend execution → result. | [P4](./00-overview.md#design-principles) |
 | **A6** | Chart selection is deterministic and governed by the Data Visualization Language (DVL) — not inferred by the LLM per query. | [P7](./00-overview.md#design-principles) |
 | **A7** | The LQP is platform-agnostic. Physical execution translation is the FQE's responsibility. | [P10](./00-overview.md#design-principles) |
-| **A8** | Governance circuit breakers are applied at the semantic tier. No query reaches a physical backend without passing governance checks. | [P2](./00-overview.md#design-principles) |
-| **A9** | Entitlement isolation is enforced at every layer: RAPL/SEG checks on every request, row-level security on the lineage index, and scoped access on all storage. | [P5](./00-overview.md#design-principles) |
+| **A8** | SCL controls are applied at the semantic tier. No query reaches a physical backend without passing controls checks. | [P2](./00-overview.md#design-principles) |
+| **A9** | Entitlement isolation is enforced at every layer: RAPL/SCL checks on every request, row-level security on the lineage index, and scoped access on all storage. | [P5](./00-overview.md#design-principles) |
 | **A10** | Narrative synthesis is anchored to governed metric values in the execution result. The LLM may not introduce metric values not present in the result. | [P6](./00-overview.md#design-principles) |
 
 ---

@@ -21,7 +21,7 @@ This document describes one proposed sequence of deliverables for the AI Analyti
 <td rowspan="14">1</td>
 <td rowspan="14"><strong>Governed Analytical Core</strong></td>
 <td>Platform Admin API</td>
-<td>Create new authenticated REST service; implement CRUD endpoints for the Data Source Catalog, SMR metric definitions, and role entitlement records; add governance settings endpoints for circuit breaker thresholds and feature flags; secure all routes with JWT middleware</td>
+<td>Create new authenticated REST service; implement CRUD endpoints for the Data Source Catalog, SMR metric definitions, and role entitlement records; add controls settings endpoints for threshold limits and feature flags; secure all routes with JWT middleware</td>
 <td rowspan="14">Any MCP-compatible consumer — AI assistant, application, or autonomous agent — can query a registered metric and receive a governed, reproducible result with a chart, a narrative, and an audit-grade lineage record, scoped to exactly the user's entitlements</td>
 </tr>
 <tr>
@@ -38,7 +38,7 @@ This document describes one proposed sequence of deliverables for the AI Analyti
 </tr>
 <tr>
 <td>MCP Capability Layer</td>
-<td>Build new Python service using FastMCP + Uvicorn (ASGI); deploy as a Kubernetes pod; implement JWT validation middleware at request ingress rejecting unauthenticated requests before any platform processing; implement three <code>@mcp.tool()</code> handlers (<code>run_analytics</code>, <code>list_operations</code>, <code>drilldown</code>) routing through the shared pipeline (<code>validate_jwt → sil.resolve → rapl.project → seg.approve → fqp.execute → assemble_response</code>); implement MCP resource handlers serving knowledge artifacts from the Knowledge Store (<code>guide://</code> and <code>skills://</code> URIs — no JWT required, no governance pipeline); implement two <code>@mcp.prompt()</code> templates (standard analytical assistant, regulatory reporting assistant); build per-user capability manifest endpoint reflecting feature-flag state and entitlement-gated tool availability</td>
+<td>Build new Python service using FastMCP + Uvicorn (ASGI); deploy as a Kubernetes pod; implement JWT validation middleware at request ingress rejecting unauthenticated requests before any platform processing; implement three <code>@mcp.tool()</code> handlers (<code>run_analytics</code>, <code>list_operations</code>, <code>drilldown</code>) routing through the shared pipeline (<code>validate_jwt → sil.resolve → rapl.project → scl.approve → fqp.execute → assemble_response</code>); implement MCP resource handlers serving knowledge artifacts from the Knowledge Store (<code>guide://</code> and <code>skills://</code> URIs — no JWT required, no controls pipeline); implement two <code>@mcp.prompt()</code> templates (standard analytical assistant, regulatory reporting assistant); build per-user capability manifest endpoint reflecting feature-flag state and entitlement-gated tool availability</td>
 </tr>
 <tr>
 <td>Semantic Intent Layer</td>
@@ -49,8 +49,8 @@ This document describes one proposed sequence of deliverables for the AI Analyti
 <td>Build new service implementing JWT claim extraction (<code>roles</code>, <code>managed_portfolios</code>, <code>entity_ids</code>); implement role definition template store in PostgreSQL; build row predicate injector that materialises WHERE clause conditions from role templates and attaches them to the LQP before FQE dispatch; implement column mask registry and apply masks at result assembly; enforce <code>defaultDenyAll: true</code> — return <code>ENTITLEMENT_DENIED</code> for any user with no matching role before any query executes</td>
 </tr>
 <tr>
-<td>Semantic Execution Governance</td>
-<td>Build new governance pipeline service with five sequential steps: (1) cost estimation against a configurable cost unit model, (2) classification gate checking the LQP's metric data sensitivity levels against the requesting role's clearance, (3) circuit breaker checks for query complexity score, platform-level cost budget, and per-user rate limit, (4) governance decision record written to the lineage store before any backend call, (5) pass-through or structured rejection with decision reason; read the governance config from a <code>governance_config</code> document in the SDR at startup and refresh on SDR change events — config is not stored in a separate database table; all decisions logged with microsecond timestamps</td>
+<td>Semantic Controls Layer</td>
+<td>Build new controls pipeline service with five sequential steps: (1) performance impact assessment against a configurable performance impact unit model, (2) classification gate checking the LQP's metric data sensitivity levels against the requesting role's clearance, (3) threshold checks for query complexity score, platform-level performance impact budget, and per-user rate limit, (4) controls decision record written to the lineage store before any backend call, (5) pass-through or structured rejection with decision reason; read the controls config from a <code>controls_config</code> document in the SDR at startup and refresh on SDR change events — config is not stored in a separate database table; all decisions logged with microsecond timestamps</td>
 </tr>
 <tr>
 <td>Federated Query Engine (FQE)</td>
@@ -66,7 +66,7 @@ This document describes one proposed sequence of deliverables for the AI Analyti
 </tr>
 <tr>
 <td>Analytical Lineage Store (ALS)</td>
-<td>Provision S3-compatible object store bucket with date-partitioned key structure (<code>lineage/{org_id}/{yyyy}/{mm}/{dd}/{result_id}.json</code>); implement write-once JSON document serialiser covering the full query record (request payload, resolved metric versions, governance decision, sub-plans, assembled result, DVL display spec, compliance metadata); implement write path called by the Semantic Execution Governance service before any backend execution and by the FQE on completion; create lightweight <code>analytics.lineage_index</code> PostgreSQL table (scalar fields only — no JSON payloads) for future search queries; configure object lifecycle policy for 7-year default retention; post-hoc compliance annotations written as sibling amendment documents, never mutating the original record</td>
+<td>Provision S3-compatible object store bucket with date-partitioned key structure (<code>lineage/{org_id}/{yyyy}/{mm}/{dd}/{result_id}.json</code>); implement write-once JSON document serialiser covering the full query record (request payload, resolved metric versions, controls decision, sub-plans, assembled result, DVL display spec, compliance metadata); implement write path called by the Semantic Controls Layer before any backend execution and by the FQE on completion; create lightweight <code>analytics.lineage_index</code> PostgreSQL table (scalar fields only — no JSON payloads) for future search queries; configure object lifecycle policy for 7-year default retention; post-hoc compliance annotations written as sibling amendment documents, never mutating the original record</td>
 </tr>
 <tr>
 <td>vega2img Rendering Service</td>
@@ -82,7 +82,7 @@ This document describes one proposed sequence of deliverables for the AI Analyti
 <td rowspan="4">2</td>
 <td rowspan="4"><strong>Automated Monitoring and Alerts</strong></td>
 <td>Scheduled Query Service</td>
-<td>Create <code>scheduled_queries</code> table in PostgreSQL storing cron expression, owner <code>sub</code>, and validated MCP tool call parameters; implement Kubernetes CronJob controller that reads pending schedules and dispatches them through the full governance pipeline using the stored owner JWT claims at runtime; write results to the Analytical Lineage Store (ALS) and result artefact store on completion</td>
+<td>Create <code>scheduled_queries</code> table in PostgreSQL storing cron expression, owner <code>sub</code>, and validated MCP tool call parameters; implement Kubernetes CronJob controller that reads pending schedules and dispatches them through the full controls pipeline using the stored owner JWT claims at runtime; write results to the Analytical Lineage Store (ALS) and result artefact store on completion</td>
 <td rowspan="4">Risk officers and portfolio managers receive automated push notifications when a metric breaches its defined threshold — no manual query required; every alert payload carries a lineage reference to the underlying computation</td>
 </tr>
 <tr>
@@ -171,7 +171,7 @@ This document describes one proposed sequence of deliverables for the AI Analyti
 </tr>
 <tr>
 <td>Per-Participant Governance Engine</td>
-<td>Extend the governance pipeline to accept a participant context identifier on each query submitted within a shared session; route each query through the full Role-Aware Projection Layer using the submitting participant's own JWT claims — not the session owner's; tag each result record with the participant's <code>sub</code> and the projection applied; implement a result visibility filter that withholds results from participants who would receive <code>ENTITLEMENT_DENIED</code> for the same query</td>
+<td>Extend the controls pipeline to accept a participant context identifier on each query submitted within a shared session; route each query through the full Role-Aware Projection Layer using the submitting participant's own JWT claims — not the session owner's; tag each result record with the participant's <code>sub</code> and the projection applied; implement a result visibility filter that withholds results from participants who would receive <code>ENTITLEMENT_DENIED</code> for the same query</td>
 </tr>
 <tr>
 <td>Annotation Layer</td>
@@ -204,8 +204,8 @@ This document describes one proposed sequence of deliverables for the AI Analyti
 <td rowspan="4">8</td>
 <td rowspan="4"><strong>Regulatory Compliance Modes</strong></td>
 <td>Compliance Mode Framework</td>
-<td>Extend the Semantic Execution Governance service to add a new pipeline step 5 evaluating the platform's <code>complianceMode</code> configuration field; implement a compliance mode dispatcher that routes to the appropriate mode handler(s); support concurrent activation of multiple modes; invalidate any cached governance plan on <code>complianceMode</code> configuration change so the new rules apply immediately to the next query</td>
-<td rowspan="4">Regulated queries automatically write regime-specific compliance audit records and enforce query-time constraints without per-query manual configuration; the governance pipeline is the enforcement point</td>
+<td>Extend the Semantic Controls Layer to add a new pipeline step 5 evaluating the platform's <code>complianceMode</code> configuration field; implement a compliance mode dispatcher that routes to the appropriate mode handler(s); support concurrent activation of multiple modes; invalidate any cached controls plan on <code>complianceMode</code> configuration change so the new rules apply immediately to the next query</td>
+<td rowspan="4">Regulated queries automatically write regime-specific compliance audit records and enforce query-time constraints without per-query manual configuration; the controls pipeline is the enforcement point</td>
 </tr>
 <tr>
 <td>MiFID II Compliance Mode</td>
@@ -272,7 +272,7 @@ This document describes one proposed sequence of deliverables for the AI Analyti
 </tr>
 <tr>
 <td>GraphQL API Gateway</td>
-<td>Create new GraphQL server implementing a typed schema over the MCP Capability Layer; define query types for <code>analyseMetric</code>, <code>comparePortfolios</code>, <code>listMetrics</code>, <code>getMetricDefinition</code>, and <code>drilldown</code> with typed input and output schemas; implement JWT extraction from HTTP Authorization header; route all resolvers through the unchanged governance pipeline — no direct backend access, no governance bypass</td>
+<td>Create new GraphQL server implementing a typed schema over the MCP Capability Layer; define query types for <code>analyseMetric</code>, <code>comparePortfolios</code>, <code>listMetrics</code>, <code>getMetricDefinition</code>, and <code>drilldown</code> with typed input and output schemas; implement JWT extraction from HTTP Authorization header; route all resolvers through the unchanged controls pipeline — no direct backend access, no governance bypass</td>
 </tr>
 <tr>
 <td>NDJSON Result Streaming and Progress Events</td>
@@ -284,7 +284,7 @@ This document describes one proposed sequence of deliverables for the AI Analyti
 </tr>
 <tr>
 <td>Materialised View Registration</td>
-<td>Create <code>materialised_views</code> table in PostgreSQL storing named pre-computed result templates (metric IDs, dimensions, time expression) with a cron refresh schedule; extend the Scheduled Query Service to execute registered materialised view refreshes and write results to a dedicated cache store; extend the FQE query matcher to detect when an incoming LQP matches a registered materialised view and route to the cache store; extend the Semantic Execution Governance cost estimator to apply an 800-unit cost reduction for matched materialised view queries</td>
+<td>Create <code>materialised_views</code> table in PostgreSQL storing named pre-computed result templates (metric IDs, dimensions, time expression) with a cron refresh schedule; extend the Scheduled Query Service to execute registered materialised view refreshes and write results to a dedicated cache store; extend the FQE query matcher to detect when an incoming LQP matches a registered materialised view and route to the cache store; extend the Semantic Controls Layer performance impact estimator to apply an 800-unit performance impact reduction for matched materialised view queries</td>
 </tr>
 
 </tbody>

@@ -16,7 +16,7 @@ flowchart TD
         MCP["MCP Capability Layer\nPython · FastMCP + Uvicorn · MCP Streamable HTTP"]
         SIL["Semantic Intent Layer\nParameter validation · SMR resolution · LQP generation"]
         RAPL["Role-Aware Projection Layer\nCustom middleware · Python"]
-        SEG["Semantic Execution Governance\nCost estimation · classification · circuit breakers"]
+        SCL["Semantic Controls Layer\nPerformance impact assessment · classification · thresholds"]
         FQE["Federated Query Engine\nApache Calcite + backend adapters"]
         DVL["Data Visualization Language (DVL)\nSCL generation · Vega-Lite v5"]
         NSE["Narrative Synthesis Engine\nAnthropic Claude · Haiku / Sonnet"]
@@ -44,9 +44,9 @@ flowchart TD
     MCP -->|"JWT claims"| RAPL
     RAPL -->|"row predicates + column masks"| SIL
     SIL -->|"metric resolution + validation"| SMR
-    SIL -->|"Logical Query Plan"| SEG
-    SEG -->|"approved LQP"| FQE
-    SEG -->|"governance decision"| LS
+    SIL -->|"Logical Query Plan"| SCL
+    SCL -->|"approved LQP"| FQE
+    SCL -->|"controls decision"| LS
     FQE -->|"physicalMapping lookup"| SMR
     FQE --> SQL & ODA & GDA
     FQE -->|"execution record"| LS
@@ -72,7 +72,7 @@ The Semantic Data Repository (SDR) is a pre-existing platform component: the org
 | **Protocol** | MCP Streamable HTTP | Standard MCP interoperability; supports request/response and streaming |
 | **Auth** | JWT validation at request ingress | Stateless; validated before any platform computation begins |
 | **Tools** | Three tools: `run_analytics` (SMR-driven execution), `list_operations` (discovery), `drilldown` (result navigation) | SMR owns all operation definitions; code is the execution engine |
-| **Resources** | Knowledge artifacts only — guides, skills definitions, compliance reference | Static; no user data; embedded in AI consumer context before analytical tasks; no governance pipeline |
+| **Resources** | Knowledge artifacts only — guides, skills definitions, compliance reference | Static; no user data; embedded in AI consumer context before analytical tasks; no controls pipeline |
 | **Prompts** | Pre-built analytical and regulatory assistant templates | Inject available metrics and governance constraints at session start |
 
 FastMCP (`pip install fastmcp`) provides the `@mcp.tool()`, `@mcp.resource()`, and `@mcp.prompt()` decorators and handles MCP Streamable HTTP transport. Each analytical capability is a decorated Python function; the framework serialises schemas and routes calls automatically.
@@ -812,25 +812,25 @@ class RoleAwareProjectionLayer:
 
 ---
 
-### Semantic Execution Governance
+### Semantic Controls Layer
 
-> **Specification:** [§Semantic Execution Governance](./02-core-capabilities.md#semantic-execution-governance)
+> **Specification:** [§Semantic Controls Layer](./02-core-capabilities.md#semantic-controls-layer)
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
 | **Implementation** | Custom rules engine (Python) | Deterministic; config-driven; no ML inference |
-| **Cost estimation** | `Σ(metric.costWeight × dimensionCardinality × timeRangeMultiplier)` | Pre-execution; calibrated against actual cost data |
-| **Circuit breaker** | Per-request ceiling + per-user hourly budget | Hard ceiling prevents runaway queries |
-| **Config store** | SDR document store — `governance_config` document type | Platform-level thresholds stored as a JSON document alongside SMR documents |
+| **Performance impact assessment** | `Σ(metric.costWeight × dimensionCardinality × timeRangeMultiplier)` | Pre-execution; calibrated against actual cost data |
+| **Threshold** | Per-request ceiling + per-user hourly performance impact budget | Hard ceiling prevents runaway queries |
+| **Config store** | SDR document store — `controls_config` document type | Platform-level thresholds stored as a JSON document alongside SMR documents |
 
-The platform has one governance config document. The Semantic Execution Governance layer reads it at startup and refreshes it on change events from the SDR:
+The platform has one controls config document. The Semantic Controls Layer reads it at startup and refreshes it on change events from the SDR:
 
 ```json
 {
-  "type":                       "governance_config",
+  "type":                       "controls_config",
   "org_id":                  "acme-wealth",
-  "cost_ceiling_per_query":     1000,
-  "cost_budget_per_user_hourly": 10000,
+  "performance_impact_ceiling_per_query":     1000,
+  "performance_impact_budget_per_user_hourly": 10000,
   "max_concurrent_queries":     20,
   "max_metrics_per_query":      10,
   "max_dimensions":             5,
@@ -845,7 +845,7 @@ The platform has one governance config document. The Semantic Execution Governan
 ```
 
 ```python
-class SemanticExecutionGovernance:
+class SemanticControlsLayer:
     def __init__(self, sdr_client, pg_pool):
         self.sdr = sdr_client
         self.pg  = pg_pool
@@ -854,18 +854,18 @@ class SemanticExecutionGovernance:
         config = await self._load_config(claims["org_id"])
 
         cost = self._estimate_cost(lqp, config)
-        if cost > config["cost_ceiling_per_query"]:
-            raise CostCeilingExceeded(cost)
+        if cost > config["performance_impact_ceiling_per_query"]:
+            raise PerformanceImpactCeilingExceeded(cost)
 
         spend = await self._hourly_spend(claims["sub"], claims["org_id"])
-        if spend + cost > config["cost_budget_per_user_hourly"]:
-            raise UserBudgetExceeded()
+        if spend + cost > config["performance_impact_budget_per_user_hourly"]:
+            raise UserPerformanceImpactBudgetExceeded()
 
         self._check_classification(lqp, config)
         lqp = self._check_compliance(lqp, claims, config)
 
         lqp["cost_estimate"]       = cost
-        lqp["governance_approved"] = True
+        lqp["controls_approved"] = True
         return lqp
 
     def _estimate_cost(self, lqp: dict, config: dict) -> int:
@@ -909,11 +909,11 @@ class SemanticExecutionGovernance:
         return lqp
 
     async def _load_config(self, org_id: str) -> dict:
-        return await self.sdr.get(document_type="governance_config", org_id=org_id)
+        return await self.sdr.get(document_type="controls_config", org_id=org_id)
 
     async def _hourly_spend(self, user_sub: str, org_id: str) -> int:
         return await self.pg.fetchval(
-            "SELECT COALESCE(SUM(cost_units), 0) FROM analytics.lineage_index "
+            "SELECT COALESCE(SUM(performance_impact_units), 0) FROM analytics.lineage_index "
             "WHERE user_sub=$1 AND org_id=$2 AND created_at > now() - interval '1 hour'",
             user_sub, org_id,
         )
@@ -1365,7 +1365,7 @@ class AnalyticalLineageStore:
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
 | **Storage** | S3-compatible object store (versioned Markdown or MDX files) | Human-readable; diffable; straightforward Admin API management |
-| **Access** | Read-only at runtime via MCP resource handlers | No user data; no governance pipeline required |
+| **Access** | Read-only at runtime via MCP resource handlers | No user data; no controls pipeline required |
 | **Management** | Admin API — create, update, version knowledge artifacts | Administrators can extend or override default content |
 | **Defaults** | Bundled at installation alongside the Financial Services Reference Model | Covers platform overview, all six analytical domains, core skills definitions, MiFID II and Basel III/IV compliance guides |
 
@@ -1403,7 +1403,7 @@ class KnowledgeStore:
 | MCP service | Python · FastMCP + Uvicorn | Lightweight ASGI MCP surface; deploys as Kubernetes pod |
 | Backend services | Kubernetes (cloud-agnostic) | FQE, governance, platform services as independently scalable pods |
 | Primary database | PostgreSQL (Neon or RDS) | Lineage search index, role policy config, scheduled queries, user preferences, saved queries |
-| Data Context Store (DCS) | Pre-existing platform component | SMR metric definitions, governance config, SMR search — reuses SDR versioned storage and native search |
+| Data Context Store (DCS) | Pre-existing platform component | SMR metric definitions, controls config, SMR search — reuses SDR versioned storage and native search |
 | Knowledge Store | S3-compatible object store (versioned Markdown) | MCP resource content — guides, skills definitions, compliance reference |
 | Object storage | S3-compatible | Lineage records (one JSON document per query), result artefacts, large cached result sets |
 | Message queue | SQS / Pub/Sub | Async lineage writes, SDR change events |
@@ -1854,7 +1854,7 @@ One bundle covers all analytical dimensions. Every domain bundle's metrics and o
 
 #### Regulatory domain bundle (`domain: "regulatory"`)
 
-All regulatory metrics carry `"classification_level": "restricted"` and `"compliance_modes": ["basel3"]`. The SEG classification gate is triggered for every query against these metrics.
+All regulatory metrics carry `"classification_level": "restricted"` and `"compliance_modes": ["basel3"]`. The SCL classification gate is triggered for every query against these metrics.
 
 ```json
 [

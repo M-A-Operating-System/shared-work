@@ -67,11 +67,11 @@ AI has two roles in the analytical pipeline. The first lives in the AI consumer 
 | It is | It is not |
 |-------|-----------|
 | A governed computation platform — the same question, data, and access permissions always produce the same answer | An AI product — the Analytics Engine is deterministic; the optional plain-language summary is a constrained post-computation step, not a query generator |
-| A governed analytics and data mining platform — metric queries, large dataset retrieval, and drilldown under a unified governance pipeline | A general-purpose SQL interface, BI tool replacement, or user interface |
+| A governed analytics and data mining platform — metric queries, large dataset retrieval, and drilldown under a unified controls pipeline | A general-purpose SQL interface, BI tool replacement, or user interface |
 | An API layer that AI systems call to retrieve governed analytical results and datasets | A system that accepts natural language directly or allows AI to generate arbitrary database queries |
 | A governed metric registry — every queryable metric is registered, approved, and version-controlled | A system that infers metric definitions at query time |
 
-All AI systems access the platform through a single channel — an API layer built on MCP (Model Context Protocol), an open standard for connecting AI systems to tools and data. Conversational assistants, autonomous agents, data mining pipelines, and custom applications all enter through this channel and traverse the same governance pipeline. There is no alternative path. Every AI-initiated request produces an audit record. This is the architectural guarantee that makes AI-driven analytics safe to operate in a regulated environment.
+All AI systems access the platform through a single channel — an API layer built on MCP (Model Context Protocol), an open standard for connecting AI systems to tools and data. Conversational assistants, autonomous agents, data mining pipelines, and custom applications all enter through this channel and traverse the same controls pipeline. There is no alternative path. Every AI-initiated request produces an audit record. This is the architectural guarantee that makes AI-driven analytics safe to operate in a regulated environment.
 
 ---
 
@@ -82,7 +82,7 @@ Ten principles govern all design decisions. Where a proposed feature conflicts w
 | Principle | What it means |
 |-----------|--------------|
 | **P1 — Semantic abstraction** | The platform never exposes physical database schemas to AI models or end users. Unregistered concepts cannot be queried — schema leakage is impossible by design, not by policy. |
-| **P2 — Governance before execution** | Every query passes through the full governance pipeline before any database is contacted. There is no fast path. |
+| **P2 — Controls before execution** | Every query passes through the full controls pipeline before any database is contacted. There is no fast path. |
 | **P3 — Deterministic metric resolution** | A metric name resolves to exactly one approved definition at a given point in time. "Portfolio Return" means the same thing in every query, every report, and every regulatory submission under the same version. |
 | **P4 — Complete analytical lineage** | Every result carries a complete, queryable record of how the analytics engine used individual data elements to produce it — every definition, every access decision, every sub-result. |
 | **P5 — Role-aware by default** | The recommended configuration is deny-by-default: an unauthenticated or unentitled request is blocked before any analytical processing begins. Access restrictions are injected at the query level, not applied as a post-retrieval filter. |
@@ -144,7 +144,7 @@ flowchart LR
         direction TB
        M["API / Protocol Layer\n(MCP)"]
         P1["Intent & Metric Resolution\nApproved Semantic Layer"]
-        P2["Governance Pipeline\nEntitlement · Compliance"]
+        P2["Controls Pipeline\nEntitlement · Compliance"]
         P3["Federated Query Engine"]
     end
     subgraph data["Database / Data Sources"]
@@ -161,14 +161,14 @@ flowchart LR
     platform --> data
 ```
 
-In the platform approach, every request routes through the API layer, traverses the invariant governance sequence, and produces an audit record. No path to execution backends, physical schemas, or raw data exists outside that pipeline.
+In the platform approach, every request routes through the API layer, traverses the invariant controls sequence, and produces an audit record. No path to execution backends, physical schemas, or raw data exists outside that pipeline.
 
 ### Query Space
 
 The platform's scope spans two independent dimensions that together define the full range of governed analytical work.
 
 **Output type — visualisation or dataset**
-Some requests are best answered with a chart or summary: a portfolio manager wants to see returns versus benchmark, not a raw table of numbers. Others require a structured dataset: a data science pipeline needs millions of rows of position data for model retraining, and a chart is irrelevant. Both output types traverse the same governance pipeline. The difference is resolved by the Data Visualization Language (DVL) at query time — chart or table is determined by the intent and result shape, not by the user or the AI.
+Some requests are best answered with a chart or summary: a portfolio manager wants to see returns versus benchmark, not a raw table of numbers. Others require a structured dataset: a data science pipeline needs millions of rows of position data for model retraining, and a chart is irrelevant. Both output types traverse the same controls pipeline. The difference is resolved by the Data Visualization Language (DVL) at query time — chart or table is determined by the intent and result shape, not by the user or the AI.
 
 **Governance tier — business analytics or full-provenance**
 Most queries require standard governance: approved analytics and metrics definitions, entitlement enforcement, and a compliance provenance record. Some queries require more: when a request is for a regulatory submission — or involves a metric that is flagged as compliance-relevant — the platform automatically escalates to the enhanced compliance artifact tier. Two independent signals trigger escalation: the metric's own compliance-relevant flag (set by the metric owner at registration) and the AI's classification of the query's stated purpose. When both signals are present, a regulatory trace record, export controls, and a regulator-ready artifact set are produced automatically. No user action or role claim is required.
@@ -182,7 +182,7 @@ These two dimensions define four possible result types. The platform handles all
 
 ### End-to-End Examples
 
-Four queries traced through every stage illustrate the query space in practice. The first is a routine business analytics question — metric query with visualisation output, standard governance. The second is a multi-source business question — metrics federated across two independent backends, assembled into a single governed result. The third is a data mining request from an autonomous agent — large dataset retrieval with table output, standard governance. The fourth is a regulatory submission request — the same governance pipeline with compliance artifact escalation triggered automatically by the two-signal model.
+Four queries traced through every stage illustrate the query space in practice. The first is a routine business analytics question — metric query with visualisation output, standard governance. The second is a multi-source business question — metrics federated across two independent backends, assembled into a single governed result. The third is a data mining request from an autonomous agent — large dataset retrieval with table output, standard governance. The fourth is a regulatory submission request — the same controls pipeline with compliance artifact escalation triggered automatically by the two-signal model.
 
 ---
 
@@ -221,7 +221,7 @@ entitlements:        user_scope → [authorised_portfolio_list]
 ```
 
 **4 · Query planning, governance, and execution**
-The Federated Query Engine constructs a platform-agnostic Logical Query Plan (LQP) — The governance layer then constructs a precise, warehouse-neutral query: value-weighted portfolio return joined to each portfolio's registered benchmark, filtered to equity, with access predicates injected at the query level. No raw database schemas have been exposed at any stage. The query executes against the registered warehouse; the Analytics Engine assembles the response: computed values, a chart specification, an optional plain-language summary anchored strictly to the result, and a full audit record.
+The Federated Query Engine constructs a platform-agnostic Logical Query Plan (LQP) — The controls layer then constructs a precise, warehouse-neutral query: value-weighted portfolio return joined to each portfolio's registered benchmark, filtered to equity, with access predicates injected at the query level. No raw database schemas have been exposed at any stage. The query executes against the registered warehouse; the Analytics Engine assembles the response: computed values, a chart specification, an optional plain-language summary anchored strictly to the result, and a full audit record.
 
 ```sql
 -- Logical Query Plan
@@ -386,7 +386,7 @@ entitlements:
 ```
 
 **3 · Query planning, governance, and execution**
-The Query Planner constructs a paginated retrieval plan. The governance layer constructs a paginated query across the approved field set, restricted to the agent's authorised portfolios. Each page executes under the same governance controls. An audit record is written for the full retrieval — recording exactly which data was returned to which agent under which access permissions.
+The Query Planner constructs a paginated retrieval plan. The controls layer constructs a paginated query across the approved field set, restricted to the agent's authorised portfolios. Each page executes under the same controls. An audit record is written for the full retrieval — recording exactly which data was returned to which agent under which access permissions.
 
 ```sql
 -- Logical Query Plan
@@ -467,7 +467,7 @@ escalation: ENHANCED compliance artifact tier  -- both signals required
 ```
 
 **4 · Query planning, governance, and execution**
-Compliance-purpose queries are never served from cache — a fresh computation is required for every regulatory submission. The governance layer constructs the query with cache bypass enforced. On completion, it writes a regulatory trace record to the compliance-specific audit store (in addition to the standard compliance provenance record), enforces export controls until the complete compliance provenance record exists, and validates the result's data classification against the user's authorised ceiling. The treasury analyst receives both the governed LCR result and a complete, regulator-ready audit trail — automatically.
+Compliance-purpose queries are never served from cache — a fresh computation is required for every regulatory submission. The controls layer constructs the query with cache bypass enforced. On completion, it writes a regulatory trace record to the compliance-specific audit store (in addition to the standard compliance provenance record), enforces export controls until the complete compliance provenance record exists, and validates the result's data classification against the user's authorised ceiling. The treasury analyst receives both the governed LCR result and a complete, regulator-ready audit trail — automatically.
 
 ```sql
 -- Logical Query Plan  (cache bypass enforced — compliance_purpose = true)
@@ -589,7 +589,7 @@ Once execution completes and the result is verified, the platform seals a compli
 
 ---
 
-- [Chapter 2](./02-core-capabilities.md) — Detailed specifications for each platform component: metric registry, intent layer, entitlement enforcement, governance pipeline, query federation, visualisation, narrative synthesis, lineage store, and API layer
+- [Chapter 2](./02-core-capabilities.md) — Detailed specifications for each platform component: metric registry, intent layer, entitlement enforcement, controls pipeline, query federation, visualisation, narrative synthesis, lineage store, and API layer
 - [Chapter 3](./03-integration-and-deployment.md) — Integration patterns, deployment models, and platform administration
 - [Chapter 4](./04-technical-implementation.md) — Reference implementation stack with technology rationale
 - [Chapter 5](./05-success-metrics.md) — Platform and governance success metrics

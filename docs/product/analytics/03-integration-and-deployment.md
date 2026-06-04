@@ -1,8 +1,8 @@
 # 4. Integration and Deployment
 
-This chapter covers the complete integration surface of the AI Analytics Platform: how consumers authenticate and call it, how platform administrators configure it, the financial services reference model it ships with, and the complementary ecosystem services that extend its capabilities. The platform is deliberately narrow in its external interface: a single MCP endpoint governs all consumer access, and a single Admin API governs all configuration. Complexity lives inside the governance pipeline, not in the integration contract.
+This chapter covers the complete integration surface of the AI Analytics Platform: how consumers authenticate and call it, how platform administrators configure it, the financial services reference model it ships with, and the complementary ecosystem services that extend its capabilities. The platform is deliberately narrow in its external interface: a single MCP endpoint governs all consumer access, and a single Admin API governs all configuration. Complexity lives inside the controls pipeline, not in the integration contract.
 
-Component specifications (SMR, SIL, RAPL, SEG, FQE, DVL, NSE, Analytical Lineage Store (ALS)) are in [Chapter 2 -- Core Platform Capabilities](./02-core-capabilities.md). The reference implementation stack is in [Chapter 4 -- Proposed Technical Implementation](./04-technical-implementation.md).
+Component specifications (SMR, SIL, RAPL, SCL, FQE, DVL, NSE, Analytical Lineage Store (ALS)) are in [Chapter 2 -- Core Platform Capabilities](./02-core-capabilities.md). The reference implementation stack is in [Chapter 4 -- Proposed Technical Implementation](./04-technical-implementation.md).
 
 ---
 
@@ -150,18 +150,18 @@ Execution backends are registered in the Data Source Catalog via the Admin API. 
 | `authType` | Yes | Authentication mode: `service-account` (platform-held credential), `api-key`, or `bearer` (forwards the calling user's JWT to the backend) |
 | `dataAffinity` | Yes | Logical data domains this backend serves — the FQE routes sub-plans whose metric `data.domain` matches one of these values |
 | `capabilities` | Yes | Operations the FQE may route to this backend: `aggregate`, `filter`, `join`, `window`, `timeseries`, `metric`, `traverse` |
-| `costTier` | No | Relative execution cost: `minimal`, `low`, `standard`, `high`, `unrestricted` — used by the governance circuit breaker when estimating query cost |
+| `costTier` | No | Relative execution cost: `minimal`, `low`, `standard`, `high`, `unrestricted` — used by the SCL when assessing query performance impact |
 
 Multiple backends may share the same `dataAffinity` value; the FQE selects among them based on `priority`, `capabilities`, and backend availability. If a backend declares `authType: "bearer"`, the user's own JWT is forwarded. Entitlement enforcement at the backend layer is then the consuming system's responsibility, and the platform's row-level predicate injection still applies upstream.
 
-### Governance Settings
+### Controls Settings
 
-The governance block controls the circuit breakers and compliance mode applied to every query before execution:
+The controls block controls the thresholds and compliance mode applied to every query before execution:
 
 ```json
 {
   "governance": {
-    "maxQueryCostUnits": 1000,
+    "maxPerformanceImpact": 1000,
     "maxConcurrentQueries": 5,
     "queryTimeoutSeconds": 60,
     "classificationGating": true,
@@ -175,7 +175,7 @@ The governance block controls the circuit breakers and compliance mode applied t
 
 | Field | Description |
 |-------|-------------|
-| `maxQueryCostUnits` | Maximum estimated cost units a single query may consume. Queries whose estimated cost exceeds this value are blocked before execution. |
+| `maxPerformanceImpact` | Maximum estimated performance impact units a single query may consume. Queries whose estimated performance impact exceeds this value are blocked before execution. |
 | `maxConcurrentQueries` | Maximum concurrent queries per user. Excess queries are held until a slot becomes available or the timeout budget is reached. |
 | `queryTimeoutSeconds` | Maximum wall-clock time permitted for a single query's execution across all backends. |
 | `classificationGating` | When `true`, queries involving metrics whose `data.classification` appears in `blockedClassifications` are rejected before execution. |
@@ -206,7 +206,7 @@ The scope, model, and feature blocks configure the platform's analytical domain,
 }
 ```
 
-`analyticalDomain` scopes the SMR seed template to the configured domain. `regulatoryJurisdiction` influences compliance mode defaults and regulatory threshold sourcing. When `requiresIntentConfirmation` is `true`, the platform returns a confirmation card to the consumer before executing any query. This is appropriate for high-stakes or irreversible analytical operations. The `models` block selects between available inference tiers for the Narrative Synthesis Engine: `"fast"` maps to Claude Haiku and reduces latency, `"standard"` maps to Claude Sonnet and is the balanced default for complex queries. Intent resolution is performed by the AI consumer and is not configured here. Individual features in the `features` block may be toggled without affecting the governance pipeline. Disabling `narrativeSynthesis`, for example, removes the narrative field from responses but has no effect on lineage, entitlement enforcement, or result computation.
+`analyticalDomain` scopes the SMR seed template to the configured domain. `regulatoryJurisdiction` influences compliance mode defaults and regulatory threshold sourcing. When `requiresIntentConfirmation` is `true`, the platform returns a confirmation card to the consumer before executing any query. This is appropriate for high-stakes or irreversible analytical operations. The `models` block selects between available inference tiers for the Narrative Synthesis Engine: `"fast"` maps to Claude Haiku and reduces latency, `"standard"` maps to Claude Sonnet and is the balanced default for complex queries. Intent resolution is performed by the AI consumer and is not configured here. Individual features in the `features` block may be toggled without affecting the controls pipeline. Disabling `narrativeSynthesis`, for example, removes the narrative field from responses but has no effect on lineage, entitlement enforcement, or result computation.
 
 ### SMR Administration Settings
 
