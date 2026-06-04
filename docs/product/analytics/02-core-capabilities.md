@@ -58,7 +58,7 @@ The platform exposes its capability through three consumption modes. The first i
 flowchart TD
     subgraph Consumers["AI Consumers"]
         direction LR
-        ChatComp["**Conversational AI\nconversational UI** \n Image/Chart rendering · Tool call routing\nAudit trail · Memory · Shared conversations"]
+        ChatComp["<b>Conversational AI</b>\nConversational UI, Image/Chart rendering · Tool call routing\nAudit trail · Memory · Shared conversations"]
         CustomUI["Custom analytics UI\nhost-built · renders JSON / DVL"]
         Agents["Agentic AI\n Independant Agents - event monitors · report pipelines, Anomoloy Dection, Event Prediction, Data Quality, Risk Tollerance, Reviews etc"]
     end
