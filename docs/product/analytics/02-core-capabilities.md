@@ -116,7 +116,7 @@ The Analytics Engine is a single MCP server. It exposes three analytical tools (
 
 The AI Chat Platform loads the operation catalogue from the Analytics Engine by calling `list_operations`. This is how the AI model discovers what operations, metrics, and dimensions are available. It translates the user's natural language question into explicit, structured parameters and calls `run_analytics` with the resolved `operation_id` and `params`. The Analytics Engine returns the display specification, structured data, and governed narrative; the AI Chat Platform renders the result.
 
-The `vega2img` service is shown separately from the Analytics Platform boundary because it is an optional, independently registered MCP render service. Consumers that cannot natively render the DVL display specification (for example, an agentic pipeline that requires static image output) register `vega2img` directly and call it as a separate tool invocation using the `result_id` returned by the Analytics Platform. It is not part of the core analytics pipeline.
+The `vega2img` service is shown separately from the Analytics Platform boundary because it is an optional, independently registered MCP render service. Consumers that cannot natively render the DVL display specification (for example, an agentic pipeline that requires static image output) register `vega2img` directly and call it as a separate tool invocation, passing the `display_spec` from the `run_analytics` response. It is not part of the core analytics pipeline.
 
 ---
 
@@ -280,7 +280,7 @@ When the Analytics Engine returns the structured result, display spec, and narra
 
 > **Governing principles:** [P2 — Controls before execution](./00-overview.md#design-principles) · [P5 — Role-aware by default](./00-overview.md#design-principles)
 
-The MCP Capability Layer exposes the platform's governed analytical operations to AI orchestrators via MCP Streamable HTTP transport. Each capability is a bounded, named operation with a typed input schema, a governed execution path through the full platform pipeline (Semantic Intent Layer → Role-Aware Projection → SCL → FQE), and a typed output contract. AI agents interact with capabilities, not databases. There is no privileged API path — AI agents receive the same controls-validated results as human users.
+The MCP Capability Layer exposes the platform's governed analytical operations to AI orchestrators via MCP Streamable HTTP transport. Each capability is a bounded, named operation with a typed input schema, a governed execution path — at minimum through role-aware projection and the federated query engine, and through the full pipeline (SIL → RAPL → SCL → FQE) for metric and analytical operations, and a typed output contract. AI agents interact with capabilities, not databases. There is no privileged API path — AI agents receive the same controls-validated results as human users.
 
 ### Tool Catalogue
 
@@ -312,7 +312,7 @@ The Analytics Engine exposes three tools. All analytical operations are SMR-cata
 
 ### Execution Profiles
 
-Each SMR operation carries an `execution_profile` defined in its `analytical_operation` SDR document. This tells the pipeline executor which stages to invoke. No execution depth is hardcoded in the MCP layer — it is always determined by the SMR catalogue.
+Each SMR operation carries an `execution_profile` defined in its `analytical_operation` entry in the SMR catalogue. This tells the pipeline executor which stages to invoke. No execution depth is hardcoded in the MCP layer — it is always determined by the SMR catalogue.
 
 | Profile | Pipeline stages |
 |---|---|
@@ -823,7 +823,7 @@ The platform escalates to the enhanced Provenance Artifact only when both of the
 | Signal | Source | True when |
 |---|---|---|
 | **Signal 1 — metric metadata** | `compliance_relevant` field on `analytical_metric` SMR definition | At least one resolved metric has `compliance_relevant: true`. Set by the Metrics Modeller at registration. |
-| **Signal 2 — AI intent classification** | Semantic Intent Layer compliance intent classification (Stage 2b) | `compliance_purpose_score` ≥ the platform-level `compliance_intent_threshold` (default 0.8, configurable). The SIL classifies the natural language query and sets `compliance_purpose: true` if the score meets the threshold. |
+| **Signal 2 — AI intent classification** | Semantic Intent Layer compliance intent classification (Stage 2b) | `compliance_purpose_score` ≥ the platform-level `compliance_intent_threshold` (default 0.8, configurable). The SIL classifies the query's analytical intent — derived from the operation ID, resolved metric descriptions, and parameter values — and sets `compliance_purpose: true` if the score meets the threshold. |
 
 **Combined decision:**
 
@@ -1092,7 +1092,7 @@ The ontology produces the following DVL display specification:
 
 > **Governing principles:** [P6 — Governed narrative](./00-overview.md#design-principles) · [P10 — Deterministic computation, not generation](./00-overview.md#design-principles)
 
-The Narrative Synthesis Engine (NSE) is a secondary AI component inside the Analytics Engine. It runs after the computation pipeline completes — after the FQE has assembled the result and the Data Visualization Language (DVL) has selected the chart contract — making a single, tightly-scoped call to a language model with one purpose: summarise the structured result in plain language, anchored strictly to the computed values.
+The Narrative Synthesis Engine (NSE) is a secondary AI component inside the Analytics Engine. It runs after the computation pipeline completes — after the FQE has assembled the result, in parallel with the Data Visualization Language (DVL), — making a single, tightly-scoped call to a language model with one purpose: summarise the structured result in plain language, anchored strictly to the computed values.
 
 The NSE is not a general-purpose AI model with access to the query, the user's intent, or the SMR. Its prompt is constructed entirely from the assembled result: metric labels, row values, units, and dimension names. It is told what the data shows; it is not told what the user asked. This constraint is intentional — it prevents the narrative from interpreting, recommending, or inferring beyond what was computed.
 
@@ -1231,7 +1231,7 @@ The first is written by SCL before the FQE is invoked — capturing the controls
   "lqp_id":     "lqp-20260518-093243-r9xq",
   "event":      "controls_approved",
   "timestamp":  "2026-05-18T09:32:44Z",
-  "checks":     ["performance_impact_ceiling", "metric_count", "dimension_count", "classification_gate"],
+  "checks":     ["performance_impact_ceiling", "metric_count", "dimension_count", "classification_gate", "compliance_check"],
   "result":     "all_passed"
 }
 ```
@@ -1246,7 +1246,7 @@ The first is written by SCL before the FQE is invoked — capturing the controls
   "cache_hit":         false,
   "controls_decision": {
     "approved": true,
-    "checks_passed": ["performance_impact_ceiling", "metric_count", "dimension_count", "classification_gate"]
+    "checks_passed": ["performance_impact_ceiling", "metric_count", "dimension_count", "classification_gate", "compliance_check"]
   },
   "sub_plans": [
     {
