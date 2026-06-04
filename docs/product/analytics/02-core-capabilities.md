@@ -199,7 +199,11 @@ The AI Chat Platform is the conversational layer through which users interact wi
 
 ### Example
 
-The portfolio manager types their question. The conversation engine first loads the operation catalogue:
+A portfolio manager asks: *"Show me portfolio returns versus benchmark for my equity portfolios this quarter."*
+
+**↳ Step 1 — Natural language request received.** The question enters the platform via the AI Chat Front End. No database has been contacted. No query has been generated.
+
+The conversation engine first loads the entitled operation catalogue:
 
 ```
 tools/call list_operations   (via Analytics Engine MCP, JWT forwarded)
@@ -523,6 +527,8 @@ The SIL resolves the `compare_portfolios` operation from the SMR catalogue, vali
 
 Node `n3` is the RAPL row predicate — part of the plan, not a post-execution filter.
 
+**↳ Step 2 — Intent resolution complete.** The natural language question has been resolved against the SMR into a validated, platform-agnostic Logical Query Plan. Every metric and dimension identifier is confirmed as registered and approved. No backend has been contacted.
+
 ---
 
 ## Role-Aware Projection Layer (RAPL)
@@ -632,6 +638,8 @@ The RAPL reads the `portfolio_scope` claim from the JWT and resolves it against 
 ```
 
 No column masks apply — the `portfolio_manager` role has no masking rules for performance metrics. The row predicate is injected into the LQP as node `n3` (see section 3.2 example). Any portfolio outside the four listed IDs is excluded at the physical query level.
+
+**↳ Step 3 — Metric and entitlement resolution complete.** Both metrics are confirmed against their approved SMR definitions. The user's access scope is locked — row predicates injected, entitled portfolio set established. No backend has been contacted.
 
 ---
 
@@ -878,6 +886,8 @@ Assembled result:
 
 The FQE writes an execution record to the Analytical Lineage Store (ALS) and passes the assembled result in parallel to the Data Visualization Language (DVL) and Narrative Synthesis Engine.
 
+**↳ Step 4 — Query planning, governance, and execution complete.** The LQP passed all controls checks, was decomposed into backend-specific sub-plans, executed against the registered warehouse, and the result assembled. The full audit record is written. No physical schema was exposed at any stage.
+
 ---
 
 ## Data Visualization Language (DVL)
@@ -1018,6 +1028,8 @@ The portfolio manager's query returns four rows. The NSE receives the assembled 
 ```
 
 Post-generation validation confirms every verbatim numeric value cited in the narrative (4.21, 3.85, 2.87, 2.54, 3.67, 3.90, 1.93, 2.31) is present in the assembled result rows. Validation matches on exact numeric literals extracted from the narrative text — rounding differences or proportional expressions (e.g. "roughly 4.2%") may not be caught; residual hallucination risk applies to non-literal claims. Validation passes. The narrative is included in the MCP response alongside `display_spec` and `data`.
+
+**↳ Step 5 — Presentation decision complete.** The DVL has selected the governed display contract for this result shape and intent pattern. The NSE has produced a plain-language summary anchored strictly to the computed values. The response is ready to return to the AI consumer.
 
 ---
 
