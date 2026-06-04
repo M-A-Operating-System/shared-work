@@ -425,23 +425,7 @@ Every metric in the SMR conforms to the following schema. This is the authoritat
 | `compliance_relevant` | No | When `true`, this metric's output may be used in regulatory reporting or compliance submissions. When combined with a compliance-purpose query intent (see §Semantic Intent Layer), the platform escalates to the enhanced Provenance Artifact. Set by the Metrics Modeller at registration. |
 | `regulatory_framework` | No | Array of regulatory frameworks this metric belongs to. Accepted values: `mifid2`, `basel3`, `sec_reg_bi`. Drives trace target routing in the ALS and the additional validation rules applied by the SCL when the Provenance Artifact is active. A metric may belong to multiple frameworks. An empty array indicates no framework-specific rules apply. |
 
-### Registry Governance Workflow
-
-Metrics progress through a defined lifecycle from initial authorship to eventual retirement:
-
-```
-Draft → Proposed → In Review → Approved (Active) → Deprecated → Retired
-```
-
-| Transition | Trigger | Effect |
-|---|---|---|
-| Draft → Proposed | Metrics Modeller submits a new definition | Visible in admin UI; not resolvable |
-| Proposed → In Review | Analytics Governance opens for review | Downstream impact analysis runs automatically |
-| In Review → Approved | Analytics Governance approves | Metric becomes resolvable from next refresh cycle |
-| Approved → Deprecated | Metrics Modeller or Analytics Governance marks deprecated | Metric resolves with a deprecation warning; removed from SMR browsing defaults |
-| Deprecated → Retired | Analytics Governance retires after deprecation period | Metric no longer resolvable; lineage records preserved |
-
-When a metric definition is proposed for change, the platform automatically runs an impact analysis covering downstream metrics, saved analytical sessions, and dashboards deriving results from the affected metric. Approval of a change with downstream impacts requires Analytics Governance to acknowledge the impact report; that acknowledgement is recorded in the lineage store.
+All metric definitions must pass through a governance review and approval process before they are resolvable on the platform. A metric authored by a Metrics Modeller is not queryable until it has been reviewed and approved by Analytics Governance.
 
 ### Formula Language
 
@@ -453,7 +437,7 @@ The SMR is backed by the SDR, which handles document creation, versioning, and t
 
 **Discovery** — AI models and agents discover available operations by calling the `list_operations` MCP tool (defined in the MCP Capability Layer). `list_operations` returns operation IDs, display names, required parameters, supported metrics, supported dimensions, and execution profiles for all approved operations within the caller's entitlement scope. There are no `smr://` MCP resource URIs and no separate `list_metrics`, `get_metric_definition`, `propose_metric`, or `approve_metric` MCP tools.
 
-The internal resolution calls made by the Semantic Intent Layer and Federated Query Engine query the SDR directly. There is no separate internal API. The SMR's governance workflow (Draft → Proposed → In Review → Approved → Deprecated → Retired) is managed through the SDR's existing authoring capabilities, not by custom MCP tools.
+The internal resolution calls made by the Semantic Intent Layer and Federated Query Engine query the SDR directly. There is no separate internal API.
 
 ### Example
 
