@@ -168,7 +168,7 @@ In the platform approach, every request routes through the API layer, traverses 
 The platform's scope spans two independent dimensions that together define the full range of governed analytical work.
 
 **Output type — visualisation or dataset**
-Some requests are best answered with a chart or summary: a portfolio manager wants to see returns versus benchmark, not a raw table of numbers. Others require a structured dataset: a data science pipeline needs millions of rows of position data for model retraining, and a chart is irrelevant. Both output types traverse the same governance pipeline. The difference is resolved by the Visualisation Ontology at query time — chart or table is determined by the intent and result shape, not by the user or the AI.
+Some requests are best answered with a chart or summary: a portfolio manager wants to see returns versus benchmark, not a raw table of numbers. Others require a structured dataset: a data science pipeline needs millions of rows of position data for model retraining, and a chart is irrelevant. Both output types traverse the same governance pipeline. The difference is resolved by the Data Visualization Language (DVL) at query time — chart or table is determined by the intent and result shape, not by the user or the AI.
 
 **Governance tier — business analytics or full-provenance**
 Most queries require standard governance: approved analytics and metrics definitions, entitlement enforcement, and a compliance provenance record. Some queries require more: when a request is for a regulatory submission — or involves a metric that is flagged as compliance-relevant — the platform automatically escalates to the enhanced compliance artifact tier. Two independent signals trigger escalation: the metric's own compliance-relevant flag (set by the metric owner at registration) and the AI's classification of the query's stated purpose. When both signals are present, a regulatory trace record, export controls, and a regulator-ready artifact set are produced automatically. No user action or role claim is required.
@@ -242,7 +242,7 @@ GROUP BY p.portfolio_id, b.period_return;
 ```
 
 **5 · Presentation decision**
-The result schema — two numeric measures compared across a categorical dimension — is matched against the Visualisation Ontology. The ontology resolves a grouped bar chart as the governed display contract for this result shape and intent pattern. A complete Vega-Lite specification is emitted alongside the data; the AI consumer renders it without making any independent display choice.
+The result schema — two numeric measures compared across a categorical dimension — is matched against the Data Visualization Language (DVL). DVL resolves a grouped bar chart as the governed display contract for this result shape and intent pattern. A complete Vega-Lite specification is emitted alongside the data; the AI consumer renders it without making any independent display choice.
 
 ```json
 {
@@ -328,7 +328,7 @@ WHERE    portfolio_id IN (/* authorised_portfolio_list */);
 ```
 
 **5 · Presentation decision**
-The result — metric versus threshold across multiple portfolio entities with a contributing factor breakdown — is matched against the Visualisation Ontology. The ontology resolves a heatmap as the governed display contract for this threshold-comparison pattern. Breaching portfolios are visually distinguished; the dominant risk factor is available as a drilldown dimension.
+The result — metric versus threshold across multiple portfolio entities with a contributing factor breakdown — is matched against the Data Visualization Language (DVL). DVL resolves a heatmap as the governed display contract for this threshold-comparison pattern. Breaching portfolios are visually distinguished; the dominant risk factor is available as a drilldown dimension.
 
 ```json
 {
@@ -406,7 +406,7 @@ LIMIT    10000  OFFSET :page_offset;
 ```
 
 **5 · Presentation decision**
-Bulk data retrieval resolves to a structured paginated table — not a chart. The Visualisation Ontology emits a Vega-Lite table specification defining the approved field set, column types, and formatting rules. The consuming agent receives a typed dataset with a continuation token for subsequent pages.
+Bulk data retrieval resolves to a structured paginated table — not a chart. The Data Visualization Language (DVL) emits a Vega-Lite table specification defining the approved field set, column types, and formatting rules. The consuming agent receives a typed dataset with a continuation token for subsequent pages.
 
 ```json
 {
@@ -442,7 +442,7 @@ A treasury analyst asks: *"Prepare our LCR figures for the Basel III submission.
 ```
 
 **2 · Intent resolution and compliance classification**
-The AI client resolves the operation and metric. The intent layer classifies the stated purpose: the phrase *"for the Basel III submission"* exceeds the configured compliance intent threshold. Compliance purpose is recorded and carried through the full pipeline.
+The AI client resolves the operation and metric. The Semantic Intent Layer (SIL) classifies the stated purpose: the phrase *"for the Basel III submission"* exceeds the configured compliance intent threshold. Compliance purpose is recorded and carried through the full pipeline.
 
 ```
 -- Semantic Intent Resolution
@@ -492,7 +492,7 @@ GROUP BY h.entity_id;
 ```
 
 **5 · Presentation decision**
-A small set of entity-level regulatory ratios resolves to a structured compliance table — not a chart. The Visualisation Ontology emits a Vega-Lite table specification with conditional formatting to highlight ratios below the regulatory minimum. Because compliance artifact mode is active, the specification carries an export contract: output is locked until the complete compliance provenance record is confirmed.
+A small set of entity-level regulatory ratios resolves to a structured compliance table — not a chart. The Data Visualization Language (DVL) emits a Vega-Lite table specification with conditional formatting to highlight ratios below the regulatory minimum. Because compliance artifact mode is active, the specification carries an export contract: output is locked until the complete compliance provenance record is confirmed.
 
 ```json
 {

@@ -68,7 +68,7 @@ flowchart TD
         MCP["<b>API/MCP Interface</b>\nMCP server runtime, tool/ resource/ prompt presentation, JWT validation"]
         SIL["<b>Semantic Intent Layer(SIL)</b>\nParameter validation · SMR resolution · LQP generation"]
         RAPL["<b>Role-Aware Projection Layer(RAPL)</b>\nJWT claims · row predicates · column masks"]
-        SEG["<b>Semantic Execution Control Layer(SECL)</b>\nCost estimation · classification · circuit breakers"]
+        SEG["<b>Semantic Execution Governance(SEG)</b>\nCost estimation · classification · circuit breakers"]
         FQE["<b>Federated Query Engine(FQE)</b>\nquery planning engine + backend adapters"]
         VO["<b>Data Visualization Language (DVL)</b>\ndisplay spec · the platform's chart specification format"]
         NSE["<b>Narrative Synthesis Engine(NSE)</b>\nlanguage model · post-computation\nanchored to result values · P6 governed"]
@@ -531,7 +531,7 @@ The Role-Aware Projection Layer applies the authenticated user's entitlement mod
 
 ### Restriction Types
 
-The projection layer applies four categories of restriction:
+The Role-Aware Projection Layer (RAPL) applies four categories of restriction:
 
 | Restriction type | Description | Applied at |
 |---|---|---|
@@ -551,7 +551,7 @@ flowchart TD
     S4["**4. Metric access filter**\nIntersect requested metrics with metric_access_set\nUnentitled metrics → METRIC_NOT_ENTITLED error"]
     S5["**5. Dimension access filter**\nIntersect requested dimensions with dimension_access_set\nUnentitled dimensions → DIMENSION_NOT_ENTITLED error"]
     S6["**6. Row predicate construction**\nResolve predicate templates: user.managed_portfolios\nPredicates stored in LQP for FQE injection at execution time"]
-    S7["**7. Column mask registration**\nRegister masked columns in LQP metadata\nFQP applies masks during result assembly"]
+    S7["**7. Column mask registration**\nRegister masked columns in LQP metadata\nFQE applies masks during result assembly"]
     S8(["**8. Projected LQP produced**\n→ proceeds to governance validation"])
 
     START --> S1 --> S2 --> S3 --> S4 --> S5 --> S6 --> S7 --> S8
@@ -559,7 +559,7 @@ flowchart TD
 
 ### Multi-Role Merging
 
-Users may hold multiple roles simultaneously. The projection layer merges role entitlements using union semantics for metric and dimension access. A user entitled to a metric via any role may query it. Row predicates and column masks use the inverse strategy: all predicates must be satisfied (most restrictive wins), and a column masked by any role is masked for the user.
+Users may hold multiple roles simultaneously. RAPL merges role entitlements using union semantics for metric and dimension access. A user entitled to a metric via any role may query it. Row predicates and column masks use the inverse strategy: all predicates must be satisfied (most restrictive wins), and a column masked by any role is masked for the user.
 
 | Entitlement type | Merge strategy | Rationale |
 |---|---|---|
@@ -609,7 +609,7 @@ Column masks are applied during FQE result assembly, after sub-results return fr
 
 ### Entitlement Audit
 
-Every projection decision (including blocked metrics, applied row predicates, and active column masks) is recorded in the lineage store as part of the execution record. The projection record captures the roles active at query time, which metrics were requested, which were projected through, which were blocked and why, and which predicates were injected. This record provides the evidentiary chain required for regulatory entitlement audits.
+Every projection decision (including blocked metrics, applied row predicates, and active column masks) is recorded in the Analytical Lineage Store (ALS) as part of the execution record. The projection record captures the roles active at query time, which metrics were requested, which were projected through, which were blocked and why, and which predicates were injected. This record provides the evidentiary chain required for regulatory entitlement audits.
 
 ### Example
 
@@ -759,7 +759,7 @@ SEG evaluates the LQP (`lqp-20260518-093243-r9xq`) against the `acme-wealth` gov
 | Data classification | INTERNAL | INTERNAL ceiling | Pass |
 | Compliance mode | none required | — | Pass |
 
-All checks pass. SEG writes a governance decision record to the lineage store — before the FQE is invoked — and releases the LQP to the FQE:
+All checks pass. SEG writes a governance decision record to the Analytical Lineage Store (ALS) — before the FQE is invoked — and releases the LQP to the FQE:
 
 ```json
 {
@@ -874,7 +874,7 @@ Assembled result:
 }
 ```
 
-The FQE writes an execution record to the lineage store and passes the assembled result in parallel to the Data Visualization Language (DVL) and Narrative Synthesis Engine.
+The FQE writes an execution record to the Analytical Lineage Store (ALS) and passes the assembled result in parallel to the Data Visualization Language (DVL) and Narrative Synthesis Engine.
 
 ---
 
