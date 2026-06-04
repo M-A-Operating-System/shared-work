@@ -28,7 +28,7 @@ The AI Analytics Platform is a governed computation engine that gives AI systems
 
 In practice: a portfolio manager asks "show me portfolio returns versus benchmark for my equity portfolios this quarter" in plain English and receives a governed, role-constrained, auditable result with the full computation record attached. A data science pipeline extracts millions of rows of position data under the same entitlement and audit controls. A treasury analyst produces an LCR figure for a Basel III submission and receives, automatically, a regulator-ready compliance artifact set alongside the result. The analyst bottleneck breaks. Regulatory requirements hold.
 
-The platform addresses the following challenges that Text-to-SQL and ungoverned MCP integrations cannot:
+The platform addresses the following challenges that Text-to-SQL and unstructured MCP integrations cannot:
 
 | Enterprise analytical challenge | Platform response |
 |---|---|
@@ -62,7 +62,7 @@ The dominant AI narrative has become: *natural language → LLM → SQL → data
 
 The **Analytics Engine** is the platform's computation core. Given a precisely specified question — which metrics, which dimensions, which time period, which filters — it always produces the same answer from the same data with the same access permissions in force. No probability, no AI generation, no inference affects the computed values. The computation pipeline contains no AI.
 
-AI has two roles in the analytical pipeline. The first lives in the consuming layer — the assistant, agent, or application that a user interacts with. It reads the approved metric catalogue, translates a natural-language question into a precise, structured request, and submits it to the Analytics Engine. The second lives inside the Analytics Engine itself: after computation completes, the Narrative Synthesis Engine makes a targeted call to a language model to summarise the structured result in plain text, anchored strictly to computed values. It cannot introduce figures, comparisons, or interpretations not present in the result.
+AI has two roles in the analytical pipeline. The first lives in the consuming AI client — the assistant, agent, or application that a user interacts with. It reads the approved metric catalogue, translates a natural-language question into a precise, structured request, and submits it to the Analytics Engine. The second lives inside the Analytics Engine itself: after computation completes, the Narrative Synthesis Engine makes a targeted call to a language model to summarise the structured result in plain text, anchored strictly to computed values. It cannot introduce figures, comparisons, or interpretations not present in the result.
 
 | It is | It is not |
 |-------|-----------|
@@ -211,7 +211,7 @@ display_intent: chart  →  comparative metrics across categorical dimension →
 ```
 
 **3 · Metric and entitlement resolution**
-The platform resolves both metrics against the Semantic Metrics Registry. Portfolio return resolves to an approved, version-controlled value-weighted return formula. Benchmark return resolves via each portfolio's registered default benchmark. The user's identity token is validated and access permissions are projected, restricting results to portfolios within their coverage scope.
+The platform resolves both metrics against the Metric Registry. Portfolio return resolves to an approved, version-controlled value-weighted return formula. Benchmark return resolves via each portfolio's registered default benchmark. The user's identity token is validated and access permissions are projected, restricting results to portfolios within their coverage scope.
 
 ```
 -- Metric & Entitlement Resolution
@@ -221,7 +221,7 @@ entitlements:        user_scope → [authorised_portfolio_list]
 ```
 
 **4 · Query planning, governance, and execution**
-The Semantic Execution Governance layer validates the plan, then the Federated Query Planner constructs a Logical Query Plan (LQP) — a backend-agnostic representation of the query with no physical schema references. Execution translates this to a precise, warehouse-neutral query: value-weighted portfolio return joined to each portfolio's registered benchmark, filtered to equity, with access predicates injected at the query level. No raw database schemas have been exposed at any stage. The query executes against the registered warehouse; the Analytics Engine assembles the response: computed values, a chart specification, an optional plain-language summary anchored strictly to the result, and a full audit record.
+The Query Planner constructs a backend-agnostic plan. The governance layer then constructs a precise, warehouse-neutral query: value-weighted portfolio return joined to each portfolio's registered benchmark, filtered to equity, with access predicates injected at the query level. No raw database schemas have been exposed at any stage. The query executes against the registered warehouse; the Analytics Engine assembles the response: computed values, a chart specification, an optional plain-language summary anchored strictly to the result, and a full audit record.
 
 ```sql
 -- Logical Query Plan
@@ -242,7 +242,7 @@ GROUP BY p.portfolio_id, b.period_return;
 ```
 
 **5 · Presentation decision**
-The result schema — two numeric measures compared across a categorical dimension — is matched against the Visualisation Ontology. The ontology resolves a grouped bar chart as the governed display contract for this result shape and intent pattern. A complete Semantic Charting Language (SCL) specification is emitted alongside the data; the consuming layer renders it without making any independent display choice.
+The result schema — two numeric measures compared across a categorical dimension — is matched against the Visualisation Ontology. The ontology resolves a grouped bar chart as the governed display contract for this result shape and intent pattern. A complete Vega-Lite specification is emitted alongside the data; the consuming AI client renders it without making any independent display choice.
 
 ```json
 {
@@ -276,7 +276,7 @@ A risk officer asks: *"Which portfolios are breaching their VaR 95 limit today, 
 ```
 
 **2 · Intent resolution**
-The AI client identifies three metrics — `var_95`, `var_limit`, and `risk_factor_contribution` — and resolves this as a threshold-comparison pattern with a contributing-factor breakdown. `var_limit` is a per-portfolio governance parameter stored in the risk configuration domain; `risk_factor_contribution` carries `portfolio_id` and `factor_bucket` as required dimensions. All three are registered in the Semantic Metrics Registry and resolve cleanly against the approved analytical vocabulary.
+The AI client identifies three metrics — `var_95`, `var_limit`, and `risk_factor_contribution` — and resolves this as a threshold-comparison pattern with a contributing-factor breakdown. `var_limit` is a per-portfolio governance parameter stored in the risk configuration domain; `risk_factor_contribution` carries `portfolio_id` and `factor_bucket` as required dimensions. All three are registered in the Metric Registry and resolve cleanly against the approved analytical vocabulary.
 
 ```
 -- Semantic Intent Resolution
@@ -328,7 +328,7 @@ WHERE    portfolio_id IN (/* authorised_portfolio_list */);
 ```
 
 **5 · Presentation decision**
-The result — metric versus threshold across multiple portfolio entities with a contributing factor breakdown — is matched against the Visualisation Ontology. The ontology resolves a heatmap as the governed display contract for this threshold-comparison pattern and emits an SCL specification. Breaching portfolios are visually distinguished; the dominant risk factor is available as a drilldown dimension.
+The result — metric versus threshold across multiple portfolio entities with a contributing factor breakdown — is matched against the Visualisation Ontology. The ontology resolves a heatmap as the governed display contract for this threshold-comparison pattern. Breaching portfolios are visually distinguished; the dominant risk factor is available as a drilldown dimension.
 
 ```json
 {
@@ -373,7 +373,7 @@ display_intent: table  →  paginated dataset retrieval → structured table
 ```
 
 **2 · Dataset and entitlement resolution**
-The dataset identifier resolves against the Semantic Metrics Registry — only registered, approved datasets are retrievable. The registry resolves the dataset to its approved field set. The agent's access permissions are projected: results restricted to authorised portfolios, fields exceeding the agent's data classification ceiling excluded.
+The dataset identifier resolves against the Metric Registry — only registered, approved datasets are retrievable. The registry resolves the dataset to its approved field set. The agent's access permissions are projected: results restricted to authorised portfolios, fields exceeding the agent's data classification ceiling excluded.
 
 ```
 -- Dataset & Entitlement Resolution
@@ -386,7 +386,7 @@ entitlements:
 ```
 
 **3 · Query planning, governance, and execution**
-The Federated Query Planner constructs a paginated retrieval plan. The governance layer constructs a paginated query across the approved field set, restricted to the agent's authorised portfolios. Each page executes under the same governance controls. An audit record is written for the full retrieval — recording exactly which data was returned to which agent under which access permissions.
+The Query Planner constructs a paginated retrieval plan. The governance layer constructs a paginated query across the approved field set, restricted to the agent's authorised portfolios. Each page executes under the same governance controls. An audit record is written for the full retrieval — recording exactly which data was returned to which agent under which access permissions.
 
 ```sql
 -- Logical Query Plan
@@ -405,8 +405,8 @@ LIMIT    10000  OFFSET :page_offset;
 -- audit:      lineage_id, field_set_version, entitlement_snapshot
 ```
 
-**4 · Presentation decision**
-Bulk data retrieval resolves to a structured paginated table — not a chart. The Visualisation Ontology emits an SCL table specification defining the approved field set, column types, and formatting rules. The consuming agent receives a typed dataset with a continuation token for subsequent pages.
+**5 · Presentation decision**
+Bulk data retrieval resolves to a structured paginated table — not a chart. The Visualisation Ontology emits a Vega-Lite table specification defining the approved field set, column types, and formatting rules. The consuming agent receives a typed dataset with a continuation token for subsequent pages.
 
 ```json
 {
@@ -492,7 +492,7 @@ GROUP BY h.entity_id;
 ```
 
 **5 · Presentation decision**
-A small set of entity-level regulatory ratios resolves to a structured compliance table — not a chart. The Visualisation Ontology emits an SCL table specification with conditional formatting to highlight ratios below the regulatory minimum. Because compliance artifact mode is active, the specification carries an export contract: output is locked until the complete lineage record is confirmed.
+A small set of entity-level regulatory ratios resolves to a structured compliance table — not a chart. The Visualisation Ontology emits a Vega-Lite table specification with conditional formatting to highlight ratios below the regulatory minimum. Because compliance artifact mode is active, the specification carries an export contract: output is locked until the complete lineage record is confirmed.
 
 ```json
 {
@@ -516,7 +516,7 @@ A small set of entity-level regulatory ratios resolves to a structured complianc
 ```
 
 **6 · Compliance provenance generation**
-Once execution completes and the result is verified, the platform seals the analytical lineage record — the compliance provenance record for this query — and writes it to the append-only compliance audit store. The record covers the full chain — what was asked, which metric definition and version was used, how the logical field specification mapped to physical tables, what SQL ran against which backend, and the exact entitlement state at execution time. The entire record is signed with the platform's private key using ECDSA. Any party holding the platform's published public key can independently verify that no field has been altered since sealing — without any access to the platform itself. The export gate remains locked until this record is confirmed written; the presentation specification carries the gate status and will not release the output until provenance is complete.
+Once execution completes and the result is verified, the platform seals a compliance provenance record and writes it to the append-only compliance audit store. The record covers the full chain — what was asked, which metric definition and version was used, how the logical field specification mapped to physical tables, what SQL ran against which backend, and the exact entitlement state at execution time. The entire record is signed with the platform's private key using ECDSA. Any party holding the platform's published public key can independently verify that no field has been altered since sealing — without any access to the platform itself. The export gate remains locked until this record is confirmed written; the presentation specification carries the gate status and will not release the output until provenance is complete.
 
 ```json
 {
