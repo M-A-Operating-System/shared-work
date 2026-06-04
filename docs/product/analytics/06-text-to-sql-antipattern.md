@@ -210,9 +210,9 @@ The governed architecture separates the AI translation layer from the governed c
 | Physical schema is the LLM's input surface | Semantic Metrics Repository (business definitions only) is the LLM's input surface |
 | Query logic is inferred probabilistically at runtime | Metric formulas are registered, versioned, approved, and applied deterministically |
 | Access control is the database credential | Entitlements enforced at the semantic tier before any execution backend is contacted |
-| Row restrictions depend on LLM generating correct WHERE clauses | Row predicates injected deterministically by Role-Aware Projection, LLM cannot omit or alter them |
+| Row restrictions depend on LLM generating correct WHERE clauses | Row predicates injected deterministically by Role-Aware Projection Layer (RAPL), LLM cannot omit or alter them |
 | Results are not reproducible across sessions or model versions | Same query + data + entitlements always produces the same result |
-| No audit trail | Full computation provenance record: intent → definitions → entitlements → plan → execution → result |
+| No audit trail | Provenance Artifact: intent → definitions → entitlements → plan → execution → result |
 | Metric definitions are inferred; inconsistent across queries | Every metric resolves to exactly one versioned definition at any point in time |
 | Unresolvable queries succeed incorrectly or fail opaquely | Unregistered metric references return a structured `METRIC_NOT_FOUND` error |
 | Physical schema exposed to external AI provider | Physical schema never in any prompt; only SMR business definitions are visible |

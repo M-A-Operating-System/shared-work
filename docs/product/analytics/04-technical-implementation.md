@@ -18,7 +18,7 @@ flowchart TD
         RAPL["Role-Aware Projection Layer\nCustom middleware · Python"]
         SEG["Semantic Execution Governance\nCost estimation · classification · circuit breakers"]
         FQE["Federated Query Engine\nApache Calcite + backend adapters"]
-        VO["Visualisation Ontology\nSCL generation · Vega-Lite v5"]
+        DVL["Data Visualization Language (DVL)\nSCL generation · Vega-Lite v5"]
         NSE["Narrative Synthesis Engine\nAnthropic Claude · Haiku / Sonnet"]
         LS[("Analytical Lineage Store")]
         Result(["MCP tool response\ndisplay_spec + narrative + result_id"])
@@ -50,9 +50,9 @@ flowchart TD
     FQE -->|"physicalMapping lookup"| SMR
     FQE --> SQL & ODA & GDA
     FQE -->|"execution record"| LS
-    FQE -->|"assembled result"| VO
+    FQE -->|"assembled result"| DVL
     FQE -->|"assembled result"| NSE
-    VO -->|"DVL display spec"| Result
+    DVL -->|"DVL display spec"| Result
     NSE -->|"narrative"| Result
 ```
 
@@ -889,7 +889,7 @@ class SemanticExecutionGovernance:
         compliance_purpose = intent_score >= threshold
 
         if compliance_metrics and compliance_purpose:
-            # Escalate to enhanced compliance artifact tier
+            # Escalate to Provenance Artifact generation
             active_modes = [
                 m for m in config.get("compliance_modes", [])
                 if any(cm in m for cm in compliance_metrics)
@@ -975,7 +975,7 @@ The FQE decomposes this into two sub-plans (one routed to `primary-warehouse`, n
 
 #### FQE output — assembled result
 
-After execution and result assembly the FQE returns a typed result envelope in parallel to the Visualisation Ontology and Narrative Synthesis Engine:
+After execution and result assembly the FQE returns a typed result envelope in parallel to the Data Visualization Language (DVL) and Narrative Synthesis Engine:
 
 ```json
 {
@@ -1064,16 +1064,16 @@ class FQPBackendAdapter:
 
 ---
 
-### Visualisation Ontology
+### Data Visualization Language (DVL)
 
-> **Specification:** [§Visualisation Ontology](./02-core-capabilities.md#visualisation-ontology)
+> **Specification:** [§Data Visualization Language (DVL)](./02-core-capabilities.md#data-visualization-language-dvl)
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
 | **Chart spec** | Vega-Lite v5 JSON | Industry-standard chart grammar; wide ecosystem for web, server-side, and image rendering |
 | **Table spec** | Platform-defined `type: "table"` extension | Vega-Lite has no native table mark; same `data` + `columns` convention |
 
-#### Visualisation Ontology input
+#### Data Visualization Language (DVL) input
 
 The ontology evaluator receives the FQE assembled result alongside the resolved intent pattern. It uses the result schema and intent pattern to select the best-matching chart contract:
 
@@ -1094,7 +1094,7 @@ The ontology evaluator receives the FQE assembled result alongside the resolved 
 }
 ```
 
-#### Visualisation Ontology output — DVL display spec
+#### Data Visualization Language (DVL) output — DVL display spec
 
 The evaluator matches the `COMPARISON` intent pattern and two-metric schema to the `BAR_MULTI_SERIES_COMPARISON` contract and emits a Vega-Lite v5 DVL display spec:
 
@@ -1125,7 +1125,7 @@ The evaluator matches the `COMPARISON` intent pattern and two-metric schema to t
 }
 ```
 
-Full DVL examples including the `type: "table"` spec are in [Analytical Output Format](./02-core-capabilities.md#analytical-output-format). Full chart contract definitions are in [Visualisation Ontology](./02-core-capabilities.md#visualisation-ontology).
+Full DVL examples including the `type: "table"` spec are in [Analytical Output Format](./02-core-capabilities.md#analytical-output-format). Full chart contract definitions are in [Data Visualization Language (DVL)](./02-core-capabilities.md#data-visualization-language-dvl).
 
 ```python
 INTENT_CONTRACTS = {
@@ -1135,7 +1135,7 @@ INTENT_CONTRACTS = {
     ("DISTRIBUTION", 1): "HISTOGRAM",
 }
 
-class VisualisationOntology:
+class DataVisualizationLanguage:
     def evaluate(self, result: dict, operation: dict) -> dict:
         intent   = self._infer_intent(operation)
         contract = self._match_contract(intent, result["schema"])
@@ -1256,7 +1256,7 @@ if __name__ == "__main__":
 
 ### Analytical Lineage Store
 
-> **Specification:** [§Analytical Lineage Store](./02-core-capabilities.md#analytical-lineage-store)
+> **Specification:** [§Analytical Lineage Store (ALS)](./02-core-capabilities.md#analytical-lineage-store)
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|

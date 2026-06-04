@@ -2,7 +2,7 @@
 
 This chapter covers the complete integration surface of the AI Analytics Platform: how consumers authenticate and call it, how platform administrators configure it, the financial services reference model it ships with, and the complementary ecosystem services that extend its capabilities. The platform is deliberately narrow in its external interface: a single MCP endpoint governs all consumer access, and a single Admin API governs all configuration. Complexity lives inside the governance pipeline, not in the integration contract.
 
-Component specifications (SMR, SIL, RAPL, SEG, FQE, VO, NSE, Lineage Store) are in [Chapter 2 -- Core Platform Capabilities](./02-core-capabilities.md). The reference implementation stack is in [Chapter 4 -- Proposed Technical Implementation](./04-technical-implementation.md).
+Component specifications (SMR, SIL, RAPL, SEG, FQE, DVL, NSE, Analytical Lineage Store (ALS)) are in [Chapter 2 -- Core Platform Capabilities](./02-core-capabilities.md). The reference implementation stack is in [Chapter 4 -- Proposed Technical Implementation](./04-technical-implementation.md).
 
 ---
 
@@ -81,7 +81,7 @@ When a consumer receives a result containing a `result_id`, it may pass that ide
 }
 ```
 
-The platform retrieves the original result's projection scope, role filters, and entitlement context from the Analytical Lineage Store and applies them to the drilldown query. The consumer does not re-specify query parameters, dimensions, or time periods. Governance context is fully preserved across the drill chain.
+The platform retrieves the original result's projection scope, role filters, and entitlement context from the Analytical Lineage Store (ALS) and applies them to the drilldown query. The consumer does not re-specify query parameters, dimensions, or time periods. Governance context is fully preserved across the drill chain.
 
 ### Error Handling
 
@@ -101,7 +101,7 @@ The `message` field is human-readable and suitable for surfacing directly to end
 
 ### Agentic Consumers
 
-Autonomous agents (scheduled pipelines, event-triggered monitors, report generators) integrate identically to interactive consumers. The host must provision service-level JWTs for agents, scoped to the agent's role rather than a user's identity. The Role-Aware Projection Layer applies identical entitlement enforcement to agent JWTs as to user JWTs. An agent cannot access data that a user with the same role cannot access. Every agent-initiated request is recorded in the Analytical Lineage Store under the agent's `sub` claim, making agent queries distinguishable from user queries via the audit trail.
+Autonomous agents (scheduled pipelines, event-triggered monitors, report generators) integrate identically to interactive consumers. The host must provision service-level JWTs for agents, scoped to the agent's role rather than a user's identity. The Role-Aware Projection Layer applies identical entitlement enforcement to agent JWTs as to user JWTs. An agent cannot access data that a user with the same role cannot access. Every agent-initiated request is recorded in the Analytical Lineage Store (ALS) under the agent's `sub` claim, making agent queries distinguishable from user queries via the audit trail.
 
 ### vega2img (Optional Rendering Service)
 
@@ -180,9 +180,9 @@ The governance block controls the circuit breakers and compliance mode applied t
 | `queryTimeoutSeconds` | Maximum wall-clock time permitted for a single query's execution across all backends. |
 | `classificationGating` | When `true`, queries involving metrics whose `data.classification` appears in `blockedClassifications` are rejected before execution. |
 | `blockedClassifications` | List of classification labels that trigger blocking when `classificationGating` is enabled. |
-| `requireLineageForExport` | When `true`, result export operations require a complete compliance provenance record. Exports of results with incomplete provenance are blocked. |
+| `requireLineageForExport` | When `true`, result export operations require a complete Provenance Artifact. Exports of results with incomplete provenance are blocked. |
 | `auditAllQueries` | When `true`, every query — including governance-blocked and authentication-failed requests — is written to the audit log. Platform-recommended setting is `true`. |
-| `complianceMode` | Configures the active regulatory ruleset and trace targets (e.g. `mifid2` writes to `analytics.mifid2_trace`; `basel3` writes LCR/NSFR snapshots to `analytics.regulatory_snapshots`). This setting determines **which** rules and trace tables are applied — it does not trigger the compliance artifact tier. Escalation to the compliance tier is determined at runtime by two signals: `compliance_relevant: true` on the queried metrics AND the SIL classifying query intent as compliance-purpose. See [§Compliance Modes](./02-core-capabilities.md#compliance-modes). |
+| `complianceMode` | Configures the active regulatory ruleset and trace targets (e.g. `mifid2` writes to `analytics.mifid2_trace`; `basel3` writes LCR/NSFR snapshots to `analytics.regulatory_snapshots`). This setting determines **which** rules and trace tables are applied — it does not trigger Provenance Artifact generation. Escalation to the compliance tier is determined at runtime by two signals: `compliance_relevant: true` on the queried metrics AND the SIL classifying query intent as compliance-purpose. See [§Compliance Modes](./02-core-capabilities.md#compliance-modes). |
 
 ### Operational Settings
 

@@ -2,7 +2,7 @@
 
 This chapter is the logical architecture reference for the AI Analytics Platform. It covers nine pipeline components in the order a query encounters them, using a single portfolio manager query as a running example throughout. Each section describes what a component does, its governance contract, and where in the pipeline it sits — with no references to specific technology products or vendor implementations.
 
-The pipeline processes every request in this sequence: the **MCP Capability Layer** is the entry point — the governed API through which all consumers access the platform. The **Semantic Metrics Repository** is the governing catalogue — every queryable metric, dimension, and operation must be registered here before it is resolvable. The **Semantic Intent Layer** validates the structured request and produces a platform-agnostic query plan. The **Role-Aware Projection Layer** enforces entitlements before any query reaches a backend. The **Semantic Execution Governance** layer applies circuit breakers and compliance classification before releasing the plan for execution. The **Federated Query Engine** routes the plan to registered backends, executes in parallel, and assembles the result. The **Visualisation Ontology** selects the presentation contract. The **Narrative Synthesis Engine** produces a governed plain-language summary. The **Analytical Lineage Store** records the complete computation provenance.
+The pipeline processes every request in this sequence: the **MCP Capability Layer** is the entry point — the governed API through which all consumers access the platform. The **Semantic Metrics Repository** is the governing catalogue — every queryable metric, dimension, and operation must be registered here before it is resolvable. The **Semantic Intent Layer** validates the structured request and produces a platform-agnostic query plan. The **Role-Aware Projection Layer** enforces entitlements before any query reaches a backend. The **Semantic Execution Governance** layer applies circuit breakers and compliance classification before releasing the plan for execution. The **Federated Query Engine** routes the plan to registered backends, executes in parallel, and assembles the result. The **Data Visualization Language (DVL)** selects the presentation contract. The **Narrative Synthesis Engine** produces a governed plain-language summary. The **Analytical Lineage Store** records the complete computation provenance.
 
 Platform roles — who interacts with each component and how — are defined before the component descriptions.
 
@@ -26,7 +26,7 @@ The platform operates across two distinct planes: an **analytical plane** (query
 
 **Roles are not mutually exclusive.** A single individual may hold multiple roles; the platform evaluates entitlements from the combined JWT claims present at query time.
 
-The **Semantic Modeller** is the critical pre-condition for everything downstream. No analytical query can be served against a metric that has not been modelled, registered, and approved. The governance pipeline, the entitlement layer, the lineage store, and the visualisation ontology all operate on the semantic definitions the Semantic Modeller produces. In practice this role requires both domain knowledge (what does this metric mean in this business context?) and data modelling precision (how is it calculated, from which sources, under which dimensional hierarchies, with which access policies?).
+The **Semantic Modeller** is the critical pre-condition for everything downstream. No analytical query can be served against a metric that has not been modelled, registered, and approved. The governance pipeline, the entitlement layer, the lineage store, and the Data Visualization Language (DVL) all operate on the semantic definitions the Semantic Modeller produces. In practice this role requires both domain knowledge (what does this metric mean in this business context?) and data modelling precision (how is it calculated, from which sources, under which dimensional hierarchies, with which access policies?).
 
 ### Role × Feature Access
 
@@ -70,7 +70,7 @@ flowchart TD
         RAPL["<b>Role-Aware Projection Layer(RAPL)</b>\nJWT claims · row predicates · column masks"]
         SEG["<b>Semantic Execution Control Layer(SECL)</b>\nCost estimation · classification · circuit breakers"]
         FQE["<b>Federated Query Engine(FQE)</b>\nquery planning engine + backend adapters"]
-        VO["<b>Visualisation Display Language (VDL)</b>\ndisplay spec · the platform's chart specification format"]
+        VO["<b>Data Visualization Language (DVL)</b>\ndisplay spec · the platform's chart specification format"]
         NSE["<b>Narrative Synthesis Engine(NSE)</b>\nlanguage model · post-computation\nanchored to result values · P6 governed"]
         LS[("<b>Analytical Lineage Store</b>\nlogical query plan, physical query plan, physical run time statistics")]
         Result(["<b>MCP tool response</b\nwrapped display_spec + data + narrative + provenance artifact(optional) + result_id"])
@@ -82,7 +82,7 @@ flowchart TD
 
     subgraph dcr["Data Context Repository(DCR)"]
         SMR[("Semantic Metrics Repository(SMR)\nmetric definitions, dimensions, hierarchies, aggregation rules, governance, access policies, compliance rules ")]
-        DCS[("*Semantic Data Repository(SDR)* \n data definitions, data models, object models, critical data elements, quality rules, physical schemas, data lineage,")]
+        DCS[("Semantic Data Context Store (DCS)\n data definitions, data models, object models, critical data elements, quality rules, physical schemas, data lineage,")]
         SMR --> DCS
     end
 
@@ -131,7 +131,7 @@ sequenceDiagram
     participant SEG as Semantic Execution Governance
     participant FQE as Federated Query Engine
     participant BE as Execution Backend(s)
-    participant VO as Visualisation Ontology
+    participant VO as Data Visualization Language (DVL)
     participant NSE as Narrative Synthesis Engine
     participant LS as Analytical Lineage Store
     participant vega2img as vega2img
@@ -173,7 +173,7 @@ sequenceDiagram
     end
 ```
 
-The Analytics Engine receives structured parameters, not natural language, and returns structured results. The computation pipeline contains no AI. The Narrative Synthesis Engine runs after computation completes, in parallel with the Visualisation Ontology, making a targeted secondary model call constrained to the assembled result. The natural language translation (step 3) happens in the AI Chat Platform's reasoning loop, grounded by the operation catalogue loaded in step 1 via `list_operations`. The Analytical Lineage Store receives two writes per query: a governance decision record before execution and an execution record after. This ensures the audit trail is complete regardless of whether the query ultimately succeeds.
+The Analytics Engine receives structured parameters, not natural language, and returns structured results. The computation pipeline contains no AI. The Narrative Synthesis Engine runs after computation completes, in parallel with the Data Visualization Language (DVL), making a targeted secondary model call constrained to the assembled result. The natural language translation (step 3) happens in the AI Chat Platform's reasoning loop, grounded by the operation catalogue loaded in step 1 via `list_operations`. The Analytical Lineage Store receives two writes per query: a governance decision record before execution and an execution record after. This ensures the audit trail is complete regardless of whether the query ultimately succeeds.
 
 ---
 
@@ -330,7 +330,7 @@ Every metric in the SMR conforms to the following schema. This is the authoritat
 | `lineage.upstream_metrics` | No | Other SMR metrics this metric is derived from. Used for lineage graph construction. |
 | `lineage.downstream_metrics` | No | SMR metrics that depend on this metric. Used for impact analysis when metric definitions change. |
 | `access.roles` | Yes | Role IDs from the entitlement config that may query this metric. |
-| `compliance_relevant` | No | When `true`, this metric's output may be used in regulatory reporting or compliance submissions. When combined with a compliance-purpose query intent (see §Semantic Intent Layer), the platform escalates to the enhanced compliance artifact tier. Set by the metric owner at registration. |
+| `compliance_relevant` | No | When `true`, this metric's output may be used in regulatory reporting or compliance submissions. When combined with a compliance-purpose query intent (see §Semantic Intent Layer), the platform escalates to the enhanced Provenance Artifact. Set by the metric owner at registration. |
 
 ### Registry Governance Workflow
 
@@ -691,11 +691,11 @@ Against a `maxQueryCostUnits: 1000` limit, this query is approved. Against a `50
 
 ### Compliance Modes
 
-`complianceMode` sets the active regulatory ruleset and the trace targets used when the compliance artifact tier is active (e.g. `mifid2` writes to `analytics.mifid2_trace`; `basel3` writes LCR/NSFR snapshots to `analytics.regulatory_snapshots`). It does not by itself trigger the compliance artifact tier.
+`complianceMode` sets the active regulatory ruleset and the trace targets used when the Provenance Artifact is active (e.g. `mifid2` writes to `analytics.mifid2_trace`; `basel3` writes LCR/NSFR snapshots to `analytics.regulatory_snapshots`). It does not by itself trigger the Provenance Artifact.
 
-**Compliance artifact tier trigger — two signals, both required (AND logic)**
+**Provenance Artifact trigger — two signals, both required (AND logic)**
 
-The platform escalates to the enhanced compliance artifact tier only when both of the following signals are true at runtime:
+The platform escalates to the enhanced Provenance Artifact only when both of the following signals are true at runtime:
 
 | Signal | Source | True when |
 |---|---|---|
@@ -706,12 +706,12 @@ The platform escalates to the enhanced compliance artifact tier only when both o
 
 | `compliance_relevant` (any metric) | `compliance_purpose` (SIL classification) | Governance output |
 |---|---|---|
-| `true` | `true` | **Enhanced** — full compliance artifact tier active |
+| `true` | `true` | **Enhanced** — full Provenance Artifact active |
 | `true` | `false` | Standard governance output |
 | `false` | `true` | Standard governance output |
 | `false` | `false` | Standard governance output |
 
-The compliance mode rule tables below describe the additional rules and trace targets applied **when the compliance artifact tier is active** under each mode.
+The compliance mode rule tables below describe the additional rules and trace targets applied **when the Provenance Artifact is active** under each mode.
 
 **MiFID II mode** (`"complianceMode": "mifid2"`)
 
@@ -719,7 +719,7 @@ The compliance mode rule tables below describe the additional rules and trace ta
 |---|---|
 | All queries involving client-identifiable data must be logged with business justification | Prompt user for business justification before queries on `client_name`, `account_number`, or similar PII-adjacent dimensions |
 | Best execution metrics must be queried with explicit timeframe | Validation error if `date` dimension not specified for best-execution metrics |
-| Transaction reporting queries must generate a TRACE record | Additional compliance provenance record written to `analytics.mifid2_trace` table |
+| Transaction reporting queries must generate a TRACE record | Additional Provenance Artifact written to `analytics.mifid2_trace` table |
 
 **Basel III/IV mode** (`"complianceMode": "basel3"`)
 
@@ -874,15 +874,15 @@ Assembled result:
 }
 ```
 
-The FQE writes an execution record to the lineage store and passes the assembled result in parallel to the Visualisation Ontology and Narrative Synthesis Engine.
+The FQE writes an execution record to the lineage store and passes the assembled result in parallel to the Data Visualization Language (DVL) and Narrative Synthesis Engine.
 
 ---
 
-## Visualisation Ontology
+## Data Visualization Language (DVL)
 
 > **Governing principles:** [P7 — Deterministic visualisation](./00-overview.md#design-principles)
 
-The Visualisation Ontology is the governing schema that maps result characteristics and analytical intent patterns to specific, parameterised chart contracts. It exists to make chart selection deterministic: the same analytical pattern produces the same chart type across all users, sessions, and AI model versions, regardless of how the question was phrased. The AI model does not select chart types. Intent signals from the query are treated as inputs to the ontology evaluation algorithm, but the ontology makes the final binding decision.
+The Data Visualization Language (DVL) is the governing schema that maps result characteristics and analytical intent patterns to specific, parameterised chart contracts. It exists to make chart selection deterministic: the same analytical pattern produces the same chart type across all users, sessions, and AI model versions, regardless of how the question was phrased. The AI model does not select chart types. Intent signals from the query are treated as inputs to the ontology evaluation algorithm, but the ontology makes the final binding decision.
 
 ### Intent Pattern Taxonomy
 
@@ -938,7 +938,7 @@ Power Analysts may override the ontology's chart selection for a single result b
 
 ### Example
 
-With the assembled result available, the Visualisation Ontology selects the presentation contract.
+With the assembled result available, the Data Visualization Language (DVL) selects the presentation contract.
 
 The ontology evaluator classifies the result: two metrics across four named entities, with a natural comparison relationship between return and benchmark. This matches the `COMPARISON` pattern. The highest-scoring contract is `BAR_MULTI_SERIES_COMPARISON` — a grouped bar chart with portfolios on the X axis and return values on Y, coloured by metric series.
 
@@ -970,7 +970,7 @@ The ontology produces the following DVL display specification:
 
 > **Governing principles:** [P6 — Governed narrative](./00-overview.md#design-principles) · [P10 — Deterministic computation, not generation](./00-overview.md#design-principles)
 
-The Narrative Synthesis Engine (NSE) is a secondary AI component inside the Analytics Engine. It runs after the computation pipeline completes — after the FQE has assembled the result and the Visualisation Ontology has selected the chart contract — making a single, tightly-scoped call to a language model with one purpose: summarise the structured result in plain language, anchored strictly to the computed values.
+The Narrative Synthesis Engine (NSE) is a secondary AI component inside the Analytics Engine. It runs after the computation pipeline completes — after the FQE has assembled the result and the Data Visualization Language (DVL) has selected the chart contract — making a single, tightly-scoped call to a language model with one purpose: summarise the structured result in plain language, anchored strictly to the computed values.
 
 The NSE is not a general-purpose AI model with access to the query, the user's intent, or the SMR. Its prompt is constructed entirely from the assembled result: metric labels, row values, units, and dimension names. It is told what the data shows; it is not told what the user asked. This constraint is intentional — it prevents the narrative from interpreting, recommending, or inferring beyond what was computed.
 
@@ -1001,7 +1001,7 @@ Narrative synthesis is controlled by the `features.narrativeSynthesis` platform 
 
 ### Example
 
-In parallel with the Visualisation Ontology, the NSE receives the assembled result.
+In parallel with the Data Visualization Language (DVL), the NSE receives the assembled result.
 
 The portfolio manager's query returns four rows. The NSE receives the assembled result and produces:
 
@@ -1073,7 +1073,7 @@ The Analytics Engine is headless: it produces no rendered output. Every successf
 }
 ```
 
-The `compliance` block is absent for standard queries. Its presence indicates the full compliance artifact tier was active for this response.
+The `compliance` block is absent for standard queries. Its presence indicates the full Provenance Artifact was active for this response.
 
 ### Data Visualization Language (DVL)
 
@@ -1333,7 +1333,7 @@ Each SMR operation carries an `execution_profile` defined in its `analytical_ope
 |---|---|
 | `data_retrieval` | Auth → RAPL → FQE → Lineage |
 | `metric_query` | Auth → RAPL → SIL → SEG → FQE → Lineage |
-| `full_analytical` | Full pipeline including Visualisation Ontology + Narrative Synthesis Engine |
+| `full_analytical` | Full pipeline including Data Visualization Language (DVL) + Narrative Synthesis Engine |
 
 ### Intent Confirmation Card
 

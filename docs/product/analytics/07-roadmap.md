@@ -57,7 +57,7 @@ This document describes one proposed sequence of deliverables for the AI Analyti
 <td>Integrate Apache Calcite as the SQL sub-plan optimiser; implement pluggable backend adapter interface; build SQL warehouse adapter with connection pooling for Snowflake, BigQuery, Databricks, Redshift, Trino, and PostgreSQL; build semantic layer adapter for dbt MetricFlow and Cube.js; build OpenData REST/OData adapter; implement in-process result fan-out, sub-plan execution, and assembly; add a result cache keyed on SHA-256 of the LQP with TTL configurable per metric refresh cadence</td>
 </tr>
 <tr>
-<td>Visualisation Ontology</td>
+<td>Data Visualization Language (DVL)</td>
 <td>Define eight named chart contracts in a versioned contract registry (multi-series bar, time-series line, heatmap, treemap, scatter, waterfall, stacked bar, ranked bar); implement deterministic chart selector that maps result schema shape and intent pattern to a contract — no LLM invocation; implement DVL display spec generator producing Vega-Lite v5 JSON conforming to the selected contract; add <code>type: "table"</code> extension for tabular results</td>
 </tr>
 <tr>
@@ -65,7 +65,7 @@ This document describes one proposed sequence of deliverables for the AI Analyti
 <td>Build new service implementing two prompt templates (standard: Claude Haiku for ≤5 metrics / ≤3 dimensions; complex: Claude Sonnet for attribution, multi-portfolio, and regulatory queries); construct prompt exclusively from the assembled result set — no user query text, no physical schema; implement post-generation numeric leakage validator that rejects any value in the narrative not present in the result set; implement single regeneration attempt on validation failure before returning an error</td>
 </tr>
 <tr>
-<td>Analytical Lineage Store</td>
+<td>Analytical Lineage Store (ALS)</td>
 <td>Provision S3-compatible object store bucket with date-partitioned key structure (<code>lineage/{org_id}/{yyyy}/{mm}/{dd}/{result_id}.json</code>); implement write-once JSON document serialiser covering the full query record (request payload, resolved metric versions, governance decision, sub-plans, assembled result, DVL display spec, compliance metadata); implement write path called by the Semantic Execution Governance service before any backend execution and by the FQE on completion; create lightweight <code>analytics.lineage_index</code> PostgreSQL table (scalar fields only — no JSON payloads) for future search queries; configure object lifecycle policy for 7-year default retention; post-hoc compliance annotations written as sibling amendment documents, never mutating the original record</td>
 </tr>
 <tr>
@@ -82,12 +82,12 @@ This document describes one proposed sequence of deliverables for the AI Analyti
 <td rowspan="4">2</td>
 <td rowspan="4"><strong>Automated Monitoring and Alerts</strong></td>
 <td>Scheduled Query Service</td>
-<td>Create <code>scheduled_queries</code> table in PostgreSQL storing cron expression, owner <code>sub</code>, and validated MCP tool call parameters; implement Kubernetes CronJob controller that reads pending schedules and dispatches them through the full governance pipeline using the stored owner JWT claims at runtime; write results to the Analytical Lineage Store and result artefact store on completion</td>
+<td>Create <code>scheduled_queries</code> table in PostgreSQL storing cron expression, owner <code>sub</code>, and validated MCP tool call parameters; implement Kubernetes CronJob controller that reads pending schedules and dispatches them through the full governance pipeline using the stored owner JWT claims at runtime; write results to the Analytical Lineage Store (ALS) and result artefact store on completion</td>
 <td rowspan="4">Risk officers and portfolio managers receive automated push notifications when a metric breaches its defined threshold — no manual query required; every alert payload carries a lineage reference to the underlying computation</td>
 </tr>
 <tr>
 <td>Alert Threshold Engine</td>
-<td>Create <code>alert_thresholds</code> table in PostgreSQL linked to scheduled queries; implement threshold evaluator service that iterates each result row after FQE assembly and evaluates up to ten conditions per query using <code>gt</code>, <code>lt</code>, <code>gte</code>, <code>lte</code>, <code>eq</code>, <code>pct_change_gt</code> operators; write a breach event record to the lineage store for each triggered condition and enqueue a delivery job</td>
+<td>Create <code>alert_thresholds</code> table in PostgreSQL linked to scheduled queries; implement threshold evaluator service that iterates each result row after FQE assembly and evaluates up to ten conditions per query using <code>gt</code>, <code>lt</code>, <code>gte</code>, <code>lte</code>, <code>eq</code>, <code>pct_change_gt</code> operators; write a breach event record to the Analytical Lineage Store (ALS) for each triggered condition and enqueue a delivery job</td>
 </tr>
 <tr>
 <td>Push Delivery Service</td>
@@ -145,7 +145,7 @@ This document describes one proposed sequence of deliverables for the AI Analyti
 <td rowspan="4">5</td>
 <td rowspan="4"><strong>Proactive Analytical Intelligence</strong></td>
 <td>Anomaly Detection Service</td>
-<td>Create new background service that reads completed scheduled query results from the Analytical Lineage Store; maintain a rolling statistical baseline (configurable mean ± N standard deviations and lookback window) per metric series in a time-series extension table; generate a structured insight event record when a new result value falls outside the baseline; when Benchmark Data Service or Regulatory Reference Service backends are registered, extend the baseline computation to include peer percentile comparisons using data from those backends</td>
+<td>Create new background service that reads completed scheduled query results from the Analytical Lineage Store (ALS); maintain a rolling statistical baseline (configurable mean ± N standard deviations and lookback window) per metric series in a time-series extension table; generate a structured insight event record when a new result value falls outside the baseline; when Benchmark Data Service or Regulatory Reference Service backends are registered, extend the baseline computation to include peer percentile comparisons using data from those backends</td>
 <td rowspan="4">The platform surfaces anomalies and trend signals without users submitting queries; portfolio managers and risk officers find scoped, lineage-referenced insight cards traceable to the scheduled query result that produced the signal</td>
 </tr>
 <tr>
@@ -264,11 +264,11 @@ This document describes one proposed sequence of deliverables for the AI Analyti
 <td rowspan="6"><strong>Open API Surface</strong></td>
 <td>SMR Browser REST API</td>
 <td>Add new read-only API surface to the SMR service: <code>GET /v1/smr/metrics</code> (cursor-paginated), <code>GET /v1/smr/metrics/{id}</code> (full definition with version history), <code>GET /v1/smr/dimensions</code>, <code>GET /v1/smr/hierarchies</code>; enforce JWT authentication on all endpoints; apply the querying user's entitled metric visibility as a row-level filter on all responses</td>
-<td rowspan="6">Compliance teams query the lineage store directly for regulatory audit; BI and application teams integrate against open REST and GraphQL APIs without routing through the MCP interface; high-frequency queries hit pre-computed materialised views for predictable sub-second latency; streaming consumers render progressive query status</td>
+<td rowspan="6">Compliance teams query the Analytical Lineage Store (ALS) directly for regulatory audit; BI and application teams integrate against open REST and GraphQL APIs without routing through the MCP interface; high-frequency queries hit pre-computed materialised views for predictable sub-second latency; streaming consumers render progressive query status</td>
 </tr>
 <tr>
 <td>Lineage Query REST API</td>
-<td>Add new read-only API surface to the Analytical Lineage Store service: <code>GET /v1/lineage/{result_id}</code> fetches the full JSON document from the object store by key; <code>POST /v1/lineage/search</code> queries the <code>analytics.lineage_index</code> PostgreSQL table for matching <code>result_id</code>s (filterable by <code>user_sub</code>, <code>time_range</code>, <code>compliance_mode</code>, <code>error_code</code>), then fetches full documents from the object store for each match; <code>GET /v1/lineage/{result_id}/sub-plans</code> returns the <code>sub_plans</code> field from the fetched object store document; enforce JWT scoping so users retrieve only their own records; extend to platform-wide search for Platform Admin role</td>
+<td>Add new read-only API surface to the Analytical Lineage Store (ALS) service: <code>GET /v1/lineage/{result_id}</code> fetches the full JSON document from the object store by key; <code>POST /v1/lineage/search</code> queries the <code>analytics.lineage_index</code> PostgreSQL table for matching <code>result_id</code>s (filterable by <code>user_sub</code>, <code>time_range</code>, <code>compliance_mode</code>, <code>error_code</code>), then fetches full documents from the object store for each match; <code>GET /v1/lineage/{result_id}/sub-plans</code> returns the <code>sub_plans</code> field from the fetched object store document; enforce JWT scoping so users retrieve only their own records; extend to platform-wide search for Platform Admin role</td>
 </tr>
 <tr>
 <td>GraphQL API Gateway</td>
