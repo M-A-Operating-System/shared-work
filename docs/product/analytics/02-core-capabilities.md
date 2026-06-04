@@ -184,7 +184,7 @@ The Analytics Engine receives structured parameters, not natural language, and r
 
 ---
 
-## Consuming Layer
+## AI Consumers
 
 The Analytics Engine is accessed by three consumer types: a conversational AI platform (which mediates between a user and the governed query pipeline), autonomous agents and pipelines (which call the MCP layer directly with structured requests), and custom applications (which call the MCP layer with host-issued tokens). The following describes the conversational path — the most common consumer pattern.
 
@@ -478,7 +478,7 @@ The resolved form carries metric versions, aggregation rules, and entitlement-de
 
 ### Example
 
-The structured tool call from the consuming layer is now in the SIL.
+The structured tool call from AI consumers is now in the SIL.
 
 The MCP Capability Layer forwards the structured tool call to the SIL. The SIL receives the `operation_id` and `params` from the `run_analytics` invocation:
 
@@ -722,7 +722,7 @@ The compliance mode rule tables below describe the additional rules and trace ta
 |---|---|
 | All queries involving client-identifiable data must be logged with business justification | Prompt user for business justification before queries on `client_name`, `account_number`, or similar PII-adjacent dimensions |
 | Best execution metrics must be queried with explicit timeframe | Validation error if `date` dimension not specified for best-execution metrics |
-| Transaction reporting queries must generate a TRACE record | Additional lineage record written to `analytics.mifid2_trace` table |
+| Transaction reporting queries must generate a TRACE record | Additional compliance provenance record written to `analytics.mifid2_trace` table |
 
 **Basel III/IV mode** (`"complianceMode": "basel3"`)
 
@@ -1385,6 +1385,6 @@ The `roles: []` value indicates that capability availability is determined dynam
 
 ### Example
 
-A structured tool call arrives from the consuming layer.
+A structured tool call arrives from AI consumers.
 
 A structured `run_analytics` tool call arrives from the AI Chat Platform. The MCP Capability Layer validates the JWT signature, confirms the token has not expired, and extracts the claims. It dispatches two parallel operations: the structured parameters to the Semantic Intent Layer, and the JWT claims to the Role-Aware Projection Layer. The MCP Capability Layer does not interpret the parameters or make any analytical decisions; it validates, routes, and waits.

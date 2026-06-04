@@ -62,7 +62,7 @@ The dominant AI narrative has become: *natural language → LLM → SQL → data
 
 The **Analytics Engine** is the platform's computation core. Given a precisely specified question — which metrics, which dimensions, which time period, which filters — it always produces the same answer from the same data with the same access permissions in force. No probability, no AI generation, no inference affects the computed values. The computation pipeline contains no AI.
 
-AI has two roles in the analytical pipeline. The first lives in the consuming AI client — the assistant, agent, or application that a user interacts with. It reads the approved metric catalogue, translates a natural-language question into a precise, structured request, and submits it to the Analytics Engine. The second lives inside the Analytics Engine itself: after computation completes, the Narrative Synthesis Engine makes a targeted call to a language model to summarise the structured result in plain text, anchored strictly to computed values. It cannot introduce figures, comparisons, or interpretations not present in the result.
+AI has two roles in the analytical pipeline. The first lives in the AI consumer — the assistant, agent, or application that a user interacts with. It reads the approved metric catalogue, translates a natural-language question into a precise, structured request, and submits it to the Analytics Engine. The second lives inside the Analytics Engine itself: after computation completes, the Narrative Synthesis Engine makes a targeted call to a language model to summarise the structured result in plain text, anchored strictly to computed values. It cannot introduce figures, comparisons, or interpretations not present in the result.
 
 | It is | It is not |
 |-------|-----------|
@@ -106,7 +106,7 @@ In both approaches, AI clients and LLMs are present. The difference is what happ
 
 ```mermaid
 flowchart LR
-    subgraph clients["AI-Enabled Clients"]
+    subgraph clients["AI Consumers"]
         direction TB
         C1["Conversational\nAssistant"]
         C2["Autonomous Agent\n& Data Mining"]
@@ -133,7 +133,7 @@ flowchart LR
 
 ```mermaid
 flowchart LR
-    subgraph clients["AI-Enabled Clients"]
+    subgraph clients["AI Consumers"]
         direction TB
         C1["Conversational\nAssistant"]
         C2["Autonomous Agent\n& Data Mining"]
@@ -171,7 +171,7 @@ The platform's scope spans two independent dimensions that together define the f
 Some requests are best answered with a chart or summary: a portfolio manager wants to see returns versus benchmark, not a raw table of numbers. Others require a structured dataset: a data science pipeline needs millions of rows of position data for model retraining, and a chart is irrelevant. Both output types traverse the same governance pipeline. The difference is resolved by the Visualisation Ontology at query time — chart or table is determined by the intent and result shape, not by the user or the AI.
 
 **Governance tier — business analytics or full-provenance**
-Most queries require standard governance: approved metric definitions, entitlement enforcement, and a lineage record. Some queries require more: when a request is for a regulatory submission — or involves a metric that is flagged as compliance-relevant — the platform automatically escalates to the enhanced compliance artifact tier. Two independent signals trigger escalation: the metric's own compliance-relevant flag (set by the metric owner at registration) and the AI's classification of the query's stated purpose. When both signals are present, a regulatory trace record, export controls, and a regulator-ready artifact set are produced automatically. No user action or role claim is required.
+Most queries require standard governance: approved metric definitions, entitlement enforcement, and a compliance provenance record. Some queries require more: when a request is for a regulatory submission — or involves a metric that is flagged as compliance-relevant — the platform automatically escalates to the enhanced compliance artifact tier. Two independent signals trigger escalation: the metric's own compliance-relevant flag (set by the metric owner at registration) and the AI's classification of the query's stated purpose. When both signals are present, a regulatory trace record, export controls, and a regulator-ready artifact set are produced automatically. No user action or role claim is required.
 
 These two dimensions define four possible result types. The platform handles all four under the same governed pipeline:
 
@@ -242,7 +242,7 @@ GROUP BY p.portfolio_id, b.period_return;
 ```
 
 **5 · Presentation decision**
-The result schema — two numeric measures compared across a categorical dimension — is matched against the Visualisation Ontology. The ontology resolves a grouped bar chart as the governed display contract for this result shape and intent pattern. A complete Vega-Lite specification is emitted alongside the data; the consuming AI client renders it without making any independent display choice.
+The result schema — two numeric measures compared across a categorical dimension — is matched against the Visualisation Ontology. The ontology resolves a grouped bar chart as the governed display contract for this result shape and intent pattern. A complete Vega-Lite specification is emitted alongside the data; the AI consumer renders it without making any independent display choice.
 
 ```json
 {
@@ -467,7 +467,7 @@ escalation: ENHANCED compliance artifact tier  -- both signals required
 ```
 
 **4 · Query planning, governance, and execution**
-Compliance-purpose queries are never served from cache — a fresh computation is required for every regulatory submission. The governance layer constructs the query with cache bypass enforced. On completion, it writes a regulatory trace record to the compliance-specific audit store (in addition to the standard lineage record), enforces export controls until the complete lineage record exists, and validates the result's data classification against the user's authorised ceiling. The treasury analyst receives both the governed LCR result and a complete, regulator-ready audit trail — automatically.
+Compliance-purpose queries are never served from cache — a fresh computation is required for every regulatory submission. The governance layer constructs the query with cache bypass enforced. On completion, it writes a regulatory trace record to the compliance-specific audit store (in addition to the standard compliance provenance record), enforces export controls until the complete compliance provenance record exists, and validates the result's data classification against the user's authorised ceiling. The treasury analyst receives both the governed LCR result and a complete, regulator-ready audit trail — automatically.
 
 ```sql
 -- Logical Query Plan  (cache bypass enforced — compliance_purpose = true)
@@ -487,12 +487,12 @@ GROUP BY h.entity_id;
 --   regulatory_trace_id:  written to compliance audit store
 --   artifact_set_version: "1.0"
 --   triggered_by:         [liquidity_coverage_ratio]
---   export_gate:          locked until complete lineage record exists
+--   export_gate:          locked until complete compliance provenance record exists
 -- audit:     lineage_id, metric_version, entitlement_snapshot
 ```
 
 **5 · Presentation decision**
-A small set of entity-level regulatory ratios resolves to a structured compliance table — not a chart. The Visualisation Ontology emits a Vega-Lite table specification with conditional formatting to highlight ratios below the regulatory minimum. Because compliance artifact mode is active, the specification carries an export contract: output is locked until the complete lineage record is confirmed.
+A small set of entity-level regulatory ratios resolves to a structured compliance table — not a chart. The Visualisation Ontology emits a Vega-Lite table specification with conditional formatting to highlight ratios below the regulatory minimum. Because compliance artifact mode is active, the specification carries an export contract: output is locked until the complete compliance provenance record is confirmed.
 
 ```json
 {

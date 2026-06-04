@@ -61,7 +61,7 @@ These decisions are non-negotiable architectural constraints. Each maps to one o
 | **A2** | Raw query generation by LLMs is not a permitted execution path. All queries are expressed as validated MCP tool call parameters resolved against the SMR. | [P2](./00-overview.md#design-principles), [P10](./00-overview.md#design-principles) |
 | **A3** | Every metric must be registered in the SMR before it is resolvable. Unregistered metrics cannot be queried. | [P3](./00-overview.md#design-principles) |
 | **A4** | Entitlements are enforced at the semantic tier — before the LQP is compiled and before any execution backend is contacted. | [P5](./00-overview.md#design-principles) |
-| **A5** | Every analytical result has a lineage record linking intent → semantic plan → LQP → backend execution → result. | [P4](./00-overview.md#design-principles) |
+| **A5** | Every analytical result has a compliance provenance record linking intent → semantic plan → LQP → backend execution → result. | [P4](./00-overview.md#design-principles) |
 | **A6** | Chart selection is deterministic and governed by the Visualisation Ontology — not inferred by the LLM per query. | [P7](./00-overview.md#design-principles) |
 | **A7** | The LQP is backend-agnostic. Physical execution translation is the FQE's responsibility. | [P10](./00-overview.md#design-principles) |
 | **A8** | Governance circuit breakers are applied at the semantic tier. No query reaches a physical backend without passing governance checks. | [P2](./00-overview.md#design-principles) |
