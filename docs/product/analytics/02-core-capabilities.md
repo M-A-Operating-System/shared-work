@@ -179,7 +179,11 @@ The Analytics Engine receives structured parameters, not natural language, and r
 
 ---
 
-**Running example:** A portfolio manager asks "Show me portfolio returns versus benchmark for my equity portfolios this quarter." This query is traced through every component below — each section's Example shows the same request at the next stage of the pipeline.
+**Running example:** This query is traced through every component below — each section's Example shows the same request at the next stage of the pipeline.
+
+```
+"Show me portfolio returns versus benchmark for my equity portfolios this quarter."
+```
 
 ---
 
@@ -199,7 +203,9 @@ The AI Chat Platform is the conversational layer through which users interact wi
 
 ### Example
 
-A portfolio manager asks: *"Show me portfolio returns versus benchmark for my equity portfolios this quarter."*
+```
+"Show me portfolio returns versus benchmark for my equity portfolios this quarter."
+```
 
 **↳ Step 1 — Natural language request received.** The question enters the platform via the AI Chat Front End. No database has been contacted. No query has been generated.
 
