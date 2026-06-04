@@ -349,7 +349,7 @@ The SMR is composed of three SDR document types:
 
 | SDR document type | Description |
 |---|---|
-| **`analytical_metric`** | Metric definition — formula, aggregation, `data_affinity`, `physical_mapping`, `required_dimensions`, `performance_impact_weight`, `classification_level`, `compliance_modes` |
+| **`analytical_metric`** | Metric definition — formula, aggregation, `data_affinity`, `physical_mapping`, `required_dimensions`, `performance_impact_weight`, `classification_level`, `compliance_relevant`, `regulatory_framework` |
 | **`analytical_dimension`** | Dimension definition — `data_affinity`, `physical_mapping`, enumerated values or `hierarchical` flag, `hierarchy_levels` |
 | **`analytical_operation`** | Operation catalogue entry — `execution_profile`, `required_params`, `supported_metrics`, `supported_dimensions`, `default_visualization` |
 
@@ -365,6 +365,7 @@ Every metric in the SMR conforms to the following schema. This is the authoritat
   "description": "Total return of a portfolio over the specified period, net of fees, expressed as a percentage.",
   "formula":     "(end_market_value - start_market_value + cash_flows) / start_market_value",
   "compliance_relevant": false,
+  "regulatory_framework": [],
   "unit":        "percentage",
   "aggregation": {
     "default":     "value_weighted_average",
@@ -434,6 +435,7 @@ Every metric in the SMR conforms to the following schema. This is the authoritat
 | `lineage.downstream_metrics` | No | SMR metrics that depend on this metric. Used for impact analysis when metric definitions change. |
 | `access.roles` | Yes | Role IDs from the entitlement config that may query this metric. |
 | `compliance_relevant` | No | When `true`, this metric's output may be used in regulatory reporting or compliance submissions. When combined with a compliance-purpose query intent (see §Semantic Intent Layer), the platform escalates to the enhanced Provenance Artifact. Set by the Metrics Modeller at registration. |
+| `regulatory_framework` | No | Array of regulatory frameworks this metric belongs to. Accepted values: `mifid2`, `basel3`, `sec_reg_bi`. Drives trace target routing in the ALS and the additional validation rules applied by the SCL when the Provenance Artifact is active. A metric may belong to multiple frameworks. An empty array indicates no framework-specific rules apply. |
 
 ### Registry Governance Workflow
 
@@ -755,7 +757,7 @@ flowchart TD
     S2["**2. Performance impact threshold check**\nCompare estimated performance impact to maxPerformanceImpact\nBLOCK if exceeded → user prompted to narrow scope"]
     S3["**3. Complexity limit check**\nEvaluate LQP node count, join depth, sub-plan count\nBLOCK if exceeds complexity threshold"]
     S4["**4. Classification gate**\nRetrieve data.classification from SMR per metric\nBLOCK if any metric classification is in blocked list"]
-    S5["**5. Regulatory compliance mode check**\nIf complianceMode set: apply compliance-specific rules\ne.g. MiFID II: log all queries involving client-related metrics"]
+    S5["**5. Compliance check**\nIf any resolved metric has compliance_relevant: true:\nevaluate two-signal Provenance Artifact trigger\napply framework-specific validation rules from metric regulatory_framework tags"]
     S6["**6. Concurrency limit check**\nCount active queries for this user\nBLOCK with wait if exceeds maxConcurrentQueries"]
     S7["**7. Timeout budget assignment**\nAssign queryTimeoutSeconds to FQE execution context"]
     S8(["**8. Controls approval record written**\nControls event written before FQE is invoked\n→ Release to FQE"])
@@ -796,9 +798,21 @@ Total estimate: 850 performance impact units
 
 Against a `maxPerformanceImpact: 1000` limit, this query is approved. Against a `500` limit, it is blocked and the user receives structured suggestions to narrow scope (reduce time period, reduce metric count, or add a filter).
 
-### Compliance Modes
+### Compliance
 
-`complianceMode` sets the active regulatory ruleset and the trace targets used when the Provenance Artifact is active (e.g. `mifid2` writes to `analytics.mifid2_trace`; `basel3` writes LCR/NSFR snapshots to `analytics.regulatory_snapshots`). It does not by itself trigger the Provenance Artifact.
+The platform's compliance behaviour is driven entirely by the metrics being queried and the intent of the query. There is no tenant-level compliance mode switch. The regulatory framework is declared on each metric at registration time by the Metrics Modeller.
+
+**Feature flag**
+
+Compliance features are enabled or disabled at the tenant level with a single binary flag, set by the Platform Admin:
+
+```json
+"features": {
+  "complianceMode": true
+}
+```
+
+When `complianceMode` is `false`, all compliance checks and Provenance Artifact generation are disabled. When `true`, the two-signal trigger below applies to every query.
 
 **Provenance Artifact trigger — two signals, both required (AND logic)**
 
@@ -813,35 +827,31 @@ The platform escalates to the enhanced Provenance Artifact only when both of the
 
 | `compliance_relevant` (any metric) | `compliance_purpose` (SIL classification) | SCL decision |
 |---|---|---|
-| `true` | `true` | **Enhanced** — full Provenance Artifact active |
+| `true` | `true` | **Enhanced** — full Provenance Artifact active; framework-specific validation rules applied |
 | `true` | `false` | Standard controls output |
 | `false` | `true` | Standard controls output |
 | `false` | `false` | Standard controls output |
 
-The compliance mode rule tables below describe the additional rules and trace targets applied **when the Provenance Artifact is active** under each mode.
+**Export gate**
 
-**MiFID II mode** (`"complianceMode": "mifid2"`)
+When the Provenance Artifact is active, export of the result is blocked until the artifact is confirmed written and sealed to the ALS. The `export_requires_lineage: true` flag in the response signals this state to the consumer. The consumer must not present export affordances until the platform confirms sealing.
 
-| Additional rule | Implementation |
-|---|---|
-| All queries involving client-identifiable data must be logged with business justification | Prompt user for business justification before queries on `client_name`, `account_number`, or similar PII-adjacent dimensions |
-| Best execution metrics must be queried with explicit timeframe | Validation error if `date` dimension not specified for best-execution metrics |
-| Transaction reporting queries must generate a TRACE record | Additional Provenance Artifact written to `analytics.mifid2_trace` table |
+**Framework-specific validation rules**
 
-**Basel III/IV mode** (`"complianceMode": "basel3"`)
+Each `regulatory_framework` tag on a metric carries validation rules that the SCL applies when the Provenance Artifact is active for that metric. These rules are declared at metric registration and enforced at query time — they are properties of the metric, not tenant configuration.
 
-| Additional rule | Implementation |
-|---|---|
-| Capital ratio queries must include entity identifier | Required dimension: `entity` for all regulatory capital metrics |
-| LCR/NSFR queries generate a daily snapshot record | Regulatory metric queries trigger a snapshot write to `analytics.regulatory_snapshots` |
-| Queries on stress scenario data classified as RESTRICTED | Stress scenario metrics automatically classified at RESTRICTED level regardless of user role |
+| Framework | Additional validation rule | Effect |
+|---|---|---|
+| `mifid2` | Queries on client-identifiable metrics require business justification | User is prompted for justification before execution; justification recorded in Provenance Artifact |
+| `mifid2` | Best-execution metrics require explicit timeframe | Validation error if `date` dimension not specified |
+| `mifid2` | Transaction reporting metrics generate a regulatory trace record | Additional trace written to the ALS regulatory trace partition |
+| `basel3` | Capital ratio metrics require entity identifier | Validation error if `entity` dimension not specified |
+| `basel3` | LCR/NSFR metrics generate a daily snapshot record | Snapshot written to the ALS regulatory snapshots partition |
+| `basel3` | Stress scenario metrics are subject to RESTRICTED classification ceiling | Classification ceiling applied regardless of user role |
+| `sec_reg_bi` | Client advisory metrics: narrative synthesis constrained to factual summary only | Forward-looking statements, yield projections, and investment recommendations are rejected from NSE output before inclusion in the response |
+| `sec_reg_bi` | Advisory queries require suitability record reference | `suitability_record_id` parameter required before execution |
 
-**SEC Regulation BI mode** (`"complianceMode": "sec_reg_bi"`)
-
-| Additional rule | Implementation |
-|---|---|
-| Narrative synthesis prohibited from generating investment recommendations | Additional narrative synthesis constraint injected into prompt |
-| Client analytics require suitability record reference | Advisory queries require `suitability_record_id` parameter before execution |
+Trace target routing to the correct ALS partition is determined automatically from the `regulatory_framework` tags on the resolved metrics.
 
 ### Timeout and Partial Result Handling
 
@@ -1277,7 +1287,7 @@ The Analytics Engine is headless: it produces no rendered output. Every successf
 | Structured result | `data` | Yes | The computed rows and schema — metric values, dimension values, and units. |
 | Governed narrative | `narrative` | No (feature-flag controlled) | A governed summary produced by the NSE — `lead` (one sentence), `detail` (2–4 sentences), `anchoredTo` (result row references). Present when `features.narrativeSynthesis` is enabled. |
 | Lineage reference | `result_id` + `lineage_url` | Yes | A unique result identifier and the URL of the full lineage record |
-| Compliance artifacts | `compliance` | No (compliance tier only) | Present when both `compliance_relevant` metrics are queried AND the SIL classifies query intent as compliance-purpose. Contains regulatory trace ID, triggered metrics/modes, classification enforcement flag, and export lineage requirement. |
+| Compliance artifacts | `compliance` | No (compliance tier only) | Present when both `compliance_relevant` metrics are queried AND the SIL classifies query intent as compliance-purpose. Contains regulatory trace ID, triggered metrics, triggered frameworks, intent classification score, `export_requires_lineage` flag (signals export is blocked until artifact is sealed), and `classification_ceiling_applied` flag (set when a `basel3` stress scenario metric triggered RESTRICTED classification ceiling). |
 
 ### Full MCP Response Structure
 
