@@ -58,7 +58,7 @@ The platform exposes its capability through three consumption modes. The first i
 flowchart TD
     subgraph Consumers["AI Consumers"]
         direction LR
-        ChatComp["Conversational AI\nconversational UI \n Content rendering · Tool call routing\nAudit trail · Memory · Shared conversations"]
+        ChatComp["Conversational AI\nconversational UI \n Image/Chart rendering · Tool call routing\nAudit trail · Memory · Shared conversations"]
         CustomUI["Custom analytics UI\nhost-built · renders JSON / DVL"]
         Agents["Agentic AI\n Independant Agents - event monitors · report pipelines, Anomoloy Dection, Event Prediction, Data Quality, Risk Tollerance, Reviews etc"]
     end
@@ -76,7 +76,9 @@ flowchart TD
         Result(["MCP tool response\ndisplay_spec + data + narrative + result_id"])
     end
 
-    vega2img["vega2img (optional)\nStandalone MCP render service · DVL → SVG / PNG\nRegistered directly with consumers — not part of Analytics Engine"]
+     subgraph Image["Image/Chart Rendering (Optional)"]
+            vega2img["vega2img (optional)\nStandalone MCP render service · DVL → SVG / PNG\nRegistered directly with consumers — not part of Analytics Engine"]
+    end
 
     subgraph dcr["Data Context Repository DCR"]
         SMR["Semantic Metrics Repository\nMetric definitions · dimensions · hierarchies\naggregation rules · governance · access policies"]
@@ -91,7 +93,7 @@ flowchart TD
     end
 
     Consumers -->|"JWT + structured MCP tool call"| MCP
-    Consumers -->|"MCP tool call + user JWT"| vega2img
+    Consumers -->|"MCP tool call + user JWT"| Image
     MCP -->|"structured parameters"| SIL
     MCP -->|"JWT claims"| RAPL
     RAPL -->|"row predicates + column masks"| SIL
