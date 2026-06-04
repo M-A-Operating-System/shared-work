@@ -2,7 +2,7 @@
 
 Metrics are captured from day one at both the platform level (across all tenants) and the application level (per tenant). Governance health metrics are first-class success indicators. A platform that is highly used but poorly governed is not successful.
 
-Component definitions referenced in the metrics below (SMR, FQP, RAPL, SEG, NSE, Lineage Store) are in [Chapter 3 — Core Platform Capabilities](./03-core-capabilities.md). [Analytical Lineage Store](./03-core-capabilities.md#analytical-lineage-store) · [Semantic Execution Governance](./03-core-capabilities.md#semantic-execution-governance) · [Narrative Synthesis Engine](./03-core-capabilities.md#narrative-synthesis-engine)
+Component definitions referenced in the metrics below (SMR, FQP, RAPL, SEG, NSE, Lineage Store) are in [Chapter 2 -- Core Platform Capabilities](./02-core-capabilities.md). [Analytical Lineage Store](./02-core-capabilities.md#analytical-lineage-store) · [Semantic Execution Governance](./02-core-capabilities.md#semantic-execution-governance) · [Narrative Synthesis Engine](./02-core-capabilities.md#narrative-synthesis-engine)
 
 ---
 

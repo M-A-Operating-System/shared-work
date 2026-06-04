@@ -2,7 +2,7 @@
 
 This chapter describes one reference implementation of the AI Analytics Platform. Stack choices are concrete but not prescriptive. The product specification is intentionally stack-agnostic. Any conformant implementation that satisfies the specified behaviours, governance guarantees, and interface contracts is valid. Technology substitutions at any layer require no changes to the product specification.
 
-The product specification (component behaviours, interface contracts, governance requirements) is in [Chapter 3 — Core Platform Capabilities](./03-core-capabilities.md). The design principles governing every decision are in [Platform Overview — Design Principles](./00-overview.md#design-principles).
+The product specification (component behaviours, interface contracts, governance requirements) is in [Chapter 2 -- Core Platform Capabilities](./02-core-capabilities.md). The design principles governing every decision are in [Platform Overview — Design Principles](./00-overview.md#design-principles).
 
 ---
 
@@ -64,7 +64,7 @@ The Semantic Data Context Store (DCS) is a pre-existing platform component: the 
 
 ### MCP Capability Layer
 
-> **Specification:** [§MCP Capability Layer](./03-core-capabilities.md#mcp-capability-layer)
+> **Specification:** [§MCP Capability Layer](./02-core-capabilities.md#mcp-capability-layer)
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
@@ -142,7 +142,7 @@ async def drilldown(input: DrilldownInput, jwt: str) -> dict:
 
 #### Execution profiles
 
-Each SMR operation carries an `execution_profile` that tells the pipeline executor which stages to invoke. Profile definitions are in [§MCP Capability Layer](./03-core-capabilities.md#mcp-capability-layer).
+Each SMR operation carries an `execution_profile` that tells the pipeline executor which stages to invoke. Profile definitions are in [§MCP Capability Layer](./02-core-capabilities.md#mcp-capability-layer).
 
 #### Resources
 
@@ -256,7 +256,7 @@ if __name__ == "__main__":
 
 ### Semantic Intent Layer
 
-> **Specification:** [§Semantic Intent Layer](./03-core-capabilities.md#semantic-intent-layer)
+> **Specification:** [§Semantic Intent Layer](./02-core-capabilities.md#semantic-intent-layer)
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
@@ -306,7 +306,7 @@ class SemanticIntentLayer:
 
 ### Narrative Synthesis Engine
 
-> **Specification:** [§Narrative Synthesis Engine](./03-core-capabilities.md#narrative-synthesis-engine)
+> **Specification:** [§Narrative Synthesis Engine](./02-core-capabilities.md#narrative-synthesis-engine)
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
@@ -361,7 +361,7 @@ class NarrativeSynthesisEngine:
 
 ### Semantic Metrics Registry (SMR)
 
-> **Specification:** [§Semantic Metrics Registry](./03-core-capabilities.md#semantic-metrics-registry)
+> **Specification:** [§Semantic Metrics Registry](./02-core-capabilities.md#semantic-metrics-registry)
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
@@ -415,7 +415,7 @@ The core metric definition. One document per approved metric version per tenant.
 
 `weight_metric_id` is required when `aggregation` is `"value_weighted_average"` (or any other weighted aggregation variant) and must reference the `metric_id` of an approved `analytical_metric` in the same tenant's DCS. The SIL resolves and validates this reference at query time. If the weight metric is missing or unapproved, the query is rejected. The field is absent for non-weighted aggregations (`"sum"`, `"last"`, `"count"`, `"min"`, `"max"`, `"mean"`). The LQP generator emits a `weight_metric_id` key on the `metric_scan` node so that the execution backend can fetch the weighting values alongside the primary metric.
 
-`formula` stores the business-logic expression defined in the [SMR formula language](./03-core-capabilities.md#formula-language). It is the human-readable and audit-visible definition of what the metric computes. At query time the FQP resolves the formula against the `physical_mapping` to generate the backend-specific query; the formula itself is never executed directly. Metrics backed entirely by a pre-computed measure in a semantic layer (e.g. a Cube.js measure) may leave `formula` as an empty string and rely solely on `physical_mapping`.
+`formula` stores the business-logic expression defined in the [SMR formula language](./02-core-capabilities.md#formula-language). It is the human-readable and audit-visible definition of what the metric computes. At query time the FQP resolves the formula against the `physical_mapping` to generate the backend-specific query; the formula itself is never executed directly. Metrics backed entirely by a pre-computed measure in a semantic layer (e.g. a Cube.js measure) may leave `formula` as an empty string and rely solely on `physical_mapping`.
 
 #### New DCS document type: `analytical_dimension`
 
@@ -725,7 +725,7 @@ class LQPGenerator:
 
 ### Role-Aware Projection Layer
 
-> **Specification:** [§Role-Aware Projection Layer](./03-core-capabilities.md#role-aware-projection-layer)
+> **Specification:** [§Role-Aware Projection Layer](./02-core-capabilities.md#role-aware-projection-layer)
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
@@ -814,7 +814,7 @@ class RoleAwareProjectionLayer:
 
 ### Semantic Execution Governance
 
-> **Specification:** [§Semantic Execution Governance](./03-core-capabilities.md#semantic-execution-governance)
+> **Specification:** [§Semantic Execution Governance](./02-core-capabilities.md#semantic-execution-governance)
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
@@ -923,7 +923,7 @@ class SemanticExecutionGovernance:
 
 ### Federated Query Planner (FQP)
 
-> **Specification:** [§Federated Query Planner](./03-core-capabilities.md#federated-query-planner)
+> **Specification:** [§Federated Query Planner](./02-core-capabilities.md#federated-query-planner)
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
@@ -1066,7 +1066,7 @@ class FQPBackendAdapter:
 
 ### Visualisation Ontology
 
-> **Specification:** [§Visualisation Ontology](./03-core-capabilities.md#visualisation-ontology)
+> **Specification:** [§Visualisation Ontology](./02-core-capabilities.md#visualisation-ontology)
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
@@ -1125,7 +1125,7 @@ The evaluator matches the `COMPARISON` intent pattern and two-metric schema to t
 }
 ```
 
-Full SCL examples including the `type: "table"` spec are in [Analytical Output Format](./03-core-capabilities.md#analytical-output-format). Full chart contract definitions are in [Visualisation Ontology](./03-core-capabilities.md#visualisation-ontology).
+Full SCL examples including the `type: "table"` spec are in [Analytical Output Format](./02-core-capabilities.md#analytical-output-format). Full chart contract definitions are in [Visualisation Ontology](./02-core-capabilities.md#visualisation-ontology).
 
 ```python
 INTENT_CONTRACTS = {
@@ -1256,7 +1256,7 @@ if __name__ == "__main__":
 
 ### Analytical Lineage Store
 
-> **Specification:** [§Analytical Lineage Store](./03-core-capabilities.md#analytical-lineage-store)
+> **Specification:** [§Analytical Lineage Store](./02-core-capabilities.md#analytical-lineage-store)
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
@@ -1418,9 +1418,9 @@ class KnowledgeStore:
 | **Activation** | `analyticalDomain` config triggers SMR import at tenant setup | Bundle documents are written to the DCS in `proposed` state; Application Admin approves before metrics become resolvable |
 | **Customisation** | Full edit/override via Admin API after import | Customised definitions marked `source: "tenant"` in the DCS document |
 
-Each bundle is a JSON array of DCS documents conforming to the schemas defined in [§Semantic Metrics Registry](./03-core-capabilities.md#semantic-metrics-registry). Bundles are seeded into the DCS in `"proposed"` state at tenant setup; the Application Admin approves each document before it becomes resolvable by the Semantic Intent Layer.
+Each bundle is a JSON array of DCS documents conforming to the schemas defined in [§Semantic Metrics Registry](./02-core-capabilities.md#semantic-metrics-registry). Bundles are seeded into the DCS in `"proposed"` state at tenant setup; the Application Admin approves each document before it becomes resolvable by the Semantic Intent Layer.
 
-> **Version format note:** Seed bundle documents use an integer `version` field (starting at `1`) as the bootstrap state. On first tenant activation the platform converts these to semantic versioning (`"1.0.0"`). Subsequent versions follow semver — the `"2.1.0"` form used in Chapter 3 examples reflects a metric that has been through two major revisions post-activation.
+> **Version format note:** Seed bundle documents use an integer `version` field (starting at `1`) as the bootstrap state. On first tenant activation the platform converts these to semantic versioning (`"1.0.0"`). Subsequent versions follow semver — the `"2.1.0"` form used in Chapter 2 examples reflects a metric that has been through two major revisions post-activation.
 
 #### Dimensions bundle (shared across all domains)
 

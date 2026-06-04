@@ -23,15 +23,14 @@ The platform eliminates Text-to-SQL as an architectural pattern for regulated an
 | Chapter | Title | Contents |
 |---------|-------|---------|
 | [Overview](./00-overview.md) | Governed Large-Scale Analytics and Data Mining | Problem space, platform introduction, design principles, and end-to-end worked examples |
-| [2. Personas and Architecture](./02-personas-and-architecture.md) | Consumer Personas and Platform Architecture | User personas, use cases, platform architecture diagrams, request flow |
-| [3. Core Capabilities](./03-core-capabilities.md) | Core Platform Capabilities | Deep-dive specifications: SMR, Intent Layer, RAPL, Governance, FQP, Visualisation Ontology, Output Format, Lineage Store, MCP Layer |
-| [4. Integration and Deployment](./04-integration-and-deployment.md) | Integration and Deployment | Consumer integration, platform administration, Financial Services reference model, complementary services |
-| [5. Technical Implementation](./05-technical-implementation.md) | Proposed Technical Implementation | Reference stack with rationale: Cloudflare Workers, Apache Calcite, Vega-Lite, PostgreSQL lineage store, Anthropic Claude |
-| [6. Success Metrics](./06-success-metrics.md) | Success Metrics | Platform and application-level metrics, governance health indicators, review cadence |
-| [7. Appendix: Text-to-SQL and Semantic Analytics](./07-text-to-sql-antipattern.md) | Text-to-SQL and Semantic Analytics: Better Together | Structural failure modes, SQL injection risks, and the complementary architecture where both tools coexist |
-| [8. Roadmap](./08-roadmap.md) | Platform Roadmap | Planned enhancements beyond the current release |
+| [2. Core Capabilities](./02-core-capabilities.md) | Core Platform Capabilities | Platform roles, deep-dive specifications: SMR, Intent Layer, RAPL, Governance, FQP, Visualisation Ontology, Output Format, Lineage Store, MCP Layer |
+| [3. Integration and Deployment](./03-integration-and-deployment.md) | Integration and Deployment | Consumer integration, platform administration, Financial Services reference model, complementary services |
+| [4. Technical Implementation](./04-technical-implementation.md) | Proposed Technical Implementation | Reference stack with rationale: Cloudflare Workers, Apache Calcite, Vega-Lite, PostgreSQL lineage store, Anthropic Claude |
+| [5. Success Metrics](./05-success-metrics.md) | Success Metrics | Platform and application-level metrics, governance health indicators, review cadence |
+| [Appendix](./06-text-to-sql-antipattern.md) | Text-to-SQL and Semantic Analytics: Better Together | Structural failure modes, SQL injection risks, and the complementary architecture where both tools coexist |
+| [Roadmap](./07-roadmap.md) | Platform Roadmap | Planned enhancements beyond the current release |
 
-Start with the Overview for executive and business context, then read Chapters 1–6 sequentially. Each chapter assumes the previous. The appendix may be read independently as a standalone reference for teams evaluating architectural options.
+Start with the Overview for executive and business context, then read Chapters 2–5 sequentially. Each chapter assumes the previous. The appendix may be read independently as a standalone reference for teams evaluating architectural options.
 
 ---
 
@@ -39,14 +38,14 @@ Start with the Overview for executive and business context, then read Chapters 1
 
 | Term | Definition |
 |------|------------|
-| **[Semantic Metrics Registry (SMR)](./03-core-capabilities.md#semantic-metrics-registry)** | The governing catalogue of all resolvable analytical concepts for a tenant — metrics, dimensions, hierarchies, measure groups, and domains. Nothing is queryable that is not registered. |
-| **[Logical Query Plan (LQP)](./03-core-capabilities.md#semantic-intent-layer)** | Engine-agnostic DAG of analytical operations produced by the Semantic Intent Layer. No physical backend references. |
-| **[Federated Query Planner (FQP)](./03-core-capabilities.md#federated-query-planner)** | The only component with knowledge of physical backends. Decomposes the LQP into sub-plans, routes by data domain affinity, executes in parallel, assembles results. |
-| **[Role-Aware Projection Layer (RAPL)](./03-core-capabilities.md#role-aware-projection-layer)** | Semantic-tier entitlement enforcement. Applies metric access filters, dimension access filters, row predicates, and column masks — before any query plan is compiled. |
-| **[Semantic Execution Governance (SEG)](./03-core-capabilities.md#semantic-execution-governance)** | Suite of circuit breakers, cost controls, complexity limits, and compliance classification checks applied to every query before FQP release. |
-| **[Visualisation Ontology](./03-core-capabilities.md#visualisation-ontology)** | Governed schema of chart contracts that map result schemas and intent patterns to specific chart configurations. Chart selection is deterministic — not AI-chosen. |
-| **[Semantic Charting Language (SCL)](./03-core-capabilities.md#analytical-output-format)** | Platform output format for display specifications. Two types in a consistent JSON envelope: `type: "chart"` (Vega-Lite v5) and `type: "table"`. |
-| **[Analytical Lineage](./03-core-capabilities.md#analytical-lineage-store)** | Computation provenance — not data lineage. A complete, queryable record of which metric definitions, aggregation rules, role projections, and backend sub-results produced each analytical result. |
+| **[Semantic Metrics Registry (SMR)](./02-core-capabilities.md#semantic-metrics-registry)** | The governing catalogue of all resolvable analytical concepts for a tenant — metrics, dimensions, hierarchies, measure groups, and domains. Nothing is queryable that is not registered. |
+| **[Logical Query Plan (LQP)](./02-core-capabilities.md#semantic-intent-layer)** | Engine-agnostic DAG of analytical operations produced by the Semantic Intent Layer. No physical backend references. |
+| **[Federated Query Planner (FQP)](./02-core-capabilities.md#federated-query-planner)** | The only component with knowledge of physical backends. Decomposes the LQP into sub-plans, routes by data domain affinity, executes in parallel, assembles results. |
+| **[Role-Aware Projection Layer (RAPL)](./02-core-capabilities.md#role-aware-projection-layer)** | Semantic-tier entitlement enforcement. Applies metric access filters, dimension access filters, row predicates, and column masks — before any query plan is compiled. |
+| **[Semantic Execution Governance (SEG)](./02-core-capabilities.md#semantic-execution-governance)** | Suite of circuit breakers, cost controls, complexity limits, and compliance classification checks applied to every query before FQP release. |
+| **[Visualisation Ontology](./02-core-capabilities.md#visualisation-ontology)** | Governed schema of chart contracts that map result schemas and intent patterns to specific chart configurations. Chart selection is deterministic — not AI-chosen. |
+| **[Semantic Charting Language (SCL)](./02-core-capabilities.md#analytical-output-format)** | Platform output format for display specifications. Two types in a consistent JSON envelope: `type: "chart"` (Vega-Lite v5) and `type: "table"`. |
+| **[Analytical Lineage](./02-core-capabilities.md#analytical-lineage-store)** | Computation provenance — not data lineage. A complete, queryable record of which metric definitions, aggregation rules, role projections, and backend sub-results produced each analytical result. |
 | **Application Admin** | Privileged tenant user responsible for SMR integrity, entitlement policies, and governance configuration. Equivalent to a Chief Data Officer within the platform context. Must exist before go-live. |
 | **vega2img** | Standalone MCP render service for static image output. Registered directly with consumers as a peer server. Not part of the Analytics Platform. |
 
