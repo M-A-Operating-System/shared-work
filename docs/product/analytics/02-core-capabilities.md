@@ -80,10 +80,10 @@ flowchart TD
             vega2img["vega2img (optional)\nStandalone MCP render service · DVL → SVG / PNG\nRegistered directly with consumers — not part of Analytics Engine"]
     end
 
-    subgraph dcr["Data Context Repository DCR"]
-        SMR["Semantic Metrics Repository\nMetric definitions · dimensions · hierarchies\naggregation rules · governance · access policies"]
-        DCS[("Semantic Data Context Store\nPre-existing · general-purpose common registry")]
-        SMR -. backed by .-> DCS
+    subgraph dcr["Data Context Repository(DCR)"]
+        SMR[("Semantic Metrics Repository(SMR)\nmetric definitions, dimensions, hierarchies, aggregation rules, governance, access policies, compliance rules ")]
+        DCS[("*Semantic Data Repository(SDR)* \n data definitions, data models, object models, critical data elements, quality rules, data lineage,")]
+        SMR --> DCS
     end
 
     subgraph backends["Data Sources"]
