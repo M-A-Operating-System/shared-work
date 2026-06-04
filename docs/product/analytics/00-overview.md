@@ -10,45 +10,25 @@ The consequence is a structural bottleneck. Business users cannot access the dat
 
 The regulatory dimension sharpens this further. An analytical result in a governed financial services organisation is not just a number: it is an assertion. When a regulator asks how a capital ratio was calculated, the answer must be reproducible, version-controlled, and complete. When the same metric appears in submissions to two regulators across two jurisdictions, it must resolve to exactly the same formula. These are not quality aspirations. They are legal requirements. An organisation that cannot produce computation provenance for its regulatory submissions is not merely technically incomplete. It is legally exposed.
 
-### Where AI analytics stands today
+### The opportunity
 
-Conversational AI has matured to a point where AI assistants and agents can effectively handle small-scale data access: retrieving individual records, looking up reference data, and calling predefined calculations via MCP (Model Context Protocol) tool integrations. These capabilities are well established and deliver real value — an AI assistant that can pull a client record, check a position, or invoke a pre-built calculation is a meaningful productivity gain.
+AI assistants and agents today handle small-scale data access well: retrieving records, checking positions, calling predefined calculations. The next step — large-scale analytics and data mining across governed financial data — requires something more. A portfolio manager asking for returns versus benchmark across all equity strategies, a risk officer monitoring VaR breaches across multiple entities, a data science pipeline extracting a year of position data: these are not record lookups. They are governed analytical computations.
 
-The natural next step is large-scale analytics and data mining: the portfolio manager who wants returns versus benchmark across all equity strategies, the risk officer who needs VaR exposures aggregated across multiple entities, the data science pipeline that requires 12 months of position data for model retraining. A common starting point is for organisations to explore Text-to-SQL, where they attempt to use LLMs to generate SQL queries against their data platform schemas that are then executed directly against production data. For exploratory, low-stakes, ad hoc work this is a legitimate starting point. For governed large-scale analytics in regulated financial services it is not sufficient or sustainable.
+The natural starting point for organisations is Text-to-SQL: use an LLM to generate SQL queries and run them directly against production data. For ad hoc, low-stakes exploration this has merit. For governed large-scale analytics in regulated financial services it has three structural failures that no amount of tuning resolves:
 
-The structural problems are architectural, not incidental:
+- **No approved metric definitions** — the AI infers what "Portfolio Return" means at query time; the same question can produce a different calculation in a different session
+- **No reproducible calculation record** — SQL is generated fresh each time; two identical queries are not guaranteed to produce identical results
+- **No guaranteed entitlement enforcement** — access controls depend on the reliability of AI-generated query predicates, not a guaranteed enforcement layer
 
-- **No approved metric definitions** — the AI infers what "Portfolio Return" means at query time, so the same metric can mean different things in different queries and reports
-- **No reproducible calculation record** — SQL is generated fresh each time, so no two identical queries are guaranteed to produce identical results
-- **No guaranteed entitlement enforcement** — access controls depend on the reliability of AI-generated query predicates rather than a guaranteed enforcement layer
-
-Teams can invest significant effort in training or fine-tuning LLMs to better understand their specific schemas, and this can improve query accuracy in early trials. However, this approach addresses the symptom — the model's knowledge of table structures — rather than the underlying problem. No amount of schema training produces approved metric definitions, a reproducible calculation record, or a guaranteed entitlement enforcement layer. The governance gap remains, regardless of how well the model has learned the schema.
-
-In a regulated environment, none of these properties is acceptable. The [Text-to-SQL appendix](./06-text-to-sql-antipattern.md) examines the failure modes in detail and describes the complementary architecture where both tools coexist.
-
-### Analytics engines: a well-established design pattern
-
-The governed semantic computation engine is not a new idea. The industry has developed and refined it for decades across a broad range of platforms and categories:
-
-| Category | Examples |
-|---|---|
-| BI semantic layers | Business Objects Universe, MicroStrategy Semantic Layer, Cognos Framework Manager |
-| OLAP engines | Essbase, SAP BW, Microsoft SSAS |
-| Modern metrics layers | dbt Semantic Models, Cube, AtScale |
-| Data virtualisation | Denodo, Starburst |
-| Domain-specific engines | Risk engines, actuarial engines, pricing engines, fraud detection engines |
-
-All share a common design pattern. Rather than searching tables and returning rows, a semantic computation layer interprets business concepts, applies approved calculations, enforces dimensional hierarchies and access controls, and returns governed analytical responses. When a CFO asks *"what was our adjusted EBITDA by region last quarter?"*, the analytical engine understands the business concept, applies the approved formula, enforces security, and produces a governed result — not a set of database rows.
-
-The dominant AI narrative has become: *natural language → LLM → SQL → database → answer*. This treats the database as the analytical system. It is not. The analytical system is the governed computation layer that sits above the database. The AI opportunity is to build and expose that layer through natural language and agentic interfaces — not to route around it.
+Training LLMs on database schemas improves query accuracy in early trials but addresses the symptom — table knowledge — not the problem. The governance gap remains. The [Text-to-SQL appendix](./06-text-to-sql-antipattern.md) examines the failure modes in detail.
 
 ### The platform
 
-We propose an alternative to Text-to-SQL: a dedicated, governed AI-enabled analytics platform that allows AI to correctly execute well-governed, semantically described metrics and return well-defined, structured datasets at scale. Rather than generating SQL against raw schemas, AI interacts exclusively with an approved analytical vocabulary — versioned metric definitions, governed dataset contracts, and enforced entitlements — and the platform handles all deterministic computation, access control, and audit recording.
+The AI Analytics Platform is a governed computation engine that gives AI systems correct, auditable access to an organisation's regulated metrics and datasets — without exposing database schemas, without generating SQL, and without compromising entitlement enforcement. AI interacts exclusively with an approved analytical vocabulary: versioned metric definitions, governed dataset contracts, and enforced entitlements. The platform handles all deterministic computation, access control, and audit recording behind a single governed API.
 
-In practice: a portfolio manager can ask "show me portfolio returns versus benchmark for my equity portfolios this quarter" in plain English and receive a governed, role-constrained, auditable result with the full computation record attached. A data science pipeline can extract millions of rows of position data under the same entitlement and audit controls. A treasury analyst can produce an LCR figure for a Basel III submission and receive, automatically, a regulator-ready compliance artifact set alongside the result. The analyst bottleneck breaks. Regulatory requirements hold.
+In practice: a portfolio manager asks "show me portfolio returns versus benchmark for my equity portfolios this quarter" in plain English and receives a governed, role-constrained, auditable result with the full computation record attached. A data science pipeline extracts millions of rows of position data under the same entitlement and audit controls. A treasury analyst produces an LCR figure for a Basel III submission and receives, automatically, a regulator-ready compliance artifact set alongside the result. The analyst bottleneck breaks. Regulatory requirements hold.
 
-The platform addresses the following challenges that Text-to-SQL and small-scale MCP integrations cannot:
+The platform addresses the following challenges that Text-to-SQL and unstructured MCP integrations cannot:
 
 | Enterprise analytical challenge | Platform response |
 |---|---|
@@ -60,6 +40,22 @@ The platform addresses the following challenges that Text-to-SQL and small-scale
 | Multi-source analytical federation | A single governed interface routes queries across SQL warehouses, APIs, graph databases, and any registered data source |
 | Large dataset access for AI agents and data mining pipelines | Large datasets returned to agents and pipelines under the same entitlement and audit controls as analytical queries |
 
+### Analytics engines: a well-established design pattern
+
+This is not a new category. The industry has built governed semantic computation layers for decades across a broad range of platforms:
+
+| Category | Examples |
+|---|---|
+| BI semantic layers | Business Objects Universe, MicroStrategy Semantic Layer, Cognos Framework Manager |
+| OLAP engines | Essbase, SAP BW, Microsoft SSAS |
+| Modern metrics layers | dbt Semantic Models, Cube, AtScale |
+| Data virtualisation | Denodo, Starburst |
+| Domain-specific engines | Risk engines, actuarial engines, pricing engines, fraud detection engines |
+
+All share a common design pattern. Rather than searching tables and returning rows, a semantic computation layer interprets business concepts, applies approved calculations, enforces dimensional hierarchies and access controls, and returns governed analytical responses. When a CFO asks *"what was our adjusted EBITDA by region last quarter?"*, the analytical engine resolves the business concept, applies the approved formula, enforces access controls, and returns a governed result — not a set of database rows.
+
+The dominant AI narrative has become: *natural language → LLM → SQL → database → answer*. This treats the database as the analytical system. It is not. The analytical system is the governed computation layer that sits above the database. The AI opportunity is to expose that layer through natural language and agentic interfaces — not to route around it. The AI Analytics Platform is that layer.
+
 ---
 
 ## Architectural Model
@@ -68,14 +64,14 @@ The **Analytics Engine** is the platform's computation core. Given a precisely s
 
 AI has two roles in the analytical pipeline. The first lives in the consuming AI client — the assistant, agent, or application that a user interacts with. It reads the approved metric catalogue, translates a natural-language question into a precise, structured request, and submits it to the Analytics Engine. The second lives inside the Analytics Engine itself: after computation completes, the Narrative Synthesis Engine makes a targeted call to a language model to summarise the structured result in plain text, anchored strictly to computed values. It cannot introduce figures, comparisons, or interpretations not present in the result.
 
-The platform's API layer — built on MCP (Model Context Protocol), an open standard for connecting AI systems to tools and data — is the single, governed channel through which all AI systems access the organisation's regulated data and analytics. Conversational AI assistants, autonomous agents, data mining pipelines, and custom applications all enter through this channel and traverse the same governance pipeline. There is no alternative path. Every AI-initiated request produces an audit record. This is the architectural guarantee that makes AI-driven analytics safe to operate in a regulated environment.
-
 | It is | It is not |
 |-------|-----------|
 | A governed computation platform — the same question, data, and access permissions always produce the same answer | An AI product — the Analytics Engine is deterministic; the optional plain-language summary is a constrained post-computation step, not a query generator |
 | A governed analytics and data mining platform — metric queries, large dataset retrieval, and drilldown under a unified governance pipeline | A general-purpose SQL interface, BI tool replacement, or user interface |
 | An API layer that AI systems call to retrieve governed analytical results and datasets | A system that accepts natural language directly or allows AI to generate arbitrary database queries |
 | A governed metric registry — every queryable metric is registered, approved, and version-controlled | A system that infers metric definitions at query time |
+
+All AI systems access the platform through a single channel — an API layer built on MCP (Model Context Protocol), an open standard for connecting AI systems to tools and data. Conversational assistants, autonomous agents, data mining pipelines, and custom applications all enter through this channel and traverse the same governance pipeline. There is no alternative path. Every AI-initiated request produces an audit record. This is the architectural guarantee that makes AI-driven analytics safe to operate in a regulated environment.
 
 ---
 
