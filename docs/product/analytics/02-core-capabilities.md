@@ -82,7 +82,7 @@ flowchart TD
 
     subgraph dcr["Data Context Repository(DCR)"]
         SMR[("Semantic Metrics Repository(SMR)\nmetric definitions, dimensions, hierarchies, aggregation rules, governance, access policies, compliance rules ")]
-        DCS[("*Semantic Data Repository(SDR)* \n data definitions, data models, object models, critical data elements, quality rules, data lineage,")]
+        DCS[("*Semantic Data Repository(SDR)* \n data definitions, data models, object models, critical data elements, quality rules, physical schemas, data lineage,")]
         SMR --> DCS
     end
 
