@@ -1447,7 +1447,7 @@ The SDR and SMR are both contained within the Data Context Store (DCS). The DCS 
 
 ### vega2img
 
-`vega2img` is an optional, independently deployed MCP render service. It converts the Analytics Engine's DVL display specification (a Vega-Lite v5 JSON object) into a static image — SVG or PNG — for consumers that cannot natively render a chart specification inline.
+`vega2img` is an optional, independently deployed MCP render service. It converts the Analytics Engine's DVL display specification into a static image — SVG or PNG — for consumers that cannot natively render a DVL specification inline.
 
 **Integration model:**
 
@@ -1458,4 +1458,4 @@ The SDR and SMR are both contained within the Data Context Store (DCS). The DCS 
 | Invocation | The consumer calls `vega2img` as a separate tool invocation, passing the `display_spec` returned by the Analytics Engine's `run_analytics` response. |
 | Scope | Stateless render only. `vega2img` has no access to the Analytics Engine, the SMR, or any execution backend. It receives a self-contained DVL specification and returns an image. |
 
-`vega2img` is not required for consumers that can render Vega-Lite natively (most AI chat platforms and modern front-end frameworks). It is included in the architecture diagram for completeness — agentic pipelines that produce static report output are the primary use case.
+`vega2img` is not required for consumers that can natively render DVL specifications (most AI chat platforms and modern front-end frameworks). It is included in the architecture diagram for completeness — agentic pipelines that produce static report output are the primary use case.

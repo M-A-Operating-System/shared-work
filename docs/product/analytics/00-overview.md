@@ -33,7 +33,7 @@ The platform addresses the following challenges that Text-to-SQL and MCP impleme
 | Enterprise analytical challenge | Platform response |
 |---|---|
 | Metric consistency across users, reports, and regulatory submissions | Every metric is registered once, approved, and version-controlled — "Portfolio Return" means the same thing everywhere |
-| Complex regulated formulas (VaR, LCR, BHB attribution) computed at scale | Defined once in the approved analytics and metrics definitions in the Semantic Metrics Repository, computed identically every time — never re-inferred from raw data |
+| Complex regulated formulas (VaR, LCR, BHB attribution) computed at scale | Defined once in the SMR, computed identically every time — never re-inferred from raw data |
 | Computation provenance for regulatory review | Full audit record for every result: intent → definitions → entitlements → plan → execution → result |
 | Entitlement enforcement that AI cannot bypass | Enforced at the analytical layer before any database is contacted — not dependent on AI query generation reliability |
 | Metric governance and change management | Every metric definition is version-controlled with an approval workflow and full change history |
@@ -62,7 +62,7 @@ The dominant AI narrative has become: *natural language → LLM → SQL → data
 
 The **Analytics Engine** is the platform's computation core. Given a precisely specified question — which metrics, which dimensions, which time period, which filters — it always produces the same answer from the same data with the same access permissions in force. No probability, no AI generation, no inference affects the computed values. The computation pipeline contains no AI.
 
-AI has two roles in the analytical pipeline. The first lives in the AI consumer — the assistant, agent, or application that a user interacts with. It reads the approved analytics and metrics definitions in the Semantic Metrics Repository, translates a natural-language question into a precise, structured request, and submits it to the Analytics Engine. The second lives inside the Analytics Engine itself: after computation completes, the Narrative Synthesis Engine makes a targeted call to a language model to summarise the structured result in plain text, anchored strictly to computed values. It cannot introduce figures, comparisons, or interpretations not present in the result.
+AI has two roles in the analytical pipeline. The first lives in the AI consumer — the assistant, agent, or application that a user interacts with. It reads the metric registry and translates a natural-language question into a precise, structured request, and submits it to the Analytics Engine. The second lives inside the Analytics Engine itself: after computation completes, the Narrative Synthesis Engine makes a targeted call to a language model to summarise the structured result in plain text, anchored strictly to computed values. It cannot introduce figures, comparisons, or interpretations not present in the result.
 
 | It is | It is not |
 |-------|-----------|
@@ -197,7 +197,7 @@ A portfolio manager asks: *"Show me portfolio returns versus benchmark for my eq
 ```
 
 **2 · Intent resolution**
-The AI client reads the approved analytics and metrics definitions in the Semantic Metrics Repository and translates the question into a precise, structured request: compare portfolio return against benchmark return, for equity portfolios, current quarter, broken down by portfolio. No database query is generated at this stage — the AI is resolving intent against the approved analytics and metrics definitions in the Semantic Metrics Repository.
+The AI client reads the metric registry and translates the question into a precise, structured request: compare portfolio return against benchmark return, for equity portfolios, current quarter, broken down by portfolio. No database query is generated at this stage — the AI is resolving intent against the metric registry.
 
 ```
 -- Semantic Intent Resolution
@@ -207,7 +207,6 @@ metrics:
   benchmark_return  (unresolved)
 filters:        asset_class = equity  |  period = current_quarter
 dimensions:     portfolio_id
-display_intent: chart  →  comparative metrics across categorical dimension → grouped_bar
 ```
 
 **3 · Metric and entitlement resolution**
@@ -215,16 +214,16 @@ The platform resolves both metrics against the Semantic Metrics Repository. Port
 
 ```
 -- Metric & Entitlement Resolution
-portfolio_return  →  definition v2.3: SUM(daily_pnl) / SUM(opening_market_value)
+portfolio_return  →  definition v2.1.0: (end_market_value - start_market_value + cash_flows) / start_market_value
 benchmark_return  →  portfolio.registered_default_benchmark.period_return
 entitlements:        user_scope → [authorised_portfolio_list]
 ```
 
 **4 · Query planning, governance, and execution**
-The Federated Query Engine constructs a platform-agnostic Logical Query Plan (LQP) — The controls layer then constructs a precise, warehouse-neutral query: value-weighted portfolio return joined to each portfolio's registered benchmark, filtered to equity, with access predicates injected at the query level. No raw database schemas have been exposed at any stage. The query executes against the registered warehouse; the Analytics Engine assembles the response: computed values, a chart specification, an optional plain-language summary anchored strictly to the result, and a full audit record.
+The Semantic Controls Layer validates the Logical Query Plan against performance impact thresholds, data classification limits, and complexity checks. The Federated Query Engine then decomposes the approved plan into backend-specific physical queries, injecting the entitlement predicates at the physical layer. No raw database schemas have been exposed at any stage. The query executes against the registered warehouse; the Analytics Engine assembles the response: computed values, a DVL display specification, an optional plain-language summary anchored strictly to the result, and a full audit record.
 
 ```sql
--- Logical Query Plan
+-- Physical execution (FQE output)
 SELECT   p.portfolio_id,
          SUM(p.daily_pnl) / SUM(p.opening_market_value)  AS portfolio_return,
          b.period_return                                   AS benchmark_return
@@ -242,11 +241,10 @@ GROUP BY p.portfolio_id, b.period_return;
 ```
 
 **5 · Presentation decision**
-The result schema — two numeric measures compared across a categorical dimension — is matched against the Data Visualization Language (DVL). DVL resolves a grouped bar chart as the governed display contract for this result shape and intent pattern. A complete Vega-Lite specification is emitted alongside the data; the AI consumer renders it without making any independent display choice.
+The result schema — two numeric measures compared across a categorical dimension — is matched against the Data Visualization Language (DVL). DVL resolves a grouped bar chart as the governed display contract for this result shape and intent pattern. A complete DVL display specification is emitted alongside the data; the AI consumer renders it without making any independent display choice.
 
 ```json
 {
-  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
   "mark": "bar",
   "encoding": {
     "x":      { "field": "portfolio_id", "type": "nominal",      "title": "Portfolio"  },
@@ -276,7 +274,7 @@ A risk officer asks: *"Which portfolios are breaching their VaR 95 limit today, 
 ```
 
 **2 · Intent resolution**
-The AI client identifies three metrics — `var_95`, `var_limit`, and `risk_factor_contribution` — and resolves this as a threshold-comparison pattern with a contributing-factor breakdown. `var_limit` is a per-portfolio governance parameter stored in the risk configuration domain; `risk_factor_contribution` carries `portfolio_id` and `factor_bucket` as required dimensions. All three are registered in the Semantic Metrics Repository and resolve cleanly against the approved analytics and metrics definitions in the Semantic Metrics Repository.
+The AI client identifies three metrics — `var_95`, `var_limit`, and `risk_factor_contribution` — and resolves this as a threshold-comparison pattern with a contributing-factor breakdown. `var_limit` is a per-portfolio governance parameter stored in the risk configuration domain; `risk_factor_contribution` carries `portfolio_id` and `factor_bucket` as required dimensions. All three are registered in the Semantic Metrics Repository and resolve cleanly against the metric registry.
 
 ```
 -- Semantic Intent Resolution
@@ -284,7 +282,6 @@ operation:      compare_metric_to_threshold_with_breakdown
 metrics:        [var_95, var_limit, risk_factor_contribution]
 dimensions:     [portfolio_id, factor_bucket]
 filters:        as_of = today
-display_intent: chart  →  metric vs threshold across entities with breakdown → heatmap
 ```
 
 **3 · Metric and entitlement resolution**
@@ -332,7 +329,6 @@ The result — metric versus threshold across multiple portfolio entities with a
 
 ```json
 {
-  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
   "layer": [{
     "mark": "rect",
     "encoding": {
@@ -369,7 +365,6 @@ operation:      retrieve_dataset
 dataset:        fixed_income_daily_positions
 time_range:     trailing 12 months
 pagination:     page_size = 10,000 rows
-display_intent: table  →  paginated dataset retrieval → structured table
 ```
 
 **2 · Dataset and entitlement resolution**
@@ -389,7 +384,7 @@ entitlements:
 The Query Planner constructs a paginated retrieval plan. The controls layer constructs a paginated query across the approved field set, restricted to the agent's authorised portfolios. Each page executes under the same controls. An audit record is written for the full retrieval — recording exactly which data was returned to which agent under which access permissions.
 
 ```sql
--- Logical Query Plan
+-- Physical execution (FQE output)
 SELECT   portfolio_id, instrument_id, asset_class,
          daily_pnl, market_value, duration, currency, position_date
 FROM     positions_fact
@@ -405,12 +400,14 @@ LIMIT    10000  OFFSET :page_offset;
 -- audit:      lineage_id, field_set_version, entitlement_snapshot
 ```
 
+**4 · Query planning, governance, and execution**
+The Semantic Controls Layer validates the retrieval plan — performance impact assessment, data classification check, complexity limits. All checks pass. The Federated Query Engine executes the paginated retrieval plan against the registered backend, enforcing the entitlement scope and field ceiling on every page. An audit record is written for the full retrieval, recording exactly which data was returned to which agent under which access permissions.
+
 **5 · Presentation decision**
-Bulk data retrieval resolves to a structured paginated table — not a chart. The Data Visualization Language (DVL) emits a Vega-Lite table specification defining the approved field set, column types, and formatting rules. The consuming agent receives a typed dataset with a continuation token for subsequent pages.
+Bulk data retrieval resolves to a structured paginated table — not a chart. The Data Visualization Language (DVL) emits a table specification defining the approved field set, column types, and formatting rules. The consuming agent receives a typed dataset with a continuation token for subsequent pages.
 
 ```json
 {
-  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
   "view": { "type": "table" },
   "columns": [
     { "field": "portfolio_id",  "type": "nominal",      "title": "Portfolio"      },
@@ -451,17 +448,16 @@ metric:         liquidity_coverage_ratio  (unresolved)
 intent_classification:
   compliance_purpose_score: 0.94  |  threshold: 0.80
   compliance_purpose: true
-display_intent: table  →  regulatory metric result → structured compliance table
 ```
 
 **3 · Metric resolution and compliance escalation**
-The liquidity coverage ratio metric resolves to its approved registry definition, which carries a compliance-relevant flag set by the metric owner at registration. Two independent signals are now both active — the metric is marked as compliance-relevant, and the AI has classified the stated intent as compliance-driven. The governance layer escalates automatically to the enhanced compliance artifact tier. No role claim, no manual flag, no special user action is required: escalation is a runtime consequence of what the metric is and what the query is for.
+The liquidity coverage ratio metric resolves to its approved registry definition, which carries a compliance-relevant flag set by the Metrics Modeller at registration. Two independent signals are now both active — the metric is marked as compliance-relevant, and the AI has classified the stated intent as compliance-driven. The governance layer escalates automatically to the enhanced compliance artifact tier. No role claim, no manual flag, no special user action is required: escalation is a runtime consequence of what the metric is and what the query is for.
 
 ```
 -- Metric Resolution & Compliance Escalation
 liquidity_coverage_ratio  →  definition v1.1: SUM(hqla_value) / SUM(net_outflow_30d)
 compliance_signals:
-  metric.compliance_relevant: true   -- set by metric owner at registration
+  metric.compliance_relevant: true   -- set by Metrics Modeller at registration
   intent.compliance_purpose:  true   -- classified by AI at query time
 escalation: ENHANCED compliance artifact tier  -- both signals required
 ```
@@ -470,7 +466,7 @@ escalation: ENHANCED compliance artifact tier  -- both signals required
 Compliance-purpose queries are never served from cache — a fresh computation is required for every regulatory submission. The controls layer constructs the query with cache bypass enforced. On completion, it writes a regulatory trace record to the compliance-specific audit store (in addition to the standard compliance provenance record), enforces export controls until the complete compliance provenance record exists, and validates the result's data classification against the user's authorised ceiling. The treasury analyst receives both the governed LCR result and a complete, regulator-ready audit trail — automatically.
 
 ```sql
--- Logical Query Plan  (cache bypass enforced — compliance_purpose = true)
+-- Physical execution (FQE output — cache bypass enforced, compliance_purpose = true)
 SELECT   h.entity_id,
          SUM(h.hqla_value)       AS total_hqla,
          SUM(c.net_outflow_30d)  AS total_net_outflows,
@@ -492,11 +488,10 @@ GROUP BY h.entity_id;
 ```
 
 **5 · Presentation decision**
-A small set of entity-level regulatory ratios resolves to a structured compliance table — not a chart. The Data Visualization Language (DVL) emits a Vega-Lite table specification with conditional formatting to highlight ratios below the regulatory minimum. Because compliance artifact mode is active, the specification carries an export contract: output is locked until the complete compliance provenance record is confirmed.
+A small set of entity-level regulatory ratios resolves to a structured compliance table — not a chart. The Data Visualization Language (DVL) emits a table specification with conditional formatting to highlight ratios below the regulatory minimum. Because compliance artifact mode is active, the specification carries an export contract: output is locked until the complete compliance provenance record is confirmed.
 
 ```json
 {
-  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
   "view": { "type": "table" },
   "columns": [
     { "field": "entity_id",          "type": "nominal",      "title": "Entity"           },
