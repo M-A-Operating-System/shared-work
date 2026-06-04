@@ -59,21 +59,21 @@ flowchart TD
     subgraph Consumers["AI Consumers"]
         direction LR
         ChatComp["<b>Conversational AI</b>\nConversational UI, Image/Chart rendering · Tool call routing\nAudit trail · Memory · Shared conversations"]
-        CustomUI["Custom analytics UI\nhost-built · renders JSON / DVL"]
-        Agents["Agentic AI\n Independant Agents - event monitors · report pipelines, Anomoloy Dection, Event Prediction, Data Quality, Risk Tollerance, Reviews etc"]
+        CustomUI["<b>Custom analytics UI</b>\napplication hosted, embedded aanalysis, presentations, dashboards, self-service apps"]
+        Agents["<b>Agentic AI</b>\n Independant Agents - event monitors · report pipelines, Anomoloy Dection, Event Prediction, Data Quality, Risk Tollerance, Reviews etc"]
     end
 
     subgraph analytics["Analytics Engine"]
         direction TB
-        MCP["API/MCP Capability Layer\nMCP server runtime · JWT validation"]
-        SIL["Semantic Intent Layer\nParameter validation · SMR resolution · LQP generation"]
-        RAPL["Role-Aware Projection Layer\nJWT claims · row predicates · column masks"]
-        SEG["Semantic Execution Governance\nCost estimation · classification · circuit breakers"]
-        FQE["Federated Query Engine\nquery planning engine + backend adapters"]
-        VO["Visualisation Ontology\nSCL display spec · the platform's chart specification format"]
-        NSE["Narrative Synthesis Engine\nlanguage model · post-computation\nanchored to result values · P6 governed"]
-        LS[("Analytical Lineage Store")]
-        Result(["MCP tool response\ndisplay_spec + data + narrative + result_id"])
+        MCP["<b>API/MCP Interface</b>\nMCP server runtime, tool/ resource/ prompt presentation, JWT validation"]
+        SIL["<b>Semantic Intent Layer(SIL)</b>\nParameter validation · SMR resolution · LQP generation"]
+        RAPL["<b>Role-Aware Projection Layer(RAPL)</b>\nJWT claims · row predicates · column masks"]
+        SEG["<b>Semantic Execution Control Layer(SECL)</b>\nCost estimation · classification · circuit breakers"]
+        FQE["<b>Federated Query Engine(FQE)</b>\nquery planning engine + backend adapters"]
+        VO["<b>Visualisation Display Language</b>\ndisplay spec · the platform's chart specification format"]
+        NSE["<b>Narrative Synthesis Engine(NSE)</b>\nlanguage model · post-computation\nanchored to result values · P6 governed"]
+        LS[("<b>Analytical Lineage Store</b>\nlogical query plan, physical query plan, physical run time statistics")]
+        Result(["<b>MCP tool response</b\nwrapped display_spec + data + narrative + provenance artifact(optional) + result_id"])
     end
 
      subgraph Image["Image/Chart Rendering (Optional)"]
