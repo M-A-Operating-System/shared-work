@@ -499,6 +499,46 @@ Node `n3` is the RAPL row predicate — part of the plan, not a post-execution f
 
 ---
 
+## Platform Roles
+
+The platform operates across two distinct planes: an **analytical plane** (querying, exploring, and exporting governed data) and a **governance plane** (defining, approving, and administering the semantic layer and its access controls). The table below defines the roles that span these planes, their responsibilities, and their interaction with the platform.
+
+| Role | Plane | Primary responsibility |
+|------|-------|----------------------|
+| **Analytical End User** | Analytical | Ask governed analytical questions via natural language; receive role-constrained results without knowledge of data structures or metric identifiers |
+| **Power Analyst** | Analytical | Multi-dimensional exploration, governed drilldown, lineage inspection, result export |
+| **Semantic Modeller** | Governance | Define and maintain the logical semantic layer: metric definitions, dimension hierarchies, aggregation rules, measure groups, and domain structures in the Semantic Metrics Registry. This is a specialist data modelling role — the people who know what "Portfolio Return" means precisely enough to write a version-controlled, formula-specific definition that will govern every calculation across every report |
+| **Metric Owner** | Governance | Subject-matter expert assigned ownership of one or more registered metrics. Reviews proposed definition changes, approves aggregation rule modifications, and maintains documentation accuracy for their assigned metrics. Distributes review responsibility without concentrating all approval authority in the Semantic Modeller or Application Admin |
+| **Application Admin** | Governance | Privileged tenant user responsible for SMR integrity, entitlement policies, and governance configuration. Must be configured before go-live — without one, the registry contains no approved metric definitions and the platform cannot serve any query. The Application Admin approves Semantic Modeller changes and maintains the entitlement policies that RAPL enforces at query time |
+| **Integration Engineer** | Governance | Registers execution backends, maintains connection configuration, and declares the physical mapping that the Federated Query Planner resolves at execution time. Operates through configuration interfaces, not the query path |
+| **Platform Admin** | Infrastructure | Cross-tenant platform team. Responsible for infrastructure health, tenant onboarding, and cross-tenant governance audit. Has no query interface into tenant data |
+
+**Compliance-enhanced governance artifacts are not a role feature.** Any entitled user querying a compliance-relevant metric for a compliance-stated purpose receives the full enhanced artifact set — regulatory trace, export gate, and lineage-locked output — automatically. This is determined at runtime by metric metadata and AI intent classification, not by a dedicated role or claim.
+
+**Roles are not mutually exclusive.** A single individual may hold multiple roles within a tenant; the platform evaluates entitlements from the combined JWT claims present at query time.
+
+The **Semantic Modeller** is the critical pre-condition for everything downstream. No analytical query can be served against a metric that has not been modelled, registered, and approved. The governance pipeline, the entitlement layer, the lineage store, and the visualisation ontology all operate on the semantic definitions the Semantic Modeller produces. In practice this role requires both domain knowledge (what does this metric mean in this business context?) and data modelling precision (how is it calculated, from which sources, under which dimensional hierarchies, with which access policies?).
+
+### Role × Feature Access
+
+| Feature | End User | Power Analyst | Semantic Modeller | Metric Owner | App Admin | Integration Eng | Platform Admin |
+|---------|:--------:|:-------------:|:-----------------:|:------------:|:---------:|:---------------:|:--------------:|
+| Natural language query | ✓ | ✓ | ✓ | | ✓ | | |
+| Role-aware results | ✓ | ✓ | ✓ | | ✓ | | |
+| Governed drilldown | | ✓ | ✓ | | ✓ | | |
+| Lineage inspector | | ✓ | ✓ | ✓ | ✓ | | |
+| Result export | ✓ | ✓ | ✓ | | ✓ | | |
+| SMR browsing | | ✓ | ✓ | ✓ | ✓ | | |
+| Metric definition authoring | | | ✓ | | | | |
+| Metric definition approval | | | | ✓ | ✓ | | |
+| Dimension & hierarchy management | | | ✓ | | ✓ | | |
+| Entitlement policy management | | | | | ✓ | | |
+| Backend registration | | | | | | ✓ | |
+| Governance audit trail | | | | | ✓ | ✓ | ✓ |
+| Tenant onboarding / infrastructure | | | | | | | ✓ |
+
+---
+
 ## Role-Aware Projection Layer
 
 > **Governing principles:** [P5 — Role-aware by default](./00-overview.md#design-principles) · [P1 — Semantic abstraction](./00-overview.md#design-principles)

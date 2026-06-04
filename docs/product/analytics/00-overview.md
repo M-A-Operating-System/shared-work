@@ -186,7 +186,7 @@ These two dimensions define four possible result types. The platform handles all
 
 ### End-to-End Examples
 
-Three queries traced through every stage illustrate the query space in practice. The first is a routine business analytics question — metric query with visualisation output, standard governance. The second is a data mining request from an autonomous agent — large dataset retrieval with table output, standard governance. The third is a regulatory submission request — the same governance pipeline with compliance artifact escalation triggered automatically by the two-signal model.
+Four queries traced through every stage illustrate the query space in practice. The first is a routine business analytics question — metric query with visualisation output, standard governance. The second is a multi-source business question — metrics federated across two independent backends, assembled into a single governed result. The third is a data mining request from an autonomous agent — large dataset retrieval with table output, standard governance. The fourth is a regulatory submission request — the same governance pipeline with compliance artifact escalation triggered automatically by the two-signal model.
 
 ---
 
@@ -269,7 +269,98 @@ The result schema — two numeric measures compared across a categorical dimensi
 
 ---
 
-#### Example 2 — Fixed income position extraction (data mining query)
+#### Example 2 — VaR breach investigation (multi-source business analytics query)
+
+**1 · Natural language request**
+A risk officer asks: *"Which portfolios are breaching their VaR 95 limit today, and what is the dominant risk factor contribution for each?"*
+
+```
+-- Request
+"Which portfolios are breaching their VaR 95 limit today, and what is the dominant risk factor contribution for each?"
+```
+
+**2 · Intent resolution**
+The AI client identifies three metrics — `var_95`, `var_limit`, and `risk_factor_contribution` — and resolves this as a threshold-comparison pattern with a contributing-factor breakdown. `var_limit` is a per-portfolio governance parameter stored in the risk configuration domain; `risk_factor_contribution` carries `portfolio_id` and `factor_bucket` as required dimensions. All three are registered in the Metric Registry and resolve cleanly against the approved analytical vocabulary.
+
+```
+-- Semantic Intent Resolution
+operation:      compare_metric_to_threshold_with_breakdown
+metrics:        [var_95, var_limit, risk_factor_contribution]
+dimensions:     [portfolio_id, factor_bucket]
+filters:        as_of = today
+display_intent: chart  →  metric vs threshold across entities with breakdown → heatmap
+```
+
+**3 · Metric and entitlement resolution**
+`var_95` and `risk_factor_contribution` resolve to their approved registry definitions — VaR is a versioned, formula-specific computation that must be calculated identically across every report. The Federated Query Planner identifies that these metrics are served by two independent backends: VaR metrics are registered against the risk engine execution backend; portfolio metadata and limits are registered against the primary data warehouse. The user's entitlement scope is projected, restricting results to portfolios within the risk officer's authorised coverage.
+
+```
+-- Metric & Entitlement Resolution
+var_95                   →  definition v3.1: 95th-percentile 1-day historical simulation VaR
+var_limit                →  portfolio governance parameter  (data warehouse domain)
+risk_factor_contribution →  definition v2.0: factor decomposition of excess VaR
+backend_routing:
+  var_95, risk_factor_contribution  →  risk_engine_backend
+  var_limit, portfolio_metadata     →  primary_data_warehouse
+entitlements: user_scope → [authorised_portfolio_list]
+```
+
+**4 · Query planning, governance, and execution**
+The Federated Query Planner decomposes the Logical Query Plan into two independent sub-plans and routes each to its registered backend. Both sub-plans execute in parallel. The planner assembles the joined result — breach status and dominant contributing factor per portfolio — before passing it downstream. Each sub-plan execution is recorded in the lineage store independently, with the assembled result linked to both records.
+
+```sql
+-- Sub-plan A  →  risk_engine_backend
+SELECT   portfolio_id,
+         var_95_value,
+         risk_factor_contribution,
+         factor_bucket
+FROM     risk_engine.var_daily_positions
+WHERE    as_of_date   = current_date
+  AND    portfolio_id IN (/* authorised_portfolio_list */)
+ORDER BY var_95_value DESC;
+
+-- Sub-plan B  →  primary_data_warehouse
+SELECT   portfolio_id,
+         var_limit_value
+FROM     dw_prod.portfolio_governance.var_limits
+WHERE    portfolio_id IN (/* authorised_portfolio_list */);
+
+-- Federated assembly: JOIN on portfolio_id  →  breach = var_95_value > var_limit_value
+-- Execution Response
+-- data:      [{ portfolio_id, var_95_value, var_limit_value, breach_pct, factor_bucket, risk_factor_contribution }, ...]
+-- audit:     lineage_id (linked to both sub-plan execution records), entitlement_snapshot
+```
+
+**5 · Presentation decision**
+The result — metric versus threshold across multiple portfolio entities with a contributing factor breakdown — is matched against the Visualisation Ontology. The ontology resolves a heatmap as the governed display contract for this threshold-comparison pattern. Breaching portfolios are visually distinguished; the dominant risk factor is available as a drilldown dimension.
+
+```json
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "layer": [{
+    "mark": "rect",
+    "encoding": {
+      "x":     { "field": "portfolio_id",            "type": "nominal",      "title": "Portfolio"          },
+      "y":     { "field": "factor_bucket",            "type": "nominal",      "title": "Risk Factor"        },
+      "color": { "field": "risk_factor_contribution", "type": "quantitative", "title": "Factor Contribution",
+                 "scale": { "scheme": "orangered" } }
+    }
+  }, {
+    "mark": { "type": "text", "fontSize": 9 },
+    "encoding": {
+      "x":    { "field": "portfolio_id", "type": "nominal" },
+      "y":    { "field": "factor_bucket","type": "nominal" },
+      "text": { "field": "breach_pct",  "type": "quantitative", "format": ".0%" },
+      "color":{ "condition": { "test": "datum.breach_pct > 1.0", "value": "white" }, "value": "black" }
+    }
+  }],
+  "title": "VaR 95 Breach — Factor Contribution by Portfolio"
+}
+```
+
+---
+
+#### Example 3 — Fixed income position extraction (data mining query)
 
 **1 · Request**
 A quantitative research pipeline submits: *"Extract daily position and PnL data for all fixed income portfolios over the past 12 months for factor model retraining."*
@@ -344,7 +435,7 @@ Bulk data retrieval resolves to a structured paginated table — not a chart. Th
 
 ---
 
-#### Example 3 — Regulatory LCR submission (compliance analytics query)
+#### Example 4 — Regulatory LCR submission (compliance analytics query)
 
 **1 · Natural language request**
 A treasury analyst asks: *"Prepare our LCR figures for the Basel III submission."*
