@@ -234,7 +234,7 @@ When the Analytics Engine returns the structured result, display spec, and narra
 
 ---
 
-## Semantic Metrics Repository
+## Semantic Metrics Repository (SMR)
 
 > **Governing principles:** [P1 — Semantic abstraction](./00-overview.md#design-principles) · [P3 — Deterministic metric resolution](./00-overview.md#design-principles) · [P9 — Administrator sovereignty](./00-overview.md#design-principles)
 
@@ -370,7 +370,7 @@ The SIL asks the SMR to resolve the `compare_portfolios` operation, then resolve
 
 ---
 
-## Semantic Intent Layer
+## Semantic Intent Layer (SIL)
 
 > **Governing principles:** [P2 — Controls before execution](./00-overview.md#design-principles) · [P10 — Deterministic computation, not generation](./00-overview.md#design-principles)
 
@@ -523,7 +523,7 @@ Node `n3` is the RAPL row predicate — part of the plan, not a post-execution f
 
 ---
 
-## Role-Aware Projection Layer
+## Role-Aware Projection Layer (RAPL)
 
 > **Governing principles:** [P5 — Role-aware by default](./00-overview.md#design-principles) · [P1 — Semantic abstraction](./00-overview.md#design-principles)
 
@@ -633,7 +633,7 @@ No column masks apply — the `portfolio_manager` role has no masking rules for 
 
 ---
 
-## Semantic Controls Layer
+## Semantic Controls Layer (SCL)
 
 > **Governing principles:** [P2 — Controls before execution](./00-overview.md#design-principles) · [P8 — Explainability at every layer](./00-overview.md#design-principles) · [P9 — Administrator sovereignty](./00-overview.md#design-principles)
 
@@ -773,7 +773,7 @@ All checks pass. SCL writes a controls decision record to the Analytical Lineage
 
 ---
 
-## Federated Query Engine
+## Federated Query Engine (FQE)
 
 > **Governing principles:** [P1 — Semantic abstraction](./00-overview.md#design-principles) · [P4 — Complete analytical lineage](./00-overview.md#design-principles) · [P10 — Deterministic computation, not generation](./00-overview.md#design-principles)
 
@@ -966,7 +966,7 @@ The ontology produces the following DVL display specification:
 
 ---
 
-## Narrative Synthesis Engine
+## Narrative Synthesis Engine (NSE)
 
 > **Governing principles:** [P6 — Governed narrative](./00-overview.md#design-principles) · [P10 — Deterministic computation, not generation](./00-overview.md#design-principles)
 
@@ -1157,7 +1157,7 @@ The chat engine renders the grouped bar chart inline and displays the narrative 
 
 ---
 
-## Analytical Lineage Store
+## Analytical Lineage Store (ALS)
 
 > **Governing principles:** [P4 — Complete analytical lineage](./00-overview.md#design-principles) · [P8 — Explainability at every layer](./00-overview.md#design-principles)
 
@@ -1291,7 +1291,7 @@ The document is immutable from the moment of writing. A corresponding row is ins
 
 ---
 
-## MCP Capability Layer
+## MCP Capability Layer (MCP)
 
 > **Governing principles:** [P2 — Controls before execution](./00-overview.md#design-principles) · [P5 — Role-aware by default](./00-overview.md#design-principles)
 
