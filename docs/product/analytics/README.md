@@ -29,8 +29,9 @@ The platform eliminates Text-to-SQL as an architectural pattern for regulated an
 | [5. Success Metrics](./05-success-metrics.md) | Success Metrics | Platform and application-level metrics, governance health indicators, review cadence |
 | [Appendix](./06-text-to-sql-antipattern.md) | Text-to-SQL and Semantic Analytics: Better Together | Structural failure modes, SQL injection risks, and the complementary architecture where both tools coexist |
 | [Roadmap](./07-roadmap.md) | Platform Roadmap | Planned enhancements beyond the current release |
+| [Glossary](./08-glossary.md) | Glossary | Definitions for all named components, technical terms, abbreviations, and domain concepts used across this specification |
 
-Start with the Overview for executive and business context, then read Chapters 2–5 sequentially. Each chapter assumes the previous. The appendix may be read independently as a standalone reference for teams evaluating architectural options.
+Start with the Overview for executive and business context, then read Chapters 2–5 sequentially. Each chapter assumes the previous. The appendix may be read independently as a standalone reference for teams evaluating architectural options. The glossary may be consulted at any point.
 
 ---
 
