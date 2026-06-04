@@ -61,8 +61,8 @@ flowchart TD
     subgraph Consumers["AI Consumers"]
         direction LR
         ChatComp["<b>Conversational AI</b>\nConversational UI, Image/Chart rendering · Tool call routing\nAudit trail · Memory · Shared conversations"]
-        CustomUI["<b>Custom analytics UI</b>\napplication hosted, embedded aanalysis, presentations, dashboards, self-service apps"]
-        Agents["<b>Agentic AI</b>\n Independant Agents - event monitors · report pipelines, Anomoloy Dection, Event Prediction, Data Quality, Risk Tollerance, Reviews etc"]
+        CustomUI["<b>Custom analytics UI</b>\napplication hosted, embedded analysis, presentations, dashboards, self-service apps"]
+        Agents["<b>Agentic AI</b>\n Independent Agents - event monitors · report pipelines, Anomaly Detection, Event Prediction, Data Quality, Risk Tolerance, Reviews etc"]
     end
 
     subgraph analytics["Analytics Engine"]
@@ -427,7 +427,7 @@ Every metric in the SMR conforms to the following schema. This is the authoritat
 | `dimensions.optional` | No | Dimensions that may optionally be applied. |
 | `data.domain` | Yes | The logical data domain this metric belongs to. Must match a domain registered in the SMR. |
 | `data.refresh_cadence` | Yes | How frequently the underlying data is updated. Displayed in the lineage inspector and narrative synthesis. |
-| `governance.owner` | Yes | Identifier of the metric owner. Must be a registered owner in the platform. |
+| `governance.owner` | Yes | Identifier of the registered owner for this metric. Must be a registered user in the platform. |
 | `governance.classification` | Yes | Data classification level. Used by the SCL classification gate. |
 | `governance.approved` | Yes | Whether this metric has been approved and is resolvable. Unapproved metrics are not returned by SMR queries. |
 | `lineage.upstream_metrics` | No | Other SMR metrics this metric is derived from. Used for lineage graph construction. |
@@ -449,7 +449,7 @@ Draft → Proposed → In Review → Approved (Active) → Deprecated → Retire
 | Proposed → In Review | Analytics Governance opens for review | Downstream impact analysis runs automatically |
 | In Review → Approved | Analytics Governance approves | Metric becomes resolvable from next refresh cycle |
 | Approved → Deprecated | Metrics Modeller or Analytics Governance marks deprecated | Metric resolves with a deprecation warning; removed from SMR browsing defaults |
-| Deprecated → Retired | Admin retires after deprecation period | Metric no longer resolvable; lineage records preserved |
+| Deprecated → Retired | Analytics Governance retires after deprecation period | Metric no longer resolvable; lineage records preserved |
 
 When a metric definition is proposed for change, the platform automatically runs an impact analysis covering downstream metrics, saved analytical sessions, and dashboards deriving results from the affected metric. Approval of a change with downstream impacts requires Analytics Governance to acknowledge the impact report; that acknowledgement is recorded in the lineage store.
 
@@ -459,7 +459,7 @@ The SMR formula language expresses metric computation logic in terms of other re
 
 ### SMR Authoring and Discovery
 
-The SMR is backed by the SDR, which handles document creation, versioning, and the approval workflow natively. There are no custom MCP tools for metric authoring. Administrators create, edit, and approve `analytical_metric`, `analytical_dimension`, and `analytical_operation` documents using the SDR's existing authoring capabilities.
+The SMR is backed by the SDR, which handles document creation, versioning, and the approval workflow natively. There are no custom MCP tools for metric authoring. Metrics Modellers author `analytical_metric`, `analytical_dimension`, and `analytical_operation` documents using the SDR's existing authoring capabilities; Analytics Governance approves them.
 
 **Discovery** — AI models and agents discover available operations by calling the `list_operations` MCP tool (defined in the MCP Capability Layer). `list_operations` returns operation IDs, display names, required parameters, supported metrics, supported dimensions, and execution profiles for all approved operations within the caller's entitlement scope. There are no `smr://` MCP resource URIs and no separate `list_metrics`, `get_metric_definition`, `propose_metric`, or `approve_metric` MCP tools.
 
@@ -782,8 +782,8 @@ Performance impact units are estimated from LQP metadata before any backend is c
 ```
 portfolio_return:        50 (metric base)
 tracking_error:          50 (metric base)
-SQL warehouse backend:  100 (standard cost tier)
-semantic layer backend:  50 (low cost tier)
+SQL warehouse backend:  100 (standard performance tier)
+semantic layer backend:  50 (low performance tier)
 asset_class:            1.5× cardinality multiplier (medium)
 YEAR_TO_DATE:           4.0× period multiplier
 2 sub-plans:            100 (federation overhead)
@@ -814,9 +814,9 @@ The platform escalates to the enhanced Provenance Artifact only when both of the
 | `compliance_relevant` (any metric) | `compliance_purpose` (SIL classification) | SCL decision |
 |---|---|---|
 | `true` | `true` | **Enhanced** — full Provenance Artifact active |
-| `true` | `false` | Standard governance output |
-| `false` | `true` | Standard governance output |
-| `false` | `false` | Standard governance output |
+| `true` | `false` | Standard controls output |
+| `false` | `true` | Standard controls output |
+| `false` | `false` | Standard controls output |
 
 The compliance mode rule tables below describe the additional rules and trace targets applied **when the Provenance Artifact is active** under each mode.
 
@@ -952,6 +952,7 @@ The approved LQP is released to the FQE for physical execution.
 Both `portfolio_return` and `benchmark_return` have `data_affinity: "portfolio"`, so the FQE routes a single sub-plan to the primary SQL warehouse:
 
 ```sql
+-- Physical execution (FQE output)
 SELECT
     p.portfolio_id,
     SUM(f.portfolio_return * f.market_value) / SUM(f.market_value) AS portfolio_return,
@@ -1380,7 +1381,7 @@ The MCP Capability Layer assembles the DVL display specification and the NSE nar
         "type": "resource",
         "resource": {
           "uri":      "analytics://result/res-20260518-093247-wk4n",
-          "mimeType": "application/vnd.analytics.scl+json",
+          "mimeType": "application/vnd.analytics.dvl+json",
           "text":     "{ ... DVL grouped bar chart specification ... }"
         }
       }
