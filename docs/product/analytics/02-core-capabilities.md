@@ -10,14 +10,14 @@ Platform roles — who interacts with each component and how — are defined bef
 
 ## Platform Roles
 
-The platform operates across three distinct planes: an **analytical plane** (querying, exploring, and exporting governed data), a **controls plane** (defining, approving, and administering the semantic layer and its access controls), and an **infrastructure plane** (platform deployment, health, and technical configuration). The table below defines the roles that span these planes, their responsibilities, and their interaction with the platform.
+The platform operates across three distinct planes: an **analytical plane** (querying, exploring, and exporting governed data), a **controls plane** (defining, approving, and administering the semantic layer and its access controls), and an **infrastructure plane** (platform deployment, health, and technical configuration).
 
 | Role | Plane | Definition |
 |------|-------|------------|
 | **Analytical End User** | Analytical | Ask governed analytical questions via natural language; receive role-constrained results without knowledge of data structures or metric identifiers |
 | **Power Analyst** | Analytical | Multi-dimensional exploration, governed drilldown, lineage inspection, result export |
-| **Data Modeller** | Controls | Responsible for understanding business context and creating and maintaining semantic data definitions in the SDR: logical data elements, object models, business definitions, critical data elements, and physical schema mappings. Ensures the organisation's data assets are accurately described and structured — the foundational layer on which metric definitions are built |
-| **Metrics Modeller** | Controls | Responsible for understanding business context and creating and maintaining semantic metrics and analytics definitions in the SMR: key performance metrics, analytics operations, trend analysis constructs, and insight definitions. Must combine domain knowledge — what does this metric mean in this business context — with modelling precision: how it is calculated, from which sources, under which dimensional hierarchies, and with which access policies |
+| **Data Modeller** | Controls | Owns semantic data definitions in the SDR: logical data elements, object models, business definitions, critical data elements, and physical schema mappings. Ensures the organisation's data assets are accurately described and structured — the foundational layer on which metric definitions are built |
+| **Metrics Modeller** | Controls | Owns semantic metrics and analytics definitions in the SMR: key performance metrics, analytics operations, trend analysis constructs, and insight definitions. Must combine domain knowledge — what does this metric mean in this business context — with modelling precision: how it is calculated, from which sources, under which dimensional hierarchies, and with which access policies |
 | **Entitlements Manager** | Controls | Responsible for defining and maintaining the organisation's data entitlement policies: who may perform which actions (create, read, update, delete) on which data elements, analytics definitions, and business process metrics. Configures the metric access sets, dimension access sets, row predicates, and column masks that RAPL enforces at query time |
 | **Analytics Governance** | Controls | Overall accountability for the governance, integrity, and outcomes of the analytics platform. Owns SMR registry health, approves semantic definition changes from Metrics Modellers, oversees entitlement policy governance, and is accountable for the quality, accuracy, and completeness of analytical outputs across the organisation. Reviews platform success metrics and controls health indicators. The final authority on what is defined, who can access it, and whether the platform is delivering the right outcomes. Must be in place before go-live — without this role, the registry has no approval authority and the platform cannot serve any query |
 | **Integration Engineer** | Controls | Registers execution backends, maintains connection configuration, and declares the physical mappings that the Federated Query Engine resolves at execution time. Operates through configuration interfaces only — not the query path |
@@ -238,9 +238,7 @@ The Analytics Engine receives structured parameters — never natural language �
 
 ## AI Consumers
 
-The Analytics Engine is accessed by three consumer types: a conversational AI platform (which mediates between a user and the governed query pipeline), autonomous agents and pipelines (which call the MCP layer directly with structured requests), and custom applications (which call the MCP layer with host-issued tokens). The following describes the conversational path — the most common consumer pattern.
-
-The AI Chat Platform is the conversational layer through which users interact with the Analytics Engine. It hosts the AI model responsible for natural language translation, orchestrates calls to the Analytics Engine, and renders the assembled result to the user. Natural language translation is the only AI step the AI Chat Platform performs. It happens here, grounded by the SMR metric catalogue. Narrative synthesis is performed inside the Analytics Engine as a secondary, post-computation step.
+The Analytics Engine is accessed by three consumer types: a conversational AI platform (which mediates between a user and the governed query pipeline), autonomous agents and pipelines (which call the MCP layer directly with structured requests), and custom applications (which call the MCP layer with host-issued tokens). The AI Chat Platform is the conversational layer through which users interact with the Analytics Engine. It hosts the AI model responsible for natural language translation, orchestrates calls to the Analytics Engine, and renders the assembled result to the user. Natural language translation is the only AI step the AI Chat Platform performs. It happens here, grounded by the SMR metric catalogue. Narrative synthesis is performed inside the Analytics Engine as a secondary, post-computation step.
 
 **Operation catalogue loading.** Before the AI model can translate a user's question into structured parameters, it needs to know what operations, metrics, and dimensions are available. The conversation engine calls `list_operations` on the Analytics Engine's MCP endpoint with the user's JWT. The response is the authenticated user's entitled operation catalogue. Only operations the user can execute are returned, with their `operation_id`, display names, required parameters, supported metrics, supported dimensions, and execution profiles. This catalogue is injected into the model's context and serves as the controlled vocabulary for intent translation.
 
@@ -307,27 +305,9 @@ The Analytics Engine exposes three tools. All analytical operations are SMR-cata
 
 **`run_analytics(operation_id: str, params: dict, jwt: str)`** — Executes any SMR-registered operation. The operation's `execution_profile` in the SMR determines which pipeline stages run.
 
-| Parameter | Required | Type | Notes |
-|---|---|---|---|
-| `operation_id` | Yes | `string` | SMR operation ID — discover via `list_operations` |
-| `params` | Yes | `object` | Operation-specific parameters; validated by the SIL against the operation's `required_params` schema in the SMR catalogue |
-| `jwt` | Yes | `string` | Bearer token; validated at request ingress before any platform computation begins |
-
 **`list_operations(domain: str | None, jwt: str)`** — Returns the SMR operation catalogue with operation IDs, display names, required parameters, supported metrics/dimensions, and execution profiles. Only operations the authenticated user is entitled to execute are returned.
 
-| Parameter | Required | Type | Notes |
-|---|---|---|---|
-| `domain` | No | `string \| None` | Optional filter by analytical domain |
-| `jwt` | Yes | `string` | Bearer token |
-
 **`drilldown(result_id: str, hierarchy: str, selected_value: str | None, jwt: str)`** — Navigates into a dimension hierarchy from a prior result. All filters, role predicates, and entitlement context from the original result are preserved.
-
-| Parameter | Required | Type | Notes |
-|---|---|---|---|
-| `result_id` | Yes | `string` | Result ID from a prior `run_analytics` call |
-| `hierarchy` | Yes | `string` | Hierarchy ID to traverse |
-| `selected_value` | No | `string \| None` | Dimension value to anchor the drilldown |
-| `jwt` | Yes | `string` | Bearer token |
 
 ### Execution Profiles
 
@@ -360,7 +340,7 @@ When `requiresIntentConfirmation: true` is configured, the platform returns a co
 }
 ```
 
-The card surfaces the resolved `operation_id`, metric IDs, dimensions, filters, estimated performance impact units, and data classification level — everything needed for a user or AI agent to verify the resolved intent before execution proceeds. This is appropriate for high-stakes or compliance-sensitive queries where silent intent misresolution is unacceptable.
+This is appropriate for high-stakes or compliance-sensitive queries where silent intent misresolution is unacceptable.
 
 ### Capability Governance
 
@@ -448,32 +428,6 @@ Every metric in the SMR conforms to the following schema. This is the authoritat
 }
 ```
 
-### Metric Schema Field Reference
-
-| Field | Required | Description |
-|---|---|---|
-| `id` | Yes | Unique metric identifier. Lowercase, underscores. Used in MCP tool call parameters. |
-| `version` | Yes | Semantic version. Increment on formula changes (major), aggregation changes (minor), documentation changes (patch). |
-| `label` | Yes | Human-readable metric name. Used in UI, narrative synthesis, and chart axis labels. |
-| `description` | Yes | Full prose definition. Must be unambiguous — this definition is injected into the AI model context. |
-| `formula` | Yes | Business-logic formula expressed in the platform's formula language. Does not reference physical table columns directly — references other SMR metrics or canonical data source identifiers. |
-| `unit` | Yes | Value unit. Accepted: `percentage`, `currency`, `basis_points`, `ratio`, `count`, `years`, `days`, `custom`. |
-| `aggregation.default` | Yes | Default aggregation rule when the metric is rolled up across a dimension. |
-| `aggregation.allowed` | Yes | All permitted aggregation rules for this metric. Requests using non-allowed rules are rejected at intent validation. |
-| `aggregation.granularity` | Yes | Time granularities at which this metric is calculable. Requests at unsupported granularities are rejected. |
-| `dimensions.required` | Yes | Dimensions that must be present in any query using this metric. Missing required dimensions cause a validation error. |
-| `dimensions.optional` | No | Dimensions that may optionally be applied. |
-| `data.domain` | Yes | The logical data domain this metric belongs to. Must match a domain registered in the SMR. |
-| `data.refresh_cadence` | Yes | How frequently the underlying data is updated. Displayed in the lineage inspector and narrative synthesis. |
-| `governance.owner` | Yes | Identifier of the registered owner for this metric. Must be a registered user in the platform. |
-| `governance.classification` | Yes | Data classification level. Used by the SCL classification gate. |
-| `governance.approved` | Yes | Whether this metric has been approved and is resolvable. Unapproved metrics are not returned by SMR queries. |
-| `lineage.upstream_metrics` | No | Other SMR metrics this metric is derived from. Used for lineage graph construction. |
-| `lineage.downstream_metrics` | No | SMR metrics that depend on this metric. Used for impact analysis when metric definitions change. |
-| `access.roles` | Yes | Role IDs from the entitlement config that may query this metric. |
-| `compliance_relevant` | No | When `true`, this metric's output may be used in regulatory reporting or compliance submissions. When combined with a compliance-purpose query intent (see §Semantic Intent Layer), the platform escalates to the enhanced Provenance Artifact. Set by the Metrics Modeller at registration. |
-| `regulatory_framework` | No | Array of regulatory frameworks this metric belongs to. Accepted values: `mifid2`, `basel3`, `sec_reg_bi`. Drives trace target routing in the ALS and the additional validation rules applied by the SCL when the Provenance Artifact is active. A metric may belong to multiple frameworks. An empty array indicates no framework-specific rules apply. |
-
 All metric definitions must pass through a governance review and approval process before they are resolvable on the platform. A metric authored by a Metrics Modeller is not queryable until it has been reviewed and approved by Analytics Governance.
 
 ### Formula Language
@@ -521,12 +475,7 @@ flowchart TD
 
 ### Intent Parameter Schema
 
-All `run_analytics` calls use the same outer envelope. The `params` dict is operation-specific. Its valid keys are defined by the `required_params` and `optional_params` fields on the `analytical_operation` document in the SMR catalogue.
-
-| Parameter | Type | Description |
-|---|---|---|
-| `operation_id` | `string` | SMR operation ID — resolved from the `analytical_operation` catalogue via `list_operations`. |
-| `params` | `object` | Operation-specific parameters. Validated by the SIL against the operation's `required_params` schema. May include `metrics` (SMR metric IDs), `dimensions`, `time_period`, `filters`, and operation-specific fields. |
+All `run_analytics` calls use the same outer envelope — `operation_id` (SMR operation ID) and `params` (operation-specific dict). The valid keys for `params` are defined by the `required_params` and `optional_params` fields on the `analytical_operation` document in the SMR catalogue.
 
 **Example `params` for the `risk_breakdown` operation:**
 
@@ -546,7 +495,7 @@ The SIL validates that `portfolio_id`, `metrics`, `attribution_by`, and `as_of_d
 
 ### MCP Input to Resolved Intent: Example
 
-The following illustrates how raw MCP tool call parameters are transformed through SMR resolution and role projection into the enriched input that enters the LQP generator:
+Raw MCP tool call parameters are transformed through SMR resolution and role projection into the enriched input that enters the LQP generator:
 
 ```json
 // MCP tool call input (what the AI produces)
