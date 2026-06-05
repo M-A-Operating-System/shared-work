@@ -43,7 +43,7 @@ flowchart TD
         NSE["Narrative Synthesis Engine\nAnthropic Claude Haiku 4.5 — simple queries\nAnthropic Claude Sonnet 4.6 — complex queries"]
         Cache[("Result Cache\nRedis · SHA-256 cache key · 5-min TTL\ncompliance queries bypass")]
         LS[("Analytical Lineage Store (ALS)\nAWS S3 — JSON record per query\nPostgreSQL lineage_index — scalar search")]
-        Result(["MCP tool response\ndisplay_spec + narrative + result_id\n+ compliance block if Provenance Artifact active"])
+        Result(["MCP tool response\ndisplay_spec + data + narrative + result_id\n+ compliance block if Provenance Artifact active"])
     end
 
     vega2img["vega2img (optional) · port 8001\nPython · FastMCP · vega-embed · Playwright (headless Chromium)\nStandalone MCP render service — not part of Analytics Platform"]
@@ -80,7 +80,7 @@ flowchart TD
     NSE -->|"governed narrative"| Result
 ```
 
-The Semantic Data Repository (SDR) is a pre-existing platform component: the organisation's general-purpose registry for semantic definitions. The Analytics Platform registers metric definitions as a new `analytical_metric` type in the SDR, reusing its versioned storage, full-text search, cross-definition relationships, and scoped access control. The SMR governance layer adds the approval workflow, metric-specific schema validation, and the Admin API surface on top.
+The Semantic Data Repository (SDR) is a pre-existing platform component: the organisation's general-purpose registry for semantic definitions. The Analytics Platform registers three new document types (`analytical_metric`, `analytical_dimension`, `analytical_operation`) in the SDR, reusing its versioned storage, full-text search, cross-definition relationships, and scoped access control. The SMR governance layer adds the approval workflow, metric-specific schema validation, and the Admin API surface on top.
 
 ---
 
@@ -211,7 +211,7 @@ class PipelineExecutor:
         # 2. RAPL injects role predicates and column masks into the LQP
         # 3. Branch on execution_profile:
         #    data_retrieval  — FQE only → { result_id, rows, schema }
-        #    metric_query    — FQE + DVL → { result_id, rows, display_spec }
+        #    metric_query    — FQE → { result_id, rows, schema }
         #    full_analytical — SCL approval → ALS controls write → FQE → DVL + NSE in parallel
         #                    → { result_id, rows, schema, display_spec, narrative, export_requires_lineage }
         # Note: DVL is CPU-bound; asyncio.to_thread prevents it blocking the NSE API call
@@ -464,7 +464,8 @@ class NarrativeSynthesisEngine:
 
     def _is_simple(self, result: dict) -> bool:
         # Input:  assembled result with schema field list
-        # Output: True if ≤5 numeric fields and ≤3 non-numeric fields — routes to Haiku
+        # Output: True if ≤5 metrics and ≤3 dimensions — routes to Haiku
+        #         Attribution, multi-portfolio, and regulatory queries always route to Sonnet regardless of count
         ...
 
     def _build_prompt(self, result: dict, operation: dict) -> str:
@@ -485,7 +486,7 @@ class NarrativeSynthesisEngine:
 
 ### Semantic Metrics Repository (SMR)
 
-> **Specification:** [§Semantic Metrics Repository](./02-core-capabilities.md#semantic-metrics-registry)
+> **Specification:** [§Semantic Metrics Repository](./02-core-capabilities.md#semantic-metrics-repository-smr)
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
@@ -866,7 +867,7 @@ The platform has one controls config document. The Semantic Controls Layer reads
   "classification_gate":        true,
   "blocked_classifications":    ["TOP_SECRET", "RESTRICTED"],
   "query_timeout_seconds":      60,
-  "compliance_mode_enabled":     true,
+  "complianceMode":              true,
   "require_lineage_for_export": true,
   "audit_all_queries":          true,
   "compliance_intent_threshold": 0.8
@@ -909,10 +910,13 @@ class SemanticControlsLayer:
         # Input:  LQP with resolved_metrics and nodes
         # Output: integer performance impact score — compared against config ceilings
 
-        # Formula: Σ(metric.cost_weight × dimension_cardinality × time_multiplier)
-        #   time_multiplier:      month_to_date=1, quarter=2, year=4, trailing_12m=6, trailing_3y=18
-        #   dimension_cardinality: estimated row count per dimension (portfolio=10, issuer=5000, etc.)
-        # Calibrated against actual backend query costs — cost_weight on each metric drives the score
+        # Formula (matches Ch02 §SCL performance impact model):
+        #   base:        metric_count × 50
+        #   engine tier: minimal=10, low=50, standard=100, high=300 per sub-plan
+        #   cardinality: low=×1.0, medium=×1.5, high=×3.0, unbounded=×5.0
+        #   time:        single_day=×1.0, quarter=×2.0, year=×4.0, trailing_12m=×6.0, since_inception=×8.0
+        #   federation:  +100 per additional sub-plan beyond the first
+        # metric.cost_weight calibrates the per-metric base against observed backend execution cost
         ...
 
     def _check_classification(self, lqp: dict, config: dict) -> None:
@@ -949,7 +953,7 @@ class SemanticControlsLayer:
 
 ### Federated Query Engine (FQE)
 
-> **Specification:** [§Federated Query Engine](./02-core-capabilities.md#federated-query-planner)
+> **Specification:** [§Federated Query Engine](./02-core-capabilities.md#federated-query-engine-fqe)
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
@@ -1005,7 +1009,7 @@ After execution and result assembly the FQE returns a typed result envelope in p
 
 ```json
 {
-  "result_id":      "res_20260514_093247_a1b2c3",
+  "result_id":      "res-20260514-093247-a1b2c3",
   "lqp_id":        "lqp-20260514-093241-xyz",
   "org_id":     "acme-wealth",
   "cache_hit":     false,
@@ -1331,14 +1335,14 @@ Each completed query writes a single JSON document to the object store at `linea
 
 ```json
 {
-  "result_id":          "res_20260514_093247_a1b2c3",
+  "result_id":          "res-20260514-093247-a1b2c3",
   "org_id":          "acme-wealth",
   "user_sub":           "auth0|user_xyz",
   "lqp_id":             "lqp-20260514-093241-xyz",
   "cache_hit":          false,
   "request_payload":    { "tool": "run_analytics", "input": { "operation_id": "compare_portfolios", "params": {"..."} } },
   "resolved_metrics":   [{ "metric_id": "portfolio_return", "version": "2.1.0" }],
-  "governance_decision":{ "approved": true, "performance_impact_units": 850, "checks_passed": ["performance_impact_ceiling", "metric_count", "dimension_count", "classification_gate", "compliance_check"] },
+  "controls_decision":{ "approved": true, "performance_impact_units": 850, "checks_passed": ["performance_impact_ceiling", "metric_count", "dimension_count", "classification_gate", "compliance_check"] },
   "sub_plans":          [{ "backend": "primary-warehouse", "query": "...", "latency_ms": 980 }],
   "result_summary":     { "row_count": 2, "schema": ["..."], "rows": ["..."] },
   "display_spec":       { "type": "chart", "contract": "BAR_MULTI_SERIES_COMPARISON", "..." },
@@ -1358,7 +1362,7 @@ A lightweight PostgreSQL table (`analytics.lineage_index`) holds only the scalar
 
 ```json
 {
-  "result_id":                "res_20260514_093247_a1b2c3",
+  "result_id":                "res-20260514-093247-a1b2c3",
   "org_id":                   "acme-wealth",
   "user_sub":                 "auth0|user_xyz",
   "regulatory_frameworks":    "mifid2,basel3",
@@ -1621,7 +1625,7 @@ All platform services run in a dedicated Kubernetes namespace (`analytics`). Bac
 | **Activation** | `analyticalDomain` config triggers SMR import at initial platform setup | Bundle documents are written to the SDR in `proposed` state; Analytics Governance approves before metrics become resolvable |
 | **Customisation** | Full edit/override via Admin API after import | Customised definitions marked `source: "custom"` in the SDR document |
 
-Each bundle is a JSON array of SDR documents conforming to the schemas defined in [§Semantic Metrics Repository](./02-core-capabilities.md#semantic-metrics-registry). Bundles are seeded into the SDR in `"proposed"` state at initial platform setup; the Analytics Governance approves each document before it becomes resolvable by the Semantic Intent Layer.
+Each bundle is a JSON array of SDR documents conforming to the schemas defined in [§Semantic Metrics Repository](./02-core-capabilities.md#semantic-metrics-repository-smr). Bundles are seeded into the SDR in `"proposed"` state at initial platform setup; the Analytics Governance approves each document before it becomes resolvable by the Semantic Intent Layer.
 
 > **Version format note:** Seed bundle documents use an integer `version` field (starting at `1`) as the bootstrap state. On first platform activation the platform converts these to semantic versioning (`"1.0.0"`). Subsequent versions follow semver — the `"2.1.0"` form used in Chapter 2 examples reflects a metric that has been through two major revisions post-activation.
 
