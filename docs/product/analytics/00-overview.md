@@ -24,7 +24,9 @@ Training LLMs on database schemas improves query accuracy in early trials but ad
 
 ### The platform
 
-The AI Analytics Platform is a governed computation engine that gives AI systems correct, auditable access to an organisation's regulated metrics and datasets — without exposing database schemas, without generating SQL, and without compromising entitlement enforcement. AI interacts exclusively with an approved analytics and metrics definitions in the Semantic Metrics Repository: versioned metric definitions, governed dataset contracts, and enforced entitlements. The platform handles all deterministic computation, access control, and audit recording behind a single governed API.
+The AI Analytics Platform is a governed computation engine that gives AI systems correct, auditable access to an organisation's regulated metrics and datasets — without exposing database schemas, without generating SQL, and without compromising entitlement enforcement. AI interacts exclusively with approved analytics and metrics definitions in the Semantic Metrics Repository: versioned metric definitions, governed dataset contracts, and enforced entitlements. The platform handles all deterministic computation, access control, and audit recording behind a single governed API.
+
+A defining design objective is that the platform operates across any data warehouse, data source, or analytical tool within a large enterprise environment. It is not tied to a single application schema, a single data model, or localised AI model training on a specific database. Instead, it relies on **centrally governed analytics and data definitions** — registered once in the Semantic Metrics Repository and the Semantic Data Repository — that describe what metrics mean and how they are calculated in terms that are independent of any physical implementation. A metric defined once in the SMR is queryable across every registered data source, and its definition travels with it regardless of which backend holds the underlying data. This is the architectural property that makes cross-platform analytical consistency possible at enterprise scale: the governance layer, not the data layer, is the source of truth.
 
 In practice: a portfolio manager asks "show me portfolio returns versus benchmark for my equity portfolios this quarter" in plain English and receives a governed, role-constrained, auditable result with the full computation record attached. A data science pipeline extracts millions of rows of position data under the same entitlement and audit controls. A treasury analyst produces an LCR figure for a Basel III submission and receives, automatically, a regulator-ready compliance artifact set alongside the result. The analyst bottleneck breaks. Regulatory requirements hold.
 
@@ -37,7 +39,8 @@ The platform addresses the following challenges that Text-to-SQL and MCP impleme
 | Computation provenance for regulatory review | Full audit record for every result: intent → definitions → entitlements → plan → execution → result |
 | Entitlement enforcement that AI cannot bypass | Enforced at the analytical layer before any database is contacted — not dependent on AI query generation reliability |
 | Metric governance and change management | Every metric definition is version-controlled with an approval workflow and full change history |
-| Multi-source analytical federation | A single governed interface routes queries across SQL warehouses, APIs, graph databases, and any registered data source |
+| Multi-source analytical federation | A single governed interface routes queries across SQL warehouses, APIs, graph databases, and any registered data source — not tied to a single application schema, data model, or localised AI training |
+| Cross-platform metric consistency | Analytics and data definitions are registered centrally and are independent of physical implementation — the same metric is queryable identically across every backend in the enterprise |
 | Large dataset access for AI agents and data mining pipelines | Large datasets returned to agents and pipelines under the same entitlement and audit controls as analytical queries |
 
 ### Analytics engines: a well-established design pattern
@@ -77,6 +80,7 @@ All computation between these two steps — validation, entitlement enforcement,
 | A governed analytics and data mining platform — metric queries, large dataset retrieval, and drilldown under a unified controls pipeline | A general-purpose SQL interface, BI tool replacement, or user interface |
 | A platform with two tightly-bounded AI steps: intent resolution (selecting the right governed definition) and narrative synthesis (summarising the computed result) | A system where AI influences computation, query construction, or result values |
 | A governed metric registry — every queryable metric is registered, approved, and version-controlled | A system that infers metric definitions at query time |
+| An enterprise-wide platform — works across any data warehouse or source in the organisation, governed by central definitions not tied to any single application or schema | A single-application or single-warehouse analytics tool — not dependent on localised AI training or a specific data model |
 
 All AI systems access the platform through a single channel — an API layer built on MCP (Model Context Protocol), an open standard for connecting AI systems to tools and data. Conversational assistants, autonomous agents, data mining pipelines, and custom applications all enter through this channel and traverse the same controls pipeline. There is no alternative path. Every AI-initiated request produces an audit record. This is the architectural guarantee that makes AI-driven analytics safe to operate in a regulated environment.
 
