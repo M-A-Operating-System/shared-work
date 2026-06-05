@@ -1,4 +1,4 @@
-# 4. Proposed Technical Implementation
+# 4. Reference Implementation
 
 This chapter describes one reference implementation of the AI Analytics Platform. Stack choices are concrete but not prescriptive. The product specification is intentionally stack-agnostic. Any conformant implementation that satisfies the specified behaviours, governance guarantees, and interface contracts is valid. Technology substitutions at any layer require no changes to the product specification.
 
