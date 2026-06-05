@@ -383,101 +383,6 @@ A structured tool call arrives from AI consumers.
 A structured `run_analytics` tool call arrives from the AI Chat Platform. The MCP Capability Layer validates the JWT signature, confirms the token has not expired, and extracts the claims. It dispatches two parallel operations: the structured parameters to the Semantic Validation Layer, and the JWT claims to the Role-Aware Projection Layer. The MCP Capability Layer does not interpret the parameters or make any analytical decisions; it validates, routes, and waits.
 
 
-## Semantic Metrics Repository (SMR)
-
-> **Governing principles:** [P1 — Semantic abstraction](./00-overview.md#design-principles) · [P3 — Deterministic metric resolution](./00-overview.md#design-principles) · [P9 — Administrator sovereignty](./00-overview.md#design-principles)
-
-The Semantic Metrics Repository (SMR) is the governing catalogue of every analytical concept resolvable on the platform. Before any query can be planned or executed, every identifier in that query (metrics, dimensions, hierarchies) must be registered in the SMR. This is an architectural constraint, not a policy: the Semantic Validation Layer rejects any identifier not present in the SMR, and nothing is queryable that is not registered.
-
-### Concept Types
-
-The SMR is composed of three SDR document types:
-
-| SDR document type | Description |
-|---|---|
-| **`analytical_metric`** | Metric definition — formula, aggregation, `data_affinity`, `physical_mapping`, `required_dimensions`, `performance_impact_weight`, `classification_level`, `compliance_relevant`, `regulatory_framework` |
-| **`analytical_dimension`** | Dimension definition — `data_affinity`, `physical_mapping`, enumerated values or `hierarchical` flag, `hierarchy_levels` |
-| **`analytical_operation`** | Operation catalogue entry — `execution_profile`, `required_params`, `supported_metrics`, `supported_dimensions`, `default_visualization` |
-
-### Metric Definition Schema
-
-Every metric in the SMR conforms to the following schema. This is the authoritative reference for metric registration and validation:
-
-```json
-{
-  "id":          "portfolio_return",
-  "version":     "2.1.0",
-  "label":       "Portfolio Return",
-  "description": "Total return of a portfolio over the specified period, net of fees, expressed as a percentage.",
-  "formula":     "(end_market_value - start_market_value + cash_flows) / start_market_value",
-  "compliance_relevant": false,
-  "regulatory_framework": [],
-  "unit":        "percentage",
-  "aggregation": {
-    "default":     "value_weighted_average",
-    "allowed":     ["value_weighted_average", "equal_weighted_average", "sum"],
-    "granularity": ["daily", "monthly", "quarterly", "annual", "since_inception"]
-  },
-  "dimensions": {
-    "required": ["portfolio", "date"],
-    "optional": ["asset_class", "currency", "benchmark"]
-  },
-  "data": {
-    "domain":          "portfolio",
-    "sub_domain":      "performance",
-    "source_tables":   ["fact_portfolio_daily", "dim_portfolio"],
-    "refresh_cadence": "daily",
-    "latency_sla":     "T+1"
-  },
-  "governance": {
-    "owner":          "head_of_performance_analytics",
-    "steward":        "performance_analytics_team",
-    "classification": "INTERNAL",
-    "approved":       true,
-    "approved_by":    "cdo_office",
-    "approved_at":    "2025-11-15T09:00:00Z",
-    "effective_from": "2025-11-15",
-    "deprecated":     false
-  },
-  "lineage": {
-    "upstream_metrics":   [],
-    "upstream_sources":   ["positions_service", "pricing_service", "cash_flow_service"],
-    "downstream_metrics": ["active_return", "information_ratio"]
-  },
-  "access": {
-    "roles":  ["portfolio_manager", "risk_officer", "analytics_governance"],
-    "public": false
-  },
-  "display": {
-    "format":               "percentage",
-    "decimals":             2,
-    "sign_convention":      "positive_is_gain",
-    "benchmark_comparison": true
-  }
-}
-```
-
-All metric definitions must pass through a governance review and approval process before they are resolvable on the platform. A metric authored by a Metrics Modeller is not queryable until it has been reviewed and approved by Analytics Governance.
-
-### Formula Language
-
-The SMR formula language expresses metric computation logic in terms of other registered metrics or canonical data source identifiers — never physical column names. This decouples metric definitions from backend schema changes: renaming a physical table or column requires only a mapping update, not a metric definition change. The formula language supports arithmetic composition, conditional expressions, safe division with null protection, time-windowed aggregations, and filtered sub-aggregations.
-
-### SMR Authoring and Discovery
-
-The SMR is backed by the SDR, which handles document creation, versioning, and the approval workflow natively. There are no custom MCP tools for metric authoring. Metrics Modellers author `analytical_metric`, `analytical_dimension`, and `analytical_operation` documents using the SDR's existing authoring capabilities; Analytics Governance approves them.
-
-**Discovery** — AI models and agents discover available operations by calling the `list_operations` MCP tool (defined in the MCP Capability Layer). `list_operations` returns operation IDs, display names, required parameters, supported metrics, supported dimensions, and execution profiles for all approved operations within the caller's entitlement scope. There are no `smr://` MCP resource URIs and no separate `list_metrics`, `get_metric_definition`, `propose_metric`, or `approve_metric` MCP tools.
-
-The internal resolution calls made by the Semantic Validation Layer and Federated Query Engine query the SDR directly. There is no separate internal API.
-
-### Example
-
-Continuing the portfolio manager query — the SVL now asks the SMR to resolve the requested metrics and operation.
-
-The SVL asks the SMR to resolve the `compare_portfolios` operation, then resolves `portfolio_return` and `benchmark_return` as `analytical_metric` documents. The SMR confirms both are approved for the `portfolio_manager` role and returns their definitions, including `data_affinity` (`portfolio`), `required_dimensions` (`portfolio_id`, `time_period`), and `aggregation` (`value_weighted_average`). `asset_class` resolves as an approved `analytical_dimension` document with an approved filter operator (`eq`). If either metric document were absent or not in `"status": "approved"` state, the SVL would return `METRIC_NOT_FOUND` and the pipeline would stop here.
-
-
 ## Intent Resolution Agent (IRA)
 
 > **Governing principles:** [P2 — Controls before execution](./00-overview.md#design-principles) · [P10 — Deterministic computation, not generation](./00-overview.md#design-principles)
@@ -595,6 +500,101 @@ The IRA encodes this query and retrieves the top-3 candidate operations from the
 Confidence is 0.91 — above threshold, no candidate cards shown. Resolved intent is forwarded to the SVL.
 
 **↳ Step 1 — Intent resolved.** The IRA has translated the natural language query into a structured, bound operation request with a presentation preview. The SVL now validates and plans.
+
+
+## Semantic Metrics Repository (SMR)
+
+> **Governing principles:** [P1 — Semantic abstraction](./00-overview.md#design-principles) · [P3 — Deterministic metric resolution](./00-overview.md#design-principles) · [P9 — Administrator sovereignty](./00-overview.md#design-principles)
+
+The Semantic Metrics Repository (SMR) is the governing catalogue of every analytical concept resolvable on the platform. Before any query can be planned or executed, every identifier in that query (metrics, dimensions, hierarchies) must be registered in the SMR. This is an architectural constraint, not a policy: the Semantic Validation Layer rejects any identifier not present in the SMR, and nothing is queryable that is not registered.
+
+### Concept Types
+
+The SMR is composed of three SDR document types:
+
+| SDR document type | Description |
+|---|---|
+| **`analytical_metric`** | Metric definition — formula, aggregation, `data_affinity`, `physical_mapping`, `required_dimensions`, `performance_impact_weight`, `classification_level`, `compliance_relevant`, `regulatory_framework` |
+| **`analytical_dimension`** | Dimension definition — `data_affinity`, `physical_mapping`, enumerated values or `hierarchical` flag, `hierarchy_levels` |
+| **`analytical_operation`** | Operation catalogue entry — `execution_profile`, `required_params`, `supported_metrics`, `supported_dimensions`, `default_visualization` |
+
+### Metric Definition Schema
+
+Every metric in the SMR conforms to the following schema. This is the authoritative reference for metric registration and validation:
+
+```json
+{
+  "id":          "portfolio_return",
+  "version":     "2.1.0",
+  "label":       "Portfolio Return",
+  "description": "Total return of a portfolio over the specified period, net of fees, expressed as a percentage.",
+  "formula":     "(end_market_value - start_market_value + cash_flows) / start_market_value",
+  "compliance_relevant": false,
+  "regulatory_framework": [],
+  "unit":        "percentage",
+  "aggregation": {
+    "default":     "value_weighted_average",
+    "allowed":     ["value_weighted_average", "equal_weighted_average", "sum"],
+    "granularity": ["daily", "monthly", "quarterly", "annual", "since_inception"]
+  },
+  "dimensions": {
+    "required": ["portfolio", "date"],
+    "optional": ["asset_class", "currency", "benchmark"]
+  },
+  "data": {
+    "domain":          "portfolio",
+    "sub_domain":      "performance",
+    "source_tables":   ["fact_portfolio_daily", "dim_portfolio"],
+    "refresh_cadence": "daily",
+    "latency_sla":     "T+1"
+  },
+  "governance": {
+    "owner":          "head_of_performance_analytics",
+    "steward":        "performance_analytics_team",
+    "classification": "INTERNAL",
+    "approved":       true,
+    "approved_by":    "cdo_office",
+    "approved_at":    "2025-11-15T09:00:00Z",
+    "effective_from": "2025-11-15",
+    "deprecated":     false
+  },
+  "lineage": {
+    "upstream_metrics":   [],
+    "upstream_sources":   ["positions_service", "pricing_service", "cash_flow_service"],
+    "downstream_metrics": ["active_return", "information_ratio"]
+  },
+  "access": {
+    "roles":  ["portfolio_manager", "risk_officer", "analytics_governance"],
+    "public": false
+  },
+  "display": {
+    "format":               "percentage",
+    "decimals":             2,
+    "sign_convention":      "positive_is_gain",
+    "benchmark_comparison": true
+  }
+}
+```
+
+All metric definitions must pass through a governance review and approval process before they are resolvable on the platform. A metric authored by a Metrics Modeller is not queryable until it has been reviewed and approved by Analytics Governance.
+
+### Formula Language
+
+The SMR formula language expresses metric computation logic in terms of other registered metrics or canonical data source identifiers — never physical column names. This decouples metric definitions from backend schema changes: renaming a physical table or column requires only a mapping update, not a metric definition change. The formula language supports arithmetic composition, conditional expressions, safe division with null protection, time-windowed aggregations, and filtered sub-aggregations.
+
+### SMR Authoring and Discovery
+
+The SMR is backed by the SDR, which handles document creation, versioning, and the approval workflow natively. There are no custom MCP tools for metric authoring. Metrics Modellers author `analytical_metric`, `analytical_dimension`, and `analytical_operation` documents using the SDR's existing authoring capabilities; Analytics Governance approves them.
+
+**Discovery** — AI models and agents discover available operations by calling the `list_operations` MCP tool (defined in the MCP Capability Layer). `list_operations` returns operation IDs, display names, required parameters, supported metrics, supported dimensions, and execution profiles for all approved operations within the caller's entitlement scope. There are no `smr://` MCP resource URIs and no separate `list_metrics`, `get_metric_definition`, `propose_metric`, or `approve_metric` MCP tools.
+
+The internal resolution calls made by the Semantic Validation Layer and Federated Query Engine query the SDR directly. There is no separate internal API.
+
+### Example
+
+Continuing the portfolio manager query — the SVL now asks the SMR to resolve the requested metrics and operation.
+
+The SVL asks the SMR to resolve the `compare_portfolios` operation, then resolves `portfolio_return` and `benchmark_return` as `analytical_metric` documents. The SMR confirms both are approved for the `portfolio_manager` role and returns their definitions, including `data_affinity` (`portfolio`), `required_dimensions` (`portfolio_id`, `time_period`), and `aggregation` (`value_weighted_average`). `asset_class` resolves as an approved `analytical_dimension` document with an approved filter operator (`eq`). If either metric document were absent or not in `"status": "approved"` state, the SVL would return `METRIC_NOT_FOUND` and the pipeline would stop here.
 
 
 ## Semantic Validation Layer (SVL)
