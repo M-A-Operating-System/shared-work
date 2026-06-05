@@ -198,12 +198,14 @@ def _render_mermaid(source: str) -> str | None:
                 out_path = alt
 
         if result.returncode != 0 or not out_path.exists():
-            print(f"  [warn] mmdc error: {result.stderr.decode('utf-8', errors='replace').strip()}")
+            stderr = result.stderr.decode('utf-8', errors='replace').strip()
+            print(f"  [warn] mmdc error (rc={result.returncode}): {stderr}")
             return None
 
         px_w, px_h   = _png_size(out_path)
         w_mm, h_mm   = _diagram_display_size(px_w, px_h)
         data         = _b64.b64encode(out_path.read_bytes()).decode()
+        print(f"  [diagram] rendered {px_w}×{px_h}px → {w_mm:.0f}×{h_mm:.0f}mm")
 
     # Inline width/height bypass WeasyPrint's broken max-width+max-height+height:auto
     # aspect-ratio resolution — explicit dimensions are always honoured correctly.
