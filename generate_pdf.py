@@ -68,10 +68,14 @@ EXCLUDE = {"README.md"}
 # ---------- document ordering ----------
 
 def get_ordered_files(docs_dir: Path) -> list[Path]:
-    """Numbered docs in reading order, then ROADMAP."""
+    """Numbered docs in reading order, then ROADMAP.
+
+    Files whose stem contains '-ignore' are parked and excluded from the build.
+    """
     numbered = sorted(
-        [f for f in docs_dir.glob("[0-9][0-9]-*.md") if f.name not in EXCLUDE],
-        key=lambda f: f.stem[:2],
+        [f for f in docs_dir.glob("[0-9][0-9]-*.md")
+         if f.name not in EXCLUDE and "-ignore" not in f.stem],
+        key=lambda f: int(f.stem[:2]),
     )
     roadmap = docs_dir / "ROADMAP.md"
     result = list(numbered)
@@ -82,8 +86,12 @@ def get_ordered_files(docs_dir: Path) -> list[Path]:
 # ---------- markdown processing ----------
 
 def strip_md_links(text: str) -> str:
-    """Replace cross-doc .md links with plain text — they don't resolve in PDF."""
-    return re.sub(r"\(\./[\w-]+\.md(?:#[\w-]*)?\)", "()", text)
+    """Replace cross-doc .md links with their plain text — they don't resolve in PDF."""
+    # [label](./file.md#anchor) → label
+    text = re.sub(r"\[([^\]]+)\]\(\./[\w-]+\.md(?:#[\w-]*)?\)", r"\1", text)
+    # any remaining bare (./file.md#anchor) with no label → drop it
+    text = re.sub(r"\(\./[\w-]+\.md(?:#[\w-]*)?\)", "", text)
+    return text
 
 
 # ---------- mermaid rendering ----------

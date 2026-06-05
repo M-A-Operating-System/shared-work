@@ -1,4 +1,4 @@
-# 6. Success Metrics
+# 5. Success Metrics
 
 Metrics are captured from day one at both the platform level and the application level. Governance health metrics are first-class success indicators. A platform that is highly used but poorly governed is not successful.
 
