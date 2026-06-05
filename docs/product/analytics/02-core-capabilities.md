@@ -2,7 +2,7 @@
 
 This chapter is the logical architecture reference for the AI Analytics Platform. It covers nine pipeline components in the order a query encounters them, using a single portfolio manager query as a running example throughout. Each section describes what a component does, its controls contract, and where in the pipeline it sits — with no references to specific technology products or vendor implementations.
 
-The pipeline processes every request in this sequence: the **MCP Capability Layer** is the entry point — the governed API through which all consumers access the platform. The **Semantic Metrics Repository** is the governing catalogue — every queryable metric, dimension, and operation must be registered here before it is resolvable. The **Intent Resolution Agent** receives natural language queries, retrieves candidate operations from the SMR via RAG, and uses a language model to rank and resolve the user's intent into a structured operation and parameters. The **Semantic Validation Layer** validates the resolved structured request and produces a platform-agnostic query plan. The **Role-Aware Projection Layer** enforces entitlements before any query reaches a backend. The **Semantic Controls Layer** applies thresholds and compliance classification before releasing the plan for execution. The **Physical Query Planner** translates the approved logical plan into backend-specific physical query fragments. The **Federated Query Engine** routes those fragments to registered backends, executes in parallel, and assembles the result. The **Data Visualization Language (DVL)** selects the presentation contract. The **Narrative Synthesis Agent** produces a governed plain-language summary via a tightly-scoped language model call. The **Analytical Lineage Store** records the complete computation provenance. The **Provenance Artifact Service** assembles and seals the compliance artifact when a query meets the two-signal compliance trigger.
+The pipeline processes every request in this sequence: the **MCP Capability Layer** is the entry point — the governed API through which all consumers access the platform. The **Semantic Metrics Repository** is the governing catalogue — every queryable metric, dimension, and operation must be registered here before it is resolvable. The **Intent Resolution Agent** receives natural language queries, retrieves candidate operations from the SMR via RAG, and uses a language model to rank and resolve the user's intent into a structured operation and parameters. The **Role-Aware Projection Layer** receives the resolved request and the caller's JWT, makes the entitlement decisions, and produces an entitlement projection before any query plan is compiled. The **Semantic Validation Layer** validates the resolved structured request, enforces the entitlement projection, and produces a platform-agnostic query plan. The **Semantic Controls Layer** applies thresholds and compliance classification before releasing the plan for execution. The **Physical Query Planner** translates the approved logical plan into backend-specific physical query fragments. The **Federated Query Engine** routes those fragments to registered backends, executes in parallel, and assembles the result. The **Data Visualization Language (DVL)** selects the presentation contract. The **Narrative Synthesis Agent** produces a governed plain-language summary via a tightly-scoped language model call. The **Analytical Lineage Store** records the complete computation provenance. The **Provenance Artifact Service** assembles and seals the compliance artifact when a query meets the two-signal compliance trigger.
 
 Platform roles — who interacts with each component and how — are defined before the component descriptions.
 
@@ -67,8 +67,8 @@ flowchart TD
         direction TB
         MCP["<b>API/MCP Interface</b>\nMCP server runtime · tool/resource/prompt presentation · JWT validation"]
         IRA["<b>Intent Resolution Agent (IRA)</b>\nRAG over SMR catalogue · LLM intent ranking · confirmation gate\nnatural language → resolved operation_id + params"]
-        SVL["<b>Semantic Validation Layer (SVL)</b>\nSMR resolution · schema validation · role projection · LQP generation\nentirely deterministic — no AI"]
-        RAPL["<b>Role-Aware Projection Layer (RAPL)</b>\nJWT claims · metric/dimension access sets · row predicates · column masks"]
+        RAPL["<b>Role-Aware Projection Layer (RAPL)</b>\nentitlement decisions · metric/dimension access · row scope · column masks\nreads role definitions from DES"]
+        SVL["<b>Semantic Validation Layer (SVL)</b>\nSMR resolution · schema validation · entitlement enforcement · LQP generation\nentirely deterministic — no AI"]
         SCL["<b>Semantic Controls Layer (SCL)</b>\nPerformance impact · complexity · classification · compliance checks"]
         PQP["<b>Physical Query Planner (PQP)</b>\nphysicalMapping resolution · sub-plan decomposition · dialect translation"]
         FQE["<b>Federated Query Engine (FQE)</b>\nbackend routing · parallel execution · result assembly"]
@@ -109,7 +109,7 @@ flowchart TD
     Consumers -->|"render tool call (display_spec)"| Image
     Consumers -->|"JWT + MCP tool call"| DCSMCP
     MCP -->|"natural language query"| IRA
-    MCP -->|"structured tool call (bypass IRA)"| SVL
+    MCP -->|"structured tool call (bypass IRA) + JWT"| RAPL
     IRA -->|"RAG retrieval"| SMR
     IRA -->|"intent ranking"| LLM
     IRA -->|"resolved request + JWT"| RAPL
@@ -149,8 +149,9 @@ sequenceDiagram
     participant MCP as API/MCP Interface
     participant IRA as Intent Resolution Agent
     participant LLM as Language Model
-    participant SVL as Semantic Validation Layer
     participant RAPL as Role-Aware Projection Layer
+    participant DES as Data Entitlements Store
+    participant SVL as Semantic Validation Layer
     participant SMR as Semantic Metrics Repository
     participant SCL as Semantic Controls Layer
     participant ALS as Analytical Lineage Store
@@ -181,10 +182,10 @@ sequenceDiagram
 
         IRA->>RAPL: resolved operation_id + params + JWT
         RAPL->>RAPL: validate JWT · extract role claims
-        RAPL->>ENT: retrieve role definitions
-        ENT-->>RAPL: metric access sets · dimension access sets · row predicate templates · column masks
-        note over RAPL: Merge role definitions · make YES/NO decisions per metric and dimension<br/>Resolve predicate templates against JWT claims · register column masks
-        RAPL->>SVL: entitlement projection (metric_access_set · dimension_access_set · row_predicates · column_masks)
+        RAPL->>DES: retrieve role definitions
+        DES-->>RAPL: metric access sets · dimension access sets · row scope templates · column masks
+        note over RAPL: Merge role definitions · APPROVE/DENY per metric and dimension<br/>Resolve row scope templates against JWT claims · register column masks
+        RAPL->>SVL: entitlement projection (metric_access_set · dimension_access_set · row_scope_predicates · column_masks)
 
         SVL->>SMR: resolve operation · metric IDs · dimension IDs
         SMR-->>SVL: definitions · aggregation rules · performance_impact_weight · compliance metadata
@@ -255,7 +256,7 @@ The Analytics Engine is accessed by three consumer types: a conversational AI pl
 
 **Natural language path.** When a user asks an analytical question, the consumer forwards the natural language query and the user's JWT to the Analytics Engine. The engine's IRA handles operation selection, parameter binding, and — if intent is ambiguous — returns a confirmation card before proceeding to execution. The consumer does not need to know the SMR catalogue or construct structured parameters.
 
-**Structured path.** Consumers that construct explicit `operation_id` + `params` payloads (agentic pipelines, custom analytics UIs, integration tests) call `run_analytics` with structured arguments directly. The `list_operations` tool returns the entitled operation catalogue for consumers that build their own operation selection UI. Structured calls bypass the IRA and route directly to the SVL.
+**Structured path.** Consumers that construct explicit `operation_id` + `params` payloads (agentic pipelines, custom analytics UIs, integration tests) call `run_analytics` with structured arguments directly. The `list_operations` tool returns the entitled operation catalogue for consumers that build their own operation selection UI. Structured calls bypass the IRA and route directly to the RAPL, which makes the entitlement decisions before the SVL compiles the plan.
 
 **Analytics Engine call.** The tool call is submitted to the Analytics Engine with the user's JWT forwarded unmodified. The Analytics Engine validates, plans, executes, and returns a structured result and DVL display specification. Entitlement enforcement, query planning, and execution are entirely the Analytics Engine's responsibility.
 
@@ -293,7 +294,7 @@ The Analytics Engine processes the request end-to-end and returns a structured r
 
 > **Governing principles:** [P2 — Controls before execution](./00-overview.md#design-principles) · [P5 — Role-aware by default](./00-overview.md#design-principles)
 
-The MCP Capability Layer exposes the platform's governed analytical operations to AI orchestrators via MCP Streamable HTTP transport. Each capability is a bounded, named operation with a typed input schema, a governed execution path — at minimum through role-aware projection and the federated query engine, and through the full pipeline (SVL → RAPL → SCL → FQE) for metric and analytical operations, and a typed output contract. AI agents interact with capabilities, not databases. There is no privileged API path — AI agents receive the same controls-validated results as human users.
+The MCP Capability Layer exposes the platform's governed analytical operations to AI orchestrators via MCP Streamable HTTP transport. Each capability is a bounded, named operation with a typed input schema, a governed execution path — at minimum through role-aware projection and the federated query engine, and through the full pipeline (RAPL → SVL → SCL → FQE) for metric and analytical operations, and a typed output contract. AI agents interact with capabilities, not databases. There is no privileged API path — AI agents receive the same controls-validated results as human users.
 
 ### Tool Catalogue
 
@@ -376,20 +377,20 @@ This is appropriate for any query where silent intent misresolution is unaccepta
 
 ### Capability Governance
 
-Every capability invocation passes through the full controls pipeline: input schema validation → capability availability check (feature flags and role entitlements) → Semantic Validation Layer → Role-Aware Projection → Semantic Controls Layer → FQE → result assembly → lineage record write. Capability availability is declared in the MCP manifest; a capability not enabled by a feature flag or accessible to the user's role appears as `available: false` with a reason.
+Every capability invocation passes through the full controls pipeline: input schema validation → capability availability check (feature flags and role entitlements) → Role-Aware Projection → Semantic Validation Layer → Semantic Controls Layer → FQE → result assembly → lineage record write. Capability availability is declared in the MCP manifest; a capability not enabled by a feature flag or accessible to the user's role appears as `available: false` with a reason.
 
 ### Example
 
 A structured tool call arrives from AI consumers.
 
-A structured `run_analytics` tool call arrives from the AI Chat Platform. The MCP Capability Layer validates the JWT signature, confirms the token has not expired, and extracts the claims. It dispatches two parallel operations: the structured parameters to the Semantic Validation Layer, and the JWT claims to the Role-Aware Projection Layer. The MCP Capability Layer does not interpret the parameters or make any analytical decisions; it validates, routes, and waits.
+A structured `run_analytics` tool call arrives from the AI Chat Platform. The MCP Capability Layer validates the JWT signature, confirms the token has not expired, and extracts the claims. For a natural language query it routes to the Intent Resolution Agent; for a structured call it routes directly to the Role-Aware Projection Layer, which makes the entitlement decisions before the Semantic Validation Layer compiles the plan. The MCP Capability Layer does not interpret the parameters or make any analytical decisions; it validates, routes, and waits.
 
 
 ## Intent Resolution Agent (IRA)
 
 > **Governing principles:** [P2 — Controls before execution](./00-overview.md#design-principles) · [P10 — Deterministic computation, not generation](./00-overview.md#design-principles)
 
-The Intent Resolution Agent is the AI component responsible for translating a natural language query into a structured, validated operation request. It is the only AI step in the pre-computation pipeline. Its output — a resolved `operation_id` and bound `params` — is the input to the Semantic Validation Layer.
+The Intent Resolution Agent is the AI component responsible for translating a natural language query into a structured, validated operation request. It is the only AI step in the pre-computation pipeline. Its output — a resolved `operation_id` and bound `params` — is handed, with the caller's JWT, to the Role-Aware Projection Layer for entitlement decisions before the Semantic Validation Layer compiles the plan.
 
 The IRA does not interpret data, make recommendations, or produce output visible to the end user. Its sole function is operation selection and parameter binding. Once it has resolved intent, it hands off a deterministic structured request and plays no further role in the pipeline.
 
@@ -403,7 +404,7 @@ flowchart LR
     CONF{"Ambiguous?"}
     CARDS["1–3 candidate cards\nreturned to consumer"]
     REFINE{"User tweaks\nor selects?"}
-    OUT["Resolved intent\noperation_id + params + presentation_hint → SVL"]
+    OUT["Resolved intent\noperation_id + params + presentation_hint → RAPL"]
 
     NL --> RAG --> RANK --> CONF
     CONF -->|"yes"| CARDS
@@ -423,7 +424,7 @@ When a query arrives, the IRA encodes the natural language input and performs a 
 
 The LLM receives the top-K candidates and the user's query. It ranks candidates, binds parameters, and scores confidence for each. It also derives a `presentation_hint` for each candidate — the likely chart type and primary axes — based on the operation's result shape and the SMR operation definition. This preview is included in every candidate card returned to the consumer.
 
-If the top candidate's confidence score exceeds `intentConfidenceThreshold` (configurable, default 0.75) and leads the second candidate by more than `intentConfidenceBand` (configurable, default 0.1), the IRA proceeds directly to the SVL with no card shown. Otherwise, up to three ranked candidate cards are returned for the user to select or refine.
+If the top candidate's confidence score exceeds `intentConfidenceThreshold` (configurable, default 0.75) and leads the second candidate by more than `intentConfidenceBand` (configurable, default 0.1), the IRA proceeds directly to the RAPL with no card shown. Otherwise, up to three ranked candidate cards are returned for the user to select or refine.
 
 The LLM call is constrained: the prompt contains only the candidate operation definitions and the user's query. The LLM has no access to result data, SMR governance metadata, or user entitlements — those are enforced downstream by SVL and RAPL.
 
@@ -435,12 +436,12 @@ The number of candidates returned is determined by confidence clustering:
 
 | Situation | Cards shown |
 |---|---|
-| Top candidate above threshold, clear leader | 0 — proceeds directly to SVL |
+| Top candidate above threshold, clear leader | 0 — proceeds directly to RAPL |
 | Top candidate below threshold, or top two within confidence band | 2 candidates |
 | Top three candidates within confidence band | 3 candidates |
 | `requiresIntentConfirmation: true` on the operation (governance override) | 1 candidate — approval required regardless of confidence |
 
-The consumer re-submits with `"selected_candidate": <index>` (0-based) to indicate which card the user chose. The IRA then forwards the selected candidate's resolved intent to the SVL.
+The consumer re-submits with `"selected_candidate": <index>` (0-based) to indicate which card the user chose. The IRA then forwards the selected candidate's resolved intent to the RAPL.
 
 ### Conversational Refinement
 
@@ -450,7 +451,7 @@ This creates a pre-execution dialogue loop between the user and the IRA:
 
 1. User sends a query → IRA returns candidate cards
 2. User refines ("weekly not quarterly") → IRA updates and returns revised cards
-3. User selects a card → IRA forwards resolved intent to SVL → execution proceeds
+3. User selects a card → IRA forwards resolved intent to RAPL → SVL → execution proceeds
 
 The loop is bounded: a maximum number of refinement turns is configurable (`intentRefinementMaxTurns`, default 5). After the limit, the IRA requires the user to select from the current candidate set or start a new query. No data is accessed and no query is executed during the refinement loop — it is entirely within the IRA's pre-execution scope.
 
@@ -471,7 +472,7 @@ The `presentation_hint` is a pre-execution estimate. The DVL produces the author
 
 ### Structured API Path
 
-Consumers that construct explicit `operation_id` + `params` (agentic pipelines, custom analytics UIs, integration tests) can call `run_analytics` with a structured payload directly. MCP routes these calls directly to the SVL, bypassing the IRA. The `list_operations` tool returns the full entitled operation catalogue for consumers that build their own operation selection UI or inject the catalogue into their own model context.
+Consumers that construct explicit `operation_id` + `params` (agentic pipelines, custom analytics UIs, integration tests) can call `run_analytics` with a structured payload directly. MCP routes these calls directly to the RAPL — which makes the entitlement decisions — and then on to the SVL, bypassing the IRA. The `list_operations` tool returns the full entitled operation catalogue for consumers that build their own operation selection UI or inject the catalogue into their own model context.
 
 ### Example
 
@@ -507,9 +508,9 @@ The IRA encodes this query and retrieves the top-3 candidate operations from the
 
 </td></tr></table>
 
-Confidence is 0.91 — above threshold, no candidate cards shown. Resolved intent is forwarded to the SVL.
+Confidence is 0.91 — above threshold, no candidate cards shown. Resolved intent is forwarded to the RAPL.
 
-**↳ Step 1 — Intent resolved.** The IRA has translated the natural language query into a structured, bound operation request with a presentation preview. The SVL now validates and plans.
+**↳ Step 1 — Intent resolved.** The IRA has translated the natural language query into a structured, bound operation request with a presentation preview. The RAPL now makes the entitlement decisions, then the SVL validates and plans.
 
 
 ## Semantic Metrics Repository (SMR)
@@ -604,71 +605,9 @@ The Analytics Engine queries the SMR directly at request time — the SVL resolv
 
 ### Example
 
-Continuing the portfolio manager query — the SVL now asks the SMR to resolve the requested metrics and operation.
+Continuing the portfolio manager query — when the request reaches the SVL (Stage 1 validation, downstream of RAPL), the SMR is the catalogue every identifier is resolved against.
 
 The SVL asks the SMR to resolve the `compare_portfolios` operation, then resolves `portfolio_return` and `benchmark_return` as `analytical_metric` documents. The SMR confirms both are approved for the `portfolio_manager` role and returns their definitions, including `data_affinity` (`portfolio`), `required_dimensions` (`portfolio_id`, `time_period`), and `aggregation` (`value_weighted_average`). `asset_class` resolves as an approved `analytical_dimension` document with an approved filter operator (`eq`). If either metric document were absent or not in `"status": "approved"` state, the SVL would return `METRIC_NOT_FOUND` and the pipeline would stop here.
-
-
-## Semantic Validation Layer (SVL)
-
-> **Governing principles:** [P2 — Controls before execution](./00-overview.md#design-principles) · [P10 — Deterministic computation, not generation](./00-overview.md#design-principles)
-
-The Semantic Validation Layer receives the entitlement projection from the Role-Aware Projection Layer together with the fully qualified analytical request — either from a structured API caller or as the resolved output of the Intent Resolution Agent — and produces a validated, platform-agnostic Logical Query Plan (LQP). It is entirely deterministic: no AI model runs inside it. Its purpose is to: (1) resolve the operation from the SMR catalogue, (2) validate `params` against the operation's `required_params` schema, (3) resolve metric IDs within `params` against `analytical_metric` metadata definitions, (4) apply role predicates from RAPL, (5) build the LQP. The output (the LQP) contains no backend references, no SQL, and no physical schema identifiers: only analytical operations expressed against SMR-registered concepts.
-
-### Four-Stage Validation Pipeline
-
-Every analytical request passes through four sequential stages:
-
-```mermaid
-flowchart LR
-    S1["**Stage 1**\nValid · Complete\nResolved · Compatible"]
-    S2["**Stage 2**\nCompliance Signal\nEvaluation"]
-    S3["**Stage 3**\nEntitlement\nEnforcement"]
-    S4["**Stage 4**\nLQP Generation"]
-    LQP(["Logical Query Plan (LQP)"])
-
-    S1 --> S2 --> S3 --> S4 --> LQP
-```
-
-**Stage 1 — Valid, Complete, Resolved & Compatible.** The request must be well-formed, fully populated, and resolvable against the SMR before any further processing occurs. Required fields must be present and correctly typed. The `operation_id` must resolve to an approved `analytical_operation` metadata definition. Every metric ID must resolve to an approved `analytical_metric` metadata definition and every dimension ID to an approved `analytical_dimension` metadata definition. Params must conform to the operation's `required_params` schema. Cross-entity compatibility is validated in the same pass: required dimensions must be present for each metric, aggregation rules must be mutually compatible, time granularity must be consistent, and filter predicates must reference valid fields. Anything unregistered, unapproved, missing, or incompatible is rejected here — the pipeline does not proceed.
-
-**Stage 2 — Compliance Signal Evaluation.** The SVL combines two independent signals to determine the compliance disposition of the request. Signal 1 is the IRA's compliance intent score — derived from the user's natural language query and forwarded as part of the resolved request. Signal 2 is the `compliance_relevant` flag on each resolved `analytical_metric` metadata definition, set by the Metrics Modeller at registration. If both signals are active the request is escalated to the full compliance tier and the Provenance Artifact Service will be invoked. If only the metric signal is active the request proceeds as a standard governed query. If the user's stated intent is compliance-driven but the requested metrics are not registered as compliance-relevant, the SVL rejects the request — the metric definition is not approved for compliance use and the query must not proceed silently with an inappropriate definition.
-
-**Stage 3 — Entitlement Enforcement.** The SVL applies the role projection computed by the Role-Aware Projection Layer. Metrics and dimensions are filtered to the caller's entitled scope. Row predicates derived from the caller's role configuration are injected into the plan. Column masks are applied where the caller's classification ceiling requires them. Any metric or dimension the caller is not entitled to access is removed; if removal leaves the request without its required metrics the request is rejected with an entitlement error rather than returning a partial result.
-
-**Stage 4 — LQP Generation.** The validated, projected, and compliance-classified request is compiled into a platform-agnostic Logical Query Plan — a directed acyclic graph of analytical operations expressed entirely in SMR-registered concepts. No SQL, no backend references, and no physical schema identifiers appear in the LQP. Data affinity hints are assigned per metric node to guide the Physical Query Planner's sub-plan decomposition. Result cardinality and execution performance impact are estimated and attached to the plan for the Semantic Controls Layer to evaluate before execution is authorised.
-
-### Example
-
-The SVL receives the resolved analytical request from the IRA and passes it through all four stages. The output is the Logical Query Plan passed to the Semantic Controls Layer:
-
-```json
-{
-  "lqp_id":    "lqp-20260518-093243-r9xq",
-  "intent_id": "int-20260518-093241-pk7m",
-  "org_id": "acme-wealth",
-  "nodes": [
-    { "id": "n1", "type": "metric_scan",
-      "metrics": ["portfolio_return", "benchmark_return"],
-      "dimensions": ["portfolio_id"],
-      "time_period": { "granularity": "quarterly", "anchor": "current" } },
-    { "id": "n2", "type": "filter", "input": "n1",
-      "predicate": { "field": "asset_class", "operator": "eq", "value": "EQUITY" } },
-    { "id": "n3", "type": "filter", "input": "n2",
-      "predicate": { "field": "portfolio_id", "operator": "in",
-                     "values": ["GLOB_EQ_OPP", "UK_CORE_INC", "ASIA_PAC_GRW", "EUR_BAL_INC"] } },
-    { "id": "n4", "type": "sort", "input": "n3",
-      "field": "portfolio_return", "direction": "desc" }
-  ],
-  "output_node":             "n4",
-  "estimated_performance_impact": 620,
-  "classification_required":      "INTERNAL"
-}
-```
-
-Node `n3` is the RAPL row predicate — part of the plan, not a post-execution filter.
-
-**↳ Step 2 — Intent resolution complete.** The natural language question has been resolved against the SMR into a validated, platform-agnostic Logical Query Plan. Every metric and dimension identifier is confirmed as registered and approved. No backend has been contacted.
 
 
 ## Role-Aware Projection Layer (RAPL)
@@ -685,14 +624,14 @@ Projection is not optional and not bypassable. Every request passes through RAPL
 
 ### Restriction Types
 
-The Role-Aware Projection Layer (RAPL) applies four categories of restriction:
+RAPL makes four categories of entitlement decision. Every decision is made inside RAPL (Stage 5 of the projection lifecycle); the resulting conditions are carried in the entitlement projection and enforced downstream — metric and dimension removals by the SVL during plan generation, row and column restrictions by the FQE at execution and result assembly.
 
-| Restriction type | Description | Applied at |
+| Restriction type | Decided in RAPL | Enforced at |
 |---|---|---|
-| **Metric access filter** | Removes metrics from the resolved intent that the user's role is not entitled to query | SVL Stage 3 — Entitlement Enforcement |
-| **Dimension access filter** | Removes dimensions the user is not entitled to slice by | SVL Stage 3 — Entitlement Enforcement |
-| **Row predicate injection** | Injects SQL-like predicates that restrict which data rows the user can access | FQE physical query generation |
-| **Column mask application** | Replaces or nullifies column values the user is not permitted to see in the assembled result | FQE result assembly |
+| **Metric access** | Stage 5 — requested metric not in the entitled access set is **DENIED** | SVL Stage 3 — denied metric removed from plan; request rejected if a required metric is lost |
+| **Dimension access** | Stage 5 — requested dimension not in the entitled access set is **DENIED** | SVL Stage 3 — denied dimension removed from plan |
+| **Row scope predicate** | Stage 5–6 — population predicate decided and resolved against JWT claims | FQE physical query generation — injected as a predicate node |
+| **Column mask** | Stage 5 — masked columns and masking mode registered | FQE result assembly — value replaced, redacted, or excluded |
 
 ### Projection Lifecycle
 
@@ -772,9 +711,71 @@ The RAPL reads the `portfolio_scope` claim from the JWT and resolves it against 
 }
 ```
 
-No column masks apply — the `portfolio_manager` role has no masking rules for performance metrics. The row predicate is injected into the LQP as node `n3` (see SVL example above). Any portfolio outside the four listed IDs is excluded at the physical query level.
+No column masks apply — the `portfolio_manager` role has no masking rules for performance metrics. The row predicate is injected into the LQP as node `n3` (see SVL example below). Any portfolio outside the four listed IDs is excluded at the physical query level.
 
-**↳ Entitlement projection complete.** Both metrics are confirmed as entitled for the `portfolio_manager` role. The user's access scope is locked — row predicates injected, entitled portfolio set established. No backend has been contacted.
+**↳ Step 2 — Entitlement projection complete.** Both metrics are confirmed as entitled for the `portfolio_manager` role. The user's access scope is locked — row scope predicates resolved, entitled portfolio set established, column masks registered. The entitlement projection is handed to the SVL. No backend has been contacted.
+
+
+## Semantic Validation Layer (SVL)
+
+> **Governing principles:** [P2 — Controls before execution](./00-overview.md#design-principles) · [P10 — Deterministic computation, not generation](./00-overview.md#design-principles)
+
+The Semantic Validation Layer receives the entitlement projection from the Role-Aware Projection Layer together with the fully qualified analytical request — either from a structured API caller or as the resolved output of the Intent Resolution Agent — and produces a validated, platform-agnostic Logical Query Plan (LQP). It is entirely deterministic: no AI model runs inside it. Its purpose is to: (1) resolve the operation from the SMR catalogue, (2) validate `params` against the operation's `required_params` schema, (3) resolve metric IDs within `params` against `analytical_metric` metadata definitions, (4) enforce the entitlement projection computed by RAPL, (5) build the LQP. The output (the LQP) contains no backend references, no SQL, and no physical schema identifiers: only analytical operations expressed against SMR-registered concepts.
+
+### Four-Stage Validation Pipeline
+
+Every analytical request passes through four sequential stages:
+
+```mermaid
+flowchart LR
+    S1["**Stage 1**\nValid · Complete\nResolved · Compatible"]
+    S2["**Stage 2**\nCompliance Signal\nEvaluation"]
+    S3["**Stage 3**\nEntitlement\nEnforcement"]
+    S4["**Stage 4**\nLQP Generation"]
+    LQP(["Logical Query Plan (LQP)"])
+
+    S1 --> S2 --> S3 --> S4 --> LQP
+```
+
+**Stage 1 — Valid, Complete, Resolved & Compatible.** The request must be well-formed, fully populated, and resolvable against the SMR before any further processing occurs. Required fields must be present and correctly typed. The `operation_id` must resolve to an approved `analytical_operation` metadata definition. Every metric ID must resolve to an approved `analytical_metric` metadata definition and every dimension ID to an approved `analytical_dimension` metadata definition. Params must conform to the operation's `required_params` schema. Cross-entity compatibility is validated in the same pass: required dimensions must be present for each metric, aggregation rules must be mutually compatible, time granularity must be consistent, and filter predicates must reference valid fields. Anything unregistered, unapproved, missing, or incompatible is rejected here — the pipeline does not proceed.
+
+**Stage 2 — Compliance Signal Evaluation.** The SVL combines two independent signals to determine the compliance disposition of the request. Signal 1 is the IRA's compliance intent score — derived from the user's natural language query and forwarded as part of the resolved request. Signal 2 is the `compliance_relevant` flag on each resolved `analytical_metric` metadata definition, set by the Metrics Modeller at registration. If both signals are active the request is escalated to the full compliance tier and the Provenance Artifact Service will be invoked. If only the metric signal is active the request proceeds as a standard governed query. If the user's stated intent is compliance-driven but the requested metrics are not registered as compliance-relevant, the SVL rejects the request — the metric definition is not approved for compliance use and the query must not proceed silently with an inappropriate definition.
+
+**Stage 3 — Entitlement Enforcement.** The SVL applies the entitlement projection computed by the Role-Aware Projection Layer. Metrics and dimensions are filtered to the caller's entitled scope. Row scope predicates resolved by RAPL are injected into the plan. Column masks are registered for enforcement at result assembly. Any metric or dimension RAPL did not approve is removed; if removal leaves the request without its required metrics the request is rejected with an entitlement error rather than returning a partial result.
+
+**Stage 4 — LQP Generation.** The validated, projected, and compliance-classified request is compiled into a platform-agnostic Logical Query Plan — a directed acyclic graph of analytical operations expressed entirely in SMR-registered concepts. No SQL, no backend references, and no physical schema identifiers appear in the LQP. Data affinity hints are assigned per metric node to guide the Physical Query Planner's sub-plan decomposition. Result cardinality and execution performance impact are estimated and attached to the plan for the Semantic Controls Layer to evaluate before execution is authorised.
+
+### Example
+
+The SVL receives the fully qualified analytical request together with RAPL's entitlement projection and passes them through all four stages. The output is the Logical Query Plan passed to the Semantic Controls Layer:
+
+```json
+{
+  "lqp_id":    "lqp-20260518-093243-r9xq",
+  "intent_id": "int-20260518-093241-pk7m",
+  "org_id": "acme-wealth",
+  "nodes": [
+    { "id": "n1", "type": "metric_scan",
+      "metrics": ["portfolio_return", "benchmark_return"],
+      "dimensions": ["portfolio_id"],
+      "time_period": { "granularity": "quarterly", "anchor": "current" } },
+    { "id": "n2", "type": "filter", "input": "n1",
+      "predicate": { "field": "asset_class", "operator": "eq", "value": "EQUITY" } },
+    { "id": "n3", "type": "filter", "input": "n2",
+      "predicate": { "field": "portfolio_id", "operator": "in",
+                     "values": ["GLOB_EQ_OPP", "UK_CORE_INC", "ASIA_PAC_GRW", "EUR_BAL_INC"] } },
+    { "id": "n4", "type": "sort", "input": "n3",
+      "field": "portfolio_return", "direction": "desc" }
+  ],
+  "output_node":             "n4",
+  "estimated_performance_impact": 620,
+  "classification_required":      "INTERNAL"
+}
+```
+
+Node `n3` is the RAPL row scope predicate — part of the plan, not a post-execution filter.
+
+**↳ Step 3 — Validation and planning complete.** The fully qualified request has been validated against the SMR and compiled into a platform-agnostic Logical Query Plan, with RAPL's entitlement projection enforced into the plan. Every metric and dimension identifier is confirmed as registered and approved. No backend has been contacted.
 
 
 ## Semantic Controls Layer (SCL)
