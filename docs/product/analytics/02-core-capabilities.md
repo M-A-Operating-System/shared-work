@@ -91,8 +91,8 @@ flowchart TD
         DCSMCP --> SDR & SMR
     end
 
-    subgraph entstore["Entitlements Store (External)"]
-        ENT[("<b>Entitlements Store</b>\nrole definitions · metric access sets · dimension access sets\nrow predicate templates · column masks\nmanaged at logical object and data element level")]
+    subgraph entstore["Data Entitlements Store (DES) — External"]
+        ENT[("<b>Data Entitlements Store (DES)</b>\nrole definitions · metric access sets · dimension access sets\nrow predicate templates · column masks\nmanaged at logical object and data element level")]
     end
 
     subgraph llmext["LLM Service (External)"]
@@ -682,9 +682,9 @@ The Analytics Engine's domain is analytics and data mining — it operates on go
 
 This distinction is significant. A user may be restricted from raw row-level or column-specific data and yet be fully entitled to receive governed aggregated results. RAPL manages this boundary at the semantic layer: entitlement is conferred by role membership against registered metric definitions, not by database permissions. A portfolio manager who cannot access the positions table can still receive `portfolio_return` as an aggregated metric because their role grants access to that metric definition, and the row predicates RAPL injects ensure the result covers only their authorised portfolios.
 
-Entitlement policies are managed in the **Entitlements Store** — an independent external component. Policies are defined at the **logical object and data element level**, not at the system or database level. A policy grants or restricts access to a named metric, a named dimension, or a named data element as governed concepts — not to a specific table, schema, or connection string. This means entitlements remain stable as the underlying physical implementation changes, and they are comprehensible to business owners and governance teams who have no visibility into the data platform's internal structure.
+Entitlement policies are managed in the **Data Entitlements Store (DES)** — an independent external component. Policies are defined at the **logical object and data element level**, not at the system or database level. A policy grants or restricts access to a named metric, a named dimension, or a named data element as governed concepts — not to a specific table, schema, or connection string. This means entitlements remain stable as the underlying physical implementation changes, and they are comprehensible to business owners and governance teams who have no visibility into the data platform's internal structure.
 
-Projection is not optional and not bypassable. Every request, whether from a human user or an AI orchestrator, passes through RAPL. At query time, RAPL reads the caller's role claims from the JWT, retrieves the matching role definitions from the Entitlements Store, and constructs the entitlement projection before any query plan is compiled. The SVL enforces that projection in Stage 3 before any backend is contacted.
+Projection is not optional and not bypassable. Every request, whether from a human user or an AI orchestrator, passes through RAPL. At query time, RAPL reads the caller's role claims from the JWT, retrieves the matching role definitions from the Data Entitlements Store (DES), and constructs the entitlement projection before any query plan is compiled. The SVL enforces that projection in Stage 3 before any backend is contacted.
 
 ### Restriction Types
 
@@ -704,7 +704,7 @@ flowchart LR
     START(["Authenticated request arrives with JWT"])
     S1["**1. JWT validation**\nsignature · expiry · org claim"]
     S2["**2. Role claim extraction**\nroleClaimField: 'analytics_roles'\nextracted roles: ['portfolio_manager']"]
-    S3["**3. Entitlement profile construction**\nRetrieve role definitions from Entitlements Store\nMerge all role definitions for the user's roles\nProduce: metric_access_set, dimension_access_set,\nrow_predicates[], column_masks[]"]
+    S3["**3. Entitlement profile construction**\nRetrieve role definitions from Data Entitlements Store (DES)\nMerge all role definitions for the user's roles\nProduce: metric_access_set, dimension_access_set,\nrow_predicates[], column_masks[]"]
     S4["**4. Metric access filter**\nIntersect requested metrics with metric_access_set\nUnentitled metrics → METRIC_NOT_ENTITLED error"]
     S5["**5. Dimension access filter**\nIntersect requested dimensions with dimension_access_set\nUnentitled dimensions → DIMENSION_NOT_ENTITLED error"]
     S6["**6. Row predicate construction**\nResolve predicate templates: user.managed_portfolios\nPredicates stored in LQP for FQE injection at execution time"]
@@ -1612,9 +1612,9 @@ The SDR contains the organisation's foundational data context: data models, obje
 | Search and RAG | The DCS search index (spanning both SMR and SDR) supports the `list_operations` tool and the IRA's vector similarity search over SMR operation and metric embeddings for NL intent resolution. |
 
 
-### Entitlements Store
+### Data Entitlements Store (DES)
 
-The Entitlements Store is an independent external component that holds the organisation's data and analytics entitlement policies. It is managed separately from the Analytics Engine and from the data platform — it is a dedicated governance control point.
+The Data Entitlements Store (DES) is an independent external component that holds the organisation's data and analytics entitlement policies. It is managed separately from the Analytics Engine and from the data platform — it is a dedicated governance control point.
 
 Entitlement policies are declared at the **logical object and data element level**. A policy grants or restricts access to a named metric, a named dimension, or a named data element as governed concepts. Policies do not reference physical tables, schemas, column names, or connection strings. This separation means entitlements remain stable as the underlying physical implementation evolves, and they are comprehensible to business data owners, compliance teams, and governance teams who have no visibility into the data platform's internal structure.
 
@@ -1624,7 +1624,7 @@ Entitlement policies are declared at the **logical object and data element level
 |---|---|
 | Role definition storage | Stores `analytical_role` definitions: metric access sets, dimension access sets, row predicate templates, column masks, and classification ceilings per role. |
 | Logical-level policy | All policies reference SMR-registered metric and dimension identifiers — never physical table or column names. |
-| RAPL lookup | RAPL reads role definitions from the Entitlements Store at query time, keyed on the role claims extracted from the caller's JWT. |
+| RAPL lookup | RAPL reads role definitions from the Data Entitlements Store (DES) at query time, keyed on the role claims extracted from the caller's JWT. |
 | Independent governance | Managed by the Entitlements Manager persona. Changes to entitlement policies do not require changes to metric definitions, platform configuration, or backend schemas. |
 
 
