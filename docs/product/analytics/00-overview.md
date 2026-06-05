@@ -66,7 +66,7 @@ A defining characteristic of this architecture is that **the Analytics Engine ne
 
 The Analytics Engine contains exactly two targeted uses of AI, both strictly bounded:
 
-1. **Intent resolution** — the Intent Resolution Agent (IRE) receives a natural language question, retrieves candidate analytics operations from the SMR catalogue using embedding similarity (RAG), and uses a language model to identify and rank the most appropriate analytics definition and bind the user's parameters to it. The language model selects from the governed inventory; it does not construct queries or access data.
+1. **Intent resolution** — the Intent Resolution Agent (IRA) receives a natural language question, retrieves candidate analytics operations from the SMR catalogue using embedding similarity (RAG), and uses a language model to identify and rank the most appropriate analytics definition and bind the user's parameters to it. The language model selects from the governed inventory; it does not construct queries or access data.
 
 2. **Narrative synthesis** — after computation completes, the Narrative Synthesis Agent (NSA) makes a single, tightly-scoped language model call to produce a brief plain-language summary of the result, anchored strictly to the computed values. It is told what the data shows; it cannot introduce figures, comparisons, or interpretations not present in the result.
 
@@ -447,7 +447,7 @@ A treasury analyst asks: *"Prepare our LCR figures for the Basel III submission.
 ```
 
 **2 · Intent resolution and compliance classification**
-The Intent Resolution Agent (IRE) resolves the operation and metric from the SMR catalogue and classifies the stated purpose: the phrase *"for the Basel III submission"* exceeds the configured compliance intent threshold. Compliance purpose is recorded and carried through the full pipeline.
+The Intent Resolution Agent (IRA) resolves the operation and metric from the SMR catalogue and classifies the stated purpose: the phrase *"for the Basel III submission"* exceeds the configured compliance intent threshold. Compliance purpose is recorded and carried through the full pipeline.
 
 ```
 -- Semantic Intent Resolution

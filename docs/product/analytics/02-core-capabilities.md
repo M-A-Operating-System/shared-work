@@ -68,7 +68,7 @@ flowchart TD
     subgraph analytics["Analytics Engine"]
         direction TB
         MCP["<b>API/MCP Interface</b>\nMCP server runtime · tool/resource/prompt presentation · JWT validation"]
-        IRE["<b>Intent Resolution Agent (IRE)</b>\nRAG over SMR catalogue · LLM intent ranking · confirmation gate\nnatural language → resolved operation_id + params"]
+        IRA["<b>Intent Resolution Agent (IRA)</b>\nRAG over SMR catalogue · LLM intent ranking · confirmation gate\nnatural language → resolved operation_id + params"]
         SVL["<b>Semantic Validation Layer (SVL)</b>\nSMR resolution · schema validation · role projection · LQP generation\nentirely deterministic — no AI"]
         RAPL["<b>Role-Aware Projection Layer (RAPL)</b>\nJWT claims · metric/dimension access sets · row predicates · column masks"]
         SCL["<b>Semantic Controls Layer (SCL)</b>\nPerformance impact · complexity · classification · compliance checks"]
@@ -94,7 +94,7 @@ flowchart TD
     end
 
     subgraph llmext["LLM Service (External)"]
-        LLM["<b>Language Model</b>\nIntent ranking · narrative synthesis\nCalled by IRE and NSA"]
+        LLM["<b>Language Model</b>\nIntent ranking · narrative synthesis\nCalled by IRA and NSA"]
     end
 
     subgraph backends["Data Sources"]
@@ -106,12 +106,12 @@ flowchart TD
     Consumers -->|"JWT + structured MCP tool call"| MCP
     Consumers -->|"render tool call (display_spec)"| Image
     Consumers -->|"JWT + MCP tool call"| DCSMCP
-    MCP -->|"natural language query"| IRE
-    MCP -->|"structured tool call (bypass IRE)"| SVL
+    MCP -->|"natural language query"| IRA
+    MCP -->|"structured tool call (bypass IRA)"| SVL
     MCP -->|"JWT claims"| RAPL
-    IRE -->|"RAG retrieval"| SMR
-    IRE -->|"intent ranking"| LLM
-    IRE -->|"resolved operation_id + params"| SVL
+    IRA -->|"RAG retrieval"| SMR
+    IRA -->|"intent ranking"| LLM
+    IRA -->|"resolved operation_id + params"| SVL
     RAPL -->|"row predicates + column masks"| SVL
     SVL -->|"Logical Query Plan (LQP)"| SCL
     SCL -->|"controls decision record"| LS
@@ -131,9 +131,9 @@ flowchart TD
     style analytics fill:#dbeafe,stroke:#93c5fd
 ```
 
-The Analytics Engine is a single MCP server. It exposes three analytical tools (`run_analytics`, `list_operations`, `drilldown`) through a single MCP Capability Layer endpoint. The engine contains exactly two bounded AI steps: the Intent Resolution Agent (IRE), which identifies the right governed operation from the user's natural language query, and the Narrative Synthesis Agent (NSA), which summarises the computed result in plain text after execution. All stages between them — SVL, RAPL, SCL, PQP, and FQE — are entirely deterministic. The same resolved intent, access permissions, and data always produce the same query plan, the same execution, and the same result.
+The Analytics Engine is a single MCP server. It exposes three analytical tools (`run_analytics`, `list_operations`, `drilldown`) through a single MCP Capability Layer endpoint. The engine contains exactly two bounded AI steps: the Intent Resolution Agent (IRA), which identifies the right governed operation from the user's natural language query, and the Narrative Synthesis Agent (NSA), which summarises the computed result in plain text after execution. All stages between them — SVL, RAPL, SCL, PQP, and FQE — are entirely deterministic. The same resolved intent, access permissions, and data always produce the same query plan, the same execution, and the same result.
 
-For conversational consumers, the user's natural language query is forwarded directly to the Analytics Engine. Intent resolution — selecting the right governed operation and binding parameters — happens inside the engine's Intent Resolution Agent. The Analytics Engine returns the display specification, structured data, and governed narrative; the AI Chat Platform renders the result. Structured API consumers (agents, custom UIs) may call `run_analytics` with an explicit `operation_id` and `params`, bypassing the IRE entirely.
+For conversational consumers, the user's natural language query is forwarded directly to the Analytics Engine. Intent resolution — selecting the right governed operation and binding parameters — happens inside the engine's Intent Resolution Agent. The Analytics Engine returns the display specification, structured data, and governed narrative; the AI Chat Platform renders the result. Structured API consumers (agents, custom UIs) may call `run_analytics` with an explicit `operation_id` and `params`, bypassing the IRA entirely.
 
 The `vega2img` service is shown separately from the Analytics Platform boundary because it is an optional, independently registered MCP render service. Consumers that cannot natively render the DVL display specification (for example, an agentic pipeline that requires static image output) register `vega2img` directly and call it as a separate tool invocation, passing the `display_spec` from the `run_analytics` response. It is not part of the core analytics pipeline.
 
@@ -146,7 +146,7 @@ sequenceDiagram
     autonumber
     participant C as AI Consumer
     participant MCP as API/MCP Interface
-    participant IRE as Intent Resolution Agent
+    participant IRA as Intent Resolution Agent
     participant LLM as Language Model
     participant SVL as Semantic Validation Layer
     participant RAPL as Role-Aware Projection Layer
@@ -167,18 +167,18 @@ sequenceDiagram
         MCP->>MCP: validate JWT signature · expiry · org claim
 
         par Intent resolution
-            MCP->>IRE: natural language query
-            IRE->>SMR: vector similarity search (RAG)
-            SMR-->>IRE: top-K candidate operations + metric definitions
-            IRE->>LLM: candidate operations + user query (intent ranking prompt)
-            note over IRE: Ranks candidates · binds params · scores confidence
+            MCP->>IRA: natural language query
+            IRA->>SMR: vector similarity search (RAG)
+            SMR-->>IRA: top-K candidate operations + metric definitions
+            IRA->>LLM: candidate operations + user query (intent ranking prompt)
+            note over IRA: Ranks candidates · binds params · scores confidence
             alt ambiguous intent
-                IRE-->>MCP: confirmation card (requiresIntentConfirmation: true)
+                IRA-->>MCP: confirmation card (requiresIntentConfirmation: true)
                 MCP-->>C: confirmation card
                 C->>MCP: confirmed: true + selected intent
-                MCP->>IRE: confirmed intent
+                MCP->>IRA: confirmed intent
             end
-            IRE->>SVL: resolved operation_id + params
+            IRA->>SVL: resolved operation_id + params
         and Entitlement projection
             MCP->>RAPL: JWT claims
         end
@@ -240,7 +240,7 @@ sequenceDiagram
     end
 ```
 
-The Analytics Engine receives natural language or structured parameters and returns structured results. The computation pipeline (SVL → RAPL → SCL → PQP → FQE) is entirely deterministic and contains no AI. The only AI steps are: intent resolution (in the IRE, using RAG over the SMR catalogue and a language model call) and narrative synthesis (in the NSA, post-computation, constrained to the assembled result). The Analytical Lineage Store receives two writes per query — a controls decision record before the PQP is invoked and a full execution record after — ensuring the audit trail is complete regardless of whether execution succeeds.
+The Analytics Engine receives natural language or structured parameters and returns structured results. The computation pipeline (SVL → RAPL → SCL → PQP → FQE) is entirely deterministic and contains no AI. The only AI steps are: intent resolution (in the IRA, using RAG over the SMR catalogue and a language model call) and narrative synthesis (in the NSA, post-computation, constrained to the assembled result). The Analytical Lineage Store receives two writes per query — a controls decision record before the PQP is invoked and a full execution record after — ensuring the audit trail is complete regardless of whether execution succeeds.
 
 ---
 
@@ -256,9 +256,9 @@ The Analytics Engine receives natural language or structured parameters and retu
 
 The Analytics Engine is accessed by three consumer types: a conversational AI platform (which mediates between a user and the governed query pipeline), autonomous agents and pipelines (which call the MCP layer directly with structured requests), and custom applications (which call the MCP layer with host-issued tokens). The AI Chat Platform is the conversational layer through which users interact with the Analytics Engine. Its role is to relay the user's natural language query to the Analytics Engine and render the structured result it receives back. Intent resolution — identifying which governed operation and parameters match the user's question — is performed inside the Analytics Engine by the Intent Resolution Agent, not by the consumer.
 
-**Natural language path.** When a user asks an analytical question, the consumer forwards the natural language query and the user's JWT to the Analytics Engine. The engine's IRE handles operation selection, parameter binding, and — if intent is ambiguous — returns a confirmation card before proceeding to execution. The consumer does not need to know the SMR catalogue or construct structured parameters.
+**Natural language path.** When a user asks an analytical question, the consumer forwards the natural language query and the user's JWT to the Analytics Engine. The engine's IRA handles operation selection, parameter binding, and — if intent is ambiguous — returns a confirmation card before proceeding to execution. The consumer does not need to know the SMR catalogue or construct structured parameters.
 
-**Structured path.** Consumers that construct explicit `operation_id` + `params` payloads (agentic pipelines, custom analytics UIs, integration tests) call `run_analytics` with structured arguments directly. The `list_operations` tool returns the entitled operation catalogue for consumers that build their own operation selection UI. Structured calls bypass the IRE and route directly to the SVL.
+**Structured path.** Consumers that construct explicit `operation_id` + `params` payloads (agentic pipelines, custom analytics UIs, integration tests) call `run_analytics` with structured arguments directly. The `list_operations` tool returns the entitled operation catalogue for consumers that build their own operation selection UI. Structured calls bypass the IRA and route directly to the SVL.
 
 **Analytics Engine call.** The tool call is submitted to the Analytics Engine with the user's JWT forwarded unmodified. The Analytics Engine validates, plans, executes, and returns a structured result and DVL display specification. Entitlement enforcement, query planning, and execution are entirely the Analytics Engine's responsibility.
 
@@ -315,9 +315,9 @@ Each SMR operation carries an `execution_profile` defined in its `analytical_ope
 
 | Profile | Pipeline stages |
 |---|---|
-| `data_retrieval` | Auth → IRE → RAPL → FQE → Lineage |
-| `metric_query` | Auth → IRE → RAPL → SVL → SCL → FQE → Lineage |
-| `full_analytical` | Auth → IRE → RAPL → SVL → SCL → PQP → FQE → DVL + NSA + PAS → Lineage |
+| `data_retrieval` | Auth → IRA → RAPL → FQE → Lineage |
+| `metric_query` | Auth → IRA → RAPL → SVL → SCL → FQE → Lineage |
+| `full_analytical` | Auth → IRA → RAPL → SVL → SCL → PQP → FQE → DVL + NSA + PAS → Lineage |
 
 ### Intent Confirmation Card
 
@@ -458,13 +458,13 @@ The SVL asks the SMR to resolve the `compare_portfolios` operation, then resolve
 
 ---
 
-## Intent Resolution Agent (IRE)
+## Intent Resolution Agent (IRA)
 
 > **Governing principles:** [P2 — Controls before execution](./00-overview.md#design-principles) · [P10 — Deterministic computation, not generation](./00-overview.md#design-principles)
 
 The Intent Resolution Agent is the AI component responsible for translating a natural language query into a structured, validated operation request. It is the only AI step in the pre-computation pipeline. Its output — a resolved `operation_id` and bound `params` — is the input to the Semantic Validation Layer.
 
-The IRE does not interpret data, make recommendations, or produce output visible to the end user. Its sole function is operation selection and parameter binding. Once it has resolved intent, it hands off a deterministic structured request and plays no further role in the pipeline.
+The IRA does not interpret data, make recommendations, or produce output visible to the end user. Its sole function is operation selection and parameter binding. Once it has resolved intent, it hands off a deterministic structured request and plays no further role in the pipeline.
 
 ### Intent Resolution Pipeline
 
@@ -487,21 +487,21 @@ flowchart LR
 
 At registration time, each `analytical_operation` and `analytical_metric` definition in the SMR is embedded: the operation name, description, example phrasings, required parameters, and associated metric descriptions are concatenated and encoded as a dense vector stored alongside the definition.
 
-When a query arrives, the IRE encodes the natural language input and performs a vector similarity search against the SMR operation embeddings. The top-K candidate operations (and their associated metric definitions) are retrieved. Only these candidates — not the full catalogue — are injected into the LLM ranking prompt.
+When a query arrives, the IRA encodes the natural language input and performs a vector similarity search against the SMR operation embeddings. The top-K candidate operations (and their associated metric definitions) are retrieved. Only these candidates — not the full catalogue — are injected into the LLM ranking prompt.
 
 ### LLM Intent Ranking
 
-The LLM receives the top-K candidates and the user's query. It selects the best-matching operation, binds the required parameters from the query context, and returns a confidence-scored intent. If the top candidate's confidence score falls below the `intentConfidenceThreshold` (configurable, default 0.75), or if two candidates score within a narrow band (configurable, default 0.1), the IRE returns a confirmation card rather than proceeding.
+The LLM receives the top-K candidates and the user's query. It selects the best-matching operation, binds the required parameters from the query context, and returns a confidence-scored intent. If the top candidate's confidence score falls below the `intentConfidenceThreshold` (configurable, default 0.75), or if two candidates score within a narrow band (configurable, default 0.1), the IRA returns a confirmation card rather than proceeding.
 
 The LLM call is constrained: the prompt contains only the candidate operation definitions and the user's query. The LLM has no access to result data, SMR governance metadata, or user entitlements — those are enforced downstream by SVL and RAPL.
 
 ### Confirmation Gate
 
-When intent is ambiguous, the IRE returns a confirmation card as the MCP response. The card presents the resolved operation, bound parameters, estimated performance impact, and classification to the consumer for approval. The consumer must re-submit with `"confirmed": true` to proceed. This is the same confirmation card described in the API/MCP Interface section.
+When intent is ambiguous, the IRA returns a confirmation card as the MCP response. The card presents the resolved operation, bound parameters, estimated performance impact, and classification to the consumer for approval. The consumer must re-submit with `"confirmed": true` to proceed. This is the same confirmation card described in the API/MCP Interface section.
 
 ### Structured API Path
 
-Consumers that construct explicit `operation_id` + `params` (agentic pipelines, custom analytics UIs, integration tests) can call `run_analytics` with a structured payload directly. MCP routes these calls directly to the SVL, bypassing the IRE. The `list_operations` tool returns the full entitled operation catalogue for consumers that build their own operation selection UI or inject the catalogue into their own model context.
+Consumers that construct explicit `operation_id` + `params` (agentic pipelines, custom analytics UIs, integration tests) can call `run_analytics` with a structured payload directly. MCP routes these calls directly to the SVL, bypassing the IRA. The `list_operations` tool returns the full entitled operation catalogue for consumers that build their own operation selection UI or inject the catalogue into their own model context.
 
 ### Example
 
@@ -509,7 +509,7 @@ Running example — portfolio manager asks:
 
 > "Show me portfolio returns versus benchmark for my equity portfolios this quarter."
 
-The IRE encodes this query and retrieves the top-3 candidate operations from the SMR: `compare_portfolios` (score 0.91), `portfolio_summary` (score 0.67), `benchmark_attribution` (score 0.61). The top candidate exceeds the confidence threshold and leads by more than 0.1. The LLM binds:
+The IRA encodes this query and retrieves the top-3 candidate operations from the SMR: `compare_portfolios` (score 0.91), `portfolio_summary` (score 0.67), `benchmark_attribution` (score 0.61). The top candidate exceeds the confidence threshold and leads by more than 0.1. The LLM binds:
 
 ```json
 {
@@ -525,7 +525,7 @@ The IRE encodes this query and retrieves the top-3 candidate operations from the
 
 Confidence is 0.91 — above threshold, no confirmation card. Resolved intent is forwarded to the SVL.
 
-**↳ Step 1 — Intent resolved.** The IRE has translated the natural language query into a structured, bound operation request. The SVL now validates and plans.
+**↳ Step 1 — Intent resolved.** The IRA has translated the natural language query into a structured, bound operation request. The SVL now validates and plans.
 
 ---
 
@@ -1621,7 +1621,7 @@ The SDR contains the organisation's foundational data context: data models, obje
 | Persistence and versioning | Hosts the `analytical_metric`, `analytical_dimension`, `analytical_operation`, and `controls_config` document types registered by the Analytics Platform alongside the SDR's existing data definition documents. |
 | Approval workflow | The SMR lifecycle (Draft → Proposed → In Review → Approved → Deprecated → Retired) runs on the SDR's native authoring and approval capabilities. No custom workflow tooling is required. |
 | Runtime resolution | The Semantic Validation Layer and Federated Query Engine query the SDR directly at request time to resolve metric definitions, operation schemas, and physical mappings. |
-| Search and RAG | The SDR's search index supports both the `list_operations` tool (structured API consumers) and the IRE's vector similarity search over operation and metric embeddings for NL intent resolution. |
+| Search and RAG | The SDR's search index supports both the `list_operations` tool (structured API consumers) and the IRA's vector similarity search over operation and metric embeddings for NL intent resolution. |
 
 The SDR and SMR are both contained within the Data Context Store (DCS). The DCS is the outer persistence container for all governed context — the SDR providing the data definition layer and the SMR providing the metric semantic layer above it.
 
