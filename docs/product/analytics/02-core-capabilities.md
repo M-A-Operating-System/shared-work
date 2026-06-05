@@ -698,72 +698,61 @@ The Role-Aware Projection Layer (RAPL) applies four categories of restriction:
 
 ```mermaid
 flowchart LR
-    START(["Authenticated request arrives with JWT"])
-    S1["**1. JWT validation**\nsignature · expiry · org claim"]
-    S2["**2. Role claim extraction**\nroleClaimField: 'analytics_roles'\nextracted roles: ['portfolio_manager']"]
-    S3["**3. Entitlement profile construction**\nRetrieve role definitions from Data Entitlements Store (DES)\nMerge all role definitions for the user's roles\nProduce: metric_access_set, dimension_access_set,\nrow_predicates[], column_masks[]"]
-    S4["**4. Metric access filter**\nIntersect requested metrics with metric_access_set\nUnentitled metrics → METRIC_NOT_ENTITLED error"]
-    S5["**5. Dimension access filter**\nIntersect requested dimensions with dimension_access_set\nUnentitled dimensions → DIMENSION_NOT_ENTITLED error"]
-    S6["**6. Row predicate construction**\nResolve predicate templates: user.managed_portfolios\nPredicates stored in LQP for FQE injection at execution time"]
-    S7["**7. Column mask registration**\nRegister masked columns in LQP metadata\nFQE applies masks during result assembly"]
-    S8(["**8. Projected LQP produced**\n→ proceeds to controls validation"])
+    START(["Fully qualified analytical\nrequest + JWT"])
+    S1["**Stage 1**\nJWT Validation"]
+    S2["**Stage 2**\nRole Claim\nExtraction"]
+    S3["**Stage 3**\nDES Role Definition\nRetrieval"]
+    S4["**Stage 4**\nMulti-Role\nMerge"]
+    S5["**Stage 5**\nEntitlement\nDecisions"]
+    S6["**Stage 6**\nRow Scope Template\nResolution"]
+    S7(["**Stage 7**\nEntitlement Projection\nOutput → SVL"])
 
-    START --> S1 --> S2 --> S3 --> S4 --> S5 --> S6 --> S7 --> S8
+    START --> S1 --> S2 --> S3 --> S4 --> S5 --> S6 --> S7
 ```
 
-### Multi-Role Merging
+**Stage 1 — JWT Validation.** Validate the inbound JWT: signature, expiry, and org claim. **DENY** — request rejected immediately if any check fails. No further processing occurs on an invalid token.
 
-Users may hold multiple roles simultaneously. RAPL merges role entitlements using union semantics for metric and dimension access. A user entitled to a metric via any role may query it. Row predicates and column masks use the inverse strategy: all predicates must be satisfied (most restrictive wins), and a column masked by any role is masked for the user.
+**Stage 2 — Role Claim Extraction.** Extract the user's analytical role claims from the validated JWT using the configured `roleClaimField` (e.g. `analytics_roles`). **DENY** — if no valid analytical role claims are present the request is rejected. All extracted roles are carried forward for merging.
+
+**Stage 3 — DES Role Definition Retrieval.** Look up the full role definition for each extracted role from the Data Entitlements Store (DES). Each definition declares the metric access set, dimension access set, row scope predicate templates, column masks, and classification ceiling for that role. **DENY** — if no valid role definitions are retrieved the request is rejected.
+
+**Stage 4 — Multi-Role Merge.** Merge all retrieved role definitions into a single entitlement profile. Metric and dimension access: union. Row scope predicates: intersection (most restrictive wins). Column masks: union (masked by any role = masked for the user). No APPROVE/DENY decision is made here — this stage produces the profile against which all decisions are made in Stage 5.
+
+**Stage 5 — Entitlement Decisions.** Four classes of decision are made against the merged entitlement profile:
+
+- **Metrics** — each requested metric is **APPROVED** or **DENIED** (`METRIC_NOT_ENTITLED`). Approval may be with or without dimensional constraints — a role may grant access to a metric only at a summary level (no dimension slicing permitted), only with specific aggregations, or with full dimensional access. If any required metric is denied the request is rejected.
+- **Dimensions** — each requested dimension is **APPROVED** or **DENIED** (`DIMENSION_NOT_ENTITLED`). Entitlement is evaluated per metric-dimension combination — a dimension approved for one metric may not be approved for another.
+- **Row scope** — each approved metric carries an **APPROVED with population restrictions** decision: the row scope predicates that define which population of data the user is permitted to see within that metric's result — for example, only their managed portfolios, only their assigned entities, only their region.
+- **Columns** — each approved metric carries an **APPROVED with column restrictions** decision where applicable: which columns are fully visible, which are masked (value replaced or redacted), and which are excluded entirely from the result.
+
+No approved metric reaches the output without its full set of population scope and column visibility conditions attached.
+
+**Stage 6 — Row Scope Template Resolution.** Resolve the row scope predicate templates from Stage 5 against the user's JWT claims. `{{user.claim_name}}` syntax is expanded to concrete values at query time, producing the exact data population each approved metric is scoped to for this user. **DENY** — if a required JWT claim for scope resolution is missing the request is rejected.
+
+**Stage 7 — Entitlement Projection Output.** Produce the completed entitlement projection: approved `metric_access_set` (each with permitted aggregations and dimensional constraints), approved `dimension_access_set`, resolved `row_scope_predicates[]`, registered `column_masks[]`, and `classification_ceiling`. Every entry in the output is either an approval or an approval with restrictions — there are no unexamined metrics, dimensions, populations, or columns in the output. Write the full projection record to the ALS. Pass to SVL for Stage 3 enforcement.
+
+### Multi-Role Merge Strategy
 
 | Entitlement type | Merge strategy | Rationale |
 |---|---|---|
-| Metric access | Union | A user entitled to a metric via any role may query it |
-| Dimension access | Union | A user entitled to a dimension via any role may use it |
-| Row predicates | Intersection (AND) | All predicates must be satisfied — most restrictive wins |
+| Metric access | Union | Entitlement via any role is sufficient |
+| Dimension access | Union | Entitlement via any role is sufficient |
+| Row scope predicates | Intersection (AND) | All predicates must be satisfied — most restrictive wins |
 | Column masks | Union | A column masked by any role is masked for the user |
 
-### Row Predicate Template Resolution
+### Column Masking Modes
 
-Row predicate templates reference JWT claim values using `{{user.claim_name}}` syntax, resolved at query time from the authenticated user's current JWT:
+Three masking modes are supported for column restrictions applied in Stage 5 and enforced by the FQE during result assembly:
 
-**Predicate template (in entitlement config):**
-```
-portfolio_id IN ({{user.managed_portfolios}})
-```
-
-**JWT claim:**
-```json
-{ "managed_portfolios": ["GLOB_EQ_OPP", "UK_CORE_INC", "STRAT_BAL"] }
-```
-
-**Resolved predicate (injected into FQE physical queries):**
-```sql
-portfolio_id IN ('GLOB_EQ_OPP', 'UK_CORE_INC', 'STRAT_BAL')
-```
-
-### Column Masking
-
-Column masks are applied during FQE result assembly, after sub-results return from execution backends but before the result leaves the platform. Three masking modes are supported:
-
-| Mode | Masked column representation |
+| Mode | Column representation in result |
 |---|---|
 | `null_replacement` | Column value replaced with `null` |
-| `redacted_label` | Column value replaced with the string `"[REDACTED]"` |
+| `redacted_label` | Column value replaced with `"[REDACTED]"` |
 | `excluded` | Column omitted entirely from the result schema |
-
-**Before masking (compliance analyst role with `column_masks: ["client_name", "account_number"]`):**
-```json
-[{ "portfolio_id": "GLOB_EQ_OPP", "client_name": "Blackwood Family Trust", "account_number": "WM-00412", "lcr": 1.24 }]
-```
-
-**After masking (`redacted_label` mode):**
-```json
-[{ "portfolio_id": "GLOB_EQ_OPP", "client_name": "[REDACTED]", "account_number": "[REDACTED]", "lcr": 1.24 }]
-```
 
 ### Entitlement Audit
 
-Every projection decision (including blocked metrics, applied row predicates, and active column masks) is recorded in the Analytical Lineage Store (ALS) as part of the execution record. The projection record captures the roles active at query time, which metrics were requested, which were projected through, which were blocked and why, and which predicates were injected. This record provides the evidentiary chain required for regulatory entitlement audits.
+Every entitlement decision — approved metrics, denied metrics, approved dimensions, row scope predicates applied, and column masks registered — is recorded in the Analytical Lineage Store (ALS) as part of the projection record. The record captures the roles active at query time, each metric's APPROVE or DENY outcome and the basis for it, the resolved row scope population for each approved metric, and the column restrictions in force. This record provides the evidentiary chain required for regulatory entitlement audits.
 
 ### Example
 
