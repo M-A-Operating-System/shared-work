@@ -323,6 +323,8 @@ Each SMR operation carries an `execution_profile` defined in its `analytical_ope
 
 When `requiresIntentConfirmation: true` is configured, the platform returns a confirmation card before executing any query. The card is returned as the MCP response body in place of the analytical result; the consumer must re-submit with `"confirmed": true` to proceed to execution.
 
+<table><tr><td>
+
 ```json
 {
   "confirmation_required": true,
@@ -340,7 +342,11 @@ When `requiresIntentConfirmation: true` is configured, the platform returns a co
 }
 ```
 
-![Intent Confirmation Card](./intent-confirmation-card.png)
+</td><td>
+
+<img src="./intent-confirmation-card.png" width="370" alt="Intent Confirmation Card" />
+
+</td></tr></table>
 
 This is appropriate for high-stakes or compliance-sensitive queries where silent intent misresolution is unacceptable.
 
