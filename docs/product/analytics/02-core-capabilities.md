@@ -317,9 +317,9 @@ Each SMR operation carries an `execution_profile` defined in its `analytical_ope
 
 | Profile | Pipeline stages |
 |---|---|
-| `data_retrieval` | Auth → RAPL → FQE → Lineage |
-| `metric_query` | Auth → RAPL → SVL → SCL → FQE → Lineage |
-| `full_analytical` | Full pipeline including Data Visualization Language (DVL) + Narrative Synthesis Agent |
+| `data_retrieval` | Auth → IRE → RAPL → FQE → Lineage |
+| `metric_query` | Auth → IRE → RAPL → SVL → SCL → FQE → Lineage |
+| `full_analytical` | Auth → IRE → RAPL → SVL → SCL → PQP → FQE → DVL + NSA + PAS → Lineage |
 
 ### Intent Confirmation Card
 
@@ -545,7 +545,7 @@ Every MCP tool call passes through five sequential validation stages:
 flowchart LR
     S1["**Stage 1: Schema validation**\nJSON parameters conform to tool schema\nRequired fields present and typed"]
     S2["**Stage 2: SMR resolution**\nResolve operation_id → analytical_operation document\nValidate params against operation required_params schema\nResolve metric IDs → analytical_metric documents\nResolve dimension IDs → analytical_dimension documents\nReject unregistered or unapproved IDs"]
-    S2b["**Stage 2b: Compliance intent classification**\nScore natural language query for compliance purpose (0–1)\ncompliance_purpose: true if score ≥ complianceIntentThreshold\nRecord score + matched signals in resolved intent"]
+    S2b["**Stage 2b: Compliance intent classification**\nScore resolved intent (operation_id · resolved metrics · params) for compliance purpose (0–1)\ncompliance_purpose: true if score ≥ complianceIntentThreshold\nRecord score + matched signals in resolved intent"]
     S3["**Stage 3: Role-Aware Projection**\nFilter metric set to entitled scope\nFilter dimension set to entitled scope\nInject row predicates from role config\nApply column masks · Reject entitlement violations"]
     S4["**Stage 4: Semantic validation**\nRequired dimensions present per metric\nAggregation rules compatible\nTime granularity compatible per metric\nFilter predicates reference valid fields"]
     S5["**Stage 5: LQP generation**\nProduce platform-agnostic DAG\nAssign data affinity hints per metric\nEstimate result cardinality and execution performance impact"]
@@ -1594,18 +1594,18 @@ The following components appear in the architecture diagram and interact with th
 
 ### Conversational AI — Chat Front End
 
-The AI Chat Platform is the conversational consumer of the Analytics Engine. It is responsible for the one AI step that occurs outside the Analytics Engine: translating a user's natural language question into the structured `operation_id` and `params` that the MCP Capability Layer accepts.
+The AI Chat Platform is the conversational consumer of the Analytics Engine. It relays natural language questions from users to the Analytics Engine and renders the structured results it receives. Intent resolution — identifying which governed operation matches the user's question and binding its parameters — is performed inside the Analytics Engine by the Intent Resolution Agent. The AI Chat Platform performs no NL translation and has no dependency on the SMR operation catalogue.
 
 **Responsibilities:**
 
 | Responsibility | Detail |
 |---|---|
-| Operation catalogue loading | Calls `list_operations` with the user's JWT to retrieve the entitled operation catalogue. This catalogue is injected into the AI model's context and provides the controlled vocabulary for intent translation. |
-| NL → structured intent | Maps the user's natural language question to a specific `operation_id` and typed `params` drawn from the catalogue. No natural language is forwarded to the Analytics Engine. |
+| Query relay | Forwards the user's natural language query and JWT to the Analytics Engine via `run_analytics`. The query is sent as-is — no structured `operation_id` or `params` is constructed by the consumer. |
 | JWT forwarding | Passes the host-issued JWT unmodified with every `run_analytics` call. The Analytics Engine performs its own JWT validation; the AI Chat Platform does not pre-authorise or modify token claims. |
+| Confirmation card handling | If the Analytics Engine returns a confirmation card (`requiresIntentConfirmation: true`), the AI Chat Platform renders it to the user and re-submits with `confirmed: true` when the user approves. |
 | Result rendering | Renders the DVL `display_spec` returned by the Analytics Engine. Surfaces the governed `narrative` as the assistant's reply. Retains the `result_id` for follow-up `drilldown` calls. |
 
-The AI Chat Platform has no access to physical schemas, execution backends, or metric definitions beyond the entitled operation catalogue. Entitlement enforcement, query planning, and execution are entirely the Analytics Engine's responsibility.
+The AI Chat Platform has no access to physical schemas, execution backends, or metric definitions. Entitlement enforcement, intent resolution, query planning, and execution are entirely the Analytics Engine's responsibility.
 
 ---
 
@@ -1623,7 +1623,7 @@ The SDR contains the organisation's foundational data context: data models, obje
 | Persistence and versioning | Hosts the `analytical_metric`, `analytical_dimension`, `analytical_operation`, and `controls_config` document types registered by the Analytics Platform alongside the SDR's existing data definition documents. |
 | Approval workflow | The SMR lifecycle (Draft → Proposed → In Review → Approved → Deprecated → Retired) runs on the SDR's native authoring and approval capabilities. No custom workflow tooling is required. |
 | Runtime resolution | The Semantic Validation Layer and Federated Query Engine query the SDR directly at request time to resolve metric definitions, operation schemas, and physical mappings. |
-| Search | The `list_operations` tool queries the SDR's native search index to return the entitled operation catalogue. No separate search infrastructure is required. |
+| Search and RAG | The SDR's search index supports both the `list_operations` tool (structured API consumers) and the IRE's vector similarity search over operation and metric embeddings for NL intent resolution. |
 
 The SDR and SMR are both contained within the Data Context Store (DCS). The DCS is the outer persistence container for all governed context — the SDR providing the data definition layer and the SMR providing the metric semantic layer above it.
 
