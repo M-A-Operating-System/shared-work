@@ -2,7 +2,7 @@
 
 This chapter is the logical architecture reference for the AI Analytics Platform. It covers nine pipeline components in the order a query encounters them, using a single portfolio manager query as a running example throughout. Each section describes what a component does, its controls contract, and where in the pipeline it sits — with no references to specific technology products or vendor implementations.
 
-The pipeline processes every request in this sequence: the **MCP Capability Layer** is the entry point — the governed API through which all consumers access the platform. The **Semantic Metrics Repository** is the governing catalogue — every queryable metric, dimension, and operation must be registered here before it is resolvable. The **Semantic Intent Layer** validates the structured request and produces a platform-agnostic query plan. The **Role-Aware Projection Layer** enforces entitlements before any query reaches a backend. The **Semantic Controls Layer** applies thresholds and compliance classification before releasing the plan for execution. The **Physical Query Planner** translates the approved logical plan into backend-specific physical query fragments. The **Federated Query Engine** routes those fragments to registered backends, executes in parallel, and assembles the result. The **Data Visualization Language (DVL)** selects the presentation contract. The **Narrative Synthesis Engine** produces a governed plain-language summary. The **Analytical Lineage Store** records the complete computation provenance. The **Provenance Artifact Service** assembles and seals the compliance artifact when a query meets the two-signal compliance trigger.
+The pipeline processes every request in this sequence: the **MCP Capability Layer** is the entry point — the governed API through which all consumers access the platform. The **Semantic Metrics Repository** is the governing catalogue — every queryable metric, dimension, and operation must be registered here before it is resolvable. The **Intent Resolution Agent** receives natural language queries, retrieves candidate operations from the SMR via RAG, and uses a language model to rank and resolve the user's intent into a structured operation and parameters. The **Semantic Validation Layer** validates the resolved structured request and produces a platform-agnostic query plan. The **Role-Aware Projection Layer** enforces entitlements before any query reaches a backend. The **Semantic Controls Layer** applies thresholds and compliance classification before releasing the plan for execution. The **Physical Query Planner** translates the approved logical plan into backend-specific physical query fragments. The **Federated Query Engine** routes those fragments to registered backends, executes in parallel, and assembles the result. The **Data Visualization Language (DVL)** selects the presentation contract. The **Narrative Synthesis Agent** produces a governed plain-language summary via a tightly-scoped language model call. The **Analytical Lineage Store** records the complete computation provenance. The **Provenance Artifact Service** assembles and seals the compliance artifact when a query meets the two-signal compliance trigger.
 
 Platform roles — who interacts with each component and how — are defined before the component descriptions.
 
@@ -68,13 +68,14 @@ flowchart TD
     subgraph analytics["Analytics Engine"]
         direction TB
         MCP["<b>API/MCP Interface</b>\nMCP server runtime · tool/resource/prompt presentation · JWT validation"]
-        SIL["<b>Semantic Intent Layer (SIL)</b>\nSMR resolution · compliance intent classification · LQP generation"]
+        IRE["<b>Intent Resolution Agent (IRE)</b>\nRAG over SMR catalogue · LLM intent ranking · confirmation gate\nnatural language → resolved operation_id + params"]
+        SVL["<b>Semantic Validation Layer (SVL)</b>\nSMR resolution · schema validation · role projection · LQP generation\nentirely deterministic — no AI"]
         RAPL["<b>Role-Aware Projection Layer (RAPL)</b>\nJWT claims · metric/dimension access sets · row predicates · column masks"]
         SCL["<b>Semantic Controls Layer (SCL)</b>\nPerformance impact · complexity · classification · compliance checks"]
         PQP["<b>Physical Query Planner (PQP)</b>\nphysicalMapping resolution · sub-plan decomposition · dialect translation"]
         FQE["<b>Federated Query Engine (FQE)</b>\nbackend routing · parallel execution · result assembly"]
         DVL["<b>Data Visualization Language (DVL)</b>\nontology evaluation · deterministic chart contract selection"]
-        NSE["<b>Narrative Synthesis Engine (NSE)</b>\nsecondary language model · post-computation · anchored to result values"]
+        NSA["<b>Narrative Synthesis Agent (NSA)</b>\npost-computation · anchored to result values · LLM call"]
         PAS["<b>Provenance Artifact Service (PAS)</b>\nassembles and seals Provenance Artifact from ALS records\nactive only when compliance_tier.active = true"]
         LS[("<b>Analytical Lineage Store (ALS)</b>\ncomputation provenance records\ntool call · SMR resolution · LQP · controls decision · execution record · narrative status")]
         Result(["<b>MCP tool response</b>\ndisplay_spec + data + narrative + result_id\n+ compliance block (if Provenance Artifact active)"])
@@ -92,6 +93,10 @@ flowchart TD
         DCSMCP --> SDR & SMR
     end
 
+    subgraph llmext["LLM Service (External)"]
+        LLM["<b>Language Model</b>\nIntent ranking · narrative synthesis\nCalled by IRE and NSA"]
+    end
+
     subgraph backends["Data Sources"]
         SQL["<b>SQL Warehouse</b>"]
         ODA["<b>OpenData API</b>\nREST / OData"]
@@ -101,11 +106,15 @@ flowchart TD
     Consumers -->|"JWT + structured MCP tool call"| MCP
     Consumers -->|"render tool call (display_spec)"| Image
     Consumers -->|"JWT + MCP tool call"| DCSMCP
-    MCP -->|"structured parameters"| SIL
+    MCP -->|"natural language query"| IRE
+    MCP -->|"structured tool call (bypass IRE)"| SVL
     MCP -->|"JWT claims"| RAPL
-    RAPL -->|"row predicates + column masks"| SIL
-    SIL -->|"metric + dimension ID resolution"| SMR
-    SIL -->|"Logical Query Plan (LQP)"| SCL
+    IRE -->|"RAG retrieval"| SMR
+    IRE -->|"intent ranking"| LLM
+    LLM -->|"ranked candidates"| IRE
+    IRE -->|"resolved operation_id + params"| SVL
+    RAPL -->|"row predicates + column masks"| SVL
+    SVL -->|"Logical Query Plan (LQP)"| SCL
     SCL -->|"controls decision record"| LS
     SCL -->|"approved LQP"| PQP
     PQP -->|"physicalMapping lookup"| SMR
@@ -113,14 +122,15 @@ flowchart TD
     FQE --> SQL & ODA & GDA
     FQE -->|"execution record"| LS
     FQE -->|"assembled result"| DVL
-    FQE -->|"assembled result"| NSE
+    FQE -->|"assembled result"| NSA
+    NSA -->|"LLM call"| LLM
     LS -->|"lineage records (compliance queries only)"| PAS
     DVL -->|"DVL display spec"| Result
-    NSE -->|"governed narrative"| Result
+    NSA -->|"governed narrative"| Result
     PAS -->|"sealed compliance block"| Result
 ```
 
-The Analytics Engine is a single MCP server. It exposes three analytical tools (`run_analytics`, `list_operations`, `drilldown`) through a single MCP Capability Layer endpoint. The computation pipeline (SIL, RAPL, SCL, FQE) is entirely deterministic. The Narrative Synthesis Engine runs as a post-computation step: after the FQE assembles the result, the NSE makes a targeted call to a secondary language model to summarise the data in plain text; its prompt is constructed from the result set only and its output is validated against computed values before being returned.
+The Analytics Engine is a single MCP server. It exposes three analytical tools (`run_analytics`, `list_operations`, `drilldown`) through a single MCP Capability Layer endpoint. The computation pipeline (SVL, RAPL, SCL, PQP, FQE) is entirely deterministic and contains no AI. The Narrative Synthesis Agent runs as a post-computation step: after the FQE assembles the result, the NSA makes a targeted call to a language model to summarise the data in plain text; its prompt is constructed from the result set only and its output is validated against computed values before being returned.
 
 The AI Chat Platform loads the operation catalogue from the Analytics Engine by calling `list_operations`. This is how the AI model discovers what operations, metrics, and dimensions are available. It translates the user's natural language question into explicit, structured parameters and calls `run_analytics` with the resolved `operation_id` and `params`. The Analytics Engine returns the display specification, structured data, and governed narrative; the AI Chat Platform renders the result.
 
@@ -135,7 +145,9 @@ sequenceDiagram
     autonumber
     participant C as AI Consumer
     participant MCP as API/MCP Interface
-    participant SIL as Semantic Intent Layer
+    participant IRE as Intent Resolution Agent
+    participant LLM as Language Model
+    participant SVL as Semantic Validation Layer
     participant RAPL as Role-Aware Projection Layer
     participant SMR as Semantic Metrics Repository
     participant SCL as Semantic Controls Layer
@@ -144,19 +156,26 @@ sequenceDiagram
     participant FQE as Federated Query Engine
     participant BE as Data Sources
     participant DVL as Data Visualization Language
-    participant NSE as Narrative Synthesis Engine
+    participant NSA as Narrative Synthesis Agent
     participant PAS as Provenance Artifact Service
     participant vega2img as vega2img (optional)
 
     rect rgb(240, 245, 255)
-        note over C,SMR: Catalogue loading — discover entitled operations
-        C->>MCP: list_operations (JWT)
-        MCP->>SMR: fetch entitled operation catalogue
-        SMR-->>MCP: operation catalogue
-        MCP-->>C: operation IDs · display names · required params · execution profiles
+        note over C,LLM: Intent resolution — natural language → structured intent
+        C->>MCP: natural language query + JWT
+        MCP->>IRE: natural language query
+        IRE->>SMR: vector similarity search (RAG)
+        SMR-->>IRE: top-K candidate operations + metric definitions
+        IRE->>LLM: candidate operations + user query (intent ranking prompt)
+        LLM-->>IRE: ranked intent + bound params
+        alt ambiguous intent
+            IRE-->>MCP: confirmation card (requiresIntentConfirmation: true)
+            MCP-->>C: confirmation card
+            C->>MCP: confirmed: true + selected intent
+            MCP->>IRE: confirmed intent
+        end
+        IRE->>SVL: resolved operation_id + params
     end
-
-    note over C: AI model translates natural language → structured parameters
 
     rect rgb(240, 255, 245)
         note over C,ALS: Query execution
@@ -164,21 +183,21 @@ sequenceDiagram
         MCP->>MCP: validate JWT signature · expiry · org claim
 
         par Intent resolution
-            MCP->>SIL: structured parameters
+            note over SVL: structured parameters received from IRE
         and Entitlement projection
             MCP->>RAPL: JWT claims
         end
 
         par
-            SIL->>SMR: resolve operation · metric IDs · dimension IDs
-            SMR-->>SIL: definitions · aggregation rules · performance_impact_weight · compliance metadata
+            SVL->>SMR: resolve operation · metric IDs · dimension IDs
+            SMR-->>SVL: definitions · aggregation rules · performance_impact_weight · compliance metadata
         and
-            RAPL-->>SIL: metric access set · dimension access set · row predicates · column masks
+            RAPL-->>SVL: metric access set · dimension access set · row predicates · column masks
         end
 
-        note over SIL: Stage 2b — compliance intent classification<br/>scores query for compliance_purpose (0–1)<br/>sets compliance_purpose: true if score ≥ threshold
+        note over SVL: Stage 2b — compliance intent classification<br/>scores query for compliance_purpose (0–1)<br/>sets compliance_purpose: true if score ≥ threshold
 
-        SIL->>SCL: Logical Query Plan (LQP)<br/>— no SQL · no backend refs · SMR concepts only
+        SVL->>SCL: Logical Query Plan (LQP)<br/>— no SQL · no backend refs · SMR concepts only
 
         note over SCL: Evaluates: performance impact · complexity · classification gate · compliance check<br/>Blocks if any threshold exceeded
 
@@ -199,15 +218,17 @@ sequenceDiagram
     end
 
     rect rgb(255, 248, 240)
-        note over FQE,NSE: Presentation assembly — parallel
+        note over FQE,NSA: Presentation assembly — parallel
         par
             FQE->>DVL: assembled result
             note over DVL: Ontology evaluation → deterministic chart contract selection<br/>AI does not select chart type
             DVL-->>MCP: DVL display specification
         and
-            FQE->>NSE: assembled result
-            note over NSE: Secondary language model call<br/>Anchored strictly to result values · validation pass before inclusion
-            NSE-->>MCP: governed narrative (lead + detail + anchoredTo)
+            FQE->>NSA: assembled result
+            note over NSA: Language model call<br/>Anchored strictly to result values · validation pass before inclusion
+            NSA->>LLM: result summary prompt
+            LLM-->>NSA: narrative text
+            NSA-->>MCP: governed narrative (lead + detail + anchoredTo)
         and
             note over ALS,PAS: Only when compliance_tier.active = true
             ALS->>PAS: lineage records (controls decision + execution record)
@@ -224,7 +245,7 @@ sequenceDiagram
     end
 ```
 
-The Analytics Engine receives structured parameters — never natural language — and returns structured results. The computation pipeline (SIL → RAPL → SCL → PQP → FQE) is entirely deterministic and contains no AI. The only AI steps are: natural language translation (in the consumer, grounded by the operation catalogue) and narrative synthesis (in the NSE, post-computation, constrained to the assembled result). The Analytical Lineage Store receives two writes per query — a controls decision record before the PQP is invoked and a full execution record after — ensuring the audit trail is complete regardless of whether execution succeeds.
+The Analytics Engine receives natural language or structured parameters and returns structured results. The computation pipeline (SVL → RAPL → SCL → PQP → FQE) is entirely deterministic and contains no AI. The only AI steps are: intent resolution (in the IRE, using RAG over the SMR catalogue and a language model call) and narrative synthesis (in the NSA, post-computation, constrained to the assembled result). The Analytical Lineage Store receives two writes per query — a controls decision record before the PQP is invoked and a full execution record after — ensuring the audit trail is complete regardless of whether execution succeeds.
 
 ---
 
