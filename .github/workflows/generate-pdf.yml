@@ -9,10 +9,25 @@ on:
       - 'generate_pdf.py'
   workflow_dispatch:
     inputs:
-      page:
-        description: 'Path to a single .md file (e.g. docs/product/analytics/03-core-capabilities.md). Leave blank to regenerate all product PDFs.'
+      product:
+        description: 'Product to generate (analytics, assistant). Leave blank to regenerate all products.'
+        required: false
+        type: choice
+        options:
+          - ''
+          - analytics
+          - assistant
+        default: ''
+      pages:
+        description: 'Space-separated chapter prefixes for a subset PDF, e.g. "02 04 08". Requires a product selection above. Leave blank for the full product.'
         required: false
         type: string
+        default: ''
+      out:
+        description: 'Output filename for a pages-subset PDF (e.g. subset.pdf). Only used when pages are specified.'
+        required: false
+        type: string
+        default: ''
       nofront:
         description: 'Omit the branded cover page from the generated PDF.'
         required: false
@@ -47,58 +62,82 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      # ── Single-page mode ────────────────────────────────────────────────────
-      - name: Validate page input
-        if: github.event_name == 'workflow_dispatch' && inputs.page != ''
+      # ── Input validation ─────────────────────────────────────────────────────
+      - name: Validate inputs
+        if: github.event_name == 'workflow_dispatch'
         env:
-          PAGE_INPUT: ${{ inputs.page }}
+          INPUT_PAGES: ${{ inputs.pages }}
+          INPUT_PRODUCT: ${{ inputs.product }}
+          INPUT_OUT: ${{ inputs.out }}
         run: |
-          if [[ "$PAGE_INPUT" != *.md ]]; then
-            echo "Error: page input must end in .md — got: $PAGE_INPUT"
+          # pages requires a product
+          if [ -n "$INPUT_PAGES" ] && [ -z "$INPUT_PRODUCT" ]; then
+            echo "Error: 'pages' requires a product to be selected."
             exit 1
           fi
+          # out requires pages
+          if [ -n "$INPUT_OUT" ] && [ -z "$INPUT_PAGES" ]; then
+            echo "Error: 'out' is only valid when 'pages' is also specified."
+            exit 1
+          fi
+          # each page prefix must be exactly two digits
+          if [ -n "$INPUT_PAGES" ]; then
+            for prefix in $INPUT_PAGES; do
+              if ! echo "$prefix" | grep -qE '^[0-9]{2}$'; then
+                echo "Error: page prefix '$prefix' is not a two-digit number."
+                exit 1
+              fi
+            done
+          fi
 
-      - name: Generate single-page PDF
-        id: gen_page
-        if: github.event_name == 'workflow_dispatch' && inputs.page != ''
+      # ── Pages-subset mode (product + pages specified) ────────────────────────
+      - name: Generate pages-subset PDF
+        if: github.event_name == 'workflow_dispatch' && inputs.pages != ''
         env:
-          PAGE_INPUT: ${{ inputs.page }}
-          NOFRONT: ${{ inputs.nofront }}  # empty string on push events; condition below handles it
+          INPUT_PRODUCT: ${{ inputs.product }}
+          INPUT_PAGES: ${{ inputs.pages }}
+          INPUT_OUT: ${{ inputs.out }}
+          NOFRONT: ${{ inputs.nofront }}
         run: |
           NOFRONT_FLAG=""
           [ "$NOFRONT" = "true" ] && NOFRONT_FLAG="--nofront"
-          python generate_pdf.py --page "$PAGE_INPUT" ${NOFRONT_FLAG:+"$NOFRONT_FLAG"}
+          OUT_FLAG=""
+          [ -n "$INPUT_OUT" ] && OUT_FLAG="--out $INPUT_OUT"
+          python generate_pdf.py --product "$INPUT_PRODUCT" --pages $INPUT_PAGES $OUT_FLAG ${NOFRONT_FLAG:+"$NOFRONT_FLAG"}
 
-      - name: Commit single-page PDF
-        if: github.event_name == 'workflow_dispatch' && inputs.page != ''
+      - name: Commit pages-subset PDF
+        if: github.event_name == 'workflow_dispatch' && inputs.pages != ''
         env:
-          PDF_PATH: ${{ steps.gen_page.outputs.pdf_path }}
+          INPUT_PRODUCT: ${{ inputs.product }}
         run: |
-          git add "$PDF_PATH"
-          git diff --cached --quiet || git commit -m "docs: regenerate PDF for ${PDF_PATH} [skip ci]"
+          git add "docs/product/$INPUT_PRODUCT/"*.pdf
+          git diff --cached --quiet || git commit -m "docs($INPUT_PRODUCT): generate pages-subset PDF [skip ci]"
 
-      # ── Full regeneration mode ───────────────────────────────────────────────
-      - name: Generate and commit analytics PDF
-        if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.page == '')
+      # ── Single-product full mode (product selected, no pages) ────────────────
+      - name: Generate single-product PDF
+        if: github.event_name == 'workflow_dispatch' && inputs.product != '' && inputs.pages == ''
         env:
-          NOFRONT: ${{ inputs.nofront }}  # empty string on push events; cover is always included on auto-push
+          INPUT_PRODUCT: ${{ inputs.product }}
+          NOFRONT: ${{ inputs.nofront }}
         run: |
           NOFRONT_FLAG=""
           [ "$NOFRONT" = "true" ] && NOFRONT_FLAG="--nofront"
-          python generate_pdf.py analytics ${NOFRONT_FLAG:+"$NOFRONT_FLAG"}
+          python generate_pdf.py --product "$INPUT_PRODUCT" ${NOFRONT_FLAG:+"$NOFRONT_FLAG"}
+          git add "docs/product/$INPUT_PRODUCT/${INPUT_PRODUCT}_product_design.pdf"
+          git diff --cached --quiet || git commit -m "docs($INPUT_PRODUCT): regenerate PDF [skip ci]"
+
+      # ── All-products mode (push trigger, or dispatch with no product/pages) ───
+      - name: Generate all PDFs
+        if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.product == '' && inputs.pages == '')
+        env:
+          NOFRONT: ${{ inputs.nofront }}
+        run: |
+          NOFRONT_FLAG=""
+          [ "$NOFRONT" = "true" ] && NOFRONT_FLAG="--nofront"
+          python generate_pdf.py ${NOFRONT_FLAG:+"$NOFRONT_FLAG"}
           git add docs/product/analytics/analytics_product_design.pdf
-          git diff --cached --quiet || git commit -m "docs(analytics): regenerate PDF [skip ci]"
-
-      - name: Generate and commit assistant PDF
-        if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.page == '')
-        env:
-          NOFRONT: ${{ inputs.nofront }}  # empty string on push events; cover is always included on auto-push
-        run: |
-          NOFRONT_FLAG=""
-          [ "$NOFRONT" = "true" ] && NOFRONT_FLAG="--nofront"
-          python generate_pdf.py assistant ${NOFRONT_FLAG:+"$NOFRONT_FLAG"}
           git add docs/product/assistant/assistant_product_design.pdf
-          git diff --cached --quiet || git commit -m "docs(assistant): regenerate PDF [skip ci]"
+          git diff --cached --quiet || git commit -m "docs: regenerate all product PDFs [skip ci]"
 
       - name: Push
         run: git push

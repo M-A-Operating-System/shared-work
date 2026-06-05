@@ -1,4 +1,4 @@
-# 4. Integration and Deployment
+# 3. Integration and Deployment
 
 This chapter covers the complete integration surface of the AI Analytics Platform: how consumers authenticate and call it, how platform administrators configure it, the financial services reference model it ships with, and the complementary ecosystem services that extend its capabilities. The platform is deliberately narrow in its external interface: a single MCP endpoint governs all consumer access, and a single Admin API governs all configuration. Complexity lives inside the controls pipeline, not in the integration contract.
 
