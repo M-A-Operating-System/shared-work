@@ -16,7 +16,6 @@ The table below maps each Chapter 2 capability to its reference implementation n
 |---|---|---|---|
 | MCP Capability Layer | MCP | `build_mcp_app()` + FastMCP router | Python 3.12 · FastMCP 2.x · Uvicorn · port 8000 · JWT via python-jose (RS256) |
 | Semantic Metrics Repository | SMR | `SemanticMetricsRepository` | DCS API — JSON documents: `analytical_metric`, `analytical_dimension`, `analytical_operation` |
-| Semantic Data Repository | SDR | `SDRClient` (read-only, via DCS) | DCS API — JSON documents: data models, physical schemas, data lineage |
 | Semantic Intent Layer | SIL | `SemanticIntentLayer` + `LQPGenerator` | Python · Pydantic v2 · JSON Schema validation |
 | Role-Aware Projection Layer | RAPL | `RoleAwareProjectionLayer` | Python · asyncpg · PostgreSQL `role_policies` |
 | Semantic Controls Layer | SCL | `SemanticControlsLayer` | Python · Redis (concurrency semaphore) · rules engine |
@@ -66,9 +65,9 @@ flowchart TD
     Consumer -->|"render tool call (display_spec)"| vega2img
     MCP -->|"validated tool call parameters"| SIL
     MCP -->|"JWT claims"| RAPL
-    RAPL -->|"row predicates + column masks"| SIL
+    SIL -->|"LQP (pre-projection)"| RAPL
+    RAPL -->|"LQP with row predicates + column masks injected"| SCL
     SIL -->|"metric + dimension ID resolution"| SMR
-    SIL -->|"Logical Query Plan (LQP)"| SCL
     SCL -->|"controls decision record"| LS
     SCL -->|"approved LQP"| FQE
     FQE -->|"physicalMapping lookup"| SMR
@@ -218,8 +217,6 @@ class PipelineExecutor:
         # Note: DVL is CPU-bound; asyncio.to_thread prevents it blocking the NSE API call
         ...
 ```
-
-DVL is synchronous (CPU-bound ontology evaluation); `asyncio.to_thread` runs it on the thread pool so it does not block the event loop during the concurrent NSE API call.
 
 #### Drilldown Service
 
@@ -393,11 +390,11 @@ Error code reference table:
 | **SMR resolution** | Direct SMR service call | Synchronous lookup against the metric registry; rejects unregistered IDs before LQP generation |
 | **LQP generation** | Custom Python | Backend-agnostic DAG construction from validated parameters; deterministic for any given input |
 
-`SemanticIntentLayer` is the entry point — it validates params, resolves metrics from the SMR, and delegates DAG construction to `LQPGenerator`. Full `LQPGenerator` implementation is in [§Semantic Intent Layer and LQP Generator](#semantic-intent-layer-and-lqp-generator) below.
+`SemanticIntentLayer` is the entry point — it validates params, resolves metrics from the SMR, scores compliance intent, and delegates DAG construction to `LQPGenerator`. The compliance score is attached to the LQP here so the SCL can apply its two-signal gate without requiring the caller to declare intent explicitly.
 
 ```python
 class SemanticIntentLayer:
-    def __init__(self, smr: "SemanticMetricsRegistry"):
+    def __init__(self, smr: "SemanticMetricsRepository"):
         self.smr = smr
 
     async def resolve(self, operation: dict, params: dict, claims: dict) -> dict:
@@ -406,7 +403,7 @@ class SemanticIntentLayer:
 
         # 1. Validate params against operation's required_params — fail fast before any SMR calls
         # 2. Resolve each metric ID from SMR — rejects unknown or non-approved metrics
-        # 3. Delegate DAG construction to LQPGenerator
+        # 3. Delegate DAG construction to LQPGenerator (see §Semantic Intent Layer and LQP Generator)
         # 4. Attach compliance_purpose_score — SCL reads this; caller never declares intent explicitly
         # 5. Retain resolved_metrics on LQP — SCL needs them for classification and compliance checks
         ...
@@ -415,26 +412,18 @@ class SemanticIntentLayer:
         # Input:  raw params dict + required field list from SMR operation definition
         # Raises: ValueError listing all missing keys — fast rejection before SMR resolution
         ...
+
+    def _score_compliance_intent(self, operation: dict, resolved_metrics: list[dict], params: dict) -> float:
+        # Input:  operation definition + resolved metric list + call params
+        # Output: float 0.0–1.0 — compliance intent probability score
+
+        # Three independent signals, summed and capped at 1.0:
+        #   +0.5 if operation_id contains a compliance keyword (regulatory, audit, report, compliance)
+        #   +0.3 if any resolved metric carries compliance_relevant: true
+        #   +0.2 if params include justification or regulatory_period keys
+        # SCL compares this score against compliance_intent_threshold in controls_config
+        ...
 ```
-
-#### Stage 2b — Compliance Intent Classification
-
-The SIL scores each resolved query for compliance intent using three independent signals. The score drives the SCL two-signal compliance gate without requiring the caller to declare compliance purpose explicitly.
-
-```python
-def _score_compliance_intent(self, operation: dict, resolved_metrics: list[dict], params: dict) -> float:
-    # Input:  operation definition + resolved metric list + call params
-    # Output: float 0.0–1.0 — compliance intent probability score
-
-    # Three independent signals, summed and capped at 1.0:
-    #   +0.5 if operation_id contains a compliance keyword (regulatory, audit, report, compliance)
-    #   +0.3 if any resolved metric carries compliance_relevant: true
-    #   +0.2 if params include justification or regulatory_period keys
-    # SCL compares this score against compliance_intent_threshold in controls_config
-    ...
-```
-
-Both fields are attached inside `resolve()` and flow through to the SCL without any additional caller wiring.
 
 ---
 
@@ -505,7 +494,7 @@ class NarrativeSynthesisEngine:
 | **Runtime reads** | Direct SDR API query by Semantic Intent Layer | Definitions from the authoritative source at resolution time |
 | **Search** | SDR native search index | `list_operations` queries SDR directly — no separate search infrastructure |
 
-The SMR is implemented as two new document types registered in the SDR. The SDR manages the full document lifecycle (draft → in review → approved → deprecated) for both types using its existing authoring and approval capabilities.
+The SMR is implemented as three new document types registered in the SDR. The SDR manages the full document lifecycle (draft → in review → approved → deprecated) for both types using its existing authoring and approval capabilities.
 
 #### New SDR document type: `analytical_metric`
 
@@ -597,7 +586,7 @@ The operation catalogue. One document per approved operation. The `execution_pro
 ```
 
 ```python
-class SemanticMetricsRegistry:
+class SemanticMetricsRepository:
     def __init__(self, sdr_client):
         self.sdr = sdr_client
 
@@ -1606,7 +1595,6 @@ Configuration is read from environment variables at startup. Required variables:
 | Data Context Store (DCS) | Pre-existing platform component | SMR metric definitions, controls config, SMR search — reuses SDR versioned storage and native search |
 | Knowledge Store | S3-compatible object store (versioned Markdown) | MCP resource content — guides, skills definitions, compliance reference |
 | Object storage | S3-compatible | Lineage records (one JSON document per query), result artefacts, large cached result sets |
-| Message queue | SQS / Pub/Sub | Async lineage writes, SDR change events |
 | Secrets | HashiCorp Vault or cloud-native | Backend credentials, platform service keys |
 
 ### Kubernetes Deployment Summary
