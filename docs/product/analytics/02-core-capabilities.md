@@ -111,7 +111,6 @@ flowchart TD
     MCP -->|"JWT claims"| RAPL
     IRE -->|"RAG retrieval"| SMR
     IRE -->|"intent ranking"| LLM
-    LLM -->|"ranked candidates"| IRE
     IRE -->|"resolved operation_id + params"| SVL
     RAPL -->|"row predicates + column masks"| SVL
     SVL -->|"Logical Query Plan (LQP)"| SCL
