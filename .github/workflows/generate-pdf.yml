@@ -34,6 +34,13 @@ on:
         type: boolean
         default: false
 
+# Serialize all runs that commit PDFs back to master.
+# cancel-in-progress: false means concurrent runs queue rather than cancel —
+# every triggered run completes and its PDF is committed.
+concurrency:
+  group: pdf-commit-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   generate:
     runs-on: ubuntu-latest
@@ -51,11 +58,39 @@ jobs:
           python-version: '3.12'
           cache: pip
 
-      - name: Install dependencies
+      - name: Cache apt packages
+        id: cache-apt
+        uses: actions/cache@v4
+        with:
+          path: /var/cache/apt/archives
+          key: apt-pango-${{ runner.os }}-${{ hashFiles('.github/workflows/generate-pdf.yml') }}
+
+      - name: Install apt dependencies
+        if: steps.cache-apt.outputs.cache-hit != 'true'
+        run: sudo apt-get install -y libpango-1.0-0 libpangoft2-1.0-0
+
+      - name: Restore apt packages from cache
+        if: steps.cache-apt.outputs.cache-hit == 'true'
+        run: sudo dpkg -i /var/cache/apt/archives/*.deb 2>/dev/null || true
+
+      - name: Cache npm global (mermaid-cli)
+        id: cache-npm
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm-global
+          key: npm-mmdc-11.4.2-${{ runner.os }}
+
+      - name: Configure npm global prefix
         run: |
-          sudo apt-get install -y libpango-1.0-0 libpangoft2-1.0-0
-          pip install -r requirements.txt
-          npm install -g @mermaid-js/mermaid-cli@11.4.2
+          npm config set prefix ~/.npm-global
+          echo "$HOME/.npm-global/bin" >> "$GITHUB_PATH"
+
+      - name: Install mermaid-cli
+        if: steps.cache-npm.outputs.cache-hit != 'true'
+        run: npm install -g @mermaid-js/mermaid-cli@11.4.2
+
+      - name: Install pip dependencies
+        run: pip install -r requirements.txt
 
       - name: Configure git
         run: |
@@ -140,4 +175,9 @@ jobs:
           git diff --cached --quiet || git commit -m "docs: regenerate all product PDFs [skip ci]"
 
       - name: Push
-        run: git push
+        # Pull --rebase before pushing so that if a queued run is behind the
+        # run that just finished (and committed a PDF), this run incorporates
+        # that commit rather than failing with a non-fast-forward error.
+        run: |
+          git pull --rebase origin ${{ github.ref_name }}
+          git push
