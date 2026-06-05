@@ -605,21 +605,19 @@ The SVL asks the SMR to resolve the `compare_portfolios` operation, then resolve
 
 The Semantic Validation Layer receives a fully qualified analytical request — either directly from a structured API caller or as the resolved output of the Intent Resolution Agent — and produces a validated, platform-agnostic Logical Query Plan (LQP). It is entirely deterministic: no AI model runs inside it. Its purpose is to: (1) resolve the operation from the SMR catalogue, (2) validate `params` against the operation's `required_params` schema, (3) resolve metric IDs within `params` against `analytical_metric` metadata definitions, (4) apply role predicates from RAPL, (5) build the LQP. The output (the LQP) contains no backend references, no SQL, and no physical schema identifiers: only analytical operations expressed against SMR-registered concepts.
 
-### Five-Stage Validation Pipeline
+### Four-Stage Validation Pipeline
 
-Every MCP tool call passes through five sequential validation stages:
+Every analytical request passes through four sequential stages:
 
 ```mermaid
 flowchart LR
-    S1["**Stage 1: Schema validation**\nJSON parameters conform to tool schema\nRequired fields present and typed"]
-    S2["**Stage 2: SMR resolution**\nResolve operation_id → analytical_operation document\nValidate params against operation required_params schema\nResolve metric IDs → analytical_metric documents\nResolve dimension IDs → analytical_dimension documents\nReject unregistered or unapproved IDs"]
-    S2b["**Stage 2b: Compliance intent classification**\nScore resolved intent (operation_id · resolved metrics · params) for compliance purpose (0–1)\ncompliance_purpose: true if score ≥ complianceIntentThreshold\nRecord score + matched signals in resolved intent"]
-    S3["**Stage 3: Role-Aware Projection**\nFilter metric set to entitled scope\nFilter dimension set to entitled scope\nInject row predicates from role config\nApply column masks · Reject entitlement violations"]
-    S4["**Stage 4: Semantic validation**\nRequired dimensions present per metric\nAggregation rules compatible\nTime granularity compatible per metric\nFilter predicates reference valid fields"]
-    S5["**Stage 5: LQP generation**\nProduce platform-agnostic DAG\nAssign data affinity hints per metric\nEstimate result cardinality and execution performance impact"]
+    S1["**Stage 1**\nValid · Complete\nResolved · Compatible"]
+    S2["**Stage 2**\nCompliance Signal\nEvaluation"]
+    S3["**Stage 3**\nEntitlement\nEnforcement"]
+    S4["**Stage 4**\nLQP Generation"]
     LQP(["Logical Query Plan (LQP)"])
 
-    S1 --> S2 --> S2b --> S3 --> S4 --> S5 --> LQP
+    S1 --> S2 --> S3 --> S4 --> LQP
 ```
 
 ### Intent Parameter Schema
