@@ -340,6 +340,8 @@ When `requiresIntentConfirmation: true` is configured, the platform returns a co
 }
 ```
 
+![Intent Confirmation Card](./intent-confirmation-card.png)
+
 This is appropriate for high-stakes or compliance-sensitive queries where silent intent misresolution is unacceptable.
 
 ### Capability Governance
@@ -461,7 +463,7 @@ The Semantic Intent Layer receives a structured MCP tool call (an `operation_id`
 Every MCP tool call passes through five sequential validation stages:
 
 ```mermaid
-flowchart TD
+flowchart LR
     S1["**Stage 1: Schema validation**\nJSON parameters conform to tool schema\nRequired fields present and typed"]
     S2["**Stage 2: SMR resolution**\nResolve operation_id → analytical_operation document\nValidate params against operation required_params schema\nResolve metric IDs → analytical_metric documents\nResolve dimension IDs → analytical_dimension documents\nReject unregistered or unapproved IDs"]
     S2b["**Stage 2b: Compliance intent classification**\nScore natural language query for compliance purpose (0–1)\ncompliance_purpose: true if score ≥ complianceIntentThreshold\nRecord score + matched signals in resolved intent"]
@@ -620,7 +622,7 @@ The Role-Aware Projection Layer (RAPL) applies four categories of restriction:
 ### Projection Lifecycle
 
 ```mermaid
-flowchart TD
+flowchart LR
     START(["Authenticated request arrives with JWT"])
     S1["**1. JWT validation**\nsignature · expiry · org claim"]
     S2["**2. Role claim extraction**\nroleClaimField: 'analytics_roles'\nextracted roles: ['portfolio_manager']"]
@@ -721,7 +723,7 @@ The Semantic Controls Layer (SCL) applies a suite of performance impact threshol
 ### Controls Pipeline
 
 ```mermaid
-flowchart TD
+flowchart LR
     START(["Validated LQP\npost role-aware projection"])
     S1["**1. Performance impact assessment**\nEstimate execution performance impact units from LQP metadata\ncardinality estimate × engine performance tier × complexity factor"]
     S2["**2. Performance impact threshold check**\nCompare estimated performance impact to maxPerformanceImpact\nBLOCK if exceeded → user prompted to narrow scope"]
@@ -873,7 +875,7 @@ Nothing above the PQP has knowledge of physical schemas, table names, or backend
 The PQP performs three operations in sequence:
 
 ```mermaid
-flowchart TD
+flowchart LR
     S1["**1. physicalMapping resolution**\nFor each metric_scan node in the LQP\nread physical_mapping from the resolved metric definition\n→ source system · table or cube · measure identifier"]
     S2["**2. Sub-plan decomposition**\nGroup metric nodes by data_affinity\nOne sub-plan per affinity group\nDistribute row predicates and filters to each sub-plan"]
     S3["**3. Dialect translation**\nTranslate each sub-plan to the backend's native query language\nSQL for warehouse backends\nMetricFlow query for semantic layer backends\nOData filter expressions for REST data APIs\nCypher / SPARQL for graph backends"]
@@ -937,7 +939,7 @@ The Federated Query Engine (FQE) is the only component in the platform with know
 ### Nine-Step FQE Pipeline
 
 ```mermaid
-flowchart TD
+flowchart LR
     S1["**1. Sub-plan Reception**\nreceives physical sub-plans from PQP · validates backend availability"]
     S2["**2. Cache Check**\nexact match and approximate match on LQP signature"]
     CACHED(["Cached result returned"])
