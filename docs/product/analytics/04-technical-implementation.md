@@ -6,6 +6,28 @@ The product specification (component behaviours, interface contracts, governance
 
 ---
 
+## 4.0 Reference Architecture Summary
+
+This chapter presents **one reference implementation**. It is intended as a concrete starting point — a worked example of how the capabilities defined in Chapter 2 can be realised using a specific technology stack. It is not a prescriptive design. Teams should treat each layer-level technology choice as a recommendation, not a constraint. A conformant implementation may substitute any component provided it honours the interface contracts and governance guarantees specified in Chapter 2.
+
+The table below maps each Chapter 2 capability to its reference implementation name and the key technology it uses in this architecture.
+
+| Capability (Ch02) | Abbr | Reference Implementation | Key Technology |
+|---|---|---|---|
+| MCP Capability Layer | MCP | `build_mcp_app()` + FastMCP router | Python 3.12 · FastMCP 2.x · Uvicorn · port 8000 · JWT via python-jose (RS256) |
+| Semantic Metrics Repository | SMR | `SemanticMetricsRepository` | DCS API — JSON documents: `analytical_metric`, `analytical_dimension`, `analytical_operation` |
+| Semantic Data Repository | SDR | `SDRClient` (read-only, via DCS) | DCS API — JSON documents: data models, physical schemas, data lineage |
+| Semantic Intent Layer | SIL | `SemanticIntentLayer` + `LQPGenerator` | Python · Pydantic v2 · JSON Schema validation |
+| Role-Aware Projection Layer | RAPL | `RoleAwareProjectionLayer` | Python · asyncpg · PostgreSQL `role_policies` |
+| Semantic Controls Layer | SCL | `SemanticControlsLayer` | Python · Redis (concurrency semaphore) · rules engine |
+| Federated Query Engine | FQE | `FederatedQueryPlanner` + backend adapters | Python asyncio fan-out · Apache Calcite (within adapters) · Snowflake (primary) · dbt MetricFlow · REST/OData · Neo4j |
+| Data Visualization Language | DVL | `DataVisualizationLanguage` | Python · priority-ordered chart contract evaluation · output: Vega-Lite v5 spec |
+| Narrative Synthesis Engine | NSE | `NarrativeSynthesisEngine` | Claude Haiku 4.5 (simple queries) · Claude Sonnet 4.6 (complex queries) |
+| Analytical Lineage Store | ALS | `AnalyticalLineageStore` | AWS S3 (JSON records per query) · PostgreSQL `lineage_index` (scalar search) |
+| Result Cache | — | `ResultCache` | Redis · SHA-256 cache key · 5-min TTL · compliance queries bypass cache |
+
+---
+
 ## 4.1 Architecture Overview
 
 ```mermaid
