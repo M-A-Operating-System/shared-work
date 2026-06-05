@@ -510,13 +510,13 @@ The Semantic Metrics Repository (SMR) is the governing catalogue of every analyt
 
 ### Concept Types
 
-The SMR stores three document types:
+The SMR holds three types of JSON metadata definition:
 
-| SMR document type | Description |
+| Definition type | Description |
 |---|---|
-| **`analytical_metric`** | Metric definition — formula, aggregation, `data_affinity`, `physical_mapping`, `required_dimensions`, `performance_impact_weight`, `classification_level`, `compliance_relevant`, `regulatory_framework` |
-| **`analytical_dimension`** | Dimension definition — `data_affinity`, `physical_mapping`, enumerated values or `hierarchical` flag, `hierarchy_levels` |
-| **`analytical_operation`** | Operation catalogue entry — `execution_profile`, `required_params`, `supported_metrics`, `supported_dimensions`, `default_visualization` |
+| **`analytical_metric`** | Governed metric definition — formula, aggregation, `data_affinity`, `physical_mapping`, `required_dimensions`, `performance_impact_weight`, `classification_level`, `compliance_relevant`, `regulatory_framework` |
+| **`analytical_dimension`** | Governed dimension definition — `data_affinity`, `physical_mapping`, enumerated values or `hierarchical` flag, `hierarchy_levels` |
+| **`analytical_operation`** | Governed operation definition — `execution_profile`, `required_params`, `supported_metrics`, `supported_dimensions`, `default_visualization` |
 
 ### Metric Definition Schema
 
@@ -586,7 +586,7 @@ The SMR formula language expresses metric computation logic in terms of other re
 
 The SMR and SDR are independent stores, both housed within the Data Context Store (DCS). The SDR contains the organisation's existing data definitions — data models, object models, physical schemas, and data lineage — and will already exist in most organisations before the Analytics Platform is deployed. The SMR is a separate store for metric definitions; it references the SDR's data definitions but does not extend or depend on it structurally. The DCS is the external container that holds both.
 
-Metric authoring uses the DCS's native document creation, versioning, and approval workflow. There are no custom MCP tools for metric authoring. Metrics Modellers author `analytical_metric`, `analytical_dimension`, and `analytical_operation` documents through the DCS authoring interface; Analytics Governance approves them before they become resolvable.
+Metric authoring uses the DCS's native versioning and approval workflow. There are no custom MCP tools for metric authoring. Metrics Modellers author `analytical_metric`, `analytical_dimension`, and `analytical_operation` JSON metadata definitions through the DCS authoring interface; Analytics Governance approves them before they become resolvable.
 
 **Discovery** — AI models and agents discover available operations by calling the `list_operations` MCP tool (defined in the MCP Capability Layer). `list_operations` returns operation IDs, display names, required parameters, supported metrics, supported dimensions, and execution profiles for all approved operations within the caller's entitlement scope. There are no `smr://` MCP resource URIs and no separate `list_metrics`, `get_metric_definition`, `propose_metric`, or `approve_metric` MCP tools.
 
@@ -1667,21 +1667,17 @@ The AI Chat Platform has no access to physical schemas, execution backends, or m
 
 ### Semantic Data Repository (SDR)
 
-The Semantic Data Repository is a pre-existing organisational component — the governed store of data definitions that describe the organisation's information assets. It exists independently of the Analytics Platform and is not built or owned by it. Together with the Semantic Metrics Repository (SMR), it forms one of the two datasets within the Data Context Store (DCS).
+The Semantic Data Repository is a pre-existing organisational component — the governed store of JSON-based data metadata definitions that describe the organisation's information assets. It exists independently of the Analytics Platform and is not built or owned by it. For most organisations it will already exist before the Analytics Platform is deployed.
 
-The SDR contains the organisation's foundational data context: data models, object models, critical data elements, quality rules, physical schemas, and data lineage records. This is the layer that describes *what data exists and how it is structured*. The SMR is built on top of the SDR to add metric context and semantic definitions — the layer that describes *what the data means analytically* and how it should be calculated, aggregated, and governed.
+The SDR contains the organisation's foundational data context: data models, object models, critical data elements, quality rules, physical schemas, and data lineage records — *what data exists and how it is structured*. The SMR is a separate store for metric metadata definitions — *what the data means analytically* and how it should be calculated, aggregated, and governed. Both are independent stores housed within the Data Context Store (DCS), which is the external container for all governed context.
 
 **Role in the platform:**
 
 | Function | Detail |
 |---|---|
-| Foundational data context | Provides the data model and schema definitions that SMR metric `physical_mapping` fields reference. The SMR does not duplicate this — it builds upon it. |
-| Persistence and versioning | Hosts the `analytical_metric`, `analytical_dimension`, `analytical_operation`, and `controls_config` document types registered by the Analytics Platform alongside the SDR's existing data definition documents. |
-| Approval workflow | The SMR lifecycle (Draft → Proposed → In Review → Approved → Deprecated → Retired) runs on the SDR's native authoring and approval capabilities. No custom workflow tooling is required. |
-| Runtime resolution | The Semantic Validation Layer and Federated Query Engine query the SDR directly at request time to resolve metric definitions, operation schemas, and physical mappings. |
-| Search and RAG | The SDR's search index supports both the `list_operations` tool (structured API consumers) and the IRA's vector similarity search over operation and metric embeddings for NL intent resolution. |
-
-The SDR and SMR are both contained within the Data Context Store (DCS). The DCS is the outer persistence container for all governed context — the SDR providing the data definition layer and the SMR providing the metric semantic layer above it.
+| Foundational data context | Provides the data model and schema metadata definitions that SMR metric `physical_mapping` fields reference. |
+| Physical mapping source | The `physical_mapping` fields in SMR metric definitions resolve against SDR schema metadata to identify the physical tables and columns that back each metric. |
+| Search and RAG | The DCS search index (spanning both SMR and SDR) supports the `list_operations` tool and the IRA's vector similarity search over SMR operation and metric embeddings for NL intent resolution. |
 
 
 ### vega2img
