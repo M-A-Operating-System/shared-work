@@ -261,13 +261,13 @@ The Analytics Engine receives natural language or structured parameters and retu
 
 The Analytics Engine is accessed by three consumer types: a conversational AI platform (which mediates between a user and the governed query pipeline), autonomous agents and pipelines (which call the MCP layer directly with structured requests), and custom applications (which call the MCP layer with host-issued tokens). The AI Chat Platform is the conversational layer through which users interact with the Analytics Engine. It hosts the AI model responsible for natural language translation, orchestrates calls to the Analytics Engine, and renders the assembled result to the user. Natural language translation is the only AI step the AI Chat Platform performs. It happens here, grounded by the SMR metric catalogue. Narrative synthesis is performed inside the Analytics Engine as a secondary, post-computation step.
 
-**Operation catalogue loading.** Before the AI model can translate a user's question into structured parameters, it needs to know what operations, metrics, and dimensions are available. The conversation engine calls `list_operations` on the Analytics Engine's MCP endpoint with the user's JWT. The response is the authenticated user's entitled operation catalogue. Only operations the user can execute are returned, with their `operation_id`, display names, required parameters, supported metrics, supported dimensions, and execution profiles. This catalogue is injected into the model's context and serves as the controlled vocabulary for intent translation.
+**Operation catalogue loading.** The `list_operations` tool is still available for structured API consumers and UI builders that construct explicit `operation_id` + `params` payloads. Conversational consumers can send natural language directly — intent resolution happens inside the Analytics Engine's Intent Resolution Agent (IRE). When `list_operations` is called, the response is the authenticated user's entitled operation catalogue. Only operations the user can execute are returned, with their `operation_id`, display names, required parameters, supported metrics, supported dimensions, and execution profiles.
 
-**NL → structured intent.** When a user asks an analytical question, the AI model maps the natural language to an `operation_id` and explicit `params`, drawn from the catalogue it loaded. It constructs a `run_analytics` call with the resolved operation and typed parameters. No natural language is sent to the Analytics Engine; it receives structured parameters only.
+**NL → structured intent.** When a user asks an analytical question, the consumer relays the natural language query to the Analytics Engine via `run_analytics`. The Intent Resolution Agent (IRE) inside the engine retrieves candidate operations from the SMR catalogue via embedding similarity search, then uses a language model to rank candidates and bind parameters. If intent is ambiguous, the engine returns a confirmation card before proceeding.
 
-**Analytics Engine call.** The structured tool call is submitted to the Analytics Engine with the user's JWT forwarded unmodified. The Analytics Engine validates, plans, executes, and returns a structured result and DVL display specification. Entitlement enforcement, query planning, and execution are entirely the Analytics Engine's responsibility.
+**Analytics Engine call.** The tool call is submitted to the Analytics Engine with the user's JWT forwarded unmodified. The Analytics Engine validates, plans, executes, and returns a structured result and DVL display specification. Entitlement enforcement, query planning, and execution are entirely the Analytics Engine's responsibility.
 
-**Response assembly.** The conversation engine renders the DVL display specification inline. When narrative synthesis is enabled, the `narrative` object in the response contains the governed summary produced by the Analytics Engine's NSE. The conversation engine surfaces this directly. The `result_id` is retained for any follow-up `drilldown` call or lineage inspection.
+**Response assembly.** The conversation engine renders the DVL display specification inline. When narrative synthesis is enabled, the `narrative` object in the response contains the governed summary produced by the Analytics Engine's NSA. The conversation engine surfaces this directly. The `result_id` is retained for any follow-up `drilldown` call or lineage inspection.
 
 ### Example
 
@@ -310,7 +310,7 @@ Authorization: Bearer <host-issued-jwt>
 }
 ```
 
-When the Analytics Engine returns the structured result, display spec, and narrative summary, the conversation engine renders the grouped bar chart from the DVL specification and surfaces the governed narrative produced by the Analytics Engine's Narrative Synthesis Engine.
+When the Analytics Engine returns the structured result, display spec, and narrative summary, the conversation engine renders the grouped bar chart from the DVL specification and surfaces the governed narrative produced by the Analytics Engine's Narrative Synthesis Agent.
 
 ---
 
@@ -318,7 +318,7 @@ When the Analytics Engine returns the structured result, display spec, and narra
 
 > **Governing principles:** [P2 — Controls before execution](./00-overview.md#design-principles) · [P5 — Role-aware by default](./00-overview.md#design-principles)
 
-The MCP Capability Layer exposes the platform's governed analytical operations to AI orchestrators via MCP Streamable HTTP transport. Each capability is a bounded, named operation with a typed input schema, a governed execution path — at minimum through role-aware projection and the federated query engine, and through the full pipeline (SIL → RAPL → SCL → FQE) for metric and analytical operations, and a typed output contract. AI agents interact with capabilities, not databases. There is no privileged API path — AI agents receive the same controls-validated results as human users.
+The MCP Capability Layer exposes the platform's governed analytical operations to AI orchestrators via MCP Streamable HTTP transport. Each capability is a bounded, named operation with a typed input schema, a governed execution path — at minimum through role-aware projection and the federated query engine, and through the full pipeline (SVL → RAPL → SCL → FQE) for metric and analytical operations, and a typed output contract. AI agents interact with capabilities, not databases. There is no privileged API path — AI agents receive the same controls-validated results as human users.
 
 ### Tool Catalogue
 
@@ -337,8 +337,8 @@ Each SMR operation carries an `execution_profile` defined in its `analytical_ope
 | Profile | Pipeline stages |
 |---|---|
 | `data_retrieval` | Auth → RAPL → FQE → Lineage |
-| `metric_query` | Auth → RAPL → SIL → SCL → FQE → Lineage |
-| `full_analytical` | Full pipeline including Data Visualization Language (DVL) + Narrative Synthesis Engine |
+| `metric_query` | Auth → RAPL → SVL → SCL → FQE → Lineage |
+| `full_analytical` | Full pipeline including Data Visualization Language (DVL) + Narrative Synthesis Agent |
 
 ### Intent Confirmation Card
 
@@ -373,13 +373,13 @@ This is appropriate for high-stakes or compliance-sensitive queries where silent
 
 ### Capability Governance
 
-Every capability invocation passes through the full controls pipeline: input schema validation → capability availability check (feature flags and role entitlements) → Semantic Intent Layer → Role-Aware Projection → Semantic Controls Layer → FQE → result assembly → lineage record write. Capability availability is declared in the MCP manifest; a capability not enabled by a feature flag or accessible to the user's role appears as `available: false` with a reason.
+Every capability invocation passes through the full controls pipeline: input schema validation → capability availability check (feature flags and role entitlements) → Semantic Validation Layer → Role-Aware Projection → Semantic Controls Layer → FQE → result assembly → lineage record write. Capability availability is declared in the MCP manifest; a capability not enabled by a feature flag or accessible to the user's role appears as `available: false` with a reason.
 
 ### Example
 
 A structured tool call arrives from AI consumers.
 
-A structured `run_analytics` tool call arrives from the AI Chat Platform. The MCP Capability Layer validates the JWT signature, confirms the token has not expired, and extracts the claims. It dispatches two parallel operations: the structured parameters to the Semantic Intent Layer, and the JWT claims to the Role-Aware Projection Layer. The MCP Capability Layer does not interpret the parameters or make any analytical decisions; it validates, routes, and waits.
+A structured `run_analytics` tool call arrives from the AI Chat Platform. The MCP Capability Layer validates the JWT signature, confirms the token has not expired, and extracts the claims. It dispatches two parallel operations: the structured parameters to the Semantic Validation Layer, and the JWT claims to the Role-Aware Projection Layer. The MCP Capability Layer does not interpret the parameters or make any analytical decisions; it validates, routes, and waits.
 
 ---
 
@@ -387,7 +387,7 @@ A structured `run_analytics` tool call arrives from the AI Chat Platform. The MC
 
 > **Governing principles:** [P1 — Semantic abstraction](./00-overview.md#design-principles) · [P3 — Deterministic metric resolution](./00-overview.md#design-principles) · [P9 — Administrator sovereignty](./00-overview.md#design-principles)
 
-The Semantic Metrics Repository (SMR) is the governing catalogue of every analytical concept resolvable on the platform. Before any query can be planned or executed, every identifier in that query (metrics, dimensions, hierarchies) must be registered in the SMR. This is an architectural constraint, not a policy: the Semantic Intent Layer rejects any identifier not present in the SMR, and nothing is queryable that is not registered.
+The Semantic Metrics Repository (SMR) is the governing catalogue of every analytical concept resolvable on the platform. Before any query can be planned or executed, every identifier in that query (metrics, dimensions, hierarchies) must be registered in the SMR. This is an architectural constraint, not a policy: the Semantic Validation Layer rejects any identifier not present in the SMR, and nothing is queryable that is not registered.
 
 ### Concept Types
 
@@ -469,21 +469,92 @@ The SMR is backed by the SDR, which handles document creation, versioning, and t
 
 **Discovery** — AI models and agents discover available operations by calling the `list_operations` MCP tool (defined in the MCP Capability Layer). `list_operations` returns operation IDs, display names, required parameters, supported metrics, supported dimensions, and execution profiles for all approved operations within the caller's entitlement scope. There are no `smr://` MCP resource URIs and no separate `list_metrics`, `get_metric_definition`, `propose_metric`, or `approve_metric` MCP tools.
 
-The internal resolution calls made by the Semantic Intent Layer and Federated Query Engine query the SDR directly. There is no separate internal API.
+The internal resolution calls made by the Semantic Validation Layer and Federated Query Engine query the SDR directly. There is no separate internal API.
 
 ### Example
 
-Continuing the portfolio manager query — the SIL now asks the SMR to resolve the requested metrics and operation.
+Continuing the portfolio manager query — the SVL now asks the SMR to resolve the requested metrics and operation.
 
-The SIL asks the SMR to resolve the `compare_portfolios` operation, then resolves `portfolio_return` and `benchmark_return` as `analytical_metric` documents. The SMR confirms both are approved for the `portfolio_manager` role and returns their definitions, including `data_affinity` (`portfolio`), `required_dimensions` (`portfolio_id`, `time_period`), and `aggregation` (`value_weighted_average`). `asset_class` resolves as an approved `analytical_dimension` document with an approved filter operator (`eq`). If either metric document were absent or not in `"status": "approved"` state, the SIL would return `METRIC_NOT_FOUND` and the pipeline would stop here.
+The SVL asks the SMR to resolve the `compare_portfolios` operation, then resolves `portfolio_return` and `benchmark_return` as `analytical_metric` documents. The SMR confirms both are approved for the `portfolio_manager` role and returns their definitions, including `data_affinity` (`portfolio`), `required_dimensions` (`portfolio_id`, `time_period`), and `aggregation` (`value_weighted_average`). `asset_class` resolves as an approved `analytical_dimension` document with an approved filter operator (`eq`). If either metric document were absent or not in `"status": "approved"` state, the SVL would return `METRIC_NOT_FOUND` and the pipeline would stop here.
 
 ---
 
-## Semantic Intent Layer (SIL)
+## Intent Resolution Agent (IRE)
 
 > **Governing principles:** [P2 — Controls before execution](./00-overview.md#design-principles) · [P10 — Deterministic computation, not generation](./00-overview.md#design-principles)
 
-The Semantic Intent Layer receives a structured MCP tool call (an `operation_id` and a `params` dict) and produces a validated, platform-agnostic Logical Query Plan (LQP). It is entirely deterministic: no AI model runs inside it. Its purpose is to: (1) resolve the operation from the SMR catalogue, (2) validate `params` against the operation's `required_params` schema, (3) resolve metric IDs within `params` against `analytical_metric` documents, (4) apply role predicates from RAPL, (5) build the LQP. The output (the LQP) contains no backend references, no SQL, and no physical schema identifiers: only analytical operations expressed against SMR-registered concepts.
+The Intent Resolution Agent is the AI component responsible for translating a natural language query into a structured, validated operation request. It is the only AI step in the pre-computation pipeline. Its output — a resolved `operation_id` and bound `params` — is the input to the Semantic Validation Layer.
+
+The IRE does not interpret data, make recommendations, or produce output visible to the end user. Its sole function is operation selection and parameter binding. Once it has resolved intent, it hands off a deterministic structured request and plays no further role in the pipeline.
+
+### Intent Resolution Pipeline
+
+```mermaid
+flowchart LR
+    NL["Natural language query"]
+    RAG["RAG retrieval\nvector similarity search\nagainst SMR embeddings"]
+    RANK["LLM intent ranking\ncandidate operations + query\n→ ranked match + bound params"]
+    CONF{"Ambiguous?"}
+    CARD["Confirmation card\nreturned to consumer"]
+    OUT["Resolved intent\noperation_id + params → SVL"]
+
+    NL --> RAG --> RANK --> CONF
+    CONF -->|"yes"| CARD
+    CARD -->|"consumer confirms"| OUT
+    CONF -->|"no"| OUT
+```
+
+### RAG Retrieval
+
+At registration time, each `analytical_operation` and `analytical_metric` definition in the SMR is embedded: the operation name, description, example phrasings, required parameters, and associated metric descriptions are concatenated and encoded as a dense vector stored alongside the definition.
+
+When a query arrives, the IRE encodes the natural language input and performs a vector similarity search against the SMR operation embeddings. The top-K candidate operations (and their associated metric definitions) are retrieved. Only these candidates — not the full catalogue — are injected into the LLM ranking prompt.
+
+### LLM Intent Ranking
+
+The LLM receives the top-K candidates and the user's query. It selects the best-matching operation, binds the required parameters from the query context, and returns a confidence-scored intent. If the top candidate's confidence score falls below the `intentConfidenceThreshold` (configurable, default 0.75), or if two candidates score within a narrow band (configurable, default 0.1), the IRE returns a confirmation card rather than proceeding.
+
+The LLM call is constrained: the prompt contains only the candidate operation definitions and the user's query. The LLM has no access to result data, SMR governance metadata, or user entitlements — those are enforced downstream by SVL and RAPL.
+
+### Confirmation Gate
+
+When intent is ambiguous, the IRE returns a confirmation card as the MCP response. The card presents the resolved operation, bound parameters, estimated performance impact, and classification to the consumer for approval. The consumer must re-submit with `"confirmed": true` to proceed. This is the same confirmation card described in the API/MCP Interface section.
+
+### Structured API Path
+
+Consumers that construct explicit `operation_id` + `params` (agentic pipelines, custom analytics UIs, integration tests) can call `run_analytics` with a structured payload directly. MCP routes these calls directly to the SVL, bypassing the IRE. The `list_operations` tool returns the full entitled operation catalogue for consumers that build their own operation selection UI or inject the catalogue into their own model context.
+
+### Example
+
+Running example — portfolio manager asks:
+
+> "Show me portfolio returns versus benchmark for my equity portfolios this quarter."
+
+The IRE encodes this query and retrieves the top-3 candidate operations from the SMR: `compare_portfolios` (score 0.91), `portfolio_summary` (score 0.67), `benchmark_attribution` (score 0.61). The top candidate exceeds the confidence threshold and leads by more than 0.1. The LLM binds:
+
+```json
+{
+  "operation_id": "compare_portfolios",
+  "params": {
+    "portfolio_ids":  ["GLOB_EQ_OPP", "UK_CORE_INC"],
+    "metrics":        ["portfolio_return", "benchmark_return"],
+    "time_period":    "quarter_to_date",
+    "filters": [{ "dimension": "asset_class", "operator": "eq", "value": "EQUITY" }]
+  }
+}
+```
+
+Confidence is 0.91 — above threshold, no confirmation card. Resolved intent is forwarded to the SVL.
+
+**↳ Step 1 — Intent resolved.** The IRE has translated the natural language query into a structured, bound operation request. The SVL now validates and plans.
+
+---
+
+## Semantic Validation Layer (SVL)
+
+> **Governing principles:** [P2 — Controls before execution](./00-overview.md#design-principles) · [P10 — Deterministic computation, not generation](./00-overview.md#design-principles)
+
+The Semantic Validation Layer receives a structured MCP tool call (an `operation_id` and a `params` dict) and produces a validated, platform-agnostic Logical Query Plan (LQP). It is entirely deterministic: no AI model runs inside it. Its purpose is to: (1) resolve the operation from the SMR catalogue, (2) validate `params` against the operation's `required_params` schema, (3) resolve metric IDs within `params` against `analytical_metric` documents, (4) apply role predicates from RAPL, (5) build the LQP. The output (the LQP) contains no backend references, no SQL, and no physical schema identifiers: only analytical operations expressed against SMR-registered concepts.
 
 ### Five-Stage Validation Pipeline
 
@@ -520,7 +591,7 @@ All `run_analytics` calls use the same outer envelope — `operation_id` (SMR op
 }
 ```
 
-The SIL validates that `portfolio_id`, `metrics`, `attribution_by`, and `as_of_date` are all present (per the operation's `required_params`), resolves each metric ID in `params.metrics` against `analytical_metric` documents, and rejects any unregistered or unapproved ID before LQP generation.
+The SVL validates that `portfolio_id`, `metrics`, `attribution_by`, and `as_of_date` are all present (per the operation's `required_params`), resolves each metric ID in `params.metrics` against `analytical_metric` documents, and rejects any unregistered or unapproved ID before LQP generation.
 
 ### MCP Input to Resolved Intent: Example
 
@@ -579,9 +650,9 @@ The resolved form carries metric versions, aggregation rules, and entitlement-de
 
 ### Example
 
-The structured tool call from AI consumers is now in the SIL.
+The structured tool call from AI consumers is now in the SVL.
 
-The MCP Capability Layer forwards the structured tool call to the SIL. The SIL receives the `operation_id` and `params` from the `run_analytics` invocation:
+The MCP Capability Layer forwards the structured tool call to the SVL. The SVL receives the `operation_id` and `params` from the `run_analytics` invocation:
 
 ```json
 {
@@ -597,7 +668,7 @@ The MCP Capability Layer forwards the structured tool call to the SIL. The SIL r
 }
 ```
 
-The SIL resolves the `compare_portfolios` operation from the SMR catalogue, validates the `params` against the operation's `required_params` schema, resolves each metric ID against `analytical_metric` documents, and applies role predicates from RAPL. After SMR resolution and role projection (Stage 3), the SIL produces the Logical Query Plan:
+The SVL resolves the `compare_portfolios` operation from the SMR catalogue, validates the `params` against the operation's `required_params` schema, resolves each metric ID against `analytical_metric` documents, and applies role predicates from RAPL. After SMR resolution and role projection (Stage 3), the SVL produces the Logical Query Plan:
 
 ```json
 {
@@ -820,11 +891,11 @@ The platform escalates to the enhanced Provenance Artifact only when both of the
 | Signal | Source | True when |
 |---|---|---|
 | **Signal 1 — metric metadata** | `compliance_relevant` field on `analytical_metric` SMR definition | At least one resolved metric has `compliance_relevant: true`. Set by the Metrics Modeller at registration. |
-| **Signal 2 — AI intent classification** | Semantic Intent Layer compliance intent classification (Stage 2b) | `compliance_purpose_score` ≥ the platform-level `compliance_intent_threshold` (default 0.8, configurable). The SIL classifies the query's analytical intent — derived from the operation ID, resolved metric descriptions, and parameter values — and sets `compliance_purpose: true` if the score meets the threshold. |
+| **Signal 2 — AI intent classification** | Semantic Validation Layer compliance intent classification (Stage 2b) | `compliance_purpose_score` ≥ the platform-level `compliance_intent_threshold` (default 0.8, configurable). The SVL classifies the query's analytical intent — derived from the operation ID, resolved metric descriptions, and parameter values — and sets `compliance_purpose: true` if the score meets the threshold. |
 
 **Combined decision:**
 
-| `compliance_relevant` (any metric) | `compliance_purpose` (SIL classification) | SCL decision |
+| `compliance_relevant` (any metric) | `compliance_purpose` (SVL classification) | SCL decision |
 |---|---|---|
 | `true` | `true` | **Enhanced** — full Provenance Artifact active; framework-specific validation rules applied |
 | `true` | `false` | Standard controls output |
@@ -847,7 +918,7 @@ Each `regulatory_framework` tag on a metric carries validation rules that the SC
 | `basel3` | Capital ratio metrics require entity identifier | Validation error if `entity` dimension not specified |
 | `basel3` | LCR/NSFR metrics generate a daily snapshot record | Snapshot written to the ALS regulatory snapshots partition |
 | `basel3` | Stress scenario metrics are subject to RESTRICTED classification ceiling | Classification ceiling applied regardless of user role |
-| `sec_reg_bi` | Client advisory metrics: narrative synthesis constrained to factual summary only | Forward-looking statements, yield projections, and investment recommendations are rejected from NSE output before inclusion in the response |
+| `sec_reg_bi` | Client advisory metrics: narrative synthesis constrained to factual summary only | Forward-looking statements, yield projections, and investment recommendations are rejected from NSA output before inclusion in the response |
 | `sec_reg_bi` | Advisory queries require suitability record reference | `suitability_record_id` parameter required before execution |
 
 Trace target routing to the correct ALS partition is determined automatically from the `regulatory_framework` tags on the resolved metrics.
@@ -928,7 +999,7 @@ The `physical_mapping` field on each `analytical_metric` SMR definition declares
 | `physical_mapping.measure` | Column or pre-computed measure identifier |
 | `physical_mapping.cube` | Cube name for semantic layer backends |
 
-These fields are already attached to the metric nodes in the LQP by the SIL at resolution time. The PQP reads them directly — no additional SMR call is required.
+These fields are already attached to the metric nodes in the LQP by the SVL at resolution time. The PQP reads them directly — no additional SMR call is required.
 
 ### Example
 
@@ -1057,7 +1128,7 @@ Assembled result:
 }
 ```
 
-The FQE writes an execution record to the Analytical Lineage Store (ALS) and passes the assembled result in parallel to the Data Visualization Language (DVL) and Narrative Synthesis Engine.
+The FQE writes an execution record to the Analytical Lineage Store (ALS) and passes the assembled result in parallel to the Data Visualization Language (DVL) and Narrative Synthesis Agent.
 
 **↳ Step 4b — Execution complete.** The physical sub-plans were routed to the registered warehouse, executed, and the result assembled. The full audit record is written. No physical schema was exposed at any stage.
 
@@ -1151,17 +1222,17 @@ The ontology produces the following DVL display specification:
 
 ---
 
-## Narrative Synthesis Engine (NSE)
+## Narrative Synthesis Agent (NSA)
 
 > **Governing principles:** [P6 — Governed narrative](./00-overview.md#design-principles) · [P10 — Deterministic computation, not generation](./00-overview.md#design-principles)
 
-The Narrative Synthesis Engine (NSE) is a secondary AI component inside the Analytics Engine. It runs after the computation pipeline completes — after the FQE has assembled the result, in parallel with the Data Visualization Language (DVL), — making a single, tightly-scoped call to a language model with one purpose: summarise the structured result in plain language, anchored strictly to the computed values.
+The Narrative Synthesis Agent (NSA) is a secondary AI component inside the Analytics Engine. It runs after the computation pipeline completes — after the FQE has assembled the result, in parallel with the Data Visualization Language (DVL), — making a single, tightly-scoped call to a language model with one purpose: summarise the structured result in plain language, anchored strictly to the computed values.
 
-The NSE is not a general-purpose AI model with access to the query, the user's intent, or the SMR. Its prompt is constructed entirely from the assembled result: metric labels, row values, units, and dimension names. It is told what the data shows; it is not told what the user asked. This constraint is intentional — it prevents the narrative from interpreting, recommending, or inferring beyond what was computed.
+The NSA is not a general-purpose AI model with access to the query, the user's intent, or the SMR. Its prompt is constructed entirely from the assembled result: metric labels, row values, units, and dimension names. It is told what the data shows; it is not told what the user asked. This constraint is intentional — it prevents the narrative from interpreting, recommending, or inferring beyond what was computed.
 
 ### Anchoring and Validation
 
-The NSE produces two output fields:
+The NSA produces two output fields:
 
 | Field | Description |
 |---|---|
@@ -1169,7 +1240,7 @@ The NSE produces two output fields:
 | `narrative.detail` | Two to four sentences covering the most significant data points, one per dimension value or notable comparison |
 | `narrative.anchoredTo` | An array of dimension value identifiers from the result that the narrative references — used for post-generation validation |
 
-After generation, the NSE runs a validation pass: every numeric value in the narrative must be present in the result set. If any value in the narrative cannot be matched to a result row, the narrative is rejected and a single regeneration is attempted. If the second attempt also fails validation, the `narrative` field is omitted from the response and the failure is recorded in the lineage record. This constraint enforces P6 (governed narrative) at the component level.
+After generation, the NSA runs a validation pass: every numeric value in the narrative must be present in the result set. If any value in the narrative cannot be matched to a result row, the narrative is rejected and a single regeneration is attempted. If the second attempt also fails validation, the `narrative` field is omitted from the response and the failure is recorded in the lineage record. This constraint enforces P6 (governed narrative) at the component level.
 
 ### Model Selection
 
@@ -1182,13 +1253,13 @@ The model used is recorded in `narrative_status` in the lineage record.
 
 ### Feature Flag
 
-Narrative synthesis is controlled by the `features.narrativeSynthesis` platform configuration flag. When disabled, the NSE is not invoked and no `narrative` field is included in the response. The default is enabled. Disabling narrative synthesis has no effect on computation, lineage, or display spec generation.
+Narrative synthesis is controlled by the `features.narrativeSynthesis` platform configuration flag. When disabled, the NSA is not invoked and no `narrative` field is included in the response. The default is enabled. Disabling narrative synthesis has no effect on computation, lineage, or display spec generation.
 
 ### Example
 
-In parallel with the Data Visualization Language (DVL), the NSE receives the assembled result.
+In parallel with the Data Visualization Language (DVL), the NSA receives the assembled result.
 
-The portfolio manager's query returns four rows. The NSE receives the assembled result and produces:
+The portfolio manager's query returns four rows. The NSA receives the assembled result and produces:
 
 ```json
 {
@@ -1202,7 +1273,7 @@ The portfolio manager's query returns four rows. The NSE receives the assembled 
 
 Post-generation validation confirms every verbatim numeric value cited in the narrative (4.21, 3.85, 2.87, 2.54, 3.67, 3.90, 1.93, 2.31) is present in the assembled result rows. Validation matches on exact numeric literals extracted from the narrative text — rounding differences or proportional expressions (e.g. "roughly 4.2%") may not be caught; residual hallucination risk applies to non-literal claims. Validation passes. The narrative is included in the MCP response alongside `display_spec` and `data`.
 
-**↳ Step 5 — Presentation decision complete.** The DVL has selected the governed display contract for this result shape and intent pattern. The NSE has produced a plain-language summary anchored strictly to the computed values. The response is ready to return to the AI consumer.
+**↳ Step 5 — Presentation decision complete.** The DVL has selected the governed display contract for this result shape and intent pattern. The NSA has produced a plain-language summary anchored strictly to the computed values. The response is ready to return to the AI consumer.
 
 ---
 
@@ -1344,7 +1415,7 @@ The document is immutable from the moment of writing. A corresponding row is ins
 
 > **Governing principles:** [P4 — Complete analytical lineage](./00-overview.md#design-principles) · [P2 — Controls before execution](./00-overview.md#design-principles) · [P9 — Administrator sovereignty](./00-overview.md#design-principles)
 
-The Provenance Artifact Service (PAS) assembles the Provenance Artifact and returns the sealed compliance block to the MCP tool response. It is invoked in parallel with DVL and NSE, but only when the Semantic Controls Layer has determined that the two-signal compliance trigger is active (`compliance_tier.active: true`). For all other queries the PAS is not invoked and no compliance block appears in the response.
+The Provenance Artifact Service (PAS) assembles the Provenance Artifact and returns the sealed compliance block to the MCP tool response. It is invoked in parallel with DVL and NSA, but only when the Semantic Controls Layer has determined that the two-signal compliance trigger is active (`compliance_tier.active: true`). For all other queries the PAS is not invoked and no compliance block appears in the response.
 
 ### Purpose
 
@@ -1365,7 +1436,7 @@ The PAS returns a structured compliance block to the MCP layer for inclusion in 
 | Field | Description |
 |---|---|
 | `compliance_purpose` | `true` — confirms the two-signal trigger was active for this query |
-| `intent_score` | The `compliance_purpose_score` from SIL — the signal that crossed the `compliance_intent_threshold` |
+| `intent_score` | The `compliance_purpose_score` from SVL — the signal that crossed the `compliance_intent_threshold` |
 | `triggered_by_metrics` | Metric IDs whose `compliance_relevant: true` flag contributed Signal 1 |
 | `triggered_by_frameworks` | Regulatory framework tags from the triggered metrics — e.g. `["mifid2"]`, `["basel3"]` |
 | `regulatory_trace_id` | The trace record identifier written to the ALS regulatory partition for the triggered framework(s) |
@@ -1377,7 +1448,7 @@ The PAS returns a structured compliance block to the MCP layer for inclusion in 
 
 The portfolio manager query carries no compliance-relevant metrics — the PAS is not invoked and no compliance block appears in the response.
 
-For a regulatory query against `lcr` and `nsfr` (both `compliance_relevant: true`, `regulatory_framework: ["basel3"]`) where the SIL's compliance intent score is `0.94`, both signals are active. The PAS assembles the Provenance Artifact, seals it in the ALS, and returns:
+For a regulatory query against `lcr` and `nsfr` (both `compliance_relevant: true`, `regulatory_framework: ["basel3"]`) where the SVL's compliance intent score is `0.94`, both signals are active. The PAS assembles the Provenance Artifact, seals it in the ALS, and returns:
 
 ```json
 {
@@ -1406,9 +1477,9 @@ The Analytics Engine is headless: it produces no rendered output. Every successf
 |---|---|---|---|
 | Display specification | `display_spec` | Yes | A Data Visualization Language (DVL) JSON object — either a chart or table specification. Consumers render from this. |
 | Structured result | `data` | Yes | The computed rows and schema — metric values, dimension values, and units. |
-| Governed narrative | `narrative` | No (feature-flag controlled) | A governed summary produced by the NSE — `lead` (one sentence), `detail` (2–4 sentences), `anchoredTo` (result row references). Present when `features.narrativeSynthesis` is enabled. |
+| Governed narrative | `narrative` | No (feature-flag controlled) | A governed summary produced by the NSA — `lead` (one sentence), `detail` (2–4 sentences), `anchoredTo` (result row references). Present when `features.narrativeSynthesis` is enabled. |
 | Lineage reference | `result_id` + `lineage_url` | Yes | A unique result identifier and the URL of the full lineage record |
-| Compliance artifacts | `compliance` | No (compliance tier only) | Present when both `compliance_relevant` metrics are queried AND the SIL classifies query intent as compliance-purpose. Contains regulatory trace ID, triggered metrics, triggered frameworks, intent classification score, `export_requires_lineage` flag (signals export is blocked until artifact is sealed), and `classification_ceiling_applied` flag (set when a `basel3` stress scenario metric triggered RESTRICTED classification ceiling). |
+| Compliance artifacts | `compliance` | No (compliance tier only) | Present when both `compliance_relevant` metrics are queried AND the SVL classifies query intent as compliance-purpose. Contains regulatory trace ID, triggered metrics, triggered frameworks, intent classification score, `export_requires_lineage` flag (signals export is blocked until artifact is sealed), and `classification_ceiling_applied` flag (set when a `basel3` stress scenario metric triggered RESTRICTED classification ceiling). |
 
 ### Full MCP Response Structure
 
@@ -1496,7 +1567,7 @@ Column labels in table specifications come from SMR metric and dimension `displa
 
 ### Example
 
-The MCP Capability Layer assembles the DVL display specification and the NSE narrative into the final tool response:
+The MCP Capability Layer assembles the DVL display specification and the NSA narrative into the final tool response:
 
 ```json
 {
@@ -1570,7 +1641,7 @@ The SDR contains the organisation's foundational data context: data models, obje
 | Foundational data context | Provides the data model and schema definitions that SMR metric `physical_mapping` fields reference. The SMR does not duplicate this — it builds upon it. |
 | Persistence and versioning | Hosts the `analytical_metric`, `analytical_dimension`, `analytical_operation`, and `controls_config` document types registered by the Analytics Platform alongside the SDR's existing data definition documents. |
 | Approval workflow | The SMR lifecycle (Draft → Proposed → In Review → Approved → Deprecated → Retired) runs on the SDR's native authoring and approval capabilities. No custom workflow tooling is required. |
-| Runtime resolution | The Semantic Intent Layer and Federated Query Engine query the SDR directly at request time to resolve metric definitions, operation schemas, and physical mappings. |
+| Runtime resolution | The Semantic Validation Layer and Federated Query Engine query the SDR directly at request time to resolve metric definitions, operation schemas, and physical mappings. |
 | Search | The `list_operations` tool queries the SDR's native search index to return the entitled operation catalogue. No separate search infrastructure is required. |
 
 The SDR and SMR are both contained within the Data Context Store (DCS). The DCS is the outer persistence container for all governed context — the SDR providing the data definition layer and the SMR providing the metric semantic layer above it.
