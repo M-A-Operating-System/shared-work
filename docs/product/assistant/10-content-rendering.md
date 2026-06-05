@@ -52,19 +52,22 @@ The rendering engine evaluates each content block in an assistant response in pr
 
 | Priority | Trigger | Rendered as |
 |----------|---------|------------|
-| 1 | Tool call event (`mcp_tool_use` / `mcp_tool_result`) | **Tool call disclosure** card |
+| 1 | Tool call event (`mcp_tool_use` / `mcp_tool_result`) or MCP `elicitation/create` event | **Tool call disclosure** card / **Feedback request** card |
 | 2 | Fenced block tag matching a registered host renderer (`renderers[].trigger`) | **Custom host renderer** — host-provided ES module; see below |
-| 3 | Fenced block tagged ` ```document ` | **Document canvas** — opens in right panel canvas; reference card in thread |
-| 4 | Fenced block tagged ` ```mermaid ` | **Mermaid diagram** — SVG, expandable, exportable |
-| 5 | Fenced block tagged ` ```vega-lite ` | **Vega-Lite chart** — interactive, responsive |
-| 6 | Fenced block tagged ` ```math ` or `$$...$$` display block | **Math expression** — KaTeX rendered display block |
-| 7 | Fenced block tagged ` ```json ` | **JSON inspector** — collapsible tree, copy-to-clipboard |
-| 8 | Fenced block tagged ` ```csv ` or ` ```table ` | **Data table** — sortable, filterable, paginated, CSV export |
-| 9 | Any other fenced block | **Syntax-highlighted code** — Prism, copy-to-clipboard, line numbers > 5 lines |
-| 10 | Inline `$...$` within prose | **Inline math** — KaTeX rendered inline |
-| 11 | All other content | **Rich markdown prose** — GFM |
+| 3 | Fenced block tagged ` ```feedback-request ` | **Feedback request card** — blocking interactive prompt; streaming pauses until user responds |
+| 4 | Fenced block tagged ` ```document ` | **Document canvas** — opens in right panel canvas; reference card in thread |
+| 5 | Fenced block tagged ` ```mermaid ` | **Mermaid diagram** — SVG, expandable, exportable |
+| 6 | Fenced block tagged ` ```vega-lite ` | **Vega-Lite chart** — interactive, responsive |
+| 7 | Fenced block tagged ` ```math ` or `$$...$$` display block | **Math expression** — KaTeX rendered display block |
+| 8 | Fenced block tagged ` ```json ` | **JSON inspector** — collapsible tree, copy-to-clipboard |
+| 9 | Fenced block tagged ` ```csv ` or ` ```table ` | **Data table** — sortable, filterable, paginated, CSV export |
+| 10 | Any other fenced block | **Syntax-highlighted code** — Prism, copy-to-clipboard, line numbers > 5 lines |
+| 11 | Inline `$...$` within prose | **Inline math** — KaTeX rendered inline |
+| 12 | All other content | **Rich markdown prose** — GFM |
 
-> **Note — priority 1 is event-driven, not fenced-block matching.** Tool call disclosures are triggered by `mcp_tool_use` / `mcp_tool_result` streaming events, which arrive outside content blocks entirely. Priorities 2–11 are evaluated against the fenced block tag of each content block. The two mechanisms do not compete — tool call events are always rendered as disclosure cards regardless of block content.
+> **Note — priority 1 is event-driven, not fenced-block matching.** Tool call disclosures are triggered by `mcp_tool_use` / `mcp_tool_result` streaming events; feedback request cards are triggered by MCP `elicitation/create` events. Both arrive outside content blocks entirely. Priorities 2–12 are evaluated against the fenced block tag of each content block. The two mechanisms do not compete — protocol events are always rendered as their respective cards regardless of block content.
+>
+> **Feedback request cards (priority 3) are the only content type that block streaming.** When the rendering engine encounters a `feedback-request` block, it pauses the stream and does not render subsequent content until the user has responded.
 
 The system prompt (injected by the platform) instructs the model to:
 - Prefer structured outputs — Vega-Lite for metrics and trends, Mermaid for relationships and flows, data tables for entity lists — over prose equivalents when the data supports it
@@ -75,6 +78,7 @@ The system prompt (injected by the platform) instructs the model to:
 | Content type | Trigger | Typical use cases |
 |-------------|---------|------------------|
 | Prose / markdown | Default | Explanations, summaries, narrative answers |
+| Feedback request card | ` ```feedback-request ` / MCP elicitation | Approval gates, structured confirmations, mid-workflow choices — any point where the agent must pause for user input before continuing |
 | Document canvas | ` ```document ` | Reports, policy drafts, structured summaries, plans — any substantial prose the user will iterate on |
 | Custom host renderer | Registered `trigger` tag | Host-defined domain-specific visualisations (risk gauges, compliance scorecards, Gantt views, org charts) |
 | Mermaid diagram | ` ```mermaid ` | Entity relationships, process flows, system dependencies, hierarchies |
@@ -207,6 +211,68 @@ The platform extracts the document title from the first `# Heading` in the block
 
 ---
 
+### Feedback request card
+
+A `feedback-request` block renders an interactive confirmation card inline in the conversation thread. It is the primary mechanism for the model — or an MCP server mid-execution — to request explicit user input before the conversation continues.
+
+> **This is the only blocking content type.** Streaming pauses at a `feedback-request` block and does not resume until the user selects a response. The input field is disabled while the card is pending. The stop-generation button is also hidden — a pending feedback card is not cancellable by stop; it must be explicitly declined via a `Cancel` or `Reject` option in the card itself.
+
+| Behaviour | Specification |
+|-----------|--------------|
+| Trigger | Fenced block tagged ` ```feedback-request `, or MCP `elicitation/create` event |
+| Placement | Inline in conversation thread — never modal, never toast |
+| Blocking | Streaming pauses on receipt; resumes only after user responds |
+| Response recording | The selected response is written to the conversation as a structured user turn so the model sees it in context on the next turn |
+| One at a time | At most one pending feedback card per conversation at any moment |
+| Timeout | None — feedback cards do not expire. The user may respond minutes or hours later |
+
+#### Payload schema
+
+The fenced block content must be valid JSON:
+
+```json
+{
+  "prompt":       "<question or action description shown to the user>",
+  "options": [
+    { "id": "<machine-id>", "label": "<human-readable label>", "style": "primary | destructive | secondary" }
+  ],
+  "allowFreeText": false
+}
+```
+
+- **`prompt`** — the question or description displayed at the top of the card. Should state clearly what action is being requested or what decision the user is making.
+- **`options`** — one to four labelled choices. At least one is required. `style` drives visual weight: `primary` (brand colour, default action), `destructive` (red, irreversible or high-risk action), `secondary` (neutral, cancel or deferral).
+- **`allowFreeText`** — if `true`, a text input appears below the option buttons, allowing the user to type a custom response in addition to or instead of selecting a button. The typed response is included in the recorded turn.
+
+#### Option design guidelines
+
+| Pattern | Options | Notes |
+|---------|---------|-------|
+| Simple approval gate | `Approve` (primary) + `Reject` (destructive) | Use for irreversible or high-impact actions |
+| Multi-choice | 2–4 labelled options, one primary | Use when there are meaningful alternatives, not just yes/no |
+| With escape hatch | Any options + `Cancel` (secondary) | Include whenever doing nothing is a valid choice |
+| Guided free text | 1–2 options + `allowFreeText: true` | Use when sensible defaults exist but the user may need to specify |
+
+The platform enforces a maximum of four option buttons. Flows requiring more than four choices should use a `document` block or a data table to present options and ask the user to respond in free text.
+
+#### MCP elicitation alignment
+
+The feedback request card is the platform's implementation of [MCP Elicitation](https://modelcontextprotocol.io/specification/draft/client/elicitation) — the protocol-level mechanism that allows MCP servers to pause a tool call and request structured input from the user before continuing.
+
+| MCP concept | Platform equivalent |
+|-------------|-------------------|
+| `elicitation/create` event | Triggers feedback request card directly (bypasses fenced block; same UI) |
+| Form mode (JSON Schema input) | Single-question flows → feedback request card; multi-field forms → `document` block with a form layout |
+| URL mode (external redirect for OAuth, payments) | Platform opens the URL in a new tab / webview; this is *not* handled by the feedback card |
+| Titled enum options | `label` field on each option — human-readable text, not the machine `id` |
+| Multi-select enum | Not yet supported by the feedback card; multi-select flows should use a data table or document block until the MCP multi-select spec stabilises |
+
+#### Raw / rendered toggle
+
+Feedback request cards do **not** expose a Raw toggle while the card is pending — displaying the JSON payload while the user is deciding what to do could be misleading. Once the user has responded, the resolved card shows a **Raw** control that reveals the original JSON payload alongside the recorded response, for audit and debugging purposes.
+
+---
+
 ### Mermaid diagram
 
 | Behaviour | Specification |
@@ -327,6 +393,7 @@ When the model references a specific section, it cites by page number (PDF), she
 |-------------|-------------------|
 | Prose / markdown | Streams character-by-character; renders incrementally |
 | Non-prose blocks (Mermaid, Vega-Lite, JSON, tables, code) | Buffers internally; renders on `content_block_stop` to prevent hydration errors on partial content |
+| **Feedback request card** | **Blocks the stream entirely.** Subsequent content is withheld until the user responds. The stop-generation button is hidden while a card is pending |
 | Tool call disclosures | Appear as an in-progress card while the tool is running; update on result receipt |
 | Artefact chips | *"Added to artefacts ↗"* chip appears beneath each completed non-prose block |
 
@@ -472,5 +539,12 @@ The only shared surface is the `HostRenderer` interface and the `RendererContext
 #### System prompt assembly
 
 At session start, the platform assembles the system prompt guidance block by iterating the registry in order and appending each entry's `systemPromptGuidance`. Built-in renderers come first (they are at the top of the registry), host-registered renderers follow. The LLM receives a complete, current list of available rendering targets with no manual prompt maintenance required — adding a renderer to the registry automatically teaches the LLM to use it.
+
+The `feedback-request` renderer is a built-in entry in the registry. Its system prompt guidance instructs the model on when to emit a feedback block:
+
+```
+[Feedback request]
+Use a ```feedback-request block when you need explicit user confirmation or a structured choice before continuing. Provide a clear prompt, 1–4 labelled options, and set allowFreeText to true only when free-form input adds value over the available options. Do not use feedback-request for rhetorical or clarifying questions that do not block execution — use prose instead.
+```
 
 > **Adding a new renderer requires writing one module and adding one config entry. No existing renderer code, no platform core, and no system prompt template needs to be touched.** The rendering surface scales by addition, not by modification — each new capability is a self-contained deployment that sits alongside everything already running.
