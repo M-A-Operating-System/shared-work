@@ -110,12 +110,11 @@ flowchart TD
     Consumers -->|"JWT + MCP tool call"| DCSMCP
     MCP -->|"natural language query"| IRA
     MCP -->|"structured tool call (bypass IRA)"| SVL
-    MCP -->|"JWT claims"| RAPL
     IRA -->|"RAG retrieval"| SMR
     IRA -->|"intent ranking"| LLM
-    IRA -->|"resolved operation_id + params"| SVL
+    IRA -->|"resolved request + JWT"| RAPL
     RAPL -->|"role definition lookup"| ENT
-    RAPL -->|"row predicates + column masks"| SVL
+    RAPL -->|"entitlement projection (decisions + conditions)"| SVL
     SVL -->|"Logical Query Plan (LQP)"| SCL
     SCL -->|"controls decision record"| LS
     SCL -->|"approved LQP"| PQP
@@ -168,31 +167,29 @@ sequenceDiagram
         C->>MCP: run_analytics (NL query + JWT)
         MCP->>MCP: validate JWT signature · expiry · org claim
 
-        par Intent resolution
-            MCP->>IRA: natural language query
-            IRA->>SMR: vector similarity search (RAG)
-            SMR-->>IRA: top-K candidate operations + metric definitions
-            IRA->>LLM: candidate operations + user query (intent ranking prompt)
-            note over IRA: Ranks candidates · binds params · scores confidence
-            alt ambiguous intent
-                IRA-->>MCP: confirmation card (requiresIntentConfirmation: true)
-                MCP-->>C: confirmation card
-                C->>MCP: confirmed: true + selected intent
-                MCP->>IRA: confirmed intent
-            end
-            IRA->>SVL: resolved operation_id + params
-        and Entitlement projection
-            MCP->>RAPL: JWT claims
+        MCP->>IRA: natural language query + JWT
+        IRA->>SMR: vector similarity search (RAG)
+        SMR-->>IRA: top-K candidate operations + metric definitions
+        IRA->>LLM: candidate operations + user query (intent ranking prompt)
+        note over IRA: Ranks candidates · binds params · scores confidence
+        alt ambiguous intent
+            IRA-->>MCP: confirmation card (requiresIntentConfirmation: true)
+            MCP-->>C: confirmation card
+            C->>MCP: confirmed: true + selected intent
+            MCP->>IRA: confirmed intent
         end
 
-        par
-            SVL->>SMR: resolve operation · metric IDs · dimension IDs
-            SMR-->>SVL: definitions · aggregation rules · performance_impact_weight · compliance metadata
-        and
-            RAPL-->>SVL: metric access set · dimension access set · row predicates · column masks
-        end
+        IRA->>RAPL: resolved operation_id + params + JWT
+        RAPL->>RAPL: validate JWT · extract role claims
+        RAPL->>ENT: retrieve role definitions
+        ENT-->>RAPL: metric access sets · dimension access sets · row predicate templates · column masks
+        note over RAPL: Merge role definitions · make YES/NO decisions per metric and dimension<br/>Resolve predicate templates against JWT claims · register column masks
+        RAPL->>SVL: entitlement projection (metric_access_set · dimension_access_set · row_predicates · column_masks)
 
-        note over SVL: Compliance intent classification (Stage 2b)<br/>scores resolved intent for compliance_purpose (0–1)<br/>sets compliance_purpose: true if score ≥ threshold
+        SVL->>SMR: resolve operation · metric IDs · dimension IDs
+        SMR-->>SVL: definitions · aggregation rules · performance_impact_weight · compliance metadata
+
+        note over SVL: Stage 2 — Compliance signal evaluation<br/>Stage 3 — Enforce entitlement projection against request<br/>Stage 4 — LQP generation
 
         SVL->>SCL: Logical Query Plan (LQP)<br/>— no SQL · no backend refs · SMR concepts only
 
@@ -616,7 +613,7 @@ The SVL asks the SMR to resolve the `compare_portfolios` operation, then resolve
 
 > **Governing principles:** [P2 — Controls before execution](./00-overview.md#design-principles) · [P10 — Deterministic computation, not generation](./00-overview.md#design-principles)
 
-The Semantic Validation Layer receives a fully qualified analytical request — either directly from a structured API caller or as the resolved output of the Intent Resolution Agent — and produces a validated, platform-agnostic Logical Query Plan (LQP). It is entirely deterministic: no AI model runs inside it. Its purpose is to: (1) resolve the operation from the SMR catalogue, (2) validate `params` against the operation's `required_params` schema, (3) resolve metric IDs within `params` against `analytical_metric` metadata definitions, (4) apply role predicates from RAPL, (5) build the LQP. The output (the LQP) contains no backend references, no SQL, and no physical schema identifiers: only analytical operations expressed against SMR-registered concepts.
+The Semantic Validation Layer receives the entitlement projection from the Role-Aware Projection Layer together with the fully qualified analytical request — either from a structured API caller or as the resolved output of the Intent Resolution Agent — and produces a validated, platform-agnostic Logical Query Plan (LQP). It is entirely deterministic: no AI model runs inside it. Its purpose is to: (1) resolve the operation from the SMR catalogue, (2) validate `params` against the operation's `required_params` schema, (3) resolve metric IDs within `params` against `analytical_metric` metadata definitions, (4) apply role predicates from RAPL, (5) build the LQP. The output (the LQP) contains no backend references, no SQL, and no physical schema identifiers: only analytical operations expressed against SMR-registered concepts.
 
 ### Four-Stage Validation Pipeline
 
@@ -684,7 +681,7 @@ This distinction is significant. A user may be restricted from raw row-level or 
 
 Entitlement policies are managed in the **Data Entitlements Store (DES)** — an independent external component. Policies are defined at the **logical object and data element level**, not at the system or database level. A policy grants or restricts access to a named metric, a named dimension, or a named data element as governed concepts — not to a specific table, schema, or connection string. This means entitlements remain stable as the underlying physical implementation changes, and they are comprehensible to business owners and governance teams who have no visibility into the data platform's internal structure.
 
-Projection is not optional and not bypassable. Every request, whether from a human user or an AI orchestrator, passes through RAPL. At query time, RAPL reads the caller's role claims from the JWT, retrieves the matching role definitions from the Data Entitlements Store (DES), and constructs the entitlement projection before any query plan is compiled. The SVL enforces that projection in Stage 3 before any backend is contacted.
+Projection is not optional and not bypassable. Every request passes through RAPL. RAPL sits after the Intent Resolution Agent and before the Semantic Validation Layer. It receives the fully qualified analytical request — the resolved operation, metric IDs, dimension IDs, and params — together with the caller's JWT. Only with the complete request can RAPL make YES/NO entitlement decisions per metric and dimension, resolve row predicate templates to the user's actual data scope, and register the column masks that apply. The resulting entitlement projection is passed to the SVL, which enforces it in Stage 3 before any query plan is compiled or any backend is contacted.
 
 ### Restriction Types
 
