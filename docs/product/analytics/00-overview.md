@@ -60,15 +60,23 @@ The dominant AI narrative has become: *natural language → LLM → SQL → data
 
 ## Architectural Model
 
-The **Analytics Engine** is the platform's computation core. Given a precisely specified question — which metrics, which dimensions, which time period, which filters — it always produces the same answer from the same data with the same access permissions in force. No probability, no AI generation, no inference affects the computed values. The computation pipeline contains no AI.
+The **Analytics Engine** is the platform's computation core. Given a precisely specified question — which metrics, which dimensions, which time period, which filters — it always produces the same answer from the same data with the same access permissions in force. No probability, no AI generation, no inference affects the computed values.
 
-AI has two roles in the analytical pipeline. The first lives in the AI consumer — the assistant, agent, or application that a user interacts with. It reads the metric registry and translates a natural-language question into a precise, structured request, and submits it to the Analytics Engine. The second lives inside the Analytics Engine itself: after computation completes, the Narrative Synthesis Engine makes a targeted call to a language model to summarise the structured result in plain text, anchored strictly to computed values. It cannot introduce figures, comparisons, or interpretations not present in the result.
+A defining characteristic of this architecture is that **the Analytics Engine never uses AI to generate SQL or analytical queries**. Every query executed against a data source is constructed deterministically from pre-registered, governed analytics definitions in the Semantic Metrics Repository. An approved metric definition specifies exactly how a computation is performed; the platform reads that definition and constructs the physical query mechanically. The same metric, the same parameters, and the same permissions always produce the same query. AI cannot alter, extend, or influence query construction.
+
+The Analytics Engine contains exactly two targeted uses of AI, both strictly bounded:
+
+1. **Intent resolution** — the Intent Resolution Agent (IRE) receives a natural language question, retrieves candidate analytics operations from the SMR catalogue using embedding similarity (RAG), and uses a language model to identify and rank the most appropriate analytics definition and bind the user's parameters to it. The language model selects from the governed inventory; it does not construct queries or access data.
+
+2. **Narrative synthesis** — after computation completes, the Narrative Synthesis Agent (NSA) makes a single, tightly-scoped language model call to produce a brief plain-language summary of the result, anchored strictly to the computed values. It is told what the data shows; it cannot introduce figures, comparisons, or interpretations not present in the result.
+
+All computation between these two steps — validation, entitlement enforcement, controls, physical query construction, execution, and visualisation — is entirely deterministic and contains no AI.
 
 | It is | It is not |
 |-------|-----------|
-| A governed computation platform — the same question, data, and access permissions always produce the same answer | An AI product — the Analytics Engine is deterministic; the optional plain-language summary is a constrained post-computation step, not a query generator |
+| A governed computation platform — the same question, data, and access permissions always produce the same answer | An AI query generator — the Analytics Engine never uses AI to construct SQL or analytical queries |
 | A governed analytics and data mining platform — metric queries, large dataset retrieval, and drilldown under a unified controls pipeline | A general-purpose SQL interface, BI tool replacement, or user interface |
-| An API layer that AI systems call to retrieve governed analytical results and datasets | A system that accepts natural language directly or allows AI to generate arbitrary database queries |
+| A platform with two tightly-bounded AI steps: intent resolution (selecting the right governed definition) and narrative synthesis (summarising the computed result) | A system where AI influences computation, query construction, or result values |
 | A governed metric registry — every queryable metric is registered, approved, and version-controlled | A system that infers metric definitions at query time |
 
 All AI systems access the platform through a single channel — an API layer built on MCP (Model Context Protocol), an open standard for connecting AI systems to tools and data. Conversational assistants, autonomous agents, data mining pipelines, and custom applications all enter through this channel and traverse the same controls pipeline. There is no alternative path. Every AI-initiated request produces an audit record. This is the architectural guarantee that makes AI-driven analytics safe to operate in a regulated environment.
@@ -220,7 +228,7 @@ entitlements:        user_scope → [authorised_portfolio_list]
 ```
 
 **4 · Query planning, governance, and execution**
-The Semantic Controls Layer validates the Logical Query Plan against performance impact thresholds, data classification limits, and complexity checks. The Federated Query Engine then decomposes the approved plan into backend-specific physical queries, injecting the entitlement predicates at the physical layer. No raw database schemas have been exposed at any stage. The query executes against the registered warehouse; the Analytics Engine assembles the response: computed values, a DVL display specification, an optional plain-language summary anchored strictly to the result, and a full audit record.
+The Semantic Controls Layer validates the Logical Query Plan against performance impact thresholds, data classification limits, and complexity checks. The Federated Query Engine then decomposes the approved plan into backend-specific physical queries, injecting the entitlement predicates at the physical layer. No raw database schemas have been exposed at any stage. The query executes against the registered warehouse; the Analytics Engine assembles the response: computed values, a DVL display specification, an optional plain-language narrative summary anchored strictly to the result (produced by the Narrative Synthesis Agent), and a full audit record.
 
 ```sql
 -- Physical execution (FQE output)
@@ -439,7 +447,7 @@ A treasury analyst asks: *"Prepare our LCR figures for the Basel III submission.
 ```
 
 **2 · Intent resolution and compliance classification**
-The AI client resolves the operation and metric. The Semantic Intent Layer (SIL) classifies the stated purpose: the phrase *"for the Basel III submission"* exceeds the configured compliance intent threshold. Compliance purpose is recorded and carried through the full pipeline.
+The Intent Resolution Agent (IRE) resolves the operation and metric from the SMR catalogue and classifies the stated purpose: the phrase *"for the Basel III submission"* exceeds the configured compliance intent threshold. Compliance purpose is recorded and carried through the full pipeline.
 
 ```
 -- Semantic Intent Resolution
@@ -584,7 +592,7 @@ Once execution completes and the result is verified, the platform seals a compli
 
 ---
 
-- [Chapter 2](./02-core-capabilities.md) — Detailed specifications for each platform component: metric registry, intent layer, entitlement enforcement, controls pipeline, query federation, visualisation, narrative synthesis, lineage store, and API layer
+- [Chapter 2](./02-core-capabilities.md) — Detailed specifications for each platform component: metric registry, intent resolution, semantic validation, entitlement enforcement, controls pipeline, query federation, visualisation, narrative synthesis, lineage store, and API layer
 - [Chapter 3](./03-integration-and-deployment.md) — Integration patterns, deployment models, and platform administration
 - [Chapter 4](./04-technical-implementation.md) — Reference implementation stack with technology rationale
 - [Chapter 5](./05-success-metrics.md) — Platform and governance success metrics
