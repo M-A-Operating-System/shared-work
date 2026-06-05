@@ -590,7 +590,7 @@ Metric authoring uses the DCS's native versioning and approval workflow. There a
 
 **Discovery** — AI models and agents discover available operations by calling the `list_operations` MCP tool (defined in the MCP Capability Layer). `list_operations` returns operation IDs, display names, required parameters, supported metrics, supported dimensions, and execution profiles for all approved operations within the caller's entitlement scope. There are no `smr://` MCP resource URIs and no separate `list_metrics`, `get_metric_definition`, `propose_metric`, or `approve_metric` MCP tools.
 
-The internal resolution calls made by the Semantic Validation Layer and Federated Query Engine query the SMR directly via the DCS. The DCS also exposes its own external API and MCP interface — consumers and tooling can use this independently to browse, inspect, and discover SMR metric definitions and SDR data definitions without going through the Analytics Engine.
+The Analytics Engine queries the SMR directly at request time — the SVL resolves metric and operation definitions, and the FQE resolves physical mappings. The DCS also exposes its own external API and MCP interface through which consumers and tooling can independently browse, inspect, and discover SMR metric definitions and SDR data definitions without going through the Analytics Engine.
 
 ### Example
 
