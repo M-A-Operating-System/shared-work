@@ -673,7 +673,11 @@ Node `n3` is the RAPL row predicate — part of the plan, not a post-execution f
 
 > **Governing principles:** [P5 — Role-aware by default](./00-overview.md#design-principles) · [P1 — Semantic abstraction](./00-overview.md#design-principles)
 
-The Role-Aware Projection Layer applies the authenticated user's entitlement model to the resolved analytical intent before any query plan is compiled. It is the semantic-layer enforcement of data access controls, operating above physical execution before any query reaches a backend. Projection is not optional and not bypassable: every request, whether from a human user or an AI orchestrator, passes through it.
+The Analytics Engine's domain is analytics and data mining — it operates on governed metric definitions, not raw tables. The Role-Aware Projection Layer is the component that determines what each user is entitled to see within that domain. It enforces access at two levels: the **analytical level** (which metrics and dimensions a user may query) and the **data level** (which rows and columns are visible within an entitled result).
+
+This distinction is significant. A user may have no direct access to the underlying data platform — no ability to query raw tables or row-level records — and yet be fully entitled to receive governed, aggregated analytical results. RAPL manages this boundary: entitlement is conferred by role membership against registered metric definitions, not by database permissions. A portfolio manager who cannot access the positions table can still receive `portfolio_return` as an aggregated metric because their role grants access to that metric definition, and the row predicates RAPL injects ensure the result covers only their authorised portfolios.
+
+Projection is not optional and not bypassable. Every request, whether from a human user or an AI orchestrator, passes through RAPL. The projection is computed before any query plan is compiled and enforced through the SVL before any backend is contacted.
 
 ### Restriction Types
 
@@ -681,8 +685,8 @@ The Role-Aware Projection Layer (RAPL) applies four categories of restriction:
 
 | Restriction type | Description | Applied at |
 |---|---|---|
-| **Metric access filter** | Removes metrics from the resolved intent that the user's role is not entitled to query | Intent validation — Stage 3 |
-| **Dimension access filter** | Removes dimensions the user is not entitled to slice by | Intent validation — Stage 3 |
+| **Metric access filter** | Removes metrics from the resolved intent that the user's role is not entitled to query | SVL Stage 3 — Entitlement Enforcement |
+| **Dimension access filter** | Removes dimensions the user is not entitled to slice by | SVL Stage 3 — Entitlement Enforcement |
 | **Row predicate injection** | Injects SQL-like predicates that restrict which data rows the user can access | FQE physical query generation |
 | **Column mask application** | Replaces or nullifies column values the user is not permitted to see in the assembled result | FQE result assembly |
 
@@ -775,9 +779,9 @@ The RAPL reads the `portfolio_scope` claim from the JWT and resolves it against 
 }
 ```
 
-No column masks apply — the `portfolio_manager` role has no masking rules for performance metrics. The row predicate is injected into the LQP as node `n3` (see section 3.2 example). Any portfolio outside the four listed IDs is excluded at the physical query level.
+No column masks apply — the `portfolio_manager` role has no masking rules for performance metrics. The row predicate is injected into the LQP as node `n3` (see SVL example above). Any portfolio outside the four listed IDs is excluded at the physical query level.
 
-**↳ Step 3 — Metric and entitlement resolution complete.** Both metrics are confirmed against their approved SMR definitions. The user's access scope is locked — row predicates injected, entitled portfolio set established. No backend has been contacted.
+**↳ Entitlement projection complete.** Both metrics are confirmed as entitled for the `portfolio_manager` role. The user's access scope is locked — row predicates injected, entitled portfolio set established. No backend has been contacted.
 
 
 ## Semantic Controls Layer (SCL)
