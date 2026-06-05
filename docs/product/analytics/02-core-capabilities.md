@@ -127,6 +127,8 @@ flowchart TD
     DVL -->|"DVL display spec"| Result
     NSA -->|"governed narrative"| Result
     PAS -->|"sealed compliance block"| Result
+
+    style analytics fill:#dbeafe,stroke:#93c5fd
 ```
 
 The Analytics Engine is a single MCP server. It exposes three analytical tools (`run_analytics`, `list_operations`, `drilldown`) through a single MCP Capability Layer endpoint. The computation pipeline (SVL, RAPL, SCL, PQP, FQE) is entirely deterministic and contains no AI. The Narrative Synthesis Agent runs as a post-computation step: after the FQE assembles the result, the NSA makes a targeted call to a language model to summarise the data in plain text; its prompt is constructed from the result set only and its output is validated against computed values before being returned.
