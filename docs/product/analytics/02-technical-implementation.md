@@ -1,8 +1,8 @@
-# 4. Reference Implementation
+# 2. Reference Implementation
 
 This chapter describes one reference implementation of the AI Analytics Platform. Stack choices are concrete but not prescriptive. The product specification is intentionally stack-agnostic. Any conformant implementation that satisfies the specified behaviours, governance guarantees, and interface contracts is valid. Technology substitutions at any layer require no changes to the product specification.
 
-The product specification (component behaviours, interface contracts, governance requirements) is in [Chapter 2 -- Core Platform Capabilities](./02-core-capabilities.md). The design principles governing every decision are in [Platform Overview — Design Principles](./00-overview.md#design-principles).
+The product specification (component behaviours, interface contracts, governance requirements) is in [Chapter 1 -- Core Platform Capabilities](./01-core-capabilities.md). The design principles governing every decision are in [Platform Overview — Design Principles](./00-overview.md#design-principles).
 
 
 ## 4.0 Reference Architecture Summary
@@ -85,7 +85,7 @@ The Semantic Data Repository (SDR) is a pre-existing platform component: the org
 
 ### MCP Capability Layer
 
-> **Specification:** [§MCP Capability Layer](./02-core-capabilities.md#mcp-capability-layer)
+> **Specification:** [§MCP Capability Layer](./01-core-capabilities.md#mcp-capability-layer)
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
@@ -239,7 +239,7 @@ class DrilldownService:
 
 #### Execution profiles
 
-Each SMR operation carries an `execution_profile` that tells the pipeline executor which stages to invoke. Profile definitions are in [§MCP Capability Layer](./02-core-capabilities.md#mcp-capability-layer).
+Each SMR operation carries an `execution_profile` that tells the pipeline executor which stages to invoke. Profile definitions are in [§MCP Capability Layer](./01-core-capabilities.md#mcp-capability-layer).
 
 #### Resources
 
@@ -378,7 +378,7 @@ Error code reference table:
 
 ### Semantic Intent Layer
 
-> **Specification:** [§Semantic Intent Layer](./02-core-capabilities.md#semantic-intent-layer)
+> **Specification:** [§Semantic Intent Layer](./01-core-capabilities.md#semantic-intent-layer)
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
@@ -424,7 +424,7 @@ class SemanticIntentLayer:
 
 ### Narrative Synthesis Engine
 
-> **Specification:** [§Narrative Synthesis Engine](./02-core-capabilities.md#narrative-synthesis-engine)
+> **Specification:** [§Narrative Synthesis Engine](./01-core-capabilities.md#narrative-synthesis-engine)
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
@@ -480,7 +480,7 @@ class NarrativeSynthesisEngine:
 
 ### Semantic Metrics Repository (SMR)
 
-> **Specification:** [§Semantic Metrics Repository](./02-core-capabilities.md#semantic-metrics-repository-smr)
+> **Specification:** [§Semantic Metrics Repository](./01-core-capabilities.md#semantic-metrics-repository-smr)
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
@@ -534,7 +534,7 @@ The core metric definition. One document per approved metric version. The `statu
 
 `weight_metric_id` is required when `aggregation` is `"value_weighted_average"` (or any other weighted aggregation variant) and must reference the `metric_id` of an approved `analytical_metric` in the platform's SDR. The SIL resolves and validates this reference at query time. If the weight metric is missing or unapproved, the query is rejected. The field is absent for non-weighted aggregations (`"sum"`, `"last"`, `"count"`, `"min"`, `"max"`, `"mean"`). The LQP generator emits a `weight_metric_id` key on the `metric_scan` node so that the execution backend can fetch the weighting values alongside the primary metric.
 
-`formula` stores the business-logic expression defined in the [SMR formula language](./02-core-capabilities.md#formula-language). It is the human-readable and audit-visible definition of what the metric computes. At query time the FQE resolves the formula against the `physical_mapping` to generate the backend-specific query; the formula itself is never executed directly. Metrics backed entirely by a pre-computed measure in a semantic layer (e.g. a Cube.js measure) may leave `formula` as an empty string and rely solely on `physical_mapping`.
+`formula` stores the business-logic expression defined in the [SMR formula language](./01-core-capabilities.md#formula-language). It is the human-readable and audit-visible definition of what the metric computes. At query time the FQE resolves the formula against the `physical_mapping` to generate the backend-specific query; the formula itself is never executed directly. Metrics backed entirely by a pre-computed measure in a semantic layer (e.g. a Cube.js measure) may leave `formula` as an empty string and rely solely on `physical_mapping`.
 
 #### New SDR document type: `analytical_dimension`
 
@@ -741,7 +741,7 @@ class LQPGenerator:
 
 ### Role-Aware Projection Layer
 
-> **Specification:** [§Role-Aware Projection Layer](./02-core-capabilities.md#role-aware-projection-layer)
+> **Specification:** [§Role-Aware Projection Layer](./01-core-capabilities.md#role-aware-projection-layer)
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
@@ -833,7 +833,7 @@ class RoleAwareProjectionLayer:
 
 ### Semantic Controls Layer
 
-> **Specification:** [§Semantic Controls Layer](./02-core-capabilities.md#semantic-controls-layer)
+> **Specification:** [§Semantic Controls Layer](./01-core-capabilities.md#semantic-controls-layer)
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
@@ -943,7 +943,7 @@ class SemanticControlsLayer:
 
 ### Federated Query Engine (FQE)
 
-> **Specification:** [§Federated Query Engine](./02-core-capabilities.md#federated-query-engine-fqe)
+> **Specification:** [§Federated Query Engine](./01-core-capabilities.md#federated-query-engine-fqe)
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
@@ -1126,7 +1126,7 @@ class FQPBackendAdapter:
 
 ### Data Visualization Language (DVL)
 
-> **Specification:** [§Data Visualization Language (DVL)](./02-core-capabilities.md#data-visualization-language-dvl)
+> **Specification:** [§Data Visualization Language (DVL)](./01-core-capabilities.md#data-visualization-language-dvl)
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
@@ -1185,7 +1185,7 @@ The evaluator matches the `COMPARISON` intent pattern and two-metric schema to t
 }
 ```
 
-Full DVL examples including the `type: "table"` spec are in [Analytical Output Format](./02-core-capabilities.md#analytical-output-format). Full chart contract definitions are in [Data Visualization Language (DVL)](./02-core-capabilities.md#data-visualization-language-dvl).
+Full DVL examples including the `type: "table"` spec are in [Analytical Output Format](./01-core-capabilities.md#analytical-output-format). Full chart contract definitions are in [Data Visualization Language (DVL)](./01-core-capabilities.md#data-visualization-language-dvl).
 
 ```python
 INTENT_CONTRACTS = {
@@ -1307,7 +1307,7 @@ if __name__ == "__main__":
 
 ### Analytical Lineage Store
 
-> **Specification:** [§Analytical Lineage Store (ALS)](./02-core-capabilities.md#analytical-lineage-store)
+> **Specification:** [§Analytical Lineage Store (ALS)](./01-core-capabilities.md#analytical-lineage-store)
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
@@ -1607,7 +1607,7 @@ All platform services run in a dedicated Kubernetes namespace (`analytics`). Bac
 | **Activation** | `analyticalDomain` config triggers SMR import at initial platform setup | Bundle documents are written to the SDR in `proposed` state; Analytics Governance approves before metrics become resolvable |
 | **Customisation** | Full edit/override via Admin API after import | Customised definitions marked `source: "custom"` in the SDR document |
 
-Each bundle is a JSON array of SDR documents conforming to the schemas defined in [§Semantic Metrics Repository](./02-core-capabilities.md#semantic-metrics-repository-smr). Bundles are seeded into the SDR in `"proposed"` state at initial platform setup; the Analytics Governance approves each document before it becomes resolvable by the Semantic Intent Layer.
+Each bundle is a JSON array of SDR documents conforming to the schemas defined in [§Semantic Metrics Repository](./01-core-capabilities.md#semantic-metrics-repository-smr). Bundles are seeded into the SDR in `"proposed"` state at initial platform setup; the Analytics Governance approves each document before it becomes resolvable by the Semantic Intent Layer.
 
 > **Version format note:** Seed bundle documents use an integer `version` field (starting at `1`) as the bootstrap state. On first platform activation the platform converts these to semantic versioning (`"1.0.0"`). Subsequent versions follow semver — the `"2.1.0"` form used in Chapter 2 examples reflects a metric that has been through two major revisions post-activation.
 
