@@ -313,36 +313,64 @@ Each SMR operation carries an `execution_profile` defined in its `analytical_ope
 | `metric_query` | Auth → IRA → RAPL → SVL → SCL → FQE → Lineage |
 | `full_analytical` | Auth → IRA → RAPL → SVL → SCL → PQP → FQE → DVL + NSA + PAS → Lineage |
 
-### Intent Confirmation Card
+### Intent Confirmation Cards
 
-When `requiresIntentConfirmation: true` is configured, the platform returns a confirmation card before executing any query. The card is returned as the MCP response body in place of the analytical result; the consumer must re-submit with `"confirmed": true` to proceed to execution.
+When intent is ambiguous, or when `requiresIntentConfirmation: true` is set on the operation, the IRA returns candidate cards before executing any query. The cards are returned as the MCP response body in place of the analytical result. The consumer renders all candidates simultaneously; the user selects one, optionally refines it through the chat experience, then confirms to proceed.
 
-<table><tr><td>
+Each card includes the resolved operation and parameters alongside a **presentation preview** — the anticipated chart type and axis structure — so the user can verify both what will be queried and how the result will be presented before execution commits.
+
+The response payload uses a `candidates[]` array. A single-candidate response (governance override) uses the same structure with one entry:
 
 ```json
 {
-  "confirmation_required": true,
-  "intent": {
-    "operation_id":   "compare_portfolios",
-    "operation_label": "Compare Portfolios",
-    "resolved_metrics": ["portfolio_return", "benchmark_return"],
-    "resolved_dimensions": ["portfolio_id", "asset_class"],
-    "time_period":    "quarter_to_date",
-    "filters":        [{ "field": "asset_class", "operator": "eq", "value": "EQUITY" }],
-    "estimated_performance_impact": 620,
-    "classification": "INTERNAL"
-  },
-  "confirm_by": "re-submit run_analytics with confirmed: true"
+  "intent_session_id": "ira-sess-20260605-wk4n",
+  "candidates": [
+    {
+      "rank": 1,
+      "confidence": 0.91,
+      "operation_id":    "compare_portfolios",
+      "operation_label": "Compare Portfolios",
+      "resolved_metrics":    ["portfolio_return", "benchmark_return"],
+      "resolved_dimensions": ["portfolio_id", "asset_class"],
+      "time_period":    "quarter_to_date",
+      "filters":        [{ "field": "asset_class", "operator": "eq", "value": "EQUITY" }],
+      "estimated_performance_impact": 620,
+      "classification": "INTERNAL",
+      "presentation_hint": {
+        "chart_type":        "bar",
+        "primary_dimension": "portfolio_id",
+        "measures":          ["portfolio_return", "benchmark_return"],
+        "series_by":         "metric"
+      }
+    },
+    {
+      "rank": 2,
+      "confidence": 0.67,
+      "operation_id":    "portfolio_summary",
+      "operation_label": "Portfolio Summary",
+      "resolved_metrics":    ["portfolio_return", "portfolio_nav"],
+      "resolved_dimensions": ["portfolio_id"],
+      "time_period":    "quarter_to_date",
+      "filters":        [],
+      "estimated_performance_impact": 280,
+      "classification": "INTERNAL",
+      "presentation_hint": {
+        "chart_type":        "table",
+        "primary_dimension": "portfolio_id",
+        "measures":          ["portfolio_return", "portfolio_nav"],
+        "series_by":         null
+      }
+    }
+  ],
+  "action": "select or refine — re-submit with selected_candidate: <index> or a refinement message"
 }
 ```
 
-</td><td>
+**Selecting a candidate:** re-submit `run_analytics` with `"selected_candidate": 0` (0-based index) to confirm the chosen interpretation and proceed to execution.
 
-<img src="./intent-confirmation-card.png" width="370" alt="Intent Confirmation Card" />
+**Refining through chat:** send a natural language adjustment ("make it monthly, not quarterly") — the IRA updates the leading candidate's parameters and returns a revised card set. Refinement turns are bounded by `intentRefinementMaxTurns` (default 5) and recorded in the lineage record's `intent_session` field.
 
-</td></tr></table>
-
-This is appropriate for high-stakes or compliance-sensitive queries where silent intent misresolution is unacceptable.
+This is appropriate for any query where silent intent misresolution is unacceptable — including high-stakes, compliance-sensitive, or inherently ambiguous requests.
 
 ### Capability Governance
 
@@ -462,16 +490,19 @@ The IRA does not interpret data, make recommendations, or produce output visible
 
 ```mermaid
 flowchart LR
-    NL["Natural language query"]
+    NL["Natural language query\n(or refinement turn)"]
     RAG["RAG retrieval\nvector similarity search\nagainst SMR embeddings"]
-    RANK["LLM intent ranking\ncandidate operations + query\n→ ranked match + bound params"]
+    RANK["LLM intent ranking\ncandidate operations + query\n→ ranked candidates + bound params\n+ presentation preview"]
     CONF{"Ambiguous?"}
-    CARD["Confirmation card\nreturned to consumer"]
-    OUT["Resolved intent\noperation_id + params → SVL"]
+    CARDS["1–3 candidate cards\nreturned to consumer"]
+    REFINE{"User tweaks\nor selects?"}
+    OUT["Resolved intent\noperation_id + params + presentation_hint → SVL"]
 
     NL --> RAG --> RANK --> CONF
-    CONF -->|"yes"| CARD
-    CARD -->|"consumer confirms"| OUT
+    CONF -->|"yes"| CARDS
+    CARDS --> REFINE
+    REFINE -->|"selects a card"| OUT
+    REFINE -->|"requests a change"| NL
     CONF -->|"no"| OUT
 ```
 
@@ -483,13 +514,53 @@ When a query arrives, the IRA encodes the natural language input and performs a 
 
 ### LLM Intent Ranking
 
-The LLM receives the top-K candidates and the user's query. It selects the best-matching operation, binds the required parameters from the query context, and returns a confidence-scored intent. If the top candidate's confidence score falls below the `intentConfidenceThreshold` (configurable, default 0.75), or if two candidates score within a narrow band (configurable, default 0.1), the IRA returns a confirmation card rather than proceeding.
+The LLM receives the top-K candidates and the user's query. It ranks candidates, binds parameters, and scores confidence for each. It also derives a `presentation_hint` for each candidate — the likely chart type and primary axes — based on the operation's result shape and the SMR operation definition. This preview is included in every candidate card returned to the consumer.
+
+If the top candidate's confidence score exceeds `intentConfidenceThreshold` (configurable, default 0.75) and leads the second candidate by more than `intentConfidenceBand` (configurable, default 0.1), the IRA proceeds directly to the SVL with no card shown. Otherwise, up to three ranked candidate cards are returned for the user to select or refine.
 
 The LLM call is constrained: the prompt contains only the candidate operation definitions and the user's query. The LLM has no access to result data, SMR governance metadata, or user entitlements — those are enforced downstream by SVL and RAPL.
 
-### Confirmation Gate
+### Multi-Candidate Selection
 
-When intent is ambiguous, the IRA returns a confirmation card as the MCP response. The card presents the resolved operation, bound parameters, estimated performance impact, and classification to the consumer for approval. The consumer must re-submit with `"confirmed": true` to proceed. This is the same confirmation card described in the API/MCP Interface section.
+When intent is ambiguous, the IRA returns up to three ranked candidate cards in a single `candidates[]` array. Each card represents one plausible interpretation of the user's query, ordered by confidence. The consumer renders all candidates simultaneously, allowing the user to select the one that matches their intent rather than guessing from a single interpretation.
+
+The number of candidates returned is determined by confidence clustering:
+
+| Situation | Cards shown |
+|---|---|
+| Top candidate above threshold, clear leader | 0 — proceeds directly to SVL |
+| Top candidate below threshold, or top two within confidence band | 2 candidates |
+| Top three candidates within confidence band | 3 candidates |
+| `requiresIntentConfirmation: true` on the operation (governance override) | 1 candidate — approval required regardless of confidence |
+
+The consumer re-submits with `"selected_candidate": <index>` (0-based) to indicate which card the user chose. The IRA then forwards the selected candidate's resolved intent to the SVL.
+
+### Conversational Refinement
+
+After candidate cards are presented, the user may respond with a natural language adjustment rather than selecting a card — "actually make it monthly, not quarterly" or "add tracking error as a metric." The consumer forwards the refinement turn to the IRA alongside the current candidate state. The IRA treats the refinement as a constrained update: it re-runs the LLM with the selected or leading candidate as context and applies the requested changes to that candidate's parameters. An updated card set is returned.
+
+This creates a pre-execution dialogue loop between the user and the IRA:
+
+1. User sends a query → IRA returns candidate cards
+2. User refines ("weekly not quarterly") → IRA updates and returns revised cards
+3. User selects a card → IRA forwards resolved intent to SVL → execution proceeds
+
+The loop is bounded: a maximum number of refinement turns is configurable (`intentRefinementMaxTurns`, default 5). After the limit, the IRA requires the user to select from the current candidate set or start a new query. No data is accessed and no query is executed during the refinement loop — it is entirely within the IRA's pre-execution scope.
+
+Each refinement turn is recorded in the session context and included in the lineage record's `intent_session` field, providing a complete audit trail of how the final resolved intent was reached.
+
+### Presentation Preview
+
+Each candidate card includes a `presentation_hint` block derived from the operation's result shape and the SMR operation definition. This gives the user a preview of how the result will be presented before committing to execution — surfacing whether the result will be a grouped bar chart, a line chart, a heatmap, or a table, and which fields will appear on each axis.
+
+The `presentation_hint` is a pre-execution estimate. The DVL produces the authoritative display specification after execution, based on the actual result shape. If the result shape differs from the estimate (for example, because entitlement projection reduces the metric set), the DVL governs. The hint is informational only.
+
+| Field | Description |
+|---|---|
+| `chart_type` | Predicted chart type — `bar`, `line`, `heatmap`, `scatter`, `table` |
+| `primary_dimension` | The field that will appear on the X axis or as the primary grouping |
+| `measures` | Metric fields that will appear as Y axis values or colour encoding |
+| `series_by` | Dimension used to create series or colour bands (if applicable) |
 
 ### Structured API Path
 
@@ -501,7 +572,7 @@ Running example — portfolio manager asks:
 
 > "Show me portfolio returns versus benchmark for my equity portfolios this quarter."
 
-The IRA encodes this query and retrieves the top-3 candidate operations from the SMR: `compare_portfolios` (score 0.91), `portfolio_summary` (score 0.67), `benchmark_attribution` (score 0.61). The top candidate exceeds the confidence threshold and leads by more than 0.1. The LLM binds:
+The IRA encodes this query and retrieves the top-3 candidate operations from the SMR: `compare_portfolios` (score 0.91), `portfolio_summary` (score 0.67), `benchmark_attribution` (score 0.61). The top candidate exceeds the confidence threshold and leads by more than 0.1. The LLM binds the resolved intent and derives a presentation preview:
 
 ```json
 {
@@ -511,13 +582,19 @@ The IRA encodes this query and retrieves the top-3 candidate operations from the
     "metrics":        ["portfolio_return", "benchmark_return"],
     "time_period":    "quarter_to_date",
     "filters": [{ "dimension": "asset_class", "operator": "eq", "value": "EQUITY" }]
+  },
+  "presentation_hint": {
+    "chart_type":        "bar",
+    "primary_dimension": "portfolio_id",
+    "measures":          ["portfolio_return", "benchmark_return"],
+    "series_by":         "metric"
   }
 }
 ```
 
-Confidence is 0.91 — above threshold, no confirmation card. Resolved intent is forwarded to the SVL.
+Confidence is 0.91 — above threshold, no candidate cards shown. Resolved intent is forwarded to the SVL.
 
-**↳ Step 1 — Intent resolved.** The IRA has translated the natural language query into a structured, bound operation request. The SVL now validates and plans.
+**↳ Step 1 — Intent resolved.** The IRA has translated the natural language query into a structured, bound operation request with a presentation preview. The SVL now validates and plans.
 
 
 ## Semantic Validation Layer (SVL)
