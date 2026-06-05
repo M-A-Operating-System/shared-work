@@ -479,6 +479,8 @@ Running example — portfolio manager asks:
 
 The IRA encodes this query and retrieves the top-3 candidate operations from the SMR: `compare_portfolios` (score 0.91), `portfolio_summary` (score 0.67), `benchmark_attribution` (score 0.61). The top candidate exceeds the confidence threshold and leads by more than 0.1. The LLM binds the resolved intent and derives a presentation preview:
 
+<table><tr><td>
+
 ```json
 {
   "operation_id": "compare_portfolios",
@@ -496,6 +498,12 @@ The IRA encodes this query and retrieves the top-3 candidate operations from the
   }
 }
 ```
+
+</td><td>
+
+<img src="./intent-confirmation-card.png" width="446" alt="Intent Confirmation Card" />
+
+</td></tr></table>
 
 Confidence is 0.91 — above threshold, no candidate cards shown. Resolved intent is forwarded to the SVL.
 
