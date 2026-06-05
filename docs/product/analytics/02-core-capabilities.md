@@ -2,7 +2,7 @@
 
 This chapter is the logical architecture reference for the AI Analytics Platform. It covers nine pipeline components in the order a query encounters them, using a single portfolio manager query as a running example throughout. Each section describes what a component does, its controls contract, and where in the pipeline it sits — with no references to specific technology products or vendor implementations.
 
-The pipeline processes every request in this sequence: the **MCP Capability Layer** is the entry point — the governed API through which all consumers access the platform. The **Semantic Metrics Repository** is the governing catalogue — every queryable metric, dimension, and operation must be registered here before it is resolvable. The **Semantic Intent Layer** validates the structured request and produces a platform-agnostic query plan. The **Role-Aware Projection Layer** enforces entitlements before any query reaches a backend. The **Semantic Controls Layer** applies thresholds and compliance classification before releasing the plan for execution. The **Federated Query Engine** routes the plan to registered backends, executes in parallel, and assembles the result. The **Data Visualization Language (DVL)** selects the presentation contract. The **Narrative Synthesis Engine** produces a governed plain-language summary. The **Analytical Lineage Store** records the complete computation provenance.
+The pipeline processes every request in this sequence: the **MCP Capability Layer** is the entry point — the governed API through which all consumers access the platform. The **Semantic Metrics Repository** is the governing catalogue — every queryable metric, dimension, and operation must be registered here before it is resolvable. The **Semantic Intent Layer** validates the structured request and produces a platform-agnostic query plan. The **Role-Aware Projection Layer** enforces entitlements before any query reaches a backend. The **Semantic Controls Layer** applies thresholds and compliance classification before releasing the plan for execution. The **Physical Query Planner** translates the approved logical plan into backend-specific physical query fragments. The **Federated Query Engine** routes those fragments to registered backends, executes in parallel, and assembles the result. The **Data Visualization Language (DVL)** selects the presentation contract. The **Narrative Synthesis Engine** produces a governed plain-language summary. The **Analytical Lineage Store** records the complete computation provenance. The **Provenance Artifact Service** assembles and seals the compliance artifact when a query meets the two-signal compliance trigger.
 
 Platform roles — who interacts with each component and how — are defined before the component descriptions.
 
@@ -71,29 +71,31 @@ flowchart TD
         SIL["<b>Semantic Intent Layer (SIL)</b>\nSMR resolution · compliance intent classification · LQP generation"]
         RAPL["<b>Role-Aware Projection Layer (RAPL)</b>\nJWT claims · metric/dimension access sets · row predicates · column masks"]
         SCL["<b>Semantic Controls Layer (SCL)</b>\nPerformance impact · complexity · classification · compliance checks"]
-        FQE["<b>Federated Query Engine (FQE)</b>\nsub-plan decomposition · backend routing · parallel execution · result assembly"]
+        PQP["<b>Physical Query Planner (PQP)</b>\nphysicalMapping resolution · sub-plan decomposition · dialect translation"]
+        FQE["<b>Federated Query Engine (FQE)</b>\nbackend routing · parallel execution · result assembly"]
         DVL["<b>Data Visualization Language (DVL)</b>\nontology evaluation · deterministic chart contract selection"]
         NSE["<b>Narrative Synthesis Engine (NSE)</b>\nsecondary language model · post-computation · anchored to result values"]
+        PAS["<b>Provenance Artifact Service (PAS)</b>\nassembles and seals Provenance Artifact from ALS records\nactive only when compliance_tier.active = true"]
         LS[("<b>Analytical Lineage Store (ALS)</b>\ncomputation provenance records\ntool call · SMR resolution · LQP · controls decision · execution record · narrative status")]
         Result(["<b>MCP tool response</b>\ndisplay_spec + data + narrative + result_id\n+ compliance block (if Provenance Artifact active)"])
     end
 
-    subgraph Image["Image/Chart Rendering (Optional)"]
-        vega2img["vega2img (optional)\nStandalone MCP render service · DVL → SVG / PNG\nRegistered directly with consumers — not part of Analytics Engine"]
+    subgraph Image["<b>Image/Chart Rendering</b> (Optional)"]
+        vega2img["<b>vega2img</b> (optional)\nStandalone MCP render service · DVL → SVG / PNG\nRegistered directly with consumers — not part of Analytics Engine"]
     end
 
     subgraph dcs["Data Context Store (DCS)"]
         DCSMCP["<b>API/MCP Interface</b>\nMCP server runtime · tool/resource/prompt presentation · JWT validation"]
-        SDR[("Semantic Data Repository (SDR)\ndata models · object models · critical data elements\nquality rules · physical schemas · data lineage")]
-        SMR[("Semantic Metrics Repository (SMR)\nmetric definitions · dimensions · hierarchies\naggregation rules · access policies · compliance metadata")]
+        SDR[("<b>Semantic Data Repository (SDR)</b>\ndata models · object models · critical data elements\nquality rules · physical schemas · data lineage")]
+        SMR[("<b>Semantic Metrics Repository (SMR)</b>\nmetric definitions · dimensions · hierarchies\naggregation rules · access policies · compliance metadata")]
         SDR -->|"SMR extends SDR"| SMR
         DCSMCP --> SDR & SMR
     end
 
     subgraph backends["Data Sources"]
-        SQL["SQL Warehouse"]
-        ODA["OpenData API\nREST / OData"]
-        GDA["Graph Data API"]
+        SQL["<b>SQL Warehouse</b>"]
+        ODA["<b>OpenData API</b>\nREST / OData"]
+        GDA["<b>Graph Data API</b>"]
     end
 
     Consumers -->|"JWT + structured MCP tool call"| MCP
@@ -105,14 +107,17 @@ flowchart TD
     SIL -->|"metric + dimension ID resolution"| SMR
     SIL -->|"Logical Query Plan (LQP)"| SCL
     SCL -->|"controls decision record"| LS
-    SCL -->|"approved LQP"| FQE
-    FQE -->|"physicalMapping lookup"| SMR
+    SCL -->|"approved LQP"| PQP
+    PQP -->|"physicalMapping lookup"| SMR
+    PQP -->|"physical sub-plans"| FQE
     FQE --> SQL & ODA & GDA
     FQE -->|"execution record"| LS
     FQE -->|"assembled result"| DVL
     FQE -->|"assembled result"| NSE
+    LS -->|"lineage records (compliance queries only)"| PAS
     DVL -->|"DVL display spec"| Result
     NSE -->|"governed narrative"| Result
+    PAS -->|"sealed compliance block"| Result
 ```
 
 The Analytics Engine is a single MCP server. It exposes three analytical tools (`run_analytics`, `list_operations`, `drilldown`) through a single MCP Capability Layer endpoint. The computation pipeline (SIL, RAPL, SCL, FQE) is entirely deterministic. The Narrative Synthesis Engine runs as a post-computation step: after the FQE assembles the result, the NSE makes a targeted call to a secondary language model to summarise the data in plain text; its prompt is constructed from the result set only and its output is validated against computed values before being returned.
@@ -135,10 +140,12 @@ sequenceDiagram
     participant SMR as Semantic Metrics Repository
     participant SCL as Semantic Controls Layer
     participant ALS as Analytical Lineage Store
+    participant PQP as Physical Query Planner
     participant FQE as Federated Query Engine
     participant BE as Execution Backend(s)
     participant DVL as Data Visualization Language
     participant NSE as Narrative Synthesis Engine
+    participant PAS as Provenance Artifact Service
     participant vega2img as vega2img (optional)
 
     rect rgb(240, 245, 255)
@@ -175,11 +182,15 @@ sequenceDiagram
 
         note over SCL: Evaluates: performance impact · complexity · classification gate · compliance check<br/>Blocks if any threshold exceeded
 
-        SCL->>ALS: controls decision record (written before FQE is invoked)
-        SCL->>FQE: approved LQP
+        SCL->>ALS: controls decision record (written before execution is invoked)
+        SCL->>PQP: approved LQP
 
-        FQE->>SMR: physicalMapping lookup
-        SMR-->>FQE: physical source mappings · backend affinity
+        PQP->>SMR: physicalMapping lookup
+        SMR-->>PQP: physical source mappings · backend affinity
+
+        note over PQP: Resolves physical_mapping per metric node<br/>Groups nodes by data_affinity → one sub-plan per affinity<br/>Translates each sub-plan to backend native dialect<br/>(SQL · MetricFlow · OData · SPARQL)
+
+        PQP->>FQE: physical sub-plans
 
         FQE->>BE: sub-plan execution (parallel per data affinity)
         BE-->>FQE: raw result sets
@@ -197,6 +208,11 @@ sequenceDiagram
             FQE->>NSE: assembled result
             note over NSE: Secondary language model call<br/>Anchored strictly to result values · validation pass before inclusion
             NSE-->>MCP: governed narrative (lead + detail + anchoredTo)
+        and
+            note over ALS,PAS: Only when compliance_tier.active = true
+            ALS->>PAS: lineage records (controls decision + execution record)
+            note over PAS: Assembles Provenance Artifact from ALS records<br/>Seals artifact — immutable from this point<br/>Blocks export until sealing confirmed
+            PAS-->>MCP: sealed compliance block (regulatory_trace_id · triggered_frameworks · export_requires_lineage)
         end
     end
 
@@ -208,7 +224,7 @@ sequenceDiagram
     end
 ```
 
-The Analytics Engine receives structured parameters — never natural language — and returns structured results. The computation pipeline (SIL → RAPL → SCL → FQE) is entirely deterministic and contains no AI. The only AI steps are: natural language translation (in the consumer, grounded by the operation catalogue) and narrative synthesis (in the NSE, post-computation, constrained to the assembled result). The Analytical Lineage Store receives two writes per query — a controls decision record before the FQE is invoked and a full execution record after — ensuring the audit trail is complete regardless of whether execution succeeds.
+The Analytics Engine receives structured parameters — never natural language — and returns structured results. The computation pipeline (SIL → RAPL → SCL → PQP → FQE) is entirely deterministic and contains no AI. The only AI steps are: natural language translation (in the consumer, grounded by the operation catalogue) and narrative synthesis (in the NSE, post-computation, constrained to the assembled result). The Analytical Lineage Store receives two writes per query — a controls decision record before the PQP is invoked and a full execution record after — ensuring the audit trail is complete regardless of whether execution succeeds.
 
 ---
 
@@ -895,39 +911,105 @@ All checks pass. SCL writes a controls decision record to the Analytical Lineage
 
 ---
 
+## Physical Query Planner (PQP)
+
+> **Governing principles:** [P1 — Semantic abstraction](./00-overview.md#design-principles) · [P10 — Deterministic computation, not generation](./00-overview.md#design-principles)
+
+The Physical Query Planner (PQP) is the translation boundary between the logical and physical layers of the pipeline. It receives the controls-approved Logical Query Plan from the SCL and produces backend-specific physical query fragments — one per data affinity — that the Federated Query Engine can route directly to execution backends.
+
+Nothing above the PQP has knowledge of physical schemas, table names, or backend query languages. Nothing below it operates on logical concepts. The PQP is the single point where semantic intent becomes executable instruction.
+
+### Responsibilities
+
+The PQP performs three operations in sequence:
+
+```mermaid
+flowchart TD
+    S1["**1. physicalMapping resolution**\nFor each metric_scan node in the LQP\nread physical_mapping from the resolved metric definition\n→ source system · table or cube · measure identifier"]
+    S2["**2. Sub-plan decomposition**\nGroup metric nodes by data_affinity\nOne sub-plan per affinity group\nDistribute row predicates and filters to each sub-plan"]
+    S3["**3. Dialect translation**\nTranslate each sub-plan to the backend's native query language\nSQL for warehouse backends\nMetricFlow query for semantic layer backends\nOData filter expressions for REST data APIs\nCypher / SPARQL for graph backends"]
+    OUT(["Physical sub-plans\n→ FQE for execution"])
+
+    S1 --> S2 --> S3 --> OUT
+```
+
+The PQP has no execution capability. It does not connect to backends, manage timeouts, or assemble results. Its output is a set of ready-to-execute physical query fragments; the FQE owns everything from that point forward.
+
+### Translation is deterministic
+
+The same LQP always produces the same physical sub-plans. Given identical metric definitions, filter predicates, and time expressions, the PQP's output is fully reproducible. This property is required for lineage: the physical sub-plans written to the lineage record must faithfully represent what was executed, with no runtime variation.
+
+### physicalMapping resolution
+
+The `physical_mapping` field on each `analytical_metric` SMR definition declares where the metric lives physically:
+
+| Metric field | Resolved to |
+|---|---|
+| `physical_mapping.source` | Registered backend ID — matched against the FQE backend registry |
+| `physical_mapping.table` | Physical table or view name in the target backend |
+| `physical_mapping.measure` | Column or pre-computed measure identifier |
+| `physical_mapping.cube` | Cube name for semantic layer backends |
+
+These fields are already attached to the metric nodes in the LQP by the SIL at resolution time. The PQP reads them directly — no additional SMR call is required.
+
+### Example
+
+The SCL has approved the LQP for the portfolio manager query. The PQP receives it and begins translation.
+
+Both `portfolio_return` and `benchmark_return` carry `data_affinity: "portfolio"` and `physical_mapping.source: "primary-warehouse"`, so the PQP produces a single sub-plan. It reads the physical table and measure references from the metric nodes, applies the RAPL row predicate and asset class filter, expands `quarter_to_date` to the concrete date range `2026-04-01 → 2026-06-30`, and translates the result into SQL:
+
+```sql
+-- Physical sub-plan: affinity=portfolio · backend=primary-warehouse
+SELECT
+    p.portfolio_id,
+    SUM(f.portfolio_return  * f.market_value) / SUM(f.market_value) AS portfolio_return,
+    SUM(f.benchmark_return  * f.market_value) / SUM(f.market_value) AS benchmark_return
+FROM fact_portfolio_daily f
+JOIN dim_portfolio p ON f.portfolio_id = p.portfolio_id
+WHERE p.asset_class  = 'EQUITY'
+  AND f.portfolio_id IN ('GLOB_EQ_OPP', 'UK_CORE_INC', 'ASIA_PAC_GRW', 'EUR_BAL_INC')
+  AND f.date         BETWEEN '2026-04-01' AND '2026-06-30'
+GROUP BY p.portfolio_id
+ORDER BY portfolio_return DESC
+```
+
+If the query also included a risk metric with `data_affinity: "risk_metrics"`, the PQP would produce a second sub-plan — translated to the semantic layer's MetricFlow query format — and hand both to the FQE for parallel execution.
+
+**↳ Step 4a — Physical query planning complete.** The approved LQP has been resolved against physical mappings and translated into one executable SQL sub-plan. The FQE will route it to the registered backend. No backend has been contacted yet.
+
+---
+
 ## Federated Query Engine (FQE)
 
 > **Governing principles:** [P1 — Semantic abstraction](./00-overview.md#design-principles) · [P4 — Complete analytical lineage](./00-overview.md#design-principles) · [P10 — Deterministic computation, not generation](./00-overview.md#design-principles)
 
-The Federated Query Engine (FQE) is the only component in the platform that has knowledge of physical execution backends. No other component — not the Semantic Intent Layer, not the AI model, not the MCP Capability Layer — has access to backend connection details or physical schema information. The FQE receives a validated, controls-approved LQP, decomposes it into backend-specific sub-plans, routes those sub-plans to registered execution backends in parallel, assembles the results, and writes a complete execution record to the lineage store.
+The Federated Query Engine (FQE) is the only component in the platform with knowledge of execution backend connection details — endpoints, credentials, and availability. It receives physical sub-plans from the Physical Query Planner, routes them to the registered execution backends in parallel, assembles the results, and writes a complete execution record to the lineage store. Sub-plan decomposition and dialect translation are the PQP's responsibility; the FQE owns everything from routing onward.
 
 ### Nine-Step FQE Pipeline
 
 ```mermaid
 flowchart TD
-    S1["**1. LQP Reception & Controls Validation**\nvalidates performance impact estimate · complexity · classification"]
+    S1["**1. Sub-plan Reception**\nreceives physical sub-plans from PQP · validates backend availability"]
     S2["**2. Cache Check**\nexact match and approximate match on LQP signature"]
     CACHED(["Cached result returned"])
-    S3["**3. Sub-plan Decomposition**\nsplit LQP into sub-plans by data affinity"]
-    S4["**4. Backend Selection & Routing**\nmatch sub-plans to backends by affinity + capability"]
-    S5["**5. Physical Query Generation**\ntranslate sub-plans to engine-specific query dialect"]
-    S6["**6. Parallel Execution & Coordination**\nexecute sub-plans concurrently · handle timeouts"]
-    S7["**7. Result Assembly & Reconciliation**\njoin sub-results by shared dimensions · apply column masks"]
-    S8["**8. Result Caching & Materialisation**\nwrite result to cache · update materialisation index"]
-    S9["**9. Lineage Record Writing**\nwrite complete execution trace to lineage store"]
+    S3["**3. Backend Selection & Routing**\nmatch sub-plans to backends by affinity + capability"]
+    S4["**4. Parallel Execution & Coordination**\nexecute sub-plans concurrently · handle timeouts"]
+    S5["**5. Result Assembly & Reconciliation**\njoin sub-results by shared dimensions · apply column masks"]
+    S6["**6. Result Caching & Materialisation**\nwrite result to cache · update materialisation index"]
+    S7["**7. Lineage Record Writing**\nwrite complete execution trace to lineage store"]
     RESULT(["Assembled result + lineage record"])
 
     S1 --> S2
     S2 -->|cache hit| CACHED
     S2 -->|cache miss| S3
-    S3 --> S4 --> S5 --> S6 --> S7 --> S8 --> S9 --> RESULT
+    S3 --> S4 --> S5 --> S6 --> S7 --> RESULT
 ```
 
-### Sub-Plan Decomposition
+### Backend Routing
 
-The FQE decomposes an LQP into sub-plans by data affinity — the logical data domain declared by each metric in its SMR definition. Metrics with the same affinity are grouped into a single sub-plan; metrics with different affinities produce separate sub-plans that execute in parallel. Shared dimensions across sub-plans become the join keys for result assembly.
+The FQE receives physical sub-plans from the PQP — already decomposed by data affinity and translated to the backend's native dialect. It matches each sub-plan to a registered execution backend by affinity and capability, then executes all sub-plans concurrently. Shared dimensions across sub-plans become the join keys for result assembly.
 
-For a query requesting `portfolio_return` (affinity: `portfolio`) and `var_95` (affinity: `risk_metrics`), the FQE produces two sub-plans routed to different engines, executes them concurrently, and joins the results in memory on `portfolio_id` and `date`.
+For a query producing two sub-plans — `portfolio_return` (affinity: `portfolio`, SQL) and `var_95` (affinity: `risk_metrics`, MetricFlow) — the FQE routes each to its registered backend, executes them concurrently, and joins the results in memory on `portfolio_id` and `date`.
 
 ### Backend Adapter Table
 
@@ -999,7 +1081,7 @@ Assembled result:
 
 The FQE writes an execution record to the Analytical Lineage Store (ALS) and passes the assembled result in parallel to the Data Visualization Language (DVL) and Narrative Synthesis Engine.
 
-**↳ Step 4 — Query planning, governance, and execution complete.** The LQP passed all controls checks, was decomposed into backend-specific sub-plans, executed against the registered warehouse, and the result assembled. The full audit record is written. No physical schema was exposed at any stage.
+**↳ Step 4b — Execution complete.** The physical sub-plans were routed to the registered warehouse, executed, and the result assembled. The full audit record is written. No physical schema was exposed at any stage.
 
 ---
 
@@ -1277,6 +1359,62 @@ The first is written by SCL before the FQE is invoked — capturing the controls
 ```
 
 The document is immutable from the moment of writing. A corresponding row is inserted into `analytics.lineage_index` for search access. The full chain — original query, controls decision, metric definition versions, entitlements, physical backend call, and chart contract — is retrievable from the object store under `result_id: res-20260518-093247-wk4n`.
+
+---
+
+## Provenance Artifact Service (PAS)
+
+> **Governing principles:** [P4 — Complete analytical lineage](./00-overview.md#design-principles) · [P2 — Controls before execution](./00-overview.md#design-principles) · [P9 — Administrator sovereignty](./00-overview.md#design-principles)
+
+The Provenance Artifact Service (PAS) assembles the Provenance Artifact and returns the sealed compliance block to the MCP tool response. It is invoked in parallel with DVL and NSE, but only when the Semantic Controls Layer has determined that the two-signal compliance trigger is active (`compliance_tier.active: true`). For all other queries the PAS is not invoked and no compliance block appears in the response.
+
+### Purpose
+
+The Provenance Artifact is a sealed, tamper-evident record that satisfies regulatory requirements for demonstrable audit trail on compliance-purpose queries. It is distinct from the standard lineage record that every query produces. The lineage record is the full computation trace. The Provenance Artifact is the governed, signed output of that trace — structured for regulatory consumption, explicitly linked to the frameworks that triggered it, and sealed before the result is returned to the consumer.
+
+### Assembly and sealing
+
+The PAS reads the controls decision record and execution record that the ALS has written for the current query. It assembles them into a Provenance Artifact document — adding regulatory trace identifiers, framework tags, and the compliance intent score — and seals it by writing the sealed artifact back to the ALS as a sibling document (`{result_id}_provenance.json`). The artifact is immutable from the moment of sealing. No further write or amendment is permitted without creating a new amendment document referencing the original.
+
+### Export gate
+
+Until sealing is confirmed, export of the query result is blocked. The PAS sets `export_requires_lineage: true` in the compliance block it returns to the MCP layer. The MCP layer includes this flag in the tool response; the consumer must not present export affordances until the platform confirms sealing is complete.
+
+### Compliance block structure
+
+The PAS returns a structured compliance block to the MCP layer for inclusion in the tool response:
+
+| Field | Description |
+|---|---|
+| `compliance_purpose` | `true` — confirms the two-signal trigger was active for this query |
+| `intent_score` | The `compliance_purpose_score` from SIL — the signal that crossed the `compliance_intent_threshold` |
+| `triggered_by_metrics` | Metric IDs whose `compliance_relevant: true` flag contributed Signal 1 |
+| `triggered_by_frameworks` | Regulatory framework tags from the triggered metrics — e.g. `["mifid2"]`, `["basel3"]` |
+| `regulatory_trace_id` | The trace record identifier written to the ALS regulatory partition for the triggered framework(s) |
+| `artifact_set_version` | Artifact schema version — used by regulatory consumers to validate the structure |
+| `export_requires_lineage` | `true` — consumer must not present export until sealing is confirmed |
+| `classification_ceiling_applied` | `true` if a Basel III stress scenario metric triggered the RESTRICTED classification ceiling |
+
+### Example
+
+The portfolio manager query carries no compliance-relevant metrics — the PAS is not invoked and no compliance block appears in the response.
+
+For a regulatory query against `lcr` and `nsfr` (both `compliance_relevant: true`, `regulatory_framework: ["basel3"]`) where the SIL's compliance intent score is `0.94`, both signals are active. The PAS assembles the Provenance Artifact, seals it in the ALS, and returns:
+
+```json
+{
+  "compliance_purpose":             true,
+  "intent_score":                   0.94,
+  "triggered_by_metrics":           ["lcr", "nsfr"],
+  "triggered_by_frameworks":        ["basel3"],
+  "regulatory_trace_id":            "trace-20260518-093247-lcr-b3",
+  "artifact_set_version":           "1.0",
+  "export_requires_lineage":        true,
+  "classification_ceiling_applied": true
+}
+```
+
+This block is included in the MCP tool response under the `compliance` key. The consumer renders an appropriate disclosure to the user and withholds export affordances until the platform signals sealing is complete.
 
 ---
 
