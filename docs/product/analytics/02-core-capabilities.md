@@ -96,9 +96,9 @@ flowchart TD
     end
 
     subgraph backends["Data Sources"]
-        SQL["<b>SQL Warehouse</b>"]
-        ODA["<b>OpenData API</b>\nREST / OData"]
-        GDA["<b>Graph Data API</b>"]
+        SQL[("<b>SQL Warehouse</b>")]
+        ODA[("<b>OpenData API</b>\nREST / OData")]
+        GDA[("<b>Graph Data API</b>")]
     end
 
     Consumers -->|"JWT + structured MCP tool call"| MCP
