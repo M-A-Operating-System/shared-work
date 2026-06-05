@@ -143,25 +143,27 @@ async def run_analytics(input: RunAnalyticsInput, jwt: str) -> dict:
     Call list_operations first to discover valid operation_id values and their required params.
     The execution pipeline depth — data retrieval, metric query, or full analytical — is determined
     by the operation's execution_profile in the SMR, not by this tool."""
-    claims    = validate_jwt(jwt)
-    operation = await smr.get_operation(input.operation_id, claims)
-    # RAPL runs after SIL: SIL builds the LQP, RAPL injects role predicates into it before SCL sees it
-    return await pipeline_executor.run(operation, input.params, claims)
+    # 1. Validate JWT → claims
+    # 2. Resolve operation from SMR — rejects unknown/unapproved operation IDs
+    # 3. Delegate to pipeline_executor.run — returns result shaped by execution_profile
+    ...
 
 @mcp.tool()
 async def list_operations(input: ListOperationsInput, jwt: str) -> dict:
     """List all SMR-registered operations available to the current user's role.
     Returns operation IDs, display names, required parameters, supported metrics,
     supported dimensions, and execution profiles."""
-    claims = validate_jwt(jwt)
-    return await smr.list_operations(claims, domain=input.domain)
+    # 1. Validate JWT → claims
+    # 2. Query SMR for approved operations scoped to claims["org_id"], filtered by domain if supplied
+    ...
 
 @mcp.tool()
 async def drilldown(input: DrilldownInput, jwt: str) -> dict:
     """Navigate into a dimension hierarchy from a prior result.
     All filters, role predicates, and entitlement context from the original result are preserved."""
-    claims = validate_jwt(jwt)
-    return await drilldown_service.execute(input, claims)
+    # 1. Validate JWT → claims
+    # 2. Delegate to drilldown_service.execute — inherits governance context from original result
+    ...
 ```
 
 #### JWT Validation
@@ -178,21 +180,13 @@ JWT_ISSUER   = config["auth"]["issuer"]
 jwks_cache = {}  # { "keys": [...], "fetched_at": timestamp }
 
 async def validate_jwt(token: str) -> dict:
-    if not jwks_cache or time.time() - jwks_cache["fetched_at"] > 3600:
-        jwks_cache.update({"keys": await fetch_jwks(JWKS_URI), "fetched_at": time.time()})
+    # Input:  raw Bearer token from MCP request header
+    # Output: verified claims dict — { sub, org_id, analytics_roles, managed_portfolios, ... }
 
-    try:
-        claims = jwt.decode(token, jwks_cache["keys"], algorithms=["RS256"],
-                            audience=JWT_AUDIENCE, issuer=JWT_ISSUER)
-    except JWTError as e:
-        raise AuthenticationError(str(e))
-
-    required = ["sub", "org_id"]
-    missing  = [k for k in required if k not in claims]
-    if missing:
-        raise AuthenticationError(f"Missing required JWT claims: {missing}")
-
-    return claims   # { sub, org_id, analytics_roles: [...], managed_portfolios: [...], ... }
+    # 1. Refresh JWKS key cache if stale (>1 hour) — avoids a key fetch on every request
+    # 2. Decode and verify JWT using RS256 + cached public keys — raises AuthenticationError on failure
+    # 3. Assert required claims (sub, org_id) are present — missing claims are rejected immediately
+    ...
 ```
 
 #### Pipeline Executor
@@ -211,38 +205,18 @@ class PipelineExecutor:
         self.als  = als   # AnalyticalLineageStore
 
     async def run(self, operation: dict, params: dict, claims: dict) -> dict:
-        lqp = await self.sil.resolve(operation, params, claims)
-        lqp = await self.rapl.project(lqp, claims)
+        # Input:  SMR operation definition + raw call params + verified JWT claims
+        # Output: result dict — shape varies by execution_profile (see below)
 
-        profile = operation["execution_profile"]
-
-        if profile == "data_retrieval":
-            result = await self.fqe.execute(lqp, claims)
-            return {"result_id": result["result_id"], "rows": result["rows"], "schema": result["schema"]}
-
-        if profile == "metric_query":
-            result  = await self.fqe.execute(lqp, claims)
-            display = self.dvl.evaluate(result, operation)
-            return {"result_id": result["result_id"], "rows": result["rows"], "display_spec": display}
-
-        if profile == "full_analytical":
-            lqp    = await self.scl.approve(lqp, claims)
-            await self.als.write_controls_decision(lqp, claims)
-            result              = await self.fqe.execute(lqp, claims)
-            display, narrative  = await asyncio.gather(
-                asyncio.to_thread(self.dvl.evaluate, result, operation),
-                self.nse.synthesise(result, operation),
-            )
-            return {
-                "result_id":    result["result_id"],
-                "rows":         result["rows"],
-                "schema":       result["schema"],
-                "display_spec": display,
-                "narrative":    narrative,
-                "export_requires_lineage": lqp.get("require_lineage_for_export", False),
-            }
-
-        raise ValueError(f"Unknown execution_profile: {profile}")
+        # 1. SIL resolves params + metrics into a Logical Query Plan (LQP)
+        # 2. RAPL injects role predicates and column masks into the LQP
+        # 3. Branch on execution_profile:
+        #    data_retrieval  — FQE only → { result_id, rows, schema }
+        #    metric_query    — FQE + DVL → { result_id, rows, display_spec }
+        #    full_analytical — SCL approval → ALS controls write → FQE → DVL + NSE in parallel
+        #                    → { result_id, rows, schema, display_spec, narrative, export_requires_lineage }
+        # Note: DVL is CPU-bound; asyncio.to_thread prevents it blocking the NSE API call
+        ...
 ```
 
 DVL is synchronous (CPU-bound ontology evaluation); `asyncio.to_thread` runs it on the thread pool so it does not block the event loop during the concurrent NSE API call.
@@ -259,27 +233,14 @@ class DrilldownService:
         self.smr  = smr   # SemanticMetricsRepository — resolve drill-target metric definitions
 
     async def execute(self, input: DrilldownInput, claims: dict) -> dict:
-        # Load original lineage record to recover the LQP and governance context
-        lineage = await self.als.fetch(input.result_id, claims["org_id"])
+        # Input:  drilldown request — parent result_id + hierarchy dimension + selected value
+        # Output: { result_id, parent_id, rows, display_spec }
 
-        # Rebuild a refined LQP: add a filter node for the selected hierarchy value
-        refined_lqp = deepcopy(lineage["request_payload"]["lqp"])
-        refined_lqp["lqp_id"] = generate_id("lqp")
-        refined_lqp["nodes"].append({
-            "op":         "filter",
-            "predicates": [f"{input.hierarchy} = {repr(input.selected_value)}"],
-        })
-
-        # Role predicates from original lineage are already embedded — do not re-project
-        # Re-run FQE and DVL only; SCL approval is inherited from the original query
-        result  = await self.fqe.execute(refined_lqp, claims)
-        display = self.dvl.evaluate(result, lineage["operation"])
-        return {
-            "result_id":    result["result_id"],
-            "parent_id":    input.result_id,
-            "rows":         result["rows"],
-            "display_spec": display,
-        }
+        # 1. Fetch original lineage record — recovers the LQP and governance context
+        # 2. Clone original LQP and append a filter node for the selected hierarchy value
+        # 3. Skip RAPL and SCL — role predicates are embedded in the original LQP; approval is inherited
+        # 4. Re-run FQE and DVL only to produce a narrowed result with an updated display spec
+        ...
 ```
 
 #### Execution profiles
@@ -358,37 +319,20 @@ Prompts provide pre-built instruction templates that AI consumers can load to an
 async def analytical_assistant(jwt: str) -> str:
     """System prompt for an AI assistant using the Analytics Platform.
     Injects the organisation's available metrics and governance constraints."""
-    claims  = validate_jwt(jwt)
-    metrics = await smr.list_approved_summary(claims)   # id + label + description
-    return f"""You are a governed analytical assistant. You answer quantitative questions
-by calling the Analytics Platform tools — never by estimating or generating numbers.
-
-Available operations and metrics (call list_operations for full detail including required parameters):
-{metrics}
-
-Rules:
-- Only reference metric IDs that appear in the list above.
-- Do not invent metric values. Every number must come from a tool result.
-- When a result includes a narrative field, surface it as the primary response — do not paraphrase or restate.
-- When a result includes a result_id, offer to drilldown or inspect lineage if relevant.
-- If an operation or metric is not available, tell the user it is not registered and suggest list_operations."""
+    # 1. Validate JWT → claims
+    # 2. Fetch slim metric summary from SMR (id + label + description only — prompt size matters)
+    # 3. Return system prompt string — instructs the assistant to use tool results only, never estimate
+    ...
 
 @mcp.prompt()
 async def regulatory_reporting_assistant(jwt: str) -> str:
     """System prompt for a compliance-focused assistant operating under MiFID II or Basel III/IV.
     Adds regulatory framing and prohibits investment recommendations."""
-    claims  = validate_jwt(jwt)
-    metrics = await smr.list_approved_summary(claims, domain="regulatory")
-    return f"""You are a regulatory reporting assistant operating under strict compliance constraints.
-
-Available regulatory metrics:
-{metrics}
-
-Additional rules beyond the standard analytical assistant:
-- Do not generate investment recommendations under any circumstances.
-- For client-related queries, remind the user that a business justification will be required.
-- Cite the result_id and lineage_url in every response that references a computed metric value.
-- If a compliance mode error is returned, explain the constraint in plain English before retrying."""
+    # 1. Validate JWT → claims
+    # 2. Fetch regulatory-domain metric summary from SMR
+    # 3. Return system prompt — extends analytical_assistant rules with compliance constraints:
+    #    no investment recommendations, cite result_id in every response, explain compliance errors
+    ...
 
 if __name__ == "__main__":
     mcp.run(transport="streamable-http", host="0.0.0.0", port=8000)
@@ -414,9 +358,12 @@ class NarrativeValidationError(AnalyticsError):   code = "NARRATIVE_FAILED"
 class ClassificationGateError(AnalyticsError):    code = "CLASSIFICATION_BLOCKED"
 
 def handle_tool_error(exc: Exception) -> dict:
-    if isinstance(exc, AnalyticsError):
-        return {"error": {"code": exc.code, "message": str(exc)}}
-    return {"error": {"code": "INTERNAL_ERROR", "message": "An internal error occurred."}}
+    # Input:  any exception raised inside a tool handler
+    # Output: { error: { code, message } } — safe to return to the AI consumer
+
+    # Known AnalyticsError subclasses map to stable error codes (see table above)
+    # All other exceptions collapse to INTERNAL_ERROR — detail is never leaked to the consumer
+    ...
 ```
 
 Error code reference table:
@@ -454,21 +401,20 @@ class SemanticIntentLayer:
         self.smr = smr
 
     async def resolve(self, operation: dict, params: dict, claims: dict) -> dict:
-        self._validate_params(params, operation["required_params"])
-        resolved_metrics = [
-            await self.smr.get_metric(m, claims)
-            for m in params.get("metrics", [])
-        ]
-        lqp = LQPGenerator().build(operation, params, resolved_metrics, claims)
-        # Attach compliance intent score so SCL can apply the two-signal gate
-        lqp["compliance_purpose_score"] = self._score_compliance_intent(operation, resolved_metrics, params)
-        lqp["resolved_metrics"]         = resolved_metrics
-        return lqp
+        # Input:  SMR operation definition + raw call params + JWT claims
+        # Output: LQP with compliance_purpose_score and resolved_metrics attached
+
+        # 1. Validate params against operation's required_params — fail fast before any SMR calls
+        # 2. Resolve each metric ID from SMR — rejects unknown or non-approved metrics
+        # 3. Delegate DAG construction to LQPGenerator
+        # 4. Attach compliance_purpose_score — SCL reads this; caller never declares intent explicitly
+        # 5. Retain resolved_metrics on LQP — SCL needs them for classification and compliance checks
+        ...
 
     def _validate_params(self, params: dict, required: list[str]) -> None:
-        missing = [k for k in required if k not in params]
-        if missing:
-            raise ValueError(f"Missing required params: {missing}")
+        # Input:  raw params dict + required field list from SMR operation definition
+        # Raises: ValueError listing all missing keys — fast rejection before SMR resolution
+        ...
 ```
 
 #### Stage 2b — Compliance Intent Classification
@@ -477,15 +423,15 @@ The SIL scores each resolved query for compliance intent using three independent
 
 ```python
 def _score_compliance_intent(self, operation: dict, resolved_metrics: list[dict], params: dict) -> float:
-    # Signal sources: operation ID suffix, metric compliance_relevant flags, param keys
-    score = 0.0
-    if any(op in operation["operation_id"] for op in ["regulatory", "compliance", "audit", "report"]):
-        score += 0.5
-    if any(m.get("compliance_relevant") for m in resolved_metrics):
-        score += 0.3
-    if "justification" in params or "regulatory_period" in params:
-        score += 0.2
-    return min(score, 1.0)
+    # Input:  operation definition + resolved metric list + call params
+    # Output: float 0.0–1.0 — compliance intent probability score
+
+    # Three independent signals, summed and capped at 1.0:
+    #   +0.5 if operation_id contains a compliance keyword (regulatory, audit, report, compliance)
+    #   +0.3 if any resolved metric carries compliance_relevant: true
+    #   +0.2 if params include justification or regulatory_period keys
+    # SCL compares this score against compliance_intent_threshold in controls_config
+    ...
 ```
 
 Both fields are attached inside `resolve()` and flow through to the SCL without any additional caller wiring.
@@ -517,46 +463,33 @@ class NarrativeSynthesisEngine:
     STANDARD_MODEL = "claude-sonnet-4-6"
 
     async def synthesise(self, result: dict, operation: dict) -> str:
-        model  = self.FAST_MODEL if self._is_simple(result) else self.STANDARD_MODEL
-        prompt = self._build_prompt(result, operation)
+        # Input:  assembled FQE result + SMR operation definition
+        # Output: governed narrative string — all numeric values verified against result rows
 
-        for attempt in range(2):
-            response  = await self.client.messages.create(
-                model=model, max_tokens=512,
-                messages=[{"role": "user", "content": prompt}],
-            )
-            narrative = response.content[0].text
-            try:
-                self._validate_numbers(narrative, result["rows"])
-                return narrative
-            except NarrativeValidationError:
-                if attempt == 1:
-                    raise
-        raise NarrativeValidationError("Narrative validation failed after 2 attempts")
+        # 1. Select model — Haiku for simple results (≤5 metrics, ≤3 dimensions); Sonnet otherwise
+        # 2. Build prompt — injects metric labels, row values, and units; never includes user query or schema
+        # 3. Call Anthropic API and extract narrative text
+        # 4. Validate numbers in narrative against result rows — retry once on failure
+        # 5. Raise NarrativeValidationError if validation fails on both attempts
+        ...
 
     def _is_simple(self, result: dict) -> bool:
-        # Route to Haiku for ≤5 metrics and ≤3 dimensions; Sonnet for complex queries
-        schema = result.get("schema", [])
-        metric_count    = sum(1 for f in schema if f.get("type") == "number")
-        dimension_count = len(schema) - metric_count
-        return metric_count <= 5 and dimension_count <= 3
+        # Input:  assembled result with schema field list
+        # Output: True if ≤5 numeric fields and ≤3 non-numeric fields — routes to Haiku
+        ...
 
     def _build_prompt(self, result: dict, operation: dict) -> str:
-        # Inject metric labels + row values + units; no user query, no physical schema
-        rows_text = "\n".join(str(row) for row in result["rows"])
-        return f"Summarise this {operation['display_name']} result in 2-3 sentences:\n{rows_text}"
+        # Input:  result rows + operation display_name
+        # Output: prompt string — metric labels + values injected; no user query, no physical schema
+        # Keeping the prompt free of schema details prevents the model from leaking internal structure
+        ...
 
     def _validate_numbers(self, narrative: str, rows: list[dict]) -> None:
-        # Extract every numeric token from narrative text (e.g. "12.4%", "1,023")
-        # For each number, verify it appears in at least one result row within ±1% tolerance
-        # If any number cannot be matched, raise NarrativeValidationError
-        # Caller (synthesise) retries once with a correction prompt before propagating the error
-        numeric_tokens = re.findall(r"[\d,]+\.?\d*", narrative.replace(",", ""))
-        flat_values    = [str(v) for row in rows for v in row.values() if isinstance(v, (int, float))]
-        for token in numeric_tokens:
-            if not any(abs(float(token) - float(v)) / max(abs(float(v)), 1) <= 0.01
-                       for v in flat_values if v.replace(".", "").isdigit()):
-                raise NarrativeValidationError(f"Unverifiable number in narrative: {token}")
+        # Input:  generated narrative + result rows
+        # Raises: NarrativeValidationError if any numeric token in the narrative cannot be matched
+        #         to a value in the result rows within ±1% tolerance
+        # Purpose: prevents hallucinated figures reaching the consumer
+        ...
 ```
 
 ---
@@ -669,40 +602,32 @@ class SemanticMetricsRegistry:
         self.sdr = sdr_client
 
     async def get_operation(self, operation_id: str, claims: dict) -> dict:
-        doc = await self.sdr.get(
-            document_type="analytical_operation",
-            id=operation_id,
-            org_id=claims["org_id"],
-        )
-        if doc["status"] != "approved":
-            raise OperationNotAvailableError(operation_id)
-        return doc
+        # Input:  operation_id string + JWT claims (for org_id scoping)
+        # Output: approved analytical_operation document from SDR
+        # Raises: OperationNotAvailableError if not found or status != "approved"
+        ...
 
     async def list_operations(self, claims: dict, domain: str | None = None) -> list[dict]:
-        return await self.sdr.search(
-            document_type="analytical_operation",
-            org_id=claims["org_id"],
-            filters={"domain": domain} if domain else {},
-        )
+        # Input:  JWT claims + optional domain filter
+        # Output: list of approved analytical_operation documents for the caller's org
+        ...
 
     async def get_metric(self, metric_id: str, claims: dict) -> dict:
-        return await self.sdr.get(
-            document_type="analytical_metric",
-            id=metric_id,
-            org_id=claims["org_id"],
-        )
+        # Input:  metric_id string + JWT claims
+        # Output: approved analytical_metric document — includes physical_mapping and compliance fields
+        # Raises: MetricNotFoundError if not found or not approved
+        ...
 
     async def list_metrics(self, claims: dict, **filters) -> list[dict]:
-        return await self.sdr.search(
-            document_type="analytical_metric",
-            org_id=claims["org_id"],
-            filters=filters,
-        )
+        # Input:  JWT claims + arbitrary SDR filter kwargs (status, domain, etc.)
+        # Output: list of matching analytical_metric documents for the caller's org
+        ...
 
     async def list_approved_summary(self, claims: dict, domain: str | None = None) -> list[dict]:
-        metrics = await self.list_metrics(claims, status="approved", domain=domain)
-        return [{"id": m["metric_id"], "label": m["display_name"], "description": m["description"]}
-                for m in metrics]
+        # Input:  JWT claims + optional domain filter
+        # Output: slim list — [{ id, label, description }] — injected into prompt context
+        # Intentionally minimal: prompt context size matters; full definitions are available via get_metric
+        ...
 ```
 
 ---
@@ -800,127 +725,34 @@ The Semantic Intent Layer resolves metric IDs against the SMR, merges in role pr
 from datetime import date, timedelta
 
 class LQPGenerator:
-    def build(
-        self,
-        operation:  dict,
-        params:     dict,
-        metrics:    list[dict],
-        dimensions: list[dict],
-        claims:     dict,
-    ) -> dict:
-        nodes    = []
-        node_seq = 0
+    def build(self, operation: dict, params: dict, metrics: list[dict], claims: dict) -> dict:
+        # Input:  SMR operation + validated params + resolved metric documents + JWT claims
+        # Output: LQP dict — { lqp_id, org_id, nodes: [...], output: terminal_node_id }
 
-        def next_id() -> str:
-            nonlocal node_seq
-            node_seq += 1
-            return f"node-{node_seq}"
-
-        # 1. One metric_scan node per resolved metric
-        scan_ids = []
-        for metric in metrics:
-            nid  = next_id()
-            node = {
-                "id":               nid,
-                "op":               "metric_scan",
-                "metric_id":        metric["metric_id"],
-                "metric_version":   metric["version"],
-                "aggregation":      metric["aggregation"],
-                "data_affinity":    metric["data_affinity"],
-                "physical_mapping": metric["physical_mapping"],
-            }
-            if wm := metric.get("weight_metric_id"):
-                node["weight_metric_id"] = wm   # present only for weighted aggregations
-            nodes.append(node)
-            scan_ids.append(nid)
-
-        # 2. Join if metrics span multiple nodes
-        current = scan_ids[0]
-        if len(scan_ids) > 1:
-            join_id = next_id()
-            nodes.append({
-                "id":        join_id,
-                "op":        "join",
-                "inputs":    scan_ids,
-                "join_keys": self._infer_join_keys(metrics),
-            })
-            current = join_id
-
-        # 3. Filter — from params["filters"] and any role predicates already merged in
-        filters = params.get("filters", [])
-        if filters:
-            filter_id = next_id()
-            nodes.append({
-                "id":         filter_id,
-                "op":         "filter",
-                "input":      current,
-                "predicates": [self._render_predicate(f) for f in filters],
-            })
-            current = filter_id
-
-        # 4. Time expansion — resolve symbolic period to a concrete date range
-        if "time_period" in params or "as_of_date" in params:
-            time_id = next_id()
-            nodes.append({
-                "id":             time_id,
-                "op":             "time_expand",
-                "input":          current,
-                "period":         params.get("time_period"),
-                "as_of_date":     params.get("as_of_date"),
-                "resolved_range": self._resolve_time(params),
-            })
-            current = time_id
-
-        # 5. Sort — from operation default or params override
-        sort_by = params.get("sort") or operation.get("default_sort")
-        if sort_by:
-            sort_id = next_id()
-            nodes.append({"id": sort_id, "op": "sort", "input": current, "by": sort_by})
-            current = sort_id
-
-        return {
-            "lqp_id":    generate_id("lqp"),
-            "org_id": claims["org_id"],
-            "nodes":     nodes,
-            "output":    current,   # terminal node consumed by FQE
-        }
+        # 1. Emit one metric_scan node per resolved metric — carries physical_mapping and aggregation
+        # 2. If metrics span >1 node, emit a join node — join keys inferred from shared required_dimensions
+        # 3. Emit filter node from params["filters"] if present
+        # 4. Emit time_expand node if time_period or as_of_date in params — resolves symbolic period to date range
+        # 5. Emit sort node from params["sort"] or operation["default_sort"] if present
+        # Note: "output" points to the terminal node — FQE reads this to find the execution entry point
+        ...
 
     def _infer_join_keys(self, metrics: list[dict]) -> list[str]:
-        # Intersection of required_dimensions across all metrics — safe shared join keys
-        key_sets = [set(m.get("required_dimensions", [])) for m in metrics]
-        keys = list(set.intersection(*key_sets)) if key_sets else []
-        if not keys:
-            raise ValueError(
-                f"No shared required_dimensions across metrics — cannot infer join keys. "
-                f"Ensure all co-queried metrics share at least one canonical dimension name. "
-                f"Metrics: {[m['metric_id'] for m in metrics]}"
-            )
-        return keys
+        # Input:  list of resolved metric documents
+        # Output: intersection of required_dimensions across all metrics — safe shared join keys
+        # Raises: ValueError if no shared dimensions exist — co-queried metrics must share at least one
+        ...
 
     def _render_predicate(self, f: dict) -> str:
-        op_map = {
-            "eq": "=", "neq": "!=", "gt": ">", "lt": "<", "gte": ">=", "lte": "<=",
-            "in": "IN", "not_in": "NOT IN",
-        }
-        op  = op_map[f["operator"]]
-        val = f"({', '.join(repr(v) for v in f['value'])})" if isinstance(f["value"], list) \
-              else repr(f["value"])
-        return f"{f['dimension']} {op} {val}"
+        # Input:  filter dict — { dimension, operator, value }
+        # Output: SQL predicate string — e.g. "asset_class IN ('EQUITY', 'FIXED_INCOME')"
+        ...
 
     def _resolve_time(self, params: dict) -> dict:
-        as_of  = date.fromisoformat(params.get("as_of_date", date.today().isoformat()))
-        period = params.get("time_period", "")
-        if period == "quarter_to_date":
-            start = date(as_of.year, ((as_of.month - 1) // 3) * 3 + 1, 1)
-        elif period == "month_to_date":
-            start = as_of.replace(day=1)
-        elif period == "year_to_date":
-            start = as_of.replace(month=1, day=1)
-        elif period == "trailing_12m":
-            start = as_of.replace(year=as_of.year - 1)
-        else:
-            start = as_of   # point-in-time or caller-supplied range
-        return {"from": start.isoformat(), "to": as_of.isoformat()}
+        # Input:  params with time_period and/or as_of_date
+        # Output: { from: ISO date, to: ISO date } — concrete range for time_expand node
+        # Handles: month_to_date, quarter_to_date, year_to_date, trailing_12m; defaults to point-in-time
+        ...
 ```
 
 ---
@@ -980,59 +812,40 @@ class RoleAwareProjectionLayer:
         self.config = config or {}   # platform config — used for roleClaimField lookup
 
     async def project(self, lqp: dict, claims: dict) -> dict:
-        # analytics_roles is an array claim — users may hold multiple roles
-        # roleClaimField is configurable (see Ch04 §entitlements config)
-        role_claim_field = self.config.get("roleClaimField", "analytics_roles")
-        roles = claims.get(role_claim_field, [])
-        if isinstance(roles, str):
-            roles = [roles]  # normalise scalar claim to list
+        # Input:  LQP from SIL + JWT claims
+        # Output: LQP with role predicates injected and column_masks attached
 
-        policies = [p for p in [await self._load_policy(claims["org_id"], r) for r in roles] if p]
-        if not policies:
-            raise AccessDeniedError("No role policy found — defaultDenyAll")
-
-        # Merge: metric access = union across roles; row predicates = intersection (most restrictive)
-        merged = self._merge_policies(policies)
-        lqp = self._inject_row_predicates(lqp, merged, claims)
-        lqp["column_masks"] = merged.get("columnMasks", {})
-        return lqp
+        # 1. Extract analytics_roles from claims — roleClaimField is configurable
+        # 2. Load a role policy for each role — raises AccessDeniedError if none found (defaultDenyAll)
+        # 3. Merge policies — row predicates intersected; column masks unioned
+        # 4. Inject row predicate filter nodes into LQP
+        # 5. Attach column_masks to LQP for FQE assembler to apply post-execution
+        ...
 
     def _merge_policies(self, policies: list[dict]) -> dict:
-        # Row predicates: intersection by key presence — only dimensions constrained by ALL roles are applied
-        # Where two roles define different predicate values for the same key, the first role's value is used
-        # Column masks: union — a field masked by any role is masked for the user
-        # Metric access: union — a metric permitted by any role is permitted
-        row_predicates = policies[0].get("rowPredicates", {})
-        for p in policies[1:]:
-            row_predicates = {k: v for k, v in row_predicates.items() if k in p.get("rowPredicates", {})}
-        column_masks: dict = {}
-        for p in policies:
-            column_masks.update(p.get("columnMasks", {}))
-        return {"rowPredicates": row_predicates, "columnMasks": column_masks}
+        # Input:  list of role policy documents for all of the user's roles
+        # Output: merged policy — { rowPredicates, columnMasks }
+
+        # Row predicates: intersection by key — only dimensions constrained by ALL roles are applied
+        #   Where two roles define different values for the same key, first role wins
+        # Column masks: union — masked by any role means masked for the user
+        ...
 
     def _inject_row_predicates(self, lqp: dict, policy: dict, claims: dict) -> dict:
-        for dimension, template in policy.get("rowPredicates", {}).items():
-            predicate = self._interpolate(template, claims)
-            lqp["nodes"].append({"op": "filter", "predicates": [predicate]})
-        lqp["row_predicates_applied"] = True
-        return lqp
+        # Input:  LQP + merged policy + claims (for template interpolation)
+        # Output: LQP with filter nodes appended for each row predicate
+        ...
 
     def _interpolate(self, template: str, claims: dict) -> str:
-        # Replace every {{user.claim_name}} token with the matching JWT claim value
-        # Unknown tokens collapse to empty string so the predicate remains valid SQL
-        def replace(match):
-            claim_key = match.group(1)
-            value     = claims.get(claim_key, "")
-            if isinstance(value, list):
-                value = ", ".join(f"'{v}'" for v in value)
-            return str(value)
-        return re.sub(r"\{\{user\.(\w+)\}\}", replace, template)
+        # Input:  predicate template string — e.g. "portfolio_id IN ({{user.managed_portfolios}})"
+        # Output: resolved predicate string with {{user.claim_name}} tokens replaced by JWT claim values
+        # List claims are expanded to comma-separated quoted values; unknown tokens collapse to empty string
+        ...
 
     async def _load_policy(self, org_id: str, role: str) -> dict | None:
-        return await self.pg.fetchrow(
-            "SELECT * FROM role_policies WHERE org_id=$1 AND role_id=$2",
-            org_id, role,
-        )
+        # Input:  org_id + role name
+        # Output: role_policies row as dict, or None if no policy exists for this role
+        ...
 ```
 
 ---
@@ -1079,128 +892,68 @@ class SemanticControlsLayer:
         self.redis = redis_client
 
     async def _acquire_query_slot(self, org_id: str, config: dict) -> None:
-        key     = f"query_slots:{org_id}"
-        ceiling = config["max_concurrent_queries"]
-        count   = await self.redis.incr(key)
-        await self.redis.expire(key, config["query_timeout_seconds"] + 5)
-        if count > ceiling:
-            await self.redis.decr(key)
-            raise ConcurrentQueryLimitExceeded(f"Org {org_id} at concurrent query limit ({ceiling})")
+        # Input:  org_id + controls config (for max_concurrent_queries and timeout)
+        # Raises: ConcurrentQueryLimitExceeded if the org is at its concurrent query ceiling
+        # Uses Redis INCR as a cross-pod atomic counter — safe under horizontal scaling
+        ...
 
     async def _release_query_slot(self, org_id: str) -> None:
-        await self.redis.decr(f"query_slots:{org_id}")
+        # Decrements the Redis counter — called in the except block of approve() to release on failure
+        ...
 
     async def approve(self, lqp: dict, claims: dict) -> dict:
-        config = await self._load_config(claims["org_id"])
-        await self._acquire_query_slot(claims["org_id"], config)
-        try:
-            # All checks run inside the try so the semaphore slot is always released on failure
-            performance_impact = self._estimate_performance_impact(lqp, config)
-            if performance_impact > config["performance_impact_ceiling_per_query"]:
-                raise PerformanceImpactCeilingExceeded(performance_impact)
+        # Input:  RAPL-projected LQP + JWT claims
+        # Output: LQP with controls_approved: true and estimated_performance_impact attached
+        # Raises: one of PerformanceImpactCeilingExceeded, UserPerformanceImpactBudgetExceeded,
+        #         ClassificationGateError, ConcurrentQueryLimitExceeded
 
-            spend = await self._hourly_spend(claims["sub"], claims["org_id"])
-            if spend + performance_impact > config["performance_impact_budget_per_user_hourly"]:
-                raise UserPerformanceImpactBudgetExceeded()
-
-            self._check_classification(lqp, config)
-            lqp = self._check_compliance(lqp, claims, config)
-
-            lqp["estimated_performance_impact"] = performance_impact
-            lqp["controls_approved"]            = True
-            return lqp
-        except Exception:
-            await self._release_query_slot(claims["org_id"])
-            raise
+        # 1. Load controls config for the org
+        # 2. Acquire Redis query slot — raises ConcurrentQueryLimitExceeded if at ceiling
+        # 3. Estimate performance impact — raises PerformanceImpactCeilingExceeded if over limit
+        # 4. Check hourly user spend — raises UserPerformanceImpactBudgetExceeded if over budget
+        # 5. Check metric classification levels — raises ClassificationGateError if blocked
+        # 6. Run two-signal compliance check — escalates to Provenance Artifact if both signals active
+        # Note: all checks are inside try/except so the semaphore slot is always released on failure
+        ...
 
     def _estimate_performance_impact(self, lqp: dict, config: dict) -> int:
-        TIME_MULTIPLIERS = {
-            "month_to_date":    1.0,
-            "quarter_to_date":  2.0,
-            "year_to_date":     4.0,
-            "trailing_12m":     6.0,
-            "trailing_3y":     18.0,
-        }
-        DIMENSION_CARDINALITY = {   # estimated cardinality per dimension type
-            "portfolio_id":  10,
-            "asset_class":    5,
-            "sector":        11,
-            "geography":    200,
-            "currency":      50,
-            "issuer":      5000,
-        }
+        # Input:  LQP with resolved_metrics and nodes
+        # Output: integer performance impact score — compared against config ceilings
 
-        metrics    = lqp.get("resolved_metrics", [])
-        dimensions = [n for n in lqp["nodes"] if n["op"] == "filter"]
-        time_node  = next((n for n in lqp["nodes"] if n["op"] == "time_expand"), None)
-
-        time_multiplier = TIME_MULTIPLIERS.get(
-            time_node["period"] if time_node else "", 1.0
-        )
-        dim_cardinality = sum(
-            DIMENSION_CARDINALITY.get(dim, 100)
-            for dim in lqp.get("requested_dimensions", [])
-        ) or 1
-
-        return int(sum(
-            m.get("cost_weight", 1) * dim_cardinality * time_multiplier
-            for m in metrics
-        ))
+        # Formula: Σ(metric.cost_weight × dimension_cardinality × time_multiplier)
+        #   time_multiplier:      month_to_date=1, quarter=2, year=4, trailing_12m=6, trailing_3y=18
+        #   dimension_cardinality: estimated row count per dimension (portfolio=10, issuer=5000, etc.)
+        # Calibrated against actual backend query costs — cost_weight on each metric drives the score
+        ...
 
     def _check_classification(self, lqp: dict, config: dict) -> None:
-        # Reject if any resolved metric carries a classificationLevel that exceeds the configured gate
-        # blocked_classifications is an ordered list — e.g. ["restricted", "confidential", "top_secret"]
-        blocked = config.get("blocked_classifications", [])
-        for metric in lqp.get("resolved_metrics", []):
-            level = metric.get("data_classification", "internal")
-            if level in blocked:
-                raise ClassificationGateError(
-                    f"Metric '{metric['metric_id']}' has classification '{level}' — blocked by controls config"
-                )
+        # Input:  LQP with resolved_metrics + controls config with blocked_classifications list
+        # Raises: ClassificationGateError if any metric's classification_level is in blocked_classifications
+        ...
 
     def _check_compliance(self, lqp: dict, claims: dict, config: dict) -> dict:
-        # Two-signal compliance escalation:
-        # Signal 1 — any resolved metric has compliance_relevant: true
-        # Signal 2 — compliance_purpose_score meets configured threshold
-        compliance_metrics = [
-            m["metric_id"] for m in lqp.get("resolved_metrics", [])
-            if m.get("compliance_relevant", False)
-        ]
-        threshold = config.get("compliance_intent_threshold", 0.8)
-        intent_score = lqp.get("compliance_purpose_score", 0.0)
-        compliance_purpose = intent_score >= threshold
+        # Input:  LQP (with compliance_purpose_score from SIL) + controls config
+        # Output: LQP with compliance_tier block attached
 
-        if compliance_metrics and compliance_purpose:
-            # Escalate to Provenance Artifact generation
-            triggered_frameworks = list({
-                fw
-                for m in lqp.get("resolved_metrics", [])
-                if m.get("compliance_relevant")
-                for fw in m.get("regulatory_framework", [])
-            })
-            lqp["compliance_tier"] = {
-                "active":                  True,
-                "intent_score":            intent_score,
-                "triggered_by_metrics":    compliance_metrics,
-                "triggered_by_frameworks": triggered_frameworks,
-                "bypass_cache":            True,
-            }
-            # Enforce lineage-gated export regardless of platform config
-            lqp["require_lineage_for_export"] = True
-        else:
-            lqp["compliance_tier"] = {"active": False}
-
-        return lqp
+        # Two-signal gate:
+        #   Signal 1 — any resolved metric has compliance_relevant: true
+        #   Signal 2 — compliance_purpose_score >= compliance_intent_threshold (default 0.8)
+        # Both signals active → Provenance Artifact: compliance_tier.active = true,
+        #   triggered_by_frameworks derived from metric regulatory_framework tags,
+        #   bypass_cache = true, require_lineage_for_export = true
+        # Either signal absent → compliance_tier.active = false (normal query path)
+        ...
 
     async def _load_config(self, org_id: str) -> dict:
-        return await self.sdr.get(document_type="controls_config", org_id=org_id)
+        # Input:  org_id
+        # Output: controls_config document from SDR — thresholds, classification gates, compliance settings
+        ...
 
     async def _hourly_spend(self, user_sub: str, org_id: str) -> int:
-        return await self.pg.fetchval(
-            "SELECT COALESCE(SUM(performance_impact_units), 0) FROM analytics.lineage_index "
-            "WHERE user_sub=$1 AND org_id=$2 AND created_at > now() - interval '1 hour'",
-            user_sub, org_id,
-        )
+        # Input:  user JWT sub + org_id
+        # Output: sum of performance_impact_units from lineage_index in the past hour
+        # Used to enforce the per-user hourly performance impact budget
+        ...
 ```
 
 ---
@@ -1319,53 +1072,25 @@ class SnowflakeAdapter:
         self.conn_params = connection_params
 
     async def ping(self) -> bool:
-        try:
-            conn = snowflake.connector.connect(**self.conn_params)
-            conn.cursor().execute("SELECT 1")
-            return True
-        except Exception:
-            return False
+        # Output: True if Snowflake connection is healthy — used by Admin API health check
+        ...
 
     async def execute_sub_plan(self, sub_plan: dict) -> dict:
-        sql, params = self._render_sql(sub_plan)
-        conn        = snowflake.connector.connect(**self.conn_params)
-        cursor      = conn.cursor()
-        cursor.execute(sql, params)
-        columns = [d[0].lower() for d in cursor.description]
-        rows    = [dict(zip(columns, row)) for row in cursor.fetchall()]
-        return {"affinity": sub_plan["affinity"], "rows": rows, "columns": columns}
+        # Input:  sub-plan fragment — metric_scan, filter, time_expand, sort nodes for one affinity
+        # Output: { affinity, rows: [dict], columns: [str] }
+        # Renders SQL via _render_sql, executes against Snowflake, returns typed row dicts
+        ...
 
     def _render_sql(self, sub_plan: dict) -> tuple[str, list]:
-        # Build parameterised SQL from LQP node list
-        metric_nodes = [n for n in sub_plan["nodes"] if n["op"] == "metric_scan"]
-        filter_nodes = [n for n in sub_plan["nodes"] if n["op"] == "filter"]
-        time_node    = next((n for n in sub_plan["nodes"] if n["op"] == "time_expand"), None)
-        sort_node    = next((n for n in sub_plan["nodes"] if n["op"] == "sort"), None)
+        # Input:  sub-plan node list
+        # Output: (parameterised SQL string, positional params list)
 
-        # SELECT clause — one column per metric measure
-        selects = [f"{n['physical_mapping']['measure']} AS {n['metric_id']}" for n in metric_nodes]
-        table   = metric_nodes[0]["physical_mapping"]["table"]
-
-        sql    = f"SELECT {', '.join(selects)} FROM {table}"
-        params = []
-
-        # WHERE clause — from filter node predicates
-        where = []
-        for node in filter_nodes:
-            for pred in node.get("predicates", []):
-                where.append(pred)
-        if time_node:
-            where.append(f"date BETWEEN %s AND %s")
-            params += [time_node["resolved_range"]["from"], time_node["resolved_range"]["to"]]
-        if where:
-            sql += " WHERE " + " AND ".join(where)
-
-        # ORDER BY
-        if sort_node:
-            by  = sort_node["by"][0]
-            sql += f" ORDER BY {by['field']} {by['direction'].upper()}"
-
-        return sql, params
+        # 1. SELECT — one measure column per metric_scan node (from physical_mapping)
+        # 2. FROM — physical table from first metric_scan node's physical_mapping
+        # 3. WHERE — predicates from filter nodes + date range from time_expand node
+        # 4. ORDER BY — from sort node if present
+        # Note: Calcite optimises the physical plan inside the adapter before this SQL runs
+        ...
 ```
 
 ```python
@@ -1378,55 +1103,36 @@ class FederatedQueryPlanner:
         self.cache    = cache
 
     async def execute(self, lqp: dict, claims: dict) -> dict:
-        # Cache-aside: return cached result if available; bypass for compliance queries
-        cached = await self.cache.get(lqp, claims)
-        if cached:
-            cached["cache_hit"] = True
-            return cached
-        sub_plans = self._split_by_affinity(lqp)
-        results   = await asyncio.gather(*[self._execute_sub_plan(sp) for sp in sub_plans])
-        assembled = self._assemble(results, lqp)
-        await self.cache.set(lqp, claims, assembled, ttl=lqp.get("cache_ttl_seconds", 300))
-        await self.lineage.write_execution(lqp, assembled)
-        return assembled
+        # Input:  SCL-approved LQP + JWT claims
+        # Output: assembled result — { result_id, rows, columns, schema, cache_hit, ... }
+
+        # 1. Cache read — return cached result if available; compliance queries always bypass
+        # 2. Split LQP into sub-plans by data_affinity — one sub-plan per backend
+        # 3. Fan-out: execute all sub-plans in parallel via asyncio.gather
+        # 4. Assemble: fan-in results, join on shared dimension key, apply sort/limit
+        # 5. Cache write — store assembled result with TTL
+        # 6. Write execution record to ALS
+        ...
 
     def _split_by_affinity(self, lqp: dict) -> list[dict]:
-        # Group metric_scan nodes by data_affinity; each group becomes a sub-plan
-        groups: dict[str, list] = {}
-        for node in lqp["nodes"]:
-            if node["op"] == "metric_scan":
-                groups.setdefault(node["data_affinity"], []).append(node)
-        return [{"affinity": aff, "nodes": nodes} for aff, nodes in groups.items()]
+        # Input:  full LQP
+        # Output: list of sub-plan dicts — one per unique data_affinity value in metric_scan nodes
+        ...
 
     async def _execute_sub_plan(self, sub_plan: dict) -> dict:
-        adapter = self.backends[sub_plan["affinity"]]
-        return await adapter.execute_sub_plan(sub_plan)
+        # Input:  sub-plan dict with affinity key
+        # Output: result from the matching backend adapter — { affinity, rows, columns }
+        # Routes by affinity to the registered FQPBackendAdapter (e.g. SnowflakeAdapter, CubeJSAdapter)
+        ...
 
     def _assemble(self, results: list[dict], lqp: dict) -> dict:
-        # Fan-in: merge sub-results from each backend adapter into a single result set
-        # If only one sub-result, pass through directly
-        # If multiple, join on the first shared dimension key present in all row dicts
-        # Apply any top-level sort/limit nodes from the LQP after joining
-        if len(results) == 1:
-            rows    = results[0]["rows"]
-            columns = results[0]["columns"]
-        else:
-            # Merge sub-results on the shared join key — dict.update() combines columns from each backend
-            join_key = lqp.get("join_key", "date")
-            merged: dict = {}
-            for result in results:
-                for row in result["rows"]:
-                    merged.setdefault(row[join_key], {}).update(row)
-            rows = list(merged.values())
-            columns  = list({col for result in results for col in result["columns"]})
-        sort_node  = next((n for n in lqp["nodes"] if n["op"] == "sort"), None)
-        limit_node = next((n for n in lqp["nodes"] if n["op"] == "limit"), None)
-        if sort_node:
-            by  = sort_node["by"][0]
-            rows = sorted(rows, key=lambda r: r.get(by["field"]), reverse=by["direction"] == "desc")
-        if limit_node:
-            rows = rows[:limit_node["count"]]
-        return {"result_id": generate_id("res"), "rows": rows, "columns": columns, "schema": lqp.get("output_schema", [])}
+        # Input:  list of sub-plan results + original LQP
+        # Output: { result_id, rows, columns, schema }
+
+        # Single result — pass through directly
+        # Multiple results — join on shared dimension key using dict.update() to merge columns
+        # Apply sort node and limit node from LQP after joining
+        ...
 
 
 class FQPBackendAdapter:
@@ -1509,71 +1215,34 @@ INTENT_CONTRACTS = {
 
 class DataVisualizationLanguage:
     def evaluate(self, result: dict, operation: dict) -> dict:
-        intent   = self._infer_intent(operation)
-        contract = self._match_contract(intent, result["schema"])
-        return self._build_display_spec(contract, result, operation)
+        # Input:  assembled FQE result + SMR operation definition
+        # Output: DVL display spec — Vega-Lite v5 JSON for charts, platform table spec for tabular results
+
+        # 1. Infer intent pattern from operation's default_visualization field
+        # 2. Match intent + metric count to a named chart contract
+        # 3. Build display spec for the matched contract — TABLE is the safe fallback for any unmatched case
+        ...
 
     def _infer_intent(self, operation: dict) -> str:
-        intent_map = {
-            "attribution_waterfall":       "ATTRIBUTION",
-            "bar_multi_series_comparison": "COMPARISON",
-            "line_time_series":            "TREND",
-            "histogram":                   "DISTRIBUTION",
-            "table":                       "TABLE",
-        }
-        return intent_map.get(operation.get("default_visualization", "table"), "TABLE")
+        # Input:  SMR operation definition
+        # Output: intent pattern string — ATTRIBUTION, COMPARISON, TREND, DISTRIBUTION, or TABLE
+        # Derived from operation["default_visualization"] — set at metric authoring time
+        ...
 
     def _match_contract(self, intent: str, schema: list) -> str:
-        num_metrics = sum(1 for f in schema if f["type"] == "number")
-        return INTENT_CONTRACTS.get((intent, num_metrics), "TABLE")
+        # Input:  intent pattern + result schema field list
+        # Output: named chart contract — e.g. BAR_MULTI_SERIES_COMPARISON, LINE_TIME_SERIES, TABLE
+        # Looks up (intent, metric_count) in INTENT_CONTRACTS map; defaults to TABLE
+        ...
 
     def _build_display_spec(self, contract: str, result: dict, operation: dict) -> dict:
-        metric_fields = [f["field"] for f in result["schema"] if f["type"] == "number"]
-        dim_field     = next(f["field"] for f in result["schema"] if f["type"] == "string")
+        # Input:  contract name + assembled result + operation definition
+        # Output: Vega-Lite v5 spec (for charts) or { type: "table", columns, data } (for tables)
 
-        if contract == "TABLE":
-            return {
-                "type":    "table",
-                "columns": [{"field": f["field"], "label": f["field"].replace("_", " ").title(),
-                              "type": f["type"]} for f in result["schema"]],
-                "data":    {"values": result["rows"]},
-            }
-
-        if contract == "BAR_MULTI_SERIES_COMPARISON":
-            # Pivot to long form: one row per (dimension × metric)
-            values = [
-                {dim_field: row[dim_field], "metric": mf.replace("_", " ").title(), "value": row[mf]}
-                for row in result["rows"]
-                for mf in metric_fields
-            ]
-            return {
-                "type":     "chart",
-                "contract": contract,
-                "mark":     "bar",
-                "data":     {"values": values},
-                "encoding": {
-                    "x":     {"field": dim_field,  "type": "nominal",      "sort": "-y"},
-                    "y":     {"field": "value",    "type": "quantitative", "axis": {"format": ".2f"}},
-                    "color": {"field": "metric",   "type": "nominal"},
-                },
-                "formatHints":  {mf: {"format": ".2%"} for mf in metric_fields},
-                "interactions": ["click:drilldown", "hover:tooltip", "select:multi-point"],
-            }
-
-        if contract == "LINE_TIME_SERIES":
-            return {
-                "type":     "chart",
-                "contract": contract,
-                "mark":     "line",
-                "data":     {"values": result["rows"]},
-                "encoding": {
-                    "x":     {"field": "date",              "type": "temporal"},
-                    "y":     {"field": metric_fields[0],    "type": "quantitative"},
-                    "color": {"field": dim_field,           "type": "nominal"},
-                },
-            }
-
-        return {"type": "table", "data": {"values": result["rows"]}}   # safe fallback
+        # Each contract has a fixed encoding shape — no runtime chart-type decisions
+        # Multi-metric charts pivot to long form (one row per dimension × metric)
+        # TABLE is always the safe fallback if no contract matches
+        ...
 ```
 
 ---
@@ -1622,55 +1291,33 @@ class RenderTableInput(BaseModel):
 async def render_chart(input: RenderChartInput) -> dict:
     """Render a Vega-Lite display spec from the Analytics Platform to a static image.
     Returns a base64-encoded image and MIME type."""
-    html        = _vega_embed_html(input.display_spec, input.width, input.height)
-    image_bytes = await _screenshot(html, input.format, input.width, input.height)
-    return {
-        "image":     base64.b64encode(image_bytes).decode(),
-        "mime_type": "image/png" if input.format == "png" else "image/svg+xml",
-    }
+    # 1. Build an HTML page embedding the Vega-Lite spec via vega-embed
+    # 2. Screenshot the rendered canvas via Playwright — returns base64 PNG or SVG
+    ...
 
 @mcp.tool()
 async def render_table(input: RenderTableInput) -> dict:
     """Render a table display spec from the Analytics Platform to a static image.
     Returns a base64-encoded image and MIME type."""
-    html        = _table_html(input.display_spec, input.width)
-    image_bytes = await _screenshot(html, input.format, input.width, height=600)
-    return {
-        "image":     base64.b64encode(image_bytes).decode(),
-        "mime_type": "image/png" if input.format == "png" else "image/svg+xml",
-    }
+    # 1. Build a plain HTML table from the DVL table spec
+    # 2. Screenshot via Playwright — same path as render_chart
+    ...
 
 def _vega_embed_html(spec: dict, width: int, height: int) -> str:
-    return f"""<!DOCTYPE html><html><body style="margin:0">
-<div id="vis"></div>
-<script src="/vega/vega.min.js"></script>
-<script src="/vega/vega-lite.min.js"></script>
-<script src="/vega/vega-embed.min.js"></script>
-<script>
-  vegaEmbed('#vis', {json.dumps(spec)}, {{width: {width}, height: {height}, actions: false}});
-</script></body></html>"""
+    # Input:  Vega-Lite v5 spec dict + dimensions
+    # Output: self-contained HTML page that renders the spec via vega-embed
+    ...
 
 def _table_html(spec: dict, width: int) -> str:
-    # Fallback renderer: builds a plain HTML table from spec["columns"] and spec["data"]["values"]
-    # spec["columns"] is a list of {"field": ..., "label": ..., "type": ...} objects
-    columns = spec.get("columns", [])
-    rows    = spec.get("data", {}).get("values", [])
-    header  = "<tr>" + "".join(f"<th>{col['label']}</th>" for col in columns) + "</tr>"
-    body    = "".join(
-        "<tr>" + "".join(f"<td>{row.get(col['field'], '')}</td>" for col in columns) + "</tr>"
-        for row in rows
-    )
-    return f'<table style="width:{width}px;border-collapse:collapse">{header}{body}</table>'
+    # Input:  DVL table spec — { columns: [{field, label, type}], data: { values: [...] } }
+    # Output: styled HTML table string — col["field"] used for row lookup, col["label"] for headers
+    ...
 
 async def _screenshot(html: str, fmt: str, width: int, height: int) -> bytes:
-    async with async_playwright() as pw:
-        browser = await pw.chromium.launch(args=["--no-sandbox", "--disable-setuid-sandbox"])
-        page    = await browser.new_page(viewport={"width": width, "height": height})
-        await page.set_content(html)
-        await page.wait_for_selector("#vis canvas")   # wait for Vega render to complete
-        image   = await page.locator("#vis").screenshot(type=fmt)
-        await browser.close()
-        return image
+    # Input:  rendered HTML + format + viewport dimensions
+    # Output: raw image bytes — PNG or SVG
+    # Launches headless Chromium via Playwright; waits for Vega canvas render before capturing
+    ...
 
 if __name__ == "__main__":
     mcp.run(transport="streamable-http", host="0.0.0.0", port=8001)
@@ -1754,13 +1401,13 @@ Indexed on `(org_id, user_sub, created_at DESC)`, `(org_id, created_at DESC)`, a
 import json
 
 def utc_now() -> str:
-    return datetime.utcnow().isoformat() + "Z"
+    # Output: current UTC time as ISO 8601 string with Z suffix
+    ...
 
 def compute_expiry(lqp: dict) -> str:
-    # Default retention 7 years; compliance queries may carry a longer period
-    years   = 7 if not lqp.get("compliance_tier", {}).get("active") else 10
-    expires = datetime.utcnow().replace(year=datetime.utcnow().year + years)
-    return expires.isoformat() + "Z"
+    # Input:  LQP — checks compliance_tier.active to select retention period
+    # Output: ISO 8601 expiry timestamp — 7 years default; 10 years for compliance queries (MiFID II)
+    ...
 
 class AnalyticalLineageStore:
     def __init__(self, s3_client, pg_pool, bucket: str):
@@ -1769,72 +1416,40 @@ class AnalyticalLineageStore:
         self.bucket = bucket   # S3 bucket name for lineage records
 
     async def write(self, record: dict) -> str:
-        key = self._object_key(record["org_id"], record["result_id"], record["created_at"])
-        await self.s3.put_object(Key=key, Body=json.dumps(record).encode())
-        await self._index(record)
-        return record["result_id"]
+        # Input:  lineage record dict
+        # Output: result_id string
+        # Writes JSON to S3 at date-partitioned key, then indexes scalar fields in PostgreSQL
+        ...
 
     async def fetch(self, result_id: str, org_id: str) -> dict:
-        row = await self.pg.fetchrow(
-            "SELECT * FROM analytics.lineage_index WHERE result_id=$1 AND org_id=$2",
-            result_id, org_id,
-        )
-        key = self._object_key(row["org_id"], result_id, row["created_at"].isoformat())
-        obj = await self.s3.get_object(Key=key)
-        return json.loads(obj["Body"].read())
+        # Input:  result_id + org_id (tenant scope)
+        # Output: full lineage record from S3
+        # PostgreSQL index used only to resolve the S3 key — full record always read from S3
+        ...
 
     async def write_controls_decision(self, lqp: dict, claims: dict) -> None:
-        record = {
-            "record_type":   "controls_decision",
-            "result_id":     lqp["lqp_id"],        # keyed by lqp_id before result_id exists
-            "org_id":        lqp["org_id"],
-            "user_sub":      claims["sub"],
-            "approved":      lqp["controls_approved"],
-            "checks_passed": ["performance_impact_ceiling", "metric_count", "dimension_count",
-                              "classification_gate", "compliance_check"],
-            "estimated_performance_impact": lqp["estimated_performance_impact"],
-            "compliance_tier":              lqp.get("compliance_tier"),
-            "created_at":    utc_now(),
-        }
-        key = f"lineage/{lqp['org_id']}/controls/{lqp['lqp_id']}.json"
-        await self.s3.put_object(Key=key, Body=json.dumps(record).encode())
+        # Input:  SCL-approved LQP + JWT claims
+        # Writes a controls_decision record to S3 keyed by lqp_id (before result_id exists)
+        # First of the two ALS writes — captures governance decision before FQE runs
+        ...
 
     async def write_execution(self, lqp: dict, result: dict) -> None:
-        record = {
-            "record_type":       "execution",
-            "result_id":         result["result_id"],
-            "lqp_id":            lqp["lqp_id"],
-            "org_id":            lqp["org_id"],
-            "user_sub":          lqp.get("user_sub"),
-            "cache_hit":         result.get("cache_hit", False),
-            "performance_impact_units": lqp.get("estimated_performance_impact"),
-            "regulatory_frameworks":    list({fw for m in lqp.get("resolved_metrics", [])
-                                             if m.get("compliance_relevant")
-                                             for fw in m.get("regulatory_framework", [])}),
-            "sub_plans":         result.get("sub_plans", []),
-            "result_summary":    {"row_count": len(result.get("rows", [])), "schema": result.get("schema")},
-            "error_code":        result.get("error_code"),
-            "created_at":        utc_now(),
-            "expires_at":        compute_expiry(lqp),
-        }
-        await self.write(record)
+        # Input:  approved LQP + assembled FQE result
+        # Builds a full execution lineage record — includes sub_plans, regulatory_frameworks, result summary
+        # Second of the two ALS writes — called by FQE after assembly
+        # regulatory_frameworks aggregated from resolved_metrics with compliance_relevant: true
+        ...
 
     def _object_key(self, org_id: str, result_id: str, created_at: str) -> str:
-        date = created_at[:10].replace("-", "/")
-        return f"lineage/{org_id}/{date}/{result_id}.json"
+        # Input:  org_id + result_id + ISO timestamp
+        # Output: S3 key — lineage/{org_id}/{yyyy}/{mm}/{dd}/{result_id}.json
+        ...
 
     async def _index(self, record: dict) -> None:
-        await self.pg.execute(
-            """INSERT INTO analytics.lineage_index
-               (result_id, org_id, user_sub, regulatory_frameworks, performance_impact_units,
-                error_code, cache_hit, created_at, expires_at)
-               VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)""",
-            record["result_id"], record["org_id"], record["user_sub"],
-            ",".join(record.get("regulatory_frameworks", [])) or None,
-            record.get("performance_impact_units"),
-            record.get("error_code"),
-            record["cache_hit"], record["created_at"], record["expires_at"],
-        )
+        # Input:  full lineage record dict
+        # Inserts scalar fields only into analytics.lineage_index — never stores JSON blobs
+        # Index supports the Lineage Query API — full records are always fetched from S3
+        ...
 ```
 
 ---
@@ -1859,20 +1474,15 @@ class KnowledgeStore:
         self.bucket = bucket
 
     def get(self, artifact_path: str) -> str:
-        key = f"knowledge/{artifact_path}.md"
-        obj = self.s3.get_object(Bucket=self.bucket, Key=key)
-        return obj["Body"].read().decode("utf-8")
+        # Input:  artifact path — maps directly to MCP resource URI (e.g. "guide/platform-overview")
+        # Output: Markdown content string
+        ...
 
     async def put(self, artifact_path: str, content: str, author: str) -> str:
-        # Called via Admin API; previous version retained with version suffix in S3
-        version = generate_version_id()
-        key     = f"knowledge/{artifact_path}.md"
-        await self.s3.put_object(
-            Bucket=self.bucket, Key=key,
-            Body=content.encode("utf-8"),
-            Metadata={"author": author, "version": version},
-        )
-        return version
+        # Input:  artifact path + Markdown content + author identifier
+        # Output: version ID string
+        # Called via Admin API only — previous version retained in S3 with version suffix for audit
+        ...
 ```
 
 ---
@@ -1895,20 +1505,21 @@ class ResultCache:
         self.redis = redis_client
 
     def _key(self, lqp: dict, claims: dict) -> str:
-        role_hash   = hashlib.sha256(str(sorted(claims.get("analytics_roles", []))).encode()).hexdigest()[:8]
-        payload     = json.dumps({"org": lqp["org_id"], "nodes": lqp["nodes"]}, sort_keys=True)
-        return "arc:" + hashlib.sha256((payload + role_hash).encode()).hexdigest()
+        # Input:  LQP (org_id + nodes) + claims (analytics_roles)
+        # Output: Redis key string — SHA-256 of canonical LQP payload + 8-char role hash
+        # Role hash ensures two users with different entitlements never share a cached result
+        ...
 
     async def get(self, lqp: dict, claims: dict) -> dict | None:
-        if lqp.get("compliance_tier", {}).get("active"):
-            return None                          # compliance queries always bypass cache
-        data = await self.redis.get(self._key(lqp, claims))
-        return json.loads(data) if data else None
+        # Input:  LQP + claims
+        # Output: cached result dict, or None on miss
+        # Returns None immediately for compliance queries — they must always produce a fresh lineage record
+        ...
 
     async def set(self, lqp: dict, claims: dict, result: dict, ttl: int = 300) -> None:
-        if lqp.get("compliance_tier", {}).get("active"):
-            return                               # never cache compliance query results
-        await self.redis.setex(self._key(lqp, claims), ttl, json.dumps(result))
+        # Input:  LQP + claims + assembled result + TTL seconds (default 5 min)
+        # No-op for compliance queries — result must not be cached
+        ...
 ```
 
 The FQE uses a cache-aside pattern: check before execution, write after assembly. See `FederatedQueryPlanner.execute()` in §Federated Query Engine above for the full implementation.
@@ -1932,24 +1543,14 @@ The Admin API is a REST service authenticated with a platform service token (Bea
 | `GET` | `/v1/admin/health` | Platform health check — returns status of all registered backends and DCS connectivity. |
 
 ```python
-# Pseudo code — Admin API request handler shape
 async def handle_seed_bundle(request: Request) -> Response:
-    token   = verify_platform_token(request.headers["Authorization"])
-    bundle  = await request.json()       # list of DCS documents
+    # Input:  POST body — JSON array of analytical_metric / analytical_dimension / analytical_operation docs
+    # Output: 207 Multi-Status — { seeded: [...], skipped: [...], errors: [...] }
 
-    results = {"seeded": [], "skipped": [], "errors": []}
-    for doc in bundle:
-        existing = await dcs.get(doc["type"], doc.get("metric_id") or doc.get("operation_id") or doc.get("dimension_id"), doc["org_id"])
-        if existing and existing["status"] == "approved":
-            results["skipped"].append(doc["metric_id"])
-            continue
-        try:
-            await dcs.put(doc)
-            results["seeded"].append(doc["metric_id"])
-        except Exception as e:
-            results["errors"].append({"id": doc.get("metric_id"), "error": str(e)})
-
-    return JSONResponse(results, status_code=207)
+    # 1. Verify platform service token — this endpoint requires admin credentials, not user JWT
+    # 2. For each document: skip if an approved version already exists (idempotent import)
+    # 3. Write to DCS; collect seeded/skipped/error counts
+    ...
 ```
 
 ---
@@ -1963,40 +1564,16 @@ from anthropic import AsyncAnthropic
 from fastmcp import FastMCP
 
 async def build_app() -> FastMCP:
-    cfg = load_config()                         # reads from env vars + config file
+    # Output: fully wired FastMCP application ready to serve on port 8000
 
-    # Infrastructure clients
-    pg_pool     = await asyncpg.create_pool(cfg["postgres_dsn"])
-    s3_client   = boto3.client("s3", **cfg["s3"])
-    redis_client = await aioredis.from_url(cfg["redis_url"])
-    dcs_client  = DCSClient(base_url=cfg["dcs_url"], api_key=cfg["dcs_api_key"])
-    llm_client  = AsyncAnthropic(api_key=cfg["anthropic_api_key"])
-
-    # Platform services
-    als    = AnalyticalLineageStore(s3_client, pg_pool, bucket=cfg["lineage_bucket"])
-    cache  = ResultCache(redis_client)
-    smr    = SemanticMetricsRepository(dcs_client)
-    rapl   = RoleAwareProjectionLayer(pg_pool)
-    scl    = SemanticControlsLayer(dcs_client, pg_pool, redis_client)
-    dvl    = DataVisualizationLanguage()
-    nse    = NarrativeSynthesisEngine(llm_client)
-
-    # FQE — register backend adapters by data_affinity name
-    backend_registry = {
-        "portfolio":    SnowflakeAdapter(cfg["backends"]["primary_warehouse"]),
-        "risk_metrics": CubeJSAdapter(cfg["backends"]["risk_semantic_layer"]),
-        "regulatory":   SnowflakeAdapter(cfg["backends"]["regulatory_data_store"]),
-    }
-    fqe = FederatedQueryPlanner(backend_registry, als, cache)
-
-    pipeline = PipelineExecutor(
-        sil=SemanticIntentLayer(smr),
-        rapl=rapl, scl=scl, fqe=fqe, dvl=dvl, nse=nse, als=als,
-    )
-
-    # Wire into MCP app
-    app = build_mcp_app(pipeline, smr, als, cfg)
-    return app
+    # 1. Load config from env vars
+    # 2. Construct infrastructure clients — asyncpg pool, S3, Redis, DCS, Anthropic
+    # 3. Construct platform services — ALS, ResultCache, SMR, RAPL, SCL, DVL, NSE
+    # 4. Register backend adapters by data_affinity name — portfolio → Snowflake, risk → CubeJS, etc.
+    # 5. Assemble FederatedQueryPlanner with backend registry + ALS + cache
+    # 6. Assemble PipelineExecutor with all services injected
+    # 7. Wire everything into the FastMCP app and return
+    ...
 
 if __name__ == "__main__":
     app = asyncio.run(build_app())
