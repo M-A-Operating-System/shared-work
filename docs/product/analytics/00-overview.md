@@ -56,7 +56,6 @@ All share a common design pattern. Rather than searching tables and returning ro
 
 The dominant AI narrative has become: *natural language → LLM → SQL → database → answer*. This treats the database as the analytical system. It is not. The analytical system is the governed computation layer that sits above the database. The AI opportunity is to expose that layer through natural language and agentic interfaces — not to route around it. The AI Analytics Platform is that layer.
 
----
 
 ## Architectural Model
 
@@ -81,7 +80,6 @@ All computation between these two steps — validation, entitlement enforcement,
 
 All AI systems access the platform through a single channel — an API layer built on MCP (Model Context Protocol), an open standard for connecting AI systems to tools and data. Conversational assistants, autonomous agents, data mining pipelines, and custom applications all enter through this channel and traverse the same controls pipeline. There is no alternative path. Every AI-initiated request produces an audit record. This is the architectural guarantee that makes AI-driven analytics safe to operate in a regulated environment.
 
----
 
 ## Design Principles
 
@@ -104,7 +102,6 @@ Each principle creates natural tensions with product requirements — expressive
 
 Two tensions are worth noting here. When a business concept cannot be queried, the resolution is to register it in the metric registry: a governed addition subject to approval and version control, not an ad hoc inference. That is a productive tension — it is how the platform's analytical vocabulary grows. The tension between administrator control and governance minimums is different: governance floors are architectural properties of the platform, not configurable thresholds. There is no bypass mode.
 
----
 
 ## The Architecture in Practice
 
@@ -192,7 +189,6 @@ These two dimensions define four possible result types. The platform handles all
 
 Four queries traced through every stage illustrate the query space in practice. The first is a routine business analytics question — metric query with visualisation output, standard governance. The second is a multi-source business question — metrics federated across two independent backends, assembled into a single governed result. The third is a data mining request from an autonomous agent — large dataset retrieval with table output, standard governance. The fourth is a regulatory submission request — the same controls pipeline with compliance artifact escalation triggered automatically by the two-signal model.
 
----
 
 #### Example 1 — Portfolio performance (business analytics query)
 
@@ -269,7 +265,6 @@ The result schema — two numeric measures compared across a categorical dimensi
 }
 ```
 
----
 
 #### Example 2 — VaR breach investigation (multi-source business analytics query)
 
@@ -358,7 +353,6 @@ The result — metric versus threshold across multiple portfolio entities with a
 }
 ```
 
----
 
 #### Example 3 — Fixed income position extraction (data mining query)
 
@@ -434,7 +428,6 @@ Bulk data retrieval resolves to a structured paginated table — not a chart. Th
 }
 ```
 
----
 
 #### Example 4 — Regulatory LCR submission (compliance analytics query)
 
@@ -590,7 +583,6 @@ Once execution completes and the result is verified, the platform seals a compli
 }
 ```
 
----
 
 - [Chapter 2](./02-core-capabilities.md) — Detailed specifications for each platform component: metric registry, intent resolution, semantic validation, entitlement enforcement, controls pipeline, query federation, visualisation, narrative synthesis, lineage store, and API layer
 - [Chapter 3](./03-integration-and-deployment.md) — Integration patterns, deployment models, and platform administration

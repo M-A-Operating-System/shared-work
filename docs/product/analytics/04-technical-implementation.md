@@ -4,7 +4,6 @@ This chapter describes one reference implementation of the AI Analytics Platform
 
 The product specification (component behaviours, interface contracts, governance requirements) is in [Chapter 2 -- Core Platform Capabilities](./02-core-capabilities.md). The design principles governing every decision are in [Platform Overview — Design Principles](./00-overview.md#design-principles).
 
----
 
 ## 4.0 Reference Architecture Summary
 
@@ -25,7 +24,6 @@ The table below maps each Chapter 2 capability to its reference implementation n
 | Analytical Lineage Store | ALS | `AnalyticalLineageStore` | AWS S3 (JSON records per query) · PostgreSQL `lineage_index` (scalar search) |
 | Result Cache | — | `ResultCache` | Redis · SHA-256 cache key · 5-min TTL · compliance queries bypass cache |
 
----
 
 ## 4.1 Architecture Overview
 
@@ -82,7 +80,6 @@ flowchart TD
 
 The Semantic Data Repository (SDR) is a pre-existing platform component: the organisation's general-purpose registry for semantic definitions. The Analytics Platform registers three new document types (`analytical_metric`, `analytical_dimension`, `analytical_operation`) in the SDR, reusing its versioned storage, full-text search, cross-definition relationships, and scoped access control. The SMR governance layer adds the approval workflow, metric-specific schema validation, and the Admin API surface on top.
 
----
 
 ## 4.2 Layer-by-Layer Stack Decisions
 
@@ -378,7 +375,6 @@ Error code reference table:
 | `CLASSIFICATION_BLOCKED` | SCL | Inform user the requested metric requires elevated access |
 | `INTERNAL_ERROR` | Any | Log `result_id` if available; operator investigation required |
 
----
 
 ### Semantic Intent Layer
 
@@ -425,7 +421,6 @@ class SemanticIntentLayer:
         ...
 ```
 
----
 
 ### Narrative Synthesis Engine
 
@@ -482,7 +477,6 @@ class NarrativeSynthesisEngine:
         ...
 ```
 
----
 
 ### Semantic Metrics Repository (SMR)
 
@@ -620,7 +614,6 @@ class SemanticMetricsRepository:
         ...
 ```
 
----
 
 ### Semantic Intent Layer and LQP Generator
 
@@ -745,7 +738,6 @@ class LQPGenerator:
         ...
 ```
 
----
 
 ### Role-Aware Projection Layer
 
@@ -838,7 +830,6 @@ class RoleAwareProjectionLayer:
         ...
 ```
 
----
 
 ### Semantic Controls Layer
 
@@ -949,7 +940,6 @@ class SemanticControlsLayer:
         ...
 ```
 
----
 
 ### Federated Query Engine (FQE)
 
@@ -1133,7 +1123,6 @@ class FQPBackendAdapter:
     async def execute_sub_plan(self, sub_plan: dict) -> dict: ...
 ```
 
----
 
 ### Data Visualization Language (DVL)
 
@@ -1238,7 +1227,6 @@ class DataVisualizationLanguage:
         ...
 ```
 
----
 
 ### Static Image Rendering (vega2img)
 
@@ -1316,7 +1304,6 @@ if __name__ == "__main__":
     mcp.run(transport="streamable-http", host="0.0.0.0", port=8001)
 ```
 
----
 
 ### Analytical Lineage Store
 
@@ -1445,7 +1432,6 @@ class AnalyticalLineageStore:
         ...
 ```
 
----
 
 ### Knowledge Store
 
@@ -1478,7 +1464,6 @@ class KnowledgeStore:
         ...
 ```
 
----
 
 ### Result Cache
 
@@ -1517,7 +1502,6 @@ class ResultCache:
 
 The FQE uses a cache-aside pattern: check before execution, write after assembly. See `FederatedQueryPlanner.execute()` in §Federated Query Engine above for the full implementation.
 
----
 
 ### Admin API
 
@@ -1546,7 +1530,6 @@ async def handle_seed_bundle(request: Request) -> Response:
     ...
 ```
 
----
 
 ### Service Startup and Dependency Wiring
 
@@ -1587,7 +1570,6 @@ Configuration is read from environment variables at startup. Required variables:
 | `JWT_AUDIENCE` | Expected JWT audience claim |
 | `JWT_ISSUER` | Expected JWT issuer claim |
 
----
 
 ## 4.3 Infrastructure
 

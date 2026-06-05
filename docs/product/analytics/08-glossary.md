@@ -26,6 +26,5 @@ All named components, technical terms, abbreviations, and domain concepts used a
 | **Semantic Metrics Repository** | SMR | The governing catalogue of all resolvable analytical concepts for the organisation — metrics, dimensions, hierarchies, measure groups, and domains. Nothing is queryable that is not registered, approved, and versioned here. Managed as a dataset within the **Data Context Store (DCS)**, alongside the **Semantic Data Repository (SDR)**. Operation and metric definitions are stored with embeddings to support the **IRA**'s RAG-based intent resolution. |
 | **Semantic Validation Layer** | SVL | Receives a structured operation request (resolved `operation_id` + `params` from the **IRA**, or a direct structured call), resolves every identifier against the approved analytics and metrics definitions in the **SMR**, enforces entitlement projection from **RAPL**, and produces a validated, platform-agnostic **LQP**. Entirely deterministic — no AI model runs inside it. |
 
----
 
 *AI Analytics Platform — Product Design & Technical Specification · Confidential*

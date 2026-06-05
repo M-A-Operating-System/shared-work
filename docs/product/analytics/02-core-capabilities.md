@@ -6,7 +6,6 @@ The pipeline processes every request in this sequence: the **MCP Capability Laye
 
 Platform roles — who interacts with each component and how — are defined before the component descriptions.
 
----
 
 ## Platform Roles
 
@@ -48,7 +47,6 @@ The **Data Modeller** and **Metrics Modeller** are the critical pre-conditions f
 | Audit trail | | | | | ✓ | ✓ | ✓ | ✓ |
 | Platform infrastructure | | | | | | | | ✓ |
 
----
 
 ## Architecture and Request Flow
 
@@ -137,7 +135,6 @@ For conversational consumers, the user's natural language query is forwarded dir
 
 The `vega2img` service is shown separately from the Analytics Platform boundary because it is an optional, independently registered MCP render service. Consumers that cannot natively render the DVL display specification (for example, an agentic pipeline that requires static image output) register `vega2img` directly and call it as a separate tool invocation, passing the `display_spec` from the `run_analytics` response. It is not part of the core analytics pipeline.
 
----
 
 ### Request Flow
 
@@ -242,7 +239,6 @@ sequenceDiagram
 
 The Analytics Engine receives natural language or structured parameters and returns structured results. The computation pipeline (SVL → RAPL → SCL → PQP → FQE) is entirely deterministic and contains no AI. The only AI steps are: intent resolution (in the IRA, using RAG over the SMR catalogue and a language model call) and narrative synthesis (in the NSA, post-computation, constrained to the assembled result). The Analytical Lineage Store receives two writes per query — a controls decision record before the PQP is invoked and a full execution record after — ensuring the audit trail is complete regardless of whether execution succeeds.
 
----
 
 **Running example:** This query is traced through every component below — each section's Example shows the same request at the next stage of the pipeline.
 
@@ -250,7 +246,6 @@ The Analytics Engine receives natural language or structured parameters and retu
 "Show me portfolio returns versus benchmark for my equity portfolios this quarter."
 ```
 
----
 
 ## AI Consumers
 
@@ -291,7 +286,6 @@ Authorization: Bearer <host-issued-jwt>
 
 The Analytics Engine processes the request end-to-end and returns a structured result. The conversation engine renders the grouped bar chart from the DVL display specification and surfaces the governed narrative as the assistant's reply.
 
----
 
 ## MCP Capability Layer (MCP)
 
@@ -360,7 +354,6 @@ A structured tool call arrives from AI consumers.
 
 A structured `run_analytics` tool call arrives from the AI Chat Platform. The MCP Capability Layer validates the JWT signature, confirms the token has not expired, and extracts the claims. It dispatches two parallel operations: the structured parameters to the Semantic Validation Layer, and the JWT claims to the Role-Aware Projection Layer. The MCP Capability Layer does not interpret the parameters or make any analytical decisions; it validates, routes, and waits.
 
----
 
 ## Semantic Metrics Repository (SMR)
 
@@ -456,7 +449,6 @@ Continuing the portfolio manager query — the SVL now asks the SMR to resolve t
 
 The SVL asks the SMR to resolve the `compare_portfolios` operation, then resolves `portfolio_return` and `benchmark_return` as `analytical_metric` documents. The SMR confirms both are approved for the `portfolio_manager` role and returns their definitions, including `data_affinity` (`portfolio`), `required_dimensions` (`portfolio_id`, `time_period`), and `aggregation` (`value_weighted_average`). `asset_class` resolves as an approved `analytical_dimension` document with an approved filter operator (`eq`). If either metric document were absent or not in `"status": "approved"` state, the SVL would return `METRIC_NOT_FOUND` and the pipeline would stop here.
 
----
 
 ## Intent Resolution Agent (IRA)
 
@@ -527,7 +519,6 @@ Confidence is 0.91 — above threshold, no confirmation card. Resolved intent is
 
 **↳ Step 1 — Intent resolved.** The IRA has translated the natural language query into a structured, bound operation request. The SVL now validates and plans.
 
----
 
 ## Semantic Validation Layer (SVL)
 
@@ -677,7 +668,6 @@ Node `n3` is the RAPL row predicate — part of the plan, not a post-execution f
 
 **↳ Step 2 — Intent resolution complete.** The natural language question has been resolved against the SMR into a validated, platform-agnostic Logical Query Plan. Every metric and dimension identifier is confirmed as registered and approved. No backend has been contacted.
 
----
 
 ## Role-Aware Projection Layer (RAPL)
 
@@ -789,7 +779,6 @@ No column masks apply — the `portfolio_manager` role has no masking rules for 
 
 **↳ Step 3 — Metric and entitlement resolution complete.** Both metrics are confirmed against their approved SMR definitions. The user's access scope is locked — row predicates injected, entitled portfolio set established. No backend has been contacted.
 
----
 
 ## Semantic Controls Layer (SCL)
 
@@ -937,7 +926,6 @@ All checks pass. SCL writes a controls decision record to the Analytical Lineage
 }
 ```
 
----
 
 ## Physical Query Planner (PQP)
 
@@ -1005,7 +993,6 @@ If the query also included a risk metric with `data_affinity: "risk_metrics"`, t
 
 **↳ Step 4a — Physical query planning complete.** The approved LQP has been resolved against physical mappings and translated into one executable SQL sub-plan. The FQE will route it to the registered backend. No backend has been contacted yet.
 
----
 
 ## Federated Query Engine (FQE)
 
@@ -1111,7 +1098,6 @@ The FQE writes an execution record to the Analytical Lineage Store (ALS) and pas
 
 **↳ Step 4b — Execution complete.** The physical sub-plans were routed to the registered warehouse, executed, and the result assembled. The full audit record is written. No physical schema was exposed at any stage.
 
----
 
 ## Data Visualization Language (DVL)
 
@@ -1199,7 +1185,6 @@ The ontology produces the following DVL display specification:
 }
 ```
 
----
 
 ## Narrative Synthesis Agent (NSA)
 
@@ -1254,7 +1239,6 @@ Post-generation validation confirms every verbatim numeric value cited in the na
 
 **↳ Step 5 — Presentation decision complete.** The DVL has selected the governed display contract for this result shape and intent pattern. The NSA has produced a plain-language summary anchored strictly to the computed values. The response is ready to return to the AI consumer.
 
----
 
 ## Analytical Lineage Store (ALS)
 
@@ -1388,7 +1372,6 @@ The first is written by SCL before the FQE is invoked — capturing the controls
 
 The document is immutable from the moment of writing. A corresponding row is inserted into `analytics.lineage_index` for search access. The full chain — original query, controls decision, metric definition versions, entitlements, physical backend call, and chart contract — is retrievable from the object store under `result_id: res-20260518-093247-wk4n`.
 
----
 
 ## Provenance Artifact Service (PAS)
 
@@ -1444,7 +1427,6 @@ For a regulatory query against `lcr` and `nsfr` (both `compliance_relevant: true
 
 This block is included in the MCP tool response under the `compliance` key. The consumer renders an appropriate disclosure to the user and withholds export affordances until the platform signals sealing is complete.
 
----
 
 ## Analytical Output Format
 
@@ -1582,13 +1564,11 @@ The MCP Capability Layer assembles the DVL display specification and the NSA nar
 
 The chat engine renders the grouped bar chart inline and displays the narrative as the assistant's reply. The `result_id` is retained for any follow-up drilldown.
 
----
 
 ## External Components
 
 The following components appear in the architecture diagram and interact with the Analytics Engine but sit outside its boundary. They are not built or owned by the Analytics Engine; they are pre-existing or independently deployed services that the platform integrates with.
 
----
 
 ### Conversational AI — Chat Front End
 
@@ -1605,7 +1585,6 @@ The AI Chat Platform is the conversational consumer of the Analytics Engine. It 
 
 The AI Chat Platform has no access to physical schemas, execution backends, or metric definitions. Entitlement enforcement, intent resolution, query planning, and execution are entirely the Analytics Engine's responsibility.
 
----
 
 ### Semantic Data Repository (SDR)
 
@@ -1625,7 +1604,6 @@ The SDR contains the organisation's foundational data context: data models, obje
 
 The SDR and SMR are both contained within the Data Context Store (DCS). The DCS is the outer persistence container for all governed context — the SDR providing the data definition layer and the SMR providing the metric semantic layer above it.
 
----
 
 ### vega2img
 

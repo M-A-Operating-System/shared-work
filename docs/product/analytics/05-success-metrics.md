@@ -4,7 +4,6 @@ Metrics are captured from day one at both the platform level and the application
 
 Component definitions referenced in the metrics below (SMR, FQE, RAPL, SEG, NSE, Analytical Lineage Store (ALS)) are in [Chapter 2 -- Core Platform Capabilities](./02-core-capabilities.md). [Analytical Lineage Store (ALS)](./02-core-capabilities.md#analytical-lineage-store) · [Semantic Execution Governance](./02-core-capabilities.md#semantic-execution-governance) · [Narrative Synthesis Engine](./02-core-capabilities.md#narrative-synthesis-engine)
 
----
 
 ## 6.1 Platform-Level Metrics
 
@@ -17,7 +16,6 @@ Component definitions referenced in the metrics below (SMR, FQE, RAPL, SEG, NSE,
 | **Lineage completeness** | Queries with complete lineage records ÷ total queries | **100%** — any deviation is a platform defect |
 | **SMR registry health** | Metrics with no owner OR not updated in 12 months ÷ total active metrics | < 5% |
 
----
 
 ## 6.2 Application-Level Metrics
 
@@ -60,7 +58,6 @@ Component definitions referenced in the metrics below (SMR, FQE, RAPL, SEG, NSE,
 | **Query reformulation rate** | Queries where user rephrased within 2 turns after a resolution error | < 10% |
 | **Narrative validation failure rate** | Narrative synthesis attempts failing post-generation validation | < 2% |
 
----
 
 ## 6.3 Metric Interpretation
 
@@ -77,7 +74,6 @@ Component definitions referenced in the metrics below (SMR, FQE, RAPL, SEG, NSE,
 
 **SMR approval backlog** counts metric definitions in `proposed` or `in_review` state for more than 7 calendar days. A non-zero count triggers a notification to the Application Admin.
 
----
 
 ## 6.4 Review Cadence
 
@@ -89,7 +85,6 @@ Component definitions referenced in the metrics below (SMR, FQE, RAPL, SEG, NSE,
 | **Day 90** | WAU adoption assessment (50% target); drilldown adoption; export rate | Application Admin + Platform team |
 | **Quarterly** | SMR completeness; metric owner coverage; entitlement policy review | Application Admin + Metric Owners |
 
----
 
 ## 6.5 Analytics Dashboard
 
