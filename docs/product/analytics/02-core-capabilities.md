@@ -510,9 +510,9 @@ The Semantic Metrics Repository (SMR) is the governing catalogue of every analyt
 
 ### Concept Types
 
-The SMR is composed of three SDR document types:
+The SMR stores three document types:
 
-| SDR document type | Description |
+| SMR document type | Description |
 |---|---|
 | **`analytical_metric`** | Metric definition — formula, aggregation, `data_affinity`, `physical_mapping`, `required_dimensions`, `performance_impact_weight`, `classification_level`, `compliance_relevant`, `regulatory_framework` |
 | **`analytical_dimension`** | Dimension definition — `data_affinity`, `physical_mapping`, enumerated values or `hierarchical` flag, `hierarchy_levels` |
@@ -584,11 +584,13 @@ The SMR formula language expresses metric computation logic in terms of other re
 
 ### SMR Authoring and Discovery
 
-The SMR is backed by the SDR, which handles document creation, versioning, and the approval workflow natively. There are no custom MCP tools for metric authoring. Metrics Modellers author `analytical_metric`, `analytical_dimension`, and `analytical_operation` documents using the SDR's existing authoring capabilities; Analytics Governance approves them.
+The SMR and SDR are independent stores, both housed within the Data Context Store (DCS). The SDR contains the organisation's existing data definitions — data models, object models, physical schemas, and data lineage — and will already exist in most organisations before the Analytics Platform is deployed. The SMR is a separate store for metric definitions; it references the SDR's data definitions but does not extend or depend on it structurally. The DCS is the external container that holds both.
+
+Metric authoring uses the DCS's native document creation, versioning, and approval workflow. There are no custom MCP tools for metric authoring. Metrics Modellers author `analytical_metric`, `analytical_dimension`, and `analytical_operation` documents through the DCS authoring interface; Analytics Governance approves them before they become resolvable.
 
 **Discovery** — AI models and agents discover available operations by calling the `list_operations` MCP tool (defined in the MCP Capability Layer). `list_operations` returns operation IDs, display names, required parameters, supported metrics, supported dimensions, and execution profiles for all approved operations within the caller's entitlement scope. There are no `smr://` MCP resource URIs and no separate `list_metrics`, `get_metric_definition`, `propose_metric`, or `approve_metric` MCP tools.
 
-The internal resolution calls made by the Semantic Validation Layer and Federated Query Engine query the SDR directly. There is no separate internal API.
+The internal resolution calls made by the Semantic Validation Layer and Federated Query Engine query the SMR directly. There is no separate internal API.
 
 ### Example
 
