@@ -270,7 +270,7 @@ The Analytics Engine is accessed by three consumer types: a conversational AI pl
 "Show me portfolio returns versus benchmark for my equity portfolios this quarter."
 ```
 
-**↳ Step 0 — Natural language query forwarded.** The user's question is relayed by the conversational AI directly to the Analytics Engine with the user's JWT. The consumer does not interpret, translate, or structure the query — it forwards it as-is. No database has been contacted. No query has been generated.
+**↳ Step 0 — Natural language query forwarded.** The user's question is relayed by the conversational AI directly to the Analytics Engine with the user's JWT. The consumer does not interpret, translate, or structure the query — it forwards it as-is.
 
 ```json
 POST /v1/mcp
@@ -289,9 +289,7 @@ Authorization: Bearer <host-issued-jwt>
 }
 ```
 
-The Analytics Engine's Intent Resolution Agent (IRE) receives the query, retrieves candidate operations from the SMR via RAG, and resolves intent to a structured operation. Intent resolution, parameter binding, and the optional confirmation gate all happen inside the engine — invisible to the consumer.
-
-When the Analytics Engine returns the structured result, display spec, and narrative summary, the conversation engine renders the grouped bar chart from the DVL specification and surfaces the governed narrative produced by the Analytics Engine's Narrative Synthesis Agent.
+The Analytics Engine processes the request end-to-end and returns a structured result. The conversation engine renders the grouped bar chart from the DVL display specification and surfaces the governed narrative as the assistant's reply.
 
 ---
 
