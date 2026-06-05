@@ -134,7 +134,7 @@ The `vega2img` service is shown separately from the Analytics Platform boundary 
 sequenceDiagram
     autonumber
     participant C as AI Consumer
-    participant MCP as MCP Capability Layer
+    participant MCP as API/MCP Interface
     participant SIL as Semantic Intent Layer
     participant RAPL as Role-Aware Projection Layer
     participant SMR as Semantic Metrics Repository
@@ -142,7 +142,7 @@ sequenceDiagram
     participant ALS as Analytical Lineage Store
     participant PQP as Physical Query Planner
     participant FQE as Federated Query Engine
-    participant BE as Execution Backend(s)
+    participant BE as Data Sources
     participant DVL as Data Visualization Language
     participant NSE as Narrative Synthesis Engine
     participant PAS as Provenance Artifact Service
