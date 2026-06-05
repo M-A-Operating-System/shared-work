@@ -260,11 +260,11 @@ The Analytics Engine receives natural language or structured parameters and retu
 
 ## AI Consumers
 
-The Analytics Engine is accessed by three consumer types: a conversational AI platform (which mediates between a user and the governed query pipeline), autonomous agents and pipelines (which call the MCP layer directly with structured requests), and custom applications (which call the MCP layer with host-issued tokens). The AI Chat Platform is the conversational layer through which users interact with the Analytics Engine. It hosts the AI model responsible for natural language translation, orchestrates calls to the Analytics Engine, and renders the assembled result to the user. Natural language translation is the only AI step the AI Chat Platform performs. It happens here, grounded by the SMR metric catalogue. Narrative synthesis is performed inside the Analytics Engine as a secondary, post-computation step.
+The Analytics Engine is accessed by three consumer types: a conversational AI platform (which mediates between a user and the governed query pipeline), autonomous agents and pipelines (which call the MCP layer directly with structured requests), and custom applications (which call the MCP layer with host-issued tokens). The AI Chat Platform is the conversational layer through which users interact with the Analytics Engine. Its role is to relay the user's natural language query to the Analytics Engine and render the structured result it receives back. Intent resolution — identifying which governed operation and parameters match the user's question — is performed inside the Analytics Engine by the Intent Resolution Agent, not by the consumer.
 
-**Operation catalogue loading.** The `list_operations` tool is still available for structured API consumers and UI builders that construct explicit `operation_id` + `params` payloads. Conversational consumers can send natural language directly — intent resolution happens inside the Analytics Engine's Intent Resolution Agent (IRE). When `list_operations` is called, the response is the authenticated user's entitled operation catalogue. Only operations the user can execute are returned, with their `operation_id`, display names, required parameters, supported metrics, supported dimensions, and execution profiles.
+**Natural language path.** When a user asks an analytical question, the consumer forwards the natural language query and the user's JWT to the Analytics Engine. The engine's IRE handles operation selection, parameter binding, and — if intent is ambiguous — returns a confirmation card before proceeding to execution. The consumer does not need to know the SMR catalogue or construct structured parameters.
 
-**NL → structured intent.** When a user asks an analytical question, the consumer relays the natural language query to the Analytics Engine via `run_analytics`. The Intent Resolution Agent (IRE) inside the engine retrieves candidate operations from the SMR catalogue via embedding similarity search, then uses a language model to rank candidates and bind parameters. If intent is ambiguous, the engine returns a confirmation card before proceeding.
+**Structured path.** Consumers that construct explicit `operation_id` + `params` payloads (agentic pipelines, custom analytics UIs, integration tests) call `run_analytics` with structured arguments directly. The `list_operations` tool returns the entitled operation catalogue for consumers that build their own operation selection UI. Structured calls bypass the IRE and route directly to the SVL.
 
 **Analytics Engine call.** The tool call is submitted to the Analytics Engine with the user's JWT forwarded unmodified. The Analytics Engine validates, plans, executes, and returns a structured result and DVL display specification. Entitlement enforcement, query planning, and execution are entirely the Analytics Engine's responsibility.
 
@@ -276,17 +276,7 @@ The Analytics Engine is accessed by three consumer types: a conversational AI pl
 "Show me portfolio returns versus benchmark for my equity portfolios this quarter."
 ```
 
-**↳ Step 1 — Natural language request received.** The question enters the platform via the AI Chat Front End. No database has been contacted. No query has been generated.
-
-The conversation engine first loads the entitled operation catalogue:
-
-```
-tools/call list_operations   (via Analytics Engine MCP, JWT forwarded)
-→ returns: compare_portfolios, risk_breakdown, portfolio_return, ... (entitled subset)
-          with operation_id, display names, required_params, supported_metrics, execution_profiles
-```
-
-The AI model reads "Show me portfolio returns versus benchmark for my equity portfolios this quarter" and, using the catalogue, resolves it to an operation and explicit parameters. It calls `run_analytics` with structured arguments. No natural language is sent to the Analytics Engine:
+**↳ Step 0 — Natural language query forwarded.** The user's question is relayed by the conversational AI directly to the Analytics Engine with the user's JWT. The consumer does not interpret, translate, or structure the query — it forwards it as-is. No database has been contacted. No query has been generated.
 
 ```json
 POST /v1/mcp
@@ -299,17 +289,13 @@ Authorization: Bearer <host-issued-jwt>
   "params": {
     "name": "run_analytics",
     "arguments": {
-      "operation_id": "compare_portfolios",
-      "params": {
-        "portfolio_ids": ["GLOB_EQ_OPP", "UK_CORE_INC", "ASIA_PAC_GRW", "EUR_BAL_INC"],
-        "metrics":       ["portfolio_return", "benchmark_return"],
-        "time_period":   "quarter_to_date",
-        "filters":       [{ "field": "asset_class", "operator": "eq", "value": "EQUITY" }]
-      }
+      "query": "Show me portfolio returns versus benchmark for my equity portfolios this quarter."
     }
   }
 }
 ```
+
+The Analytics Engine's Intent Resolution Agent (IRE) receives the query, retrieves candidate operations from the SMR via RAG, and resolves intent to a structured operation. Intent resolution, parameter binding, and the optional confirmation gate all happen inside the engine — invisible to the consumer.
 
 When the Analytics Engine returns the structured result, display spec, and narrative summary, the conversation engine renders the grouped bar chart from the DVL specification and surfaces the governed narrative produced by the Analytics Engine's Narrative Synthesis Agent.
 
