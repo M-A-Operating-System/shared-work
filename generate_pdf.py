@@ -4,14 +4,24 @@ Generates a PDF for each product in docs/product/, placing the output inside
 the respective product folder.
 
 Usage:
-    python generate_pdf.py [product-name] [--nofront]
+    python generate_pdf.py [--product <name>] [--nofront]
     python generate_pdf.py --page <path/to/file.md> [--nofront]
+    python generate_pdf.py --product <name> --pages <nn> [<nn> ...] [--out <file.pdf>] [--nofront]
 
-    python generate_pdf.py              → generates all products
-    python generate_pdf.py assistant    → generates only the assistant product
-    python generate_pdf.py analytics    → generates only the analytics product
-    python generate_pdf.py --nofront    → generates all products without branded cover pages
+    python generate_pdf.py                              → generates all products
+    python generate_pdf.py --product analytics          → generates only the analytics product
+    python generate_pdf.py --product analytics --nofront
+                                                        → without branded cover page
+    python generate_pdf.py --product analytics --pages 02 04 08
+                                                        → merged PDF of specific chapters
+    python generate_pdf.py --product analytics --pages 02 08 --out subset.pdf
+                                                        → merged PDF written to subset.pdf
 
+    --product   Select a single product by name.  Omit to generate all products.
+    --pages     Space-separated two-digit chapter prefixes to include (requires --product).
+                Chapters are included in the order listed on the command line.
+    --out       Output filename for --pages mode (default: <product>_pages_<nn…>.pdf,
+                placed in the product directory).
     --nofront   Omit the branded cover page. Useful for distributing content
                 outside the M&A Operating System brand context.
 
@@ -628,6 +638,60 @@ def generate_page(file_path: Path, nofront: bool = False) -> None:
             with open(gop, "a") as f:
                 f.write(f"pdf_path={output.relative_to(repo_root)}\n")
 
+# ---------- pages-subset generation ----------
+
+def generate_pages(product_name: str, page_prefixes: list[str],
+                   out_name: str | None, nofront: bool = False) -> None:
+    """Generate a merged PDF from a subset of chapters, in the order given."""
+    config = PRODUCTS[product_name]
+    docs_dir = PRODUCTS_DIR / product_name
+
+    files: list[Path] = []
+    missing: list[str] = []
+    for prefix in page_prefixes:
+        matches = sorted(docs_dir.glob(f"{prefix}-*.md"))
+        matches = [m for m in matches if "-ignore" not in m.stem and m.name not in EXCLUDE]
+        if not matches:
+            missing.append(prefix)
+        else:
+            files.append(matches[0])  # take the single canonical chapter file
+
+    if missing:
+        print(f"  [error] no chapter file found for prefix(es): {', '.join(missing)}")
+        print(f"          Available chapters in '{product_name}':")
+        for f in sorted(docs_dir.glob("[0-9][0-9]-*.md")):
+            if "-ignore" not in f.stem:
+                print(f"    {f.stem[:2]}  ({f.name})")
+        sys.exit(1)
+
+    if out_name:
+        output = docs_dir / out_name
+    else:
+        label = "_".join(page_prefixes)
+        output = docs_dir / f"{product_name}_pages_{label}.pdf"
+
+    print(f"\n── {product_name} pages: {', '.join(page_prefixes)} ──────────────────────────────")
+    print(f"Documents ({len(files)}):")
+    for f in files:
+        print(f"  {f.name}")
+
+    print("Building HTML…")
+    html = build_html(files, config["title"], config["meta"],
+                      author=config.get("author", ""),
+                      nofront=nofront,
+                      subs={"{{PRODUCT_NAME}}": product_name})
+
+    print("Rendering PDF…")
+    from weasyprint import HTML as WeasyprintHTML, CSS as WeasyprintCSS
+    WeasyprintHTML(string=html, base_url=str(docs_dir)).write_pdf(
+        str(output),
+        stylesheets=[WeasyprintCSS(string=CSS)],
+    )
+
+    size_mb = output.stat().st_size / 1_000_000
+    print(f"Done → {output}  ({size_mb:.1f} MB)")
+
+
 # ---------- main ----------
 
 def main():
@@ -641,6 +705,7 @@ def main():
     nofront = "--nofront" in args
     args = [a for a in args if a != "--nofront"]
 
+    # --page <file>
     if args and args[0] == '--page':
         if len(args) < 2:
             print("Usage: python generate_pdf.py --page <path/to/file.md> [--nofront]")
@@ -649,13 +714,63 @@ def main():
         print("\nAll done.")
         return
 
-    requested = args[0] if args else None
+    # Extract --product, --pages, --out from args
+    product_flag: str | None = None
+    pages_flag: list[str] = []
+    out_flag: str | None = None
 
-    if requested:
-        if requested not in PRODUCTS:
-            print(f"Unknown product '{requested}'. Available: {', '.join(PRODUCTS)}")
+    i = 0
+    positional: list[str] = []
+    while i < len(args):
+        if args[i] == "--product":
+            if i + 1 >= len(args):
+                print("  [error] --product requires a value")
+                sys.exit(1)
+            product_flag = args[i + 1]
+            i += 2
+        elif args[i] == "--pages":
+            i += 1
+            while i < len(args) and not args[i].startswith("--"):
+                pages_flag.append(args[i])
+                i += 1
+        elif args[i] == "--out":
+            if i + 1 >= len(args):
+                print("  [error] --out requires a filename")
+                sys.exit(1)
+            out_flag = args[i + 1]
+            i += 2
+        else:
+            positional.append(args[i])
+            i += 1
+
+    if positional:
+        print(f"  [error] unexpected positional argument(s): {' '.join(positional)}")
+        print(f"          Use --product <name> to select a product.")
+        sys.exit(1)
+
+    # --pages mode: needs --product
+    if pages_flag:
+        if not product_flag:
+            print("  [error] --pages requires --product <name>")
             sys.exit(1)
-        targets = {requested: PRODUCTS[requested]}
+        if product_flag not in PRODUCTS:
+            print(f"  [error] unknown product '{product_flag}'. Available: {', '.join(PRODUCTS)}")
+            sys.exit(1)
+        # validate prefix format (exactly two digits)
+        bad = [p for p in pages_flag if not re.fullmatch(r"\d{2}", p)]
+        if bad:
+            print(f"  [error] page prefixes must be two digits (e.g. 02 04 08), got: {', '.join(bad)}")
+            sys.exit(1)
+        generate_pages(product_flag, pages_flag, out_flag, nofront=nofront)
+        print("\nAll done.")
+        return
+
+    # Normal product generation
+    if product_flag:
+        if product_flag not in PRODUCTS:
+            print(f"Unknown product '{product_flag}'. Available: {', '.join(PRODUCTS)}")
+            sys.exit(1)
+        targets = {product_flag: PRODUCTS[product_flag]}
     else:
         targets = PRODUCTS
 
