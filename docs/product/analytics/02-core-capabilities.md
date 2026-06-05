@@ -116,7 +116,7 @@ flowchart TD
     SCL -->|"approved LQP"| PQP
     PQP -->|"physicalMapping lookup"| SMR
     PQP -->|"physical sub-plans"| FQE
-    FQE --> SQL & ODA & GDA
+    FQE --> backends
     FQE -->|"execution record"| LS
     FQE -->|"assembled result"| DVL
     FQE -->|"assembled result"| NSA
