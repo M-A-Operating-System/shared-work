@@ -180,7 +180,13 @@ The MCP layer routes JWT claims to `validate_jwt` and validated parameters to th
 ```python
 class PipelineExecutor:
     def __init__(self, sil, rapl, scl, fqe, dvl, nse, als):
-        ...
+        self.sil  = sil   # SemanticIntentLayer
+        self.rapl = rapl  # RoleAwareProjectionLayer
+        self.scl  = scl   # SemanticControlsLayer
+        self.fqe  = fqe   # FederatedQueryPlanner
+        self.dvl  = dvl   # DataVisualizationLanguage
+        self.nse  = nse   # NarrativeSynthesisEngine
+        self.als  = als   # AnalyticalLineageStore
 
     async def run(self, operation: dict, params: dict, claims: dict) -> dict:
         lqp = await sil.resolve(operation, params, claims)
@@ -224,7 +230,11 @@ DVL is synchronous (CPU-bound ontology evaluation); `asyncio.to_thread` runs it 
 ```python
 class DrilldownService:
     def __init__(self, als, fqe, dvl, rapl, smr):
-        ...
+        self.als  = als   # AnalyticalLineageStore — fetch original lineage records
+        self.fqe  = fqe   # FederatedQueryPlanner — execute refined sub-queries
+        self.dvl  = dvl   # DataVisualizationLanguage — generate updated display_spec
+        self.rapl = rapl  # RoleAwareProjectionLayer — re-apply row predicates / column masks
+        self.smr  = smr   # SemanticMetricsRepository — resolve drill-target metric definitions
 
     async def execute(self, input: DrilldownInput, claims: dict) -> dict:
         # Load original lineage record to recover the LQP and governance context
@@ -448,9 +458,9 @@ class SemanticIntentLayer:
             if wm := metric.get("weight_metric_id"):
                 node["weight_metric_id"] = wm
             nodes.append(node)
-        # Append join, filter, time_expand, sort nodes from params
-        ...
-        return {"lqp_id": generate_id(), "nodes": nodes, "org_id": claims["org_id"]}
+        # Append filter, time_expand, sort nodes derived from call params
+        # Delegates to LQPGenerator for full node construction — see §Semantic Intent Layer and LQP Generator
+        return LQPGenerator().build(operation, nodes, params, rapl_context, claims["org_id"])
 ```
 
 #### Stage 2b — Compliance Intent Classification
@@ -523,7 +533,7 @@ class NarrativeSynthesisEngine:
         raise NarrativeValidationError("Narrative validation failed after 2 attempts")
 
     def _is_simple(self, result: dict) -> bool:
-        # Route to Haiku for ≤5 metrics and ≤3 dimensions — matches Ch03 model selection spec
+        # Route to Haiku for ≤5 metrics and ≤3 dimensions; Sonnet for complex queries
         schema = result.get("schema", [])
         metric_count    = sum(1 for f in schema if f.get("type") == "number")
         dimension_count = len(schema) - metric_count
@@ -535,9 +545,16 @@ class NarrativeSynthesisEngine:
         return f"Summarise this {operation['display_name']} result in 2-3 sentences:\n{rows_text}"
 
     def _validate_numbers(self, narrative: str, rows: list[dict]) -> None:
-        # Every numeric value cited in the narrative must appear in result rows
-        # Raise NarrativeValidationError; caller retries once before propagating
-        ...
+        # Extract every numeric token from narrative text (e.g. "12.4%", "1,023")
+        # For each number, verify it appears in at least one result row within ±1% tolerance
+        # If any number cannot be matched, raise NarrativeValidationError
+        # Caller (synthesise) retries once with a correction prompt before propagating the error
+        numeric_tokens = re.findall(r"[\d,]+\.?\d*", narrative.replace(",", ""))
+        flat_values    = [str(v) for row in rows for v in row.values() if isinstance(v, (int, float))]
+        for token in numeric_tokens:
+            if not any(abs(float(token) - float(v)) / max(abs(float(v)), 1) <= 0.01
+                       for v in flat_values if v.replace(".", "").isdigit()):
+                raise NarrativeValidationError(f"Unverifiable number in narrative: {token}")
 ```
 
 ---
@@ -998,8 +1015,15 @@ class RoleAwareProjectionLayer:
         return lqp
 
     def _interpolate(self, template: str, claims: dict) -> str:
-        # Replace {{user.claim_name}} tokens with JWT claim values
-        ...
+        # Replace every {{user.claim_name}} token with the matching JWT claim value
+        # Unknown tokens collapse to empty string so the predicate remains valid SQL
+        def replace(match):
+            claim_key = match.group(1)
+            value     = claims.get(claim_key, "")
+            if isinstance(value, list):
+                value = ", ".join(f"'{v}'" for v in value)
+            return str(value)
+        return re.sub(r"\{\{user\.(\w+)\}\}", replace, template)
 
     async def _load_policy(self, org_id: str, role: str) -> dict | None:
         return await self.pg.fetchrow(
@@ -1122,8 +1146,15 @@ class SemanticControlsLayer:
         ))
 
     def _check_classification(self, lqp: dict, config: dict) -> None:
-        # Reject if any metric classificationLevel is in blocked_classifications
-        ...
+        # Reject if any resolved metric carries a classificationLevel that exceeds the configured gate
+        # blocked_classifications is an ordered list — e.g. ["restricted", "confidential", "top_secret"]
+        blocked = config.get("blocked_classifications", [])
+        for metric in lqp.get("resolved_metrics", []):
+            level = metric.get("data_classification", "internal")
+            if level in blocked:
+                raise ClassificationGateError(
+                    f"Metric '{metric['metric_id']}' has classification '{level}' — blocked by controls config"
+                )
 
     def _check_compliance(self, lqp: dict, claims: dict, config: dict) -> dict:
         # Two-signal compliance escalation:
@@ -1343,10 +1374,16 @@ class FederatedQueryPlanner:
         self.backends = backend_registry   # data_affinity → FQPBackendAdapter
         self.lineage  = lineage_store
 
-    async def execute(self, lqp: dict) -> dict:
+    async def execute(self, lqp: dict, claims: dict) -> dict:
+        # Cache-aside: return cached result if available; bypass for compliance queries
+        cached = await self.cache.get(lqp, claims)
+        if cached:
+            cached["cache_hit"] = True
+            return cached
         sub_plans = self._split_by_affinity(lqp)
         results   = await asyncio.gather(*[self._execute_sub_plan(sp) for sp in sub_plans])
         assembled = self._assemble(results, lqp)
+        await self.cache.set(lqp, claims, assembled, ttl=lqp.get("cache_ttl_seconds", 300))
         await self.lineage.write_execution(lqp, assembled)
         return assembled
 
@@ -1363,8 +1400,26 @@ class FederatedQueryPlanner:
         return await adapter.execute_sub_plan(sub_plan)
 
     def _assemble(self, results: list[dict], lqp: dict) -> dict:
-        # Fan-in: join on shared keys, apply sort/limit, apply column masks
-        ...
+        # Fan-in: merge sub-results from each backend adapter into a single result set
+        # If only one sub-result, pass through directly
+        # If multiple, join on the first shared dimension key present in all row dicts
+        # Apply any top-level sort/limit nodes from the LQP after joining
+        if len(results) == 1:
+            rows    = results[0]["rows"]
+            columns = results[0]["columns"]
+        else:
+            join_key = lqp.get("join_key", "date")
+            merged   = {row[join_key]: row for result in results for row in result["rows"]}
+            rows     = list(merged.values())
+            columns  = list({col for result in results for col in result["columns"]})
+        sort_node  = next((n for n in lqp["nodes"] if n["op"] == "sort"), None)
+        limit_node = next((n for n in lqp["nodes"] if n["op"] == "limit"), None)
+        if sort_node:
+            by  = sort_node["by"][0]
+            rows = sorted(rows, key=lambda r: r.get(by["field"]), reverse=by["direction"] == "desc")
+        if limit_node:
+            rows = rows[:limit_node["count"]]
+        return {"result_id": generate_id("res"), "rows": rows, "columns": columns, "schema": lqp.get("output_schema", [])}
 
 
 class FQPBackendAdapter:
@@ -1589,8 +1644,15 @@ def _vega_embed_html(spec: dict, width: int, height: int) -> str:
 </script></body></html>"""
 
 def _table_html(spec: dict, width: int) -> str:
-    # Build styled HTML table from spec["columns"] and spec["data"]["values"]
-    ...
+    # Fallback renderer: builds a plain HTML table from spec["columns"] and spec["data"]["values"]
+    columns = spec.get("columns", [])
+    rows    = spec.get("data", {}).get("values", [])
+    header  = "<tr>" + "".join(f"<th>{col}</th>" for col in columns) + "</tr>"
+    body    = "".join(
+        "<tr>" + "".join(f"<td>{row.get(col, '')}</td>" for col in columns) + "</tr>"
+        for row in rows
+    )
+    return f'<table style="width:{width}px;border-collapse:collapse">{header}{body}</table>'
 
 async def _screenshot(html: str, fmt: str, width: int, height: int) -> bytes:
     async with async_playwright() as pw:
@@ -1831,22 +1893,7 @@ class ResultCache:
         await self.redis.setex(self._key(lqp, claims), ttl, json.dumps(result))
 ```
 
-The FQE uses a cache-aside pattern: check before execution, write after assembly.
-
-```python
-async def execute(self, lqp: dict, claims: dict) -> dict:
-    cached = await self.cache.get(lqp, claims)
-    if cached:
-        cached["cache_hit"] = True
-        return cached
-
-    sub_plans = self._split_by_affinity(lqp)
-    results   = await asyncio.gather(*[self._execute_sub_plan(sp) for sp in sub_plans])
-    assembled = self._assemble(results, lqp)
-    await self.cache.set(lqp, claims, assembled, ttl=lqp.get("cache_ttl_seconds", 300))
-    await self.lineage.write_execution(lqp, assembled)
-    return assembled
-```
+The FQE uses a cache-aside pattern: check before execution, write after assembly. See `FederatedQueryPlanner.execute()` in §Federated Query Engine above for the full implementation.
 
 ---
 
