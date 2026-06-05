@@ -83,9 +83,11 @@ flowchart TD
     end
 
     subgraph dcs["Data Context Store (DCS)"]
+        DCSMCP["<b>API/MCP Interface</b>\nMCP server runtime · tool/resource/prompt presentation · JWT validation"]
         SDR[("Semantic Data Repository (SDR)\ndata models · object models · critical data elements\nquality rules · physical schemas · data lineage")]
         SMR[("Semantic Metrics Repository (SMR)\nmetric definitions · dimensions · hierarchies\naggregation rules · access policies · compliance metadata")]
         SDR -->|"SMR extends SDR"| SMR
+        DCSMCP --> SDR & SMR
     end
 
     subgraph backends["Data Sources"]
@@ -96,6 +98,7 @@ flowchart TD
 
     Consumers -->|"JWT + structured MCP tool call"| MCP
     Consumers -->|"render tool call (display_spec)"| Image
+    Consumers -->|"JWT + MCP tool call"| DCSMCP
     MCP -->|"structured parameters"| SIL
     MCP -->|"JWT claims"| RAPL
     RAPL -->|"row predicates + column masks"| SIL
