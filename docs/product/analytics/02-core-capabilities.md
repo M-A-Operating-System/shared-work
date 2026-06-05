@@ -133,7 +133,7 @@ flowchart TD
 
 The Analytics Engine is a single MCP server. It exposes three analytical tools (`run_analytics`, `list_operations`, `drilldown`) through a single MCP Capability Layer endpoint. The computation pipeline (SVL, RAPL, SCL, PQP, FQE) is entirely deterministic and contains no AI. The Narrative Synthesis Agent runs as a post-computation step: after the FQE assembles the result, the NSA makes a targeted call to a language model to summarise the data in plain text; its prompt is constructed from the result set only and its output is validated against computed values before being returned.
 
-The AI Chat Platform loads the operation catalogue from the Analytics Engine by calling `list_operations`. This is how the AI model discovers what operations, metrics, and dimensions are available. It translates the user's natural language question into explicit, structured parameters and calls `run_analytics` with the resolved `operation_id` and `params`. The Analytics Engine returns the display specification, structured data, and governed narrative; the AI Chat Platform renders the result.
+For conversational consumers, the user's natural language query is forwarded directly to the Analytics Engine. Intent resolution — selecting the right governed operation and binding parameters — happens inside the engine's Intent Resolution Agent. The Analytics Engine returns the display specification, structured data, and governed narrative; the AI Chat Platform renders the result. Structured API consumers (agents, custom UIs) may call `run_analytics` with an explicit `operation_id` and `params`, bypassing the IRE entirely.
 
 The `vega2img` service is shown separately from the Analytics Platform boundary because it is an optional, independently registered MCP render service. Consumers that cannot natively render the DVL display specification (for example, an agentic pipeline that requires static image output) register `vega2img` directly and call it as a separate tool invocation, passing the `display_spec` from the `run_analytics` response. It is not part of the core analytics pipeline.
 
@@ -161,30 +161,24 @@ sequenceDiagram
     participant PAS as Provenance Artifact Service
     participant vega2img as vega2img (optional)
 
-    rect rgb(240, 245, 255)
-        note over C,LLM: Intent resolution — natural language → structured intent
-        C->>MCP: natural language query + JWT
-        MCP->>IRE: natural language query
-        IRE->>SMR: vector similarity search (RAG)
-        SMR-->>IRE: top-K candidate operations + metric definitions
-        IRE->>LLM: candidate operations + user query (intent ranking prompt)
-        LLM-->>IRE: ranked intent + bound params
-        alt ambiguous intent
-            IRE-->>MCP: confirmation card (requiresIntentConfirmation: true)
-            MCP-->>C: confirmation card
-            C->>MCP: confirmed: true + selected intent
-            MCP->>IRE: confirmed intent
-        end
-        IRE->>SVL: resolved operation_id + params
-    end
-
     rect rgb(240, 255, 245)
-        note over C,ALS: Query execution
-        C->>MCP: run_analytics (operation_id + params + JWT)
+        note over C,ALS: Single consumer request — full pipeline
+        C->>MCP: run_analytics (NL query + JWT)
         MCP->>MCP: validate JWT signature · expiry · org claim
 
         par Intent resolution
-            note over SVL: structured parameters received from IRE
+            MCP->>IRE: natural language query
+            IRE->>SMR: vector similarity search (RAG)
+            SMR-->>IRE: top-K candidate operations + metric definitions
+            IRE->>LLM: candidate operations + user query (intent ranking prompt)
+            note over IRE: Ranks candidates · binds params · scores confidence
+            alt ambiguous intent
+                IRE-->>MCP: confirmation card (requiresIntentConfirmation: true)
+                MCP-->>C: confirmation card
+                C->>MCP: confirmed: true + selected intent
+                MCP->>IRE: confirmed intent
+            end
+            IRE->>SVL: resolved operation_id + params
         and Entitlement projection
             MCP->>RAPL: JWT claims
         end
@@ -196,7 +190,7 @@ sequenceDiagram
             RAPL-->>SVL: metric access set · dimension access set · row predicates · column masks
         end
 
-        note over SVL: Stage 2b — compliance intent classification<br/>scores query for compliance_purpose (0–1)<br/>sets compliance_purpose: true if score ≥ threshold
+        note over SVL: Compliance intent classification (Stage 2b)<br/>scores resolved intent for compliance_purpose (0–1)<br/>sets compliance_purpose: true if score ≥ threshold
 
         SVL->>SCL: Logical Query Plan (LQP)<br/>— no SQL · no backend refs · SMR concepts only
 
