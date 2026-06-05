@@ -1,8 +1,8 @@
-# 5. Success Metrics
+# 3. Success Metrics
 
 Metrics are captured from day one at both the platform level and the application level. Governance health metrics are first-class success indicators. A platform that is highly used but poorly governed is not successful.
 
-Component definitions referenced in the metrics below (SMR, FQE, RAPL, SEG, NSE, Analytical Lineage Store (ALS)) are in [Chapter 2 -- Core Platform Capabilities](./02-core-capabilities.md). [Analytical Lineage Store (ALS)](./02-core-capabilities.md#analytical-lineage-store) · [Semantic Execution Governance](./02-core-capabilities.md#semantic-execution-governance) · [Narrative Synthesis Engine](./02-core-capabilities.md#narrative-synthesis-engine)
+Component definitions referenced in the metrics below (SMR, FQE, RAPL, SEG, NSE, Analytical Lineage Store (ALS)) are in [Chapter 1 -- Core Platform Capabilities](./01-core-capabilities.md). [Analytical Lineage Store (ALS)](./01-core-capabilities.md#analytical-lineage-store) · [Semantic Execution Governance](./01-core-capabilities.md#semantic-execution-governance) · [Narrative Synthesis Engine](./01-core-capabilities.md#narrative-synthesis-engine)
 
 
 ## 6.1 Platform-Level Metrics

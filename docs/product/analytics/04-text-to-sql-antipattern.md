@@ -6,7 +6,7 @@ The central argument here is not that Text-to-SQL should be avoided. It is that 
 
 Most of the governance risks below are not new problems that Text-to-SQL introduced. Inconsistent metric definitions, opaque SQL logic, and entitlement gaps have been longstanding challenges in enterprise analytics. What Text-to-SQL does is **amplify and democratise** them: more people generating queries and outputs, with less friction, against the same ungoverned foundation. Problems manageable at data-team scale become serious at organisational scale. A semantic analytics engine addresses the root cause; Text-to-SQL continues as the exploration layer on top of it.
 
-The risks below apply to any approach where AI generates and executes SQL without a governance layer in between, including SQL tools exposed over MCP to an agent. The examples lean on financial services, but the same issues arise anywhere analytical outputs need to be reproducible, auditable, and tied to approved definitions. The alternative architecture is covered in [Platform Overview](./00-overview.md) and [Chapter 2](./02-core-capabilities.md); the [Right Architecture](#the-right-architecture) section summarises the boundary between the two.
+The risks below apply to any approach where AI generates and executes SQL without a governance layer in between, including SQL tools exposed over MCP to an agent. The examples lean on financial services, but the same issues arise anywhere analytical outputs need to be reproducible, auditable, and tied to approved definitions. The alternative architecture is covered in [Platform Overview](./00-overview.md) and [Chapter 1](./01-core-capabilities.md); the [Right Architecture](#the-right-architecture) section summarises the boundary between the two.
 
 
 ## Text-to-SQL: A Strong Starting Point
@@ -221,7 +221,7 @@ The governed architecture separates the AI translation layer from the governed c
 
 The boundary is the governed semantic registry. Crossing from exploration into production — from informal query into governed metric — requires a formal definition, approval, and versioning process. Text-to-SQL is available on the exploration side of that boundary. It is not available on the governed execution side.
 
-For a complete specification of this architecture, see [Chapter 2, Core Platform Capabilities](./02-core-capabilities.md).
+For a complete specification of this architecture, see [Chapter 2, Core Platform Capabilities](./01-core-capabilities.md).
 
 
 ## SQL Injection in MCP-Exposed Query Services

@@ -1,4 +1,4 @@
-# 2. Core Platform Capabilities
+# 1. Core Platform Capabilities
 
 This chapter is the logical architecture reference for the AI Analytics Platform. It covers nine pipeline components in the order a query encounters them, using a single portfolio manager query as a running example throughout. Each section describes what a component does, its controls contract, and where in the pipeline it sits — with no references to specific technology products or vendor implementations.
 
