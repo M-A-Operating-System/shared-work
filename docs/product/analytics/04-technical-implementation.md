@@ -211,27 +211,27 @@ class PipelineExecutor:
         self.als  = als   # AnalyticalLineageStore
 
     async def run(self, operation: dict, params: dict, claims: dict) -> dict:
-        lqp = await sil.resolve(operation, params, claims)
-        lqp = await rapl.project(lqp, claims)
+        lqp = await self.sil.resolve(operation, params, claims)
+        lqp = await self.rapl.project(lqp, claims)
 
         profile = operation["execution_profile"]
 
         if profile == "data_retrieval":
-            result = await fqe.execute(lqp)
+            result = await self.fqe.execute(lqp, claims)
             return {"result_id": result["result_id"], "rows": result["rows"], "schema": result["schema"]}
 
         if profile == "metric_query":
-            result  = await fqe.execute(lqp)
-            display = dvl.evaluate(result, operation)
+            result  = await self.fqe.execute(lqp, claims)
+            display = self.dvl.evaluate(result, operation)
             return {"result_id": result["result_id"], "rows": result["rows"], "display_spec": display}
 
         if profile == "full_analytical":
-            lqp    = await scl.approve(lqp, claims)
-            await als.write_controls_decision(lqp, claims)
-            result              = await fqe.execute(lqp)
+            lqp    = await self.scl.approve(lqp, claims)
+            await self.als.write_controls_decision(lqp, claims)
+            result              = await self.fqe.execute(lqp, claims)
             display, narrative  = await asyncio.gather(
-                asyncio.to_thread(dvl.evaluate, result, operation),
-                nse.synthesise(result, operation),
+                asyncio.to_thread(self.dvl.evaluate, result, operation),
+                self.nse.synthesise(result, operation),
             )
             return {
                 "result_id":    result["result_id"],
@@ -260,8 +260,7 @@ class DrilldownService:
 
     async def execute(self, input: DrilldownInput, claims: dict) -> dict:
         # Load original lineage record to recover the LQP and governance context
-        lineage   = await als.fetch(input.result_id, claims["org_id"])
-        orig_lqp  = lineage["lqp_id"]
+        lineage = await self.als.fetch(input.result_id, claims["org_id"])
 
         # Rebuild a refined LQP: add a filter node for the selected hierarchy value
         refined_lqp = deepcopy(lineage["request_payload"]["lqp"])
@@ -273,8 +272,8 @@ class DrilldownService:
 
         # Role predicates from original lineage are already embedded — do not re-project
         # Re-run FQE and DVL only; SCL approval is inherited from the original query
-        result  = await fqe.execute(refined_lqp)
-        display = dvl.evaluate(result, lineage["operation"])
+        result  = await self.fqe.execute(refined_lqp, claims)
+        display = self.dvl.evaluate(result, lineage["operation"])
         return {
             "result_id":    result["result_id"],
             "parent_id":    input.result_id,
@@ -447,6 +446,8 @@ Error code reference table:
 | **SMR resolution** | Direct SMR service call | Synchronous lookup against the metric registry; rejects unregistered IDs before LQP generation |
 | **LQP generation** | Custom Python | Backend-agnostic DAG construction from validated parameters; deterministic for any given input |
 
+`SemanticIntentLayer` is the entry point — it validates params, resolves metrics from the SMR, and delegates DAG construction to `LQPGenerator`. Full `LQPGenerator` implementation is in [§Semantic Intent Layer and LQP Generator](#semantic-intent-layer-and-lqp-generator) below.
+
 ```python
 class SemanticIntentLayer:
     def __init__(self, smr: "SemanticMetricsRegistry"):
@@ -458,31 +459,16 @@ class SemanticIntentLayer:
             await self.smr.get_metric(m, claims)
             for m in params.get("metrics", [])
         ]
-        return self._build_lqp(operation, params, resolved_metrics)
+        lqp = LQPGenerator().build(operation, params, resolved_metrics, claims)
+        # Attach compliance intent score so SCL can apply the two-signal gate
+        lqp["compliance_purpose_score"] = self._score_compliance_intent(operation, resolved_metrics, params)
+        lqp["resolved_metrics"]         = resolved_metrics
+        return lqp
 
     def _validate_params(self, params: dict, required: list[str]) -> None:
         missing = [k for k in required if k not in params]
         if missing:
             raise ValueError(f"Missing required params: {missing}")
-
-    def _build_lqp(self, operation: dict, params: dict, metrics: list[dict]) -> dict:
-        # Construct platform-agnostic DAG; each metric node carries physicalMapping from SMR
-        nodes = []
-        for metric in metrics:
-            node = {
-                "op":               "metric_scan",
-                "metric_id":        metric["metric_id"],
-                "metric_version":   metric["version"],
-                "aggregation":      metric["aggregation"],
-                "data_affinity":    metric["data_affinity"],
-                "physical_mapping": metric["physical_mapping"],
-            }
-            if wm := metric.get("weight_metric_id"):
-                node["weight_metric_id"] = wm
-            nodes.append(node)
-        # Append filter, time_expand, sort nodes derived from call params
-        # Delegates to LQPGenerator for full node construction — see §Semantic Intent Layer and LQP Generator
-        return LQPGenerator().build(operation, nodes, params, rapl_context, claims["org_id"])
 ```
 
 #### Stage 2b — Compliance Intent Classification
@@ -502,13 +488,7 @@ def _score_compliance_intent(self, operation: dict, resolved_metrics: list[dict]
     return min(score, 1.0)
 ```
 
-`resolve()` attaches this score to the LQP before returning it:
-
-```python
-lqp["compliance_purpose_score"] = self._score_compliance_intent(operation, resolved_metrics, params)
-lqp["resolved_metrics"]         = resolved_metrics   # retained for SCL compliance check
-return lqp
-```
+Both fields are attached inside `resolve()` and flow through to the SCL without any additional caller wiring.
 
 ---
 
@@ -995,8 +975,9 @@ Field reference:
 
 ```python
 class RoleAwareProjectionLayer:
-    def __init__(self, pg_pool):
-        self.pg = pg_pool
+    def __init__(self, pg_pool, config: dict = None):
+        self.pg     = pg_pool
+        self.config = config or {}   # platform config — used for roleClaimField lookup
 
     async def project(self, lqp: dict, claims: dict) -> dict:
         # analytics_roles is an array claim — users may hold multiple roles
@@ -1017,12 +998,12 @@ class RoleAwareProjectionLayer:
         return lqp
 
     def _merge_policies(self, policies: list[dict]) -> dict:
-        # Row predicates: intersection (AND — most restrictive role wins)
-        # Column masks: union (masked by any role = masked for the user)
-        # Metric access: union (permitted by any role = permitted)
+        # Row predicates: intersection by key presence — only dimensions constrained by ALL roles are applied
+        # Where two roles define different predicate values for the same key, the first role's value is used
+        # Column masks: union — a field masked by any role is masked for the user
+        # Metric access: union — a metric permitted by any role is permitted
         row_predicates = policies[0].get("rowPredicates", {})
         for p in policies[1:]:
-            # Intersection: keep only predicates present in all role policies
             row_predicates = {k: v for k, v in row_predicates.items() if k in p.get("rowPredicates", {})}
         column_masks: dict = {}
         for p in policies:
@@ -1113,25 +1094,24 @@ class SemanticControlsLayer:
         config = await self._load_config(claims["org_id"])
         await self._acquire_query_slot(claims["org_id"], config)
         try:
-            pass  # existing checks below — slot released by FQE after execution completes
+            # All checks run inside the try so the semaphore slot is always released on failure
+            performance_impact = self._estimate_performance_impact(lqp, config)
+            if performance_impact > config["performance_impact_ceiling_per_query"]:
+                raise PerformanceImpactCeilingExceeded(performance_impact)
+
+            spend = await self._hourly_spend(claims["sub"], claims["org_id"])
+            if spend + performance_impact > config["performance_impact_budget_per_user_hourly"]:
+                raise UserPerformanceImpactBudgetExceeded()
+
+            self._check_classification(lqp, config)
+            lqp = self._check_compliance(lqp, claims, config)
+
+            lqp["estimated_performance_impact"] = performance_impact
+            lqp["controls_approved"]            = True
+            return lqp
         except Exception:
             await self._release_query_slot(claims["org_id"])
             raise
-
-        performance_impact = self._estimate_performance_impact(lqp, config)
-        if performance_impact > config["performance_impact_ceiling_per_query"]:
-            raise PerformanceImpactCeilingExceeded(performance_impact)
-
-        spend = await self._hourly_spend(claims["sub"], claims["org_id"])
-        if spend + performance_impact > config["performance_impact_budget_per_user_hourly"]:
-            raise UserPerformanceImpactBudgetExceeded()
-
-        self._check_classification(lqp, config)
-        lqp = self._check_compliance(lqp, claims, config)
-
-        lqp["estimated_performance_impact"] = performance_impact
-        lqp["controls_approved"]            = True
-        return lqp
 
     def _estimate_performance_impact(self, lqp: dict, config: dict) -> int:
         TIME_MULTIPLIERS = {
@@ -1392,9 +1372,10 @@ class SnowflakeAdapter:
 import asyncio
 
 class FederatedQueryPlanner:
-    def __init__(self, backend_registry: dict, lineage_store: "AnalyticalLineageStore"):
+    def __init__(self, backend_registry: dict, lineage_store: "AnalyticalLineageStore", cache: "ResultCache"):
         self.backends = backend_registry   # data_affinity → FQPBackendAdapter
         self.lineage  = lineage_store
+        self.cache    = cache
 
     async def execute(self, lqp: dict, claims: dict) -> dict:
         # Cache-aside: return cached result if available; bypass for compliance queries
@@ -1430,9 +1411,13 @@ class FederatedQueryPlanner:
             rows    = results[0]["rows"]
             columns = results[0]["columns"]
         else:
+            # Merge sub-results on the shared join key — dict.update() combines columns from each backend
             join_key = lqp.get("join_key", "date")
-            merged   = {row[join_key]: row for result in results for row in result["rows"]}
-            rows     = list(merged.values())
+            merged: dict = {}
+            for result in results:
+                for row in result["rows"]:
+                    merged.setdefault(row[join_key], {}).update(row)
+            rows = list(merged.values())
             columns  = list({col for result in results for col in result["columns"]})
         sort_node  = next((n for n in lqp["nodes"] if n["op"] == "sort"), None)
         limit_node = next((n for n in lqp["nodes"] if n["op"] == "limit"), None)
@@ -1667,11 +1652,12 @@ def _vega_embed_html(spec: dict, width: int, height: int) -> str:
 
 def _table_html(spec: dict, width: int) -> str:
     # Fallback renderer: builds a plain HTML table from spec["columns"] and spec["data"]["values"]
+    # spec["columns"] is a list of {"field": ..., "label": ..., "type": ...} objects
     columns = spec.get("columns", [])
     rows    = spec.get("data", {}).get("values", [])
-    header  = "<tr>" + "".join(f"<th>{col}</th>" for col in columns) + "</tr>"
+    header  = "<tr>" + "".join(f"<th>{col['label']}</th>" for col in columns) + "</tr>"
     body    = "".join(
-        "<tr>" + "".join(f"<td>{row.get(col, '')}</td>" for col in columns) + "</tr>"
+        "<tr>" + "".join(f"<td>{row.get(col['field'], '')}</td>" for col in columns) + "</tr>"
         for row in rows
     )
     return f'<table style="width:{width}px;border-collapse:collapse">{header}{body}</table>'
@@ -1767,10 +1753,20 @@ Indexed on `(org_id, user_sub, created_at DESC)`, `(org_id, created_at DESC)`, a
 ```python
 import json
 
+def utc_now() -> str:
+    return datetime.utcnow().isoformat() + "Z"
+
+def compute_expiry(lqp: dict) -> str:
+    # Default retention 7 years; compliance queries may carry a longer period
+    years   = 7 if not lqp.get("compliance_tier", {}).get("active") else 10
+    expires = datetime.utcnow().replace(year=datetime.utcnow().year + years)
+    return expires.isoformat() + "Z"
+
 class AnalyticalLineageStore:
-    def __init__(self, s3_client, pg_pool):
-        self.s3 = s3_client
-        self.pg = pg_pool
+    def __init__(self, s3_client, pg_pool, bucket: str):
+        self.s3     = s3_client
+        self.pg     = pg_pool
+        self.bucket = bucket   # S3 bucket name for lineage records
 
     async def write(self, record: dict) -> str:
         key = self._object_key(record["org_id"], record["result_id"], record["created_at"])
