@@ -844,9 +844,35 @@ flowchart LR
 
 ### Example
 
-The PQP will receive the approved LQP for the portfolio manager query. Both `portfolio_return` and `benchmark_return` carry `data_affinity: "portfolio"` and `physical_mapping.source: "primary-warehouse"`, so the PQP will produce a single sub-plan. It will read the physical table and measure references from the metric nodes, apply the RAPL row scope and asset class filter, expand `quarter_to_date` to the concrete date range `2026-04-01 → 2026-06-30`, and translate the result into SQL for the FQE to execute.
+The PQP will receive the approved LQP for the portfolio manager query. Both `portfolio_return` and `benchmark_return` carry `data_affinity: "portfolio"` and `physical_mapping.source: "primary-warehouse"`, so the PQP will produce a single sub-plan. It will read the physical table and measure references from the metric nodes, apply the RAPL row scope and asset class filter, expand `quarter_to_date` to the concrete date range `2026-04-01 → 2026-06-30`, and translate the result into SQL.
 
-If the query also included a risk metric with `data_affinity: "risk_metrics"`, the PQP would produce a second sub-plan — translated to the semantic layer's MetricFlow query format — and hand both to the FQE for parallel execution.
+```json
+{
+  "sub_plan_id":           "sp-20260518-093244-m2kp",
+  "lqp_id":               "lqp-20260518-093243-r9xq",
+  "backend_id":            "primary-warehouse",
+  "data_affinity":         "portfolio",
+  "dialect":               "sql",
+  "column_masks":          [],
+  "query_timeout_seconds": 30
+}
+```
+
+```sql
+SELECT
+    p.portfolio_id,
+    SUM(f.portfolio_return * f.market_value) / SUM(f.market_value) AS portfolio_return,
+    SUM(f.benchmark_return * f.market_value) / SUM(f.market_value) AS benchmark_return
+FROM fact_portfolio_daily f
+JOIN dim_portfolio p ON f.portfolio_id = p.portfolio_id
+WHERE p.asset_class  = 'EQUITY'
+  AND f.portfolio_id IN ('GLOB_EQ_OPP', 'UK_CORE_INC', 'ASIA_PAC_GRW', 'EUR_BAL_INC')
+  AND f.date         BETWEEN '2026-04-01' AND '2026-06-30'
+GROUP BY p.portfolio_id
+ORDER BY portfolio_return DESC
+```
+
+The PQP will pass this sub-plan to the FQE for execution. If the query also included a risk metric with `data_affinity: "risk_metrics"`, the PQP would produce a second sub-plan — translated to the semantic layer's MetricFlow query format — and hand both to the FQE for parallel execution.
 
 
 ## Federated Query Engine (FQE)
@@ -926,7 +952,7 @@ The FQE will adapt routing decisions based on observed execution performance. It
 Both `portfolio_return` and `benchmark_return` have `data_affinity: "portfolio"`, so the FQE will route a single sub-plan to the primary SQL warehouse:
 
 ```sql
--- Physical execution (FQE output)
+-- PQP sub-plan received by FQE
 SELECT
     p.portfolio_id,
     SUM(f.portfolio_return * f.market_value) / SUM(f.market_value) AS portfolio_return,
