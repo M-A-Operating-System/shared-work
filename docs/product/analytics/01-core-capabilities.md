@@ -775,16 +775,6 @@ flowchart LR
 
 **Check 4 — Compliance Check.** A request will be classified as a compliance-type request when two independent signals are both active at evaluation time. When classified, the platform will invoke the Provenance Artifact Service, apply framework-specific validation rules, and block result export until the artifact is sealed. Compliance relevance is declared on each metric at registration by the Metrics Modeller — the platform makes no compliance determination on a request without that declaration.
 
-Compliance features will be enabled or disabled by a single platform configuration flag, set by the Platform Admin:
-
-```json
-"features": {
-  "complianceMode": true
-}
-```
-
-When `complianceMode` is `false`, all compliance checks and Provenance Artifact generation will be disabled. When `true`, the two-signal trigger below will apply to every query.
-
 **Provenance Artifact trigger — two signals, both required (AND logic)**
 
 | Signal | Source | True when |
