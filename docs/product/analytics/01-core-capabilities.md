@@ -792,15 +792,6 @@ Framework-specific validation rules — additional parameter requirements, data 
 
 **Step 7 — Controls Record and Release.** The SCL will write a signed controls decision record to the Analytical Lineage Store before forwarding the LQP to the Physical Query Planner. The record will capture the LQP identifier, the outcome of every check, the assigned timeout budget, and the compliance classification. Only after this record is confirmed written will the SCL release the query to the PQP. The lineage record is the authoritative confirmation that every control was applied.
 
-### Timeout and Partial Result Handling
-
-| Scenario | Behaviour |
-|---|---|
-| All sub-plans complete within timeout | Normal result assembly and return |
-| One sub-plan times out, others complete | Partial result assembly — missing metrics represented as null with `timeout` provenance marker; user notified |
-| All sub-plans time out | Query failed — error returned to user; controls event written with `timeout` status |
-| Engine cancellation on timeout | FQE sends cancellation signal to timed-out engine (if engine supports cancellation) |
-
 ### Example
 
 SCL will evaluate the LQP against the `acme-wealth` controls config:
@@ -936,6 +927,15 @@ The FQE will maintain a result cache keyed by the LQP signature — a determinis
 ### Adaptive Planning
 
 The FQE will adapt routing decisions based on observed execution performance. It will track p50/p95 latency per engine per data affinity over a rolling one-hour window, automatically fall back to the next available engine if performance degrades, and calibrate performance impact estimates based on observed execution data from completed queries. If a sub-plan engine returns a partial result due to timeout, the FQE will log this in the lineage record and surface a warning to the user alongside the partial result.
+
+### Timeout and Partial Result Handling
+
+| Scenario | Behaviour |
+|---|---|
+| All sub-plans complete within timeout | Normal result assembly and return |
+| One sub-plan times out, others complete | Partial result assembly — missing metrics represented as null with `timeout` provenance marker; user notified |
+| All sub-plans time out | Query failed — error returned to user; execution record written with `timeout` status |
+| Engine cancellation on timeout | FQE sends cancellation signal to timed-out engine (if engine supports cancellation) |
 
 ### Example
 
