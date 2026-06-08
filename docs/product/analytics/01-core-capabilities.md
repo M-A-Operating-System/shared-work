@@ -821,46 +821,30 @@ All checks will pass. SCL will write a controls decision record to the ALS befor
 
 > **Governing principles:** [P1 — Semantic abstraction](./00-overview.md#design-principles) · [P10 — Deterministic computation, not generation](./00-overview.md#design-principles)
 
-The Physical Query Planner (PQP) will be the translation boundary between the logical and physical layers of the pipeline. It will receive the controls-approved Logical Query Plan from the SCL and produce backend-specific physical query fragments — one per data affinity — that the Federated Query Engine can route directly to execution backends.
+The Physical Query Planner (PQP) will be the translation boundary between the logical and physical layers of the pipeline. It will receive the controls-approved Logical Query Plan from the SCL and produce backend-specific physical query fragments — one per data affinity — that the Federated Query Engine can route directly to execution backends. Nothing above the PQP will have knowledge of physical schemas, table names, or backend query languages. Nothing below it will operate on logical concepts. The same LQP will always produce the same physical sub-plans: given identical metric definitions, filters, and time expressions, the PQP's output will be fully reproducible — a property required for lineage integrity.
 
-Nothing above the PQP will have knowledge of physical schemas, table names, or backend query languages. Nothing below it will operate on logical concepts. The PQP will be the single point where semantic intent becomes executable instruction.
-
-### Responsibilities
-
-The PQP will perform three operations in sequence:
+### Translation Pipeline
 
 ```mermaid
 flowchart LR
-    S1["**1. physicalMapping resolution**\nFor each metric_scan node in the LQP\nread physical_mapping from the resolved metric definition\n→ source system · table or cube · measure identifier"]
-    S2["**2. Sub-plan decomposition**\nGroup metric nodes by data_affinity\nOne sub-plan per affinity group\nDistribute row predicates and filters to each sub-plan"]
-    S3["**3. Dialect translation**\nTranslate each sub-plan to the backend's native query language\nSQL for warehouse backends\nMetricFlow query for semantic layer backends\nOData filter expressions for REST data APIs\nCypher / SPARQL for graph backends"]
-    OUT(["Physical sub-plans\n→ FQE for execution"])
+    START(["Approved LQP"])
+    S1["**1. physicalMapping Resolution**"]
+    S2["**2. Sub-plan Decomposition**"]
+    S3["**3. Dialect Translation**"]
+    OUT(["Physical sub-plans → FQE"])
 
-    S1 --> S2 --> S3 --> OUT
+    START --> S1 --> S2 --> S3 --> OUT
 ```
 
-The PQP will have no execution capability. It will not connect to backends, manage timeouts, or assemble results. Its output will be a set of ready-to-execute physical query fragments; the FQE will own everything from that point forward.
+**Step 1 — physicalMapping Resolution.** For each `metric_scan` node in the LQP, the PQP will read the `physical_mapping` field from the resolved metric definition already attached to the node by the SVL. This field declares the registered backend identifier (`source`), the physical table or view (`table`), the column or pre-computed measure (`measure`), and the cube name for semantic layer backends (`cube`). No additional SMR call will be required — all physical mapping information will already be present in the LQP.
 
-### Translation is deterministic
+**Step 2 — Sub-plan Decomposition.** The PQP will group metric nodes by their `data_affinity` value and produce one sub-plan per affinity group. Row scope filters and dimension filters from the LQP will be distributed to each sub-plan so that entitlement enforcement carries through to the physical layer. Column masking directives from the LQP's `column_masks` array will be attached to each sub-plan for the FQE to apply during result assembly.
 
-The same LQP will always produce the same physical sub-plans. Given identical metric definitions, filter predicates, and time expressions, the PQP's output will be fully reproducible. This property is required for lineage: the physical sub-plans written to the lineage record must faithfully represent what was executed, with no runtime variation.
-
-### physicalMapping resolution
-
-The `physical_mapping` field on each `analytical_metric` SMR definition will declare where the metric lives physically:
-
-| Metric field | Resolved to |
-|---|---|
-| `physical_mapping.source` | Registered backend ID — matched against the FQE backend registry |
-| `physical_mapping.table` | Physical table or view name in the target backend |
-| `physical_mapping.measure` | Column or pre-computed measure identifier |
-| `physical_mapping.cube` | Cube name for semantic layer backends |
-
-These fields will already be attached to the metric nodes in the LQP by the SVL at resolution time. The PQP will read them directly — no additional SMR call will be required.
+**Step 3 — Dialect Translation.** Each sub-plan will be translated to the native query language of its target backend: SQL for warehouse backends, MetricFlow query format for semantic layer backends, OData filter expressions for REST data APIs, and SPARQL or Cypher for graph backends. The PQP will have no execution capability — it will not connect to backends, manage timeouts, or assemble results. Its output will be a set of ready-to-execute physical query fragments; the FQE will own everything from that point forward.
 
 ### Example
 
-The PQP will receive the approved LQP for the portfolio manager query. Both `portfolio_return` and `benchmark_return` carry `data_affinity: "portfolio"` and `physical_mapping.source: "primary-warehouse"`, so the PQP will produce a single sub-plan. It will read the physical table and measure references from the metric nodes, apply the RAPL row predicate and asset class filter, expand `quarter_to_date` to the concrete date range `2026-04-01 → 2026-06-30`, and translate the result into SQL for the FQE to execute.
+The PQP will receive the approved LQP for the portfolio manager query. Both `portfolio_return` and `benchmark_return` carry `data_affinity: "portfolio"` and `physical_mapping.source: "primary-warehouse"`, so the PQP will produce a single sub-plan. It will read the physical table and measure references from the metric nodes, apply the RAPL row scope and asset class filter, expand `quarter_to_date` to the concrete date range `2026-04-01 → 2026-06-30`, and translate the result into SQL for the FQE to execute.
 
 If the query also included a risk metric with `data_affinity: "risk_metrics"`, the PQP would produce a second sub-plan — translated to the semantic layer's MetricFlow query format — and hand both to the FQE for parallel execution.
 
