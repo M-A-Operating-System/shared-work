@@ -975,7 +975,7 @@ The Data Visualization Language (DVL) will be the governing schema that maps res
 
 ### Intent Pattern Taxonomy
 
-Every analytical result will be classified into one of seven intent patterns:
+Intent patterns are registered classifications in the DVL. The initial set is defined below; new patterns will be added as the platform's analytical vocabulary grows.
 
 | Intent pattern | Description | Typical trigger phrases |
 |---|---|---|
@@ -988,6 +988,8 @@ Every analytical result will be classified into one of seven intent patterns:
 | `COMPOSITION` | Showing part-to-whole relationships | "proportion", "weight", "allocation", "share" |
 
 ### Chart Contract Table
+
+Chart contracts are registered specifications in the DVL, each binding an intent pattern to a chart type, axis assignments, and interaction semantics. The initial set is defined below; new contracts will be registered as the platform's visualisation vocabulary is extended.
 
 | Contract name | Intent patterns matched | Chart type | Key axis assignments | Interaction semantics |
 |---|---|---|---|---|
