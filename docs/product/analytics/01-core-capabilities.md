@@ -971,7 +971,7 @@ The FQE will write an execution record to the Analytical Lineage Store (ALS) and
 
 > **Governing principles:** [P7 — Deterministic visualisation](./00-overview.md#design-principles)
 
-The Data Visualization Language (DVL) will be the governing schema that maps result characteristics and analytical intent patterns to specific, parameterised chart contracts. It will make chart selection deterministic: the same analytical pattern will produce the same chart type across all users, sessions, and AI model versions, regardless of how the question was phrased. The AI model will not select chart types. Intent signals from the query will be treated as inputs to the ontology evaluation algorithm, but DVL will make the final binding decision.
+The Data Visualization Language (DVL) will be the governing schema that maps result characteristics and analytical intent patterns to specific, parameterised chart contracts. It will make chart selection deterministic: the same analytical pattern will produce the same chart type across all users, sessions, and AI model versions, regardless of how the question was phrased. The AI model will not select chart types. Intent signals from the query will be treated as inputs to the ontology evaluator, which will evaluate contracts in order of specificity and return the highest-scoring match. The `TABLE_GOVERNED` contract will be the unconditional fallback — always eligible and always matching — ensuring every query receives a valid `display_spec` regardless of result shape.
 
 ### Intent Pattern Taxonomy
 
@@ -999,10 +999,6 @@ Every analytical result will be classified into one of seven intent patterns:
 | `SCATTER_RISK_RETURN` | `RELATIONSHIP` | Scatter | X: first metric (conventionally risk); Y: second metric (conventionally return); Colour: categorical dimension; Size: optional third metric | Hover: all metric values; Reference lines: quadrant boundaries from benchmark values if present |
 | `TABLE_GOVERNED` | Fallback (any) | Table | All result columns; column labels from SMR; inline sparklines for temporal metrics | Column sorting; column filtering; export to CSV and JSON |
 
-### Priority-Ordered Evaluation
-
-The ontology evaluator will receive the LQP, intent pattern classification, and result schema. It will evaluate contracts in order of specificity and return the highest-scoring match. The `TABLE_GOVERNED` contract will be the unconditional fallback — always eligible and always matching — ensuring that every query receives a valid `display_spec` regardless of result shape.
-
 ### Override Mechanism
 
 Power Analysts will be able to override the ontology's chart selection for a single result by expressing an explicit chart type preference in their query. Overrides will be subject to the requested chart type being in the platform's configured `allowedChartTypes` list and the result schema being compatible with the requested chart type. Incompatible overrides will be rejected with an explanation. All overrides will be logged in the lineage record as analyst-requested deviations from the governing ontology.
@@ -1013,19 +1009,15 @@ The ontology evaluator will classify the result: two metrics across four named e
 
 ```json
 {
-  "type": "chart",
-  "mark": "bar",
-  "data": { "name": "result" },
-  "transform": [
-    { "fold": ["portfolio_return", "benchmark_return"], "as": ["metric", "value"] }
-  ],
+  "display_spec_id": "dsp-20260518-093248-f3xp",
+  "contract":        "BAR_MULTI_SERIES_COMPARISON",
+  "intent_pattern":  "COMPARISON",
+  "chart_type":      "bar",
   "encoding": {
-    "x":       { "field": "portfolio_id", "type": "nominal",      "title": "Portfolio"   },
-    "y":       { "field": "value",        "type": "quantitative", "title": "Return (%)", "axis": { "format": ".2f" } },
-    "color":   { "field": "metric",       "type": "nominal",      "title": "Metric",
-                 "scale": { "domain": ["portfolio_return", "benchmark_return"],
-                            "range":  ["#0057B8", "#A8C8F0"] } },
-    "xOffset": { "field": "metric", "type": "nominal" }
+    "x":       { "field": "portfolio_id", "type": "nominal"      },
+    "y":       { "field": "value",        "type": "quantitative" },
+    "color":   { "field": "metric",       "type": "nominal"      },
+    "xOffset": { "field": "metric",       "type": "nominal"      }
   },
   "title": "Portfolio Return vs Benchmark — Q2 2026"
 }
@@ -1042,7 +1034,7 @@ The NSA will not be a general-purpose AI model with access to the query, the use
 
 ### Anchoring and Validation
 
-The NSA will produce two output fields:
+The NSA will produce three output fields:
 
 | Field | Description |
 |---|---|
