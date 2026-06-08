@@ -749,63 +749,31 @@ Node `n3` is the RAPL row scope — a first-class plan node, not a post-executio
 
 > **Governing principles:** [P2 — Controls before execution](./00-overview.md#design-principles) · [P8 — Explainability at every layer](./00-overview.md#design-principles) · [P9 — Administrator sovereignty](./00-overview.md#design-principles)
 
-The Semantic Controls Layer (SCL) will apply a suite of performance impact thresholds, complexity limits, and compliance classification checks to every query before it is released to the Federated Query Engine. It will be the final gate before physical execution. Controls will apply to every query without exception. There will be no privileged user, trusted agent, or internal path that bypasses SCL checks.
+The Semantic Controls Layer (SCL) will apply five sequential checks to every query before releasing it to the Physical Query Planner — data scale, complexity, classification, compliance, and concurrency. Every check must pass. There will be no privileged user, trusted agent, or internal path that bypasses SCL checks.
 
 ### Controls Pipeline
 
 ```mermaid
 flowchart LR
-    START(["Validated LQP\npost role-aware projection"])
-    S1["**1. Performance impact assessment**\nEstimate execution performance impact units from LQP metadata\ncardinality estimate × engine performance tier × complexity factor"]
-    S2["**2. Performance impact threshold check**\nCompare estimated performance impact to maxPerformanceImpact\nBLOCK if exceeded → user prompted to narrow scope"]
-    S3["**3. Complexity limit check**\nEvaluate LQP node count, join depth, sub-plan count\nBLOCK if exceeds complexity threshold"]
-    S4["**4. Classification gate**\nRetrieve data.classification from SMR per metric\nBLOCK if any metric classification is in blocked list"]
-    S5["**5. Compliance check**\nIf any resolved metric has compliance_relevant: true:\nevaluate two-signal Provenance Artifact trigger\napply framework-specific validation rules from metric regulatory_framework tags"]
-    S6["**6. Concurrency limit check**\nCount active queries for this user\nBLOCK with wait if exceeds maxConcurrentQueries"]
-    S7["**7. Timeout budget assignment**\nAssign queryTimeoutSeconds to FQE execution context"]
-    S8(["**8. Controls approval record written**\nControls event written before FQE is invoked\n→ Release to FQE"])
+    START(["Approved LQP"])
+    S1["**1. Data Scale Check**"]
+    S2["**2. Complexity Check**"]
+    S3["**3. Classification Gate**"]
+    S4["**4. Compliance Check**"]
+    S5["**5. Concurrency Check**"]
+    S6["**6. Timeout Budget**"]
+    S7(["**7. Controls Record & Release**\n→ PQP"])
 
-    START --> S1 --> S2 --> S3 --> S4 --> S5 --> S6 --> S7 --> S8
+    START --> S1 --> S2 --> S3 --> S4 --> S5 --> S6 --> S7
 ```
 
-### Performance Impact Assessment Model
+**Check 1 — Data Scale Check.** The SCL will estimate the total scan volume for the query using data profiling statistics held in the Semantic Data Repository — row counts, partition sizes, and time-series volume distributions for each physical data source. It will compute an estimated scan volume in rows across all sub-plans and compare it against the `maxScanRows` limit in the controls configuration. A simple query spanning a large, unpartitioned fact table may exceed the limit and be blocked; a structurally complex query operating over a narrow time-window partition may pass comfortably. When blocked, the user will receive structured suggestions to narrow scope — reduce the time period, add a filter, or reduce the number of metrics.
 
-Performance impact units will be estimated from LQP metadata before any backend is contacted:
+**Check 2 — Complexity Check.** The SCL will evaluate the structural complexity of the LQP independently of data scale: total node count, join depth, and number of federated sub-plans. Complexity limits protect the Physical Query Planner and the FQE coordinator from pathologically complex plans that could degrade coordination performance regardless of underlying data volume. A query blocked by the complexity ceiling will receive an error identifying which dimension of complexity was exceeded.
 
-| Factor | Contribution |
-|---|---|
-| Number of metrics | `metric_count × 50` base units |
-| Engine performance tier per sub-plan | `minimal: 10`, `low: 50`, `standard: 100`, `high: 300`, `unrestricted: 0` |
-| Dimension cardinality | `low: ×1.0`, `medium: ×1.5`, `high: ×3.0`, `unbounded: ×5.0` |
-| Time period scope | `single_day: ×1.0`, `quarter: ×2.0`, `year: ×4.0`, `since_inception: ×8.0` |
-| Number of sub-plans (federation) | `+100 per additional sub-plan` |
-| Materialised view match | `−800` (pre-computed result) |
-| Cache hit (estimated) | `−900` (full cache hit expected) |
+**Check 3 — Classification Gate.** Every resolved metric carries a `data.classification` value set by the Metrics Modeller at registration. The SCL will identify the highest classification level across all metrics in the LQP and compare it against the permitted classification ceiling in the controls configuration. If any metric's classification exceeds the ceiling the query will be blocked. This check operates independently of entitlement enforcement — RAPL will have already confirmed the caller's access to each metric; the classification gate confirms the overall query's classification envelope is within the platform's operational boundary.
 
-**Worked example — `portfolio_return, tracking_error BY portfolio, asset_class FOR YEAR_TO_DATE`:**
-
-```
-portfolio_return:        50 (metric base)
-tracking_error:          50 (metric base)
-SQL warehouse backend:  100 (standard performance tier)
-semantic layer backend:  50 (low performance tier)
-asset_class:            1.5× cardinality multiplier (medium)
-YEAR_TO_DATE:           4.0× period multiplier
-2 sub-plans:            100 (federation overhead)
-—————————————————————————————
-Base: (50+50) × 1.5 × 4.0 = 600
-Engines: 100+50 = 150
-Federation: 100
-Total estimate: 850 performance impact units
-```
-
-Against a `maxPerformanceImpact: 1000` limit, this query is approved. Against a `500` limit, it is blocked and the user receives structured suggestions to narrow scope (reduce time period, reduce metric count, or add a filter).
-
-### Compliance
-
-A request will be classified as a compliance-type request when two independent signals are both active at evaluation time. When classified, the platform will invoke the Provenance Artifact Service, apply framework-specific validation rules, and block result export until the artifact is sealed. Compliance relevance is declared on each metric at registration by the Metrics Modeller — the platform makes no compliance determination on a request without that declaration.
-
-**Platform compliance configuration**
+**Check 4 — Compliance Check.** A request will be classified as a compliance-type request when two independent signals are both active at evaluation time. When classified, the platform will invoke the Provenance Artifact Service, apply framework-specific validation rules, and block result export until the artifact is sealed. Compliance relevance is declared on each metric at registration by the Metrics Modeller — the platform makes no compliance determination on a request without that declaration.
 
 Compliance features will be enabled or disabled by a single platform configuration flag, set by the Platform Admin:
 
@@ -833,13 +801,15 @@ When `complianceMode` is `false`, all compliance checks and Provenance Artifact 
 | `false` | `true` | Standard controls output |
 | `false` | `false` | Standard controls output |
 
-**Export gate**
-
 When the Provenance Artifact is active, export of the result will be blocked until the artifact is confirmed written and sealed to the ALS. The `export_requires_lineage: true` flag in the response will signal this state to the consumer. The consumer will not present export affordances until the platform confirms sealing.
 
-**Framework-specific validation rules**
-
 Framework-specific validation rules — additional parameter requirements, data constraints, lineage record types, and NSA output constraints — are declared exclusively on the metric definition in the SMR via the metric's `regulatory_framework` attribute, set by the Metrics Modeller at registration. The SCL will read and apply these rules directly from the resolved metric definitions at query time. No regulatory framework logic is hardcoded in the SCL.
+
+**Check 5 — Concurrency Check.** The SCL will count the number of active queries currently in execution and compare it against the `maxConcurrentQueries` limit in the controls configuration. If the platform is at capacity, the query will be blocked with a `concurrency_limit_reached` response, and the caller will be advised to retry. This limit protects FQE coordination resources and ensures that no single burst of requests degrades response times across all active queries.
+
+**Step 6 — Timeout Budget Assignment.** Once all five checks pass, the SCL will assign a `queryTimeoutSeconds` value to the query. This is not a blocking check — it is a budget allocation. The timeout is derived from the estimated scan volume and the configured per-engine timeout settings in the controls configuration. It will be attached to the controls output and forwarded with the LQP to the Physical Query Planner, which will pass it to the FQE for enforcement during execution.
+
+**Step 7 — Controls Record and Release.** The SCL will write a signed controls decision record to the Analytical Lineage Store before forwarding the LQP to the Physical Query Planner. The record will capture the LQP identifier, the outcome of every check, the assigned timeout budget, and the compliance classification. Only after this record is confirmed written will the SCL release the query to the PQP. The lineage record is the authoritative confirmation that every control was applied.
 
 ### Timeout and Partial Result Handling
 
@@ -856,20 +826,20 @@ SCL will evaluate the LQP against the `acme-wealth` controls config:
 
 | Check | Value | Limit | Result |
 |---|---|---|---|
-| Estimated performance impact | 620 | 1,000 | Pass |
-| Metrics per query | 2 | 10 | Pass |
-| Dimensions | 1 | 5 | Pass |
-| Data classification | INTERNAL | INTERNAL ceiling | Pass |
-| Compliance | none required | — | Pass |
+| Data scale (estimated scan volume) | 620M rows | 1B rows | Pass |
+| Complexity (node count) | 4 nodes | 50 nodes | Pass |
+| Classification | INTERNAL | INTERNAL ceiling | Pass |
+| Compliance | none triggered | — | Pass |
+| Concurrency (active queries) | 3 | 20 | Pass |
 
-All checks will pass. SCL will write a controls decision record to the ALS before the FQE is invoked:
+All checks will pass. SCL will write a controls decision record to the ALS before releasing to the PQP:
 
 ```json
 {
   "lqp_id":    "lqp-20260518-093243-r9xq",
   "decision":  "approved",
   "timestamp": "2026-05-18T09:32:44Z",
-  "checks":    ["performance_impact_ceiling", "metric_count", "dimension_count", "classification_gate", "compliance_check"],
+  "checks":    ["data_scale_check", "complexity_check", "classification_gate", "compliance_check", "concurrency_check"],
   "result":    "all_passed"
 }
 ```
