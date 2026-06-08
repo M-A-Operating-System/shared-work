@@ -588,7 +588,7 @@ When the request reaches the SVL, the SMR will be the catalogue every identifier
 
 > **Governing principles:** [P5 — Role-aware by default](./00-overview.md#design-principles) · [P1 — Semantic abstraction](./00-overview.md#design-principles)
 
-The Role-Aware Projection Layer will enforce entitlement at two levels: the **analytical level** (which metrics and dimensions a user may query) and the **data level** (which rows and columns are visible within an entitled result). Entitlement will be conferred by role membership against registered metric definitions, not by database permissions — a user restricted from raw source tables can still receive a governed aggregated metric if their role grants access to it.
+The platform's scope covers both analytical querying and data mining. The Role-Aware Projection Layer will be the single point where every request is assessed against five entitlement dimensions — data access, metrics access, dimension access, row scope access, and result set column masking — before any query plan is compiled. Entitlement will be conferred by role membership against governed concepts in the DES, not by database permissions.
 
 Entitlement policies will be managed in the **Data Entitlements Store (DES)** — an independent external component. Policies will be defined at the **logical object and data element level**: granting or restricting access to named metrics, dimensions, and data elements as governed concepts, never to physical tables, schemas, or column names. This will keep entitlements stable as the underlying physical implementation changes and comprehensible to governance teams with no visibility into the data platform's internals.
 
@@ -596,14 +596,15 @@ Projection will not be optional and will not be bypassable. Every request will p
 
 ### Restriction Types
 
-RAPL will make four categories of entitlement decision. Every decision will be made inside RAPL (Stage 5 of the projection lifecycle); the resulting conditions will be carried in the entitlement projection and enforced downstream — metric and dimension removals by the SVL during plan generation, row and column restrictions by the FQE at execution and result assembly.
+RAPL will make five categories of entitlement decision. Every decision will be made inside RAPL (Stage 5 of the projection lifecycle); the resulting conditions will be carried in the entitlement projection and enforced downstream — data and metric/dimension removals by the SVL during plan generation, row scope and column restrictions by the FQE at execution and result assembly.
 
 | Restriction type | Decided in RAPL | Enforced at |
 |---|---|---|
-| **Metric access** | Stage 5 — requested metric not in the entitled access set is **DENIED** | SVL Stage 3 — denied metric removed from plan; request rejected if a required metric is lost |
+| **Data access** | Stage 5 — data domain or classification ceiling not within the user's entitled scope is **DENIED** | SVL Stage 3 — request rejected before plan generation |
+| **Metrics access** | Stage 5 — requested metric not in the entitled access set is **DENIED** | SVL Stage 3 — denied metric removed from plan; request rejected if a required metric is lost |
 | **Dimension access** | Stage 5 — requested dimension not in the entitled access set is **DENIED** | SVL Stage 3 — denied dimension removed from plan |
-| **Row scope predicate** | Stage 5–6 — population predicate decided and resolved against JWT claims | FQE physical query generation — injected as a predicate node |
-| **Column mask** | Stage 5 — masked columns and masking mode registered | FQE result assembly — value replaced, redacted, or excluded |
+| **Row scope access** | Stage 5–6 — population scope decided and resolved against JWT claims | FQE physical query generation — injected as a scope node |
+| **Result set column masking** | Stage 5 — masked columns and masking mode registered | FQE result assembly — value replaced, redacted, or excluded |
 
 ### Projection Lifecycle
 
@@ -625,31 +626,33 @@ flowchart LR
 
 **Stage 2 — Role Claim Extraction.** Extract the user's analytical role claims from the validated JWT using the configured `roleClaimField`. **DENY** — if no valid analytical role claims are present the request is rejected.
 
-**Stage 3 — DES Role Definition Retrieval.** Look up the full role definition for each extracted role from the Data Entitlements Store (DES). Each definition declares the metric access set, dimension access set, row scope predicate templates, column masks, and classification ceiling for that role. **DENY** — if no valid role definitions are retrieved the request is rejected.
+**Stage 3 — DES Role Definition Retrieval.** Look up the full role definition for each extracted role from the Data Entitlements Store (DES). Each definition declares the data access scope, metric access set, dimension access set, row scope templates, column masks, and classification ceiling for that role. **DENY** — if no valid role definitions are retrieved the request is rejected.
 
-**Stage 4 — Multi-Role Merge.** Merge all retrieved role definitions into a single entitlement profile. Metric and dimension access: union. Row scope predicates: intersection (most restrictive wins). Column masks: union (masked by any role = masked for the user). No APPROVE/DENY decision is made here — this stage produces the profile against which all decisions are made in Stage 5.
+**Stage 4 — Multi-Role Merge.** Merge all retrieved role definitions into a single entitlement profile. Data, metric, and dimension access: union. Row scope: intersection (most restrictive wins). Column masks: union (masked by any role = masked for the user). No APPROVE/DENY decision is made here — this stage produces the profile against which all decisions are made in Stage 5.
 
-**Stage 5 — Entitlement Decisions.** Four classes of decision will be made against the merged entitlement profile:
+**Stage 5 — Entitlement Decisions.** Five classes of decision will be made against the merged entitlement profile:
 
-- **Metrics** — each requested metric will be **APPROVED** or **DENIED** (`METRIC_NOT_ENTITLED`). Approval may be with or without dimensional constraints. If any required metric is denied the request will be rejected.
-- **Dimensions** — each requested dimension will be **APPROVED** or **DENIED** (`DIMENSION_NOT_ENTITLED`). Entitlement will be evaluated per metric-dimension combination.
-- **Row scope** — each approved metric will carry an **APPROVED with population restrictions** decision: the row scope predicates that define which population of data the user is permitted to see.
-- **Columns** — each approved metric will carry an **APPROVED with column restrictions** decision where applicable.
+- **Data access** — the requested data domain and classification level will be checked against the user's entitled data access scope and classification ceiling. If either check fails the request will be **DENIED** (`DATA_NOT_ENTITLED`) before metric evaluation begins.
+- **Metrics access** — each requested metric will be **APPROVED** or **DENIED** (`METRIC_NOT_ENTITLED`). Approval may be with or without dimensional constraints. If any required metric is denied the request will be rejected.
+- **Dimension access** — each requested dimension will be **APPROVED** or **DENIED** (`DIMENSION_NOT_ENTITLED`). Entitlement will be evaluated per metric-dimension combination.
+- **Row scope access** — each approved metric will carry an **APPROVED with population scope** decision: the row scope that defines which population of data the user is permitted to see.
+- **Result set column masking** — each approved metric will carry an **APPROVED with column restrictions** decision where applicable.
 
-No approved metric will reach the output without its full set of population scope and column visibility conditions attached.
+No approved metric will reach the output without its full set of data access clearance, population scope, and column visibility conditions attached.
 
-**Stage 6 — Row Scope Template Resolution.** Resolve the row scope predicate templates from Stage 5 against the user's JWT claims. `{{user.claim_name}}` syntax will be expanded to concrete values at query time. **DENY** — if a required JWT claim for scope resolution is missing the request will be rejected.
+**Stage 6 — Row Scope Resolution.** Resolve the row scope templates from Stage 5 against the user's JWT claims. `{{user.claim_name}}` syntax will be expanded to concrete values at query time. **DENY** — if a required JWT claim for scope resolution is missing the request will be rejected.
 
-**Stage 7 — Entitlement Projection Output.** Produce the completed entitlement projection: approved `metric_access_set` (each with permitted aggregations and dimensional constraints), approved `dimension_access_set`, resolved `row_scope_predicates[]`, registered `column_masks[]`, and `classification_ceiling`. Write the full projection record to the ALS. Pass to SVL for Stage 3 enforcement.
+**Stage 7 — Entitlement Projection Output.** Produce the completed entitlement projection: approved `data_access_scope`, approved `metric_access_set` (each with permitted aggregations and dimensional constraints), approved `dimension_access_set`, resolved `row_scope[]`, registered `column_masks[]`, and `classification_ceiling`. Write the full projection record to the ALS. Pass to SVL for Stage 3 enforcement.
 
 ### Multi-Role Merge Strategy
 
 | Entitlement type | Merge strategy | Rationale |
 |---|---|---|
-| Metric access | Union | Entitlement via any role is sufficient |
+| Data access | Union | Entitlement via any role is sufficient |
+| Metrics access | Union | Entitlement via any role is sufficient |
 | Dimension access | Union | Entitlement via any role is sufficient |
-| Row scope predicates | Intersection (AND) | All predicates must be satisfied — most restrictive wins |
-| Column masks | Union | A column masked by any role is masked for the user |
+| Row scope access | Intersection (AND) | All scope conditions must be satisfied — most restrictive wins |
+| Result set column masking | Union | A column masked by any role is masked for the user |
 
 ### Column Masking Modes
 
@@ -661,15 +664,16 @@ No approved metric will reach the output without its full set of population scop
 
 ### Entitlement Audit
 
-Every entitlement decision — approved metrics, denied metrics, approved dimensions, row scope predicates applied, and column masks registered — will be recorded in the Analytical Lineage Store (ALS) as part of the projection record. The record will capture the roles active at query time, each metric's APPROVE or DENY outcome and the basis for it, the resolved row scope population for each approved metric, and the column restrictions in force.
+Every entitlement decision — data access clearance, approved and denied metrics, approved dimensions, row scope applied, and column masking registered — will be recorded in the Analytical Lineage Store (ALS) as part of the projection record. The record will capture the roles active at query time, each decision's APPROVE or DENY outcome and the basis for it, the resolved row scope for each approved metric, and the column restrictions in force.
 
 ### Example
 
-The RAPL will read the `portfolio_scope` claim from the JWT and resolve it against the `portfolio_manager` role's predicate template (`portfolio_id IN ({{user.portfolio_scope}})`):
+The RAPL will read the `portfolio_scope` claim from the JWT and resolve it against the `portfolio_manager` role's row scope template (`portfolio_id IN ({{user.portfolio_scope}})`):
 
 ```json
 {
-  "row_predicates": [
+  "data_access_scope":      "domain:portfolio · classification:INTERNAL",
+  "row_scope": [
     { "dimension": "portfolio_id", "operator": "in",
       "values": ["GLOB_EQ_OPP", "UK_CORE_INC", "ASIA_PAC_GRW", "EUR_BAL_INC"] }
   ],
@@ -679,7 +683,7 @@ The RAPL will read the `portfolio_scope` claim from the JWT and resolve it again
 }
 ```
 
-No column masks will apply — the `portfolio_manager` role has no masking rules for performance metrics. The row predicate will be injected into the LQP as node `n3`. Any portfolio outside the four listed IDs will be excluded at the physical query level. The entitlement projection will be handed to the SVL.
+No column masks will apply — the `portfolio_manager` role has no masking rules for performance metrics. The row scope will be injected into the LQP as node `n3`. Any portfolio outside the four listed IDs will be excluded at the physical query level. The entitlement projection will be handed to the SVL.
 
 
 ## Semantic Validation Layer (SVL)
