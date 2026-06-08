@@ -844,17 +844,21 @@ flowchart LR
 
 ### Example
 
-The PQP will receive the approved LQP for the portfolio manager query. Both `portfolio_return` and `benchmark_return` carry `data_affinity: "portfolio"` and `physical_mapping.source: "primary-warehouse"`, so the PQP will produce a single sub-plan. It will read the physical table and measure references from the metric nodes, apply the RAPL row scope and asset class filter, expand `quarter_to_date` to the concrete date range `2026-04-01 → 2026-06-30`, and translate the result into SQL.
+The PQP will receive the approved LQP for the portfolio manager query. Both `portfolio_return` and `benchmark_return` carry `data_affinity: "portfolio"` and `physical_mapping.source: "primary-warehouse"`, so the PQP will produce a single sub-plan. It will read the physical table and measure references from the metric nodes, apply the RAPL row scope and asset class filter, expand `quarter_to_date` to the concrete date range `2026-04-01 → 2026-06-30`, and translate the result into SQL. The PQP output is always a `sub_plans` array — one entry per data affinity group.
 
 ```json
 {
-  "sub_plan_id":           "sp-20260518-093244-m2kp",
-  "lqp_id":               "lqp-20260518-093243-r9xq",
-  "backend_id":            "primary-warehouse",
-  "data_affinity":         "portfolio",
-  "dialect":               "sql",
-  "column_masks":          [],
-  "query_timeout_seconds": 30
+  "lqp_id":    "lqp-20260518-093243-r9xq",
+  "sub_plans": [
+    {
+      "sub_plan_id":           "sp-20260518-093244-m2kp",
+      "backend_id":            "primary-warehouse",
+      "data_affinity":         "portfolio",
+      "dialect":               "sql",
+      "column_masks":          [],
+      "query_timeout_seconds": 30
+    }
+  ]
 }
 ```
 
@@ -872,7 +876,7 @@ GROUP BY p.portfolio_id
 ORDER BY portfolio_return DESC
 ```
 
-The PQP will pass this sub-plan to the FQE for execution. If the query also included a risk metric with `data_affinity: "risk_metrics"`, the PQP would produce a second sub-plan — translated to the semantic layer's MetricFlow query format — and hand both to the FQE for parallel execution.
+The PQP will pass the `sub_plans` array to the FQE. If the query also included a risk metric with `data_affinity: "risk_metrics"`, the array would contain a second entry — with `backend_id: "risk-semantic-layer"`, `dialect: "metricflow"`, and its own translated MetricFlow query — and the FQE would execute both sub-plans in parallel.
 
 
 ## Federated Query Engine (FQE)
@@ -927,7 +931,7 @@ flowchart LR
 
 ### Example
 
-Both `portfolio_return` and `benchmark_return` have `data_affinity: "portfolio"`, so the FQE will route a single sub-plan to the primary SQL warehouse:
+The FQE will receive the `sub_plans` array from the PQP. This query produces one sub-plan — both metrics share `data_affinity: "portfolio"` — which the FQE routes to the primary SQL warehouse. A query spanning two data affinities would produce two entries in the array, each routed to its own backend and executed in parallel.
 
 ```sql
 -- PQP sub-plan received by FQE
