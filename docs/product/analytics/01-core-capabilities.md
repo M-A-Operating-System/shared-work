@@ -803,11 +803,11 @@ Against a `maxPerformanceImpact: 1000` limit, this query is approved. Against a 
 
 ### Compliance
 
-The platform's compliance behaviour will be driven entirely by the metrics being queried and the intent of the query. There will be no tenant-level compliance mode switch. The regulatory framework will be declared on each metric at registration time by the Metrics Modeller.
+A request will be classified as a compliance-type request when two independent signals are both active at evaluation time. When classified, the platform will invoke the Provenance Artifact Service, apply framework-specific validation rules, and block result export until the artifact is sealed. Compliance relevance is declared on each metric at registration by the Metrics Modeller — the platform makes no compliance determination on a request without that declaration.
 
-**Feature flag**
+**Platform compliance configuration**
 
-Compliance features will be enabled or disabled at the tenant level with a single binary flag, set by the Platform Admin:
+Compliance features will be enabled or disabled by a single platform configuration flag, set by the Platform Admin:
 
 ```json
 "features": {
@@ -822,7 +822,7 @@ When `complianceMode` is `false`, all compliance checks and Provenance Artifact 
 | Signal | Source | True when |
 |---|---|---|
 | **Signal 1 — metric metadata** | `compliance_relevant` field on `analytical_metric` SMR definition | At least one resolved metric has `compliance_relevant: true`. Set by the Metrics Modeller at registration. |
-| **Signal 2 — AI intent classification** | SVL compliance intent classification (Stage 2b) | `compliance_purpose_score` ≥ the platform-level `compliance_intent_threshold` (default 0.8, configurable). The SVL will classify the query's analytical intent — derived from the operation ID, resolved metric descriptions, and parameter values — and set `compliance_purpose: true` if the score meets the threshold. |
+| **Signal 2 — AI intent classification** | SVL Stage 2 — Compliance Signal Evaluation | `compliance_purpose_score` ≥ `compliance_intent_threshold` (default 0.8, configurable). The SVL will classify the query's analytical intent — derived from the operation ID, resolved metric descriptions, and parameter values — and set `compliance_purpose: true` if the score meets the threshold. |
 
 **Combined decision:**
 
