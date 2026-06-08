@@ -839,18 +839,7 @@ When the Provenance Artifact is active, export of the result will be blocked unt
 
 **Framework-specific validation rules**
 
-Each `regulatory_framework` tag on a metric will carry validation rules that the SCL applies when the Provenance Artifact is active for that metric.
-
-| Framework | Additional validation rule | Effect |
-|---|---|---|
-| `mifid2` | Queries on client-identifiable metrics require business justification | User is prompted for justification before execution; justification recorded in Provenance Artifact |
-| `mifid2` | Best-execution metrics require explicit timeframe | Validation error if `date` dimension not specified |
-| `mifid2` | Transaction reporting metrics generate a regulatory trace record | Additional trace written to the ALS regulatory trace partition |
-| `basel3` | Capital ratio metrics require entity identifier | Validation error if `entity` dimension not specified |
-| `basel3` | LCR/NSFR metrics generate a daily snapshot record | Snapshot written to the ALS regulatory snapshots partition |
-| `basel3` | Stress scenario metrics are subject to RESTRICTED classification ceiling | Classification ceiling applied regardless of user role |
-| `sec_reg_bi` | Client advisory metrics: narrative synthesis constrained to factual summary only | Forward-looking statements, yield projections, and investment recommendations are rejected from NSA output before inclusion in the response |
-| `sec_reg_bi` | Advisory queries require suitability record reference | `suitability_record_id` parameter required before execution |
+Framework-specific validation rules — additional parameter requirements, data constraints, lineage record types, and NSA output constraints — are declared exclusively on the metric definition in the SMR via the metric's `regulatory_framework` attribute, set by the Metrics Modeller at registration. The SCL will read and apply these rules directly from the resolved metric definitions at query time. No regulatory framework logic is hardcoded in the SCL.
 
 ### Timeout and Partial Result Handling
 
@@ -1290,7 +1279,7 @@ Until sealing is confirmed, export of the query result will be blocked. The PAS 
 | `compliance_purpose` | `true` — confirms the two-signal trigger was active for this query |
 | `intent_score` | The `compliance_purpose_score` from SVL |
 | `triggered_by_metrics` | Metric IDs whose `compliance_relevant: true` flag contributed Signal 1 |
-| `triggered_by_frameworks` | Regulatory framework tags from the triggered metrics — e.g. `["mifid2"]`, `["basel3"]` |
+| `triggered_by_frameworks` | Regulatory framework identifiers from the triggered metrics' SMR definitions |
 | `regulatory_trace_id` | The trace record identifier written to the ALS regulatory partition for the triggered framework(s) |
 | `artifact_set_version` | Artifact schema version — used by regulatory consumers to validate the structure |
 | `export_requires_lineage` | `true` — consumer must not present export until sealing is confirmed |
@@ -1298,15 +1287,15 @@ Until sealing is confirmed, export of the query result will be blocked. The PAS 
 
 ### Example
 
-For a regulatory query against `lcr` and `nsfr` (both `compliance_relevant: true`, `regulatory_framework: ["basel3"]`) where the SVL's compliance intent score is `0.94`, both signals will be active. The PAS will assemble the Provenance Artifact, seal it in the ALS, and return:
+For a regulatory query where the resolved metrics carry `compliance_relevant: true` and regulatory framework attributes in their SMR definitions, and the SVL's compliance intent score is `0.94`, both signals will be active. The PAS will assemble the Provenance Artifact, seal it in the ALS, and return:
 
 ```json
 {
   "compliance_purpose":             true,
   "intent_score":                   0.94,
-  "triggered_by_metrics":           ["lcr", "nsfr"],
-  "triggered_by_frameworks":        ["basel3"],
-  "regulatory_trace_id":            "trace-20260518-093247-lcr-b3",
+  "triggered_by_metrics":           ["<metric_id_a>", "<metric_id_b>"],
+  "triggered_by_frameworks":        ["<framework_id>"],
+  "regulatory_trace_id":            "trace-20260518-093247-<framework_id>",
   "artifact_set_version":           "1.0",
   "export_requires_lineage":        true,
   "classification_ceiling_applied": true
