@@ -881,71 +881,49 @@ The PQP will pass this sub-plan to the FQE for execution. If the query also incl
 
 The Federated Query Engine (FQE) will be the only component in the platform with knowledge of execution backend connection details — endpoints, credentials, and availability. It will receive physical sub-plans from the Physical Query Planner, route them to the registered execution backends in parallel, assemble the results, and write a complete execution record to the lineage store. Sub-plan decomposition and dialect translation will be the PQP's responsibility; the FQE will own everything from routing onward.
 
-### Nine-Step FQE Pipeline
+### Execution Pipeline
 
 ```mermaid
 flowchart LR
-    S1["**1. Sub-plan Reception**\nreceives physical sub-plans from PQP · validates backend availability"]
-    S2["**2. Cache Check**\nexact match and approximate match on LQP signature"]
+    START(["Physical sub-plans"])
+    S1["**1. Sub-plan Reception**"]
+    S2["**2. Cache Check**"]
     CACHED(["Cached result returned"])
-    S3["**3. Backend Selection & Routing**\nmatch sub-plans to backends by affinity + capability"]
-    S4["**4. Parallel Execution & Coordination**\nexecute sub-plans concurrently · handle timeouts"]
-    S5["**5. Result Assembly & Reconciliation**\njoin sub-results by shared dimensions · apply column masks"]
-    S6["**6. Result Caching & Materialisation**\nwrite result to cache · update materialisation index"]
-    S7["**7. Lineage Record Writing**\nwrite complete execution trace to lineage store"]
+    S3["**3. Backend Selection & Routing**"]
+    S4["**4. Parallel Execution & Coordination**"]
+    S5["**5. Result Assembly & Reconciliation**"]
+    S6["**6. Result Caching**"]
+    S7["**7. Lineage Record Writing**"]
     RESULT(["Assembled result + lineage record"])
 
-    S1 --> S2
+    START --> S1 --> S2
     S2 -->|cache hit| CACHED
     S2 -->|cache miss| S3
     S3 --> S4 --> S5 --> S6 --> S7 --> RESULT
 ```
 
-### Backend Routing
+**Step 1 — Sub-plan Reception.** The FQE will receive the physical sub-plans from the PQP and validate that every required execution backend is registered and available before proceeding.
 
-The FQE will receive physical sub-plans from the PQP — already decomposed by data affinity and translated to the backend's native dialect. It will match each sub-plan to a registered execution backend by affinity and capability, then execute all sub-plans concurrently. Shared dimensions across sub-plans will become the join keys for result assembly.
+**Step 2 — Cache Check.** The FQE will check the result cache using the LQP signature as the cache key. The key incorporates an entitlement hash derived from the caller's effective row scope and column masks, ensuring that two users with different entitlements will never be served each other's cached results. On a cache hit, the cached result is returned directly — steps 3–7 are skipped. Compliance-purpose queries bypass the cache and are always freshly executed.
 
-For a query producing two sub-plans — `portfolio_return` (affinity: `portfolio`, SQL) and `var_95` (affinity: `risk_metrics`, MetricFlow) — the FQE will route each to its registered backend, execute them concurrently, and join the results in memory on `portfolio_id` and `date`.
-
-### Backend Adapter Table
+**Step 3 — Backend Selection & Routing.** The FQE will match each sub-plan to a registered execution backend by data affinity and capability, selecting the highest-priority available engine per affinity. If the primary engine is unavailable or its observed p95 latency has degraded beyond threshold, the FQE will fall back automatically to the next registered engine for that affinity.
 
 | Backend type | Protocol | Typical use |
 |---|---|---|
-| SQL warehouse | database connector protocol, SQL dialect | Primary performance and position data |
+| SQL warehouse | Database connector, SQL dialect | Primary performance and position data |
 | Semantic layer | REST/JSON query API | Pre-modelled metrics via semantic layer backend |
 | OpenData API | REST data API | Reference data and third-party feeds |
-| Graph Data API | graph query API | Relationship and counterparty data |
+| Graph data API | Graph query API | Relationship and counterparty data |
 | OLAP engine | REST/JSON cube query | Pre-aggregated dimensional data |
 | Custom adapter | Platform adapter SDK | Proprietary or specialised data sources |
 
-When multiple engines are registered for the same data affinity, the FQE will select the highest-priority available engine. If the highest-priority engine is unavailable or its p95 latency exceeds twice its baseline over a rolling one-hour window, the FQE will automatically route to the next registered engine for that affinity.
+**Step 4 — Parallel Execution & Coordination.** The FQE will execute all sub-plans concurrently against their assigned backends, enforcing the `queryTimeoutSeconds` budget assigned by the SCL. If one sub-plan times out while others complete, the FQE will assemble a partial result — representing missing metrics as null with a `timeout` provenance marker — and notify the user. If all sub-plans time out, the query will fail and an execution record will be written with `timeout` status.
 
-### Caching
+**Step 5 — Result Assembly & Reconciliation.** Sub-results from multiple backends will be joined in memory on shared dimensions. Column masks from the LQP's `column_masks` array will be applied to the assembled result before it is passed downstream.
 
-The FQE will maintain a result cache keyed by the LQP signature — a deterministic SHA-256 hash of the metric IDs and versions, dimension IDs, filter predicates, time expression, entitlement hash, and org ID.
+**Step 6 — Result Caching.** The assembled result will be written to the result cache keyed by LQP signature. Results over 10 MB will bypass the cache and be streamed directly.
 
-| Cache property | Specification |
-|---|---|
-| Cache key | SHA-256 of (metric IDs + versions, dimension IDs, filter predicates, time expression, entitlement hash, org ID). **Entitlement hash** is a SHA-256 of the fully resolved `row_predicates` and `column_masks` from the RAPL projection record for the request, computed after role merging. Two users with different effective predicates will always produce different entitlement hashes and will never be served each other's cached results. |
-| Cache TTL | Configurable per `data.refresh_cadence` in the metric definition. Default: 3600 seconds. |
-| Cache invalidation | On metric definition version change; on execution backend data refresh signal; on explicit cache clear via Admin API |
-| Cache scope | Platform-scoped. All results are isolated to the single deployed organisation. |
-| Cache storage | Platform-managed result cache. Results over 10 MB will bypass the cache and be streamed directly. |
-| Cache hit disclosure | Cache hits will be disclosed in the lineage record and optionally surfaced to the user as a "Result from cache (data as of [timestamp])" indicator. |
-| Cache bypass | Queries with `compliance_purpose: true` will bypass the cache. Compliance artifacts must be freshly generated for each compliance-purpose execution. |
-
-### Adaptive Planning
-
-The FQE will adapt routing decisions based on observed execution performance. It will track p50/p95 latency per engine per data affinity over a rolling one-hour window, automatically fall back to the next available engine if performance degrades, and calibrate performance impact estimates based on observed execution data from completed queries. If a sub-plan engine returns a partial result due to timeout, the FQE will log this in the lineage record and surface a warning to the user alongside the partial result.
-
-### Timeout and Partial Result Handling
-
-| Scenario | Behaviour |
-|---|---|
-| All sub-plans complete within timeout | Normal result assembly and return |
-| One sub-plan times out, others complete | Partial result assembly — missing metrics represented as null with `timeout` provenance marker; user notified |
-| All sub-plans time out | Query failed — error returned to user; execution record written with `timeout` status |
-| Engine cancellation on timeout | FQE sends cancellation signal to timed-out engine (if engine supports cancellation) |
+**Step 7 — Lineage Record Writing.** The FQE will write a complete execution record to the Analytical Lineage Store before returning the result — capturing backends used, latency, cache status, any timeout events, and column mask applications.
 
 ### Example
 
