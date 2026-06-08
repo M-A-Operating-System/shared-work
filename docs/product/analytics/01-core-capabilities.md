@@ -690,7 +690,7 @@ No column masks will apply — the `portfolio_manager` role has no masking rules
 
 > **Governing principles:** [P2 — Controls before execution](./00-overview.md#design-principles) · [P10 — Deterministic computation, not generation](./00-overview.md#design-principles)
 
-The Semantic Validation Layer will receive the entitlement projection from the Role-Aware Projection Layer together with the fully qualified analytical request — either from a structured API caller or as the resolved output of the Intent Resolution Agent — and will produce a validated, platform-agnostic Logical Query Plan (LQP). It will be entirely deterministic: no AI model will run inside it. Its purpose will be to: (1) resolve the operation from the SMR catalogue, (2) validate `params` against the operation's `required_params` schema, (3) resolve metric IDs within `params` against `analytical_metric` metadata definitions, (4) enforce the entitlement projection computed by RAPL, (5) build the LQP. The output (the LQP) will contain no backend references, no SQL, and no physical schema identifiers: only analytical operations expressed against SMR-registered concepts.
+The Semantic Validation Layer will receive the entitlement projection from the Role-Aware Projection Layer together with the fully qualified analytical request — either from a structured API caller or as the resolved output of the Intent Resolution Agent — and will produce a validated, platform-agnostic Logical Query Plan (LQP). It will be entirely deterministic: no AI model will run inside it. Its purpose will be to: (1) resolve the operation from the SMR catalogue, (2) validate `params` against the operation's `required_params` schema, (3) resolve metric IDs within `params` against `analytical_metric` metadata definitions, (4) enforce the entitlement projection computed by RAPL — including metric and dimension scope, row scope nodes, and column masking directives, (5) build the LQP. The LQP will carry all entitlement decisions — including column masking directives — as first-class plan elements, so the Physical Query Planner can pass them through to the FQE for enforcement during result assembly. The output will contain no backend references, no SQL, and no physical schema identifiers: only analytical operations and entitlement directives expressed against SMR-registered concepts.
 
 ### Four-Stage Validation Pipeline
 
@@ -709,9 +709,9 @@ flowchart LR
 
 **Stage 2 — Compliance Signal Evaluation.** The SVL will combine two independent signals to determine the compliance disposition of the request. Signal 1 will be the IRA's compliance intent score — derived from the user's natural language query and forwarded as part of the resolved request. Signal 2 will be the `compliance_relevant` flag on each resolved `analytical_metric` metadata definition. If both signals are active the request will be escalated to the full compliance tier and the Provenance Artifact Service will be invoked. If the user's stated intent is compliance-driven but the requested metrics are not registered as compliance-relevant, the SVL will reject the request.
 
-**Stage 3 — Entitlement Enforcement.** The SVL will apply the entitlement projection computed by the Role-Aware Projection Layer. Metrics and dimensions will be filtered to the caller's entitled scope. Row scope predicates resolved by RAPL will be injected into the plan. Column masks will be registered for enforcement at result assembly. Any metric or dimension RAPL did not approve will be removed; if removal leaves the request without its required metrics the request will be rejected with an entitlement error rather than returning a partial result.
+**Stage 3 — Entitlement Enforcement.** The SVL will apply the entitlement projection computed by the Role-Aware Projection Layer. Metrics and dimensions will be filtered to the caller's entitled scope. Row scope resolved by RAPL will be injected as scope filter nodes in the plan. Column masking directives from RAPL will be embedded in the LQP as a top-level `column_masks` array — carrying field name, masking mode, and the basis role for each masked column — so the Physical Query Planner can include them in every physical sub-plan it passes to the FQE. Any metric or dimension RAPL did not approve will be removed; if removal leaves the request without its required metrics the request will be rejected with an entitlement error rather than returning a partial result.
 
-**Stage 4 — LQP Generation.** The validated, projected, and compliance-classified request will be compiled into a platform-agnostic Logical Query Plan — a directed acyclic graph of analytical operations expressed entirely in SMR-registered concepts. No SQL, no backend references, and no physical schema identifiers will appear in the LQP. Data affinity hints will be assigned per metric node to guide the Physical Query Planner's sub-plan decomposition. Result cardinality and execution performance impact will be estimated and attached to the plan for the Semantic Controls Layer to evaluate before execution is authorised.
+**Stage 4 — LQP Generation.** The validated, projected, and compliance-classified request will be compiled into a platform-agnostic Logical Query Plan — a directed acyclic graph of analytical operations expressed entirely in SMR-registered concepts. No SQL, no backend references, and no physical schema identifiers will appear in the LQP. Data affinity hints will be assigned per metric node to guide the Physical Query Planner's sub-plan decomposition. Column masking directives from Stage 3 will be included as a top-level `column_masks` array on the plan. Result cardinality and execution performance impact will be estimated and attached to the plan for the Semantic Controls Layer to evaluate before execution is authorised.
 
 ### Example
 
@@ -729,19 +729,20 @@ The SVL will receive the fully qualified analytical request together with RAPL's
       "time_period": { "granularity": "quarterly", "anchor": "current" } },
     { "id": "n2", "type": "filter", "input": "n1",
       "predicate": { "field": "asset_class", "operator": "eq", "value": "EQUITY" } },
-    { "id": "n3", "type": "filter", "input": "n2",
-      "predicate": { "field": "portfolio_id", "operator": "in",
-                     "values": ["GLOB_EQ_OPP", "UK_CORE_INC", "ASIA_PAC_GRW", "EUR_BAL_INC"] } },
+    { "id": "n3", "type": "row_scope", "input": "n2",
+      "scope": { "field": "portfolio_id", "operator": "in",
+                 "values": ["GLOB_EQ_OPP", "UK_CORE_INC", "ASIA_PAC_GRW", "EUR_BAL_INC"] } },
     { "id": "n4", "type": "sort", "input": "n3",
       "field": "portfolio_return", "direction": "desc" }
   ],
   "output_node":             "n4",
+  "column_masks":            [],
   "estimated_performance_impact": 620,
   "classification_required":      "INTERNAL"
 }
 ```
 
-Node `n3` is the RAPL row scope predicate — part of the plan, not a post-execution filter.
+Node `n3` is the RAPL row scope — a first-class plan node, not a post-execution filter. `column_masks` is empty here because the `portfolio_manager` role carries no masking rules for performance metrics; for roles that do, the array would contain entries of the form `{ "field": "counterparty_id", "mode": "redacted_label", "basis_role": "risk_viewer" }`.
 
 
 ## Semantic Controls Layer (SCL)
