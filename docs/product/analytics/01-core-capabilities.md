@@ -782,15 +782,6 @@ flowchart LR
 | **Signal 1 — metric metadata** | `compliance_relevant` field on `analytical_metric` SMR definition | At least one resolved metric has `compliance_relevant: true`. Set by the Metrics Modeller at registration. |
 | **Signal 2 — AI intent classification** | SVL Stage 2 — Compliance Signal Evaluation | `compliance_purpose_score` ≥ `compliance_intent_threshold` (default 0.8, configurable). The SVL will classify the query's analytical intent — derived from the operation ID, resolved metric descriptions, and parameter values — and set `compliance_purpose: true` if the score meets the threshold. |
 
-**Combined decision:**
-
-| `compliance_relevant` (any metric) | `compliance_purpose` (SVL classification) | SCL decision |
-|---|---|---|
-| `true` | `true` | **Enhanced** — full Provenance Artifact active; framework-specific validation rules applied |
-| `true` | `false` | Standard controls output |
-| `false` | `true` | Standard controls output |
-| `false` | `false` | Standard controls output |
-
 When the Provenance Artifact is active, export of the result will be blocked until the artifact is confirmed written and sealed to the ALS. The `export_requires_lineage: true` flag in the response will signal this state to the consumer. The consumer will not present export affordances until the platform confirms sealing.
 
 Framework-specific validation rules — additional parameter requirements, data constraints, lineage record types, and NSA output constraints — are declared exclusively on the metric definition in the SMR via the metric's `regulatory_framework` attribute, set by the Metrics Modeller at registration. The SCL will read and apply these rules directly from the resolved metric definitions at query time. No regulatory framework logic is hardcoded in the SCL.
