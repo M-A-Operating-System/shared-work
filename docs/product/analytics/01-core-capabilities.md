@@ -497,7 +497,7 @@ The Semantic Metrics Repository (SMR) will be the governing catalogue of every a
 
 ### Concept Types
 
-The SMR will hold three types of JSON metadata definition:
+The SMR will hold at least the following three types of JSON metadata definition. The SMR is expected to be extensible in nature to accommodate other analytical concept types beyond those envisaged in this target state design:
 
 | Definition type | Description |
 |---|---|
@@ -655,6 +655,8 @@ No approved metric will reach the output without its full set of data access cle
 | Result set column masking | Union | A column masked by any role is masked for the user |
 
 ### Column Masking Modes
+
+RAPL will support at least the following column masking modes. The platform is expected to be extensible in nature to facilitate other masking models beyond those envisaged in this target state design:
 
 | Mode | Column representation in result |
 |---|---|
@@ -910,7 +912,7 @@ flowchart LR
 
 **Step 2 — Cache Check.** The FQE will check the result cache using the LQP signature as the cache key. The key incorporates an entitlement hash derived from the caller's effective row scope and column masks, ensuring that two users with different entitlements will never be served each other's cached results. On a cache hit, the cached result is returned directly — steps 3–7 are skipped. Compliance-purpose queries bypass the cache and are always freshly executed.
 
-**Step 3 — Backend Selection & Routing.** The FQE will match each sub-plan to a registered execution backend by data affinity and capability, selecting the highest-priority available engine per affinity. If the primary engine is unavailable or its observed p95 latency has degraded beyond threshold, the FQE will fall back automatically to the next registered engine for that affinity.
+**Step 3 — Backend Selection & Routing.** The FQE will match each sub-plan to a registered execution backend by data affinity and capability, selecting the highest-priority available engine per affinity. If the primary engine is unavailable or its observed p95 latency has degraded beyond threshold, the FQE will fall back automatically to the next registered engine for that affinity. The FQE is expected to support core connectivity to a wide variety of database storage and management technologies; the following are illustrative examples:
 
 | Backend type | Protocol | Typical use |
 |---|---|---|
@@ -1161,7 +1163,7 @@ Two lineage writes will occur for each query — one before execution (the contr
   "cache_hit":         false,
   "controls_decision": {
     "approved": true,
-    "checks_passed": ["performance_impact_ceiling", "metric_count", "dimension_count", "classification_gate", "compliance_check"]
+    "checks_passed": ["data_scale_check", "complexity_check", "classification_gate", "compliance_check", "concurrency_check"]
   },
   "sub_plans": [
     {
@@ -1178,7 +1180,7 @@ Two lineage writes will occur for each query — one before execution (the contr
   ],
   "projection_record": {
     "roles":          ["portfolio_manager"],
-    "row_predicates": ["portfolio_id IN ('GLOB_EQ_OPP','UK_CORE_INC','ASIA_PAC_GRW','EUR_BAL_INC')"],
+    "row_scope": ["portfolio_id IN ('GLOB_EQ_OPP','UK_CORE_INC','ASIA_PAC_GRW','EUR_BAL_INC')"],
     "column_masks":   []
   },
   "visualisation":    { "contract": "BAR_MULTI_SERIES_COMPARISON" },
@@ -1220,7 +1222,7 @@ Until sealing is confirmed, export of the query result will be blocked. The PAS 
 | `regulatory_trace_id` | The trace record identifier written to the ALS regulatory partition for the triggered framework(s) |
 | `artifact_set_version` | Artifact schema version — used by regulatory consumers to validate the structure |
 | `export_requires_lineage` | `true` — consumer must not present export until sealing is confirmed |
-| `classification_ceiling_applied` | `true` if a Basel III stress scenario metric triggered the RESTRICTED classification ceiling |
+| `classification_ceiling_applied` | `true` if a resolved metric triggered the RESTRICTED classification ceiling |
 
 ### Example
 
