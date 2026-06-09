@@ -103,6 +103,8 @@ flowchart TD
         GDA[("<b>Graph Data API</b>")]
     end
 
+    ChatComp ~~~ CustomUI
+    CustomUI ~~~ Agents
     Consumers -->|"JWT + structured MCP tool call"| MCP
     Consumers -->|"render tool call (display_spec)"| Image
     Consumers -->|"JWT + MCP tool call"| DCSMCP
