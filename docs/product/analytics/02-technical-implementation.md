@@ -53,8 +53,8 @@ flowchart TD
     vega2img["vega2img (optional) · port 8001\nPython · FastMCP · vega-embed · Playwright (headless Chromium)\nStandalone MCP render service — not part of Analytics Platform"]
 
     subgraph dcs["Data Context Store (DCS)"]
-        SMR[("Data Context Store (SMR)\nJSON documents: analytical_metric · analytical_dimension · analytical_operation\nlifecycle: proposed → in_review → approved → deprecated")]
-        SDR[("Data Context Store (SDR)\nJSON documents: data models · object models\ncritical data elements · physical schemas · data lineage")]
+        SMR[("Semantic Metrics Repository (SMR)\nJSON documents: analytical_metric · analytical_dimension · analytical_operation\nlifecycle: proposed → in_review → approved → deprecated")]
+        SDR[("Semantic Data Repository (SDR)\nJSON documents: data models · object models\ncritical data elements · physical schemas · data lineage")]
         SMR -->|"physical_mapping resolves against SDR schema metadata"| SDR
     end
 
@@ -463,7 +463,7 @@ class SemanticValidationLayer:
         # 1. Validate params against operation's required_params — fail fast before any SMR calls
         # 2. Resolve each metric ID from SMR — rejects unknown or non-approved metrics
         # 3. Enforce the RAPL projection — inject row scope filter nodes; embed column masks on the LQP
-        # 4. Delegate DAG construction to LQPGenerator (see §Semantic Validation Layer and LQP Generator)
+        # 4. Delegate DAG construction to LQPGenerator (see §Semantic Validation Layer — LQP examples)
         # 5. Attach compliance_purpose_score — SCL reads this; caller never declares intent explicitly
         # 6. Attach preliminary_impact_estimate (Σ performance_impact_weight) — Tier-1 coarse estimate
         # 7. Retain resolved_metrics on LQP — SCL needs them for classification and compliance checks
@@ -680,15 +680,9 @@ class SemanticMetricsRepository:
 ```
 
 
-### Semantic Validation Layer and LQP Generator
+### Semantic Validation Layer — LQP examples
 
-No custom query language. The MCP tool call JSON (metric IDs, dimension IDs, time period, filters) is the analytical intent representation, consistent with Cube.js and MetricFlow conventions.
-
-| Decision | Choice | Rationale |
-|----------|--------|-----------|
-| **Intent format** | MCP tool call JSON | Standard AI tool-use format; no separate language needed |
-| **Implementation** | Python (JSON schema + SMR resolution via DCS API) | Lightweight; no grammar or parser |
-| **LQP format** | Custom DAG (JSON) | Engine-agnostic across SQL, OpenData, and Graph backends |
+The MCP tool call JSON (metric IDs, dimension IDs, time period, filters) is the analytical intent representation. The SVL validates these parameters, resolves metrics from the SMR, applies the RAPL entitlement projection, and constructs the LQP DAG.
 
 #### MCP input example
 
@@ -782,7 +776,7 @@ class LQPGenerator:
         # 3. Emit filter node from params["filters"] if present
         # 4. Emit time_expand node if time_period or as_of_date in params — resolves symbolic period to date range
         # 5. Emit sort node from params["sort"] or operation["default_sort"] if present
-        # Note: "output" points to the terminal node — FQE reads this to find the execution entry point
+        # Note: "output" points to the terminal node — PQP reads this to find the plan entry point
         ...
 
     def _infer_join_keys(self, metrics: list[dict]) -> list[str]:
