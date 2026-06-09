@@ -228,7 +228,7 @@ entitlements:        user_scope → [authorised_portfolio_list]
 ```
 
 **4 · Query planning, governance, and execution**
-The Semantic Controls Layer validates the Logical Query Plan against its five checks — data scale (estimated scan volume), complexity, classification, compliance, and concurrency. The Physical Query Planner then decomposes the approved plan into backend-specific physical sub-plans, carrying the entitlement row scope through to the physical layer, and the Federated Query Engine executes them. No raw database schemas have been exposed at any stage. The query executes against the registered warehouse; the Analytics Engine assembles the response: computed values, a DVL display specification, an optional plain-language narrative summary anchored strictly to the result (produced by the Narrative Synthesis Agent), and a full audit record.
+The Semantic Controls Layer validates the Logical Query Plan against its five checks. The Physical Query Planner compiles the approved plan into a physical execution plan — resolving the data source references and carrying the entitlement row scope through to the physical layer. The Federated Query Engine executes it against the registered data source. No raw database schemas have been exposed at any stage. The Analytics Engine assembles the response: computed values, a DVL display specification, an optional plain-language narrative summary anchored strictly to the result (produced by the Narrative Synthesis Agent), and a full audit record.
 
 ```sql
 -- Physical execution (FQE output)
@@ -306,29 +306,26 @@ entitlements: user_scope → [authorised_portfolio_list]
 ```
 
 **4 · Query planning, governance, and execution**
-The Physical Query Planner decomposes the Logical Query Plan into two independent sub-plans, one per backend. The Federated Query Engine routes each to its registered backend and executes both in parallel, then assembles the joined result — breach status and dominant contributing factor per portfolio — before passing it downstream. Each sub-plan execution is recorded in the lineage store independently, with the assembled result linked to both records.
+The Physical Query Planner compiles the Logical Query Plan into a physical execution plan referencing both data sources — the risk engine and the primary data warehouse — with the authorised portfolio scope applied at the physical layer. The Federated Query Engine executes the plan, handling the cross-source join and assembling the result — breach status and dominant contributing factor per portfolio — before passing it downstream. The execution is recorded in the lineage store, with the assembled result linked to both source queries.
 
 ```sql
--- Sub-plan A  →  risk_engine_backend
-SELECT   portfolio_id,
-         var_95_value,
-         risk_factor_contribution,
-         factor_bucket
-FROM     risk_engine.var_daily_positions
-WHERE    as_of_date   = current_date
-  AND    portfolio_id IN (/* authorised_portfolio_list */)
-ORDER BY var_95_value DESC;
+-- Physical execution: cross-source join on portfolio_id
+SELECT   r.portfolio_id,
+         r.var_95_value,
+         r.risk_factor_contribution,
+         r.factor_bucket,
+         l.var_limit_value,
+         (r.var_95_value > l.var_limit_value) AS breach
+FROM     risk_engine.var_daily_positions r
+JOIN     dw_prod.portfolio_governance.var_limits l
+  ON     r.portfolio_id = l.portfolio_id
+WHERE    r.as_of_date   = current_date
+  AND    r.portfolio_id IN (/* authorised_portfolio_list */)
+ORDER BY r.var_95_value DESC;
 
--- Sub-plan B  →  primary_data_warehouse
-SELECT   portfolio_id,
-         var_limit_value
-FROM     dw_prod.portfolio_governance.var_limits
-WHERE    portfolio_id IN (/* authorised_portfolio_list */);
-
--- Federated assembly: JOIN on portfolio_id  →  breach = var_95_value > var_limit_value
 -- Execution Response
--- data:      [{ portfolio_id, var_95_value, var_limit_value, breach_pct, factor_bucket, risk_factor_contribution }, ...]
--- audit:     lineage_id (linked to both sub-plan execution records), entitlement_snapshot
+-- data:      [{ portfolio_id, var_95_value, var_limit_value, breach, factor_bucket, risk_factor_contribution }, ...]
+-- audit:     lineage_id, data_sources_used, entitlement_snapshot
 ```
 
 **5 · Presentation decision**

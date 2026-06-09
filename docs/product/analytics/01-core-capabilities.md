@@ -68,8 +68,8 @@ flowchart TD
         RAPL["<b>Role-Aware Projection Layer (RAPL)</b>\nentitlement decisions · metric/dimension access · row scope · column masks\nreads role definitions from DES"]
         SVL["<b>Semantic Validation Layer (SVL)</b>\nSMR resolution · schema validation · entitlement enforcement · LQP generation\nentirely deterministic — no AI"]
         SCL["<b>Semantic Controls Layer (SCL)</b>\ndata scale · complexity · classification · compliance · concurrency"]
-        PQP["<b>Physical Query Planner (PQP)</b>\nphysical_mapping resolution · sub-plan decomposition · dialect translation"]
-        FQE["<b>Federated Query Engine (FQE)</b>\nbackend routing · parallel execution · result assembly"]
+        PQP["<b>Physical Query Planner (PQP)</b>\nphysical_mapping resolution · execution plan compilation · entitlement filters applied"]
+        FQE["<b>Federated Query Engine (FQE)</b>\nexecution against data sources · result assembly · lineage write"]
         DVL["<b>Data Visualization Language (DVL)</b>\nontology evaluation · deterministic chart contract selection"]
         NSA["<b>Narrative Synthesis Agent (NSA)</b>\npost-computation · anchored to result values · LLM call"]
         PAS["<b>Provenance Artifact Service (PAS)</b>\nassembles and seals Provenance Artifact from ALS records\nactive only for compliance-purpose queries"]
@@ -122,7 +122,7 @@ flowchart TD
     SCL -->|"controls decision record"| LS
     SCL -->|"approved LQP"| PQP
     PQP -->|"physical_mapping lookup"| SMR
-    PQP -->|"physical sub-plans"| FQE
+    PQP -->|"physical execution plan"| FQE
     FQE --> backends
     FQE -->|"execution record"| LS
     FQE -->|"assembled result"| DVL
@@ -221,14 +221,14 @@ sequenceDiagram
 
         note over PQP: Reads physical_mapping fields from metric nodes already in the LQP<br/>No SMR call required — all mappings carried in the plan
 
-        note over PQP: Resolves physical_mapping per metric node<br/>Groups nodes by data_affinity → one sub-plan per affinity<br/>Translates each sub-plan to backend native dialect<br/>(SQL · MetricFlow · OData · SPARQL)
+        note over PQP: Resolves physical_mapping per metric node<br/>Applies entitlement row scope + column masks<br/>Compiles physical execution plan — no execution capability
 
-        PQP->>FQE: physical sub-plans
+        PQP->>FQE: physical execution plan
 
-        FQE->>BE: sub-plan execution (parallel per data affinity)
+        FQE->>BE: query execution against data sources
         BE-->>FQE: raw result sets
 
-        FQE->>ALS: execution record (sub-plans · latencies · cache hit · backends used)
+        FQE->>ALS: execution record (data sources · latency · cache hit · column mask applications)
     end
 
     rect rgb(255, 248, 240)
@@ -728,9 +728,9 @@ flowchart LR
 
 **Stage 2 — Compliance Signal Evaluation.** The SVL will combine two independent signals to determine the compliance disposition of the request. Signal 1 will be the IRA's compliance intent score — derived from the user's natural language query and forwarded as part of the resolved request. Signal 2 will be the `compliance_relevant` flag on each resolved `analytical_metric` metadata definition. If both signals are active the request will be escalated to the full compliance tier and the Provenance Artifact Service will be invoked. If the user's stated intent is compliance-driven but the requested metrics are not registered as compliance-relevant, the SVL will reject the request.
 
-**Stage 3 — Entitlement Enforcement.** The SVL will apply the entitlement projection computed by the Role-Aware Projection Layer. Metrics and dimensions will be filtered to the caller's entitled scope. Row scope resolved by RAPL will be injected as scope filter nodes in the plan. Column masking directives from RAPL will be embedded in the LQP as a top-level `column_masks` array — carrying field name, masking mode, and the basis role for each masked column — so the Physical Query Planner can include them in every physical sub-plan it passes to the FQE. Any metric or dimension RAPL did not approve will be removed; if removal leaves the request without its required metrics the request will be rejected with an entitlement error rather than returning a partial result.
+**Stage 3 — Entitlement Enforcement.** The SVL will apply the entitlement projection computed by the Role-Aware Projection Layer. Metrics and dimensions will be filtered to the caller's entitled scope. Row scope resolved by RAPL will be injected as scope filter nodes in the plan. Column masking directives from RAPL will be embedded in the LQP as a top-level `column_masks` array — carrying field name, masking mode, and the basis role for each masked column — so the Physical Query Planner can carry them through to the FQE for application to the assembled result. Any metric or dimension RAPL did not approve will be removed; if removal leaves the request without its required metrics the request will be rejected with an entitlement error rather than returning a partial result.
 
-**Stage 4 — LQP Generation.** The validated, projected, and compliance-classified request will be compiled into a platform-agnostic Logical Query Plan — a directed acyclic graph of analytical operations expressed entirely in SMR-registered concepts. No SQL, no backend references, and no physical schema identifiers will appear in the LQP. Data affinity hints will be assigned per metric node to guide the Physical Query Planner's sub-plan decomposition. Column masking directives from Stage 3 will be included as a top-level `column_masks` array on the plan. A preliminary impact estimate (`preliminary_impact_estimate`) will be computed by summing the `performance_impact_weight` values of all resolved metric definitions and attached to the LQP. This is a Tier 1 coarse indicator of query weight available before row scope is fully known; the SCL will replace it with a precise scan-volume estimate at Check 1 time using SDR data profiling statistics.
+**Stage 4 — LQP Generation.** The validated, projected, and compliance-classified request will be compiled into a platform-agnostic Logical Query Plan — a directed acyclic graph of analytical operations expressed entirely in SMR-registered concepts. No SQL, no backend references, and no physical schema identifiers will appear in the LQP. Data affinity hints will be assigned per metric node to guide the Physical Query Planner's execution plan compilation. Column masking directives from Stage 3 will be included as a top-level `column_masks` array on the plan. A preliminary impact estimate (`preliminary_impact_estimate`) will be computed by summing the `performance_impact_weight` values of all resolved metric definitions and attached to the LQP. This is a Tier 1 coarse indicator of query weight available before row scope is fully known; the SCL will replace it with a precise scan-volume estimate at Check 1 time using SDR data profiling statistics.
 
 ### Example
 
@@ -786,9 +786,9 @@ flowchart LR
     START --> S1 --> S2 --> S3 --> S4 --> S5 --> S6 --> S7
 ```
 
-**Check 1 — Data Scale Check.** Using row counts, partition sizes, and time-series volume distributions held in the Semantic Data Repository, the SCL will compute a precise `estimated_scan_rows` value across all sub-plans. This is the Tier 2 estimate — the final, authoritative scan-volume calculation — replacing the `preliminary_impact_estimate` carried in the LQP. It is the first point in the pipeline where full information is available: the LQP carries fully resolved row scope, and the SDR holds current data distribution statistics. The `estimated_scan_rows` value is compared against the `maxScanRows` limit in the controls configuration. A simple query spanning a large, unpartitioned fact table may exceed the limit and be blocked; a structurally complex query operating over a narrow time-window partition may pass comfortably. When blocked, the user will receive structured suggestions to narrow scope — reduce the time period, add a filter, or reduce the number of metrics.
+**Check 1 — Data Scale Check.** Using row counts, partition sizes, and time-series volume distributions held in the Semantic Data Repository, the SCL will compute a precise `estimated_scan_rows` value across all data sources in scope. This is the Tier 2 estimate — the final, authoritative scan-volume calculation — replacing the `preliminary_impact_estimate` carried in the LQP. It is the first point in the pipeline where full information is available: the LQP carries fully resolved row scope, and the SDR holds current data distribution statistics. The `estimated_scan_rows` value is compared against the `maxScanRows` limit in the controls configuration. A simple query spanning a large, unpartitioned fact table may exceed the limit and be blocked; a structurally complex query operating over a narrow time-window partition may pass comfortably. When blocked, the user will receive structured suggestions to narrow scope — reduce the time period, add a filter, or reduce the number of metrics.
 
-**Check 2 — Complexity Check.** The SCL will evaluate the structural complexity of the LQP independently of data scale: total node count, join depth, and number of federated sub-plans. Complexity limits protect the Physical Query Planner and the FQE coordinator from pathologically complex plans that could degrade coordination performance regardless of underlying data volume. A query blocked by the complexity ceiling will receive an error identifying which dimension of complexity was exceeded.
+**Check 2 — Complexity Check.** The SCL will evaluate the structural complexity of the LQP independently of data scale: total node count, join depth, and number of distinct data sources involved. Complexity limits protect the Physical Query Planner and the FQE from pathologically complex plans that could degrade execution performance regardless of underlying data volume. A query blocked by the complexity ceiling will receive an error identifying which dimension of complexity was exceeded.
 
 **Check 3 — Classification Gate.** Every resolved metric carries a `data.classification` value set by the Metrics Modeller at registration. The SCL will identify the highest classification level across all metrics in the LQP and compare it against the permitted classification ceiling in the controls configuration. If any metric's classification exceeds the ceiling the query will be blocked. This check operates independently of entitlement enforcement — RAPL will have already confirmed the caller's access to each metric; the classification gate confirms the overall query's classification envelope is within the platform's operational boundary.
 
@@ -840,120 +840,98 @@ All checks will pass. SCL will write a controls decision record to the ALS befor
 
 > **Governing principles:** [P1 — Semantic abstraction](./00-overview.md#design-principles) · [P10 — Deterministic computation, not generation](./00-overview.md#design-principles)
 
-The Physical Query Planner (PQP) is responsible for translating the controls-approved Logical Query Plan into backend-specific physical query fragments ready for execution. It receives the approved LQP from the Semantic Controls Layer and performs three operations in sequence: resolving the physical mapping for each metric node from the SMR definitions attached to the plan, grouping metric nodes by data affinity to produce one sub-plan per affinity group, and translating each sub-plan into the native query language of its target backend. Row scope filters, dimension filters, and column masking directives from the LQP are distributed to each sub-plan so that entitlement enforcement carries through to the physical layer. The output is a sub-plans array containing one entry per data affinity group, each carrying the backend identifier, dialect, column masks, and timeout budget. The PQP has no execution capability; it passes the sub-plans array to the Federated Query Engine.
+The Physical Query Planner (PQP) will be the translation boundary between the logical and physical layers of the pipeline. It will receive the controls-approved Logical Query Plan from the SCL and produce a physical execution plan that the Federated Query Engine can execute against the data sources. Nothing above the PQP will have knowledge of physical schemas, table names, or backend-specific query representations. Nothing below it will operate on logical concepts. The same LQP will always produce the same physical execution plan: given identical metric definitions, filters, and time expressions, the PQP's output will be fully reproducible — a property required for lineage integrity.
 
-### Translation Pipeline
+### Compilation Pipeline
 
 ```mermaid
 flowchart LR
     START(["Approved LQP"])
     S1["**1. physical_mapping Resolution**"]
-    S2["**2. Sub-plan Decomposition**"]
-    S3["**3. Dialect Translation**"]
-    OUT(["Physical sub-plans → FQE"])
+    S2["**2. Entitlement Filter Application**"]
+    S3["**3. Execution Plan Compilation**"]
+    OUT(["Physical execution plan → FQE"])
 
     START --> S1 --> S2 --> S3 --> OUT
 ```
 
-**Step 1 — physical_mapping Resolution.** For each `metric_scan` node in the LQP, the PQP will read the `physical_mapping` field from the resolved metric definition already attached to the node by the SVL. This field declares the registered backend identifier (`source`), the physical table or view (`table`), the column or pre-computed measure (`measure`), and the cube name for semantic layer backends (`cube`). No additional SMR call will be required — all physical mapping information will already be present in the LQP.
+**Step 1 — physical_mapping Resolution.** For each `metric_scan` node in the LQP, the PQP will read the `physical_mapping` field from the resolved metric definition already attached to the node by the SVL. This field declares the registered data source identifier (`source`), the physical table or view (`table`), and the column or pre-computed measure (`measure`). No additional SMR call will be required — all physical mapping information will already be present in the LQP.
 
-**Step 2 — Sub-plan Decomposition.** The PQP will group metric nodes by their `data_affinity` value and produce one sub-plan per affinity group. Row scope filters and dimension filters from the LQP will be distributed to each sub-plan so that entitlement enforcement carries through to the physical layer. Column masking directives from the LQP's `column_masks` array will be attached to each sub-plan for the FQE to apply during result assembly.
+**Step 2 — Entitlement Filter Application.** Row scope filters and dimension filters from the LQP will be applied to each data source scope so that entitlement enforcement carries through to the physical layer. Column masking directives from the LQP's `column_masks` array will be carried forward in the execution plan for the FQE to apply to the assembled result.
 
-**Step 3 — Dialect Translation.** Each sub-plan will be translated to the native query language of its target backend: SQL for warehouse backends, MetricFlow query format for semantic layer backends, OData filter expressions for REST data APIs, and SPARQL or Cypher for graph backends. The PQP will have no execution capability — it will not connect to backends, manage timeouts, or assemble results. Its output will be a set of ready-to-execute physical query fragments; the FQE will own everything from that point forward.
+**Step 3 — Execution Plan Compilation.** The PQP will compile the resolved metric nodes, filters, time range expansion, and sort/limit expressions into a physical execution plan ready for the FQE. The PQP will have no execution capability — it will not connect to data sources, manage timeouts, or assemble results. The FQE will own everything from that point forward.
 
 ### Example
 
-The PQP will receive the approved LQP for the portfolio manager query. Both `portfolio_return` and `benchmark_return` carry `data_affinity: "portfolio"` and `physical_mapping.source: "primary-warehouse"`, so the PQP will produce a single sub-plan. It will read the physical table and measure references from the metric nodes, apply the RAPL row scope and asset class filter, expand `quarter_to_date` to the concrete date range `2026-04-01 → 2026-06-30`, and translate the result into SQL. The PQP output is always a `sub_plans` array — one entry per data affinity group.
+The PQP will receive the approved LQP for the portfolio manager query. Both `portfolio_return` and `benchmark_return` carry `data_affinity: "portfolio"` and `physical_mapping.source: "primary-warehouse"`. The PQP will read the physical table and measure references from the metric nodes, apply the RAPL row scope and asset class filter, expand `quarter_to_date` to the concrete date range `2026-04-01 → 2026-06-30`, and compile the physical execution plan for the FQE.
 
 ```json
 {
-  "lqp_id":    "lqp-20260518-093243-r9xq",
-  "sub_plans": [
-    {
-      "sub_plan_id":           "sp-20260518-093244-m2kp",
-      "backend_id":            "primary-warehouse",
-      "data_affinity":         "portfolio",
-      "dialect":               "sql",
-      "column_masks":          [],
-      "query_timeout_seconds": 30
-    }
-  ]
+  "plan_id":               "plan-20260518-093244-m2kp",
+  "lqp_id":               "lqp-20260518-093243-r9xq",
+  "sources":              ["primary-warehouse"],
+  "column_masks":          [],
+  "query_timeout_seconds": 30
 }
 ```
 
-```sql
-SELECT
-    p.portfolio_id,
-    SUM(f.portfolio_return * f.market_value) / SUM(f.market_value) AS portfolio_return,
-    SUM(f.benchmark_return * f.market_value) / SUM(f.market_value) AS benchmark_return
-FROM fact_portfolio_daily f
-JOIN dim_portfolio p ON f.portfolio_id = p.portfolio_id
-WHERE p.asset_class  = 'EQUITY'
-  AND f.portfolio_id IN ('GLOB_EQ_OPP', 'UK_CORE_INC', 'ASIA_PAC_GRW', 'EUR_BAL_INC')
-  AND f.date         BETWEEN '2026-04-01' AND '2026-06-30'
-GROUP BY p.portfolio_id
-ORDER BY portfolio_return DESC
-```
-
-The PQP will pass the `sub_plans` array to the FQE. If the query also included a risk metric with `data_affinity: "risk_metrics"`, the array would contain a second entry — with `backend_id: "risk-semantic-layer"`, `dialect: "metricflow"`, and its own translated MetricFlow query — and the FQE would execute both sub-plans in parallel.
+The physical execution plan will reference the resolved measure columns from `primary-warehouse`, the entitlement row scope filter, and the expanded date range. The FQE will execute this plan against the data source and return the assembled result. If the query also included a metric from a second data source, the PQP would include both sources in the execution plan and the FQE would handle the cross-source query.
 
 
 ## Federated Query Engine (FQE)
 
 > **Governing principles:** [P1 — Semantic abstraction](./00-overview.md#design-principles) · [P4 — Complete analytical lineage](./00-overview.md#design-principles) · [P10 — Deterministic computation, not generation](./00-overview.md#design-principles)
 
-The Federated Query Engine (FQE) is responsible for executing physical sub-plans against registered backends and assembling the results. It is the only component in the platform with knowledge of execution backend connection details, including endpoints, credentials, and availability. It receives the sub-plans array from the Physical Query Planner, checks the result cache using the LQP signature, and on a cache miss routes each sub-plan to its registered backend by data affinity and capability. All sub-plans are executed concurrently and the FQE enforces the timeout budget assigned by the Semantic Controls Layer, handling partial results where one sub-plan times out while others complete. Sub-results from multiple backends are joined on shared dimensions and column masks are applied to the assembled result. The FQE writes a complete execution record to the Analytical Lineage Store and passes the assembled result to the Data Visualization Language and Narrative Synthesis Agent for presentation assembly.
+The Federated Query Engine (FQE) will be the only component in the platform with knowledge of execution backend connection details — endpoints, credentials, and availability. It will receive the physical execution plan from the Physical Query Planner, execute it against the data sources, assemble the results, and write a complete execution record to the lineage store. Execution plan compilation is the PQP's responsibility; the FQE will own everything from execution onward.
 
 ### Execution Pipeline
 
 ```mermaid
 flowchart LR
-    START(["Physical sub-plans"])
-    S1["**1. Sub-plan Reception**"]
+    START(["Physical execution plan"])
+    S1["**1. Plan Reception**"]
     S2["**2. Cache Check**"]
     CACHED(["Cached result returned"])
-    S3["**3. Backend Selection & Routing**"]
-    S4["**4. Parallel Execution & Coordination**"]
-    S5["**5. Result Assembly & Reconciliation**"]
-    S6["**6. Result Caching**"]
-    S7["**7. Lineage Record Writing**"]
+    S3["**3. Execution**"]
+    S4["**4. Result Assembly**"]
+    S5["**5. Result Caching**"]
+    S6["**6. Lineage Record Writing**"]
     RESULT(["Assembled result + lineage record"])
 
     START --> S1 --> S2
     S2 -->|cache hit| CACHED
     S2 -->|cache miss| S3
-    S3 --> S4 --> S5 --> S6 --> S7 --> RESULT
+    S3 --> S4 --> S5 --> S6 --> RESULT
 ```
 
-**Step 1 — Sub-plan Reception.** The FQE will receive the physical sub-plans from the PQP and validate that every required execution backend is registered and available before proceeding.
+**Step 1 — Plan Reception.** The FQE will receive the physical execution plan from the PQP and validate that every required data source is registered and available before proceeding.
 
-**Step 2 — Cache Check.** The FQE will check the result cache using the LQP signature as the cache key. The key incorporates an entitlement hash derived from the caller's effective row scope and column masks, ensuring that two users with different entitlements will never be served each other's cached results. On a cache hit, the cached result is returned directly — steps 3–7 are skipped. Compliance-purpose queries bypass the cache and are always freshly executed.
+**Step 2 — Cache Check.** The FQE will check the result cache using the LQP signature as the cache key. The key incorporates an entitlement hash derived from the caller's effective row scope and column masks, ensuring that two users with different entitlements will never be served each other's cached results. On a cache hit, the cached result is returned directly — steps 3–6 are skipped. Compliance-purpose queries bypass the cache and are always freshly executed.
 
-**Step 3 — Backend Selection & Routing.** The FQE will match each sub-plan to a registered execution backend by data affinity and capability, selecting the highest-priority available engine per affinity. If the primary engine is unavailable or its observed p95 latency has degraded beyond threshold, the FQE will fall back automatically to the next registered engine for that affinity. The FQE will support core connectivity to at least the following backend types, with the set of supported adapters extensible over the lifespan of the platform:
+**Step 3 — Execution.** The FQE will execute the physical execution plan against the registered data sources, enforcing the `queryTimeoutSeconds` budget assigned by the SCL. The FQE will support connectivity to data sources of at least the following types:
 
-| Backend type | Protocol | Typical use |
-|---|---|---|
-| SQL warehouse | Database connector, SQL dialect | Primary performance and position data |
-| Semantic layer | REST/JSON query API | Pre-modelled metrics via semantic layer backend |
-| OpenData API | REST data API | Reference data and third-party feeds |
-| Graph data API | Graph query API | Relationship and counterparty data |
-| OLAP engine | REST/JSON cube query | Pre-aggregated dimensional data |
-| Custom adapter | Platform adapter SDK | Proprietary or specialised data sources |
+| Data source type | Typical use |
+|---|---|
+| SQL warehouse or lakehouse | Primary performance, position, and risk data |
+| Semantic layer | Pre-modelled governed metrics |
+| REST / OpenData API | Reference data and third-party feeds |
+| Graph data store | Relationship and counterparty data |
+| OLAP engine | Pre-aggregated dimensional data |
 
-**Step 4 — Parallel Execution & Coordination.** The FQE will execute all sub-plans concurrently against their assigned backends, enforcing the `queryTimeoutSeconds` budget assigned by the SCL. If one sub-plan times out while others complete, the FQE will assemble a partial result — representing missing metrics as null with a `timeout` provenance marker — and notify the user. If all sub-plans time out, the query will fail and an execution record will be written with `timeout` status.
+If a source times out while others complete, the FQE will assemble a partial result — representing missing metrics as null with a `timeout` provenance marker — and notify the user. If all sources time out, the query will fail and an execution record will be written with `timeout` status.
 
-**Step 5 — Result Assembly & Reconciliation.** Sub-results from multiple backends will be joined in memory on shared dimensions. Column masks from the LQP's `column_masks` array will be applied to the assembled result before it is passed downstream.
+**Step 4 — Result Assembly.** Results from multiple data sources will be joined on shared dimensions. Column masks from the LQP's `column_masks` array will be applied to the assembled result before it is passed downstream.
 
-**Step 6 — Result Caching.** The assembled result will be written to the result cache keyed by LQP signature. Results over 10 MB will bypass the cache and be streamed directly.
+**Step 5 — Result Caching.** The assembled result will be written to the result cache keyed by LQP signature. Results over 10 MB will bypass the cache and be streamed directly.
 
-**Step 7 — Lineage Record Writing.** The FQE will write a complete execution record to the Analytical Lineage Store before returning the result — capturing backends used, latency, cache status, any timeout events, and column mask applications.
+**Step 6 — Lineage Record Writing.** The FQE will write a complete execution record to the Analytical Lineage Store before returning the result — capturing data sources used, latency, cache status, any timeout events, and column mask applications.
 
 ### Example
 
-The FQE will receive the `sub_plans` array from the PQP. This query produces one sub-plan — both metrics share `data_affinity: "portfolio"` — which the FQE routes to the primary SQL warehouse. A query spanning two data affinities would produce two entries in the array, each routed to its own backend and executed in parallel.
+Both `portfolio_return` and `benchmark_return` have `data_affinity: "portfolio"`, so the FQE will execute the plan against the primary data source:
 
 ```sql
--- PQP sub-plan received by FQE
+-- PQP physical execution plan received by FQE
 SELECT
     p.portfolio_id,
     SUM(f.portfolio_return * f.market_value) / SUM(f.market_value) AS portfolio_return,
@@ -1112,7 +1090,7 @@ A thin relational database search index will hold only scalar fields required fo
 | Lineage record | Object store — `lineage/{org_id}/{yyyy}/{mm}/{dd}/{result_id}.json` | Complete chain: tool call parameters → SMR resolution → projection record → LQP → controls decision → FQE execution record → result schema → visualisation contract → narrative synthesis status |
 | SMR snapshot | Embedded in lineage record (`resolved_metrics`) | For each metric in the query: metric ID, SMR definition version at query time |
 | Projection record | Embedded in lineage record | Roles, requested metrics, projected metrics, blocked metrics, row scope, column masks |
-| FQE execution record | Embedded in lineage record (`sub_plans`) | Sub-plan details, engine IDs, latencies, scan volume, cache hit status |
+| FQE execution record | Embedded in lineage record (`execution`) | Data sources used, queries executed, latencies, scan volume, cache hit status |
 | Controls decision | Embedded in lineage record (`controls_decision`) | Threshold decisions — data scale, complexity, classification, compliance, concurrency — including blocked queries |
 | Search index row | Relational database `analytics.lineage_index` | Scalar fields for filtered search — `result_id`, `org_id`, `user_sub`, `regulatory_frameworks`, `error_code`, `cache_hit`, `created_at`, `expires_at` |
 | Result artefact | Object storage | CSV result set, chart SVG, narrative text — stored per query |
