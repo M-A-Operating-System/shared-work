@@ -94,7 +94,7 @@ The Semantic Metrics Repository (SMR) and the Semantic Data Repository (SDR) are
 
 ### MCP Capability Layer
 
-> **Specification:** [§MCP Capability Layer](./01-core-capabilities.md#mcp-capability-layer)
+> **Specification:** [§MCP Capability Layer](./01-core-capabilities.md#mcp-capability-layer-mcp)
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
@@ -257,7 +257,7 @@ class DrilldownService:
 
 #### Execution profiles
 
-Each SMR operation carries an `execution_profile` that tells the pipeline executor which stages to invoke. Profile definitions are in [§MCP Capability Layer](./01-core-capabilities.md#mcp-capability-layer).
+Each SMR operation carries an `execution_profile` that tells the pipeline executor which stages to invoke. Profile definitions are in [§MCP Capability Layer](./01-core-capabilities.md#mcp-capability-layer-mcp).
 
 #### Resources
 
@@ -806,7 +806,7 @@ class LQPGenerator:
 
 ### Role-Aware Projection Layer
 
-> **Specification:** [§Role-Aware Projection Layer](./01-core-capabilities.md#role-aware-projection-layer)
+> **Specification:** [§Role-Aware Projection Layer](./01-core-capabilities.md#role-aware-projection-layer-rapl)
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
@@ -899,7 +899,7 @@ class RoleAwareProjectionLayer:
 
 ### Semantic Controls Layer
 
-> **Specification:** [§Semantic Controls Layer](./01-core-capabilities.md#semantic-controls-layer)
+> **Specification:** [§Semantic Controls Layer](./01-core-capabilities.md#semantic-controls-layer-scl)
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
@@ -1305,7 +1305,7 @@ The evaluator matches the `COMPARISON` intent pattern and two-metric schema to t
 }
 ```
 
-Full DVL examples including the `type: "table"` spec are in [Analytical Output Format](./01-core-capabilities.md#analytical-output-format). Full chart contract definitions are in [Data Visualization Language (DVL)](./01-core-capabilities.md#data-visualization-language-dvl).
+Full DVL examples including the `type: "table"` spec are in [MCP Response Format](./01-core-capabilities.md#mcp-response-format). Full chart contract definitions are in [Data Visualization Language (DVL)](./01-core-capabilities.md#data-visualization-language-dvl).
 
 ```python
 INTENT_CONTRACTS = {
@@ -1427,7 +1427,7 @@ if __name__ == "__main__":
 
 ### Analytical Lineage Store
 
-> **Specification:** [§Analytical Lineage Store (ALS)](./01-core-capabilities.md#analytical-lineage-store)
+> **Specification:** [§Analytical Lineage Store (ALS)](./01-core-capabilities.md#analytical-lineage-store-als)
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|

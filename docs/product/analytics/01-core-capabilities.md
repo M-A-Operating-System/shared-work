@@ -68,7 +68,7 @@ flowchart TD
         RAPL["<b>Role-Aware Projection Layer (RAPL)</b>\nentitlement decisions · metric/dimension access · row scope · column masks\nreads role definitions from DES"]
         SVL["<b>Semantic Validation Layer (SVL)</b>\nSMR resolution · schema validation · entitlement enforcement · LQP generation\nentirely deterministic — no AI"]
         SCL["<b>Semantic Controls Layer (SCL)</b>\ndata scale · complexity · classification · compliance · concurrency"]
-        PQP["<b>Physical Query Planner (PQP)</b>\nphysicalMapping resolution · sub-plan decomposition · dialect translation"]
+        PQP["<b>Physical Query Planner (PQP)</b>\nphysical_mapping resolution · sub-plan decomposition · dialect translation"]
         FQE["<b>Federated Query Engine (FQE)</b>\nbackend routing · parallel execution · result assembly"]
         DVL["<b>Data Visualization Language (DVL)</b>\nontology evaluation · deterministic chart contract selection"]
         NSA["<b>Narrative Synthesis Agent (NSA)</b>\npost-computation · anchored to result values · LLM call"]
@@ -116,7 +116,7 @@ flowchart TD
     SVL -->|"Logical Query Plan (LQP)"| SCL
     SCL -->|"controls decision record"| LS
     SCL -->|"approved LQP"| PQP
-    PQP -->|"physicalMapping lookup"| SMR
+    PQP -->|"physical_mapping lookup"| SMR
     PQP -->|"physical sub-plans"| FQE
     FQE --> backends
     FQE -->|"execution record"| LS
@@ -842,7 +842,7 @@ The Physical Query Planner (PQP) is responsible for translating the controls-app
 ```mermaid
 flowchart LR
     START(["Approved LQP"])
-    S1["**1. physicalMapping Resolution**"]
+    S1["**1. physical_mapping Resolution**"]
     S2["**2. Sub-plan Decomposition**"]
     S3["**3. Dialect Translation**"]
     OUT(["Physical sub-plans → FQE"])
@@ -850,7 +850,7 @@ flowchart LR
     START --> S1 --> S2 --> S3 --> OUT
 ```
 
-**Step 1 — physicalMapping Resolution.** For each `metric_scan` node in the LQP, the PQP will read the `physical_mapping` field from the resolved metric definition already attached to the node by the SVL. This field declares the registered backend identifier (`source`), the physical table or view (`table`), the column or pre-computed measure (`measure`), and the cube name for semantic layer backends (`cube`). No additional SMR call will be required — all physical mapping information will already be present in the LQP.
+**Step 1 — physical_mapping Resolution.** For each `metric_scan` node in the LQP, the PQP will read the `physical_mapping` field from the resolved metric definition already attached to the node by the SVL. This field declares the registered backend identifier (`source`), the physical table or view (`table`), the column or pre-computed measure (`measure`), and the cube name for semantic layer backends (`cube`). No additional SMR call will be required — all physical mapping information will already be present in the LQP.
 
 **Step 2 — Sub-plan Decomposition.** The PQP will group metric nodes by their `data_affinity` value and produce one sub-plan per affinity group. Row scope filters and dimension filters from the LQP will be distributed to each sub-plan so that entitlement enforcement carries through to the physical layer. Column masking directives from the LQP's `column_masks` array will be attached to each sub-plan for the FQE to apply during result assembly.
 
