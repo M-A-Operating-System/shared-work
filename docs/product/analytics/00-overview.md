@@ -68,7 +68,7 @@ A defining characteristic of this architecture is that **the Analytics Engine ne
 
 The Analytics Engine contains exactly two targeted uses of AI, both strictly bounded:
 
-1. **Intent resolution** — the Intent Resolution Agent (IRA) receives a natural language question, retrieves candidate analytics operations from the SMR catalogue using embedding similarity (RAG), and uses a language model to identify and rank the most appropriate analytics definition and bind the user's parameters to it. The language model selects from the governed inventory; it does not construct queries or access data.
+1. **Intent resolution** — the Intent Resolution Agent (IRA) is the first step in the pipeline and a contained, bounded AI component. It receives a natural language question, retrieves candidate operations from the SMR catalogue using embedding similarity (RAG), and uses a language model to rank them and bind the user's parameters — mapping the question to one or more registered analytics definitions in the SMR. The language model selects from the governed inventory; it does not construct queries or access data.
 
 2. **Narrative synthesis** — after computation completes, the Narrative Synthesis Agent (NSA) makes a single, tightly-scoped language model call to produce a brief plain-language summary of the result, anchored strictly to the computed values. It is told what the data shows; it cannot introduce figures, comparisons, or interpretations not present in the result.
 

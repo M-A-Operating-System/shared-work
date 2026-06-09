@@ -37,10 +37,10 @@ This document describes one proposed sequence of deliverables for the AI Analyti
 </tr>
 <tr>
 <td>MCP Capability Layer</td>
-<td>Build new Python service using FastMCP + Uvicorn (ASGI); deploy as a Kubernetes pod; implement JWT validation middleware at request ingress rejecting unauthenticated requests before any platform processing; implement three <code>@mcp.tool()</code> handlers (<code>run_analytics</code>, <code>list_operations</code>, <code>drilldown</code>) routing through the shared pipeline (<code>validate_jwt → sil.resolve → rapl.project → scl.approve → fqp.execute → assemble_response</code>); implement MCP resource handlers serving knowledge artifacts from the Knowledge Store (<code>guide://</code> and <code>skills://</code> URIs — no JWT required, no controls pipeline); implement two <code>@mcp.prompt()</code> templates (standard analytical assistant, regulatory reporting assistant); build per-user capability manifest endpoint reflecting feature-flag state and entitlement-gated tool availability</td>
+<td>Build new Python service using FastMCP + Uvicorn (ASGI); deploy as a Kubernetes pod; implement JWT validation middleware at request ingress rejecting unauthenticated requests before any platform processing; implement three <code>@mcp.tool()</code> handlers (<code>run_analytics</code>, <code>list_operations</code>, <code>drilldown</code>) routing through the shared pipeline (<code>validate_jwt → ira.resolve → rapl.project → svl.validate → scl.approve → pqp.plan → fqe.execute → assemble_response</code>); implement MCP resource handlers serving knowledge artifacts from the Knowledge Store (<code>guide://</code> and <code>skills://</code> URIs — no JWT required, no controls pipeline); implement two <code>@mcp.prompt()</code> templates (standard analytical assistant, regulatory reporting assistant); build per-user capability manifest endpoint reflecting feature-flag state and entitlement-gated tool availability</td>
 </tr>
 <tr>
-<td>Semantic Intent Layer</td>
+<td>Semantic Validation Layer</td>
 <td>Build new service implementing JSON schema validation for all MCP tool call parameters; implement SMR ID resolver that calls the SMR service to validate metric and dimension references, returning structured <code>METRIC_NOT_FOUND</code> errors for unregistered IDs; build LQP generator producing a platform-agnostic execution DAG from validated parameters; no LLM invocation in this layer</td>
 </tr>
 <tr>
@@ -119,7 +119,7 @@ This document describes one proposed sequence of deliverables for the AI Analyti
 <td rowspan="5">4</td>
 <td rowspan="5"><strong>Cross-Session Memory</strong></td>
 <td>User Preference Store</td>
-<td>Create <code>user_preferences</code> table in PostgreSQL scoped by <code>org_id + sub</code>; extend the Semantic Intent Layer to read preference defaults (default time period, dimensions, chart type overrides, measure groups) and apply them as parameter defaults at intent resolution, overridable per individual query; expose preference CRUD via the Platform Admin API</td>
+<td>Create <code>user_preferences</code> table in PostgreSQL scoped by <code>org_id + sub</code>; extend the Intent Resolution Agent to read preference defaults (default time period, dimensions, chart type overrides, measure groups) and apply them as parameter defaults at intent resolution, overridable per individual query; expose preference CRUD via the Platform Admin API</td>
 <td rowspan="5">Returning users find their analytical context pre-applied; saved queries surface SMR changes as explicit staleness warnings before execution rather than producing silently incorrect results</td>
 </tr>
 <tr>
@@ -128,7 +128,7 @@ This document describes one proposed sequence of deliverables for the AI Analyti
 </tr>
 <tr>
 <td>Favourite Metrics Index</td>
-<td>Create <code>user_favourites</code> table in PostgreSQL scoped by <code>org_id + sub</code>; extend the <code>list_operations</code> response to sort favourited metric IDs to the top of results; extend the Semantic Intent Layer disambiguation logic to prefer favourited metrics in tie-breaking; extend the SMR browser to visually distinguish favourited metrics</td>
+<td>Create <code>user_favourites</code> table in PostgreSQL scoped by <code>org_id + sub</code>; extend the <code>list_operations</code> response to sort favourited metric IDs to the top of results; extend the Intent Resolution Agent disambiguation logic to prefer favourited metrics in tie-breaking; extend the SMR browser to visually distinguish favourited metrics</td>
 </tr>
 <tr>
 <td>My Workspace UI</td>
@@ -216,7 +216,7 @@ This document describes one proposed sequence of deliverables for the AI Analyti
 </tr>
 <tr>
 <td>SEC Regulation BI Compliance Mode</td>
-<td>Implement SEC Reg BI handler in the Compliance Mode Framework; inject an additional system-level instruction into the Narrative Synthesis Engine prompt prohibiting investment recommendation language; extend the NSE post-generation validator to detect recommendation language patterns and trigger a single regeneration attempt; add <code>suitability_record_id</code> as a required parameter for advisory queries in the Semantic Intent Layer schema, blocking execution with a structured error if absent</td>
+<td>Implement SEC Reg BI handler in the Compliance Mode Framework; inject an additional system-level instruction into the Narrative Synthesis Engine prompt prohibiting investment recommendation language; extend the NSE post-generation validator to detect recommendation language patterns and trigger a single regeneration attempt; add <code>suitability_record_id</code> as a required parameter for advisory queries in the Semantic Validation Layer schema, blocking execution with a structured error if absent</td>
 </tr>
 
 <!-- ── Phase 9 ── -->
@@ -241,20 +241,20 @@ This document describes one proposed sequence of deliverables for the AI Analyti
 <td rowspan="4">10</td>
 <td rowspan="4"><strong>Advanced Query Capabilities</strong></td>
 <td>Ranking and Percentile Parameters</td>
-<td>Extend the Semantic Intent Layer JSON schema to add <code>rank_by</code>, <code>rank_direction</code>, <code>rank_limit</code>, and <code>rank_percentile</code> parameters; extend the FQE result assembly layer to apply ranking after all backend sub-results are assembled into the full result set, ensuring cross-backend results are ranked as a unified dataset rather than per-backend</td>
+<td>Extend the Semantic Validation Layer JSON schema to add <code>rank_by</code>, <code>rank_direction</code>, <code>rank_limit</code>, and <code>rank_percentile</code> parameters; extend the FQE result assembly layer to apply ranking after all backend sub-results are assembled into the full result set, ensuring cross-backend results are ranked as a unified dataset rather than per-backend</td>
 <td rowspan="4">Complex analytical queries — ranking, rolling windows, stress scenario comparisons, and composite benchmarks — are expressible as a single governed call; consumers receive a complete, join-ready result set without requiring multi-call composition</td>
 </tr>
 <tr>
 <td>Window Analytics Parameters</td>
-<td>Extend the Semantic Intent Layer JSON schema to add <code>window_op</code> (<code>moving_average</code>, <code>rolling_sum</code>, <code>period_over_period</code>), <code>window_size</code>, and <code>window_anchor</code> parameters; implement window computation in the FQE result assembly layer — computed against the fully assembled result set, not delegated to individual backends — to guarantee consistent behaviour across all registered backend types</td>
+<td>Extend the Semantic Validation Layer JSON schema to add <code>window_op</code> (<code>moving_average</code>, <code>rolling_sum</code>, <code>period_over_period</code>), <code>window_size</code>, and <code>window_anchor</code> parameters; implement window computation in the FQE result assembly layer — computed against the fully assembled result set, not delegated to individual backends — to guarantee consistent behaviour across all registered backend types</td>
 </tr>
 <tr>
 <td>Scenario Comparison Parameter</td>
-<td>Add <code>scenario_definitions</code> table to the SMR PostgreSQL schema; extend the Platform Admin API with scenario definition CRUD; extend the Semantic Intent Layer JSON schema to add a <code>scenario</code> parameter referencing a registered scenario ID; extend the FQE result assembly layer to perform scenario delta computation, producing a three-column result set (actual value, scenario value, delta) from a single query execution</td>
+<td>Add <code>scenario_definitions</code> table to the SMR PostgreSQL schema; extend the Platform Admin API with scenario definition CRUD; extend the Semantic Validation Layer JSON schema to add a <code>scenario</code> parameter referencing a registered scenario ID; extend the FQE result assembly layer to perform scenario delta computation, producing a three-column result set (actual value, scenario value, delta) from a single query execution</td>
 </tr>
 <tr>
 <td>Inline Composite Benchmark</td>
-<td>Extend the <code>benchmark</code> dimension field in the Semantic Intent Layer schema to accept an inline composition object (<code>[{ "benchmark_id": "…", "weight": 0.60 }, …]</code>) in addition to a pre-registered blend ID; implement inline composition resolution in the Benchmark Data Service Adapter at query time without requiring a pre-registration step; extend the lineage record writer to serialise the inline composition into the lineage record for auditability</td>
+<td>Extend the <code>benchmark</code> dimension field in the Semantic Validation Layer schema to accept an inline composition object (<code>[{ "benchmark_id": "…", "weight": 0.60 }, …]</code>) in addition to a pre-registered blend ID; implement inline composition resolution in the Benchmark Data Service Adapter at query time without requiring a pre-registration step; extend the lineage record writer to serialise the inline composition into the lineage record for auditability</td>
 </tr>
 
 <!-- ── Phase 11 ── -->
