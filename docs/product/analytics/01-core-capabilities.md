@@ -214,8 +214,7 @@ sequenceDiagram
         SCL->>ALS: controls decision record (written before execution is invoked)
         SCL->>PQP: approved LQP
 
-        PQP->>SMR: physicalMapping lookup
-        SMR-->>PQP: physical source mappings · backend affinity
+        note over PQP: Reads physical_mapping fields from metric nodes already in the LQP<br/>No SMR call required — all mappings carried in the plan
 
         note over PQP: Resolves physical_mapping per metric node<br/>Groups nodes by data_affinity → one sub-plan per affinity<br/>Translates each sub-plan to backend native dialect<br/>(SQL · MetricFlow · OData · SPARQL)
 
@@ -313,7 +312,7 @@ The Analytics Engine will expose three tools. All analytical operations will be 
 
 **`list_operations(domain: str | None, jwt: str)`** — Returns the SMR operation catalogue with operation IDs, display names, required parameters, supported metrics/dimensions, and execution profiles. Only operations the authenticated user is entitled to execute will be returned.
 
-**`drilldown(result_id: str, hierarchy: str, selected_value: str | None, jwt: str)`** — Navigates into a dimension hierarchy from a prior result. All filters, role predicates, and entitlement context from the original result will be preserved.
+**`drilldown(result_id: str, hierarchy: str, selected_value: str | None, jwt: str)`** — Navigates into a dimension hierarchy from a prior result. All filters, row scope conditions, and entitlement context from the original result will be preserved.
 
 ### Execution Profiles
 
@@ -322,7 +321,7 @@ Each SMR operation will carry an `execution_profile` defined in its `analytical_
 | Profile | Pipeline stages |
 |---|---|
 | `data_retrieval` | Auth → IRA → RAPL → FQE → Lineage |
-| `metric_query` | Auth → IRA → RAPL → SVL → SCL → FQE → Lineage |
+| `metric_query` | Auth → IRA → RAPL → SVL → SCL → PQP → FQE → Lineage |
 | `full_analytical` | Auth → IRA → RAPL → SVL → SCL → PQP → FQE → DVL + NSA + PAS → Lineage |
 
 ### Intent Confirmation Cards
@@ -384,7 +383,7 @@ The response payload will use a `candidates[]` array. A single-candidate respons
 
 ### Capability Governance
 
-Every capability invocation will pass through the full controls pipeline: input schema validation → capability availability check (feature flags and role entitlements) → Role-Aware Projection → Semantic Validation Layer → Semantic Controls Layer → FQE → result assembly → lineage record write. A capability not enabled by a feature flag or accessible to the user's role will appear as `available: false` with a reason.
+Every capability invocation will pass through the full controls pipeline: input schema validation → capability availability check (feature flags and role entitlements) → Role-Aware Projection → Semantic Validation Layer → Semantic Controls Layer → Physical Query Planner → FQE → result assembly → lineage record write. A capability not enabled by a feature flag or accessible to the user's role will appear as `available: false` with a reason.
 
 ### Example
 
@@ -481,7 +480,7 @@ The IRA will encode this query and retrieve the top-3 candidate operations from 
 {
   "operation_id": "compare_portfolios",
   "params": {
-    "portfolio_ids":  ["GLOB_EQ_OPP", "UK_CORE_INC"],
+    "portfolio_ids":  ["GLOB_EQ_OPP", "UK_CORE_INC", "ASIA_PAC_GRW", "EUR_BAL_INC"],
     "metrics":        ["portfolio_return", "benchmark_return"],
     "time_period":    "quarter_to_date",
     "filters": [{ "dimension": "asset_class", "operator": "eq", "value": "EQUITY" }]
@@ -616,7 +615,7 @@ RAPL will make five categories of entitlement decision. Every decision will be m
 | **Data access** | Stage 5 — data domain or classification ceiling not within the user's entitled scope is **DENIED** | SVL Stage 3 — request rejected before plan generation |
 | **Metrics access** | Stage 5 — requested metric not in the entitled access set is **DENIED** | SVL Stage 3 — denied metric removed from plan; request rejected if a required metric is lost |
 | **Dimension access** | Stage 5 — requested dimension not in the entitled access set is **DENIED** | SVL Stage 3 — denied dimension removed from plan |
-| **Row scope access** | Stage 5–6 — population scope decided and resolved against JWT claims | FQE physical query generation — injected as a scope node |
+| **Row scope access** | Stage 5–6 — population scope decided and resolved against JWT claims | PQP sub-plan generation — row scope filter injected into each sub-plan; enforced by FQE at execution |
 | **Result set column masking** | Stage 5 — masked columns and masking mode registered | FQE result assembly — value replaced, redacted, or excluded |
 
 ### Projection Lifecycle
