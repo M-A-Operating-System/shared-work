@@ -19,8 +19,8 @@ The table below maps each Chapter 1 capability to its reference implementation n
 | Role-Aware Projection Layer | RAPL | `RoleAwareProjectionLayer` | Python · asyncpg · PostgreSQL `role_policies` |
 | Semantic Validation Layer | SVL | `SemanticValidationLayer` + `LQPGenerator` | Python · Pydantic v2 · JSON Schema validation |
 | Semantic Controls Layer | SCL | `SemanticControlsLayer` | Python · Redis (concurrency semaphore) · rules engine |
-| Physical Query Planner | PQP | `PhysicalQueryPlanner` | Python · physical_mapping resolution · data-affinity decomposition · dialect translation |
-| Federated Query Engine | FQE | `FederatedQueryEngine` + backend adapters | Python asyncio fan-out · Apache Calcite (within adapters) · Snowflake (primary) · dbt MetricFlow · REST/OData · Neo4j |
+| Physical Query Planner | PQP | `PhysicalQueryPlanner` | Apache Calcite · physical_mapping → catalog reference binding · LQP → federated Trino SQL |
+| Federated Query Engine | FQE | `FederatedQueryEngine` (Starburst client) | Starburst (Trino) · native federation across catalog connectors — Snowflake · lakehouse · dbt Semantic Layer · Neo4j · REST/OData |
 | Data Visualization Language | DVL | `DataVisualizationLanguage` | Python · priority-ordered chart contract evaluation · output: Vega-Lite v5 spec |
 | Narrative Synthesis Agent | NSA | `NarrativeSynthesisAgent` | Claude Haiku 4.5 (simple queries) · Claude Sonnet 4.6 (complex queries) |
 | Analytical Lineage Store | ALS | `AnalyticalLineageStore` | AWS S3 (JSON records per query) · PostgreSQL `lineage_index` (scalar search) |
@@ -36,33 +36,33 @@ flowchart TD
     Consumer["Consumer\nAI Chat Platform (Claude) · autonomous agent · custom application"]
 
     subgraph analytics["AI Analytics Platform"]
-        MCP["MCP Capability Layer\nPython 3.12 · FastMCP 2.x + Uvicorn · MCP Streamable HTTP · port 8000\nJWT validation — python-jose · JWKS endpoint · RS256"]
-        IRA["Intent Resolution Agent (IRA)\nPython · embedding similarity search over SMR · Anthropic Claude\nnatural language → resolved operation_id + params · confirmation cards"]
-        RAPL["Role-Aware Projection Layer\nPython · asyncpg · PostgreSQL role_policies\nJWT claims → row scope injection · column masking"]
-        SVL["Semantic Validation Layer\nPython · Pydantic v2 · JSON Schema validation\nSMR resolution · compliance intent scoring · LQP generation"]
-        SCL["Semantic Controls Layer\nPython · Redis (concurrency semaphore)\ndata scale · complexity · classification · compliance · concurrency"]
-        PQP["Physical Query Planner\nPython · physical_mapping resolution · data-affinity decomposition\ndialect translation — SQL · MetricFlow · OData · SPARQL"]
-        FQE["Federated Query Engine\nPython · asyncio fan-out · parallel execution · result assembly\nApache Calcite (SQL plan optimisation, within adapters)\nSnowflake (primary) · dbt MetricFlow · REST/OData · Neo4j"]
-        DVL["Data Visualization Language (DVL)\nPython · ontology evaluation · Vega-Lite v5\ndeterministic chart contract selection"]
-        NSA["Narrative Synthesis Agent\nAnthropic Claude Haiku 4.5 — simple queries\nAnthropic Claude Sonnet 4.6 — complex queries"]
-        Cache[("Result Cache\nRedis · SHA-256 cache key · 5-min TTL\ncompliance queries bypass")]
-        LS[("Analytical Lineage Store (ALS)\nAWS S3 — JSON record per query\nPostgreSQL lineage_index — scalar search")]
+        MCP["FastMCP / Uvicorn (MCP)\nPython 3.12 · MCP Streamable HTTP · port 8000\nJWT — python-jose · JWKS · RS256"]
+        IRA["Anthropic Claude (IRA)\nembedding similarity search over SMR (RAG) · intent ranking\nnatural language → resolved operation_id + params · confirmation cards"]
+        RAPL["PostgreSQL (RAPL)\nPython · asyncpg · role_policies\nJWT claims → row scope injection · column masking"]
+        SVL["Pydantic / Python (SVL)\nJSON Schema validation · SMR resolution\ncompliance intent scoring · LQP generation"]
+        SCL["Redis + Python rules (SCL)\ndata scale · complexity · classification · compliance · concurrency\nRedis concurrency semaphore"]
+        PQP["Apache Calcite (PQP)\nphysical_mapping resolution · catalog reference binding\nLQP → federated Trino SQL"]
+        FQE["Starburst (FQE)\nTrino-based native federation across catalog connectors\npredicate push-down · parallel execution · result assembly"]
+        DVL["Vega-Lite (DVL)\nPython · ontology evaluation · deterministic chart contract selection\noutput: Vega-Lite v5 spec"]
+        NSA["Anthropic Claude (NSA)\nHaiku 4.5 — simple queries · Sonnet 4.6 — complex queries\nanchored strictly to result values"]
+        Cache[("Redis (Result Cache)\nSHA-256 cache key · 5-min TTL\ncompliance queries bypass")]
+        LS[("AWS S3 + PostgreSQL (ALS)\nS3 — JSON record per query\nPostgreSQL lineage_index — scalar search")]
         Result(["MCP tool response\ndisplay_spec + data + narrative + result_id\n+ compliance block if Provenance Artifact active"])
     end
 
     vega2img["vega2img (optional) · port 8001\nPython · FastMCP · vega-embed · Playwright (headless Chromium)\nStandalone MCP render service — not part of Analytics Platform"]
 
     subgraph dcs["Data Context Store (DCS)"]
-        SMR[("Semantic Metrics Repository (SMR)\nJSON documents: analytical_metric · analytical_dimension · analytical_operation\nlifecycle: proposed → in_review → approved → deprecated")]
-        SDR[("Semantic Data Repository (SDR)\nJSON documents: data models · object models\ncritical data elements · physical schemas · data lineage")]
+        SMR[("Data Context Store (SMR)\nJSON documents: analytical_metric · analytical_dimension · analytical_operation\nlifecycle: proposed → in_review → approved → deprecated")]
+        SDR[("Data Context Store (SDR)\nJSON documents: data models · object models\ncritical data elements · physical schemas · data lineage")]
         SMR -->|"physical_mapping resolves against SDR schema metadata"| SDR
     end
 
-    subgraph backends["Execution Backends"]
-        SQL["Snowflake — primary SQL warehouse\nBigQuery · Databricks · Redshift (alternatives)"]
-        SemLayer["dbt Semantic Layer — MetricFlow\nCube.js"]
-        ODA["OpenData API\nREST JSON · OData v4"]
-        GDA["Graph Data API\nNeo4j Bolt · Amazon Neptune SPARQL"]
+    subgraph backends["Starburst Catalog Connectors"]
+        SQL["Snowflake catalog\nSnowflake · BigQuery · Databricks · Redshift (warehouse / lakehouse)"]
+        SemLayer["Semantic-layer catalog\ndbt Semantic Layer (MetricFlow) · Cube.js"]
+        ODA["REST / OpenData catalog\nREST JSON · OData v4"]
+        GDA["Graph catalog\nNeo4j · Amazon Neptune"]
     end
 
     Consumer -->|"POST /v1/mcp (JWT + MCP tool call)"| MCP
@@ -77,9 +77,9 @@ flowchart TD
     SCL -->|"controls decision record"| LS
     SCL -->|"approved LQP"| PQP
     PQP -->|"physical_mapping lookup"| SMR
-    PQP -->|"physical sub-plans"| FQE
+    PQP -->|"federated Trino SQL"| FQE
     FQE <-->|"cache read / write"| Cache
-    FQE --> SQL & SemLayer & ODA & GDA
+    FQE -->|"federated query via connectors"| SQL & SemLayer & ODA & GDA
     FQE -->|"execution record"| LS
     FQE -->|"assembled result"| DVL
     FQE -->|"assembled result"| NSA
@@ -200,7 +200,7 @@ The MCP layer validates the JWT, then routes by call type. A **natural language*
 
 #### Pipeline Executor
 
-The deterministic pipeline runs in a fixed order: RAPL computes the entitlement projection first, the SVL then validates the request and compiles the Logical Query Plan with that projection enforced, the SCL applies its controls checks, the PQP translates the approved plan into physical sub-plans, and the FQE executes them.
+The deterministic pipeline runs in a fixed order: RAPL computes the entitlement projection first, the SVL then validates the request and compiles the Logical Query Plan with that projection enforced, the SCL applies its controls checks, the PQP translates the approved plan into federated Trino SQL, and the FQE submits it to Starburst for execution.
 
 ```python
 class PipelineExecutor:
@@ -239,7 +239,7 @@ class DrilldownService:
     def __init__(self, als, pqp, fqe, dvl, rapl, smr):
         self.als  = als   # AnalyticalLineageStore — fetch original lineage records
         self.pqp  = pqp   # PhysicalQueryPlanner — re-plan the refined sub-queries
-        self.fqe  = fqe   # FederatedQueryEngine — execute refined sub-plans
+        self.fqe  = fqe   # FederatedQueryEngine — execute the refined federated query via Starburst
         self.dvl  = dvl   # DataVisualizationLanguage — generate updated display_spec
         self.rapl = rapl  # RoleAwareProjectionLayer — re-apply row scope / column masks
         self.smr  = smr   # SemanticMetricsRepository — resolve drill-target metric definitions
@@ -977,7 +977,7 @@ class SemanticControlsLayer:
 
     def _check_complexity(self, lqp: dict, config: dict) -> None:
         # Input:  LQP nodes + controls config
-        # Raises: ControlsCeilingExceeded if node count, join depth, or sub-plan count exceeds limits
+        # Raises: ControlsCeilingExceeded if node count, join depth, or number of federated catalogs exceeds limits
         ...
 
     def _check_classification(self, lqp: dict, config: dict) -> None:
@@ -1011,16 +1011,16 @@ class SemanticControlsLayer:
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
-| **Implementation** | Custom Python | Deterministic translation of the approved LQP into backend-specific sub-plans |
-| **Decomposition** | Group metric nodes by `data_affinity` — one sub-plan per affinity group | Each backend receives only the nodes it can serve |
-| **Dialect translation** | Per-backend renderers (SQL, MetricFlow, OData, SPARQL) | Calcite optimises the SQL inside the SQL adapters; the PQP emits the native query for each backend |
-| **Execution** | None | The PQP has no backend connectivity; it hands the sub-plans array to the FQE |
+| **Implementation** | Apache Calcite (Python-hosted) | Builds a relational tree from the LQP and emits SQL; battle-tested, dialect-aware |
+| **Catalog binding** | `physical_mapping.source` → Starburst catalog name | Each registered source is a Starburst catalog; binding is a lookup, no extra SMR call |
+| **Output** | A single **federated Trino SQL** statement | Starburst performs the cross-source join natively; no per-backend decomposition needed |
+| **Execution** | None | The PQP has no backend connectivity; it hands the federated SQL to the FQE (Starburst) |
 
-The Physical Query Planner receives the controls-approved LQP from the SCL and translates it into a `sub_plans` array ready for execution. For each `metric_scan` node it resolves the `physical_mapping` already attached by the SVL, groups nodes by `data_affinity` to produce one sub-plan per affinity group, distributes the row scope filters, dimension filters, and column masks to each sub-plan, and translates each sub-plan into its target backend's native dialect. It has no execution capability — it passes the sub-plans array to the FQE.
+The Physical Query Planner receives the controls-approved LQP from the SCL and translates it into a single **federated Trino SQL** statement ready for Starburst to execute. For each `metric_scan` node it resolves the `physical_mapping` already attached by the SVL and binds it to a Starburst **catalog** reference (`catalog.schema.table`). It builds a Calcite relational tree from the LQP nodes — scans, joins, filters, time expansion, and sort — distributes the row scope filters, dimension filters, and column-mask directives into the statement, and emits Trino-dialect SQL. Because Starburst federates across catalogs natively, the PQP no longer decomposes the plan into per-backend sub-plans; the single statement references every catalog the query touches, and Starburst plans the cross-source join itself. This realises Chapter 1's PQP sub-plan/FQE execution contract inside Starburst — the per-source split happens in the engine rather than in application code. The PQP has no execution capability — it passes the federated SQL to the FQE.
 
 #### PQP input — approved LQP
 
-The PQP reads `data_affinity` on each metric node to decide which backend each sub-plan targets:
+The PQP reads each metric node's `physical_mapping.source` to bind it to a Starburst catalog:
 
 ```json
 {
@@ -1056,51 +1056,47 @@ The PQP reads `data_affinity` on each metric node to decide which backend each s
 }
 ```
 
-The PQP decomposes this into two sub-plans (one routed to `primary-warehouse`, nodes 1, 4, 5, 6; one to `risk-semantic-layer`, node 2) and translates each into its backend dialect.
+The two metrics resolve to different sources — `portfolio_return`'s `primary-warehouse` source maps to the `snowflake` catalog, `tracking_error`'s `risk-semantic-layer` source maps to the `risk` catalog (the `physical_mapping.source` → catalog map is configured at deployment) — so the emitted statement references both catalogs and lets Starburst perform the join.
 
 ```python
 class PhysicalQueryPlanner:
-    def __init__(self, smr: "SemanticMetricsRepository"):
-        self.smr = smr
+    def __init__(self, smr: "SemanticMetricsRepository", catalog_map: dict):
+        self.smr         = smr
+        self.catalog_map = catalog_map   # physical_mapping.source → Starburst catalog name
 
-    def plan(self, lqp: dict) -> list[dict]:
+    def plan(self, lqp: dict) -> dict:
         # Input:  SCL-approved LQP
-        # Output: sub_plans array — one entry per data_affinity group, each in its backend dialect
+        # Output: federated Trino query — { federated_sql, catalogs_referenced, column_masks, query_timeout_seconds }
 
-        # 1. Group metric_scan nodes by data_affinity — one sub-plan per affinity group
-        # 2. Distribute filter, time_expand, sort, row scope, and column-mask directives to each sub-plan
-        # 3. Resolve physical_mapping per node (already attached by the SVL — no extra SMR call needed)
-        # 4. Translate each sub-plan to its backend dialect (SQL · MetricFlow · OData · SPARQL)
+        # 1. Resolve each metric_scan node's physical_mapping.source to a Starburst catalog (no extra SMR call)
+        # 2. Build a Calcite relational tree from the LQP nodes (scan, join, filter, time_expand, sort)
+        # 3. Bind each scan to its catalog.schema.table reference; inject row scope + dimension filters
+        # 4. Emit one Trino-dialect SQL statement — Starburst performs the cross-catalog join
         ...
 
-    def _split_by_affinity(self, lqp: dict) -> list[dict]:
-        # Input:  full LQP
-        # Output: list of sub-plan node groups — one per unique data_affinity value in metric_scan nodes
+    def _catalog_for(self, physical_mapping: dict) -> str:
+        # Maps physical_mapping.source → configured Starburst catalog name
         ...
 
-    def _translate(self, sub_plan: dict) -> dict:
-        # Input:  sub-plan node group + target backend dialect
-        # Output: { backend_id, data_affinity, dialect, query, column_masks, query_timeout_seconds }
+    def _emit_trino_sql(self, rel) -> str:
+        # Calcite RelNode tree → Trino-dialect SQL with catalog-qualified table references
         ...
 ```
 
-#### PQP output — physical sub-plans
+#### PQP output — federated Trino SQL
 
 ```json
 {
-  "lqp_id": "lqp-20260514-093241-xyz",
-  "sub_plans": [
-    { "backend": "primary-warehouse", "data_affinity": "portfolio", "dialect": "snowflake_sql",
-      "query": "SELECT portfolio_id, ... GROUP BY portfolio_id ORDER BY portfolio_return DESC",
-      "column_masks": [], "query_timeout_seconds": 60 },
-    { "backend": "risk-semantic-layer", "data_affinity": "risk_metrics", "dialect": "metricflow",
-      "query": { "metrics": ["tracking_error"], "group_by": ["portfolio_id"], "where": "portfolio_id IN ('GLOB_EQ_OPP','UK_CORE_INC')" },
-      "column_masks": [], "query_timeout_seconds": 60 }
-  ]
+  "lqp_id":               "lqp-20260514-093241-xyz",
+  "engine":               "starburst",
+  "catalogs_referenced":  ["snowflake", "risk"],
+  "column_masks":         [],
+  "query_timeout_seconds": 60,
+  "federated_sql": "SELECT p.portfolio_id, p.portfolio_return, r.tracking_error FROM snowflake.analytics.fact_portfolio_daily p JOIN risk.metricflow.tracking_error r ON p.portfolio_id = r.portfolio_id AND p.date = r.date WHERE p.portfolio_id IN ('GLOB_EQ_OPP','UK_CORE_INC') AND p.asset_class = 'EQUITY' AND p.date BETWEEN DATE '2026-04-01' AND DATE '2026-05-14' GROUP BY p.portfolio_id ORDER BY p.portfolio_return DESC"
 }
 ```
 
-The PQP passes the `sub_plans` array to the FQE.
+The PQP passes the federated Trino SQL to the FQE.
 
 
 ### Federated Query Engine (FQE)
@@ -1109,29 +1105,31 @@ The PQP passes the `sub_plans` array to the FQE.
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
-| **Plan optimiser** | Apache Calcite (within SQL warehouse adapters) | Battle-tested SQL plan optimisation; used by Trino, Flink, Beam. Calcite is invoked inside each SQL warehouse adapter to optimise the sub-plan SQL before execution — the PQP has already decomposed the LQP and translated dialects |
-| **Backend adapters** | Custom adapter per backend type | Calcite handles SQL; custom adapters cover REST/OpenData/GraphQL/SPARQL |
-| **Result assembly** | Custom (Python) | Fan-out/fan-in; no off-the-shelf library needed |
+| **Engine** | Starburst (Trino) | A mature federation engine with an ANSI-SQL surface and native connectors; performs cross-source joins and predicate/aggregate push-down without bespoke code |
+| **Federation** | One federated Trino SQL statement over multiple catalogs | Starburst plans and executes the cross-source join — no application-level fan-out or per-backend adapters to maintain |
+| **Client** | Python Trino client | Submits the PQP's federated SQL to the Starburst coordinator and streams typed rows |
+| **Result handling** | Custom (Python) | Applies the LQP's column masks, caches by LQP signature, and writes the lineage record |
 
-The FQE receives the `sub_plans` array from the PQP, assigns each sub-plan to its matching registered backend, fans out execution in parallel, and assembles results. It is the only component with backend connection details. Each execution backend implements a two-method adapter contract: `ping()` for health checking and `execute_sub_plan()` for receiving a sub-plan and returning a typed result set.
+The FQE is realised as **Starburst**, a Trino-based federation engine. It receives the federated Trino SQL produced by the PQP, submits it to the Starburst coordinator, and Starburst federates the query across its configured **catalog connectors** — pushing filters and aggregations down to each source (Snowflake, lakehouse, semantic layer, graph, REST) and performing any cross-source join itself. The FQE is the only component holding the Starburst connection. Once Starburst returns the result, the FQE applies the LQP's `column_masks`, caches the result by LQP signature, and writes the execution record to the Analytical Lineage Store. There are no per-backend adapters and no application-level fan-out — federation is Starburst's responsibility, and each source is reached as a Starburst catalog.
 
-#### FQE input — physical sub-plans
+#### FQE input — federated Trino SQL
 
-The FQE receives the `sub_plans` array produced by the PQP (see *PQP output* above) — one entry per data affinity group, each already translated to its backend dialect. The FQE routes each sub-plan to the registered backend named in its `backend` field, executes them in parallel, and joins on `portfolio_id` and `date` at assembly.
+The FQE receives the federated Trino SQL produced by the PQP (see *PQP output* above) — a single statement referencing every catalog the query touches. It submits the statement to Starburst, which plans and executes the cross-catalog join.
 
 #### FQE output — assembled result
 
-After execution and result assembly the FQE returns a typed result envelope in parallel to the Data Visualization Language (DVL) and Narrative Synthesis Agent:
+After Starburst executes the federated query, the FQE returns a typed result envelope in parallel to the Data Visualization Language (DVL) and Narrative Synthesis Agent:
 
 ```json
 {
-  "result_id":      "res-20260514-093247-a1b2c3",
+  "result_id":     "res-20260514-093247-a1b2c3",
   "lqp_id":        "lqp-20260514-093241-xyz",
-  "org_id":     "acme-wealth",
+  "org_id":        "acme-wealth",
   "cache_hit":     false,
   "latency_ms":    1243,
   "scan_rows":     408517,
-  "backends_used": ["primary-warehouse", "risk-semantic-layer"],
+  "engine":        "starburst",
+  "catalogs_used": ["snowflake", "risk"],
   "schema": [
     { "field": "portfolio_id",     "type": "string"  },
     { "field": "portfolio_return", "type": "number", "unit": "percentage", "decimals": 2 },
@@ -1141,106 +1139,59 @@ After execution and result assembly the FQE returns a typed result envelope in p
     { "portfolio_id": "GLOB_EQ_OPP", "portfolio_return": 4.21, "tracking_error": 3.18 },
     { "portfolio_id": "UK_CORE_INC", "portfolio_return": 2.87, "tracking_error": 1.94 }
   ],
-  "sub_plans": [
-    {
-      "backend":    "primary-warehouse",
-      "dialect":    "snowflake_sql",
-      "query":      "SELECT portfolio_id, AVG(portfolio_return) AS portfolio_return FROM fact_portfolio_daily WHERE portfolio_id IN ('GLOB_EQ_OPP','UK_CORE_INC') AND asset_class = 'EQUITY' AND date BETWEEN '2026-04-01' AND '2026-05-14' GROUP BY portfolio_id ORDER BY portfolio_return DESC",
-      "latency_ms": 980,
-      "row_count":  2
-    },
-    {
-      "backend":    "risk-semantic-layer",
-      "dialect":    "metricflow",
-      "query":      { "metrics": ["tracking_error"], "group_by": ["portfolio_id"], "where": "portfolio_id IN ('GLOB_EQ_OPP','UK_CORE_INC')" },
-      "latency_ms": 620,
-      "row_count":  2
-    }
-  ]
+  "executed_sql": "SELECT p.portfolio_id, p.portfolio_return, r.tracking_error FROM snowflake.analytics.fact_portfolio_daily p JOIN risk.metricflow.tracking_error r ON p.portfolio_id = r.portfolio_id AND p.date = r.date WHERE p.portfolio_id IN ('GLOB_EQ_OPP','UK_CORE_INC') AND p.asset_class = 'EQUITY' AND p.date BETWEEN DATE '2026-04-01' AND DATE '2026-05-14' GROUP BY p.portfolio_id ORDER BY p.portfolio_return DESC"
 }
 ```
 
-#### Supported backend adapters
+#### Starburst catalog connectors
 
-| Backend type | Adapter | Protocols |
-|-------------|---------|-----------|
-| **SQL warehouse** | Calcite SQL adapter | Snowflake, BigQuery, Databricks, Redshift, Trino, Starburst, PostgreSQL |
-| **Semantic layer** | Semantic layer adapter | dbt Semantic Layer (MetricFlow), Cube.js |
-| **OpenData API** | REST/OData adapter | REST JSON, OData v4, SOAP (via shim) |
-| **Graph Data API** | Graph adapter | Neo4j Bolt, Amazon Neptune SPARQL, OpenCypher REST |
-| **OLAP engine** | OLAP adapter | Apache Druid, ClickHouse, Pinot |
-| **Custom** | Custom adapter interface | Any backend conforming to the `FQEBackendAdapter` contract |
+Each registered source is exposed to Starburst as a catalog. The reference deployment configures at least the following connector types; any Trino-compatible connector may be added:
 
-#### SQL Warehouse Adapter — worked example
+| Catalog type | Starburst connector | Sources |
+|---|---|---|
+| **SQL warehouse / lakehouse** | Snowflake · BigQuery · Databricks/Delta · Redshift · Iceberg · Hive | Primary performance and position data |
+| **Semantic layer** | dbt Semantic Layer (MetricFlow) · Cube.js (via JDBC/REST connector) | Pre-modelled governed metrics |
+| **Relational** | PostgreSQL · MySQL | Reference and governance data |
+| **Graph** | Neo4j · Amazon Neptune (via connector) | Relationship and counterparty data |
+| **REST / OpenData** | REST · OData v4 (via connector) | Reference data and third-party feeds |
+| **Custom** | Any Trino-compatible connector | Proprietary or specialised sources |
 
-```python
-import snowflake.connector    # swap for bigquery / databricks connector per target
+A catalog is registered with a standard Starburst catalog properties file — one per source — and becomes addressable as `catalog.schema.table` in the federated SQL the PQP emits:
 
-class SnowflakeAdapter:
-    def __init__(self, connection_params: dict):
-        self.conn_params = connection_params
-
-    async def ping(self) -> bool:
-        # Output: True if Snowflake connection is healthy — used by Admin API health check
-        ...
-
-    async def execute_sub_plan(self, sub_plan: dict) -> dict:
-        # Input:  sub-plan fragment — metric_scan, filter, time_expand, sort nodes for one affinity
-        # Output: { affinity, rows: [dict], columns: [str] }
-        # Renders SQL via _render_sql, executes against Snowflake, returns typed row dicts
-        ...
-
-    def _render_sql(self, sub_plan: dict) -> tuple[str, list]:
-        # Input:  sub-plan node list
-        # Output: (parameterised SQL string, positional params list)
-
-        # 1. SELECT — one measure column per metric_scan node (from physical_mapping)
-        # 2. FROM — physical table from first metric_scan node's physical_mapping
-        # 3. WHERE — predicates from filter nodes + date range from time_expand node
-        # 4. ORDER BY — from sort node if present
-        # Note: Calcite optimises the physical plan inside the adapter before this SQL runs
-        ...
+```properties
+# etc/catalog/snowflake.properties — one catalog per registered source
+connector.name=snowflake
+connection-url=jdbc:snowflake://acme.snowflakecomputing.com
+connection-user=${ENV:SNOWFLAKE_USER}
+connection-password=${ENV:SNOWFLAKE_PASSWORD}
 ```
 
+#### FQE implementation
+
 ```python
-import asyncio
+from trino.dbapi import connect
 
 class FederatedQueryEngine:
-    def __init__(self, backend_registry: dict, lineage_store: "AnalyticalLineageStore", cache: "ResultCache"):
-        self.backends = backend_registry   # data_affinity → FQEBackendAdapter
-        self.lineage  = lineage_store
-        self.cache    = cache
+    def __init__(self, starburst_dsn: dict, lineage_store: "AnalyticalLineageStore", cache: "ResultCache"):
+        self.dsn     = starburst_dsn   # Starburst coordinator host/port/user + default catalog
+        self.lineage = lineage_store
+        self.cache   = cache
 
-    async def execute(self, sub_plans: list[dict], lqp: dict, claims: dict) -> dict:
-        # Input:  PQP sub_plans array + LQP metadata (for cache key and assembly) + JWT claims
-        # Output: assembled result — { result_id, rows, columns, schema, cache_hit, ... }
+    async def execute(self, plan: dict, lqp: dict, claims: dict) -> dict:
+        # Input:  PQP federated Trino query (plan["federated_sql"]) + LQP metadata + JWT claims
+        # Output: assembled result — { result_id, rows, schema, cache_hit, catalogs_used, ... }
 
         # 1. Cache read — return cached result if available; compliance queries always bypass
-        # 2. Fan-out: execute all sub-plans in parallel via asyncio.gather
-        # 3. Assemble: fan-in results, join on shared dimension key, apply sort/limit
-        # 4. Cache write — store assembled result with TTL
-        # 5. Write execution record to ALS
+        # 2. Submit plan["federated_sql"] to the Starburst coordinator via the Trino client
+        #    Starburst federates across catalogs, pushes down predicates, performs cross-source joins
+        # 3. Stream typed rows; apply the LQP's column_masks during assembly
+        # 4. Cache write — store the assembled result with TTL
+        # 5. Write execution record to ALS — engine, catalogs_used, executed_sql, latency, scan_rows
         ...
 
-    async def _execute_sub_plan(self, sub_plan: dict) -> dict:
-        # Input:  sub-plan dict (backend + dialect + query) from the PQP
-        # Output: result from the matching backend adapter — { affinity, rows, columns }
-        # Routes by affinity to the registered FQEBackendAdapter (e.g. SnowflakeAdapter, CubeJSAdapter)
+    def _apply_column_masks(self, rows: list[dict], lqp: dict) -> list[dict]:
+        # Applies the LQP's column_masks (null_replacement, redacted_label, excluded) post-execution
         ...
-
-    def _assemble(self, results: list[dict], lqp: dict) -> dict:
-        # Input:  list of sub-plan results + LQP metadata
-        # Output: { result_id, rows, columns, schema }
-
-        # Single result — pass through directly
-        # Multiple results — join on shared dimension key using dict.update() to merge columns
-        # Apply sort node and limit node from the LQP after joining
-        ...
-
-
-class FQEBackendAdapter:
-    async def ping(self) -> bool: ...
-    async def execute_sub_plan(self, sub_plan: dict) -> dict: ...
 ```
 
 
@@ -1450,7 +1401,7 @@ Each completed query writes a single JSON document to the object store at `linea
   "request_payload":    { "tool": "run_analytics", "input": { "operation_id": "compare_portfolios", "params": {"..."} } },
   "resolved_metrics":   [{ "metric_id": "portfolio_return", "version": "2.1.0" }],
   "controls_decision":{ "approved": true, "estimated_scan_rows": 408517, "checks_passed": ["data_scale_check", "complexity_check", "classification_gate", "compliance_check", "concurrency_check"] },
-  "sub_plans":          [{ "backend": "primary-warehouse", "query": "...", "latency_ms": 980 }],
+  "execution":          { "engine": "starburst", "catalogs_used": ["snowflake", "risk"], "executed_sql": "...", "latency_ms": 1243 },
   "result_summary":     { "row_count": 2, "schema": ["..."], "rows": ["..."] },
   "display_spec":       { "type": "chart", "contract": "BAR_MULTI_SERIES_COMPARISON", "..." },
   "error_code":         null,
@@ -1535,7 +1486,7 @@ class AnalyticalLineageStore:
 
     async def write_execution(self, lqp: dict, result: dict) -> None:
         # Input:  approved LQP + assembled FQE result
-        # Builds a full execution lineage record — includes sub_plans, regulatory_frameworks, result summary
+        # Builds a full execution lineage record — includes the federated SQL + catalogs used, regulatory_frameworks, result summary
         # Second of the two ALS writes — called by FQE after assembly
         # regulatory_frameworks aggregated from resolved_metrics with compliance_relevant: true
         ...
@@ -1665,8 +1616,8 @@ async def build_app() -> FastMCP:
     # 1. Load config from env vars
     # 2. Construct infrastructure clients — asyncpg pool, S3, Redis, DCS, Anthropic
     # 3. Construct platform services — ALS, ResultCache, SMR, IRA, RAPL, SVL, SCL, PQP, DVL, NSA
-    # 4. Register backend adapters by data_affinity name — portfolio → Snowflake, risk → CubeJS, etc.
-    # 5. Assemble FederatedQueryEngine with backend registry + ALS + cache
+    # 4. Configure Starburst catalogs (one per registered source) + the physical_mapping.source → catalog map
+    # 5. Assemble FederatedQueryEngine with the Starburst coordinator DSN + ALS + cache
     # 6. Assemble PipelineExecutor with all services injected (IRA → RAPL → SVL → SCL → PQP → FQE)
     # 7. Wire everything into the FastMCP app and return
     ...
@@ -1685,6 +1636,7 @@ Configuration is read from environment variables at startup. Required variables:
 | `DCS_URL` | Data Context Store base URL |
 | `DCS_API_KEY` | DCS service-to-service API key |
 | `S3_LINEAGE_BUCKET` | S3 bucket name for lineage records |
+| `STARBURST_DSN` | Starburst (Trino) coordinator connection — host, port, user, default catalog |
 | `ANTHROPIC_API_KEY` | Anthropic API key for the IRA (intent ranking) and NSA (narrative synthesis) |
 | `JWT_JWKS_URI` | JWKS endpoint for JWT public key retrieval |
 | `JWT_AUDIENCE` | Expected JWT audience claim |
@@ -1696,12 +1648,13 @@ Configuration is read from environment variables at startup. Required variables:
 | Component | Choice | Rationale |
 |-----------|--------|-----------|
 | MCP service | Python · FastMCP + Uvicorn | Lightweight ASGI MCP surface; deploys as Kubernetes pod |
-| Backend services | Kubernetes (cloud-agnostic) | FQE, governance, platform services as independently scalable pods |
+| Governance services | Kubernetes (cloud-agnostic) | IRA, RAPL, SVL, SCL, PQP, DVL, NSA as independently scalable pods |
+| Federated Query Engine | Starburst (Trino) — Enterprise or Galaxy | Coordinator + workers; one catalog per registered source; performs all cross-source federation |
 | Primary database | PostgreSQL (Neon or RDS) | Lineage search index, role policy config, scheduled queries, user preferences, saved queries |
 | Data Context Store (DCS) | Pre-existing platform component | SMR metric definitions, controls config, SMR search — reuses SDR versioned storage and native search |
 | Knowledge Store | S3-compatible object store (versioned Markdown) | MCP resource content — guides, skills definitions, compliance reference |
 | Object storage | S3-compatible | Lineage records (one JSON document per query), result artefacts, large cached result sets |
-| Secrets | HashiCorp Vault or cloud-native | Backend credentials, platform service keys |
+| Secrets | HashiCorp Vault or cloud-native | Starburst catalog credentials, platform service keys |
 
 ### Kubernetes Deployment Summary
 
@@ -1710,13 +1663,14 @@ Configuration is read from environment variables at startup. Required variables:
 | Analytics MCP | `analytics-mcp` | 8000 | 2 | 500m | 512Mi | CPU > 60% |
 | vega2img (optional) | `vega2img` | 8001 | 1 | 1000m | 1Gi | CPU > 70% |
 | Admin API | `analytics-admin` | 9000 | 1 | 250m | 256Mi | — |
+| Starburst (FQE) | Coordinator + workers (managed or self-hosted) | 8080 | — | — | — | — |
 | PostgreSQL | Managed (Neon / RDS) | 5432 | — | — | — | — |
 | Redis | Managed (ElastiCache / Upstash) | 6379 | — | — | — | — |
 | Object storage | S3-compatible | — | — | — | — | — |
 
-Health check endpoint: `GET /health` on each container port. Returns `200 OK` with `{"status": "ok", "backends": {...}}` when all registered backends and DCS connectivity are confirmed.
+Health check endpoint: `GET /health` on each container port. Returns `200 OK` with `{"status": "ok", "catalogs": {...}}` when all registered Starburst catalogs and DCS connectivity are confirmed.
 
-All platform services run in a dedicated Kubernetes namespace (`analytics`). Backend credentials and API keys are injected via Kubernetes Secrets mounted as environment variables — never baked into container images.
+All platform services run in a dedicated Kubernetes namespace (`analytics`). Starburst catalog credentials and API keys are injected via Kubernetes Secrets mounted as environment variables — never baked into container images.
 
 ### Financial Services Reference Model
 
