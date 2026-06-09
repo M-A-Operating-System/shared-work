@@ -105,6 +105,8 @@ flowchart TD
 
     ChatComp ~~~ CustomUI
     CustomUI ~~~ Agents
+    SQL ~~~ ODA
+    ODA ~~~ GDA
     Consumers -->|"JWT + structured MCP tool call"| MCP
     Consumers -->|"render tool call (display_spec)"| Image
     Consumers -->|"JWT + MCP tool call"| DCSMCP
