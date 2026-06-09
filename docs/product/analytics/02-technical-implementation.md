@@ -14,7 +14,7 @@ The table below maps each Chapter 1 capability to its reference implementation n
 | Capability (Ch01) | Abbr | Reference Implementation | Key Technology |
 |---|---|---|---|
 | MCP Capability Layer | MCP | `build_mcp_app()` + FastMCP router | Python 3.12 · FastMCP 2.x · Uvicorn · port 8000 · JWT via python-jose (RS256) |
-| Semantic Intent Agent | SIA | `SemanticIntentAgent` | Python · embedding similarity search over SMR · Anthropic Claude (intent ranking) · confirmation cards |
+| Intent Resolution Agent | IRA | `IntentResolutionAgent` | Python · embedding similarity search over SMR · Anthropic Claude (intent ranking) · confirmation cards |
 | Semantic Metrics Repository | SMR | `SemanticMetricsRepository` | DCS API — JSON documents: `analytical_metric`, `analytical_dimension`, `analytical_operation` |
 | Role-Aware Projection Layer | RAPL | `RoleAwareProjectionLayer` | Python · asyncpg · PostgreSQL `role_policies` |
 | Semantic Validation Layer | SVL | `SemanticValidationLayer` + `LQPGenerator` | Python · Pydantic v2 · JSON Schema validation |
@@ -26,7 +26,7 @@ The table below maps each Chapter 1 capability to its reference implementation n
 | Analytical Lineage Store | ALS | `AnalyticalLineageStore` | AWS S3 (JSON records per query) · PostgreSQL `lineage_index` (scalar search) |
 | Result Cache | — | `ResultCache` | Redis · SHA-256 cache key · 5-min TTL · compliance queries bypass cache |
 
-The two embedded AI components are the **Semantic Intent Agent (SIA)** and the **Narrative Synthesis Agent (NSA)**. Every stage between them — RAPL, SVL, SCL, PQP, and FQE — is deterministic.
+The two embedded AI components are the **Intent Resolution Agent (IRA)** and the **Narrative Synthesis Agent (NSA)**. Every stage between them — RAPL, SVL, SCL, PQP, and FQE — is deterministic.
 
 
 ## 2.2 Architecture Overview
@@ -37,7 +37,7 @@ flowchart TD
 
     subgraph analytics["AI Analytics Platform"]
         MCP["MCP Capability Layer\nPython 3.12 · FastMCP 2.x + Uvicorn · MCP Streamable HTTP · port 8000\nJWT validation — python-jose · JWKS endpoint · RS256"]
-        SIA["Semantic Intent Agent (SIA)\nPython · embedding similarity search over SMR · Anthropic Claude\nnatural language → resolved operation_id + params · confirmation cards"]
+        IRA["Intent Resolution Agent (IRA)\nPython · embedding similarity search over SMR · Anthropic Claude\nnatural language → resolved operation_id + params · confirmation cards"]
         RAPL["Role-Aware Projection Layer\nPython · asyncpg · PostgreSQL role_policies\nJWT claims → row scope injection · column masking"]
         SVL["Semantic Validation Layer\nPython · Pydantic v2 · JSON Schema validation\nSMR resolution · compliance intent scoring · LQP generation"]
         SCL["Semantic Controls Layer\nPython · Redis (concurrency semaphore)\ndata scale · complexity · classification · compliance · concurrency"]
@@ -67,10 +67,10 @@ flowchart TD
 
     Consumer -->|"POST /v1/mcp (JWT + MCP tool call)"| MCP
     Consumer -->|"render tool call (display_spec)"| vega2img
-    MCP -->|"natural language query + JWT"| SIA
-    MCP -->|"structured call (operation_id + params) — bypasses SIA"| RAPL
-    SIA -->|"RAG retrieval over operation/metric embeddings"| SMR
-    SIA -->|"resolved operation_id + params"| RAPL
+    MCP -->|"natural language query + JWT"| IRA
+    MCP -->|"structured call (operation_id + params) — bypasses IRA"| RAPL
+    IRA -->|"RAG retrieval over operation/metric embeddings"| SMR
+    IRA -->|"resolved operation_id + params"| RAPL
     RAPL -->|"entitlement projection (row scope + column masks)"| SVL
     SVL -->|"metric + dimension ID resolution"| SMR
     SVL -->|"validated LQP"| SCL
@@ -196,7 +196,7 @@ async def validate_jwt(token: str) -> dict:
 
 #### Request Routing
 
-The MCP layer validates the JWT, then routes by call type. A **natural language** query is sent to the Semantic Intent Agent (SIA), which resolves it to an `operation_id` + `params` before the deterministic pipeline begins. A **structured** call (an explicit `operation_id` + `params`) bypasses the SIA and enters the deterministic pipeline directly. From that point the order is the same in both cases: `RAPL → SVL → SCL → PQP → FQE`.
+The MCP layer validates the JWT, then routes by call type. A **natural language** query is sent to the Intent Resolution Agent (IRA), which resolves it to an `operation_id` + `params` before the deterministic pipeline begins. A **structured** call (an explicit `operation_id` + `params`) bypasses the IRA and enters the deterministic pipeline directly. From that point the order is the same in both cases: `RAPL → SVL → SCL → PQP → FQE`.
 
 #### Pipeline Executor
 
@@ -204,8 +204,8 @@ The deterministic pipeline runs in a fixed order: RAPL computes the entitlement 
 
 ```python
 class PipelineExecutor:
-    def __init__(self, sia, rapl, svl, scl, pqp, fqe, dvl, nsa, als):
-        self.sia  = sia   # SemanticIntentAgent — natural language only
+    def __init__(self, ira, rapl, svl, scl, pqp, fqe, dvl, nsa, als):
+        self.ira  = ira   # IntentResolutionAgent — natural language only
         self.rapl = rapl  # RoleAwareProjectionLayer
         self.svl  = svl   # SemanticValidationLayer
         self.scl  = scl   # SemanticControlsLayer
@@ -217,7 +217,7 @@ class PipelineExecutor:
 
     async def run(self, operation: dict, params: dict, claims: dict) -> dict:
         # Input:  SMR operation definition + resolved call params + verified JWT claims
-        #         (params already resolved by the SIA for natural-language requests)
+        #         (params already resolved by the IRA for natural-language requests)
         # Output: result dict — shape varies by execution_profile (see below)
 
         # 1. RAPL computes the entitlement projection (row scope + column masks) from the caller's roles
@@ -390,23 +390,23 @@ Error code reference table:
 | `INTERNAL_ERROR` | Any | Log `result_id` if available; operator investigation required |
 
 
-### Semantic Intent Agent
+### Intent Resolution Agent
 
-> **Specification:** [§Semantic Intent Agent](./01-core-capabilities.md#semantic-intent-agent-sia)
+> **Specification:** [§Intent Resolution Agent](./01-core-capabilities.md#intent-resolution-agent-ira)
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
 | **Candidate retrieval** | Embedding similarity search over SMR operation/metric embeddings | RAG retrieval narrows the full catalogue to a handful of candidates before the model ranks them |
 | **Intent ranking** | Anthropic Claude | Ranks candidate operations and binds parameters from the natural-language query |
 | **Confirmation** | Candidate cards when intent is ambiguous | The user selects or refines before any query executes |
-| **Scope** | Natural-language requests only | Structured `operation_id` + `params` calls bypass the SIA entirely |
+| **Scope** | Natural-language requests only | Structured `operation_id` + `params` calls bypass the IRA entirely |
 
-The Semantic Intent Agent (SIA) is the only AI step in the pre-computation pipeline. It receives a natural-language query and the caller's JWT from the MCP layer, retrieves candidate operations from the SMR catalogue using embedding similarity search, ranks them with a language model, binds parameters to the leading candidate, and derives a presentation preview. When the top candidate is confident and unambiguous, the resolved intent is forwarded directly to the RAPL; when it is ambiguous, ranked candidate cards are returned to the consumer for selection or conversational refinement. The SIA produces no output visible to the end user once intent is resolved, and makes no governance or execution decisions — those belong to the deterministic pipeline that follows.
+The Intent Resolution Agent (IRA) is the only AI step in the pre-computation pipeline. It receives a natural-language query and the caller's JWT from the MCP layer, retrieves candidate operations from the SMR catalogue using embedding similarity search, ranks them with a language model, binds parameters to the leading candidate, and derives a presentation preview. When the top candidate is confident and unambiguous, the resolved intent is forwarded directly to the RAPL; when it is ambiguous, ranked candidate cards are returned to the consumer for selection or conversational refinement. The IRA produces no output visible to the end user once intent is resolved, and makes no governance or execution decisions — those belong to the deterministic pipeline that follows.
 
 ```python
 import anthropic
 
-class SemanticIntentAgent:
+class IntentResolutionAgent:
     def __init__(self, smr: "SemanticMetricsRepository", client: anthropic.AsyncAnthropic):
         self.smr    = smr
         self.client = client
@@ -436,7 +436,7 @@ class SemanticIntentAgent:
         ...
 ```
 
-Structured API consumers that already know the `operation_id` skip the SIA entirely: the MCP layer routes their call straight into the deterministic pipeline at the RAPL.
+Structured API consumers that already know the `operation_id` skip the IRA entirely: the MCP layer routes their call straight into the deterministic pipeline at the RAPL.
 
 
 ### Semantic Validation Layer
@@ -1664,10 +1664,10 @@ async def build_app() -> FastMCP:
 
     # 1. Load config from env vars
     # 2. Construct infrastructure clients — asyncpg pool, S3, Redis, DCS, Anthropic
-    # 3. Construct platform services — ALS, ResultCache, SMR, SIA, RAPL, SVL, SCL, PQP, DVL, NSA
+    # 3. Construct platform services — ALS, ResultCache, SMR, IRA, RAPL, SVL, SCL, PQP, DVL, NSA
     # 4. Register backend adapters by data_affinity name — portfolio → Snowflake, risk → CubeJS, etc.
     # 5. Assemble FederatedQueryEngine with backend registry + ALS + cache
-    # 6. Assemble PipelineExecutor with all services injected (SIA → RAPL → SVL → SCL → PQP → FQE)
+    # 6. Assemble PipelineExecutor with all services injected (IRA → RAPL → SVL → SCL → PQP → FQE)
     # 7. Wire everything into the FastMCP app and return
     ...
 
@@ -1685,7 +1685,7 @@ Configuration is read from environment variables at startup. Required variables:
 | `DCS_URL` | Data Context Store base URL |
 | `DCS_API_KEY` | DCS service-to-service API key |
 | `S3_LINEAGE_BUCKET` | S3 bucket name for lineage records |
-| `ANTHROPIC_API_KEY` | Anthropic API key for the SIA (intent ranking) and NSA (narrative synthesis) |
+| `ANTHROPIC_API_KEY` | Anthropic API key for the IRA (intent ranking) and NSA (narrative synthesis) |
 | `JWT_JWKS_URI` | JWKS endpoint for JWT public key retrieval |
 | `JWT_AUDIENCE` | Expected JWT audience claim |
 | `JWT_ISSUER` | Expected JWT issuer claim |
