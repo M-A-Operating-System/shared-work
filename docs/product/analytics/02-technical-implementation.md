@@ -911,17 +911,26 @@ Role policy documents are stored in the PostgreSQL `role_policies` schema — th
 
 ```json
 {
-  "role_id":        "regional_analyst",
-  "org_id":         "acme-wealth",
-  "allowed_metrics": null,
-  "denied_metrics":  ["var_99", "expected_shortfall"],
+  "role_id":                "regional_analyst",
+  "org_id":                 "acme-wealth",
+  "data_access_domains":    ["portfolio", "risk"],
+  "classification_ceiling": "internal",
+  "allowed_metrics":        null,
+  "denied_metrics":         ["var_99", "expected_shortfall"],
+  "allowed_dimensions":     null,
+  "denied_dimensions":      ["issuer"],
   "row_scope": {
     "portfolio": "portfolio_id IN ({{user.managed_portfolios}})"
   },
   "column_masks": {
     "aum": {
       "condition":   "{{user.roles}} NOT CONTAINS 'senior_analyst'",
-      "action":      "suppress",
+      "action":      "null_replacement",
+      "replacement": null
+    },
+    "client_id": {
+      "condition":   "always",
+      "action":      "hash_replacement",
       "replacement": null
     }
   },
@@ -936,10 +945,14 @@ Field reference:
 |-------|------|-------------|
 | `role_id` | string | Matches the role name in the JWT `analytics_roles` claim |
 | `org_id` | string | Organisation scope — one policy per org per role |
+| `data_access_domains` | array | Data domains the role may access; requests outside them are **DENIED** (`DATA_NOT_ENTITLED`) |
+| `classification_ceiling` | string | Highest classification level the role may touch; metrics and fields above it are denied or excluded |
 | `allowed_metrics` | array \| null | Null = all metrics permitted; array = explicit allowlist |
-| `denied_metrics` | array | Metric IDs denied regardless of `allowed_metrics` |
+| `denied_metrics` | array | Metric IDs denied regardless of `allowed_metrics` (`METRIC_NOT_ENTITLED`) |
+| `allowed_dimensions` | array \| null | Null = all dimensions permitted; array = explicit allowlist |
+| `denied_dimensions` | array | Dimension IDs denied regardless of `allowed_dimensions` (`DIMENSION_NOT_ENTITLED`) |
 | `row_scope` | object | Key = dimension name; value = `{{user.claim}}` template string |
-| `column_masks` | object | Key = field name; value = mask rule with `action: "suppress"` or `"hash"` |
+| `column_masks` | object | Key = field name; value = mask rule with `action:` one of `null_replacement`, `redacted_label`, `excluded`, `hash_replacement` |
 
 ```python
 class RoleAwareProjectionLayer:
@@ -949,7 +962,8 @@ class RoleAwareProjectionLayer:
 
     async def project(self, request: dict, claims: dict) -> dict:
         # Input:  resolved request (operation + params) + JWT claims
-        # Output: entitlement projection — { metric_access, dimension_access, row_scope, column_masks }
+        # Output: entitlement projection — { data_access_domains, classification_ceiling,
+        #         metric_access, dimension_access, row_scope, column_masks }
         #         consumed by the SVL, which enforces it while compiling the LQP
 
         # 1. Extract analytics_roles from claims — roleClaimField is configurable
@@ -961,8 +975,11 @@ class RoleAwareProjectionLayer:
 
     def _merge_policies(self, policies: list[dict]) -> dict:
         # Input:  list of role policy documents for all of the user's roles
-        # Output: merged policy — { row_scope, column_masks }
+        # Output: merged policy — { data_access_domains, classification_ceiling,
+        #         metric_access, dimension_access, row_scope, column_masks }
 
+        # Data domains, metric access, dimension access: union — entitlement via any role suffices
+        # Classification ceiling: highest ceiling across the user's roles
         # Row scope: strict AND — every condition from every role is applied; where two roles
         #   constrain the same dimension, their value sets intersect (most restrictive wins,
         #   independent of role order)
@@ -1279,7 +1296,7 @@ class FederatedQueryEngine:
         ...
 
     def _apply_column_masks(self, rows: list[dict], lqp: dict) -> list[dict]:
-        # Applies the LQP's column_masks (null_replacement, redacted_label, excluded) post-execution
+        # Applies the LQP's column_masks (null_replacement, redacted_label, excluded, hash_replacement) post-execution
         ...
 ```
 

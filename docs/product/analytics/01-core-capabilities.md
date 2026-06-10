@@ -692,6 +692,7 @@ RAPL will support at least the following column masking modes. The platform is e
 | `null_replacement` | Column value replaced with `null` |
 | `redacted_label` | Column value replaced with `"[REDACTED]"` |
 | `excluded` | Column omitted entirely from the result schema |
+| `hash_replacement` | Column value replaced with a deterministic one-way hash — preserves group-by and join behaviour without revealing the underlying value |
 
 ### Entitlement Audit
 
