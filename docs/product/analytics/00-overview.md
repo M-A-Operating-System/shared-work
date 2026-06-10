@@ -28,7 +28,7 @@ The AI Analytics Platform is a governed computation engine that gives AI systems
 
 A defining design objective is that the platform operates across any data warehouse, data source, or analytical tool within a large enterprise environment. It is not tied to a single application schema, a single data model, or localised AI model training on a specific database. Instead, it relies on **centrally governed analytics and data definitions** — registered once in the Semantic Metrics Repository and the Semantic Data Repository — that describe what metrics mean and how they are calculated in terms that are independent of any physical implementation. A metric defined once in the SMR is queryable across every registered data source, and its definition travels with it regardless of which backend holds the underlying data. This is the architectural property that makes cross-platform analytical consistency possible at enterprise scale: the governance layer, not the data layer, is the source of truth.
 
-In practice: a portfolio manager asks "show me portfolio returns versus benchmark for my equity portfolios this quarter" in plain English and receives a governed, role-constrained, auditable result with the full computation record attached. A data science pipeline extracts millions of rows of position data under the same entitlement and audit controls. A treasury analyst produces an LCR figure for a Basel III submission and receives, automatically, a regulator-ready compliance artifact set alongside the result. The analyst bottleneck breaks. Regulatory requirements hold.
+In practice: a portfolio manager asks "show me portfolio returns versus benchmark for my equity portfolios this quarter" in plain English and receives a governed, role-constrained, auditable result with the full computation record attached. A data science pipeline extracts millions of rows of position data under the same entitlement and audit controls. A treasury analyst produces an LCR figure for a regulatory submission and receives, automatically, a regulator-ready compliance artifact set alongside the result. The analyst bottleneck breaks. Regulatory requirements hold.
 
 The platform addresses the following challenges that Text-to-SQL and MCP implementations that directly expose physical schemas and delegate query execution to AI models cannot:
 
@@ -68,7 +68,7 @@ A defining characteristic of this architecture is that **the Analytics Engine ne
 
 The Analytics Engine contains exactly two targeted uses of AI, both strictly bounded:
 
-1. **Intent resolution** — the Intent Resolution Agent (IRA) receives a natural language question, retrieves candidate analytics operations from the SMR catalogue using embedding similarity (RAG), and uses a language model to identify and rank the most appropriate analytics definition and bind the user's parameters to it. The language model selects from the governed inventory; it does not construct queries or access data.
+1. **Intent resolution** — the Intent Resolution Agent (IRA) is the first step in the pipeline and a contained, bounded AI component. It receives a natural language question, retrieves candidate operations from the SMR catalogue using embedding similarity (RAG), and uses a language model to rank them and bind the user's parameters — mapping the question to one or more registered analytics definitions in the SMR. The language model selects from the governed inventory; it does not construct queries or access data.
 
 2. **Narrative synthesis** — after computation completes, the Narrative Synthesis Agent (NSA) makes a single, tightly-scoped language model call to produce a brief plain-language summary of the result, anchored strictly to the computed values. It is told what the data shows; it cannot introduce figures, comparisons, or interpretations not present in the result.
 
@@ -205,7 +205,7 @@ A portfolio manager asks: *"Show me portfolio returns versus benchmark for my eq
 ```
 
 **2 · Intent resolution**
-The AI client reads the metric registry and translates the question into a precise, structured request: compare portfolio return against benchmark return, for equity portfolios, current quarter, broken down by portfolio. No database query is generated at this stage — the AI is resolving intent against the metric registry.
+The Intent Resolution Agent (IRA) inside the engine translates the question into a precise, structured request: compare portfolio return against benchmark return, for equity portfolios, current quarter, broken down by portfolio. It retrieves and ranks candidate operations from the metric registry and binds the parameters; no database query is generated at this stage.
 
 ```
 -- Semantic Intent Resolution
@@ -228,7 +228,7 @@ entitlements:        user_scope → [authorised_portfolio_list]
 ```
 
 **4 · Query planning, governance, and execution**
-The Semantic Controls Layer validates the Logical Query Plan against performance impact thresholds, data classification limits, and complexity checks. The Federated Query Engine then decomposes the approved plan into backend-specific physical queries, injecting the entitlement predicates at the physical layer. No raw database schemas have been exposed at any stage. The query executes against the registered warehouse; the Analytics Engine assembles the response: computed values, a DVL display specification, an optional plain-language narrative summary anchored strictly to the result (produced by the Narrative Synthesis Agent), and a full audit record.
+The Semantic Controls Layer validates the Logical Query Plan against its five checks. The Physical Query Planner compiles the approved plan into a physical execution plan — resolving the data source references and carrying the entitlement row scope through to the physical layer. The Federated Query Engine executes it against the registered data source. No raw database schemas have been exposed at any stage. The Analytics Engine assembles the response: computed values, a DVL display specification, an optional plain-language narrative summary anchored strictly to the result (produced by the Narrative Synthesis Agent), and a full audit record.
 
 ```sql
 -- Physical execution (FQE output)
@@ -292,7 +292,7 @@ filters:        as_of = today
 ```
 
 **3 · Metric and entitlement resolution**
-`var_95` and `risk_factor_contribution` resolve to their approved registry definitions — VaR is a versioned, formula-specific computation that must be calculated identically across every report. The Federated Query Engine identifies that these metrics are served by two independent backends: VaR metrics are registered against the risk engine execution backend; portfolio metadata and limits are registered against the primary data warehouse. The user's entitlement scope is projected, restricting results to portfolios within the risk officer's authorised coverage.
+`var_95` and `risk_factor_contribution` resolve to their approved registry definitions — VaR is a versioned, formula-specific computation that must be calculated identically across every report. The metrics carry different data affinities, so they are served by two independent backends: VaR metrics are registered against the risk engine execution backend; portfolio metadata and limits are registered against the primary data warehouse. The user's entitlement scope is projected, restricting results to portfolios within the risk officer's authorised coverage.
 
 ```
 -- Metric & Entitlement Resolution
@@ -306,29 +306,26 @@ entitlements: user_scope → [authorised_portfolio_list]
 ```
 
 **4 · Query planning, governance, and execution**
-The Federated Query Engine decomposes the Logical Query Plan into two independent sub-plans and routes each to its registered backend. Both sub-plans execute in parallel. The planner assembles the joined result — breach status and dominant contributing factor per portfolio — before passing it downstream. Each sub-plan execution is recorded in the lineage store independently, with the assembled result linked to both records.
+The Physical Query Planner compiles the Logical Query Plan into a physical execution plan referencing both data sources — the risk engine and the primary data warehouse — with the authorised portfolio scope applied at the physical layer. The Federated Query Engine executes the plan, handling the cross-source join and assembling the result — breach status and dominant contributing factor per portfolio — before passing it downstream. The execution is recorded in the lineage store, with the assembled result linked to both source queries.
 
 ```sql
--- Sub-plan A  →  risk_engine_backend
-SELECT   portfolio_id,
-         var_95_value,
-         risk_factor_contribution,
-         factor_bucket
-FROM     risk_engine.var_daily_positions
-WHERE    as_of_date   = current_date
-  AND    portfolio_id IN (/* authorised_portfolio_list */)
-ORDER BY var_95_value DESC;
+-- Physical execution: cross-source join on portfolio_id
+SELECT   r.portfolio_id,
+         r.var_95_value,
+         r.risk_factor_contribution,
+         r.factor_bucket,
+         l.var_limit_value,
+         (r.var_95_value > l.var_limit_value) AS breach
+FROM     risk_engine.var_daily_positions r
+JOIN     dw_prod.portfolio_governance.var_limits l
+  ON     r.portfolio_id = l.portfolio_id
+WHERE    r.as_of_date   = current_date
+  AND    r.portfolio_id IN (/* authorised_portfolio_list */)
+ORDER BY r.var_95_value DESC;
 
--- Sub-plan B  →  primary_data_warehouse
-SELECT   portfolio_id,
-         var_limit_value
-FROM     dw_prod.portfolio_governance.var_limits
-WHERE    portfolio_id IN (/* authorised_portfolio_list */);
-
--- Federated assembly: JOIN on portfolio_id  →  breach = var_95_value > var_limit_value
 -- Execution Response
--- data:      [{ portfolio_id, var_95_value, var_limit_value, breach_pct, factor_bucket, risk_factor_contribution }, ...]
--- audit:     lineage_id (linked to both sub-plan execution records), entitlement_snapshot
+-- data:      [{ portfolio_id, var_95_value, var_limit_value, breach, factor_bucket, risk_factor_contribution }, ...]
+-- audit:     lineage_id, data_sources_used, entitlement_snapshot
 ```
 
 **5 · Presentation decision**
@@ -387,7 +384,7 @@ entitlements:
 ```
 
 **3 · Query planning, governance, and execution**
-The Query Planner constructs a paginated retrieval plan. The controls layer constructs a paginated query across the approved field set, restricted to the agent's authorised portfolios. Each page executes under the same controls. An audit record is written for the full retrieval — recording exactly which data was returned to which agent under which access permissions.
+The Semantic Controls Layer validates the retrieval plan against its five checks — data scale (estimated scan volume), complexity, classification, compliance, and concurrency — and all checks pass. The Physical Query Planner constructs a paginated retrieval plan across the approved field set, restricted to the agent's authorised portfolios; the Federated Query Engine then executes it page by page under the same controls, enforcing the entitlement scope and field ceiling on every page. An audit record is written for the full retrieval — recording exactly which data was returned to which agent under which access permissions.
 
 ```sql
 -- Physical execution (FQE output)
@@ -406,10 +403,7 @@ LIMIT    10000  OFFSET :page_offset;
 -- audit:      lineage_id, field_set_version, entitlement_snapshot
 ```
 
-**4 · Query planning, governance, and execution**
-The Semantic Controls Layer validates the retrieval plan — performance impact assessment, data classification check, complexity limits. All checks pass. The Federated Query Engine executes the paginated retrieval plan against the registered backend, enforcing the entitlement scope and field ceiling on every page. An audit record is written for the full retrieval, recording exactly which data was returned to which agent under which access permissions.
-
-**5 · Presentation decision**
+**4 · Presentation decision**
 Bulk data retrieval resolves to a structured paginated table — not a chart. The Data Visualization Language (DVL) emits a table specification defining the approved field set, column types, and formatting rules. The consuming agent receives a typed dataset with a continuation token for subsequent pages.
 
 ```json
@@ -436,15 +430,15 @@ Bulk data retrieval resolves to a structured paginated table — not a chart. Th
 #### Example 4 — Regulatory LCR submission (compliance analytics query)
 
 **1 · Natural language request**
-A treasury analyst asks: *"Prepare our LCR figures for the Basel III submission."*
+A treasury analyst asks: *"Prepare our LCR figures for the regulatory submission."*
 
 ```
 -- Request
-"Prepare our LCR figures for the Basel III submission"
+"Prepare our LCR figures for the regulatory submission"
 ```
 
 **2 · Intent resolution and compliance classification**
-The Intent Resolution Agent (IRA) resolves the operation and metric from the SMR catalogue and classifies the stated purpose: the phrase *"for the Basel III submission"* exceeds the configured compliance intent threshold. Compliance purpose is recorded and carried through the full pipeline.
+The Intent Resolution Agent (IRA) resolves the operation and metric from the SMR catalogue and classifies the stated purpose: the phrase *"for the regulatory submission"* exceeds the configured compliance intent threshold. Compliance purpose is recorded and carried through the full pipeline.
 
 ```
 -- Semantic Intent Resolution
@@ -521,12 +515,12 @@ Once execution completes and the result is verified, the platform seals a compli
 ```json
 {
   "lineage_id":           "lin_9f3a2c81-4d7e-4b1a-bc3f-2e8d1f6a9c04",
-  "regulatory_trace_id":  "reg_basel3_lcr_20260603_ent_007",
+  "regulatory_trace_id":  "reg_<framework_id>_lcr_20260603_ent_007",
   "artifact_set_version": "1.0",
   "export_gate":          "locked",
 
   "intent": {
-    "raw_request":              "Prepare our LCR figures for the Basel III submission",
+    "raw_request":              "Prepare our LCR figures for the regulatory submission",
     "compliance_purpose_score": 0.94,
     "compliance_purpose":       true
   },

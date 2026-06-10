@@ -30,7 +30,7 @@ Set by the metric owner at registration time. Flags metrics whose output is used
 
 ### Signal 2 — AI intent classification (inferred, runtime)
 
-The Semantic Intent Layer adds a compliance intent classification step. After resolving the operation and parameters, the SIL classifies the natural language query to determine whether the stated purpose is compliance-driven.
+The Intent Resolution Agent adds a compliance intent classification step. After resolving the operation and parameters, the IRA classifies the natural language query to determine whether the stated purpose is compliance-driven.
 
 ```json
 "compliance_purpose": true | false
@@ -39,7 +39,7 @@ The Semantic Intent Layer adds a compliance intent classification step. After re
 Examples that produce `true`: "for the regulatory submission", "for the board compliance pack", "for the MiFID report", "for the auditors", "prepare our LCR filing".  
 Examples that produce `false`: "what's our LCR today?", "show me VaR across portfolios", "morning briefing".
 
-The classification is performed by the AI model as part of the SIL intent resolution step. It should be surfaced in the lineage record alongside the resolved intent.
+The classification is performed by the AI model as part of the IRA intent resolution step. It should be surfaced in the lineage record alongside the resolved intent.
 
 ### Combined decision in SEG
 
@@ -73,13 +73,13 @@ When both signals are true, the SEG triggers additional governance outputs as pa
 ### Chapter 2 — Consumer Personas and Platform Architecture
 
 - **Remove** the Compliance Analyst column from the Persona × Feature Matrix — it is not a distinct persona
-- **Rewrite Journey C** to remove the `compliance_analyst` JWT role claim requirement. The new journey: a user queries LCR and NSFR, the SIL classifies the intent as compliance-purpose, both metrics are flagged `compliance_relevant: true`, SEG escalates automatically and returns the full compliance artifact set alongside the standard result. No special role claim required.
+- **Rewrite Journey C** to remove the `compliance_analyst` JWT role claim requirement. The new journey: a user queries LCR and NSFR, the IRA classifies the intent as compliance-purpose, both metrics are flagged `compliance_relevant: true`, SEG escalates automatically and returns the full compliance artifact set alongside the standard result. No special role claim required.
 - Update the persona prose to remove the sentence describing Compliance Analyst as a specialised Power Analyst — the concept dissolves. Any entitled user querying compliance-relevant metrics for a compliance purpose receives the enhanced artifacts.
 
 ### Chapter 3 — Core Platform Capabilities
 
 - **SMR metric schema**: add `compliance_relevant: boolean` field to the `analytical_metric` definition schema and field reference table
-- **SIL section**: add a compliance intent classification step to the intent resolution pipeline description. The SIL produces `compliance_purpose: boolean` as part of the resolved intent object
+- **IRA section**: add a compliance intent classification step to the intent resolution pipeline description. The IRA produces `compliance_purpose: boolean` as part of the resolved intent object
 - **SEG section**: document the two-signal AND decision. Replace the current role-claim-based compliance mode description with the metadata + intent model. The `complianceMode` platform config remains (it determines which trace tables and regulatory rules apply) but it no longer gates on a user role claim
 - **Response format**: add `compliance` block to the MCP response structure, present only when the enhanced artifact tier is triggered
 - **Caching note**: compliance-triggered responses must not be served from cache — the compliance artifact set must be freshly generated for each compliance-purpose query. Add a cache bypass rule to the FQE caching spec
@@ -104,4 +104,4 @@ When both signals are true, the SEG triggers additional governance outputs as pa
 
 3. **Retroactive compliance classification**: if a user queries a metric for business reasons and later needs it for compliance purposes, can they re-submit with explicit compliance intent to generate the artifact set against the cached result, or must the query be re-executed?
 
-4. **Audit of the classifier itself**: the compliance_purpose classification is AI-inferred. For regulatory purposes, is the classifier decision itself auditable? Should the SIL record the raw classification reasoning in the lineage record?
+4. **Audit of the classifier itself**: the compliance_purpose classification is AI-inferred. For regulatory purposes, is the classifier decision itself auditable? Should the IRA record the raw classification reasoning in the lineage record?

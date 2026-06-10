@@ -39,7 +39,7 @@ Start with the Overview for executive and business context, then read Chapters 1
 | Term | Definition |
 |------|------------|
 | **[Semantic Metrics Repository (SMR)](./01-core-capabilities.md#semantic-metrics-registry)** | The governing catalogue of all resolvable analytical concepts for the organisation — metrics, dimensions, hierarchies, measure groups, and domains. Nothing is queryable that is not registered. |
-| **[Logical Query Plan (LQP)](./01-core-capabilities.md#semantic-intent-layer)** | Engine-agnostic DAG of analytical operations produced by the Semantic Intent Layer. No physical backend references. |
+| **[Logical Query Plan (LQP)](./01-core-capabilities.md#semantic-validation-layer-svl)** | Engine-agnostic DAG of analytical operations produced by the Semantic Validation Layer (SVL). No physical backend references. |
 | **[Federated Query Engine (FQE)](./01-core-capabilities.md#federated-query-planner)** | The only component with knowledge of physical backends. Decomposes the LQP into sub-plans, routes by data domain affinity, executes in parallel, assembles results. |
 | **[Role-Aware Projection Layer (RAPL)](./01-core-capabilities.md#role-aware-projection-layer)** | Semantic-tier entitlement enforcement. Applies metric access filters, dimension access filters, row predicates, and column masks — before any query plan is compiled. |
 | **[Semantic Controls Layer (SCL)](./01-core-capabilities.md#semantic-controls-layer)** | Suite of performance impact thresholds, complexity limits, and compliance classification checks applied to every query before FQE release. |
