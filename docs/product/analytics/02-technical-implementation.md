@@ -744,12 +744,12 @@ The governed dataset contract for bulk retrieval. The `approved_fields` set — 
 
 ```python
 class SemanticMetricsRepository:
-    def __init__(self, sdr_client):
-        self.sdr = sdr_client
+    def __init__(self, dcs_client):
+        self.dcs = dcs_client   # SMR documents are read through the DCS API
 
     async def get_operation(self, operation_id: str, claims: dict) -> dict:
         # Input:  operation_id string + JWT claims (for org_id scoping)
-        # Output: approved analytical_operation document from SDR
+        # Output: approved analytical_operation document from the SMR (via the DCS API)
         # Raises: OperationNotAvailableError if not found or status != "approved"
         ...
 
@@ -1772,7 +1772,7 @@ Configuration is read from environment variables at startup. Required variables:
 | Primary database | PostgreSQL (Neon or RDS) | Lineage search index, scheduled queries, user preferences, saved queries; also hosts the DES `role_policies` schema under separate credentials |
 | Data Context Store (DCS) | Pre-existing platform component | SMR metric definitions, controls config, SMR search — reuses SDR versioned storage and native search |
 | Knowledge Store | S3-compatible object store (versioned Markdown) | MCP resource content — guides, skills definitions, compliance reference |
-| Object storage | S3-compatible | Lineage records (one JSON document per query), result artefacts, large cached result sets |
+| Object storage | S3-compatible | Lineage records (one JSON document per query), result artifacts, large cached result sets |
 | Secrets | HashiCorp Vault or cloud-native | Starburst catalog credentials, platform service keys |
 
 ### Kubernetes Deployment Summary
@@ -1795,10 +1795,10 @@ All platform services run in a dedicated Kubernetes namespace (`analytics`). Sta
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
-| **Packaging** | Versioned JSON document bundles (one per domain) | Conforms directly to the SDR `analytical_metric` schema; idempotently importable via `POST /v1/smr/seed`; selective per-domain activation |
+| **Packaging** | Versioned JSON document bundles (one per domain) | Conforms directly to the SMR `analytical_metric` schema; idempotently importable via `POST /v1/admin/smr/seed`; selective per-domain activation |
 | **Distribution** | Bundled at installation; updatable from Semantic Registry Service | Air-gapped deployments supported |
 | **Activation** | `analyticalDomain` config triggers SMR import at initial platform setup | Bundle documents are written to the SMR in `proposed` state; Analytics Governance approves before metrics become resolvable |
-| **Customisation** | Full edit/override via Admin API after import | Customised definitions marked `source: "custom"` in the SDR document |
+| **Customisation** | Full edit/override via Admin API after import | Customised definitions marked `source: "custom"` in the SMR document |
 
 Each bundle is a JSON array of SMR documents conforming to the schemas defined in [§Semantic Metrics Repository](./01-core-capabilities.md#semantic-metrics-repository-smr). Bundles are seeded into the SMR in `"proposed"` state at initial platform setup; the Analytics Governance approves each document before it becomes resolvable by the Semantic Validation Layer.
 

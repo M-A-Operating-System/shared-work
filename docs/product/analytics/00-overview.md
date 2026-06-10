@@ -446,7 +446,7 @@ The Intent Resolution Agent (IRA) resolves the operation and metric from the SMR
 ```
 -- Semantic Intent Resolution
 operation:      retrieve_metric
-metric:         liquidity_coverage_ratio  (unresolved)
+metric:         lcr  (unresolved)
 intent_classification:
   compliance_purpose_score: 0.94  |  threshold: 0.80
   compliance_purpose: true
@@ -457,7 +457,7 @@ The liquidity coverage ratio metric resolves to its approved registry definition
 
 ```
 -- Metric Resolution & Compliance Escalation
-liquidity_coverage_ratio  →  definition v1.1: SUM(hqla_value) / SUM(net_outflow_30d)
+lcr  →  definition v1.1: SUM(hqla_value) / SUM(net_outflow_30d)
 compliance_signals:
   metric.compliance_relevant: true   -- set by Metrics Modeller at registration
   intent.compliance_purpose:  true   -- classified by the IRA at query time
@@ -484,7 +484,7 @@ GROUP BY h.entity_id;
 -- compliance:
 --   regulatory_trace_id:  written to compliance audit store
 --   artifact_set_version: "1.0"
---   triggered_by:         [liquidity_coverage_ratio]
+--   triggered_by:         [lcr]
 --   export_gate:          locked until complete compliance provenance record exists
 -- audit:     lineage_id, metric_version, entitlement_snapshot
 ```
@@ -534,7 +534,7 @@ Once execution completes and the result is verified, the platform seals a compli
   ],
 
   "metric": {
-    "id":                  "liquidity_coverage_ratio",
+    "id":                  "lcr",
     "version":             "v1.1",
     "formula":             "SUM(hqla_value) / SUM(net_outflow_30d)",
     "compliance_relevant": true,

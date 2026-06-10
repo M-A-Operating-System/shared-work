@@ -1125,7 +1125,7 @@ A thin relational database search index will hold only scalar fields required fo
 | FQE execution record | Embedded in lineage record (`execution`) | Data sources used, queries executed, latencies, scan volume, cache hit status |
 | Controls decision | Embedded in lineage record (`controls_decision`) | Threshold decisions — data scale, complexity, classification, compliance, concurrency — including blocked queries |
 | Search index row | Relational database `analytics.lineage_index` | Scalar fields for filtered search — `result_id`, `org_id`, `user_sub`, `regulatory_frameworks`, `error_code`, `cache_hit`, `created_at`, `expires_at` |
-| Result artefact | Object storage | CSV result set, chart SVG, narrative text — stored per query |
+| Result artifact | Object storage | CSV result set, chart SVG, narrative text — stored per query |
 
 ### Search Index DDL: `analytics.lineage_index`
 
@@ -1154,7 +1154,7 @@ Every lineage document will be stored under an `org_id`-prefixed key in the obje
 | Lineage records | Retained at least as long as the corresponding query record. Cannot be deleted independently. |
 | SMR metric versions | Retained indefinitely — metric version history must be preserved for lineage reconstruction. |
 | Controls events | Retained at least as long as query records. |
-| Result artefacts (object storage) | Configurable per deployment; typically shorter than query records. Lineage record references are preserved even after object storage expiry. |
+| Result artifacts (object storage) | Configurable per deployment; typically shorter than query records. Lineage record references are preserved even after object storage expiry. |
 | Blocked queries | Retained in full — queries that fail governance checks are as important to retain as successful ones. |
 
 ### Immutability
@@ -1173,7 +1173,7 @@ GET /v1/audit/queries
     → Returns all queries matching the filter with full lineage records
 ```
 
-Audit export packages will include query records with timestamps and user identifiers, lineage records with metric definition versions, controls decisions, role-aware projection records showing entitlements in force at query time, and result artefacts within the retention period. All export packages will be digitally signed by the platform using the platform signing key registered at deployment.
+Audit export packages will include query records with timestamps and user identifiers, lineage records with metric definition versions, controls decisions, role-aware projection records showing entitlements in force at query time, and result artifacts within the retention period. All export packages will be digitally signed by the platform using the platform signing key registered at deployment.
 
 ### Example
 
