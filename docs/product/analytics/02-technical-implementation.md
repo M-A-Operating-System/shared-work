@@ -702,7 +702,7 @@ The MCP tool call JSON (metric IDs, dimension IDs, time period, filters) is the 
 }
 ```
 
-The Semantic Validation Layer resolves metric IDs against the SMR, enforces the RAPL entitlement projection, and emits a platform-agnostic LQP. The LQP carries resolved `physical_mapping` references, expanded time ranges, row scope filters, and a Tier-1 `preliminary_impact_estimate` for governance validation.
+The Semantic Validation Layer resolves metric IDs against the SMR, enforces the RAPL entitlement projection, and emits a platform-agnostic LQP. The LQP carries pinned metric definition versions, expanded time ranges, row scope filters, and a Tier-1 `preliminary_impact_estimate` for governance validation; physical mappings are resolved later by the PQP from the SMR, keyed on the pinned versions.
 
 #### LQP output example
 
@@ -717,8 +717,7 @@ The Semantic Validation Layer resolves metric IDs against the SMR, enforces the 
       "metric_id": "portfolio_return",
       "metric_version": "2.1.0",
       "aggregation": "value_weighted_average",
-      "data_affinity": "portfolio",
-      "physical_mapping": { "source": "primary-warehouse", "table": "fact_portfolio_daily" }
+      "data_affinity": "portfolio"
     },
     {
       "id": "node-2",
@@ -726,8 +725,7 @@ The Semantic Validation Layer resolves metric IDs against the SMR, enforces the 
       "metric_id": "tracking_error",
       "metric_version": "1.3.0",
       "aggregation": "value_weighted_average",
-      "data_affinity": "risk_metrics",
-      "physical_mapping": { "source": "risk-semantic-layer", "cube": "risk_cube" }
+      "data_affinity": "risk_metrics"
     },
     {
       "id": "node-3",
@@ -773,7 +771,7 @@ class LQPGenerator:
         # Input:  SMR operation + validated params + resolved metric documents + JWT claims
         # Output: LQP dict — { lqp_id, org_id, nodes: [...], output: terminal_node_id }
 
-        # 1. Emit one metric_scan node per resolved metric — carries physical_mapping and aggregation
+        # 1. Emit one metric_scan node per resolved metric — carries metric version, data affinity, and aggregation
         # 2. If metrics span >1 node, emit a join node — join keys inferred from shared required_dimensions
         # 3. Emit filter node from params["filters"] if present
         # 4. Emit time_expand node if time_period or as_of_date in params — resolves symbolic period to date range
@@ -1008,15 +1006,15 @@ class SemanticControlsLayer:
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
 | **Implementation** | Apache Calcite (Python-hosted) | Builds a relational tree from the LQP and emits SQL; battle-tested, dialect-aware |
-| **Catalog binding** | `physical_mapping.source` → Starburst catalog name | Each registered source is a Starburst catalog; binding is a lookup, no extra SMR call |
+| **Catalog binding** | SMR `physical_mapping` lookup → Starburst catalog name | The PQP resolves each node's `physical_mapping` from the SMR, keyed on the pinned metric version, then binds `source` → catalog |
 | **Output** | A single **federated Trino SQL** statement | Starburst performs the cross-source join natively; no per-backend decomposition needed |
 | **Execution** | None | The PQP has no backend connectivity; it hands the federated SQL to the FQE (Starburst) |
 
-The Physical Query Planner receives the controls-approved LQP from the SCL and translates it into a single **federated Trino SQL** statement ready for Starburst to execute. For each `metric_scan` node it resolves the `physical_mapping` already attached by the SVL and binds it to a Starburst **catalog** reference (`catalog.schema.table`). It builds a Calcite relational tree from the LQP nodes — scans, joins, filters, time expansion, and sort — distributes the row scope filters, dimension filters, and column-mask directives into the statement, and emits Trino-dialect SQL. Because Starburst federates across catalogs natively, the PQP no longer decomposes the plan into per-backend sub-plans; the single statement references every catalog the query touches, and Starburst plans the cross-source join itself. This realises Chapter 1's PQP sub-plan/FQE execution contract inside Starburst — the per-source split happens in the engine rather than in application code. The PQP has no execution capability — it passes the federated SQL to the FQE.
+The Physical Query Planner receives the controls-approved LQP from the SCL and translates it into a single **federated Trino SQL** statement ready for Starburst to execute. For each `metric_scan` node it queries the SMR for the `physical_mapping` of the pinned metric definition version and binds it to a Starburst **catalog** reference (`catalog.schema.table`). It builds a Calcite relational tree from the LQP nodes — scans, joins, filters, time expansion, and sort — distributes the row scope filters, dimension filters, and column-mask directives into the statement, and emits Trino-dialect SQL. Because Starburst federates across catalogs natively, the PQP no longer decomposes the plan into per-backend sub-plans; the single statement references every catalog the query touches, and Starburst plans the cross-source join itself. This realises Chapter 1's PQP sub-plan/FQE execution contract inside Starburst — the per-source split happens in the engine rather than in application code. The PQP has no execution capability — it passes the federated SQL to the FQE.
 
 #### PQP input — approved LQP
 
-The PQP reads each metric node's `physical_mapping.source` to bind it to a Starburst catalog:
+The PQP resolves each metric node's `physical_mapping` from the SMR (keyed on the pinned metric version) and binds its `source` to a Starburst catalog:
 
 ```json
 {
@@ -1027,15 +1025,13 @@ The PQP reads each metric node's `physical_mapping.source` to bind it to a Starb
       "id": "node-1", "op": "metric_scan",
       "metric_id": "portfolio_return", "metric_version": "2.1.0",
       "aggregation": "value_weighted_average", "weight_metric_id": "market_value",
-      "data_affinity": "portfolio",
-      "physical_mapping": { "source": "primary-warehouse", "table": "fact_portfolio_daily" }
+      "data_affinity": "portfolio"
     },
     {
       "id": "node-2", "op": "metric_scan",
       "metric_id": "tracking_error", "metric_version": "1.3.0",
       "aggregation": "value_weighted_average", "weight_metric_id": "market_value",
-      "data_affinity": "risk_metrics",
-      "physical_mapping": { "source": "risk-semantic-layer", "cube": "risk_cube" }
+      "data_affinity": "risk_metrics"
     },
     { "id": "node-3", "op": "join",   "inputs": ["node-1", "node-2"], "join_keys": ["portfolio_id", "date"] },
     { "id": "node-4", "op": "filter", "input": "node-3",
@@ -1064,7 +1060,8 @@ class PhysicalQueryPlanner:
         # Input:  SCL-approved LQP
         # Output: federated Trino query — { federated_sql, catalogs_referenced, column_masks, query_timeout_seconds }
 
-        # 1. Resolve each metric_scan node's physical_mapping.source to a Starburst catalog (no extra SMR call)
+        # 1. Resolve each metric_scan node's physical_mapping from the SMR (pinned metric version),
+        #    then map physical_mapping.source → Starburst catalog
         # 2. Build a Calcite relational tree from the LQP nodes (scan, join, filter, time_expand, sort)
         # 3. Bind each scan to its catalog.schema.table reference; inject row scope + dimension filters
         # 4. Emit one Trino-dialect SQL statement — Starburst performs the cross-catalog join
