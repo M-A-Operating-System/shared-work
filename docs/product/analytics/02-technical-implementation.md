@@ -552,8 +552,9 @@ class NarrativeSynthesisAgent:
 
     def _validate_numbers(self, narrative: str, rows: list[dict]) -> None:
         # Input:  generated narrative + result rows
-        # Raises: NarrativeValidationError if any numeric value in the narrative is not present
-        #         verbatim in the result rows — every cited figure must match a result value exactly
+        # Raises: NarrativeValidationError if any numeric value in the narrative is neither present
+        #         verbatim in the result rows nor a derived count recomputed from them —
+        #         entity counts ("2 of 4 portfolios") are verified against result cardinalities
         # Purpose: prevents hallucinated figures reaching the consumer
         ...
 ```

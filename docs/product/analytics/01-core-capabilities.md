@@ -157,7 +157,7 @@ The `vega2img` service will sit outside the Analytics Platform boundary as an op
 | 8 | **Physical Query Planner (PQP)** | The Physical Query Planner (PQP) is responsible for translating the controls-approved Logical Query Plan into backend-specific physical query fragments ready for execution. It receives the approved LQP from the Semantic Controls Layer and performs three operations in sequence: resolving the physical mapping for each metric node from the SMR, keyed on the metric definition version pinned in the plan, grouping metric nodes by data affinity to produce one sub-plan per affinity group, and translating each sub-plan into the native query language of its target backend. Row scope filters, dimension filters, and column masking directives from the LQP are distributed to each sub-plan so that entitlement enforcement carries through to the physical layer. The output is a physical execution plan — an envelope carrying the plan identifier, column masks, and timeout budget, with a sub-plans array containing one entry per data affinity group, each carrying the backend identifier and dialect. The PQP has no execution capability; it passes the physical execution plan to the Federated Query Engine. |
 | 9 | **Federated Query Engine (FQE)** | The Federated Query Engine (FQE) is responsible for executing physical sub-plans against registered backends and assembling the results. It is the only component in the platform with knowledge of execution backend connection details, including endpoints, credentials, and availability. It receives the physical execution plan from the Physical Query Planner, checks the result cache using the LQP signature, and on a cache miss routes each of the plan's sub-plans to its registered backend by data affinity and capability. All sub-plans are executed concurrently and the FQE enforces the timeout budget assigned by the Semantic Controls Layer, handling partial results where one sub-plan times out while others complete. Sub-results from multiple backends are joined on shared dimensions and column masks are applied to the assembled result. The FQE writes a complete execution record to the Analytical Lineage Store and passes the assembled result to the Data Visualization Language and Narrative Synthesis Agent for presentation assembly. |
 | 10 | **Data Visualization Language (DVL)** | The Data Visualization Language (DVL) is responsible for producing a deterministic display specification for every analytical result. It receives the assembled result from the Federated Query Engine and classifies it against a taxonomy of registered intent patterns. The ontology evaluator matches the result shape and intent classification against registered chart contracts in order of specificity, returning the highest-scoring match as the display specification. The AI model does not select chart types; the DVL makes the final binding decision, ensuring the same analytical pattern produces the same chart type across all users, sessions, and model versions. The TABLE_GOVERNED contract serves as an unconditional fallback, ensuring every query receives a valid display specification regardless of result shape. The intent pattern taxonomy and chart contract registry are initial sets, expected to be extended as the platform's visualisation vocabulary grows over time. |
-| 11 | **Narrative Synthesis Agent (NSA)** | The Narrative Synthesis Agent (NSA) is responsible for producing a governed plain-language summary of each computed result. It runs in parallel with the Data Visualization Language after the Federated Query Engine has assembled the result, making a single tightly-scoped language model call anchored strictly to the computed values. Its prompt is constructed from the assembled result only: metric labels, row values, units, and dimension names; it is not given the user's original query or SMR governance context, preventing the narrative from interpreting or inferring beyond what was computed. Every numeric value in the narrative must be present in the result set, and a post-generation validation pass rejects the output if any value cannot be matched, with one regeneration attempt permitted. The NSA is optional and can be disabled via a platform configuration flag with no effect on computation, lineage, or display specification generation. |
+| 11 | **Narrative Synthesis Agent (NSA)** | The Narrative Synthesis Agent (NSA) is responsible for producing a governed plain-language summary of each computed result. It runs in parallel with the Data Visualization Language after the Federated Query Engine has assembled the result, making a single tightly-scoped language model call anchored strictly to the computed values. Its prompt is constructed from the assembled result only: metric labels, row values, units, and dimension names; it is not given the user's original query or SMR governance context, preventing the narrative from interpreting or inferring beyond what was computed. Every numeric value in the narrative must either be present in the result set or be a derived count the validator independently recomputes from the result rows; the post-generation validation pass rejects the output if any value can be neither matched nor recomputed, with one regeneration attempt permitted. The NSA is optional and can be disabled via a platform configuration flag with no effect on computation, lineage, or display specification generation. |
 | 12 | **Analytical Lineage Store (ALS)** | The Analytical Lineage Store (ALS) is responsible for providing a complete, immutable record of how every analytical result was produced. It receives three writes per query: an entitlement projection record written by the Role-Aware Projection Layer when the projection is computed, a controls decision record written by the Semantic Controls Layer before execution begins, and a full execution record written by the Federated Query Engine after execution completes. A request denied at any stage still leaves the records written up to that point — blocked queries are never absent from the audit trail. Each lineage record captures the original request, the SMR metric definition versions resolved, the entitlement projection in force, the controls decisions applied, the physical sub-plans executed, and the visualisation contract and narrative status. Records are written once and never mutated; corrections are made via new amendment documents that reference the original record. The store supports regulatory audit export via a filtered query API, with digitally signed export packages available for compliance review. Retention periods are configurable per deployment, governed by the organisation's regulatory retention obligations. |
 | 13 | **Provenance Artifact Service (PAS)** | The Provenance Artifact Service (PAS) is responsible for assembling and sealing a tamper-evident compliance record for queries that trigger the two-signal compliance classification. It is invoked in parallel with the Data Visualization Language and Narrative Synthesis Agent, but only when the Semantic Controls Layer determines that both the metric compliance flag and the IRA intent classification signal are active. It reads the controls decision record and execution record from the Analytical Lineage Store for the current query, assembles them into a Provenance Artifact document, and seals it by writing the artifact back to the ALS as an immutable sibling record. Export of the query result is blocked until sealing is confirmed, ensuring compliance-purpose results cannot leave the platform without an associated auditable record. The sealed compliance block is included in the MCP tool response and any party holding the platform's public key can independently verify the artifact has not been altered since sealing. |
 
@@ -496,7 +496,7 @@ The IRA will encode this query and retrieve the top-3 candidate operations from 
 {
   "operation_id": "compare_portfolios",
   "params": {
-    "portfolio_ids":  ["GLOB_EQ_OPP", "UK_CORE_INC", "ASIA_PAC_GRW", "EUR_BAL_INC"],
+    "portfolio_ids":  "user_entitled",
     "metrics":        ["portfolio_return", "benchmark_return"],
     "time_period":    "quarter_to_date",
     "filters": [{ "dimension": "asset_class", "operator": "eq", "value": "EQUITY" }]
@@ -517,6 +517,8 @@ The IRA will encode this query and retrieve the top-3 candidate operations from 
 </td></tr></table>
 
 Confidence is 0.91 — above threshold, no candidate cards shown. Resolved intent will be forwarded to the RAPL.
+
+Note the symbolic binding: *"my equity portfolios"* resolves to the scope token `"user_entitled"`, not to concrete portfolio IDs. The IRA has no access to user entitlements and cannot know which portfolios the caller manages — the RAPL resolves the token to the concrete entitled list at projection time.
 
 
 ## Semantic Metrics Repository (SMR)
@@ -832,7 +834,7 @@ SCL will evaluate the LQP against the `acme-wealth` controls config:
 
 | Check | Value | Limit | Result |
 |---|---|---|---|
-| Data scale (estimated scan volume) | 620M rows | 1B rows | Pass |
+| Data scale (Tier-2 estimated scan volume — replaces the Tier-1 `preliminary_impact_estimate` of 620) | 412,000 rows | 50M rows (`maxScanRows`) | Pass |
 | Complexity (node count) | 4 nodes | 50 nodes | Pass |
 | Classification | INTERNAL | INTERNAL ceiling | Pass |
 | Compliance | none triggered | — | Pass |
@@ -878,7 +880,7 @@ flowchart LR
 
 ### Example
 
-The PQP will receive the approved LQP for the portfolio manager query. Both `portfolio_return` and `benchmark_return` carry `data_affinity: "portfolio"`, and their physical mappings resolve to `source: "primary-warehouse"`. The PQP will resolve the physical table and measure references from the SMR — keyed on the metric definition versions pinned in the LQP — apply the RAPL row scope and asset class filter, expand `quarter_to_date` to the concrete date range `2026-04-01 → 2026-06-30`, and compile the physical execution plan for the FQE.
+The PQP will receive the approved LQP for the portfolio manager query. Both `portfolio_return` and `benchmark_return` carry `data_affinity: "portfolio"`, and their physical mappings resolve to `source: "primary-warehouse"`. The PQP will resolve the physical table and measure references from the SMR — keyed on the metric definition versions pinned in the LQP — apply the RAPL row scope and asset class filter, expand `quarter_to_date` to the concrete date range `2026-04-01 → 2026-05-18`, and compile the physical execution plan for the FQE.
 
 ```json
 {
@@ -962,7 +964,7 @@ FROM fact_portfolio_daily f
 JOIN dim_portfolio p ON f.portfolio_id = p.portfolio_id
 WHERE p.asset_class  = 'EQUITY'
   AND f.portfolio_id IN ('GLOB_EQ_OPP', 'UK_CORE_INC', 'ASIA_PAC_GRW', 'EUR_BAL_INC')
-  AND f.date         BETWEEN '2026-04-01' AND '2026-06-30'
+  AND f.date         BETWEEN '2026-04-01' AND '2026-05-18'
 GROUP BY p.portfolio_id
 ORDER BY portfolio_return DESC
 ```
@@ -1050,7 +1052,7 @@ The ontology evaluator will classify the result: two metrics across four named e
 
 > **Governing principles:** [P6 — Governed narrative](./00-overview.md#design-principles) · [P10 — Deterministic computation, not generation](./00-overview.md#design-principles)
 
-The Narrative Synthesis Agent (NSA) is responsible for producing a governed plain-language summary of each computed result. It runs in parallel with the Data Visualization Language after the Federated Query Engine has assembled the result, making a single tightly-scoped language model call anchored strictly to the computed values. Its prompt is constructed from the assembled result only: metric labels, row values, units, and dimension names; it is not given the user's original query or SMR governance context, preventing the narrative from interpreting or inferring beyond what was computed. Every numeric value in the narrative must be present in the result set, and a post-generation validation pass rejects the output if any value cannot be matched, with one regeneration attempt permitted. The NSA is optional and can be disabled via a platform configuration flag with no effect on computation, lineage, or display specification generation.
+The Narrative Synthesis Agent (NSA) is responsible for producing a governed plain-language summary of each computed result. It runs in parallel with the Data Visualization Language after the Federated Query Engine has assembled the result, making a single tightly-scoped language model call anchored strictly to the computed values. Its prompt is constructed from the assembled result only: metric labels, row values, units, and dimension names; it is not given the user's original query or SMR governance context, preventing the narrative from interpreting or inferring beyond what was computed. Every numeric value in the narrative must either be present in the result set or be a derived count the validator independently recomputes from the result rows; the post-generation validation pass rejects the output if any value can be neither matched nor recomputed, with one regeneration attempt permitted. The NSA is optional and can be disabled via a platform configuration flag with no effect on computation, lineage, or display specification generation.
 
 ### Anchoring and Validation
 
@@ -1062,7 +1064,7 @@ The NSA will produce three output fields:
 | `narrative.detail` | Two to four sentences covering the most significant data points, one per dimension value or notable comparison |
 | `narrative.anchoredTo` | An array of dimension value identifiers from the result that the narrative references — used for post-generation validation |
 
-After generation, the NSA will run a validation pass: every numeric value in the narrative must be present in the result set. If any value cannot be matched to a result row, the narrative will be rejected and a single regeneration will be attempted. If the second attempt also fails validation, the `narrative` field will be omitted from the response and the failure will be recorded in the lineage record.
+After generation, the NSA will run a validation pass: every numeric value in the narrative must either be present in the result set or be a verified derived count — an entity count the validator independently recomputes from the result rows (e.g. *"2 of your 4 portfolios"* is accepted only because the validator counts the same cardinalities itself). If any value can be neither matched to a result row nor recomputed from the rows, the narrative will be rejected and a single regeneration will be attempted. If the second attempt also fails validation, the `narrative` field will be omitted from the response and the failure will be recorded in the lineage record.
 
 ### Model Selection
 
@@ -1091,7 +1093,7 @@ The NSA will receive the assembled result and produce:
 }
 ```
 
-Post-generation validation will confirm every verbatim numeric value cited in the narrative is present in the assembled result rows. Residual hallucination risk applies to non-literal claims such as proportional expressions.
+Post-generation validation will confirm every verbatim numeric value cited in the narrative is present in the assembled result rows, and will independently recompute the derived counts — "2" outperforming and "4" total portfolios — from the result rows before accepting the narrative.
 
 
 ## Analytical Lineage Store (ALS)
