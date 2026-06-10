@@ -195,10 +195,10 @@ sequenceDiagram
         IRA->>LLM: candidate operations + user query (intent ranking prompt)
         note over IRA: Ranks candidates · binds params · scores confidence · scores compliance intent
         alt ambiguous intent
-            IRA-->>MCP: confirmation card (requiresIntentConfirmation: true)
-            MCP-->>C: confirmation card
-            C->>MCP: confirmed: true + selected intent
-            MCP->>IRA: confirmed intent
+            IRA-->>MCP: candidate cards (intent_session_id + candidates[])
+            MCP-->>C: candidate cards
+            C->>MCP: intent_session_id + selected_candidate (0-based index)
+            MCP->>IRA: selected candidate resolved from intent session
         end
 
         IRA->>RAPL: resolved operation_id + params + JWT
@@ -1312,7 +1312,7 @@ The following components will appear in the architecture diagram and interact wi
 
 The AI Chat Platform will be the conversational consumer of the Analytics Engine. It will relay natural language questions from users to the Analytics Engine and render the structured results it receives. Intent resolution — identifying which governed operation matches the user's question and binding its parameters — will be performed inside the Analytics Engine by the IRA. The AI Chat Platform will perform no NL translation and will have no dependency on the SMR operation catalogue.
 
-The AI Chat Platform will forward the user's natural language query and JWT to the Analytics Engine via `run_analytics`. If the Analytics Engine returns a confirmation card, the AI Chat Platform will render it to the user and re-submit with `confirmed: true` when the user approves. It will render the DVL `display_spec` inline, surface the governed `narrative` as the assistant's reply, and retain the `result_id` for follow-up `drilldown` calls.
+The AI Chat Platform will forward the user's natural language query and JWT to the Analytics Engine via `run_analytics`. If the Analytics Engine returns candidate cards, the AI Chat Platform will render them to the user and re-submit with the `intent_session_id` and the chosen `selected_candidate` index when the user approves. It will render the DVL `display_spec` inline, surface the governed `narrative` as the assistant's reply, and retain the `result_id` for follow-up `drilldown` calls.
 
 The AI Chat Platform will have no access to physical schemas, execution backends, or metric definitions. Entitlement enforcement, intent resolution, query planning, and execution will be entirely the Analytics Engine's responsibility.
 
