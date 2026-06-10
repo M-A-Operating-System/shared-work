@@ -666,6 +666,8 @@ def generate_pages(product_name: str, page_prefixes: list[str],
 
     if out_name:
         output = docs_dir / out_name
+    elif len(files) == 1:
+        output = files[0].with_suffix('.pdf')
     else:
         label = "_".join(page_prefixes)
         output = docs_dir / f"{product_name}_pages_{label}.pdf"
