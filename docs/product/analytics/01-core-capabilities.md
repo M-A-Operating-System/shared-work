@@ -318,7 +318,7 @@ The Analytics Engine will expose three tools. All analytical operations will be 
 
 **`list_operations(domain: str | None, jwt: str)`** — Returns the SMR operation catalogue with operation IDs, display names, required parameters, supported metrics/dimensions, and execution profiles. Only operations the authenticated user is entitled to execute will be returned.
 
-**`drilldown(result_id: str, hierarchy: str, selected_value: str | None, jwt: str)`** — Navigates into a dimension hierarchy from a prior result. All filters, row scope conditions, and entitlement context from the original result will be preserved.
+**`drilldown(result_id: str, hierarchy: str, selected_value: str | None, jwt: str)`** — Navigates into a dimension hierarchy from a prior result. The parent result's analytical context — operation, filters, and hierarchy position — will be inherited; governance will not. The derived query will re-run the full pipeline (fresh RAPL projection, SVL enforcement, SCL checks) and write its own lineage record linked to the parent `result_id`.
 
 ### Execution Profiles
 

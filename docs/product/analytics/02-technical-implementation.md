@@ -166,9 +166,10 @@ async def list_operations(input: ListOperationsInput, jwt: str) -> dict:
 @mcp.tool()
 async def drilldown(input: DrilldownInput, jwt: str) -> dict:
     """Navigate into a dimension hierarchy from a prior result.
-    All filters, row scope conditions, and entitlement context from the original result are preserved."""
+    The parent result's analytical context (operation, filters, hierarchy position) is inherited;
+    entitlements and controls are re-evaluated in full for the derived query."""
     # 1. Validate JWT → claims
-    # 2. Delegate to drilldown_service.execute — inherits governance context from original result
+    # 2. Delegate to drilldown_service.execute — inherits analytical context, never approvals
     ...
 ```
 
@@ -239,22 +240,25 @@ class PipelineExecutor:
 
 ```python
 class DrilldownService:
-    def __init__(self, als, pqp, fqe, dvl, rapl, smr):
+    def __init__(self, als, rapl, svl, scl, pqp, fqe, dvl, smr):
         self.als  = als   # AnalyticalLineageStore — fetch original lineage records
+        self.rapl = rapl  # RoleAwareProjectionLayer — fresh entitlement projection at drilldown time
+        self.svl  = svl   # SemanticValidationLayer — re-enforce the projection on the derived LQP
+        self.scl  = scl   # SemanticControlsLayer — re-run the five checks on the derived query
         self.pqp  = pqp   # PhysicalQueryPlanner — re-plan the refined sub-queries
         self.fqe  = fqe   # FederatedQueryEngine — execute the refined federated query via Starburst
         self.dvl  = dvl   # DataVisualizationLanguage — generate updated display_spec
-        self.rapl = rapl  # RoleAwareProjectionLayer — re-apply row scope / column masks
         self.smr  = smr   # SemanticMetricsRepository — resolve drill-target metric definitions
 
     async def execute(self, input: DrilldownInput, claims: dict) -> dict:
         # Input:  drilldown request — parent result_id + hierarchy dimension + selected value
         # Output: { result_id, parent_id, rows, display_spec }
 
-        # 1. Fetch original lineage record — recovers the LQP and governance context
-        # 2. Clone original LQP and append a filter node for the selected hierarchy value
-        # 3. Skip RAPL and SCL — row scope is embedded in the original LQP; approval is inherited
-        # 4. Re-run PQP → FQE and DVL only to produce a narrowed result with an updated display spec
+        # 1. Fetch original lineage record — recovers the parent LQP and analytical context
+        # 2. Clone the parent LQP and append a filter node for the selected hierarchy value
+        # 3. Re-run the full pipeline on the derived query: fresh RAPL projection → SVL enforcement
+        #    → SCL five checks (hierarchy descent can grow scan volume) → PQP → FQE
+        # 4. DVL produces the updated display spec; lineage record written with parent_id linkage
         ...
 ```
 
