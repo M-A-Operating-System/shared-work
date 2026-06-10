@@ -458,7 +458,7 @@ class IntentResolutionAgent:
         # Input:  natural-language query + ranked leading candidate
         # Output: float 0.0–1.0 — compliance purpose probability (Signal 2 of the two-signal gate)
         # Scored by the language model within the same ranking call — no separate API call
-        # A score near compliance_intent_threshold triggers a clarification card instead of a guess
+        # A score near complianceIntentThreshold triggers a clarification card instead of a guess
         ...
 ```
 
@@ -1015,29 +1015,29 @@ class RoleAwareProjectionLayer:
 | **Data-scale estimation** | Tier-2 `estimated_scan_rows` from SDR profiling statistics | Precise scan volume computed from row counts, partition sizes, and time-series distributions; replaces the SVL's Tier-1 `preliminary_impact_estimate` |
 | **Config store** | DCS document store — `controls_config` document type | Platform-level thresholds stored as a JSON document alongside SMR documents |
 
-Concurrent query enforcement uses a Redis-backed semaphore rather than an in-process counter, ensuring the limit applies across all running pods.
+Concurrent query enforcement uses a Redis-backed semaphore rather than an in-process counter, ensuring the limit applies across all running pods. The implementation acquires the concurrency slot first, as a cheap admission control before computing scan estimates — check evaluation order is an implementation detail; all five outcomes are recorded in the controls decision record regardless.
 
 The platform has one controls config document. The Semantic Controls Layer reads it at startup and refreshes it on change events from the DCS:
 
 ```json
 {
-  "type":                       "controls_config",
-  "org_id":                     "acme-wealth",
-  "max_scan_rows":              50000000,
-  "max_metrics_per_query":      10,
-  "max_dimensions":             5,
-  "max_join_depth":             4,
-  "classification_gate":        true,
-  "blocked_classifications":    ["TOP_SECRET", "RESTRICTED"],
-  "max_concurrent_queries":     20,
-  "query_timeout_seconds":      60,
-  "require_lineage_for_export": true,
-  "audit_all_queries":          true,
-  "compliance_intent_threshold": 0.8
+  "type":                      "controls_config",
+  "org_id":                    "acme-wealth",
+  "maxScanRows":               50000000,
+  "maxMetricsPerQuery":        10,
+  "maxDimensions":             5,
+  "maxJoinDepth":              4,
+  "classificationGate":        true,
+  "blockedClassifications":    ["TOP_SECRET", "RESTRICTED"],
+  "maxConcurrentQueries":      20,
+  "queryTimeoutSeconds":       60,
+  "requireLineageForExport":   true,
+  "auditAllQueries":           true,
+  "complianceIntentThreshold": 0.8
 }
 ```
 
-Compliance is always active and evaluated per request — there is no platform on/off switch. The `compliance_intent_threshold` only tunes the sensitivity of the second signal.
+Compliance is always active and evaluated per request — there is no platform on/off switch. The `complianceIntentThreshold` only tunes the sensitivity of the second signal.
 
 ```python
 class SemanticControlsLayer:
@@ -1047,7 +1047,7 @@ class SemanticControlsLayer:
         self.redis = redis_client
 
     async def _acquire_query_slot(self, org_id: str, config: dict) -> None:
-        # Input:  org_id + controls config (for max_concurrent_queries and timeout)
+        # Input:  org_id + controls config (for maxConcurrentQueries and timeout)
         # Raises: ConcurrentQueryLimitExceeded if the org is at its concurrent query ceiling
         # Uses Redis INCR as a cross-pod atomic counter — safe under horizontal scaling
         ...
@@ -1064,7 +1064,7 @@ class SemanticControlsLayer:
         # The five sequential checks:
         # 1. Load controls config for the org
         # 2. Concurrency  — acquire Redis query slot; ConcurrentQueryLimitExceeded if at ceiling
-        # 3. Data scale   — compute estimated_scan_rows from SDR profiling; ControlsCeilingExceeded if > max_scan_rows
+        # 3. Data scale   — compute estimated_scan_rows from SDR profiling; ControlsCeilingExceeded if > maxScanRows
         # 4. Complexity   — node count and join depth vs limits; ControlsCeilingExceeded if exceeded
         # 5. Classification gate — ClassificationGateError if any metric is in blocked_classifications
         # 6. Compliance   — two-signal trigger; escalates to Provenance Artifact if both signals active
@@ -1073,7 +1073,7 @@ class SemanticControlsLayer:
 
     def _estimate_scan_rows(self, lqp: dict, config: dict) -> int:
         # Input:  LQP with resolved_metrics and nodes
-        # Output: Tier-2 estimated_scan_rows — compared against config["max_scan_rows"]
+        # Output: Tier-2 estimated_scan_rows — compared against config["maxScanRows"]
 
         # Computed from SDR profiling statistics rather than a static weight:
         #   - base table row counts for each metric_scan node's physical_mapping
@@ -1098,7 +1098,7 @@ class SemanticControlsLayer:
 
         # Two-signal gate (always evaluated — no platform on/off switch):
         #   Signal 1 — any resolved metric has compliance_relevant: true
-        #   Signal 2 — compliance_purpose_score >= compliance_intent_threshold (default 0.8)
+        #   Signal 2 — compliance_purpose_score >= complianceIntentThreshold (default 0.8)
         # Both signals active → compliance_purpose = true: Provenance Artifact required,
         #   triggered_by_frameworks derived from metric regulatory_framework tags,
         #   cache bypassed, export gated until lineage sealed
@@ -1492,7 +1492,7 @@ if __name__ == "__main__":
 | **Lineage records** | S3-compatible object store — one JSON document per query | Write-once; append-only; cheap at scale; no schema migration required; natural fit for immutable audit records |
 | **Object key** | `lineage/{org_id}/{yyyy}/{mm}/{dd}/{result_id}.json` | Date-partitioned; enables prefix-based listing by time window |
 | **Search index** | Thin PostgreSQL table (scalar fields only, no JSON blobs) | Used by the Lineage Query REST API (see roadmap) for filtered search; full record always fetched from the object store |
-| **Retention** | Object lifecycle policy — default 7 years (configurable) | Long-horizon regulatory retention; enforced at the storage layer, not application code |
+| **Retention** | Object lifecycle policy — sample default 7 years (configurable) | Long-horizon regulatory retention; enforced at the storage layer, not application code. Periods are deployment choices — the design documents deliberately prescribe none |
 
 #### Lineage document schema
 
@@ -1564,7 +1564,7 @@ def utc_now() -> str:
 
 def compute_expiry(lqp: dict) -> str:
     # Input:  LQP — checks compliance_purpose to select retention period
-    # Output: ISO 8601 expiry timestamp — 7 years default; 10 years for compliance-purpose queries
+    # Output: ISO 8601 expiry timestamp — sample defaults: 7 years; 10 years for compliance-purpose queries
     ...
 
 class AnalyticalLineageStore:
