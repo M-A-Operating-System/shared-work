@@ -20,7 +20,7 @@ The natural starting point for organisations is Text-to-SQL: use an LLM to gener
 - **No reproducible calculation record** — SQL is generated fresh each time; two identical queries are not guaranteed to produce identical results
 - **No guaranteed entitlement enforcement** — access controls depend on the reliability of AI-generated query predicates, not a guaranteed enforcement layer
 
-Training LLMs on database schemas improves query accuracy in early trials but addresses the symptom — table knowledge — not the problem. The governance gap remains. The [Text-to-SQL appendix](./04-text-to-sql-antipattern.md) examines the failure modes in detail.
+Training LLMs on database schemas improves query accuracy in early trials but addresses the symptom — table knowledge — not the problem. The governance gap remains. The [Text-to-SQL appendix](./04-text-to-sql-antipattern.md) examines these failure modes in detail — and where Text-to-SQL does belong: as the exploration layer alongside the governed execution layer, with outputs promoted into the registry when they need to become reliable.
 
 ### The platform
 
@@ -95,7 +95,7 @@ Ten principles govern all design decisions. Where a proposed feature conflicts w
 | **P2 — Controls before execution** | Every query passes through the full controls pipeline before any database is contacted. There is no fast path. |
 | **P3 — Deterministic metric resolution** | A metric name resolves to exactly one approved definition at a given point in time. "Portfolio Return" means the same thing in every query, every report, and every regulatory submission under the same version. |
 | **P4 — Complete analytical lineage** | Every result carries a complete, queryable record of how the analytics engine used individual data elements to produce it — every definition, every access decision, every sub-result. |
-| **P5 — Role-aware by default** | The recommended configuration is deny-by-default: an unauthenticated or unentitled request is blocked before any analytical processing begins. Access restrictions are injected at the query level, not applied as a post-retrieval filter. |
+| **P5 — Role-aware by default** | Deny-by-default is an architectural property: an unauthenticated or unentitled request is always blocked before any analytical processing begins. Access restrictions are injected at the query level, not applied as a post-retrieval filter. |
 | **P6 — Governed narrative** | Plain-language summaries are anchored exclusively to values in the computed result. Hallucinated financial metrics are a regulatory and reputational risk; the architecture makes them impossible, not merely unlikely. |
 | **P7 — Deterministic visualisation** | Chart type selection is governed by a registered set of chart contracts. The AI does not select chart types — the same analytical pattern always produces the same chart across users, sessions, and time. |
 | **P8 — Explainability at every layer** | Users and compliance functions can inspect what was queried, why, and with what results at every layer of the stack. An intent confirmation step shows resolved intent before execution; a lineage inspector exposes every step in human-readable form. |

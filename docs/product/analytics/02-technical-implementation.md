@@ -904,7 +904,7 @@ class LQPGenerator:
 | **Policy store (DES)** | PostgreSQL `role_policies` schema — the reference realisation of the Data Entitlements Store | Dedicated schema and credentials, logically separate from platform data; written only by the Entitlements Manager — not writable via the platform Admin API |
 | **Row scope** | `{{user.claim_name}}` template interpolation at projection time | Resolved from JWT claims; passed to the SVL, which injects the row scope filter nodes |
 | **Column masking** | Registered in the projection; applied post-assembly in the FQE result assembler | Post-assembly supports cross-backend result sets |
-| **Default policy** | `defaultDenyAll: true` | No access unless a matching role is found |
+| **Default policy** | Deny-by-default — fixed, not configurable | No access unless a matching role definition is found; an architectural property (P5), not a setting |
 
 #### Role policies schema
 
@@ -968,7 +968,7 @@ class RoleAwareProjectionLayer:
         #         consumed by the SVL, which enforces it while compiling the LQP
 
         # 1. Extract analytics_roles from claims — roleClaimField is configurable
-        # 2. Load a role policy for each role — raises AccessDeniedError if none found (defaultDenyAll)
+        # 2. Load a role policy for each role — raises AccessDeniedError if none found (deny-by-default — not configurable)
         # 3. Merge policies — row scope intersected; column masks unioned
         # 4. Resolve row scope templates against the JWT claims into concrete conditions
         # 5. Return the projection — the SVL injects the row scope nodes and embeds the column masks
