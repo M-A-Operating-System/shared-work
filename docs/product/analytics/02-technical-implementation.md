@@ -23,6 +23,7 @@ The table below maps each Chapter 1 capability to its reference implementation n
 | Federated Query Engine | FQE | `FederatedQueryEngine` (Starburst client) | Starburst (Trino) · native federation across catalog connectors — Snowflake · lakehouse · dbt Semantic Layer · Neo4j · REST/OData |
 | Data Visualization Language | DVL | `DataVisualizationLanguage` | Python · priority-ordered chart contract evaluation · output: Vega-Lite v5 spec |
 | Narrative Synthesis Agent | NSA | `NarrativeSynthesisAgent` | Claude Haiku 4.5 (simple queries) · Claude Sonnet 4.6 (complex queries) |
+| Provenance Artifact Service | PAS | `ProvenanceArtifactService` | In-process Python module · ECDSA P-256 signing (key from Vault) · S3 sibling document `{result_id}_provenance.json` |
 | Analytical Lineage Store | ALS | `AnalyticalLineageStore` | AWS S3 (JSON records per query) · PostgreSQL `lineage_index` (scalar search) |
 | Result Cache | — | `ResultCache` | Redis · SHA-256 cache key · 5-min TTL · compliance queries bypass cache |
 
@@ -45,6 +46,7 @@ flowchart TD
         FQE["Starburst (FQE)\nTrino-based native federation across catalog connectors\npredicate push-down · parallel execution · result assembly"]
         DVL["Vega-Lite (DVL)\nPython · ontology evaluation · deterministic chart contract selection\noutput: Vega-Lite v5 spec"]
         NSA["Anthropic Claude (NSA)\nHaiku 4.5 — simple queries · Sonnet 4.6 — complex queries\nanchored strictly to result values"]
+        PAS["ProvenanceArtifactService (PAS)\nin-process Python module — compliance queries only\nassembles + seals artifact — ECDSA P-256 (key from Vault)"]
         Cache[("Redis (Result Cache)\nSHA-256 cache key · 5-min TTL\ncompliance queries bypass")]
         LS[("AWS S3 + PostgreSQL (ALS)\nS3 — JSON record per query\nPostgreSQL lineage_index — scalar search")]
         Result(["MCP tool response\ndisplay_spec + data + narrative + result_id\n+ compliance block if Provenance Artifact active"])
@@ -85,6 +87,8 @@ flowchart TD
     FQE -->|"assembled result"| NSA
     DVL -->|"DVL display spec"| Result
     NSA -->|"governed narrative"| Result
+    LS -->|"lineage records (compliance queries only)"| PAS
+    PAS -->|"sealed compliance block"| Result
 ```
 
 The Semantic Metrics Repository (SMR) and the Semantic Data Repository (SDR) are two independent stores housed within the Data Context Store (DCS). The SDR is a pre-existing organisational component holding the foundational data definitions — data models, physical schemas, and data lineage. The SMR is a separate store holding the four analytical document types (`analytical_metric`, `analytical_dimension`, `analytical_operation`, `analytical_dataset`); both stores are built on the DCS's shared versioned storage, search index, and scoped access control, and both are reached through the DCS API. The `physical_mapping` fields in SMR metric definitions resolve against SDR schema metadata to locate the physical tables and columns behind each metric.
@@ -545,6 +549,50 @@ class NarrativeSynthesisAgent:
         # Raises: NarrativeValidationError if any numeric value in the narrative is not present
         #         verbatim in the result rows — every cited figure must match a result value exactly
         # Purpose: prevents hallucinated figures reaching the consumer
+        ...
+```
+
+
+### Provenance Artifact Service (PAS)
+
+> **Specification:** [§Provenance Artifact Service](./01-core-capabilities.md#provenance-artifact-service-pas)
+
+| Decision | Choice | Rationale |
+|----------|--------|-----------|
+| **Deployment** | In-process module within the `analytics-mcp` service | Invoked only for compliance-purpose queries — low volume; shares the S3 lineage bucket the service already writes to; no extra deployable |
+| **Signing** | ECDSA P-256 (SHA-256) via the `cryptography` library | Matches the artifact signature block in Chapter 0; any holder of the published public key can verify independently |
+| **Key management** | Private key injected from Vault / Kubernetes Secrets; public key published | Key never baked into container images; rotation via `key_id` |
+| **Sealing** | Artifact written to S3 as the `{result_id}_provenance.json` sibling document | Immutable from the moment of writing — same write-once semantics as lineage records |
+| **Export gate** | `export_requires_lineage: true` until the S3 write is confirmed | Consumer withholds export affordances until sealing is confirmed |
+
+The PAS runs in the parallel presentation-assembly step alongside the DVL and NSA, but only when the SCL's two-signal compliance check is active. It reads the projection, controls decision, and execution records for the current query from the ALS, assembles the Provenance Artifact document, signs it, writes it back to the ALS as an immutable sibling record, and returns the sealed compliance block for inclusion in the MCP tool response.
+
+> **Hardening note:** in this reference implementation the signing key is held in the `analytics-mcp` process. High-assurance deployments can isolate it by splitting the PAS into its own service, or by delegating signing to a cloud KMS/HSM so the private key is never exportable — the interface contract is unchanged either way.
+
+```python
+class ProvenanceArtifactService:
+    def __init__(self, als: "AnalyticalLineageStore", signing_key, key_id: str):
+        self.als         = als          # reads lineage records; writes the sealed sibling document
+        self.signing_key = signing_key  # ECDSA P-256 private key — injected from Vault, never logged
+        self.key_id      = key_id       # published with the artifact for verification and rotation
+
+    async def seal(self, result_id: str, lqp: dict, compliance: dict) -> dict:
+        # Input:  result_id + approved LQP + compliance context (signals, intent score, frameworks)
+        # Output: sealed compliance block — { compliance_purpose, intent_score, triggered_by_metrics,
+        #         triggered_by_frameworks, regulatory_trace_id, artifact_set_version,
+        #         export_requires_lineage, classification_ceiling_applied }
+
+        # 1. Fetch the projection, controls decision, and execution records from the ALS
+        # 2. Assemble the Provenance Artifact — intent, escalation signals, metric versions,
+        #    logical field spec, physical execution detail, entitlement snapshot
+        # 3. Sign the canonical serialised artifact — ECDSA-P256-SHA256, signed_fields listed
+        # 4. Write {result_id}_provenance.json to the ALS bucket — immutable sibling record
+        # 5. Return the compliance block; the export gate stays locked until the write is confirmed
+        ...
+
+    def _sign(self, artifact: dict) -> dict:
+        # Input:  assembled artifact dict
+        # Output: signature block — { algorithm, key_id, signed_fields, value, sealed_at }
         ...
 ```
 
@@ -1657,7 +1705,7 @@ async def build_app() -> FastMCP:
 
     # 1. Load config from env vars
     # 2. Construct infrastructure clients — asyncpg pool, S3, Redis, DCS, Anthropic
-    # 3. Construct platform services — ALS, ResultCache, SMR, IRA, RAPL, SVL, SCL, PQP, DVL, NSA
+    # 3. Construct platform services — ALS, ResultCache, SMR, IRA, RAPL, SVL, SCL, PQP, DVL, NSA, PAS
     # 4. Configure Starburst catalogs (one per registered source) + the physical_mapping.source → catalog map
     # 5. Assemble FederatedQueryEngine with the Starburst coordinator DSN + ALS + cache
     # 6. Assemble PipelineExecutor with all services injected (IRA → RAPL → SVL → SCL → PQP → FQE)
@@ -1683,6 +1731,8 @@ Configuration is read from environment variables at startup. Required variables:
 | `JWT_JWKS_URI` | JWKS endpoint for JWT public key retrieval |
 | `JWT_AUDIENCE` | Expected JWT audience claim |
 | `JWT_ISSUER` | Expected JWT issuer claim |
+| `PAS_SIGNING_KEY_PATH` | Path to the ECDSA P-256 private key mounted from Vault / Kubernetes Secrets (PAS artifact sealing) |
+| `PAS_SIGNING_KEY_ID` | Published key identifier included in artifact signature blocks (verification and rotation) |
 
 
 ## 2.4 Infrastructure
