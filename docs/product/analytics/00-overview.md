@@ -580,10 +580,3 @@ Once execution completes and the result is verified, the platform seals a compli
   "export_gate_released_at": null
 }
 ```
-
-
-- [Chapter 1](./01-core-capabilities.md) — Detailed specifications for each platform component: metric registry, intent resolution, semantic validation, entitlement enforcement, controls pipeline, query federation, visualisation, narrative synthesis, lineage store, and API layer
-- [Chapter 2](./02-technical-implementation.md) — Reference implementation stack with technology rationale
-- [Chapter 3](./03-success-metrics.md) — Platform and governance success metrics
-- [Appendix](./04-text-to-sql-antipattern.md) — Text-to-SQL and Semantic Analytics: structural failure modes and the complementary architecture
-- [Roadmap](./05-roadmap.md) — Planned enhancements beyond the current release
