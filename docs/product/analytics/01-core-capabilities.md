@@ -922,7 +922,7 @@ flowchart LR
 
 **Step 1 — Plan Reception.** The FQE will receive the physical execution plan from the PQP and validate that every required data source is registered and available before proceeding.
 
-**Step 2 — Cache Check.** The FQE will check the result cache using the LQP signature as the cache key. The key incorporates an entitlement hash derived from the caller's effective row scope and column masks, ensuring that two users with different entitlements will never be served each other's cached results. On a cache hit, the cached result is returned directly — steps 3–6 are skipped. Compliance-purpose queries bypass the cache and are always freshly executed.
+**Step 2 — Cache Check.** The FQE will check the result cache using the canonical LQP signature as the cache key — a SHA-256 over the serialised plan. Because the plan embeds the resolved row scope filter nodes and the `column_masks` array, entitlement isolation is structural: two users with different effective entitlements produce different plans and therefore different keys, while users with identical entitlements and identical queries share cache entries. On a cache hit, the cached result is returned directly — steps 3–6 are skipped. Compliance-purpose queries bypass the cache and are always freshly executed.
 
 **Step 3 — Execution.** The FQE will execute the plan's sub-plans concurrently, each against its registered data source, enforcing the `queryTimeoutSeconds` budget assigned by the SCL. The FQE will support connectivity to data sources of at least the following types:
 

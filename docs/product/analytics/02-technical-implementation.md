@@ -1539,7 +1539,7 @@ class KnowledgeStore:
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
 | **Store** | Redis (cluster mode) | Sub-millisecond read; TTL-native; cluster mode for HA |
-| **Cache key** | SHA-256 of `(org_id + operation_id + canonical_params + role_hash)` | Role hash ensures two users with different entitlements never share a cached result |
+| **Cache key** | SHA-256 of the canonical serialised LQP | The plan embeds `org_id`, the row-scope filter nodes, and `column_masks` — different effective entitlements produce different plans and therefore different keys, structurally |
 | **TTL** | 5 minutes default; configurable per operation via `cache_ttl_seconds` on `analytical_operation` | Short TTL balances freshness against backend load |
 | **Compliance bypass** | Queries with `compliance_purpose: true` skip read and write | Provenance Artifact requires a fresh execution record |
 | **Cache-aside pattern** | FQE checks before execution; writes after assembly | Cache is never on the critical governance path |
@@ -1551,10 +1551,11 @@ class ResultCache:
     def __init__(self, redis_client):
         self.redis = redis_client
 
-    def _key(self, lqp: dict, claims: dict) -> str:
-        # Input:  LQP (org_id + nodes) + claims (analytics_roles)
-        # Output: Redis key string — SHA-256 of canonical LQP payload + 8-char role hash
-        # Role hash ensures two users with different entitlements never share a cached result
+    def _key(self, lqp: dict) -> str:
+        # Input:  LQP — org_id, nodes (including the row-scope filter nodes), column_masks
+        # Output: Redis key string — SHA-256 of the canonical serialised LQP
+        # Entitlement isolation is structural: the plan embeds row scope and column masks,
+        # so different effective entitlements always produce different keys
         ...
 
     async def get(self, lqp: dict, claims: dict) -> dict | None:
