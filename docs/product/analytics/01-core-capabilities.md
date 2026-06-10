@@ -178,6 +178,7 @@ sequenceDiagram
     participant ALS as Analytical Lineage Store
     participant PQP as Physical Query Planner
     participant FQE as Federated Query Engine
+    participant Cache as Result Cache
     participant BE as Data Sources
     participant DVL as Data Visualization Language
     participant NSA as Narrative Synthesis Agent
@@ -186,58 +187,74 @@ sequenceDiagram
 
     rect rgb(240, 255, 245)
         note over C,ALS: Single consumer request — full pipeline
-        C->>MCP: run_analytics (NL query + JWT)
+        C->>MCP: run_analytics (NL query — or operation_id + params — + JWT)
         MCP->>MCP: validate JWT signature · expiry · org claim
 
-        MCP->>IRA: natural language query + JWT
-        IRA->>SMR: vector similarity search (RAG)
-        SMR-->>IRA: top-K candidate operations + metric definitions
-        IRA->>LLM: candidate operations + user query (intent ranking prompt)
-        note over IRA: Ranks candidates · binds params · scores confidence · scores compliance intent
-        alt ambiguous intent
-            IRA-->>MCP: candidate cards (intent_session_id + candidates[])
-            MCP-->>C: candidate cards
-            C->>MCP: intent_session_id + selected_candidate (0-based index)
-            MCP->>IRA: selected candidate resolved from intent session
+        alt natural language query
+            MCP->>IRA: natural language query + JWT
+            IRA->>SMR: vector similarity search (RAG)
+            SMR-->>IRA: top-K candidate operations + metric definitions
+            IRA->>LLM: candidate operations + user query (intent ranking prompt)
+            note over IRA: Ranks candidates · binds params · scores confidence<br/>scores compliance intent · derives presentation preview
+            alt ambiguous intent — or compliance purpose unclear
+                IRA-->>MCP: candidate cards (intent_session_id + candidates[])
+                MCP-->>C: candidate cards
+                opt conversational refinement (bounded by intentRefinementMaxTurns)
+                    C->>MCP: natural language adjustment
+                    MCP->>IRA: refinement turn — revised card set returned to consumer
+                end
+                C->>MCP: intent_session_id + selected_candidate (0-based index)
+                MCP->>IRA: selected candidate resolved from intent session
+            end
+            IRA->>RAPL: resolved operation_id + params + compliance_purpose_score + JWT
+        else structured call — operation_id + params (bypasses the IRA)
+            MCP->>RAPL: operation_id + params + explicit compliance_purpose + JWT
         end
 
-        IRA->>RAPL: resolved operation_id + params + JWT
-        RAPL->>RAPL: validate JWT · extract role claims
+        RAPL->>RAPL: validate JWT · extract role claims<br/>(defence in depth — re-validates the boundary check)
         RAPL->>DES: retrieve role definitions
-        DES-->>RAPL: metric access sets · dimension access sets · row scope templates · column masks
+        DES-->>RAPL: data access domains · metric/dimension access sets<br/>row scope templates · column masks · classification ceilings
         note over RAPL: Merge role definitions · APPROVE/DENY per metric and dimension<br/>Resolve row scope templates against JWT claims · register column masks
         RAPL->>ALS: entitlement projection record (decisions + basis — written even on denial)
-        RAPL->>SVL: entitlement projection (metric_access_set · dimension_access_set · row_scope · column_masks)
+        RAPL->>SVL: entitlement projection (access sets · row_scope · column_masks)<br/>+ fully qualified request (incl. compliance_purpose_score)
 
-        SVL->>SMR: resolve operation · metric IDs · dimension IDs
+        SVL->>SMR: Stage 1 — resolve operation · metric IDs · dimension IDs
         SMR-->>SVL: definitions · aggregation rules · performance_impact_weight · compliance metadata
 
-        note over SVL: Stage 2 — Compliance signal evaluation<br/>Stage 3 — Enforce entitlement projection against request<br/>Stage 4 — LQP generation
+        note over SVL: Stage 2 — Compliance signal evaluation (score vs complianceIntentThreshold)<br/>Stage 3 — Enforce entitlement projection against request<br/>Stage 4 — LQP generation
 
         SVL->>SCL: Logical Query Plan (LQP)<br/>— no SQL · no backend refs · SMR concepts only
 
-        note over SCL: data scale · complexity · classification · compliance · concurrency<br/>Blocks if any check fails
+        note over SCL: data scale · complexity · classification · compliance · concurrency<br/>Blocks if any check fails · assigns queryTimeoutSeconds budget
 
         SCL->>ALS: controls decision record (written before execution is invoked)
-        SCL->>PQP: approved LQP
+        SCL->>PQP: approved LQP + timeout budget
 
         PQP->>SMR: physical_mapping lookup — keyed on the metric definition versions pinned in the LQP
         SMR-->>PQP: physical mappings — source · table/cube · measure
 
         note over PQP: Resolves physical_mapping per metric node<br/>Applies entitlement row scope + column masks<br/>Compiles physical execution plan — no execution capability
 
-        PQP->>FQE: physical execution plan
+        PQP->>FQE: physical execution plan (sub-plans · column masks · timeout budget)
 
-        FQE->>BE: query execution against data sources
-        BE-->>FQE: raw result sets
+        FQE->>Cache: cache check — canonical LQP signature
+        alt cache hit (compliance-purpose queries always bypass the cache)
+            Cache-->>FQE: cached assembled result
+        else cache miss — or compliance bypass
+            FQE->>BE: query execution against data sources
+            BE-->>FQE: raw result sets
+            note over FQE: Result assembly · column masks applied
+            FQE->>Cache: cache write (assembled result + TTL — skipped for compliance queries)
+        end
 
         FQE->>ALS: execution record (data sources · latency · cache hit · column mask applications)
+        FQE-->>MCP: assembled result (rows + schema + result_id)
     end
 
     rect rgb(255, 248, 240)
-        note over FQE,NSA: Presentation assembly — parallel
+        note over FQE,PAS: Presentation assembly — parallel · stages per execution_profile<br/>(data_retrieval: none · metric_query: DVL · full_analytical: DVL + NSA + PAS)
         par
-            FQE->>DVL: assembled result
+            FQE->>DVL: assembled result + intent context (operation definition)
             note over DVL: Ontology evaluation → deterministic chart contract selection<br/>AI does not select chart type
             DVL-->>MCP: DVL display specification
         and
@@ -247,14 +264,17 @@ sequenceDiagram
             LLM-->>NSA: narrative text
             NSA-->>MCP: governed narrative (lead + detail + anchoredTo)
         and
-            note over ALS,PAS: Only for compliance-purpose queries
-            ALS->>PAS: lineage records (controls decision + execution record)
-            note over PAS: Assembles Provenance Artifact from ALS records<br/>Seals artifact — immutable from this point<br/>Blocks export until sealing confirmed
+            note over ALS,PAS: Only when the two-signal compliance trigger is active
+            FQE->>PAS: result_id + compliance context (invokes artifact assembly)
+            PAS->>ALS: fetch lineage records (projection + controls decision + execution)
+            ALS-->>PAS: lineage records
+            note over PAS: Assembles Provenance Artifact · signs it (ECDSA)
+            PAS->>ALS: seal — artifact written back as immutable sibling record
             PAS-->>MCP: sealed compliance block (regulatory_trace_id · triggered_frameworks · export_requires_lineage)
         end
     end
 
-    MCP-->>C: display_spec + data + narrative + result_id + lineage_url<br/>+ compliance block (if Provenance Artifact active)
+    MCP-->>C: display_spec + data + narrative + result_id<br/>+ compliance block (if Provenance Artifact active)
 
     opt Consumer cannot natively render DVL specification
         C->>vega2img: render tool call (display_spec)
@@ -653,7 +673,7 @@ flowchart LR
     START --> S1 --> S2 --> S3 --> S4 --> S5 --> S6 --> S7
 ```
 
-**Stage 1 — JWT Validation.** Validate the inbound JWT: signature, expiry, and org claim. **DENY** — request rejected immediately if any check fails. No further processing occurs on an invalid token.
+**Stage 1 — JWT Validation.** Validate the inbound JWT: signature, expiry, and org claim. This deliberately re-validates the check already performed at the MCP Capability Layer boundary — defence in depth, so the RAPL's guarantees do not depend on the entry layer's correctness. **DENY** — request rejected immediately if any check fails. No further processing occurs on an invalid token.
 
 **Stage 2 — Role Claim Extraction.** Extract the user's analytical role claims from the validated JWT using the configured `roleClaimField`. **DENY** — if no valid analytical role claims are present the request is rejected.
 
@@ -935,7 +955,7 @@ flowchart LR
 
 **Step 1 — Plan Reception.** The FQE will receive the physical execution plan from the PQP and validate that every required data source is registered and available before proceeding.
 
-**Step 2 — Cache Check.** The FQE will check the result cache using the canonical LQP signature as the cache key — a SHA-256 over the serialised plan. Because the plan embeds the resolved row scope filter nodes and the `column_masks` array, entitlement isolation is structural: two users with different effective entitlements produce different plans and therefore different keys, while users with identical entitlements and identical queries share cache entries. On a cache hit, the cached result is returned directly — steps 3–6 are skipped. Compliance-purpose queries bypass the cache and are always freshly executed.
+**Step 2 — Cache Check.** The FQE will check the result cache using the canonical LQP signature as the cache key — a SHA-256 over the serialised plan. Because the plan embeds the resolved row scope filter nodes and the `column_masks` array, entitlement isolation is structural: two users with different effective entitlements produce different plans and therefore different keys, while users with identical entitlements and identical queries share cache entries. On a cache hit, the cached result is returned directly — steps 3–5 are skipped, but the execution record (Step 6) is written for every query, recording its cache status. Compliance-purpose queries bypass the cache and are always freshly executed.
 
 **Step 3 — Execution.** The FQE will execute the plan's sub-plans concurrently, each against its registered data source, enforcing the `queryTimeoutSeconds` budget assigned by the SCL. The FQE will support connectivity to data sources of at least the following types:
 
@@ -1223,7 +1243,7 @@ The document will be immutable from the moment of writing. The full chain — or
 
 > **Governing principles:** [P4 — Complete analytical lineage](./00-overview.md#design-principles) · [P2 — Controls before execution](./00-overview.md#design-principles) · [P9 — Administrator sovereignty](./00-overview.md#design-principles)
 
-The Provenance Artifact Service (PAS) is responsible for assembling and sealing a tamper-evident compliance record for queries that trigger the two-signal compliance classification. It is invoked in parallel with the Data Visualization Language and Narrative Synthesis Agent, but only when the Semantic Controls Layer determines that both the metric compliance flag and the IRA intent classification signal are active. It reads the controls decision record and execution record from the Analytical Lineage Store for the current query, assembles them into a Provenance Artifact document, and seals it by writing the artifact back to the ALS as an immutable sibling record. Export of the query result is blocked until sealing is confirmed, ensuring compliance-purpose results cannot leave the platform without an associated auditable record. The sealed compliance block is included in the MCP tool response and any party holding the platform's public key can independently verify the artifact has not been altered since sealing.
+The Provenance Artifact Service (PAS) is responsible for assembling and sealing a tamper-evident compliance record for queries that trigger the two-signal compliance classification. It is invoked in parallel with the Data Visualization Language and Narrative Synthesis Agent, but only when the Semantic Controls Layer determines that both the metric compliance flag and the IRA intent classification signal are active. It reads the projection record, controls decision record, and execution record from the Analytical Lineage Store for the current query, assembles them into a Provenance Artifact document, and seals it by writing the artifact back to the ALS as an immutable sibling record. Export of the query result is blocked until sealing is confirmed, ensuring compliance-purpose results cannot leave the platform without an associated auditable record. The sealed compliance block is included in the MCP tool response and any party holding the platform's public key can independently verify the artifact has not been altered since sealing.
 
 ### Purpose
 
@@ -1231,7 +1251,7 @@ The Provenance Artifact will be a sealed, tamper-evident record that satisfies r
 
 ### Assembly and Sealing
 
-The PAS will read the controls decision record and execution record that the ALS has written for the current query. It will assemble them into a Provenance Artifact document — adding regulatory trace identifiers, framework tags, and the compliance intent score — and seal it by writing the sealed artifact back to the ALS as a sibling document (`{result_id}_provenance.json`). The artifact will be immutable from the moment of sealing. No further write or amendment will be permitted without creating a new amendment document referencing the original.
+The PAS will read the projection record, controls decision record, and execution record that the ALS has written for the current query. It will assemble them into a Provenance Artifact document — adding regulatory trace identifiers, framework tags, and the compliance intent score — and seal it by writing the sealed artifact back to the ALS as a sibling document (`{result_id}_provenance.json`). The artifact will be immutable from the moment of sealing. No further write or amendment will be permitted without creating a new amendment document referencing the original.
 
 ### Export Gate
 
