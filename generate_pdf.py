@@ -20,8 +20,10 @@ Usage:
     --product   Select a single product by name.  Omit to generate all products.
     --pages     Space-separated two-digit chapter prefixes to include (requires --product).
                 Chapters are included in the order listed on the command line.
-    --out       Output filename for --pages mode (default: <product>_pages_<nn…>.pdf,
-                placed in the product directory).
+    --out       Output filename for --pages mode.  When omitted: a single chapter
+                prefix produces a PDF next to the source file with the same name
+                and a .pdf extension (identical to --page); multiple prefixes
+                produce <product>_pages_<nn…>.pdf in the product directory.
     --nofront   Omit the branded cover page. Useful for distributing content
                 outside the M&A Operating System brand context.
 
@@ -654,7 +656,9 @@ def generate_pages(product_name: str, page_prefixes: list[str],
         if not matches:
             missing.append(prefix)
         else:
-            files.append(matches[0])  # take the single canonical chapter file
+            if len(matches) > 1:
+                print(f"  [warn] prefix '{prefix}' matched {len(matches)} files — using {matches[0].name}")
+            files.append(matches[0])
 
     if missing:
         print(f"  [error] no chapter file found for prefix(es): {', '.join(missing)}")
@@ -663,6 +667,13 @@ def generate_pages(product_name: str, page_prefixes: list[str],
             if "-ignore" not in f.stem:
                 print(f"    {f.stem[:2]}  ({f.name})")
         sys.exit(1)
+
+    # Single chapter with no custom output: delegate to generate_page so that
+    # the output path, cover title (H1 extraction), and GITHUB_OUTPUT emission
+    # are all handled consistently rather than duplicated here.
+    if len(page_prefixes) == 1 and out_name is None:
+        generate_page(files[0], nofront=nofront)
+        return
 
     if out_name:
         output = docs_dir / out_name
