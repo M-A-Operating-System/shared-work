@@ -68,7 +68,7 @@ A defining characteristic of this architecture is that **the Analytics Engine ne
 
 The Analytics Engine contains exactly two targeted uses of AI, both strictly bounded:
 
-1. **Intent resolution** — the Intent Resolution Agent (IRA) is the first step in the pipeline and a contained, bounded AI component. It receives a natural language question, retrieves candidate operations from the SMR catalogue using embedding similarity (RAG), and uses a language model to rank them and bind the user's parameters — mapping the question to one or more registered analytics definitions in the SMR. The language model selects from the governed inventory; it does not construct queries or access data.
+1. **Intent resolution** — the Intent Resolution Agent (IRA) is the first step in the pipeline and a contained, bounded AI component. It receives a natural language question, retrieves candidate operations from the SMR catalogue using embedding similarity (RAG), and uses a language model to rank them and bind the user's parameters — mapping the question to one or more registered analytics definitions in the SMR. The language model selects from the governed inventory; it does not construct queries or access data. As part of the same step, the IRA classifies whether the user's stated purpose is compliance-driven — the second signal of the two-signal compliance trigger — and asks the user to clarify when the purpose is ambiguous.
 
 2. **Narrative synthesis** — after computation completes, the Narrative Synthesis Agent (NSA) makes a single, tightly-scoped language model call to produce a brief plain-language summary of the result, anchored strictly to the computed values. It is told what the data shows; it cannot introduce figures, comparisons, or interpretations not present in the result.
 
@@ -180,7 +180,7 @@ The platform's scope spans two independent dimensions that together define the f
 Some requests are best answered with a chart or summary: a portfolio manager wants to see returns versus benchmark, not a raw table of numbers. Others require a structured dataset: a data science pipeline needs millions of rows of position data for model retraining, and a chart is irrelevant. Both output types traverse the same controls pipeline. The difference is resolved by the Data Visualization Language (DVL) at query time — chart or table is determined by the intent and result shape, not by the user or the AI.
 
 **Governance tier — business analytics or full-provenance**
-Most queries require standard governance: approved analytics and metrics definitions, entitlement enforcement, and a compliance provenance record. Some queries require more: when a request is for a regulatory submission — or involves a metric that is flagged as compliance-relevant — the platform automatically escalates to the enhanced compliance artifact tier. Two independent signals trigger escalation: the metric's own compliance-relevant flag (set by the metric owner at registration) and the AI's classification of the query's stated purpose. When both signals are present, a regulatory trace record, export controls, and a regulator-ready artifact set are produced automatically. No user action or role claim is required.
+Most queries require standard governance: approved analytics and metrics definitions, entitlement enforcement, and a compliance provenance record. Some queries require more: when a request involves a metric flagged as compliance-relevant and is made for a compliance-driven purpose — a regulatory submission, for example — the platform automatically escalates to the enhanced compliance artifact tier. Two independent signals trigger escalation: the metric's own compliance-relevant flag (set by the Metrics Modeller at registration) and the Intent Resolution Agent's classification of the query's stated purpose. When both signals are present, a regulatory trace record, export controls, and a regulator-ready artifact set are produced automatically. No user action or role claim is required.
 
 These two dimensions define four possible result types. The platform handles all four under the same governed pipeline:
 
@@ -450,14 +450,14 @@ intent_classification:
 ```
 
 **3 · Metric resolution and compliance escalation**
-The liquidity coverage ratio metric resolves to its approved registry definition, which carries a compliance-relevant flag set by the Metrics Modeller at registration. Two independent signals are now both active — the metric is marked as compliance-relevant, and the AI has classified the stated intent as compliance-driven. The governance layer escalates automatically to the enhanced compliance artifact tier. No role claim, no manual flag, no special user action is required: escalation is a runtime consequence of what the metric is and what the query is for.
+The liquidity coverage ratio metric resolves to its approved registry definition, which carries a compliance-relevant flag set by the Metrics Modeller at registration. Two independent signals are now both active — the metric is marked as compliance-relevant, and the IRA has classified the stated intent as compliance-driven. The governance layer escalates automatically to the enhanced compliance artifact tier. No role claim, no manual flag, no special user action is required: escalation is a runtime consequence of what the metric is and what the query is for.
 
 ```
 -- Metric Resolution & Compliance Escalation
 liquidity_coverage_ratio  →  definition v1.1: SUM(hqla_value) / SUM(net_outflow_30d)
 compliance_signals:
   metric.compliance_relevant: true   -- set by Metrics Modeller at registration
-  intent.compliance_purpose:  true   -- classified by AI at query time
+  intent.compliance_purpose:  true   -- classified by the IRA at query time
 escalation: ENHANCED compliance artifact tier  -- both signals required
 ```
 
@@ -527,7 +527,7 @@ Once execution completes and the result is verified, the platform seals a compli
 
   "escalation_signals": [
     { "signal": "metric.compliance_relevant", "source": "metric_registry",      "value": true },
-    { "signal": "intent.compliance_purpose",  "source": "ai_intent_classifier", "value": true }
+    { "signal": "intent.compliance_purpose",  "source": "ira_intent_classifier", "value": true }
   ],
 
   "metric": {

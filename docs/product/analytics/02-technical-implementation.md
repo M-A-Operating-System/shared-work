@@ -14,7 +14,7 @@ The table below maps each Chapter 1 capability to its reference implementation n
 | Capability (Ch01) | Abbr | Reference Implementation | Key Technology |
 |---|---|---|---|
 | MCP Capability Layer | MCP | `build_mcp_app()` + FastMCP router | Python 3.12 · FastMCP 2.x · Uvicorn · port 8000 · JWT via python-jose (RS256) |
-| Intent Resolution Agent | IRA | `IntentResolutionAgent` | Python · embedding similarity search over SMR · Anthropic Claude (intent ranking) · confirmation cards |
+| Intent Resolution Agent | IRA | `IntentResolutionAgent` | Python · embedding similarity search over SMR · Anthropic Claude (intent ranking + compliance intent scoring) · confirmation cards |
 | Semantic Metrics Repository | SMR | `SemanticMetricsRepository` | DCS API — JSON documents: `analytical_metric`, `analytical_dimension`, `analytical_operation` |
 | Role-Aware Projection Layer | RAPL | `RoleAwareProjectionLayer` | Python · asyncpg · PostgreSQL `role_policies` |
 | Semantic Validation Layer | SVL | `SemanticValidationLayer` + `LQPGenerator` | Python · Pydantic v2 · JSON Schema validation |
@@ -37,9 +37,9 @@ flowchart TD
 
     subgraph analytics["AI Analytics Platform"]
         MCP["FastMCP / Uvicorn (MCP)\nPython 3.12 · MCP Streamable HTTP · port 8000\nJWT — python-jose · JWKS · RS256"]
-        IRA["Anthropic Claude (IRA)\nembedding similarity search over SMR (RAG) · intent ranking\nnatural language → resolved operation_id + params · confirmation cards"]
+        IRA["Anthropic Claude (IRA)\nembedding similarity search over SMR (RAG) · intent ranking · compliance intent scoring\nnatural language → resolved operation_id + params · confirmation cards"]
         RAPL["PostgreSQL (RAPL)\nPython · asyncpg · role_policies\nJWT claims → row scope injection · column masking"]
-        SVL["Pydantic / Python (SVL)\nJSON Schema validation · SMR resolution\ncompliance intent scoring · LQP generation"]
+        SVL["Pydantic / Python (SVL)\nJSON Schema validation · SMR resolution\ncompliance signal evaluation · LQP generation"]
         SCL["Redis + Python rules (SCL)\ndata scale · complexity · classification · compliance · concurrency\nRedis concurrency semaphore"]
         PQP["Apache Calcite (PQP)\nphysical_mapping resolution · catalog reference binding\nLQP → federated Trino SQL"]
         FQE["Starburst (FQE)\nTrino-based native federation across catalog connectors\npredicate push-down · parallel execution · result assembly"]
@@ -399,9 +399,10 @@ Error code reference table:
 | **Candidate retrieval** | Embedding similarity search over SMR operation/metric embeddings | RAG retrieval narrows the full catalogue to a handful of candidates before the model ranks them |
 | **Intent ranking** | Anthropic Claude | Ranks candidate operations and binds parameters from the natural-language query |
 | **Confirmation** | Candidate cards when intent is ambiguous | The user selects or refines before any query executes |
-| **Scope** | Natural-language requests only | Structured `operation_id` + `params` calls bypass the IRA entirely |
+| **Compliance intent** | `compliance_purpose_score` produced within the same ranking call | Signal 2 of the SCL's two-signal compliance gate; an ambiguous purpose triggers a clarification card rather than a guess |
+| **Scope** | Natural-language requests only | Structured `operation_id` + `params` calls bypass the IRA entirely and declare compliance purpose explicitly |
 
-The Intent Resolution Agent (IRA) is the only AI step in the pre-computation pipeline. It receives a natural-language query and the caller's JWT from the MCP layer, retrieves candidate operations from the SMR catalogue using embedding similarity search, ranks them with a language model, binds parameters to the leading candidate, and derives a presentation preview. When the top candidate is confident and unambiguous, the resolved intent is forwarded directly to the RAPL; when it is ambiguous, ranked candidate cards are returned to the consumer for selection or conversational refinement. The IRA produces no output visible to the end user once intent is resolved, and makes no governance or execution decisions — those belong to the deterministic pipeline that follows.
+The Intent Resolution Agent (IRA) is the only AI step in the pre-computation pipeline. It receives a natural-language query and the caller's JWT from the MCP layer, retrieves candidate operations from the SMR catalogue using embedding similarity search, ranks them with a language model, binds parameters to the leading candidate, and derives a presentation preview. Within the same ranking call it scores whether the stated purpose of the query is compliance-driven — the `compliance_purpose_score` forwarded with the resolved intent and consumed by the SCL's two-signal compliance gate — and clarifies with the user through the confirmation card flow when the purpose is ambiguous. When the top candidate is confident and unambiguous, the resolved intent is forwarded directly to the RAPL; when it is ambiguous, ranked candidate cards are returned to the consumer for selection or conversational refinement. The IRA produces no output visible to the end user once intent is resolved, and makes no governance or execution decisions — those belong to the deterministic pipeline that follows.
 
 ```python
 import anthropic
@@ -415,11 +416,12 @@ class IntentResolutionAgent:
 
     async def resolve(self, query: str, claims: dict) -> dict:
         # Input:  natural-language query + verified JWT claims
-        # Output: resolved intent — { operation_id, params, presentation_hint }
-        #         or a candidate-card set when intent is ambiguous
+        # Output: resolved intent — { operation_id, params, presentation_hint, compliance_purpose_score }
+        #         or a candidate-card set when intent or compliance purpose is ambiguous
 
         # 1. Embed the query and retrieve top-k candidate operations from the SMR by vector similarity
-        # 2. Rank candidates with the language model; bind params to the leading operation
+        # 2. Rank candidates with the language model; bind params to the leading operation;
+        #    score compliance intent of the stated purpose in the same call
         # 3. If the top candidate is confident and clear of the runner-up, return the resolved intent → RAPL
         # 4. Otherwise return ranked candidate cards for the consumer to select or refine
         ...
@@ -433,6 +435,13 @@ class IntentResolutionAgent:
         # Input:  query + candidate operations
         # Output: ranked candidates with bound params + confidence scores
         # The model only ranks and binds; it never selects chart types or makes governance decisions
+        ...
+
+    def _score_compliance_intent(self, query: str, ranked: dict) -> float:
+        # Input:  natural-language query + ranked leading candidate
+        # Output: float 0.0–1.0 — compliance purpose probability (Signal 2 of the two-signal gate)
+        # Scored by the language model within the same ranking call — no separate API call
+        # A score near compliance_intent_threshold triggers a clarification card instead of a guess
         ...
 ```
 
@@ -449,7 +458,7 @@ Structured API consumers that already know the `operation_id` skip the IRA entir
 | **SMR resolution** | Direct SMR service call | Synchronous lookup against the metric registry; rejects unregistered IDs before LQP generation |
 | **LQP generation** | Custom Python | Backend-agnostic DAG construction from validated parameters; deterministic for any given input |
 
-`SemanticValidationLayer` runs after the RAPL. It receives the entitlement projection (row scope and column masks) from the RAPL together with the resolved request, validates params, resolves metrics from the SMR, enforces the projection, scores compliance intent, and delegates DAG construction to `LQPGenerator`. The compliance score is attached to the LQP here so the SCL can apply its two-signal gate without requiring the caller to declare intent explicitly. The SVL also attaches a Tier-1 `preliminary_impact_estimate` — the sum of the resolved metrics' `performance_impact_weight` values — as a coarse indicator of query weight; the SCL replaces this with a precise `estimated_scan_rows` figure at its data-scale check.
+`SemanticValidationLayer` runs after the RAPL. It receives the entitlement projection (row scope and column masks) from the RAPL together with the resolved request, validates params, resolves metrics from the SMR, enforces the projection, attaches the IRA's compliance intent score, and delegates DAG construction to `LQPGenerator`. The SVL performs no compliance classification of its own — the `compliance_purpose_score` is produced by the IRA at intent resolution (structured calls, which bypass the IRA, declare compliance purpose explicitly via a `compliance_purpose` parameter); the SVL attaches it to the LQP so the SCL can apply its two-signal gate. The SVL also attaches a Tier-1 `preliminary_impact_estimate` — the sum of the resolved metrics' `performance_impact_weight` values — as a coarse indicator of query weight; the SCL replaces this with a precise `estimated_scan_rows` figure at its data-scale check.
 
 ```python
 class SemanticValidationLayer:
@@ -464,7 +473,8 @@ class SemanticValidationLayer:
         # 2. Resolve each metric ID from SMR — rejects unknown or non-approved metrics
         # 3. Enforce the RAPL projection — inject row scope filter nodes; embed column masks on the LQP
         # 4. Delegate DAG construction to LQPGenerator (see §Semantic Validation Layer — LQP examples)
-        # 5. Attach compliance_purpose_score — SCL reads this; caller never declares intent explicitly
+        # 5. Attach compliance_purpose_score from the resolved request — scored by the IRA for
+        #    natural-language queries; explicit compliance_purpose param for structured calls
         # 6. Attach preliminary_impact_estimate (Σ performance_impact_weight) — Tier-1 coarse estimate
         # 7. Retain resolved_metrics on LQP — SCL needs them for classification and compliance checks
         ...
@@ -472,17 +482,6 @@ class SemanticValidationLayer:
     def _validate_params(self, params: dict, required: list[str]) -> None:
         # Input:  raw params dict + required field list from SMR operation definition
         # Raises: ValueError listing all missing keys — fast rejection before SMR resolution
-        ...
-
-    def _score_compliance_intent(self, operation: dict, resolved_metrics: list[dict], params: dict) -> float:
-        # Input:  operation definition + resolved metric list + call params
-        # Output: float 0.0–1.0 — compliance intent probability score
-
-        # Three independent signals, summed and capped at 1.0:
-        #   +0.5 if operation_id contains a compliance keyword (regulatory, audit, report, compliance)
-        #   +0.3 if any resolved metric carries compliance_relevant: true
-        #   +0.2 if params include justification or regulatory_period keys
-        # SCL compares this score against compliance_intent_threshold in controls_config
         ...
 ```
 
@@ -980,7 +979,7 @@ class SemanticControlsLayer:
         ...
 
     def _check_compliance(self, lqp: dict, claims: dict, config: dict) -> dict:
-        # Input:  LQP (with compliance_purpose_score from SVL) + controls config
+        # Input:  LQP (with compliance_purpose_score — scored by the IRA, attached by the SVL) + controls config
         # Output: LQP with a compliance block attached
 
         # Two-signal gate (always evaluated — no platform on/off switch):
