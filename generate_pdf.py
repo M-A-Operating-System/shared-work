@@ -59,6 +59,7 @@ from pathlib import Path
 # ---------- product registry ----------
 
 PRODUCTS_DIR = Path(__file__).parent / "docs" / "product"
+_REPO_ROOT   = Path(__file__).parent
 
 PRODUCTS = {
     "assistant": {
@@ -553,6 +554,21 @@ def generate_product(name: str, config: dict, nofront: bool = False) -> None:
     size_mb = output.stat().st_size / 1_000_000
     print(f"Done → {output}  ({size_mb:.1f} MB)")
 
+# ---------- github actions output ----------
+
+def _emit_github_output(output: Path) -> None:
+    """Write pdf_path to $GITHUB_OUTPUT for Actions step chaining, if the env var is set."""
+    github_output = os.environ.get("GITHUB_OUTPUT")
+    if not github_output:
+        return
+    gop = Path(github_output)
+    if not gop.is_absolute() or ".." in gop.parts:
+        print(f"  [warn] GITHUB_OUTPUT path looks unsafe, skipping: {github_output}")
+        return
+    with open(gop, "a") as f:
+        f.write(f"pdf_path={output.relative_to(_REPO_ROOT)}\n")
+
+
 # ---------- single-page generation ----------
 
 def _resolve_page_path(file_path: Path) -> Path:
@@ -565,15 +581,14 @@ def _resolve_page_path(file_path: Path) -> Path:
         f for f in PRODUCTS_DIR.rglob(file_path.name)
         if f.is_file() and not f.is_symlink()
     )
-    repo_root = Path(__file__).parent
     if len(candidates) == 1:
-        resolved = candidates[0].relative_to(repo_root)
+        resolved = candidates[0].relative_to(_REPO_ROOT)
         print(f"  [info] resolved '{file_path.name}' → {resolved}")
         return candidates[0].resolve()
     if len(candidates) > 1:
         print(f"  [error] '{file_path.name}' matches multiple files — use the full path:")
         for c in candidates:
-            print(f"    {c.relative_to(repo_root)}")
+            print(f"    {c.relative_to(_REPO_ROOT)}")
         sys.exit(1)
     print(f"  [error] '{file_path.name}' not found in any product directory.")
     print(f"          Provide the path relative to the repo root,")
@@ -629,22 +644,17 @@ def generate_page(file_path: Path, nofront: bool = False) -> None:
     size_mb = output.stat().st_size / 1_000_000
     print(f"Done → {output}  ({size_mb:.1f} MB)")
 
-    # Publish the output path for GitHub Actions step chaining
-    github_output = os.environ.get("GITHUB_OUTPUT")
-    if github_output:
-        gop = Path(github_output)
-        if not gop.is_absolute() or ".." in gop.parts:
-            print(f"  [warn] GITHUB_OUTPUT path looks unsafe, skipping: {github_output}")
-        else:
-            repo_root = Path(__file__).parent
-            with open(gop, "a") as f:
-                f.write(f"pdf_path={output.relative_to(repo_root)}\n")
+    _emit_github_output(output)
 
 # ---------- pages-subset generation ----------
 
 def generate_pages(product_name: str, page_prefixes: list[str],
                    out_name: str | None, nofront: bool = False) -> None:
     """Generate a merged PDF from a subset of chapters, in the order given."""
+    if not page_prefixes:
+        print("  [error] --pages requires at least one chapter prefix")
+        sys.exit(1)
+
     config = PRODUCTS[product_name]
     docs_dir = PRODUCTS_DIR / product_name
 
@@ -703,15 +713,7 @@ def generate_pages(product_name: str, page_prefixes: list[str],
     # Publish the output path for GitHub Actions step chaining (single-chapter only,
     # matching the behaviour of generate_page() for the --page flag).
     if len(page_prefixes) == 1 and out_name is None:
-        github_output = os.environ.get("GITHUB_OUTPUT")
-        if github_output:
-            gop = Path(github_output)
-            if not gop.is_absolute() or ".." in gop.parts:
-                print(f"  [warn] GITHUB_OUTPUT path looks unsafe, skipping: {github_output}")
-            else:
-                repo_root = Path(__file__).parent
-                with open(gop, "a") as f:
-                    f.write(f"pdf_path={output.relative_to(repo_root)}\n")
+        _emit_github_output(output)
 
 
 # ---------- main ----------
