@@ -28,6 +28,11 @@ on:
         required: false
         type: string
         default: ''
+      page:
+        description: 'Path to a single markdown file to generate as a standalone PDF (e.g. docs/product/analytics/07-text-to-sql.md). Output is placed next to the source file with a .pdf extension. Mutually exclusive with product/pages.'
+        required: false
+        type: string
+        default: ''
       nofront:
         description: 'Omit the branded cover page from the generated PDF.'
         required: false
@@ -104,13 +109,23 @@ jobs:
           INPUT_PAGES: ${{ inputs.pages }}
           INPUT_PRODUCT: ${{ inputs.product }}
           INPUT_OUT: ${{ inputs.out }}
+          INPUT_PAGE: ${{ inputs.page }}
         run: |
+          # page is mutually exclusive with product and pages
+          if [ -n "$INPUT_PAGE" ] && [ -n "$INPUT_PRODUCT" ]; then
+            echo "Error: 'page' and 'product' are mutually exclusive."
+            exit 1
+          fi
+          if [ -n "$INPUT_PAGE" ] && [ -n "$INPUT_PAGES" ]; then
+            echo "Error: 'page' cannot be used with 'pages'."
+            exit 1
+          fi
           # pages requires a product
           if [ -n "$INPUT_PAGES" ] && [ -z "$INPUT_PRODUCT" ]; then
             echo "Error: 'pages' requires a product to be selected."
             exit 1
           fi
-          # out requires pages
+          # out requires pages (not valid for single-page mode)
           if [ -n "$INPUT_OUT" ] && [ -z "$INPUT_PAGES" ]; then
             echo "Error: 'out' is only valid when 'pages' is also specified."
             exit 1
@@ -148,9 +163,29 @@ jobs:
           git add "docs/product/$INPUT_PRODUCT/"*.pdf
           git diff --cached --quiet || git commit -m "docs($INPUT_PRODUCT): generate pages-subset PDF [skip ci]"
 
+      # ── Single-page mode (one .md file → .pdf next to it) ──────────────────────
+      - name: Generate single-page PDF
+        id: gen-page
+        if: github.event_name == 'workflow_dispatch' && inputs.page != ''
+        env:
+          INPUT_PAGE: ${{ inputs.page }}
+          NOFRONT: ${{ inputs.nofront }}
+        run: |
+          NOFRONT_FLAG=""
+          [ "$NOFRONT" = "true" ] && NOFRONT_FLAG="--nofront"
+          python generate_pdf.py --page "$INPUT_PAGE" ${NOFRONT_FLAG:+"$NOFRONT_FLAG"}
+
+      - name: Commit single-page PDF
+        if: github.event_name == 'workflow_dispatch' && inputs.page != ''
+        env:
+          PDF_PATH: ${{ steps.gen-page.outputs.pdf_path }}
+        run: |
+          git add "$PDF_PATH"
+          git diff --cached --quiet || git commit -m "docs: generate $(basename "$PDF_PATH") [skip ci]"
+
       # ── Single-product full mode (product selected, no pages) ────────────────
       - name: Generate single-product PDF
-        if: github.event_name == 'workflow_dispatch' && inputs.product != '' && inputs.pages == ''
+        if: github.event_name == 'workflow_dispatch' && inputs.product != '' && inputs.pages == '' && inputs.page == ''
         env:
           INPUT_PRODUCT: ${{ inputs.product }}
           NOFRONT: ${{ inputs.nofront }}
@@ -163,7 +198,7 @@ jobs:
 
       # ── All-products mode (push trigger, or dispatch with no product/pages) ───
       - name: Generate all PDFs
-        if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.product == '' && inputs.pages == '')
+        if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.product == '' && inputs.pages == '' && inputs.page == '')
         env:
           NOFRONT: ${{ inputs.nofront }}
         run: |
