@@ -868,8 +868,9 @@ class RoleAwareProjectionLayer:
         # Input:  list of role policy documents for all of the user's roles
         # Output: merged policy — { row_scope, column_masks }
 
-        # Row scope: intersection by key — only dimensions constrained by ALL roles are applied
-        #   Where two roles define different values for the same key, first role wins
+        # Row scope: strict AND — every condition from every role is applied; where two roles
+        #   constrain the same dimension, their value sets intersect (most restrictive wins,
+        #   independent of role order)
         # Column masks: union — masked by any role means masked for the user
         ...
 

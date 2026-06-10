@@ -654,7 +654,7 @@ flowchart LR
 
 **Stage 3 — DES Role Definition Retrieval.** Look up the full role definition for each extracted role from the Data Entitlements Store (DES). Each definition declares the data access scope, metric access set, dimension access set, row scope templates, column masks, and classification ceiling for that role. **DENY** — if no valid role definitions are retrieved the request is rejected.
 
-**Stage 4 — Multi-Role Merge.** Merge all retrieved role definitions into a single entitlement profile. Data, metric, and dimension access: union. Row scope: intersection (most restrictive wins). Column masks: union (masked by any role = masked for the user). No APPROVE/DENY decision is made here — this stage produces the profile against which all decisions are made in Stage 5.
+**Stage 4 — Multi-Role Merge.** Merge all retrieved role definitions into a single entitlement profile. Data, metric, and dimension access: union. Row scope: strict intersection (AND) — every condition from every role applies; where two roles constrain the same dimension, their value sets intersect. Most restrictive wins, independent of role order. Column masks: union (masked by any role = masked for the user). No APPROVE/DENY decision is made here — this stage produces the profile against which all decisions are made in Stage 5.
 
 **Stage 5 — Entitlement Decisions.** Five classes of decision will be made against the merged entitlement profile:
 
@@ -677,7 +677,7 @@ No approved metric will reach the output without its full set of data access cle
 | Data access | Union | Entitlement via any role is sufficient |
 | Metrics access | Union | Entitlement via any role is sufficient |
 | Dimension access | Union | Entitlement via any role is sufficient |
-| Row scope access | Intersection (AND) | All scope conditions must be satisfied — most restrictive wins |
+| Row scope access | Strict intersection (AND) | Every condition from every role must be satisfied; value sets on the same dimension intersect — most restrictive wins, independent of role order |
 | Result set column masking | Union | A column masked by any role is masked for the user |
 
 ### Column Masking Modes
