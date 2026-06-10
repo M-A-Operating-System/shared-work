@@ -124,7 +124,8 @@ flowchart LR
     L["LLM"]
 
     subgraph I["Interface"]
-    M["API / Protocol Layer\n(MCP)"]
+        direction TB
+        M["API / Protocol Layer\n(MCP)"]
     end
 
     subgraph data["Database / Data Sources"]
@@ -134,6 +135,7 @@ flowchart LR
         D3["Graph Data API"]
     end
     clients --> L
+    L --> data
     clients --> M
     M --> data
 ```
@@ -151,10 +153,13 @@ flowchart LR
     L["LLM"]
     subgraph platform["Analytics Capability"]
         direction TB
-       M["API / Protocol Layer\n(MCP)"]
+        M["API / Protocol Layer\n(MCP)"]
         P1["Intent & Metric Resolution\nApproved Semantic Layer"]
         P2["Controls Pipeline\nEntitlement · Compliance"]
         P3["Federated Query Engine"]
+        M --> P1
+        P1 --> P2
+        P2 --> P3
     end
     subgraph data["Database / Data Sources"]
         direction TB
@@ -164,9 +169,6 @@ flowchart LR
     end
     clients --> platform
     clients --> L
-    M --> P1
-    P1 --> P2
-    P2 --> P3
     platform --> data
 ```
 
