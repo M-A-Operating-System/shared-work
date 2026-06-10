@@ -233,7 +233,9 @@ The Semantic Controls Layer validates the Logical Query Plan against its five ch
 ```sql
 -- Physical execution (FQE output)
 SELECT   p.portfolio_id,
-         SUM(p.daily_pnl) / SUM(p.opening_market_value)  AS portfolio_return,
+         -- value-weighted aggregation of the precomputed definition v2.1.0 return measure
+         SUM(p.total_return_net * p.market_value)
+                / SUM(p.market_value)                      AS portfolio_return,
          b.period_return                                   AS benchmark_return
 FROM     portfolio_fact        p
 JOIN     benchmark_timeseries  b  ON p.default_benchmark_id = b.benchmark_id
@@ -281,7 +283,7 @@ A risk officer asks: *"Which portfolios are breaching their VaR 95 limit today, 
 ```
 
 **2 · Intent resolution**
-The AI client identifies three metrics — `var_95`, `var_limit`, and `risk_factor_contribution` — and resolves this as a threshold-comparison pattern with a contributing-factor breakdown. `var_limit` is a per-portfolio governance parameter stored in the risk configuration domain; `risk_factor_contribution` carries `portfolio_id` and `factor_bucket` as required dimensions. All three are registered in the Semantic Metrics Repository and resolve cleanly against the metric registry.
+The Intent Resolution Agent (IRA) identifies three metrics — `var_95`, `var_limit`, and `risk_factor_contribution` — and resolves this as a threshold-comparison pattern with a contributing-factor breakdown. `var_limit` is a per-portfolio governance parameter stored in the risk configuration domain; `risk_factor_contribution` carries `portfolio_id` and `factor_bucket` as required dimensions. All three are registered in the Semantic Metrics Repository and resolve cleanly against the metric registry.
 
 ```
 -- Semantic Intent Resolution
@@ -315,7 +317,8 @@ SELECT   r.portfolio_id,
          r.risk_factor_contribution,
          r.factor_bucket,
          l.var_limit_value,
-         (r.var_95_value > l.var_limit_value) AS breach
+         (r.var_95_value > l.var_limit_value)  AS breach,
+         r.var_95_value / l.var_limit_value    AS breach_pct
 FROM     risk_engine.var_daily_positions r
 JOIN     dw_prod.portfolio_governance.var_limits l
   ON     r.portfolio_id = l.portfolio_id
@@ -324,7 +327,7 @@ WHERE    r.as_of_date   = current_date
 ORDER BY r.var_95_value DESC;
 
 -- Execution Response
--- data:      [{ portfolio_id, var_95_value, var_limit_value, breach, factor_bucket, risk_factor_contribution }, ...]
+-- data:      [{ portfolio_id, var_95_value, var_limit_value, breach, breach_pct, factor_bucket, risk_factor_contribution }, ...]
 -- audit:     lineage_id, data_sources_used, entitlement_snapshot
 ```
 

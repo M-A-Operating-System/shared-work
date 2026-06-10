@@ -848,7 +848,12 @@ All checks will pass. SCL will write a controls decision record to the ALS befor
   "decision":  "approved",
   "timestamp": "2026-05-18T09:32:44Z",
   "checks":    ["data_scale_check", "complexity_check", "classification_gate", "compliance_check", "concurrency_check"],
-  "result":    "all_passed"
+  "result":    "all_passed",
+  "signature": {
+    "algorithm": "ECDSA-P256-SHA256",
+    "key_id":    "analytics-platform-signing-key-2026-01",
+    "value":     "MEQCIBf4…"
+  }
 }
 ```
 
@@ -1011,6 +1016,8 @@ Intent patterns are registered classifications in the DVL. The initial set is de
 ### Chart Contract Table
 
 Chart contracts are registered specifications in the DVL, each binding an intent pattern to a chart type, axis assignments, and interaction semantics. The initial set is defined below; new contracts will be registered as the platform's visualisation vocabulary is extended.
+
+Contracts govern structure — chart type, axis assignments, encodings, and interaction semantics. Colour palettes are not part of the contract: they come from the platform's theme configuration, deterministic within a deployment and brandable across deployments.
 
 | Contract name | Intent patterns matched | Chart type | Key axis assignments | Interaction semantics |
 |---|---|---|---|---|

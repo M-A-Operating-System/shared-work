@@ -1310,6 +1310,7 @@ class FederatedQueryEngine:
 |----------|--------|-----------|
 | **Chart spec** | Vega-Lite v5 JSON | Industry-standard chart grammar; wide ecosystem for web, server-side, and image rendering |
 | **Table spec** | Platform-defined `type: "table"` extension | Vega-Lite has no native table mark; same `data` + `columns` convention |
+| **Colour palette** | Platform theme configuration | Not part of the chart contract — deterministic within a deployment, brandable across deployments |
 
 #### Data Visualization Language (DVL) input
 
