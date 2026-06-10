@@ -15,7 +15,7 @@ The table below maps each Chapter 1 capability to its reference implementation n
 |---|---|---|---|
 | MCP Capability Layer | MCP | `build_mcp_app()` + FastMCP router | Python 3.12 · FastMCP 2.x · Uvicorn · port 8000 · JWT via python-jose (RS256) |
 | Intent Resolution Agent | IRA | `IntentResolutionAgent` | Python · embedding similarity search over SMR · Anthropic Claude (intent ranking + compliance intent scoring) · confirmation cards |
-| Semantic Metrics Repository | SMR | `SemanticMetricsRepository` | DCS API — JSON documents: `analytical_metric`, `analytical_dimension`, `analytical_operation` |
+| Semantic Metrics Repository | SMR | `SemanticMetricsRepository` | DCS API — JSON documents: `analytical_metric`, `analytical_dimension`, `analytical_operation`, `analytical_dataset` |
 | Role-Aware Projection Layer | RAPL | `RoleAwareProjectionLayer` | Python · asyncpg · PostgreSQL `role_policies` |
 | Semantic Validation Layer | SVL | `SemanticValidationLayer` + `LQPGenerator` | Python · Pydantic v2 · JSON Schema validation |
 | Semantic Controls Layer | SCL | `SemanticControlsLayer` | Python · Redis (concurrency semaphore) · rules engine |
@@ -53,7 +53,7 @@ flowchart TD
     vega2img["vega2img (optional) · port 8001\nPython · FastMCP · vega-embed · Playwright (headless Chromium)\nStandalone MCP render service — not part of Analytics Platform"]
 
     subgraph dcs["Data Context Store (DCS)"]
-        SMR[("Semantic Metrics Repository (SMR)\nJSON documents: analytical_metric · analytical_dimension · analytical_operation\nlifecycle: proposed → in_review → approved → deprecated")]
+        SMR[("Semantic Metrics Repository (SMR)\nJSON documents: analytical_metric · analytical_dimension · analytical_operation · analytical_dataset\nlifecycle: proposed → in_review → approved → deprecated")]
         SDR[("Semantic Data Repository (SDR)\nJSON documents: data models · object models\ncritical data elements · physical schemas · data lineage")]
         SMR -->|"physical_mapping resolves against SDR schema metadata"| SDR
     end
@@ -87,7 +87,7 @@ flowchart TD
     NSA -->|"governed narrative"| Result
 ```
 
-The Semantic Metrics Repository (SMR) and the Semantic Data Repository (SDR) are two independent stores housed within the Data Context Store (DCS). The SDR is a pre-existing organisational component holding the foundational data definitions — data models, physical schemas, and data lineage. The SMR is a separate store holding the three analytical document types (`analytical_metric`, `analytical_dimension`, `analytical_operation`); both stores are built on the DCS's shared versioned storage, search index, and scoped access control, and both are reached through the DCS API. The `physical_mapping` fields in SMR metric definitions resolve against SDR schema metadata to locate the physical tables and columns behind each metric.
+The Semantic Metrics Repository (SMR) and the Semantic Data Repository (SDR) are two independent stores housed within the Data Context Store (DCS). The SDR is a pre-existing organisational component holding the foundational data definitions — data models, physical schemas, and data lineage. The SMR is a separate store holding the four analytical document types (`analytical_metric`, `analytical_dimension`, `analytical_operation`, `analytical_dataset`); both stores are built on the DCS's shared versioned storage, search index, and scoped access control, and both are reached through the DCS API. The `physical_mapping` fields in SMR metric definitions resolve against SDR schema metadata to locate the physical tables and columns behind each metric.
 
 
 ## 2.3 Layer-by-Layer Stack Decisions
@@ -560,7 +560,7 @@ class NarrativeSynthesisAgent:
 | **Runtime reads** | Direct DCS API query by Semantic Validation Layer | Definitions read from the authoritative source at resolution time |
 | **Search** | DCS native search index | `list_operations` queries the DCS index directly — no separate search infrastructure |
 
-The SMR and the SDR are two independent stores within the Data Context Store (DCS). The SMR holds three document types — `analytical_metric`, `analytical_dimension`, and `analytical_operation` — while the SDR holds the foundational data definitions. The DCS manages the full document lifecycle (draft → in review → approved → deprecated) for all three SMR types using the same versioned storage, search, and approval capabilities the SDR relies on.
+The SMR and the SDR are two independent stores within the Data Context Store (DCS). The SMR holds four document types — `analytical_metric`, `analytical_dimension`, `analytical_operation`, and `analytical_dataset` — while the SDR holds the foundational data definitions. The DCS manages the full document lifecycle (draft → in review → approved → deprecated) for all four SMR types using the same versioned storage, search, and approval capabilities the SDR relies on.
 
 #### SMR document type: `analytical_metric`
 
@@ -648,6 +648,42 @@ The operation catalogue. One document per approved operation. The `execution_pro
   "optional_params":     ["as_of_date", "asset_class"],
   "supported_metrics":   [],
   "supported_dimensions": ["portfolio_id", "asset_class", "currency", "instrument_id", "as_of_date"]
+}
+```
+
+#### SMR document type: `analytical_dataset`
+
+The governed dataset contract for bulk retrieval. The `approved_fields` set — with per-field classification — defines exactly which columns a `data_retrieval` operation may return for this dataset; fields above the caller's classification ceiling are excluded at projection time.
+
+```json
+{
+  "type":             "analytical_dataset",
+  "org_id":           "acme-wealth",
+  "dataset_id":       "fixed_income_daily_positions",
+  "version":          1,
+  "status":           "approved",
+  "source":           "platform",
+  "display_name":     "Fixed Income Daily Positions",
+  "description":      "Daily position and PnL records for fixed income portfolios.",
+  "domain":           "portfolio",
+  "data_affinity":    "portfolio",
+  "physical_mapping": { "source": "primary-warehouse", "table": "positions_fact" },
+  "approved_fields": [
+    { "field": "portfolio_id",  "classification_level": "internal" },
+    { "field": "instrument_id", "classification_level": "internal" },
+    { "field": "asset_class",   "classification_level": "internal" },
+    { "field": "daily_pnl",     "classification_level": "internal" },
+    { "field": "market_value",  "classification_level": "internal" },
+    { "field": "duration",      "classification_level": "internal" },
+    { "field": "currency",      "classification_level": "internal" },
+    { "field": "position_date", "classification_level": "internal" }
+  ],
+  "required_dimensions": ["portfolio_id", "position_date"],
+  "pagination":       { "default_page_size": 10000, "max_page_size": 50000 },
+  "refresh_cadence":  "daily",
+  "approved_by":      "cdo@acme.com",
+  "approved_at":      "2026-05-14T09:00:00Z",
+  "created_at":       "2026-05-13T14:32:00Z"
 }
 ```
 

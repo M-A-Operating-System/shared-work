@@ -371,7 +371,7 @@ pagination:     page_size = 10,000 rows
 ```
 
 **2 · Dataset and entitlement resolution**
-The dataset identifier resolves against the Semantic Metrics Repository — only registered, approved datasets are retrievable. The registry resolves the dataset to its approved field set. The agent's access permissions are projected: results restricted to authorised portfolios, fields exceeding the agent's data classification ceiling excluded.
+The dataset identifier resolves against an approved `analytical_dataset` contract in the Semantic Metrics Repository — only registered, approved datasets are retrievable. The contract declares the dataset's approved field set. The agent's access permissions are projected: results restricted to authorised portfolios, fields exceeding the agent's data classification ceiling excluded.
 
 ```
 -- Dataset & Entitlement Resolution
