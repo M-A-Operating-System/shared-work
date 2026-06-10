@@ -14,15 +14,17 @@ The table below maps each Chapter 1 capability to its reference implementation n
 | Capability (Ch01) | Abbr | Reference Implementation | Key Technology |
 |---|---|---|---|
 | MCP Capability Layer | MCP | `build_mcp_app()` + FastMCP router | Python 3.12 · FastMCP 2.x · Uvicorn · port 8000 · JWT via python-jose (RS256) |
-| Intent Resolution Agent | IRA | `IntentResolutionAgent` | Python · embedding similarity search over SMR · Anthropic Claude (intent ranking) · confirmation cards |
-| Semantic Metrics Repository | SMR | `SemanticMetricsRepository` | DCS API — JSON documents: `analytical_metric`, `analytical_dimension`, `analytical_operation` |
-| Role-Aware Projection Layer | RAPL | `RoleAwareProjectionLayer` | Python · asyncpg · PostgreSQL `role_policies` |
+| Intent Resolution Agent | IRA | `IntentResolutionAgent` | Python · embedding similarity search over SMR · Anthropic Claude (intent ranking + compliance intent scoring) · confirmation cards |
+| Semantic Metrics Repository | SMR | `SemanticMetricsRepository` | DCS API — JSON documents: `analytical_metric`, `analytical_dimension`, `analytical_operation`, `analytical_dataset` |
+| Role-Aware Projection Layer | RAPL | `RoleAwareProjectionLayer` | Python · asyncpg · role definition lookup from the DES |
+| Data Entitlements Store | DES | PostgreSQL `role_policies` schema | Dedicated schema + credentials — logically separate even when co-located; written only by the Entitlements Manager, not via the platform Admin API |
 | Semantic Validation Layer | SVL | `SemanticValidationLayer` + `LQPGenerator` | Python · Pydantic v2 · JSON Schema validation |
 | Semantic Controls Layer | SCL | `SemanticControlsLayer` | Python · Redis (concurrency semaphore) · rules engine |
 | Physical Query Planner | PQP | `PhysicalQueryPlanner` | Apache Calcite · physical_mapping → catalog reference binding · LQP → federated Trino SQL |
 | Federated Query Engine | FQE | `FederatedQueryEngine` (Starburst client) | Starburst (Trino) · native federation across catalog connectors — Snowflake · lakehouse · dbt Semantic Layer · Neo4j · REST/OData |
 | Data Visualization Language | DVL | `DataVisualizationLanguage` | Python · priority-ordered chart contract evaluation · output: Vega-Lite v5 spec |
 | Narrative Synthesis Agent | NSA | `NarrativeSynthesisAgent` | Claude Haiku 4.5 (simple queries) · Claude Sonnet 4.6 (complex queries) |
+| Provenance Artifact Service | PAS | `ProvenanceArtifactService` | In-process Python module · ECDSA P-256 signing (key from Vault) · S3 sibling document `{result_id}_provenance.json` |
 | Analytical Lineage Store | ALS | `AnalyticalLineageStore` | AWS S3 (JSON records per query) · PostgreSQL `lineage_index` (scalar search) |
 | Result Cache | — | `ResultCache` | Redis · SHA-256 cache key · 5-min TTL · compliance queries bypass cache |
 
@@ -37,14 +39,15 @@ flowchart TD
 
     subgraph analytics["AI Analytics Platform"]
         MCP["FastMCP / Uvicorn (MCP)\nPython 3.12 · MCP Streamable HTTP · port 8000\nJWT — python-jose · JWKS · RS256"]
-        IRA["Anthropic Claude (IRA)\nembedding similarity search over SMR (RAG) · intent ranking\nnatural language → resolved operation_id + params · confirmation cards"]
-        RAPL["PostgreSQL (RAPL)\nPython · asyncpg · role_policies\nJWT claims → row scope injection · column masking"]
-        SVL["Pydantic / Python (SVL)\nJSON Schema validation · SMR resolution\ncompliance intent scoring · LQP generation"]
+        IRA["Anthropic Claude (IRA)\nembedding similarity search over SMR (RAG) · intent ranking · compliance intent scoring\nnatural language → resolved operation_id + params · confirmation cards"]
+        RAPL["Python + asyncpg (RAPL)\nrole definition lookup from DES\nJWT claims → row scope injection · column masking"]
+        SVL["Pydantic / Python (SVL)\nJSON Schema validation · SMR resolution\ncompliance signal evaluation · LQP generation"]
         SCL["Redis + Python rules (SCL)\ndata scale · complexity · classification · compliance · concurrency\nRedis concurrency semaphore"]
         PQP["Apache Calcite (PQP)\nphysical_mapping resolution · catalog reference binding\nLQP → federated Trino SQL"]
         FQE["Starburst (FQE)\nTrino-based native federation across catalog connectors\npredicate push-down · parallel execution · result assembly"]
         DVL["Vega-Lite (DVL)\nPython · ontology evaluation · deterministic chart contract selection\noutput: Vega-Lite v5 spec"]
         NSA["Anthropic Claude (NSA)\nHaiku 4.5 — simple queries · Sonnet 4.6 — complex queries\nanchored strictly to result values"]
+        PAS["ProvenanceArtifactService (PAS)\nin-process Python module — compliance queries only\nassembles + seals artifact — ECDSA P-256 (key from Vault)"]
         Cache[("Redis (Result Cache)\nSHA-256 cache key · 5-min TTL\ncompliance queries bypass")]
         LS[("AWS S3 + PostgreSQL (ALS)\nS3 — JSON record per query\nPostgreSQL lineage_index — scalar search")]
         Result(["MCP tool response\ndisplay_spec + data + narrative + result_id\n+ compliance block if Provenance Artifact active"])
@@ -53,9 +56,13 @@ flowchart TD
     vega2img["vega2img (optional) · port 8001\nPython · FastMCP · vega-embed · Playwright (headless Chromium)\nStandalone MCP render service — not part of Analytics Platform"]
 
     subgraph dcs["Data Context Store (DCS)"]
-        SMR[("Semantic Metrics Repository (SMR)\nJSON documents: analytical_metric · analytical_dimension · analytical_operation\nlifecycle: proposed → in_review → approved → deprecated")]
+        SMR[("Semantic Metrics Repository (SMR)\nJSON documents: analytical_metric · analytical_dimension · analytical_operation · analytical_dataset\nlifecycle: proposed → in_review → approved → deprecated")]
         SDR[("Semantic Data Repository (SDR)\nJSON documents: data models · object models\ncritical data elements · physical schemas · data lineage")]
         SMR -->|"physical_mapping resolves against SDR schema metadata"| SDR
+    end
+
+    subgraph des["Data Entitlements Store (DES)"]
+        ENT[("PostgreSQL role_policies schema\ndedicated schema + credentials\nwritten only by the Entitlements Manager")]
     end
 
     subgraph backends["Starburst Catalog Connectors"]
@@ -71,6 +78,7 @@ flowchart TD
     MCP -->|"structured call (operation_id + params) — bypasses IRA"| RAPL
     IRA -->|"RAG retrieval over operation/metric embeddings"| SMR
     IRA -->|"resolved operation_id + params"| RAPL
+    RAPL -->|"role definition lookup"| ENT
     RAPL -->|"entitlement projection (row scope + column masks)"| SVL
     SVL -->|"metric + dimension ID resolution"| SMR
     SVL -->|"validated LQP"| SCL
@@ -85,9 +93,11 @@ flowchart TD
     FQE -->|"assembled result"| NSA
     DVL -->|"DVL display spec"| Result
     NSA -->|"governed narrative"| Result
+    LS -->|"lineage records (compliance queries only)"| PAS
+    PAS -->|"sealed compliance block"| Result
 ```
 
-The Semantic Metrics Repository (SMR) and the Semantic Data Repository (SDR) are two independent stores housed within the Data Context Store (DCS). The SDR is a pre-existing organisational component holding the foundational data definitions — data models, physical schemas, and data lineage. The SMR is a separate store holding the three analytical document types (`analytical_metric`, `analytical_dimension`, `analytical_operation`); both stores are built on the DCS's shared versioned storage, search index, and scoped access control, and both are reached through the DCS API. The `physical_mapping` fields in SMR metric definitions resolve against SDR schema metadata to locate the physical tables and columns behind each metric.
+The Semantic Metrics Repository (SMR) and the Semantic Data Repository (SDR) are two independent stores housed within the Data Context Store (DCS). The SDR is a pre-existing organisational component holding the foundational data definitions — data models, physical schemas, and data lineage. The SMR is a separate store holding the four analytical document types (`analytical_metric`, `analytical_dimension`, `analytical_operation`, `analytical_dataset`); both stores are built on the DCS's shared versioned storage, search index, and scoped access control, and both are reached through the DCS API. The `physical_mapping` fields in SMR metric definitions resolve against SDR schema metadata to locate the physical tables and columns behind each metric.
 
 
 ## 2.3 Layer-by-Layer Stack Decisions
@@ -107,11 +117,11 @@ The Semantic Metrics Repository (SMR) and the Semantic Data Repository (SDR) are
 
 FastMCP (`pip install fastmcp`) provides the `@mcp.tool()`, `@mcp.resource()`, and `@mcp.prompt()` decorators and handles MCP Streamable HTTP transport. Each analytical capability is a decorated Python function; the framework serialises schemas and routes calls automatically.
 
-The separation of tools and resources is intentional. All analytical execution goes through `run_analytics`, a single tool that delegates to the SMR for every operation definition. Resources expose static knowledge artifacts from the Knowledge Store; they contain no user data and require no governance evaluation. The SMR owns what operations exist, what parameters they require, and how deeply they run through the pipeline. The code owns only the execution engine.
+The separation of tools and resources is intentional. All analytical execution goes through `run_analytics`, a single tool that delegates to the SMR for every operation definition. Resources expose static knowledge artifacts from the Knowledge Store; they contain no user data and require no governance evaluation. The SMR owns what operations exist, what parameters they require, and which presentation stages they invoke. The code owns only the execution engine.
 
 #### Tools
 
-Three tools cover the entire analytical surface. The SMR owns every operation definition: what parameters it needs, what metrics and dimensions it supports, and how deeply it runs through the pipeline. No operation type is hardcoded in the execution layer.
+Three tools cover the entire analytical surface. The SMR owns every operation definition: what parameters it needs, what metrics and dimensions it supports, and which presentation stages it invokes. No operation type is hardcoded in the execution layer.
 
 ```python
 from fastmcp import FastMCP
@@ -146,8 +156,9 @@ class DrilldownInput(BaseModel):
 async def run_analytics(input: RunAnalyticsInput, jwt: str) -> dict:
     """Execute an SMR-registered analytical operation.
     Call list_operations first to discover valid operation_id values and their required params.
-    The execution pipeline depth — data retrieval, metric query, or full analytical — is determined
-    by the operation's execution_profile in the SMR, not by this tool."""
+    The presentation depth — raw dataset, display specification, or full analytical response — is
+    determined by the operation's execution_profile in the SMR, not by this tool; the full controls
+    pipeline runs for every operation."""
     # 1. Validate JWT → claims
     # 2. Resolve operation from SMR — rejects unknown/unapproved operation IDs
     # 3. Delegate to pipeline_executor.run — returns result shaped by execution_profile
@@ -165,9 +176,10 @@ async def list_operations(input: ListOperationsInput, jwt: str) -> dict:
 @mcp.tool()
 async def drilldown(input: DrilldownInput, jwt: str) -> dict:
     """Navigate into a dimension hierarchy from a prior result.
-    All filters, row scope conditions, and entitlement context from the original result are preserved."""
+    The parent result's analytical context (operation, filters, hierarchy position) is inherited;
+    entitlements and controls are re-evaluated in full for the derived query."""
     # 1. Validate JWT → claims
-    # 2. Delegate to drilldown_service.execute — inherits governance context from original result
+    # 2. Delegate to drilldown_service.execute — inherits analytical context, never approvals
     ...
 ```
 
@@ -223,10 +235,12 @@ class PipelineExecutor:
         # 1. RAPL computes the entitlement projection (row scope + column masks) from the caller's roles
         # 2. SVL validates the request, resolves metrics from the SMR, enforces the projection,
         #    and compiles the Logical Query Plan (LQP)
-        # 3. Branch on execution_profile:
-        #    data_retrieval  — PQP → FQE → { result_id, rows, schema }
-        #    metric_query    — SCL approval → PQP → FQE → { result_id, rows, schema }
-        #    full_analytical — SCL approval → ALS controls write → PQP → FQE → DVL + NSA in parallel
+        # 3. SCL approval (five checks — never skipped) → ALS controls write → PQP → FQE
+        # 4. Branch on execution_profile — presentation stages only; the controls pipeline above
+        #    is identical for every profile:
+        #    data_retrieval  — { result_id, rows, schema, pagination }
+        #    metric_query    — + DVL display_spec
+        #    full_analytical — + DVL + NSA in parallel (PAS when the compliance trigger is active)
         #                    → { result_id, rows, schema, display_spec, narrative, export_requires_lineage }
         # Note: DVL is CPU-bound; asyncio.to_thread prevents it blocking the NSA API call
         ...
@@ -236,28 +250,31 @@ class PipelineExecutor:
 
 ```python
 class DrilldownService:
-    def __init__(self, als, pqp, fqe, dvl, rapl, smr):
+    def __init__(self, als, rapl, svl, scl, pqp, fqe, dvl, smr):
         self.als  = als   # AnalyticalLineageStore — fetch original lineage records
+        self.rapl = rapl  # RoleAwareProjectionLayer — fresh entitlement projection at drilldown time
+        self.svl  = svl   # SemanticValidationLayer — re-enforce the projection on the derived LQP
+        self.scl  = scl   # SemanticControlsLayer — re-run the five checks on the derived query
         self.pqp  = pqp   # PhysicalQueryPlanner — re-plan the refined sub-queries
         self.fqe  = fqe   # FederatedQueryEngine — execute the refined federated query via Starburst
         self.dvl  = dvl   # DataVisualizationLanguage — generate updated display_spec
-        self.rapl = rapl  # RoleAwareProjectionLayer — re-apply row scope / column masks
         self.smr  = smr   # SemanticMetricsRepository — resolve drill-target metric definitions
 
     async def execute(self, input: DrilldownInput, claims: dict) -> dict:
         # Input:  drilldown request — parent result_id + hierarchy dimension + selected value
         # Output: { result_id, parent_id, rows, display_spec }
 
-        # 1. Fetch original lineage record — recovers the LQP and governance context
-        # 2. Clone original LQP and append a filter node for the selected hierarchy value
-        # 3. Skip RAPL and SCL — row scope is embedded in the original LQP; approval is inherited
-        # 4. Re-run PQP → FQE and DVL only to produce a narrowed result with an updated display spec
+        # 1. Fetch original lineage record — recovers the parent LQP and analytical context
+        # 2. Clone the parent LQP and append a filter node for the selected hierarchy value
+        # 3. Re-run the full pipeline on the derived query: fresh RAPL projection → SVL enforcement
+        #    → SCL five checks (hierarchy descent can grow scan volume) → PQP → FQE
+        # 4. DVL produces the updated display spec; lineage record written with parent_id linkage
         ...
 ```
 
 #### Execution profiles
 
-Each SMR operation carries an `execution_profile` that tells the pipeline executor which stages to invoke. Profile definitions are in [§MCP Capability Layer](./01-core-capabilities.md#mcp-capability-layer-mcp).
+Each SMR operation carries an `execution_profile` that tells the pipeline executor which presentation stages to invoke after the full deterministic pipeline has run. Profile definitions are in [§MCP Capability Layer](./01-core-capabilities.md#mcp-capability-layer-mcp).
 
 #### Resources
 
@@ -399,9 +416,10 @@ Error code reference table:
 | **Candidate retrieval** | Embedding similarity search over SMR operation/metric embeddings | RAG retrieval narrows the full catalogue to a handful of candidates before the model ranks them |
 | **Intent ranking** | Anthropic Claude | Ranks candidate operations and binds parameters from the natural-language query |
 | **Confirmation** | Candidate cards when intent is ambiguous | The user selects or refines before any query executes |
-| **Scope** | Natural-language requests only | Structured `operation_id` + `params` calls bypass the IRA entirely |
+| **Compliance intent** | `compliance_purpose_score` produced within the same ranking call | Signal 2 of the SCL's two-signal compliance gate; an ambiguous purpose triggers a clarification card rather than a guess |
+| **Scope** | Natural-language requests only | Structured `operation_id` + `params` calls bypass the IRA entirely and declare compliance purpose explicitly |
 
-The Intent Resolution Agent (IRA) is the only AI step in the pre-computation pipeline. It receives a natural-language query and the caller's JWT from the MCP layer, retrieves candidate operations from the SMR catalogue using embedding similarity search, ranks them with a language model, binds parameters to the leading candidate, and derives a presentation preview. When the top candidate is confident and unambiguous, the resolved intent is forwarded directly to the RAPL; when it is ambiguous, ranked candidate cards are returned to the consumer for selection or conversational refinement. The IRA produces no output visible to the end user once intent is resolved, and makes no governance or execution decisions — those belong to the deterministic pipeline that follows.
+The Intent Resolution Agent (IRA) is the only AI step in the pre-computation pipeline. It receives a natural-language query and the caller's JWT from the MCP layer, retrieves candidate operations from the SMR catalogue using embedding similarity search, ranks them with a language model, binds parameters to the leading candidate, and derives a presentation preview. Within the same ranking call it scores whether the stated purpose of the query is compliance-driven — the `compliance_purpose_score` forwarded with the resolved intent and consumed by the SCL's two-signal compliance gate — and clarifies with the user through the confirmation card flow when the purpose is ambiguous. When the top candidate is confident and unambiguous, the resolved intent is forwarded directly to the RAPL; when it is ambiguous, ranked candidate cards are returned to the consumer for selection or conversational refinement. The IRA produces no output visible to the end user once intent is resolved, and makes no governance or execution decisions — those belong to the deterministic pipeline that follows.
 
 ```python
 import anthropic
@@ -415,11 +433,12 @@ class IntentResolutionAgent:
 
     async def resolve(self, query: str, claims: dict) -> dict:
         # Input:  natural-language query + verified JWT claims
-        # Output: resolved intent — { operation_id, params, presentation_hint }
-        #         or a candidate-card set when intent is ambiguous
+        # Output: resolved intent — { operation_id, params, presentation_hint, compliance_purpose_score }
+        #         or a candidate-card set when intent or compliance purpose is ambiguous
 
         # 1. Embed the query and retrieve top-k candidate operations from the SMR by vector similarity
-        # 2. Rank candidates with the language model; bind params to the leading operation
+        # 2. Rank candidates with the language model; bind params to the leading operation;
+        #    score compliance intent of the stated purpose in the same call
         # 3. If the top candidate is confident and clear of the runner-up, return the resolved intent → RAPL
         # 4. Otherwise return ranked candidate cards for the consumer to select or refine
         ...
@@ -433,6 +452,13 @@ class IntentResolutionAgent:
         # Input:  query + candidate operations
         # Output: ranked candidates with bound params + confidence scores
         # The model only ranks and binds; it never selects chart types or makes governance decisions
+        ...
+
+    def _score_compliance_intent(self, query: str, ranked: dict) -> float:
+        # Input:  natural-language query + ranked leading candidate
+        # Output: float 0.0–1.0 — compliance purpose probability (Signal 2 of the two-signal gate)
+        # Scored by the language model within the same ranking call — no separate API call
+        # A score near complianceIntentThreshold triggers a clarification card instead of a guess
         ...
 ```
 
@@ -449,7 +475,7 @@ Structured API consumers that already know the `operation_id` skip the IRA entir
 | **SMR resolution** | Direct SMR service call | Synchronous lookup against the metric registry; rejects unregistered IDs before LQP generation |
 | **LQP generation** | Custom Python | Backend-agnostic DAG construction from validated parameters; deterministic for any given input |
 
-`SemanticValidationLayer` runs after the RAPL. It receives the entitlement projection (row scope and column masks) from the RAPL together with the resolved request, validates params, resolves metrics from the SMR, enforces the projection, scores compliance intent, and delegates DAG construction to `LQPGenerator`. The compliance score is attached to the LQP here so the SCL can apply its two-signal gate without requiring the caller to declare intent explicitly. The SVL also attaches a Tier-1 `preliminary_impact_estimate` — the sum of the resolved metrics' `performance_impact_weight` values — as a coarse indicator of query weight; the SCL replaces this with a precise `estimated_scan_rows` figure at its data-scale check.
+`SemanticValidationLayer` runs after the RAPL. It receives the entitlement projection (row scope and column masks) from the RAPL together with the resolved request, validates params, resolves metrics from the SMR, enforces the projection, attaches the IRA's compliance intent score, and delegates DAG construction to `LQPGenerator`. The SVL performs no compliance classification of its own — the `compliance_purpose_score` is produced by the IRA at intent resolution (structured calls, which bypass the IRA, declare compliance purpose explicitly via a `compliance_purpose` parameter); the SVL attaches it to the LQP so the SCL can apply its two-signal gate. The SVL also attaches a Tier-1 `preliminary_impact_estimate` — the sum of the resolved metrics' `performance_impact_weight` values — as a coarse indicator of query weight; the SCL replaces this with a precise `estimated_scan_rows` figure at its data-scale check.
 
 ```python
 class SemanticValidationLayer:
@@ -464,7 +490,8 @@ class SemanticValidationLayer:
         # 2. Resolve each metric ID from SMR — rejects unknown or non-approved metrics
         # 3. Enforce the RAPL projection — inject row scope filter nodes; embed column masks on the LQP
         # 4. Delegate DAG construction to LQPGenerator (see §Semantic Validation Layer — LQP examples)
-        # 5. Attach compliance_purpose_score — SCL reads this; caller never declares intent explicitly
+        # 5. Attach compliance_purpose_score from the resolved request — scored by the IRA for
+        #    natural-language queries; explicit compliance_purpose param for structured calls
         # 6. Attach preliminary_impact_estimate (Σ performance_impact_weight) — Tier-1 coarse estimate
         # 7. Retain resolved_metrics on LQP — SCL needs them for classification and compliance checks
         ...
@@ -472,17 +499,6 @@ class SemanticValidationLayer:
     def _validate_params(self, params: dict, required: list[str]) -> None:
         # Input:  raw params dict + required field list from SMR operation definition
         # Raises: ValueError listing all missing keys — fast rejection before SMR resolution
-        ...
-
-    def _score_compliance_intent(self, operation: dict, resolved_metrics: list[dict], params: dict) -> float:
-        # Input:  operation definition + resolved metric list + call params
-        # Output: float 0.0–1.0 — compliance intent probability score
-
-        # Three independent signals, summed and capped at 1.0:
-        #   +0.5 if operation_id contains a compliance keyword (regulatory, audit, report, compliance)
-        #   +0.3 if any resolved metric carries compliance_relevant: true
-        #   +0.2 if params include justification or regulatory_period keys
-        # SCL compares this score against compliance_intent_threshold in controls_config
         ...
 ```
 
@@ -536,9 +552,54 @@ class NarrativeSynthesisAgent:
 
     def _validate_numbers(self, narrative: str, rows: list[dict]) -> None:
         # Input:  generated narrative + result rows
-        # Raises: NarrativeValidationError if any numeric value in the narrative is not present
-        #         verbatim in the result rows — every cited figure must match a result value exactly
+        # Raises: NarrativeValidationError if any numeric value in the narrative is neither present
+        #         verbatim in the result rows nor a derived count recomputed from them —
+        #         entity counts ("2 of 4 portfolios") are verified against result cardinalities
         # Purpose: prevents hallucinated figures reaching the consumer
+        ...
+```
+
+
+### Provenance Artifact Service (PAS)
+
+> **Specification:** [§Provenance Artifact Service](./01-core-capabilities.md#provenance-artifact-service-pas)
+
+| Decision | Choice | Rationale |
+|----------|--------|-----------|
+| **Deployment** | In-process module within the `analytics-mcp` service | Invoked only for compliance-purpose queries — low volume; shares the S3 lineage bucket the service already writes to; no extra deployable |
+| **Signing** | ECDSA P-256 (SHA-256) via the `cryptography` library | Matches the artifact signature block in Chapter 0; any holder of the published public key can verify independently |
+| **Key management** | Private key injected from Vault / Kubernetes Secrets; public key published | Key never baked into container images; rotation via `key_id` |
+| **Sealing** | Artifact written to S3 as the `{result_id}_provenance.json` sibling document | Immutable from the moment of writing — same write-once semantics as lineage records |
+| **Export gate** | `export_requires_lineage: true` until the S3 write is confirmed | Consumer withholds export affordances until sealing is confirmed |
+
+The PAS runs in the parallel presentation-assembly step alongside the DVL and NSA, but only when the SCL's two-signal compliance check is active. It reads the projection, controls decision, and execution records for the current query from the ALS, assembles the Provenance Artifact document, signs it, writes it back to the ALS as an immutable sibling record, and returns the sealed compliance block for inclusion in the MCP tool response.
+
+> **Hardening note:** in this reference implementation the signing key is held in the `analytics-mcp` process. High-assurance deployments can isolate it by splitting the PAS into its own service, or by delegating signing to a cloud KMS/HSM so the private key is never exportable — the interface contract is unchanged either way.
+
+```python
+class ProvenanceArtifactService:
+    def __init__(self, als: "AnalyticalLineageStore", signing_key, key_id: str):
+        self.als         = als          # reads lineage records; writes the sealed sibling document
+        self.signing_key = signing_key  # ECDSA P-256 private key — injected from Vault, never logged
+        self.key_id      = key_id       # published with the artifact for verification and rotation
+
+    async def seal(self, result_id: str, lqp: dict, compliance: dict) -> dict:
+        # Input:  result_id + approved LQP + compliance context (signals, intent score, frameworks)
+        # Output: sealed compliance block — { compliance_purpose, intent_score, triggered_by_metrics,
+        #         triggered_by_frameworks, regulatory_trace_id, artifact_set_version,
+        #         export_requires_lineage, classification_ceiling_applied }
+
+        # 1. Fetch the projection, controls decision, and execution records from the ALS
+        # 2. Assemble the Provenance Artifact — intent, escalation signals, metric versions,
+        #    logical field spec, physical execution detail, entitlement snapshot
+        # 3. Sign the canonical serialised artifact — ECDSA-P256-SHA256, signed_fields listed
+        # 4. Write {result_id}_provenance.json to the ALS bucket — immutable sibling record
+        # 5. Return the compliance block; the export gate stays locked until the write is confirmed
+        ...
+
+    def _sign(self, artifact: dict) -> dict:
+        # Input:  assembled artifact dict
+        # Output: signature block — { algorithm, key_id, signed_fields, value, sealed_at }
         ...
 ```
 
@@ -554,7 +615,7 @@ class NarrativeSynthesisAgent:
 | **Runtime reads** | Direct DCS API query by Semantic Validation Layer | Definitions read from the authoritative source at resolution time |
 | **Search** | DCS native search index | `list_operations` queries the DCS index directly — no separate search infrastructure |
 
-The SMR and the SDR are two independent stores within the Data Context Store (DCS). The SMR holds three document types — `analytical_metric`, `analytical_dimension`, and `analytical_operation` — while the SDR holds the foundational data definitions. The DCS manages the full document lifecycle (draft → in review → approved → deprecated) for all three SMR types using the same versioned storage, search, and approval capabilities the SDR relies on.
+The SMR and the SDR are two independent stores within the Data Context Store (DCS). The SMR holds four document types — `analytical_metric`, `analytical_dimension`, `analytical_operation`, and `analytical_dataset` — while the SDR holds the foundational data definitions. The DCS manages the full document lifecycle (draft → in review → approved → deprecated) for all four SMR types using the same versioned storage, search, and approval capabilities the SDR relies on.
 
 #### SMR document type: `analytical_metric`
 
@@ -645,14 +706,50 @@ The operation catalogue. One document per approved operation. The `execution_pro
 }
 ```
 
+#### SMR document type: `analytical_dataset`
+
+The governed dataset contract for bulk retrieval. The `approved_fields` set — with per-field classification — defines exactly which columns a `data_retrieval` operation may return for this dataset; fields above the caller's classification ceiling are excluded at projection time.
+
+```json
+{
+  "type":             "analytical_dataset",
+  "org_id":           "acme-wealth",
+  "dataset_id":       "fixed_income_daily_positions",
+  "version":          1,
+  "status":           "approved",
+  "source":           "platform",
+  "display_name":     "Fixed Income Daily Positions",
+  "description":      "Daily position and PnL records for fixed income portfolios.",
+  "domain":           "portfolio",
+  "data_affinity":    "portfolio",
+  "physical_mapping": { "source": "primary-warehouse", "table": "positions_fact" },
+  "approved_fields": [
+    { "field": "portfolio_id",  "classification_level": "internal" },
+    { "field": "instrument_id", "classification_level": "internal" },
+    { "field": "asset_class",   "classification_level": "internal" },
+    { "field": "daily_pnl",     "classification_level": "internal" },
+    { "field": "market_value",  "classification_level": "internal" },
+    { "field": "duration",      "classification_level": "internal" },
+    { "field": "currency",      "classification_level": "internal" },
+    { "field": "position_date", "classification_level": "internal" }
+  ],
+  "required_dimensions": ["portfolio_id", "position_date"],
+  "pagination":       { "default_page_size": 10000, "max_page_size": 50000 },
+  "refresh_cadence":  "daily",
+  "approved_by":      "cdo@acme.com",
+  "approved_at":      "2026-05-14T09:00:00Z",
+  "created_at":       "2026-05-13T14:32:00Z"
+}
+```
+
 ```python
 class SemanticMetricsRepository:
-    def __init__(self, sdr_client):
-        self.sdr = sdr_client
+    def __init__(self, dcs_client):
+        self.dcs = dcs_client   # SMR documents are read through the DCS API
 
     async def get_operation(self, operation_id: str, claims: dict) -> dict:
         # Input:  operation_id string + JWT claims (for org_id scoping)
-        # Output: approved analytical_operation document from SDR
+        # Output: approved analytical_operation document from the SMR (via the DCS API)
         # Raises: OperationNotAvailableError if not found or status != "approved"
         ...
 
@@ -700,7 +797,7 @@ The MCP tool call JSON (metric IDs, dimension IDs, time period, filters) is the 
 }
 ```
 
-The Semantic Validation Layer resolves metric IDs against the SMR, enforces the RAPL entitlement projection, and emits a platform-agnostic LQP. The LQP carries resolved `physical_mapping` references, expanded time ranges, row scope filters, and a Tier-1 `preliminary_impact_estimate` for governance validation.
+The Semantic Validation Layer resolves metric IDs against the SMR, enforces the RAPL entitlement projection, and emits a platform-agnostic LQP. The LQP carries pinned metric definition versions, expanded time ranges, row scope filters, and a Tier-1 `preliminary_impact_estimate` for governance validation; physical mappings are resolved later by the PQP from the SMR, keyed on the pinned versions.
 
 #### LQP output example
 
@@ -715,8 +812,7 @@ The Semantic Validation Layer resolves metric IDs against the SMR, enforces the 
       "metric_id": "portfolio_return",
       "metric_version": "2.1.0",
       "aggregation": "value_weighted_average",
-      "data_affinity": "portfolio",
-      "physical_mapping": { "source": "primary-warehouse", "table": "fact_portfolio_daily" }
+      "data_affinity": "portfolio"
     },
     {
       "id": "node-2",
@@ -724,8 +820,7 @@ The Semantic Validation Layer resolves metric IDs against the SMR, enforces the 
       "metric_id": "tracking_error",
       "metric_version": "1.3.0",
       "aggregation": "value_weighted_average",
-      "data_affinity": "risk_metrics",
-      "physical_mapping": { "source": "risk-semantic-layer", "cube": "risk_cube" }
+      "data_affinity": "risk_metrics"
     },
     {
       "id": "node-3",
@@ -771,7 +866,7 @@ class LQPGenerator:
         # Input:  SMR operation + validated params + resolved metric documents + JWT claims
         # Output: LQP dict — { lqp_id, org_id, nodes: [...], output: terminal_node_id }
 
-        # 1. Emit one metric_scan node per resolved metric — carries physical_mapping and aggregation
+        # 1. Emit one metric_scan node per resolved metric — carries metric version, data affinity, and aggregation
         # 2. If metrics span >1 node, emit a join node — join keys inferred from shared required_dimensions
         # 3. Emit filter node from params["filters"] if present
         # 4. Emit time_expand node if time_period or as_of_date in params — resolves symbolic period to date range
@@ -805,28 +900,38 @@ class LQPGenerator:
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
 | **Implementation** | Custom middleware (Python) | Thin, stateless; computes the entitlement projection before the LQP is compiled |
-| **Role resolution** | JWT claim extraction + PostgreSQL role config | Role claim field name is configurable |
+| **Role resolution** | JWT claim extraction + DES role definition lookup | Role claim field name is configurable |
+| **Policy store (DES)** | PostgreSQL `role_policies` schema — the reference realisation of the Data Entitlements Store | Dedicated schema and credentials, logically separate from platform data; written only by the Entitlements Manager — not writable via the platform Admin API |
 | **Row scope** | `{{user.claim_name}}` template interpolation at projection time | Resolved from JWT claims; passed to the SVL, which injects the row scope filter nodes |
 | **Column masking** | Registered in the projection; applied post-assembly in the FQE result assembler | Post-assembly supports cross-backend result sets |
-| **Default policy** | `defaultDenyAll: true` | No access unless a matching role is found |
+| **Default policy** | Deny-by-default — fixed, not configurable | No access unless a matching role definition is found; an architectural property (P5), not a setting |
 
 #### Role policies schema
 
-Role policy documents are stored in the PostgreSQL `role_policies` table. Each document maps directly to the following JSON shape:
+Role policy documents are stored in the PostgreSQL `role_policies` schema — the reference realisation of the **Data Entitlements Store (DES)**. The schema carries its own credentials and is logically separate from platform data even when physically co-located; it is written only by the Entitlements Manager and is not writable through the platform Admin API. Organisations with an existing entitlement system substitute it behind the same role-definition read interface. Each document maps directly to the following JSON shape:
 
 ```json
 {
-  "role_id":        "regional_analyst",
-  "org_id":         "acme-wealth",
-  "allowed_metrics": null,
-  "denied_metrics":  ["var_99", "expected_shortfall"],
+  "role_id":                "regional_analyst",
+  "org_id":                 "acme-wealth",
+  "data_access_domains":    ["portfolio", "risk"],
+  "classification_ceiling": "internal",
+  "allowed_metrics":        null,
+  "denied_metrics":         ["var_99", "expected_shortfall"],
+  "allowed_dimensions":     null,
+  "denied_dimensions":      ["issuer"],
   "row_scope": {
     "portfolio": "portfolio_id IN ({{user.managed_portfolios}})"
   },
   "column_masks": {
     "aum": {
       "condition":   "{{user.roles}} NOT CONTAINS 'senior_analyst'",
-      "action":      "suppress",
+      "action":      "null_replacement",
+      "replacement": null
+    },
+    "client_id": {
+      "condition":   "always",
+      "action":      "hash_replacement",
       "replacement": null
     }
   },
@@ -841,10 +946,14 @@ Field reference:
 |-------|------|-------------|
 | `role_id` | string | Matches the role name in the JWT `analytics_roles` claim |
 | `org_id` | string | Organisation scope — one policy per org per role |
+| `data_access_domains` | array | Data domains the role may access; requests outside them are **DENIED** (`DATA_NOT_ENTITLED`) |
+| `classification_ceiling` | string | Highest classification level the role may touch; metrics and fields above it are denied or excluded |
 | `allowed_metrics` | array \| null | Null = all metrics permitted; array = explicit allowlist |
-| `denied_metrics` | array | Metric IDs denied regardless of `allowed_metrics` |
+| `denied_metrics` | array | Metric IDs denied regardless of `allowed_metrics` (`METRIC_NOT_ENTITLED`) |
+| `allowed_dimensions` | array \| null | Null = all dimensions permitted; array = explicit allowlist |
+| `denied_dimensions` | array | Dimension IDs denied regardless of `allowed_dimensions` (`DIMENSION_NOT_ENTITLED`) |
 | `row_scope` | object | Key = dimension name; value = `{{user.claim}}` template string |
-| `column_masks` | object | Key = field name; value = mask rule with `action: "suppress"` or `"hash"` |
+| `column_masks` | object | Key = field name; value = mask rule with `action:` one of `null_replacement`, `redacted_label`, `excluded`, `hash_replacement` |
 
 ```python
 class RoleAwareProjectionLayer:
@@ -854,11 +963,12 @@ class RoleAwareProjectionLayer:
 
     async def project(self, request: dict, claims: dict) -> dict:
         # Input:  resolved request (operation + params) + JWT claims
-        # Output: entitlement projection — { metric_access, dimension_access, row_scope, column_masks }
+        # Output: entitlement projection — { data_access_domains, classification_ceiling,
+        #         metric_access, dimension_access, row_scope, column_masks }
         #         consumed by the SVL, which enforces it while compiling the LQP
 
         # 1. Extract analytics_roles from claims — roleClaimField is configurable
-        # 2. Load a role policy for each role — raises AccessDeniedError if none found (defaultDenyAll)
+        # 2. Load a role policy for each role — raises AccessDeniedError if none found (deny-by-default — not configurable)
         # 3. Merge policies — row scope intersected; column masks unioned
         # 4. Resolve row scope templates against the JWT claims into concrete conditions
         # 5. Return the projection — the SVL injects the row scope nodes and embeds the column masks
@@ -866,10 +976,14 @@ class RoleAwareProjectionLayer:
 
     def _merge_policies(self, policies: list[dict]) -> dict:
         # Input:  list of role policy documents for all of the user's roles
-        # Output: merged policy — { row_scope, column_masks }
+        # Output: merged policy — { data_access_domains, classification_ceiling,
+        #         metric_access, dimension_access, row_scope, column_masks }
 
-        # Row scope: intersection by key — only dimensions constrained by ALL roles are applied
-        #   Where two roles define different values for the same key, first role wins
+        # Data domains, metric access, dimension access: union — entitlement via any role suffices
+        # Classification ceiling: highest ceiling across the user's roles
+        # Row scope: strict AND — every condition from every role is applied; where two roles
+        #   constrain the same dimension, their value sets intersect (most restrictive wins,
+        #   independent of role order)
         # Column masks: union — masked by any role means masked for the user
         ...
 
@@ -902,29 +1016,29 @@ class RoleAwareProjectionLayer:
 | **Data-scale estimation** | Tier-2 `estimated_scan_rows` from SDR profiling statistics | Precise scan volume computed from row counts, partition sizes, and time-series distributions; replaces the SVL's Tier-1 `preliminary_impact_estimate` |
 | **Config store** | DCS document store — `controls_config` document type | Platform-level thresholds stored as a JSON document alongside SMR documents |
 
-Concurrent query enforcement uses a Redis-backed semaphore rather than an in-process counter, ensuring the limit applies across all running pods.
+Concurrent query enforcement uses a Redis-backed semaphore rather than an in-process counter, ensuring the limit applies across all running pods. The implementation acquires the concurrency slot first, as a cheap admission control before computing scan estimates — check evaluation order is an implementation detail; all five outcomes are recorded in the controls decision record regardless.
 
 The platform has one controls config document. The Semantic Controls Layer reads it at startup and refreshes it on change events from the DCS:
 
 ```json
 {
-  "type":                       "controls_config",
-  "org_id":                     "acme-wealth",
-  "max_scan_rows":              50000000,
-  "max_metrics_per_query":      10,
-  "max_dimensions":             5,
-  "max_join_depth":             4,
-  "classification_gate":        true,
-  "blocked_classifications":    ["TOP_SECRET", "RESTRICTED"],
-  "max_concurrent_queries":     20,
-  "query_timeout_seconds":      60,
-  "require_lineage_for_export": true,
-  "audit_all_queries":          true,
-  "compliance_intent_threshold": 0.8
+  "type":                      "controls_config",
+  "org_id":                    "acme-wealth",
+  "maxScanRows":               50000000,
+  "maxMetricsPerQuery":        10,
+  "maxDimensions":             5,
+  "maxJoinDepth":              4,
+  "classificationGate":        true,
+  "blockedClassifications":    ["TOP_SECRET", "RESTRICTED"],
+  "maxConcurrentQueries":      20,
+  "queryTimeoutSeconds":       60,
+  "requireLineageForExport":   true,
+  "auditAllQueries":           true,
+  "complianceIntentThreshold": 0.8
 }
 ```
 
-Compliance is always active and evaluated per request — there is no platform on/off switch. The `compliance_intent_threshold` only tunes the sensitivity of the second signal.
+Compliance is always active and evaluated per request — there is no platform on/off switch. The `complianceIntentThreshold` only tunes the sensitivity of the second signal.
 
 ```python
 class SemanticControlsLayer:
@@ -934,7 +1048,7 @@ class SemanticControlsLayer:
         self.redis = redis_client
 
     async def _acquire_query_slot(self, org_id: str, config: dict) -> None:
-        # Input:  org_id + controls config (for max_concurrent_queries and timeout)
+        # Input:  org_id + controls config (for maxConcurrentQueries and timeout)
         # Raises: ConcurrentQueryLimitExceeded if the org is at its concurrent query ceiling
         # Uses Redis INCR as a cross-pod atomic counter — safe under horizontal scaling
         ...
@@ -951,7 +1065,7 @@ class SemanticControlsLayer:
         # The five sequential checks:
         # 1. Load controls config for the org
         # 2. Concurrency  — acquire Redis query slot; ConcurrentQueryLimitExceeded if at ceiling
-        # 3. Data scale   — compute estimated_scan_rows from SDR profiling; ControlsCeilingExceeded if > max_scan_rows
+        # 3. Data scale   — compute estimated_scan_rows from SDR profiling; ControlsCeilingExceeded if > maxScanRows
         # 4. Complexity   — node count and join depth vs limits; ControlsCeilingExceeded if exceeded
         # 5. Classification gate — ClassificationGateError if any metric is in blocked_classifications
         # 6. Compliance   — two-signal trigger; escalates to Provenance Artifact if both signals active
@@ -960,7 +1074,7 @@ class SemanticControlsLayer:
 
     def _estimate_scan_rows(self, lqp: dict, config: dict) -> int:
         # Input:  LQP with resolved_metrics and nodes
-        # Output: Tier-2 estimated_scan_rows — compared against config["max_scan_rows"]
+        # Output: Tier-2 estimated_scan_rows — compared against config["maxScanRows"]
 
         # Computed from SDR profiling statistics rather than a static weight:
         #   - base table row counts for each metric_scan node's physical_mapping
@@ -980,12 +1094,12 @@ class SemanticControlsLayer:
         ...
 
     def _check_compliance(self, lqp: dict, claims: dict, config: dict) -> dict:
-        # Input:  LQP (with compliance_purpose_score from SVL) + controls config
+        # Input:  LQP (with compliance_purpose_score — scored by the IRA, attached by the SVL) + controls config
         # Output: LQP with a compliance block attached
 
         # Two-signal gate (always evaluated — no platform on/off switch):
         #   Signal 1 — any resolved metric has compliance_relevant: true
-        #   Signal 2 — compliance_purpose_score >= compliance_intent_threshold (default 0.8)
+        #   Signal 2 — compliance_purpose_score >= complianceIntentThreshold (default 0.8)
         # Both signals active → compliance_purpose = true: Provenance Artifact required,
         #   triggered_by_frameworks derived from metric regulatory_framework tags,
         #   cache bypassed, export gated until lineage sealed
@@ -1006,15 +1120,15 @@ class SemanticControlsLayer:
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
 | **Implementation** | Apache Calcite (Python-hosted) | Builds a relational tree from the LQP and emits SQL; battle-tested, dialect-aware |
-| **Catalog binding** | `physical_mapping.source` → Starburst catalog name | Each registered source is a Starburst catalog; binding is a lookup, no extra SMR call |
+| **Catalog binding** | SMR `physical_mapping` lookup → Starburst catalog name | The PQP resolves each node's `physical_mapping` from the SMR, keyed on the pinned metric version, then binds `source` → catalog |
 | **Output** | A single **federated Trino SQL** statement | Starburst performs the cross-source join natively; no per-backend decomposition needed |
 | **Execution** | None | The PQP has no backend connectivity; it hands the federated SQL to the FQE (Starburst) |
 
-The Physical Query Planner receives the controls-approved LQP from the SCL and translates it into a single **federated Trino SQL** statement ready for Starburst to execute. For each `metric_scan` node it resolves the `physical_mapping` already attached by the SVL and binds it to a Starburst **catalog** reference (`catalog.schema.table`). It builds a Calcite relational tree from the LQP nodes — scans, joins, filters, time expansion, and sort — distributes the row scope filters, dimension filters, and column-mask directives into the statement, and emits Trino-dialect SQL. Because Starburst federates across catalogs natively, the PQP no longer decomposes the plan into per-backend sub-plans; the single statement references every catalog the query touches, and Starburst plans the cross-source join itself. This realises Chapter 1's PQP sub-plan/FQE execution contract inside Starburst — the per-source split happens in the engine rather than in application code. The PQP has no execution capability — it passes the federated SQL to the FQE.
+The Physical Query Planner receives the controls-approved LQP from the SCL and translates it into a single **federated Trino SQL** statement ready for Starburst to execute. For each `metric_scan` node it queries the SMR for the `physical_mapping` of the pinned metric definition version and binds it to a Starburst **catalog** reference (`catalog.schema.table`). It builds a Calcite relational tree from the LQP nodes — scans, joins, filters, time expansion, and sort — distributes the row scope filters, dimension filters, and column-mask directives into the statement, and emits Trino-dialect SQL. Because Starburst federates across catalogs natively, the PQP no longer decomposes the plan into per-backend sub-plans; the single statement references every catalog the query touches, and Starburst plans the cross-source join itself. This realises Chapter 1's PQP sub-plan/FQE execution contract inside Starburst — the per-source split happens in the engine rather than in application code. The PQP has no execution capability — it passes the federated SQL to the FQE.
 
 #### PQP input — approved LQP
 
-The PQP reads each metric node's `physical_mapping.source` to bind it to a Starburst catalog:
+The PQP resolves each metric node's `physical_mapping` from the SMR (keyed on the pinned metric version) and binds its `source` to a Starburst catalog:
 
 ```json
 {
@@ -1025,15 +1139,13 @@ The PQP reads each metric node's `physical_mapping.source` to bind it to a Starb
       "id": "node-1", "op": "metric_scan",
       "metric_id": "portfolio_return", "metric_version": "2.1.0",
       "aggregation": "value_weighted_average", "weight_metric_id": "market_value",
-      "data_affinity": "portfolio",
-      "physical_mapping": { "source": "primary-warehouse", "table": "fact_portfolio_daily" }
+      "data_affinity": "portfolio"
     },
     {
       "id": "node-2", "op": "metric_scan",
       "metric_id": "tracking_error", "metric_version": "1.3.0",
       "aggregation": "value_weighted_average", "weight_metric_id": "market_value",
-      "data_affinity": "risk_metrics",
-      "physical_mapping": { "source": "risk-semantic-layer", "cube": "risk_cube" }
+      "data_affinity": "risk_metrics"
     },
     { "id": "node-3", "op": "join",   "inputs": ["node-1", "node-2"], "join_keys": ["portfolio_id", "date"] },
     { "id": "node-4", "op": "filter", "input": "node-3",
@@ -1062,7 +1174,8 @@ class PhysicalQueryPlanner:
         # Input:  SCL-approved LQP
         # Output: federated Trino query — { federated_sql, catalogs_referenced, column_masks, query_timeout_seconds }
 
-        # 1. Resolve each metric_scan node's physical_mapping.source to a Starburst catalog (no extra SMR call)
+        # 1. Resolve each metric_scan node's physical_mapping from the SMR (pinned metric version),
+        #    then map physical_mapping.source → Starburst catalog
         # 2. Build a Calcite relational tree from the LQP nodes (scan, join, filter, time_expand, sort)
         # 3. Bind each scan to its catalog.schema.table reference; inject row scope + dimension filters
         # 4. Emit one Trino-dialect SQL statement — Starburst performs the cross-catalog join
@@ -1184,7 +1297,7 @@ class FederatedQueryEngine:
         ...
 
     def _apply_column_masks(self, rows: list[dict], lqp: dict) -> list[dict]:
-        # Applies the LQP's column_masks (null_replacement, redacted_label, excluded) post-execution
+        # Applies the LQP's column_masks (null_replacement, redacted_label, excluded, hash_replacement) post-execution
         ...
 ```
 
@@ -1197,6 +1310,7 @@ class FederatedQueryEngine:
 |----------|--------|-----------|
 | **Chart spec** | Vega-Lite v5 JSON | Industry-standard chart grammar; wide ecosystem for web, server-side, and image rendering |
 | **Table spec** | Platform-defined `type: "table"` extension | Vega-Lite has no native table mark; same `data` + `columns` convention |
+| **Colour palette** | Platform theme configuration | Not part of the chart contract — deterministic within a deployment, brandable across deployments |
 
 #### Data Visualization Language (DVL) input
 
@@ -1254,10 +1368,10 @@ Full DVL examples including the `type: "table"` spec are in [MCP Response Format
 
 ```python
 INTENT_CONTRACTS = {
-    ("ATTRIBUTION",  1): "ATTRIBUTION_WATERFALL",
+    ("ATTRIBUTION",  1): "WATERFALL_ATTRIBUTION",
     ("COMPARISON",   2): "BAR_MULTI_SERIES_COMPARISON",
-    ("TREND",        1): "LINE_TIME_SERIES",
-    ("DISTRIBUTION", 1): "HISTOGRAM",
+    ("TREND",        1): "LINE_TIME_SERIES_TREND",
+    ("DISTRIBUTION", 1): "HISTOGRAM_DISTRIBUTION",
 }
 
 class DataVisualizationLanguage:
@@ -1267,19 +1381,20 @@ class DataVisualizationLanguage:
 
         # 1. Infer intent pattern from operation's default_visualization field
         # 2. Match intent + metric count to a named chart contract
-        # 3. Build display spec for the matched contract — TABLE is the safe fallback for any unmatched case
+        # 3. Build display spec for the matched contract — TABLE_GOVERNED is the safe fallback for any unmatched case
         ...
 
     def _infer_intent(self, operation: dict) -> str:
         # Input:  SMR operation definition
-        # Output: intent pattern string — ATTRIBUTION, COMPARISON, TREND, DISTRIBUTION, or TABLE
+        # Output: intent pattern string — ATTRIBUTION, COMPARISON, TREND, or DISTRIBUTION
+        #         (no match → the TABLE_GOVERNED fallback applies downstream)
         # Derived from operation["default_visualization"] — set at metric authoring time
         ...
 
     def _match_contract(self, intent: str, schema: list) -> str:
         # Input:  intent pattern + result schema field list
-        # Output: named chart contract — e.g. BAR_MULTI_SERIES_COMPARISON, LINE_TIME_SERIES, TABLE
-        # Looks up (intent, metric_count) in INTENT_CONTRACTS map; defaults to TABLE
+        # Output: named chart contract — e.g. BAR_MULTI_SERIES_COMPARISON, LINE_TIME_SERIES_TREND, TABLE_GOVERNED
+        # Looks up (intent, metric_count) in INTENT_CONTRACTS map; defaults to TABLE_GOVERNED
         ...
 
     def _build_display_spec(self, contract: str, result: dict, operation: dict) -> dict:
@@ -1288,7 +1403,7 @@ class DataVisualizationLanguage:
 
         # Each contract has a fixed encoding shape — no runtime chart-type decisions
         # Multi-metric charts pivot to long form (one row per dimension × metric)
-        # TABLE is always the safe fallback if no contract matches
+        # TABLE_GOVERNED is always the safe fallback if no contract matches
         ...
 ```
 
@@ -1379,7 +1494,7 @@ if __name__ == "__main__":
 | **Lineage records** | S3-compatible object store — one JSON document per query | Write-once; append-only; cheap at scale; no schema migration required; natural fit for immutable audit records |
 | **Object key** | `lineage/{org_id}/{yyyy}/{mm}/{dd}/{result_id}.json` | Date-partitioned; enables prefix-based listing by time window |
 | **Search index** | Thin PostgreSQL table (scalar fields only, no JSON blobs) | Used by the Lineage Query REST API (see roadmap) for filtered search; full record always fetched from the object store |
-| **Retention** | Object lifecycle policy — default 7 years (configurable) | Long-horizon regulatory retention; enforced at the storage layer, not application code |
+| **Retention** | Object lifecycle policy — sample default 7 years (configurable) | Long-horizon regulatory retention; enforced at the storage layer, not application code. Periods are deployment choices — the design documents deliberately prescribe none |
 
 #### Lineage document schema
 
@@ -1451,7 +1566,7 @@ def utc_now() -> str:
 
 def compute_expiry(lqp: dict) -> str:
     # Input:  LQP — checks compliance_purpose to select retention period
-    # Output: ISO 8601 expiry timestamp — 7 years default; 10 years for compliance-purpose queries
+    # Output: ISO 8601 expiry timestamp — sample defaults: 7 years; 10 years for compliance-purpose queries
     ...
 
 class AnalyticalLineageStore:
@@ -1472,16 +1587,23 @@ class AnalyticalLineageStore:
         # PostgreSQL index used only to resolve the S3 key — full record always read from S3
         ...
 
+    async def write_projection(self, projection: dict, claims: dict) -> None:
+        # Input:  RAPL entitlement projection + JWT claims
+        # Writes the projection record to S3 keyed by intent_id (before lqp_id exists)
+        # First of the three ALS writes — entitlement decisions (including denials) are
+        # recorded even when the request stops before the SCL runs
+        ...
+
     async def write_controls_decision(self, lqp: dict, claims: dict) -> None:
         # Input:  SCL-approved LQP + JWT claims
         # Writes a controls_decision record to S3 keyed by lqp_id (before result_id exists)
-        # First of the two ALS writes — captures governance decision before FQE runs
+        # Second of the three ALS writes — captures governance decision before FQE runs
         ...
 
     async def write_execution(self, lqp: dict, result: dict) -> None:
         # Input:  approved LQP + assembled FQE result
         # Builds a full execution lineage record — includes the federated SQL + catalogs used, regulatory_frameworks, result summary
-        # Second of the two ALS writes — called by FQE after assembly
+        # Third of the three ALS writes — called by FQE after assembly
         # regulatory_frameworks aggregated from resolved_metrics with compliance_relevant: true
         ...
 
@@ -1535,7 +1657,7 @@ class KnowledgeStore:
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
 | **Store** | Redis (cluster mode) | Sub-millisecond read; TTL-native; cluster mode for HA |
-| **Cache key** | SHA-256 of `(org_id + operation_id + canonical_params + role_hash)` | Role hash ensures two users with different entitlements never share a cached result |
+| **Cache key** | SHA-256 of the canonical serialised LQP | The plan embeds `org_id`, the row-scope filter nodes, and `column_masks` — different effective entitlements produce different plans and therefore different keys, structurally |
 | **TTL** | 5 minutes default; configurable per operation via `cache_ttl_seconds` on `analytical_operation` | Short TTL balances freshness against backend load |
 | **Compliance bypass** | Queries with `compliance_purpose: true` skip read and write | Provenance Artifact requires a fresh execution record |
 | **Cache-aside pattern** | FQE checks before execution; writes after assembly | Cache is never on the critical governance path |
@@ -1547,10 +1669,11 @@ class ResultCache:
     def __init__(self, redis_client):
         self.redis = redis_client
 
-    def _key(self, lqp: dict, claims: dict) -> str:
-        # Input:  LQP (org_id + nodes) + claims (analytics_roles)
-        # Output: Redis key string — SHA-256 of canonical LQP payload + 8-char role hash
-        # Role hash ensures two users with different entitlements never share a cached result
+    def _key(self, lqp: dict) -> str:
+        # Input:  LQP — org_id, nodes (including the row-scope filter nodes), column_masks
+        # Output: Redis key string — SHA-256 of the canonical serialised LQP
+        # Entitlement isolation is structural: the plan embeds row scope and column masks,
+        # so different effective entitlements always produce different keys
         ...
 
     async def get(self, lqp: dict, claims: dict) -> dict | None:
@@ -1609,7 +1732,7 @@ async def build_app() -> FastMCP:
 
     # 1. Load config from env vars
     # 2. Construct infrastructure clients — asyncpg pool, S3, Redis, DCS, Anthropic
-    # 3. Construct platform services — ALS, ResultCache, SMR, IRA, RAPL, SVL, SCL, PQP, DVL, NSA
+    # 3. Construct platform services — ALS, ResultCache, SMR, IRA, RAPL, SVL, SCL, PQP, DVL, NSA, PAS
     # 4. Configure Starburst catalogs (one per registered source) + the physical_mapping.source → catalog map
     # 5. Assemble FederatedQueryEngine with the Starburst coordinator DSN + ALS + cache
     # 6. Assemble PipelineExecutor with all services injected (IRA → RAPL → SVL → SCL → PQP → FQE)
@@ -1635,6 +1758,8 @@ Configuration is read from environment variables at startup. Required variables:
 | `JWT_JWKS_URI` | JWKS endpoint for JWT public key retrieval |
 | `JWT_AUDIENCE` | Expected JWT audience claim |
 | `JWT_ISSUER` | Expected JWT issuer claim |
+| `PAS_SIGNING_KEY_PATH` | Path to the ECDSA P-256 private key mounted from Vault / Kubernetes Secrets (PAS artifact sealing) |
+| `PAS_SIGNING_KEY_ID` | Published key identifier included in artifact signature blocks (verification and rotation) |
 
 
 ## 2.4 Infrastructure
@@ -1644,10 +1769,10 @@ Configuration is read from environment variables at startup. Required variables:
 | MCP service | Python · FastMCP + Uvicorn | Lightweight ASGI MCP surface; deploys as Kubernetes pod |
 | Governance services | Kubernetes (cloud-agnostic) | IRA, RAPL, SVL, SCL, PQP, DVL, NSA as independently scalable pods |
 | Federated Query Engine | Starburst (Trino) — Enterprise or Galaxy | Coordinator + workers; one catalog per registered source; performs all cross-source federation |
-| Primary database | PostgreSQL (Neon or RDS) | Lineage search index, role policy config, scheduled queries, user preferences, saved queries |
+| Primary database | PostgreSQL (Neon or RDS) | Lineage search index, scheduled queries, user preferences, saved queries; also hosts the DES `role_policies` schema under separate credentials |
 | Data Context Store (DCS) | Pre-existing platform component | SMR metric definitions, controls config, SMR search — reuses SDR versioned storage and native search |
 | Knowledge Store | S3-compatible object store (versioned Markdown) | MCP resource content — guides, skills definitions, compliance reference |
-| Object storage | S3-compatible | Lineage records (one JSON document per query), result artefacts, large cached result sets |
+| Object storage | S3-compatible | Lineage records (one JSON document per query), result artifacts, large cached result sets |
 | Secrets | HashiCorp Vault or cloud-native | Starburst catalog credentials, platform service keys |
 
 ### Kubernetes Deployment Summary
@@ -1670,10 +1795,10 @@ All platform services run in a dedicated Kubernetes namespace (`analytics`). Sta
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
-| **Packaging** | Versioned JSON document bundles (one per domain) | Conforms directly to the SDR `analytical_metric` schema; idempotently importable via `POST /v1/smr/seed`; selective per-domain activation |
+| **Packaging** | Versioned JSON document bundles (one per domain) | Conforms directly to the SMR `analytical_metric` schema; idempotently importable via `POST /v1/admin/smr/seed`; selective per-domain activation |
 | **Distribution** | Bundled at installation; updatable from Semantic Registry Service | Air-gapped deployments supported |
 | **Activation** | `analyticalDomain` config triggers SMR import at initial platform setup | Bundle documents are written to the SMR in `proposed` state; Analytics Governance approves before metrics become resolvable |
-| **Customisation** | Full edit/override via Admin API after import | Customised definitions marked `source: "custom"` in the SDR document |
+| **Customisation** | Full edit/override via Admin API after import | Customised definitions marked `source: "custom"` in the SMR document |
 
 Each bundle is a JSON array of SMR documents conforming to the schemas defined in [§Semantic Metrics Repository](./01-core-capabilities.md#semantic-metrics-repository-smr). Bundles are seeded into the SMR in `"proposed"` state at initial platform setup; the Analytics Governance approves each document before it becomes resolvable by the Semantic Validation Layer.
 
@@ -1903,7 +2028,7 @@ One bundle covers all analytical dimensions. Every domain bundle's metrics and o
     "required_params":       ["portfolio_ids", "metrics", "time_period"],
     "optional_params":       ["benchmark_id"],
     "supported_metrics":     ["portfolio_return", "tracking_error", "sharpe_ratio", "volatility", "beta"],
-    "default_visualization": "bar_multi_series_comparison"
+    "default_visualization": "BAR_MULTI_SERIES_COMPARISON"
   },
   {
     "type":                  "analytical_operation",
@@ -1917,7 +2042,7 @@ One bundle covers all analytical dimensions. Every domain bundle's metrics and o
     "execution_profile":     "full_analytical",
     "required_params":       ["portfolio_id", "benchmark_id", "attribution_by", "time_period"],
     "supported_dimensions":  ["asset_class", "sector", "geography", "currency"],
-    "default_visualization": "attribution_waterfall"
+    "default_visualization": "WATERFALL_ATTRIBUTION"
   }
 ]
 ```
@@ -2114,7 +2239,7 @@ One bundle covers all analytical dimensions. Every domain bundle's metrics and o
     "required_params":       ["portfolio_id", "metrics", "attribution_by", "as_of_date"],
     "supported_metrics":     ["var_95", "var_99", "tracking_error", "beta", "duration", "expected_shortfall"],
     "supported_dimensions":  ["asset_class", "geography", "sector", "currency", "issuer"],
-    "default_visualization": "attribution_waterfall"
+    "default_visualization": "WATERFALL_ATTRIBUTION"
   }
 ]
 ```
@@ -2217,7 +2342,7 @@ All regulatory metrics carry `"classification_level": "restricted"`, `"complianc
     "supported_metrics":     ["lcr", "leverage_ratio", "nsfr"],
     "regulatory_framework":  ["<framework_id>"],
     "required_feature_flag": "regulatory_reporting",
-    "default_visualization": "table"
+    "default_visualization": "TABLE_GOVERNED"
   }
 ]
 ```

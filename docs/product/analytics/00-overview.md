@@ -20,7 +20,7 @@ The natural starting point for organisations is Text-to-SQL: use an LLM to gener
 - **No reproducible calculation record** — SQL is generated fresh each time; two identical queries are not guaranteed to produce identical results
 - **No guaranteed entitlement enforcement** — access controls depend on the reliability of AI-generated query predicates, not a guaranteed enforcement layer
 
-Training LLMs on database schemas improves query accuracy in early trials but addresses the symptom — table knowledge — not the problem. The governance gap remains. The [Text-to-SQL appendix](./04-text-to-sql-antipattern.md) examines the failure modes in detail.
+Training LLMs on database schemas improves query accuracy in early trials but addresses the symptom — table knowledge — not the problem. The governance gap remains. The [Text-to-SQL appendix](./04-text-to-sql-antipattern.md) examines these failure modes in detail — and where Text-to-SQL does belong: as the exploration layer alongside the governed execution layer, with outputs promoted into the registry when they need to become reliable.
 
 ### The platform
 
@@ -68,7 +68,7 @@ A defining characteristic of this architecture is that **the Analytics Engine ne
 
 The Analytics Engine contains exactly two targeted uses of AI, both strictly bounded:
 
-1. **Intent resolution** — the Intent Resolution Agent (IRA) is the first step in the pipeline and a contained, bounded AI component. It receives a natural language question, retrieves candidate operations from the SMR catalogue using embedding similarity (RAG), and uses a language model to rank them and bind the user's parameters — mapping the question to one or more registered analytics definitions in the SMR. The language model selects from the governed inventory; it does not construct queries or access data.
+1. **Intent resolution** — the Intent Resolution Agent (IRA) is the first step in the pipeline and a contained, bounded AI component. It receives a natural language question, retrieves candidate operations from the SMR catalogue using embedding similarity (RAG), and uses a language model to rank them and bind the user's parameters — mapping the question to one or more registered analytics definitions in the SMR. The language model selects from the governed inventory; it does not construct queries or access data. As part of the same step, the IRA classifies whether the user's stated purpose is compliance-driven — the second signal of the two-signal compliance trigger — and asks the user to clarify when the purpose is ambiguous.
 
 2. **Narrative synthesis** — after computation completes, the Narrative Synthesis Agent (NSA) makes a single, tightly-scoped language model call to produce a brief plain-language summary of the result, anchored strictly to the computed values. It is told what the data shows; it cannot introduce figures, comparisons, or interpretations not present in the result.
 
@@ -95,7 +95,7 @@ Ten principles govern all design decisions. Where a proposed feature conflicts w
 | **P2 — Controls before execution** | Every query passes through the full controls pipeline before any database is contacted. There is no fast path. |
 | **P3 — Deterministic metric resolution** | A metric name resolves to exactly one approved definition at a given point in time. "Portfolio Return" means the same thing in every query, every report, and every regulatory submission under the same version. |
 | **P4 — Complete analytical lineage** | Every result carries a complete, queryable record of how the analytics engine used individual data elements to produce it — every definition, every access decision, every sub-result. |
-| **P5 — Role-aware by default** | The recommended configuration is deny-by-default: an unauthenticated or unentitled request is blocked before any analytical processing begins. Access restrictions are injected at the query level, not applied as a post-retrieval filter. |
+| **P5 — Role-aware by default** | Deny-by-default is an architectural property: an unauthenticated or unentitled request is always blocked before any analytical processing begins. Access restrictions are injected at the query level, not applied as a post-retrieval filter. |
 | **P6 — Governed narrative** | Plain-language summaries are anchored exclusively to values in the computed result. Hallucinated financial metrics are a regulatory and reputational risk; the architecture makes them impossible, not merely unlikely. |
 | **P7 — Deterministic visualisation** | Chart type selection is governed by a registered set of chart contracts. The AI does not select chart types — the same analytical pattern always produces the same chart across users, sessions, and time. |
 | **P8 — Explainability at every layer** | Users and compliance functions can inspect what was queried, why, and with what results at every layer of the stack. An intent confirmation step shows resolved intent before execution; a lineage inspector exposes every step in human-readable form. |
@@ -185,7 +185,7 @@ The platform's scope spans two independent dimensions that together define the f
 Some requests are best answered with a chart or summary: a portfolio manager wants to see returns versus benchmark, not a raw table of numbers. Others require a structured dataset: a data science pipeline needs millions of rows of position data for model retraining, and a chart is irrelevant. Both output types traverse the same controls pipeline. The difference is resolved by the Data Visualization Language (DVL) at query time — chart or table is determined by the intent and result shape, not by the user or the AI.
 
 **Governance tier — business analytics or full-provenance**
-Most queries require standard governance: approved analytics and metrics definitions, entitlement enforcement, and a compliance provenance record. Some queries require more: when a request is for a regulatory submission — or involves a metric that is flagged as compliance-relevant — the platform automatically escalates to the enhanced compliance artifact tier. Two independent signals trigger escalation: the metric's own compliance-relevant flag (set by the metric owner at registration) and the AI's classification of the query's stated purpose. When both signals are present, a regulatory trace record, export controls, and a regulator-ready artifact set are produced automatically. No user action or role claim is required.
+Most queries require standard governance: approved analytics and metrics definitions, entitlement enforcement, and a compliance provenance record. Some queries require more: when a request involves a metric flagged as compliance-relevant and is made for a compliance-driven purpose — a regulatory submission, for example — the platform automatically escalates to the enhanced compliance artifact tier. Two independent signals trigger escalation: the metric's own compliance-relevant flag (set by the Metrics Modeller at registration) and the Intent Resolution Agent's classification of the query's stated purpose. When both signals are present, a regulatory trace record, export controls, and a regulator-ready artifact set are produced automatically. No user action or role claim is required.
 
 These two dimensions define four possible result types. The platform handles all four under the same governed pipeline:
 
@@ -238,7 +238,9 @@ The Semantic Controls Layer validates the Logical Query Plan against its five ch
 ```sql
 -- Physical execution (FQE output)
 SELECT   p.portfolio_id,
-         SUM(p.daily_pnl) / SUM(p.opening_market_value)  AS portfolio_return,
+         -- value-weighted aggregation of the precomputed definition v2.1.0 return measure
+         SUM(p.total_return_net * p.market_value)
+                / SUM(p.market_value)                      AS portfolio_return,
          b.period_return                                   AS benchmark_return
 FROM     portfolio_fact        p
 JOIN     benchmark_timeseries  b  ON p.default_benchmark_id = b.benchmark_id
@@ -286,7 +288,7 @@ A risk officer asks: *"Which portfolios are breaching their VaR 95 limit today, 
 ```
 
 **2 · Intent resolution**
-The AI client identifies three metrics — `var_95`, `var_limit`, and `risk_factor_contribution` — and resolves this as a threshold-comparison pattern with a contributing-factor breakdown. `var_limit` is a per-portfolio governance parameter stored in the risk configuration domain; `risk_factor_contribution` carries `portfolio_id` and `factor_bucket` as required dimensions. All three are registered in the Semantic Metrics Repository and resolve cleanly against the metric registry.
+The Intent Resolution Agent (IRA) identifies three metrics — `var_95`, `var_limit`, and `risk_factor_contribution` — and resolves this as a threshold-comparison pattern with a contributing-factor breakdown. `var_limit` is a per-portfolio governance parameter stored in the risk configuration domain; `risk_factor_contribution` carries `portfolio_id` and `factor_bucket` as required dimensions. All three are registered in the Semantic Metrics Repository and resolve cleanly against the metric registry.
 
 ```
 -- Semantic Intent Resolution
@@ -320,7 +322,8 @@ SELECT   r.portfolio_id,
          r.risk_factor_contribution,
          r.factor_bucket,
          l.var_limit_value,
-         (r.var_95_value > l.var_limit_value) AS breach
+         (r.var_95_value > l.var_limit_value)  AS breach,
+         r.var_95_value / l.var_limit_value    AS breach_pct
 FROM     risk_engine.var_daily_positions r
 JOIN     dw_prod.portfolio_governance.var_limits l
   ON     r.portfolio_id = l.portfolio_id
@@ -329,7 +332,7 @@ WHERE    r.as_of_date   = current_date
 ORDER BY r.var_95_value DESC;
 
 -- Execution Response
--- data:      [{ portfolio_id, var_95_value, var_limit_value, breach, factor_bucket, risk_factor_contribution }, ...]
+-- data:      [{ portfolio_id, var_95_value, var_limit_value, breach, breach_pct, factor_bucket, risk_factor_contribution }, ...]
 -- audit:     lineage_id, data_sources_used, entitlement_snapshot
 ```
 
@@ -376,7 +379,7 @@ pagination:     page_size = 10,000 rows
 ```
 
 **2 · Dataset and entitlement resolution**
-The dataset identifier resolves against the Semantic Metrics Repository — only registered, approved datasets are retrievable. The registry resolves the dataset to its approved field set. The agent's access permissions are projected: results restricted to authorised portfolios, fields exceeding the agent's data classification ceiling excluded.
+The dataset identifier resolves against an approved `analytical_dataset` contract in the Semantic Metrics Repository — only registered, approved datasets are retrievable. The contract declares the dataset's approved field set. The agent's access permissions are projected: results restricted to authorised portfolios, fields exceeding the agent's data classification ceiling excluded.
 
 ```
 -- Dataset & Entitlement Resolution
@@ -448,21 +451,21 @@ The Intent Resolution Agent (IRA) resolves the operation and metric from the SMR
 ```
 -- Semantic Intent Resolution
 operation:      retrieve_metric
-metric:         liquidity_coverage_ratio  (unresolved)
+metric:         lcr  (unresolved)
 intent_classification:
   compliance_purpose_score: 0.94  |  threshold: 0.80
   compliance_purpose: true
 ```
 
 **3 · Metric resolution and compliance escalation**
-The liquidity coverage ratio metric resolves to its approved registry definition, which carries a compliance-relevant flag set by the Metrics Modeller at registration. Two independent signals are now both active — the metric is marked as compliance-relevant, and the AI has classified the stated intent as compliance-driven. The governance layer escalates automatically to the enhanced compliance artifact tier. No role claim, no manual flag, no special user action is required: escalation is a runtime consequence of what the metric is and what the query is for.
+The liquidity coverage ratio metric resolves to its approved registry definition, which carries a compliance-relevant flag set by the Metrics Modeller at registration. Two independent signals are now both active — the metric is marked as compliance-relevant, and the IRA has classified the stated intent as compliance-driven. The governance layer escalates automatically to the enhanced compliance artifact tier. No role claim, no manual flag, no special user action is required: escalation is a runtime consequence of what the metric is and what the query is for.
 
 ```
 -- Metric Resolution & Compliance Escalation
-liquidity_coverage_ratio  →  definition v1.1: SUM(hqla_value) / SUM(net_outflow_30d)
+lcr  →  definition v1.1: SUM(hqla_value) / SUM(net_outflow_30d)
 compliance_signals:
   metric.compliance_relevant: true   -- set by Metrics Modeller at registration
-  intent.compliance_purpose:  true   -- classified by AI at query time
+  intent.compliance_purpose:  true   -- classified by the IRA at query time
 escalation: ENHANCED compliance artifact tier  -- both signals required
 ```
 
@@ -486,7 +489,7 @@ GROUP BY h.entity_id;
 -- compliance:
 --   regulatory_trace_id:  written to compliance audit store
 --   artifact_set_version: "1.0"
---   triggered_by:         [liquidity_coverage_ratio]
+--   triggered_by:         [lcr]
 --   export_gate:          locked until complete compliance provenance record exists
 -- audit:     lineage_id, metric_version, entitlement_snapshot
 ```
@@ -532,11 +535,11 @@ Once execution completes and the result is verified, the platform seals a compli
 
   "escalation_signals": [
     { "signal": "metric.compliance_relevant", "source": "metric_registry",      "value": true },
-    { "signal": "intent.compliance_purpose",  "source": "ai_intent_classifier", "value": true }
+    { "signal": "intent.compliance_purpose",  "source": "ira_intent_classifier", "value": true }
   ],
 
   "metric": {
-    "id":                  "liquidity_coverage_ratio",
+    "id":                  "lcr",
     "version":             "v1.1",
     "formula":             "SUM(hqla_value) / SUM(net_outflow_30d)",
     "compliance_relevant": true,
