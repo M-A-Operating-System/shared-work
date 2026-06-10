@@ -363,6 +363,7 @@ CSS = """
     line-height: 1.1;
     color: #1e3a6e;
     margin: 0 0 12mm;
+    bookmark-level: none;
 }
 .cover-rule {
     border: none;
@@ -391,24 +392,32 @@ h1 {
     margin: 0 0 5mm;
     padding-bottom: 3mm;
     border-bottom: 2px solid #dbeafe;
+    bookmark-level: 1;
+    bookmark-label: content();
 }
 h2 {
     font-size: 12pt;
     font-weight: 700;
     color: #1e3a6e;
     margin: 8mm 0 2mm;
+    bookmark-level: 2;
+    bookmark-label: content();
 }
 h3 {
     font-size: 10.5pt;
     font-weight: 600;
     color: #374151;
     margin: 5mm 0 1.5mm;
+    bookmark-level: 3;
+    bookmark-label: content();
 }
 h4 {
     font-size: 9.5pt;
     font-weight: 600;
     color: #374151;
     margin: 3mm 0 1mm;
+    bookmark-level: 4;
+    bookmark-label: content();
 }
 p { margin: 0 0 3mm; }
 
