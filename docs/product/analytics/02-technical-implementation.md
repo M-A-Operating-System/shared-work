@@ -1366,10 +1366,10 @@ Full DVL examples including the `type: "table"` spec are in [MCP Response Format
 
 ```python
 INTENT_CONTRACTS = {
-    ("ATTRIBUTION",  1): "ATTRIBUTION_WATERFALL",
+    ("ATTRIBUTION",  1): "WATERFALL_ATTRIBUTION",
     ("COMPARISON",   2): "BAR_MULTI_SERIES_COMPARISON",
-    ("TREND",        1): "LINE_TIME_SERIES",
-    ("DISTRIBUTION", 1): "HISTOGRAM",
+    ("TREND",        1): "LINE_TIME_SERIES_TREND",
+    ("DISTRIBUTION", 1): "HISTOGRAM_DISTRIBUTION",
 }
 
 class DataVisualizationLanguage:
@@ -1379,19 +1379,20 @@ class DataVisualizationLanguage:
 
         # 1. Infer intent pattern from operation's default_visualization field
         # 2. Match intent + metric count to a named chart contract
-        # 3. Build display spec for the matched contract — TABLE is the safe fallback for any unmatched case
+        # 3. Build display spec for the matched contract — TABLE_GOVERNED is the safe fallback for any unmatched case
         ...
 
     def _infer_intent(self, operation: dict) -> str:
         # Input:  SMR operation definition
-        # Output: intent pattern string — ATTRIBUTION, COMPARISON, TREND, DISTRIBUTION, or TABLE
+        # Output: intent pattern string — ATTRIBUTION, COMPARISON, TREND, or DISTRIBUTION
+        #         (no match → the TABLE_GOVERNED fallback applies downstream)
         # Derived from operation["default_visualization"] — set at metric authoring time
         ...
 
     def _match_contract(self, intent: str, schema: list) -> str:
         # Input:  intent pattern + result schema field list
-        # Output: named chart contract — e.g. BAR_MULTI_SERIES_COMPARISON, LINE_TIME_SERIES, TABLE
-        # Looks up (intent, metric_count) in INTENT_CONTRACTS map; defaults to TABLE
+        # Output: named chart contract — e.g. BAR_MULTI_SERIES_COMPARISON, LINE_TIME_SERIES_TREND, TABLE_GOVERNED
+        # Looks up (intent, metric_count) in INTENT_CONTRACTS map; defaults to TABLE_GOVERNED
         ...
 
     def _build_display_spec(self, contract: str, result: dict, operation: dict) -> dict:
@@ -1400,7 +1401,7 @@ class DataVisualizationLanguage:
 
         # Each contract has a fixed encoding shape — no runtime chart-type decisions
         # Multi-metric charts pivot to long form (one row per dimension × metric)
-        # TABLE is always the safe fallback if no contract matches
+        # TABLE_GOVERNED is always the safe fallback if no contract matches
         ...
 ```
 
@@ -2025,7 +2026,7 @@ One bundle covers all analytical dimensions. Every domain bundle's metrics and o
     "required_params":       ["portfolio_ids", "metrics", "time_period"],
     "optional_params":       ["benchmark_id"],
     "supported_metrics":     ["portfolio_return", "tracking_error", "sharpe_ratio", "volatility", "beta"],
-    "default_visualization": "bar_multi_series_comparison"
+    "default_visualization": "BAR_MULTI_SERIES_COMPARISON"
   },
   {
     "type":                  "analytical_operation",
@@ -2039,7 +2040,7 @@ One bundle covers all analytical dimensions. Every domain bundle's metrics and o
     "execution_profile":     "full_analytical",
     "required_params":       ["portfolio_id", "benchmark_id", "attribution_by", "time_period"],
     "supported_dimensions":  ["asset_class", "sector", "geography", "currency"],
-    "default_visualization": "attribution_waterfall"
+    "default_visualization": "WATERFALL_ATTRIBUTION"
   }
 ]
 ```
@@ -2236,7 +2237,7 @@ One bundle covers all analytical dimensions. Every domain bundle's metrics and o
     "required_params":       ["portfolio_id", "metrics", "attribution_by", "as_of_date"],
     "supported_metrics":     ["var_95", "var_99", "tracking_error", "beta", "duration", "expected_shortfall"],
     "supported_dimensions":  ["asset_class", "geography", "sector", "currency", "issuer"],
-    "default_visualization": "attribution_waterfall"
+    "default_visualization": "WATERFALL_ATTRIBUTION"
   }
 ]
 ```
@@ -2339,7 +2340,7 @@ All regulatory metrics carry `"classification_level": "restricted"`, `"complianc
     "supported_metrics":     ["lcr", "leverage_ratio", "nsfr"],
     "regulatory_framework":  ["<framework_id>"],
     "required_feature_flag": "regulatory_reporting",
-    "default_visualization": "table"
+    "default_visualization": "TABLE_GOVERNED"
   }
 ]
 ```
