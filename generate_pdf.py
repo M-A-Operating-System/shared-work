@@ -252,6 +252,42 @@ def inject_mermaid(html: str, placeholders: dict[str, str]) -> str:
     return html
 
 
+# ---------- table of contents ----------
+
+def _flatten_toc_tokens(tokens: list, prefix: str, max_depth: int) -> list[tuple[int, str, str]]:
+    """Recursively flatten markdown toc_tokens into (level, text, anchor_id) triples."""
+    result = []
+    for tok in tokens:
+        if tok['level'] <= max_depth:
+            clean = re.sub(r'<[^>]+>', '', tok['name'])
+            result.append((tok['level'], clean, prefix + tok['id']))
+        result.extend(_flatten_toc_tokens(tok.get('children', []), prefix, max_depth))
+    return result
+
+
+def _build_toc_html(entries: list[tuple[int, str, str]], standalone: bool) -> str:
+    """Build a <nav class="toc-page"> element from (level, text, anchor_id) triples.
+
+    standalone=True adds page-break-after; used for multi-chapter PDFs where the
+    TOC lives on its own page.  False renders it inline above the chapter content.
+    """
+    if not entries:
+        return ""
+    cls = "toc-page toc-standalone" if standalone else "toc-page toc-inline"
+    items = [
+        f'  <li class="toc-h{level}">'
+        f'<a href="#{_html.escape(anchor)}">{_html.escape(text)}</a></li>'
+        for level, text, anchor in entries
+    ]
+    return (
+        f'<nav class="{cls}">\n'
+        f'<h2 class="toc-heading">Contents</h2>\n'
+        f'<ul class="toc-list">\n'
+        + '\n'.join(items)
+        + '\n</ul>\n</nav>'
+    )
+
+
 def build_html(files: list[Path], title: str, meta: str,
                author: str = "", nofront: bool = False,
                subs: dict[str, str] | None = None) -> str:
@@ -261,7 +297,11 @@ def build_html(files: list[Path], title: str, meta: str,
         extensions=["tables", "fenced_code", "toc", "sane_lists"],
     )
 
+    multi_chapter = len(files) > 1
+    toc_depth = 2 if multi_chapter else 3   # multi: H1+H2; single: H1+H2+H3
+    all_toc_entries: list[tuple[int, str, str]] = []
     sections = []
+
     for i, path in enumerate(files):
         raw = strip_md_links(path.read_text(encoding="utf-8"))
         if subs:
@@ -270,6 +310,20 @@ def build_html(files: list[Path], title: str, meta: str,
         raw, mermaid_map = extract_mermaid_blocks(raw)
         body = md.convert(raw)
         body = inject_mermaid(body, mermaid_map)
+
+        # Collect headings for the TOC before reset() clears toc_tokens.
+        prefix = f"ch{i}-" if multi_chapter else ""
+        all_toc_entries.extend(_flatten_toc_tokens(md.toc_tokens, prefix, toc_depth))
+
+        # Multi-chapter: prefix every heading id to prevent cross-chapter anchor
+        # collisions (e.g. two chapters each with an "## Overview" section).
+        if multi_chapter:
+            body = re.sub(
+                r'(<h[1-6]\b[^>]*?\bid=")([^"]+)(")',
+                lambda m: f'{m.group(1)}ch{i}-{m.group(2)}{m.group(3)}',
+                body,
+            )
+
         md.reset()
 
         # Fail fast if any mermaid block slipped through unextracted.
@@ -284,6 +338,8 @@ def build_html(files: list[Path], title: str, meta: str,
 
         extra_class = " first-section" if i == 0 else ""
         sections.append(f'<section class="doc-section{extra_class}">{body}</section>')
+
+    toc_html = _build_toc_html(all_toc_entries, standalone=multi_chapter)
 
     safe_title  = _html.escape(title)
     safe_meta   = _html.escape(meta)
@@ -309,6 +365,7 @@ def build_html(files: list[Path], title: str, meta: str,
 <head><meta charset="utf-8"><title>{safe_title}</title></head>
 <body>
 {cover}
+{toc_html}
 {"".join(sections)}
 </body>
 </html>"""
@@ -497,6 +554,40 @@ a { color: #1d4ed8; text-decoration: none; }
 /* Pagination hints */
 h1, h2, h3 { page-break-after: avoid; }
 tr          { page-break-inside: avoid; }
+
+/* Table of Contents */
+.toc-page { margin-bottom: 8mm; }
+.toc-page.toc-standalone { page-break-after: always; }
+.toc-heading {
+    font-size: 14pt;
+    font-weight: 700;
+    color: #1e3a6e;
+    margin: 0 0 6mm;
+    padding-bottom: 3mm;
+    border-bottom: 2px solid #dbeafe;
+    bookmark-level: none;
+}
+.toc-list { list-style: none; padding: 0; margin: 0; }
+.toc-h1 { margin-top: 3mm;   font-size: 10pt;  font-weight: 700; color: #1e3a6e; }
+.toc-h2 { margin-top: 1mm;   font-size: 9pt;   color: #374151; padding-left: 6mm; }
+.toc-h3 { margin-top: 0.5mm; font-size: 8.5pt; color: #6b7280; padding-left: 12mm; }
+.toc-list a {
+    display: flex;
+    text-decoration: none;
+    color: inherit;
+    align-items: baseline;
+}
+.toc-list a::after {
+    content: target-counter(attr(href url), page);
+    flex-shrink: 0;
+    margin-left: auto;
+    padding-left: 4mm;
+    min-width: 8mm;
+    text-align: right;
+    color: #6b7280;
+    font-variant-numeric: tabular-nums;
+    font-size: 8.5pt;
+}
 
 /* Mermaid diagrams */
 .mermaid-diagram {
