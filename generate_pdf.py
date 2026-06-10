@@ -656,6 +656,9 @@ def generate_pages(product_name: str, page_prefixes: list[str],
         if not matches:
             missing.append(prefix)
         else:
+            if matches[0].is_symlink():
+                print(f"  [error] symlinks are not supported: {matches[0].name}")
+                sys.exit(1)
             if len(matches) > 1:
                 print(f"  [warn] prefix '{prefix}' matched {len(matches)} files — using {matches[0].name}")
             files.append(matches[0])
@@ -668,15 +671,10 @@ def generate_pages(product_name: str, page_prefixes: list[str],
                 print(f"    {f.stem[:2]}  ({f.name})")
         sys.exit(1)
 
-    # Single chapter with no custom output: delegate to generate_page so that
-    # the output path, cover title (H1 extraction), and GITHUB_OUTPUT emission
-    # are all handled consistently rather than duplicated here.
-    if len(page_prefixes) == 1 and out_name is None:
-        generate_page(files[0], nofront=nofront)
-        return
-
     if out_name:
         output = docs_dir / out_name
+    elif len(page_prefixes) == 1:
+        output = files[0].with_suffix('.pdf')
     else:
         label = "_".join(page_prefixes)
         output = docs_dir / f"{product_name}_pages_{label}.pdf"
@@ -701,6 +699,19 @@ def generate_pages(product_name: str, page_prefixes: list[str],
 
     size_mb = output.stat().st_size / 1_000_000
     print(f"Done → {output}  ({size_mb:.1f} MB)")
+
+    # Publish the output path for GitHub Actions step chaining (single-chapter only,
+    # matching the behaviour of generate_page() for the --page flag).
+    if len(page_prefixes) == 1 and out_name is None:
+        github_output = os.environ.get("GITHUB_OUTPUT")
+        if github_output:
+            gop = Path(github_output)
+            if not gop.is_absolute() or ".." in gop.parts:
+                print(f"  [warn] GITHUB_OUTPUT path looks unsafe, skipping: {github_output}")
+            else:
+                repo_root = Path(__file__).parent
+                with open(gop, "a") as f:
+                    f.write(f"pdf_path={output.relative_to(repo_root)}\n")
 
 
 # ---------- main ----------
