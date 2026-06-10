@@ -73,12 +73,14 @@ jobs:
         if: steps.cache-apt.outputs.cache-hit == 'true'
         run: sudo dpkg -i /var/cache/apt/archives/*.deb 2>/dev/null || true
 
-      - name: Cache npm global (mermaid-cli)
+      - name: Cache npm global (mermaid-cli) and Chromium
         id: cache-npm
         uses: actions/cache@v4
         with:
-          path: ~/.npm-global
-          key: npm-mmdc-11.4.2-${{ runner.os }}
+          path: |
+            ~/.npm-global
+            ~/.cache/puppeteer
+          key: npm-mmdc-11.4.2-chrome-${{ runner.os }}
 
       - name: Configure npm global prefix
         run: |
@@ -87,7 +89,12 @@ jobs:
 
       - name: Install mermaid-cli
         if: steps.cache-npm.outputs.cache-hit != 'true'
-        run: npm install -g @mermaid-js/mermaid-cli@11.4.2
+        run: |
+          npm install -g @mermaid-js/mermaid-cli@11.4.2
+          # Download the Chromium binary that mermaid-cli/puppeteer requires.
+          # puppeteer-core does not auto-download Chrome on npm install, so we
+          # fetch it explicitly here so it is captured in the cache above.
+          npx @puppeteer/browsers install chrome-headless-shell
 
       - name: Install pip dependencies
         run: pip install -r requirements.txt
