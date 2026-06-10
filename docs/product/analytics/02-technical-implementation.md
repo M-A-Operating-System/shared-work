@@ -107,11 +107,11 @@ The Semantic Metrics Repository (SMR) and the Semantic Data Repository (SDR) are
 
 FastMCP (`pip install fastmcp`) provides the `@mcp.tool()`, `@mcp.resource()`, and `@mcp.prompt()` decorators and handles MCP Streamable HTTP transport. Each analytical capability is a decorated Python function; the framework serialises schemas and routes calls automatically.
 
-The separation of tools and resources is intentional. All analytical execution goes through `run_analytics`, a single tool that delegates to the SMR for every operation definition. Resources expose static knowledge artifacts from the Knowledge Store; they contain no user data and require no governance evaluation. The SMR owns what operations exist, what parameters they require, and how deeply they run through the pipeline. The code owns only the execution engine.
+The separation of tools and resources is intentional. All analytical execution goes through `run_analytics`, a single tool that delegates to the SMR for every operation definition. Resources expose static knowledge artifacts from the Knowledge Store; they contain no user data and require no governance evaluation. The SMR owns what operations exist, what parameters they require, and which presentation stages they invoke. The code owns only the execution engine.
 
 #### Tools
 
-Three tools cover the entire analytical surface. The SMR owns every operation definition: what parameters it needs, what metrics and dimensions it supports, and how deeply it runs through the pipeline. No operation type is hardcoded in the execution layer.
+Three tools cover the entire analytical surface. The SMR owns every operation definition: what parameters it needs, what metrics and dimensions it supports, and which presentation stages it invokes. No operation type is hardcoded in the execution layer.
 
 ```python
 from fastmcp import FastMCP
@@ -146,8 +146,9 @@ class DrilldownInput(BaseModel):
 async def run_analytics(input: RunAnalyticsInput, jwt: str) -> dict:
     """Execute an SMR-registered analytical operation.
     Call list_operations first to discover valid operation_id values and their required params.
-    The execution pipeline depth — data retrieval, metric query, or full analytical — is determined
-    by the operation's execution_profile in the SMR, not by this tool."""
+    The presentation depth — raw dataset, display specification, or full analytical response — is
+    determined by the operation's execution_profile in the SMR, not by this tool; the full controls
+    pipeline runs for every operation."""
     # 1. Validate JWT → claims
     # 2. Resolve operation from SMR — rejects unknown/unapproved operation IDs
     # 3. Delegate to pipeline_executor.run — returns result shaped by execution_profile
@@ -223,10 +224,12 @@ class PipelineExecutor:
         # 1. RAPL computes the entitlement projection (row scope + column masks) from the caller's roles
         # 2. SVL validates the request, resolves metrics from the SMR, enforces the projection,
         #    and compiles the Logical Query Plan (LQP)
-        # 3. Branch on execution_profile:
-        #    data_retrieval  — PQP → FQE → { result_id, rows, schema }
-        #    metric_query    — SCL approval → PQP → FQE → { result_id, rows, schema }
-        #    full_analytical — SCL approval → ALS controls write → PQP → FQE → DVL + NSA in parallel
+        # 3. SCL approval (five checks — never skipped) → ALS controls write → PQP → FQE
+        # 4. Branch on execution_profile — presentation stages only; the controls pipeline above
+        #    is identical for every profile:
+        #    data_retrieval  — { result_id, rows, schema, pagination }
+        #    metric_query    — + DVL display_spec
+        #    full_analytical — + DVL + NSA in parallel (PAS when the compliance trigger is active)
         #                    → { result_id, rows, schema, display_spec, narrative, export_requires_lineage }
         # Note: DVL is CPU-bound; asyncio.to_thread prevents it blocking the NSA API call
         ...
@@ -257,7 +260,7 @@ class DrilldownService:
 
 #### Execution profiles
 
-Each SMR operation carries an `execution_profile` that tells the pipeline executor which stages to invoke. Profile definitions are in [§MCP Capability Layer](./01-core-capabilities.md#mcp-capability-layer-mcp).
+Each SMR operation carries an `execution_profile` that tells the pipeline executor which presentation stages to invoke after the full deterministic pipeline has run. Profile definitions are in [§MCP Capability Layer](./01-core-capabilities.md#mcp-capability-layer-mcp).
 
 #### Resources
 

@@ -311,9 +311,9 @@ The MCP Capability Layer (MCP) is responsible for providing the single governed 
 
 ### Tool Catalogue
 
-The Analytics Engine will expose three tools. All analytical operations will be SMR-catalogue driven — the code will be the execution engine, not the operation registry. The SMR will own every operation definition: what parameters it needs, what metrics and dimensions it supports, and how deeply it runs through the pipeline via its `execution_profile`.
+The Analytics Engine will expose three tools. All analytical operations will be SMR-catalogue driven — the code will be the execution engine, not the operation registry. The SMR will own every operation definition: what parameters it needs, what metrics and dimensions it supports, and which presentation stages it invokes via its `execution_profile`.
 
-**`run_analytics(operation_id: str, params: dict, jwt: str)`** — Executes any SMR-registered operation. The operation's `execution_profile` in the SMR will determine which pipeline stages run.
+**`run_analytics(operation_id: str, params: dict, jwt: str)`** — Executes any SMR-registered operation. The operation's `execution_profile` in the SMR will determine which presentation stages run after the full controls pipeline completes.
 
 **`list_operations(domain: str | None, jwt: str)`** — Returns the SMR operation catalogue with operation IDs, display names, required parameters, supported metrics/dimensions, and execution profiles. Only operations the authenticated user is entitled to execute will be returned.
 
@@ -321,13 +321,15 @@ The Analytics Engine will expose three tools. All analytical operations will be 
 
 ### Execution Profiles
 
-Each SMR operation will carry an `execution_profile` defined in its `analytical_operation` entry in the SMR catalogue. This will tell the pipeline executor which stages to invoke. No execution depth will be hardcoded in the MCP layer — it will always be determined by the SMR catalogue.
+Each SMR operation will carry an `execution_profile` defined in its `analytical_operation` entry in the SMR catalogue. This will tell the pipeline executor which presentation stages to invoke after execution. No presentation depth will be hardcoded in the MCP layer — it will always be determined by the SMR catalogue.
 
-| Profile | Pipeline stages |
-|---|---|
-| `data_retrieval` | Auth → IRA → RAPL → FQE → Lineage |
-| `metric_query` | Auth → IRA → RAPL → SVL → SCL → PQP → FQE → Lineage |
-| `full_analytical` | Auth → IRA → RAPL → SVL → SCL → PQP → FQE → DVL + NSA + PAS → Lineage |
+The deterministic pipeline — Auth → IRA (natural-language queries only) → RAPL → SVL → SCL → PQP → FQE → Lineage — runs in full for every profile, without exception ([P2](./00-overview.md#design-principles): there is no fast path). Profiles vary only what happens after the FQE assembles the result:
+
+| Profile | Controls pipeline | Presentation stages |
+|---|---|---|
+| `data_retrieval` | Full — never skipped | None — typed dataset with pagination; no chart, no narrative |
+| `metric_query` | Full — never skipped | DVL display specification |
+| `full_analytical` | Full — never skipped | DVL display specification + NSA narrative + PAS (when the compliance trigger is active) |
 
 ### Intent Confirmation Cards
 
