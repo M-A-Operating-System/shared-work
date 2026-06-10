@@ -1476,16 +1476,23 @@ class AnalyticalLineageStore:
         # PostgreSQL index used only to resolve the S3 key — full record always read from S3
         ...
 
+    async def write_projection(self, projection: dict, claims: dict) -> None:
+        # Input:  RAPL entitlement projection + JWT claims
+        # Writes the projection record to S3 keyed by intent_id (before lqp_id exists)
+        # First of the three ALS writes — entitlement decisions (including denials) are
+        # recorded even when the request stops before the SCL runs
+        ...
+
     async def write_controls_decision(self, lqp: dict, claims: dict) -> None:
         # Input:  SCL-approved LQP + JWT claims
         # Writes a controls_decision record to S3 keyed by lqp_id (before result_id exists)
-        # First of the two ALS writes — captures governance decision before FQE runs
+        # Second of the three ALS writes — captures governance decision before FQE runs
         ...
 
     async def write_execution(self, lqp: dict, result: dict) -> None:
         # Input:  approved LQP + assembled FQE result
         # Builds a full execution lineage record — includes the federated SQL + catalogs used, regulatory_frameworks, result summary
-        # Second of the two ALS writes — called by FQE after assembly
+        # Third of the three ALS writes — called by FQE after assembly
         # regulatory_frameworks aggregated from resolved_metrics with compliance_relevant: true
         ...
 
