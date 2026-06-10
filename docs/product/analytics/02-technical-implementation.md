@@ -16,7 +16,8 @@ The table below maps each Chapter 1 capability to its reference implementation n
 | MCP Capability Layer | MCP | `build_mcp_app()` + FastMCP router | Python 3.12 · FastMCP 2.x · Uvicorn · port 8000 · JWT via python-jose (RS256) |
 | Intent Resolution Agent | IRA | `IntentResolutionAgent` | Python · embedding similarity search over SMR · Anthropic Claude (intent ranking + compliance intent scoring) · confirmation cards |
 | Semantic Metrics Repository | SMR | `SemanticMetricsRepository` | DCS API — JSON documents: `analytical_metric`, `analytical_dimension`, `analytical_operation`, `analytical_dataset` |
-| Role-Aware Projection Layer | RAPL | `RoleAwareProjectionLayer` | Python · asyncpg · PostgreSQL `role_policies` |
+| Role-Aware Projection Layer | RAPL | `RoleAwareProjectionLayer` | Python · asyncpg · role definition lookup from the DES |
+| Data Entitlements Store | DES | PostgreSQL `role_policies` schema | Dedicated schema + credentials — logically separate even when co-located; written only by the Entitlements Manager, not via the platform Admin API |
 | Semantic Validation Layer | SVL | `SemanticValidationLayer` + `LQPGenerator` | Python · Pydantic v2 · JSON Schema validation |
 | Semantic Controls Layer | SCL | `SemanticControlsLayer` | Python · Redis (concurrency semaphore) · rules engine |
 | Physical Query Planner | PQP | `PhysicalQueryPlanner` | Apache Calcite · physical_mapping → catalog reference binding · LQP → federated Trino SQL |
@@ -39,7 +40,7 @@ flowchart TD
     subgraph analytics["AI Analytics Platform"]
         MCP["FastMCP / Uvicorn (MCP)\nPython 3.12 · MCP Streamable HTTP · port 8000\nJWT — python-jose · JWKS · RS256"]
         IRA["Anthropic Claude (IRA)\nembedding similarity search over SMR (RAG) · intent ranking · compliance intent scoring\nnatural language → resolved operation_id + params · confirmation cards"]
-        RAPL["PostgreSQL (RAPL)\nPython · asyncpg · role_policies\nJWT claims → row scope injection · column masking"]
+        RAPL["Python + asyncpg (RAPL)\nrole definition lookup from DES\nJWT claims → row scope injection · column masking"]
         SVL["Pydantic / Python (SVL)\nJSON Schema validation · SMR resolution\ncompliance signal evaluation · LQP generation"]
         SCL["Redis + Python rules (SCL)\ndata scale · complexity · classification · compliance · concurrency\nRedis concurrency semaphore"]
         PQP["Apache Calcite (PQP)\nphysical_mapping resolution · catalog reference binding\nLQP → federated Trino SQL"]
@@ -60,6 +61,10 @@ flowchart TD
         SMR -->|"physical_mapping resolves against SDR schema metadata"| SDR
     end
 
+    subgraph des["Data Entitlements Store (DES)"]
+        ENT[("PostgreSQL role_policies schema\ndedicated schema + credentials\nwritten only by the Entitlements Manager")]
+    end
+
     subgraph backends["Starburst Catalog Connectors"]
         SQL["Snowflake catalog\nSnowflake · BigQuery · Databricks · Redshift (warehouse / lakehouse)"]
         SemLayer["Semantic-layer catalog\ndbt Semantic Layer (MetricFlow) · Cube.js"]
@@ -73,6 +78,7 @@ flowchart TD
     MCP -->|"structured call (operation_id + params) — bypasses IRA"| RAPL
     IRA -->|"RAG retrieval over operation/metric embeddings"| SMR
     IRA -->|"resolved operation_id + params"| RAPL
+    RAPL -->|"role definition lookup"| ENT
     RAPL -->|"entitlement projection (row scope + column masks)"| SVL
     SVL -->|"metric + dimension ID resolution"| SMR
     SVL -->|"validated LQP"| SCL
@@ -893,14 +899,15 @@ class LQPGenerator:
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
 | **Implementation** | Custom middleware (Python) | Thin, stateless; computes the entitlement projection before the LQP is compiled |
-| **Role resolution** | JWT claim extraction + PostgreSQL role config | Role claim field name is configurable |
+| **Role resolution** | JWT claim extraction + DES role definition lookup | Role claim field name is configurable |
+| **Policy store (DES)** | PostgreSQL `role_policies` schema — the reference realisation of the Data Entitlements Store | Dedicated schema and credentials, logically separate from platform data; written only by the Entitlements Manager — not writable via the platform Admin API |
 | **Row scope** | `{{user.claim_name}}` template interpolation at projection time | Resolved from JWT claims; passed to the SVL, which injects the row scope filter nodes |
 | **Column masking** | Registered in the projection; applied post-assembly in the FQE result assembler | Post-assembly supports cross-backend result sets |
 | **Default policy** | `defaultDenyAll: true` | No access unless a matching role is found |
 
 #### Role policies schema
 
-Role policy documents are stored in the PostgreSQL `role_policies` table. Each document maps directly to the following JSON shape:
+Role policy documents are stored in the PostgreSQL `role_policies` schema — the reference realisation of the **Data Entitlements Store (DES)**. The schema carries its own credentials and is logically separate from platform data even when physically co-located; it is written only by the Entitlements Manager and is not writable through the platform Admin API. Organisations with an existing entitlement system substitute it behind the same role-definition read interface. Each document maps directly to the following JSON shape:
 
 ```json
 {
@@ -1742,7 +1749,7 @@ Configuration is read from environment variables at startup. Required variables:
 | MCP service | Python · FastMCP + Uvicorn | Lightweight ASGI MCP surface; deploys as Kubernetes pod |
 | Governance services | Kubernetes (cloud-agnostic) | IRA, RAPL, SVL, SCL, PQP, DVL, NSA as independently scalable pods |
 | Federated Query Engine | Starburst (Trino) — Enterprise or Galaxy | Coordinator + workers; one catalog per registered source; performs all cross-source federation |
-| Primary database | PostgreSQL (Neon or RDS) | Lineage search index, role policy config, scheduled queries, user preferences, saved queries |
+| Primary database | PostgreSQL (Neon or RDS) | Lineage search index, scheduled queries, user preferences, saved queries; also hosts the DES `role_policies` schema under separate credentials |
 | Data Context Store (DCS) | Pre-existing platform component | SMR metric definitions, controls config, SMR search — reuses SDR versioned storage and native search |
 | Knowledge Store | S3-compatible object store (versioned Markdown) | MCP resource content — guides, skills definitions, compliance reference |
 | Object storage | S3-compatible | Lineage records (one JSON document per query), result artefacts, large cached result sets |
