@@ -518,7 +518,7 @@ A small set of entity-level regulatory ratios resolves to a structured complianc
 ```
 
 **6 · Compliance provenance generation**
-Once execution completes and the result is verified, the platform seals a compliance provenance record and writes it to the append-only compliance audit store. The record covers the full chain — what was asked, which metric definition and version was used, how the logical field specification mapped to physical tables, what SQL ran against which backend, and the exact entitlement state at execution time. The entire record is signed with the platform's private key using ECDSA. Any party holding the platform's published public key can independently verify that no field has been altered since sealing — without any access to the platform itself. The export gate remains locked until this record is confirmed written; the presentation specification carries the gate status and will not release the output until provenance is complete.
+Once execution completes and the result is verified, the platform seals a compliance provenance record and writes it to the append-only compliance audit store. The record covers the full chain — what was asked, which metric definition and version was used, how the logical field specification mapped to physical tables, what SQL ran against which backend, and the exact entitlement state at execution time. The entire record is protected by a cryptographic-style hash signature, so any tampering with the record after sealing is detectable. Any party holding the platform's published verification key can independently confirm that no field has been altered since sealing — without any access to the platform itself. The export gate remains locked until this record is confirmed written; the presentation specification carries the gate status and will not release the output until provenance is complete.
 
 ```json
 {
@@ -578,7 +578,6 @@ Once execution completes and the result is verified, the platform seals a compli
   },
 
   "signature": {
-    "algorithm":     "ECDSA-P256-SHA256",
     "key_id":        "analytics-platform-signing-key-2026-01",
     "signed_fields": ["intent", "escalation_signals", "metric", "logical_field_spec", "physical_execution", "entitlement_snapshot"],
     "value":         "MEYCIQDp3f8c2a1e9b4d7f6c5a3e2d1b8f4c9a7e2d5b8f1c4a6e3CIQD9b2f7c5a1e8d4b6f3c9a2e6d4b8f1c5a3e7d2b9f4c6a8e1d3",

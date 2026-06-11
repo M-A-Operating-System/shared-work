@@ -864,9 +864,8 @@ All checks will pass. SCL will write a controls decision record to the ALS befor
   "checks":    ["data_scale_check", "complexity_check", "classification_gate", "compliance_check", "concurrency_check"],
   "result":    "all_passed",
   "signature": {
-    "algorithm": "ECDSA-P256-SHA256",
-    "key_id":    "analytics-platform-signing-key-2026-01",
-    "value":     "MEQCIBf4…"
+    "key_id": "analytics-platform-signing-key-2026-01",
+    "value":  "MEQCIBf4…"
   }
 }
 ```
