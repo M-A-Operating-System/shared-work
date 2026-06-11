@@ -20,7 +20,7 @@ The platform will operate across three distinct planes: an **analytical plane** 
 | **Integration Engineer** | Controls | Will register execution backends, maintain connection configuration, and declare the physical mappings that the Federated Query Engine resolves at execution time. Operates through configuration interfaces only — not the query path |
 | **Platform Admin** | Infrastructure | Will be responsible for platform health, deployment, infrastructure-level governance, and technical platform configuration including controls settings, feature flags, and deployment configuration. Will implement the technical policies and settings determined by Analytics Governance. Has no query interface into analytical data |
 
-**Roles are not mutually exclusive.** A single individual may hold multiple roles; the platform will evaluate entitlements from the combined JWT claims present at query time.
+**Roles are not mutually exclusive.** A single individual may hold multiple roles; the platform will evaluate entitlements from the combined claims on the caller's authentication/identity token at query time.
 
 The **Data Modeller** and **Metrics Modeller** are the critical pre-conditions for everything downstream. No analytical query can be served against a metric that has not been modelled, registered, and approved. The Data Modeller will establish the foundational data definitions in the SDR — without accurate data structure definitions, metric definitions cannot be built. The Metrics Modeller will build on that foundation to define the analytical layer in the SMR — without registered, approved metric definitions, the controls pipeline, the entitlement layer, the lineage store, and the Data Visualization Language (DVL) have nothing to operate on. Analytics Governance will hold final approval authority over both layers.
 
@@ -48,7 +48,7 @@ The **Data Modeller** and **Metrics Modeller** are the critical pre-conditions f
 
 ## Architecture and Request Flow
 
-The platform will expose its capability through three consumption modes: direct API access (a host-built custom analytics UI calling the MCP Capability Layer with a structured tool invocation); conversational backend access (the AI Chat Platform calling the Analytics Platform as a tool provider); and agentic access (scheduled agents, event monitors, and automated report pipelines calling the MCP Capability Layer with machine-issued JWTs). All three modes will share a single entry point and a single controls pipeline; consumption mode will affect only the caller's interaction pattern, not the trust model applied.
+The platform will expose its capability through three consumption modes: direct API access (a host-built custom analytics UI calling the MCP Capability Layer with a structured tool invocation); conversational backend access (the AI Chat Platform calling the Analytics Platform as a tool provider); and agentic access (scheduled agents, event monitors, and automated report pipelines calling the MCP Capability Layer with machine-issued identity tokens). All three modes will share a single entry point and a single controls pipeline; consumption mode will affect only the caller's interaction pattern, not the trust model applied.
 
 ### Architecture Diagram
 
@@ -63,7 +63,7 @@ flowchart TD
 
     subgraph analytics["Analytics Engine"]
         direction TB
-        MCP["<b>API/MCP Interface</b>\nMCP server runtime · tool/resource/prompt presentation · JWT validation"]
+        MCP["<b>API/MCP Interface</b>\nMCP server runtime · tool/resource/prompt presentation · identity token validation"]
         IRA["<b>Intent Resolution Agent (IRA)</b>\nRAG over SMR catalogue · LLM intent ranking · compliance intent score · confirmation gate\nnatural language → resolved operation_id + params"]
         RAPL["<b>Role-Aware Projection Layer (RAPL)</b>\nentitlement decisions · metric/dimension access · row scope · column masks\nreads role definitions from DES"]
         SVL["<b>Semantic Validation Layer (SVL)</b>\nSMR resolution · schema validation · entitlement enforcement · LQP generation\nentirely deterministic — no AI"]
@@ -83,7 +83,7 @@ flowchart TD
 
     subgraph dcs["Data Context Store (DCS)"]
         direction LR
-        DCSMCP["<b>API/MCP Interface</b>\nMCP server runtime · tool/resource/prompt presentation · JWT validation"]
+        DCSMCP["<b>API/MCP Interface</b>\nMCP server runtime · tool/resource/prompt presentation · identity token validation"]
         SDR[("<b>Semantic Data Repository (SDR)</b>\ndata models · object models · critical data elements\nquality rules · physical schemas · data lineage")]
         SMR[("<b>Semantic Metrics Repository (SMR)</b>\nmetric definitions · dimensions · hierarchies\naggregation rules · access policies · compliance metadata")]
         SMR --> SDR
@@ -108,14 +108,14 @@ flowchart TD
     CustomUI ~~~ Agents
     SQL ~~~ ODA
     ODA ~~~ GDA
-    Consumers -->|"JWT + structured MCP tool call"| MCP
+    Consumers -->|"identity token + structured MCP tool call"| MCP
     Consumers -->|"render tool call (display_spec)"| Image
-    Consumers -->|"JWT + MCP tool call"| DCSMCP
+    Consumers -->|"identity token + MCP tool call"| DCSMCP
     MCP -->|"natural language query"| IRA
-    MCP -->|"structured tool call (bypass IRA) + JWT"| RAPL
+    MCP -->|"structured tool call (bypass IRA) + identity token"| RAPL
     IRA -->|"RAG retrieval"| SMR
     IRA -->|"intent ranking"| LLM
-    IRA -->|"resolved request + JWT"| RAPL
+    IRA -->|"resolved request + identity token"| RAPL
     RAPL -->|"role definition lookup"| ENT
     RAPL -->|"projection record"| LS
     RAPL -->|"entitlement projection (decisions + conditions)"| SVL
@@ -148,7 +148,7 @@ The `vega2img` service will sit outside the Analytics Platform boundary as an op
 | # | Component | Summary |
 |---|-----------|---------|
 | 1 | **AI Consumers** | External access points: conversational AI, autonomous agents and pipelines, and custom applications. One governed entry point and one controls pipeline for all three — consumption mode never changes the trust model. |
-| 2 | **MCP Capability Layer (MCP)** | Single governed entry point. Validates the inbound JWT, routes natural language queries to the IRA or structured calls to the RAPL, and assembles the structured tool response. |
+| 2 | **MCP Capability Layer (MCP)** | Single governed entry point. Validates the caller's authentication/identity token, routes natural language queries to the IRA or structured calls to the RAPL, and assembles the structured tool response. |
 | 3 | **Intent Resolution Agent (IRA)** | Bounded AI step translating natural language into a validated operation request via RAG over the SMR catalogue. Scores compliance intent; returns confirmation cards when intent or purpose is ambiguous. |
 | 4 | **Semantic Metrics Repository (SMR)** | Governing catalogue of every resolvable analytical concept: versioned, approved definitions for metrics, dimensions, hierarchies, operations, and datasets. |
 | 5 | **Role-Aware Projection Layer (RAPL)** | Computes the entitlement projection from DES role definitions: data access, metric and dimension access, row scope, and column masks. Writes the projection record to the ALS. |
@@ -187,11 +187,11 @@ sequenceDiagram
 
     rect rgb(240, 255, 245)
         note over C,ALS: Single consumer request — full pipeline
-        C->>MCP: run_analytics (NL query — or operation_id + params — + JWT)
-        MCP->>MCP: validate JWT signature · expiry · org claim
+        C->>MCP: run_analytics (NL query — or operation_id + params — + identity token)
+        MCP->>MCP: validate token signature · expiry · org claim
 
         alt natural language query
-            MCP->>IRA: natural language query + JWT
+            MCP->>IRA: natural language query + identity token
             IRA->>SMR: vector similarity search (RAG)
             SMR-->>IRA: top-K candidate operations + metric definitions
             IRA->>LLM: candidate operations + user query (intent ranking prompt)
@@ -206,15 +206,15 @@ sequenceDiagram
                 C->>MCP: intent_session_id + selected_candidate (0-based index)
                 MCP->>IRA: selected candidate resolved from intent session
             end
-            IRA->>RAPL: resolved operation_id + params + compliance_purpose_score + JWT
+            IRA->>RAPL: resolved operation_id + params + compliance_purpose_score + identity token
         else structured call — operation_id + params (bypasses the IRA)
-            MCP->>RAPL: operation_id + params + explicit compliance_purpose + JWT
+            MCP->>RAPL: operation_id + params + explicit compliance_purpose + identity token
         end
 
-        RAPL->>RAPL: validate JWT · extract role claims<br/>(defence in depth — re-validates the boundary check)
+        RAPL->>RAPL: validate token · extract role claims<br/>(defence in depth — re-validates the boundary check)
         RAPL->>DES: retrieve role definitions
         DES-->>RAPL: data access domains · metric/dimension access sets<br/>row scope templates · column masks · classification ceilings
-        note over RAPL: Merge role definitions · APPROVE/DENY per metric and dimension<br/>Resolve row scope templates against JWT claims · register column masks
+        note over RAPL: Merge role definitions · APPROVE/DENY per metric and dimension<br/>Resolve row scope templates against token claims · register column masks
         RAPL->>ALS: entitlement projection record (decisions + basis — written even on denial)
         RAPL->>SVL: entitlement projection (access sets · row_scope · column_masks)<br/>+ fully qualified request (incl. compliance_purpose_score)
 
@@ -294,9 +294,9 @@ The computation pipeline (RAPL → SVL → SCL → PQP → FQE) will be entirely
 
 ## AI Consumers
 
-The AI Consumers layer is responsible for providing the external access points through which governed analytical requests reach the platform. It encompasses three consumer types: conversational AI platforms that mediate natural language queries, autonomous agents and scheduled pipelines that submit structured requests, and custom applications that call the platform via host-issued tokens. All three consumer types share a single governed entry point and a single controls pipeline; consumption mode affects only the caller's interaction pattern, not the trust model applied. For natural language queries, the consumer forwards the query and the caller's JWT to the Analytics Engine, which handles intent resolution internally. For structured requests, consumers supply an explicit operation identifier and parameters, bypassing intent resolution and routing directly to the entitlement layer. In all cases, the consumer receives a structured MCP tool response containing a display specification, result data, a governed narrative, and a lineage reference.
+The AI Consumers layer is responsible for providing the external access points through which governed analytical requests reach the platform. It encompasses three consumer types: conversational AI platforms that mediate natural language queries, autonomous agents and scheduled pipelines that submit structured requests, and custom applications that call the platform via host-issued tokens. All three consumer types share a single governed entry point and a single controls pipeline; consumption mode affects only the caller's interaction pattern, not the trust model applied. For natural language queries, the consumer forwards the query and the caller's authentication/identity token to the Analytics Engine, which handles intent resolution internally. For structured requests, consumers supply an explicit operation identifier and parameters, bypassing intent resolution and routing directly to the entitlement layer. In all cases, the consumer receives a structured MCP tool response containing a display specification, result data, a governed narrative, and a lineage reference.
 
-**Natural language path.** When a user asks an analytical question, the consumer will forward the natural language query and the user's JWT to the Analytics Engine. The engine's IRA will handle operation selection, parameter binding, and if intent is ambiguous will return a confirmation card before proceeding to execution.
+**Natural language path.** When a user asks an analytical question, the consumer will forward the natural language query and the user's authentication/identity token to the Analytics Engine. The engine's IRA will handle operation selection, parameter binding, and if intent is ambiguous will return a confirmation card before proceeding to execution.
 
 **Structured path.** Consumers that construct explicit `operation_id` + `params` payloads (agentic pipelines, custom analytics UIs, integration tests) will call `run_analytics` with structured arguments directly. The `list_operations` tool will return the entitled operation catalogue for consumers that build their own operation selection UI. Structured calls will bypass the IRA and route directly to the RAPL.
 
@@ -304,11 +304,11 @@ The AI Consumers layer is responsible for providing the external access points t
 
 ### Example
 
-The user's question will be relayed by the conversational AI directly to the Analytics Engine with the user's JWT. The consumer will not interpret, translate, or structure the query — it will forward it as-is.
+The user's question will be relayed by the conversational AI directly to the Analytics Engine with the user's authentication/identity token. The consumer will not interpret, translate, or structure the query — it will forward it as-is.
 
 ```json
 POST /v1/mcp
-Authorization: Bearer <host-issued-jwt>
+Authorization: Bearer <host-issued-identity-token>
 
 {
   "jsonrpc": "2.0",
@@ -330,17 +330,17 @@ The Analytics Engine will process the request end-to-end and return a structured
 
 > **Governing principles:** [P2 — Controls before execution](./00-overview.md#design-principles) · [P5 — Role-aware by default](./00-overview.md#design-principles)
 
-The MCP Capability Layer (MCP) is responsible for providing the single governed entry point through which all AI consumers access the platform's analytical capabilities. It receives tool call requests over MCP Streamable HTTP transport, validates the inbound JWT, and routes the request to either the Intent Resolution Agent for natural language queries or directly to the Role-Aware Projection Layer for structured calls. Each exposed tool represents a bounded, named operation with a typed input schema and a governed execution path. There is no privileged or alternative execution path; all consumers receive the same controls-validated results regardless of how they access the platform. The MCP layer assembles and returns a structured tool response containing the DVL display specification, result data, governed narrative, lineage reference, and, where applicable, a sealed compliance block.
+The MCP Capability Layer (MCP) is responsible for providing the single governed entry point through which all AI consumers access the platform's analytical capabilities. It receives tool call requests over MCP Streamable HTTP transport, validates the caller's authentication/identity token, and routes the request to either the Intent Resolution Agent for natural language queries or directly to the Role-Aware Projection Layer for structured calls. Each exposed tool represents a bounded, named operation with a typed input schema and a governed execution path. There is no privileged or alternative execution path; all consumers receive the same controls-validated results regardless of how they access the platform. The MCP layer assembles and returns a structured tool response containing the DVL display specification, result data, governed narrative, lineage reference, and, where applicable, a sealed compliance block.
 
 ### Tool Catalogue
 
 The Analytics Engine will expose three tools. All analytical operations will be SMR-catalogue driven — the code will be the execution engine, not the operation registry. The SMR will own every operation definition: what parameters it needs, what metrics and dimensions it supports, and which presentation stages it invokes via its `execution_profile`.
 
-**`run_analytics(operation_id: str, params: dict, jwt: str)`** — Executes any SMR-registered operation. The operation's `execution_profile` in the SMR will determine which presentation stages run after the full controls pipeline completes.
+**`run_analytics(operation_id: str, params: dict, auth_token: str)`** — Executes any SMR-registered operation. The operation's `execution_profile` in the SMR will determine which presentation stages run after the full controls pipeline completes.
 
-**`list_operations(domain: str | None, jwt: str)`** — Returns the SMR operation catalogue with operation IDs, display names, required parameters, supported metrics/dimensions, and execution profiles. Only operations the authenticated user is entitled to execute will be returned.
+**`list_operations(domain: str | None, auth_token: str)`** — Returns the SMR operation catalogue with operation IDs, display names, required parameters, supported metrics/dimensions, and execution profiles. Only operations the authenticated user is entitled to execute will be returned.
 
-**`drilldown(result_id: str, hierarchy: str, selected_value: str | None, jwt: str)`** — Navigates into a dimension hierarchy from a prior result. The parent result's analytical context — operation, filters, and hierarchy position — will be inherited; governance will not. The derived query will re-run the full pipeline (fresh RAPL projection, SVL enforcement, SCL checks) and write its own lineage record linked to the parent `result_id`.
+**`drilldown(result_id: str, hierarchy: str, selected_value: str | None, auth_token: str)`** — Navigates into a dimension hierarchy from a prior result. The parent result's analytical context — operation, filters, and hierarchy position — will be inherited; governance will not. The derived query will re-run the full pipeline (fresh RAPL projection, SVL enforcement, SCL checks) and write its own lineage record linked to the parent `result_id`.
 
 ### Execution Profiles
 
@@ -417,14 +417,14 @@ Every capability invocation will pass through the full controls pipeline: input 
 
 ### Example
 
-A structured `run_analytics` tool call will arrive from the AI Chat Platform. The MCP Capability Layer will validate the JWT signature, confirm the token has not expired, and extract the claims. For a natural language query it will route to the Intent Resolution Agent; for a structured call it will route directly to the Role-Aware Projection Layer. The MCP Capability Layer will not interpret the parameters or make any analytical decisions; it will validate, route, and wait.
+A structured `run_analytics` tool call will arrive from the AI Chat Platform. The MCP Capability Layer will validate the token signature, confirm the token has not expired, and extract the claims. For a natural language query it will route to the Intent Resolution Agent; for a structured call it will route directly to the Role-Aware Projection Layer. The MCP Capability Layer will not interpret the parameters or make any analytical decisions; it will validate, route, and wait.
 
 
 ## Intent Resolution Agent (IRA)
 
 > **Governing principles:** [P2 — Controls before execution](./00-overview.md#design-principles) · [P10 — Deterministic computation, not generation](./00-overview.md#design-principles)
 
-The Intent Resolution Agent (IRA) is responsible for translating a natural language query into a structured, validated operation request. It receives the natural language query and the caller's JWT from the MCP Capability Layer and retrieves candidate operations from the SMR catalogue using embedding similarity search. A language model ranks the candidates, binds parameters to the leading operation, and derives a presentation preview indicating the anticipated chart type and axis structure. When the top candidate exceeds the confidence threshold, the resolved intent is forwarded directly to the Role-Aware Projection Layer. When intent is ambiguous, ranked candidate cards are returned to the consumer for selection or conversational refinement before execution proceeds. The IRA also classifies whether the query's stated purpose is compliance-driven, producing the compliance intent score that forms Signal 2 of the two-signal compliance trigger; when the purpose is ambiguous, it clarifies through the same confirmation card flow. The IRA is the only AI step in the pre-computation pipeline and produces no output visible to the end user once intent is resolved.
+The Intent Resolution Agent (IRA) is responsible for translating a natural language query into a structured, validated operation request. It receives the natural language query and the caller's authentication/identity token from the MCP Capability Layer and retrieves candidate operations from the SMR catalogue using embedding similarity search. A language model ranks the candidates, binds parameters to the leading operation, and derives a presentation preview indicating the anticipated chart type and axis structure. When the top candidate exceeds the confidence threshold, the resolved intent is forwarded directly to the Role-Aware Projection Layer. When intent is ambiguous, ranked candidate cards are returned to the consumer for selection or conversational refinement before execution proceeds. The IRA also classifies whether the query's stated purpose is compliance-driven, producing the compliance intent score that forms Signal 2 of the two-signal compliance trigger; when the purpose is ambiguous, it clarifies through the same confirmation card flow. The IRA is the only AI step in the pre-computation pipeline and produces no output visible to the end user once intent is resolved.
 
 ### Intent Resolution Pipeline
 
@@ -635,7 +635,7 @@ When the request reaches the SVL, the SMR will be the catalogue every identifier
 
 > **Governing principles:** [P5 — Role-aware by default](./00-overview.md#design-principles) · [P1 — Semantic abstraction](./00-overview.md#design-principles)
 
-The Role-Aware Projection Layer (RAPL) is responsible for computing the entitlement projection for every request before any query plan is compiled. It receives the resolved request and caller's JWT, retrieves role definitions from the Data Entitlements Store, and merges all active roles into a single entitlement profile. Against that profile it makes five categories of decision: data access clearance, metric access, dimension access, row scope, and result set column masking. Entitlement is conferred by role membership against governed logical concepts, not by database permissions, keeping policies stable as the underlying physical implementation changes. The completed entitlement projection, covering approved metrics and dimensions, resolved row scope conditions, and registered column masks, is passed to the Semantic Validation Layer for enforcement. Every entitlement decision is written to the Analytical Lineage Store as an audit record at query time.
+The Role-Aware Projection Layer (RAPL) is responsible for computing the entitlement projection for every request before any query plan is compiled. It receives the resolved request and the caller's authentication/identity token, retrieves role definitions from the Data Entitlements Store, and merges all active roles into a single entitlement profile. Against that profile it makes five categories of decision: data access clearance, metric access, dimension access, row scope, and result set column masking. Entitlement is conferred by role membership against governed logical concepts, not by database permissions, keeping policies stable as the underlying physical implementation changes. The completed entitlement projection, covering approved metrics and dimensions, resolved row scope conditions, and registered column masks, is passed to the Semantic Validation Layer for enforcement. Every entitlement decision is written to the Analytical Lineage Store as an audit record at query time.
 
 Entitlement policies will be managed in the **Data Entitlements Store (DES)** — an independent external component. Policies will be defined at the **logical object and data element level**: granting or restricting access to named metrics, dimensions, and data elements as governed concepts, never to physical tables, schemas, or column names. Projection will not be optional and will not be bypassable; every request will pass through RAPL, sitting between the IRA and the SVL.
 
@@ -648,15 +648,15 @@ RAPL will make five categories of entitlement decision. Every decision will be m
 | **Data access** | Stage 5 — data domain or classification ceiling not within the user's entitled scope is **DENIED** | SVL Stage 3 — request rejected before plan generation |
 | **Metrics access** | Stage 5 — requested metric not in the entitled access set is **DENIED** | SVL Stage 3 — denied metric removed from plan; request rejected if a required metric is lost |
 | **Dimension access** | Stage 5 — requested dimension not in the entitled access set is **DENIED** | SVL Stage 3 — denied dimension removed from plan |
-| **Row scope access** | Stage 5–6 — population scope decided and resolved against JWT claims | PQP sub-plan generation — row scope filter injected into each sub-plan; enforced by FQE at execution |
+| **Row scope access** | Stage 5–6 — population scope decided and resolved against token claims | PQP sub-plan generation — row scope filter injected into each sub-plan; enforced by FQE at execution |
 | **Result set column masking** | Stage 5 — masked columns and masking mode registered | FQE result assembly — value replaced, redacted, or excluded |
 
 ### Projection Lifecycle
 
 ```mermaid
 flowchart LR
-    START(["Fully qualified analytical\nrequest + JWT"])
-    S1["**Stage 1**\nJWT Validation"]
+    START(["Fully qualified analytical\nrequest + identity token"])
+    S1["**Stage 1**\nToken Validation"]
     S2["**Stage 2**\nRole Claim\nExtraction"]
     S3["**Stage 3**\nDES Role Definition\nRetrieval"]
     S4["**Stage 4**\nMulti-Role\nMerge"]
@@ -667,9 +667,9 @@ flowchart LR
     START --> S1 --> S2 --> S3 --> S4 --> S5 --> S6 --> S7
 ```
 
-**Stage 1 — JWT Validation.** Validate the inbound JWT: signature, expiry, and org claim. This deliberately re-validates the check already performed at the MCP Capability Layer boundary — defence in depth, so the RAPL's guarantees do not depend on the entry layer's correctness. **DENY** — request rejected immediately if any check fails. No further processing occurs on an invalid token.
+**Stage 1 — Token Validation.** Validate the caller's authentication/identity token: signature, expiry, and org claim. This deliberately re-validates the check already performed at the MCP Capability Layer boundary — defence in depth, so the RAPL's guarantees do not depend on the entry layer's correctness. **DENY** — request rejected immediately if any check fails. No further processing occurs on an invalid token.
 
-**Stage 2 — Role Claim Extraction.** Extract the user's analytical role claims from the validated JWT using the configured `roleClaimField`. **DENY** — if no valid analytical role claims are present the request is rejected.
+**Stage 2 — Role Claim Extraction.** Extract the user's analytical role claims from the validated token using the configured `roleClaimField`. **DENY** — if no valid analytical role claims are present the request is rejected.
 
 **Stage 3 — DES Role Definition Retrieval.** Look up the full role definition for each extracted role from the Data Entitlements Store (DES). Each definition declares the data access scope, metric access set, dimension access set, row scope templates, column masks, and classification ceiling for that role. **DENY** — if no valid role definitions are retrieved the request is rejected.
 
@@ -685,7 +685,7 @@ flowchart LR
 
 No approved metric will reach the output without its full set of data access clearance, population scope, and column visibility conditions attached.
 
-**Stage 6 — Row Scope Resolution.** Resolve the row scope templates from Stage 5 against the user's JWT claims. `{{user.claim_name}}` syntax will be expanded to concrete values at query time. **DENY** — if a required JWT claim for scope resolution is missing the request will be rejected.
+**Stage 6 — Row Scope Resolution.** Resolve the row scope templates from Stage 5 against the user's token claims. `{{user.claim_name}}` syntax will be expanded to concrete values at query time. **DENY** — if a required token claim for scope resolution is missing the request will be rejected.
 
 **Stage 7 — Entitlement Projection Output.** Produce the completed entitlement projection: approved `data_access_scope`, approved `metric_access_set` (each with permitted aggregations and dimensional constraints), approved `dimension_access_set`, resolved `row_scope[]`, registered `column_masks[]`, and `classification_ceiling`. Write the full projection record to the ALS. Pass to SVL for Stage 3 enforcement.
 
@@ -716,7 +716,7 @@ Every entitlement decision — data access clearance, approved and denied metric
 
 ### Example
 
-The RAPL will read the `portfolio_scope` claim from the JWT and resolve it against the `portfolio_manager` role's row scope template (`portfolio_id IN ({{user.portfolio_scope}})`):
+The RAPL will read the `portfolio_scope` claim from the caller's identity token and resolve it against the `portfolio_manager` role's row scope template (`portfolio_id IN ({{user.portfolio_scope}})`):
 
 ```json
 {
@@ -727,7 +727,7 @@ The RAPL will read the `portfolio_scope` claim from the JWT and resolve it again
   ],
   "column_masks":           [],
   "classification_ceiling": "INTERNAL",
-  "projection_basis":       "jwt_claim:portfolio_scope"
+  "projection_basis":       "token_claim:portfolio_scope"
 }
 ```
 
@@ -1158,7 +1158,7 @@ CREATE TABLE analytics.lineage_index (
 
 ### Data Isolation
 
-Every lineage document will be stored under an `org_id`-prefixed key in the object store, and every row in the `analytics.lineage_index` table will carry an `org_id` column. Row-Level Security (RLS) in the relational database will enforce access isolation on the index table. Object store access will be gated by the platform's API, which will validate the JWT `org_id` claim before resolving any object key.
+Every lineage document will be stored under an `org_id`-prefixed key in the object store, and every row in the `analytics.lineage_index` table will carry an `org_id` column. Row-Level Security (RLS) in the relational database will enforce access isolation on the index table. Object store access will be gated by the platform's API, which will validate the token's `org_id` claim before resolving any object key.
 
 ### Retention
 
@@ -1340,7 +1340,7 @@ The following components will appear in the architecture diagram and interact wi
 
 The AI Chat Platform will be the conversational consumer of the Analytics Engine. It will relay natural language questions from users to the Analytics Engine and render the structured results it receives. Intent resolution — identifying which governed operation matches the user's question and binding its parameters — will be performed inside the Analytics Engine by the IRA. The AI Chat Platform will perform no NL translation and will have no dependency on the SMR operation catalogue.
 
-The AI Chat Platform will forward the user's natural language query and JWT to the Analytics Engine via `run_analytics`. If the Analytics Engine returns candidate cards, the AI Chat Platform will render them to the user and re-submit with the `intent_session_id` and the chosen `selected_candidate` index when the user approves. It will render the DVL `display_spec` inline, surface the governed `narrative` as the assistant's reply, and retain the `result_id` for follow-up `drilldown` calls.
+The AI Chat Platform will forward the user's natural language query and authentication/identity token to the Analytics Engine via `run_analytics`. If the Analytics Engine returns candidate cards, the AI Chat Platform will render them to the user and re-submit with the `intent_session_id` and the chosen `selected_candidate` index when the user approves. It will render the DVL `display_spec` inline, surface the governed `narrative` as the assistant's reply, and retain the `result_id` for follow-up `drilldown` calls.
 
 The AI Chat Platform will have no access to physical schemas, execution backends, or metric definitions. Entitlement enforcement, intent resolution, query planning, and execution will be entirely the Analytics Engine's responsibility.
 
@@ -1360,7 +1360,7 @@ The Data Entitlements Store (DES) will be an independent external component that
 
 Entitlement policies will be declared at the **logical object and data element level**. A policy will grant or restrict access to a named metric, a named dimension, or a named data element as governed concepts. Policies will not reference physical tables, schemas, column names, or connection strings. This separation will ensure entitlements remain stable as the underlying physical implementation evolves, and remain comprehensible to business data owners, compliance teams, and governance teams who have no visibility into the data platform's internal structure.
 
-RAPL will read role definitions from the DES at query time, keyed on the role claims extracted from the caller's JWT. Changes to entitlement policies will not require changes to metric definitions, platform configuration, or backend schemas.
+RAPL will read role definitions from the DES at query time, keyed on the role claims extracted from the caller's authentication/identity token. Changes to entitlement policies will not require changes to metric definitions, platform configuration, or backend schemas.
 
 
 ### vega2img
