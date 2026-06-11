@@ -1,4 +1,4 @@
-# 1. Core Platform Capabilities
+# 2. Core Platform Capabilities
 
 This chapter defines the target logical architecture for the AI Analytics Platform. It covers thirteen pipeline components in the order a query will encounter them, using a single portfolio manager query as a running example throughout. Each section describes what a component will do, its controls contract, and its position in the pipeline — with no references to specific technology products or vendor implementations.
 
@@ -328,7 +328,7 @@ The Analytics Engine will process the request end-to-end and return a structured
 
 ## MCP Capability Layer (MCP)
 
-> **Governing principles:** [P2 — Controls before execution](./00-overview.md#design-principles) · [P5 — Role-aware by default](./00-overview.md#design-principles)
+> **Governing principles:** [P2 — Controls before execution](./01-overview.md#design-principles) · [P5 — Role-aware by default](./01-overview.md#design-principles)
 
 The MCP Capability Layer (MCP) is responsible for providing the single governed entry point through which all AI consumers access the platform's analytical capabilities. It receives tool call requests over MCP Streamable HTTP transport, validates the caller's authentication/identity token, and routes the request to either the Intent Resolution Agent for natural language queries or directly to the Role-Aware Projection Layer for structured calls. Each exposed tool represents a bounded, named operation with a typed input schema and a governed execution path. There is no privileged or alternative execution path; all consumers receive the same controls-validated results regardless of how they access the platform. The MCP layer assembles and returns a structured tool response containing the DVL display specification, result data, governed narrative, lineage reference, and, where applicable, a sealed compliance block.
 
@@ -346,7 +346,7 @@ The Analytics Engine will expose three tools. All analytical operations will be 
 
 Each SMR operation will carry an `execution_profile` defined in its `analytical_operation` entry in the SMR catalogue. This will tell the pipeline executor which presentation stages to invoke after execution. No presentation depth will be hardcoded in the MCP layer — it will always be determined by the SMR catalogue.
 
-The deterministic pipeline — Auth → IRA (natural-language queries only) → RAPL → SVL → SCL → PQP → FQE → Lineage — runs in full for every profile, without exception ([P2](./00-overview.md#design-principles): there is no fast path). Profiles vary only what happens after the FQE assembles the result:
+The deterministic pipeline — Auth → IRA (natural-language queries only) → RAPL → SVL → SCL → PQP → FQE → Lineage — runs in full for every profile, without exception ([P2](./01-overview.md#design-principles): there is no fast path). Profiles vary only what happens after the FQE assembles the result:
 
 | Profile | Controls pipeline | Presentation stages |
 |---|---|---|
@@ -422,7 +422,7 @@ A structured `run_analytics` tool call will arrive from the AI Chat Platform. Th
 
 ## Intent Resolution Agent (IRA)
 
-> **Governing principles:** [P2 — Controls before execution](./00-overview.md#design-principles) · [P10 — Deterministic computation, not generation](./00-overview.md#design-principles)
+> **Governing principles:** [P2 — Controls before execution](./01-overview.md#design-principles) · [P10 — Deterministic computation, not generation](./01-overview.md#design-principles)
 
 The Intent Resolution Agent (IRA) is responsible for translating a natural language query into a structured, validated operation request. It receives the natural language query and the caller's authentication/identity token from the MCP Capability Layer and retrieves candidate operations from the SMR catalogue using embedding similarity search. A language model ranks the candidates, binds parameters to the leading operation, and derives a presentation preview indicating the anticipated chart type and axis structure. When the top candidate exceeds the confidence threshold, the resolved intent is forwarded directly to the Role-Aware Projection Layer. When intent is ambiguous, ranked candidate cards are returned to the consumer for selection or conversational refinement before execution proceeds. The IRA also classifies whether the query's stated purpose is compliance-driven, producing the compliance intent score that forms Signal 2 of the two-signal compliance trigger; when the purpose is ambiguous, it clarifies through the same confirmation card flow. The IRA is the only AI step in the pre-computation pipeline and produces no output visible to the end user once intent is resolved.
 
@@ -537,7 +537,7 @@ Note the symbolic binding: *"my equity portfolios"* resolves to the scope token 
 
 ## Semantic Metrics Repository (SMR)
 
-> **Governing principles:** [P1 — Semantic abstraction](./00-overview.md#design-principles) · [P3 — Deterministic metric resolution](./00-overview.md#design-principles) · [P9 — Administrator sovereignty](./00-overview.md#design-principles)
+> **Governing principles:** [P1 — Semantic abstraction](./01-overview.md#design-principles) · [P3 — Deterministic metric resolution](./01-overview.md#design-principles) · [P9 — Administrator sovereignty](./01-overview.md#design-principles)
 
 The Semantic Metrics Repository (SMR) is responsible for governing every analytical concept resolvable on the platform. It stores versioned, approved metadata definitions for metrics, dimensions, hierarchies, analytical operations, and datasets, and exposes them to the pipeline for resolution at query time. Every identifier in a request must be registered and approved in the SMR before it can be queried; the Semantic Validation Layer enforces this as an architectural constraint, not a configurable policy. Metric definitions declare formula, aggregation rules, data affinity, physical mappings, classification level, compliance relevance, and regulatory framework attributes. Operation and metric definitions are stored with embeddings to support the Intent Resolution Agent's retrieval. Authoring and approval flow through the Data Context Store's versioning and governance workflow, with Analytics Governance holding final approval authority over all definitions.
 
@@ -633,7 +633,7 @@ When the request reaches the SVL, the SMR will be the catalogue every identifier
 
 ## Role-Aware Projection Layer (RAPL)
 
-> **Governing principles:** [P5 — Role-aware by default](./00-overview.md#design-principles) · [P1 — Semantic abstraction](./00-overview.md#design-principles)
+> **Governing principles:** [P5 — Role-aware by default](./01-overview.md#design-principles) · [P1 — Semantic abstraction](./01-overview.md#design-principles)
 
 The Role-Aware Projection Layer (RAPL) is responsible for computing the entitlement projection for every request before any query plan is compiled. It receives the resolved request and the caller's authentication/identity token, retrieves role definitions from the Data Entitlements Store, and merges all active roles into a single entitlement profile. Against that profile it makes five categories of decision: data access clearance, metric access, dimension access, row scope, and result set column masking. Entitlement is conferred by role membership against governed logical concepts, not by database permissions, keeping policies stable as the underlying physical implementation changes. The completed entitlement projection, covering approved metrics and dimensions, resolved row scope conditions, and registered column masks, is passed to the Semantic Validation Layer for enforcement. Every entitlement decision is written to the Analytical Lineage Store as an audit record at query time.
 
@@ -736,7 +736,7 @@ No column masks will apply — the `portfolio_manager` role has no masking rules
 
 ## Semantic Validation Layer (SVL)
 
-> **Governing principles:** [P2 — Controls before execution](./00-overview.md#design-principles) · [P10 — Deterministic computation, not generation](./00-overview.md#design-principles)
+> **Governing principles:** [P2 — Controls before execution](./01-overview.md#design-principles) · [P10 — Deterministic computation, not generation](./01-overview.md#design-principles)
 
 The Semantic Validation Layer (SVL) is responsible for validating the analytical request and compiling it into a platform-agnostic Logical Query Plan. It receives the entitlement projection from the Role-Aware Projection Layer together with the fully qualified analytical request and passes them through four sequential stages: well-formedness and SMR resolution, compliance signal evaluation, entitlement enforcement, and LQP generation. Every identifier is resolved against approved SMR definitions; any unregistered or unapproved identifier causes the pipeline to stop before a plan is compiled. Row scope filter nodes are injected and column masking directives are embedded as a top-level array in the plan, ensuring entitlement enforcement carries through to physical execution. The output is a Logical Query Plan expressed entirely in SMR-registered concepts, carrying no backend references, no SQL, and no physical schema identifiers. The SVL is entirely deterministic; no AI model runs inside it.
 
@@ -795,7 +795,7 @@ Node `n3` is the RAPL row scope — a first-class plan node, not a post-executio
 
 ## Semantic Controls Layer (SCL)
 
-> **Governing principles:** [P2 — Controls before execution](./00-overview.md#design-principles) · [P8 — Explainability at every layer](./00-overview.md#design-principles) · [P9 — Administrator sovereignty](./00-overview.md#design-principles)
+> **Governing principles:** [P2 — Controls before execution](./01-overview.md#design-principles) · [P8 — Explainability at every layer](./01-overview.md#design-principles) · [P9 — Administrator sovereignty](./01-overview.md#design-principles)
 
 The Semantic Controls Layer (SCL) is responsible for applying five checks to every query before releasing it to the Physical Query Planner. It receives the Logical Query Plan from the Semantic Validation Layer and evaluates it against the platform controls configuration. The five checks are: data scale (estimated scan volume against the configured row limit using SDR profiling statistics), complexity (LQP node count and join depth), classification gate (metric classification ceiling), compliance check (two-signal trigger for compliance-purpose queries), and concurrency (active query count against the platform limit). Every check must pass; there is no user, agent, or internal path that bypasses SCL evaluation. When all checks pass, the SCL assigns a timeout budget, writes a signed controls decision record to the Analytical Lineage Store, and releases the approved LQP to the Physical Query Planner.
 
@@ -873,7 +873,7 @@ All checks will pass. SCL will write a controls decision record to the ALS befor
 
 ## Physical Query Planner (PQP)
 
-> **Governing principles:** [P1 — Semantic abstraction](./00-overview.md#design-principles) · [P10 — Deterministic computation, not generation](./00-overview.md#design-principles)
+> **Governing principles:** [P1 — Semantic abstraction](./01-overview.md#design-principles) · [P10 — Deterministic computation, not generation](./01-overview.md#design-principles)
 
 The Physical Query Planner (PQP) will be the translation boundary between the logical and physical layers of the pipeline. It will receive the controls-approved Logical Query Plan from the SCL and produce a physical execution plan that the Federated Query Engine can execute against the data sources. Nothing above the PQP will have knowledge of physical schemas, table names, or backend-specific query representations. Nothing below it will operate on logical concepts. The same LQP will always produce the same physical execution plan: given identical metric definitions, filters, and time expressions, the PQP's output will be fully reproducible — a property required for lineage integrity.
 
@@ -922,7 +922,7 @@ The physical execution plan will reference the resolved measure columns from `pr
 
 ## Federated Query Engine (FQE)
 
-> **Governing principles:** [P1 — Semantic abstraction](./00-overview.md#design-principles) · [P4 — Complete analytical lineage](./00-overview.md#design-principles) · [P10 — Deterministic computation, not generation](./00-overview.md#design-principles)
+> **Governing principles:** [P1 — Semantic abstraction](./01-overview.md#design-principles) · [P4 — Complete analytical lineage](./01-overview.md#design-principles) · [P10 — Deterministic computation, not generation](./01-overview.md#design-principles)
 
 The Federated Query Engine (FQE) will be the only component in the platform with knowledge of execution backend connection details — endpoints, credentials, and availability. It will receive the physical execution plan from the Physical Query Planner, execute it against the data sources, assemble the results, and write a complete execution record to the lineage store. Execution plan compilation is the PQP's responsibility; the FQE will own everything from execution onward.
 
@@ -1008,7 +1008,7 @@ The FQE will write an execution record to the Analytical Lineage Store (ALS) and
 
 ## Data Visualization Language (DVL)
 
-> **Governing principles:** [P7 — Deterministic visualisation](./00-overview.md#design-principles)
+> **Governing principles:** [P7 — Deterministic visualisation](./01-overview.md#design-principles)
 
 The Data Visualization Language (DVL) is responsible for producing a deterministic display specification for every analytical result. It receives the assembled result from the Federated Query Engine and classifies it against a taxonomy of registered intent patterns. The ontology evaluator matches the result shape and intent classification against registered chart contracts in order of specificity, returning the highest-scoring match as the display specification. The AI model does not select chart types; the DVL makes the final binding decision, ensuring the same analytical pattern produces the same chart type across all users, sessions, and model versions. The TABLE_GOVERNED contract serves as an unconditional fallback, ensuring every query receives a valid display specification regardless of result shape. The intent pattern taxonomy and chart contract registry are initial sets, expected to be extended as the platform's visualisation vocabulary grows over time.
 
@@ -1070,7 +1070,7 @@ The ontology evaluator will classify the result: two metrics across four named e
 
 ## Narrative Synthesis Agent (NSA)
 
-> **Governing principles:** [P6 — Governed narrative](./00-overview.md#design-principles) · [P10 — Deterministic computation, not generation](./00-overview.md#design-principles)
+> **Governing principles:** [P6 — Governed narrative](./01-overview.md#design-principles) · [P10 — Deterministic computation, not generation](./01-overview.md#design-principles)
 
 The Narrative Synthesis Agent (NSA) is responsible for producing a governed plain-language summary of each computed result. It runs in parallel with the Data Visualization Language after the Federated Query Engine has assembled the result, making a single tightly-scoped language model call anchored strictly to the computed values. Its prompt is constructed from the assembled result only: metric labels, row values, units, and dimension names; it is not given the user's original query or SMR governance context, preventing the narrative from interpreting or inferring beyond what was computed. Every numeric value in the narrative must either be present in the result set or be a derived count the validator independently recomputes from the result rows; the post-generation validation pass rejects the output if any value can be neither matched nor recomputed, with one regeneration attempt permitted. The NSA is optional and can be disabled via a platform configuration flag with no effect on computation, lineage, or display specification generation.
 
@@ -1118,7 +1118,7 @@ Post-generation validation will confirm every verbatim numeric value cited in th
 
 ## Analytical Lineage Store (ALS)
 
-> **Governing principles:** [P4 — Complete analytical lineage](./00-overview.md#design-principles) · [P8 — Explainability at every layer](./00-overview.md#design-principles)
+> **Governing principles:** [P4 — Complete analytical lineage](./01-overview.md#design-principles) · [P8 — Explainability at every layer](./01-overview.md#design-principles)
 
 The Analytical Lineage Store (ALS) is responsible for providing a complete, immutable record of how every analytical result was produced. It receives three writes per query: an entitlement projection record written by the Role-Aware Projection Layer when the projection is computed, a controls decision record written by the Semantic Controls Layer before execution begins, and a full execution record written by the Federated Query Engine after execution completes. A request denied at any stage still leaves the records written up to that point — blocked queries are never absent from the audit trail. Each lineage record captures the original request, the SMR metric definition versions resolved, the entitlement projection in force, the controls decisions applied, the physical sub-plans executed, and the visualisation contract and narrative status. Records are written once and never mutated; corrections are made via new amendment documents that reference the original record. The store supports regulatory audit export via a filtered query API, with digitally signed export packages available for compliance review. Retention periods are configurable per deployment, governed by the organisation's regulatory retention obligations.
 
@@ -1234,7 +1234,7 @@ The document will be immutable from the moment of writing. The full chain — or
 
 ## Provenance Artifact Service (PAS)
 
-> **Governing principles:** [P4 — Complete analytical lineage](./00-overview.md#design-principles) · [P2 — Controls before execution](./00-overview.md#design-principles) · [P9 — Administrator sovereignty](./00-overview.md#design-principles)
+> **Governing principles:** [P4 — Complete analytical lineage](./01-overview.md#design-principles) · [P2 — Controls before execution](./01-overview.md#design-principles) · [P9 — Administrator sovereignty](./01-overview.md#design-principles)
 
 The Provenance Artifact Service (PAS) is responsible for assembling and sealing a tamper-evident compliance record for queries that trigger the two-signal compliance classification. It is invoked in parallel with the Data Visualization Language and Narrative Synthesis Agent, but only when the Semantic Controls Layer determines that both the metric compliance flag and the IRA intent classification signal are active. It reads the projection record, controls decision record, and execution record from the Analytical Lineage Store for the current query, assembles them into a Provenance Artifact document, and seals it by writing the artifact back to the ALS as an immutable sibling record. Export of the query result is blocked until sealing is confirmed, ensuring compliance-purpose results cannot leave the platform without an associated auditable record. The sealed compliance block is included in the MCP tool response and any party holding the platform's public key can independently verify the artifact has not been altered since sealing.
 

@@ -1,17 +1,17 @@
-# 2. Reference Implementation
+# 3. Reference Implementation
 
 This chapter describes one reference implementation of the AI Analytics Platform. Stack choices are concrete but not prescriptive. The product specification is intentionally stack-agnostic. Any conformant implementation that satisfies the specified behaviours, governance guarantees, and interface contracts is valid. Technology substitutions at any layer require no changes to the product specification.
 
-The product specification (component behaviours, interface contracts, governance requirements) is in [Chapter 1 -- Core Platform Capabilities](./01-core-capabilities.md). The design principles governing every decision are in [Platform Overview — Design Principles](./00-overview.md#design-principles).
+The product specification (component behaviours, interface contracts, governance requirements) is in [Chapter 2 -- Core Platform Capabilities](./02-core-capabilities.md). The design principles governing every decision are in [Platform Overview — Design Principles](./01-overview.md#design-principles).
 
 
-## 2.1 Reference Architecture Summary
+## 3.1 Reference Architecture Summary
 
-This chapter presents **one reference implementation**. It is intended as a concrete starting point — a worked example of how the capabilities defined in Chapter 1 can be realised using a specific technology stack. It is not a prescriptive design. Teams should treat each layer-level technology choice as a recommendation, not a constraint. A conformant implementation may substitute any component provided it honours the interface contracts and governance guarantees specified in Chapter 1.
+This chapter presents **one reference implementation**. It is intended as a concrete starting point — a worked example of how the capabilities defined in Chapter 2 can be realised using a specific technology stack. It is not a prescriptive design. Teams should treat each layer-level technology choice as a recommendation, not a constraint. A conformant implementation may substitute any component provided it honours the interface contracts and governance guarantees specified in Chapter 2.
 
-The table below maps each Chapter 1 capability to its reference implementation name and the key technology it uses in this architecture. The components are listed in pipeline order.
+The table below maps each Chapter 2 capability to its reference implementation name and the key technology it uses in this architecture. The components are listed in pipeline order.
 
-| Capability (Ch01) | Abbr | Reference Implementation | Key Technology |
+| Capability (Ch02) | Abbr | Reference Implementation | Key Technology |
 |---|---|---|---|
 | MCP Capability Layer | MCP | `build_mcp_app()` + FastMCP router | Python 3.12 · FastMCP 2.x · Uvicorn · port 8000 · JWT via python-jose (RS256) |
 | Intent Resolution Agent | IRA | `IntentResolutionAgent` | Python · embedding similarity search over SMR · Anthropic Claude (intent ranking + compliance intent scoring) · confirmation cards |
@@ -31,7 +31,7 @@ The table below maps each Chapter 1 capability to its reference implementation n
 The two embedded AI components are the **Intent Resolution Agent (IRA)** and the **Narrative Synthesis Agent (NSA)**. Every stage between them — RAPL, SVL, SCL, PQP, and FQE — is deterministic.
 
 
-## 2.2 Architecture Overview
+## 3.2 Architecture Overview
 
 ```mermaid
 flowchart TD
@@ -100,11 +100,11 @@ flowchart TD
 The Semantic Metrics Repository (SMR) and the Semantic Data Repository (SDR) are two independent stores housed within the Data Context Store (DCS). The SDR is a pre-existing organisational component holding the foundational data definitions — data models, physical schemas, and data lineage. The SMR is a separate store holding the four analytical document types (`analytical_metric`, `analytical_dimension`, `analytical_operation`, `analytical_dataset`); both stores are built on the DCS's shared versioned storage, search index, and scoped access control, and both are reached through the DCS API. The `physical_mapping` fields in SMR metric definitions resolve against SDR schema metadata to locate the physical tables and columns behind each metric.
 
 
-## 2.3 Layer-by-Layer Stack Decisions
+## 3.3 Layer-by-Layer Stack Decisions
 
 ### MCP Capability Layer
 
-> **Specification:** [§MCP Capability Layer](./01-core-capabilities.md#mcp-capability-layer-mcp)
+> **Specification:** [§MCP Capability Layer](./02-core-capabilities.md#mcp-capability-layer-mcp)
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
@@ -274,7 +274,7 @@ class DrilldownService:
 
 #### Execution profiles
 
-Each SMR operation carries an `execution_profile` that tells the pipeline executor which presentation stages to invoke after the full deterministic pipeline has run. Profile definitions are in [§MCP Capability Layer](./01-core-capabilities.md#mcp-capability-layer-mcp).
+Each SMR operation carries an `execution_profile` that tells the pipeline executor which presentation stages to invoke after the full deterministic pipeline has run. Profile definitions are in [§MCP Capability Layer](./02-core-capabilities.md#mcp-capability-layer-mcp).
 
 #### Resources
 
@@ -409,7 +409,7 @@ Error code reference table:
 
 ### Intent Resolution Agent
 
-> **Specification:** [§Intent Resolution Agent](./01-core-capabilities.md#intent-resolution-agent-ira)
+> **Specification:** [§Intent Resolution Agent](./02-core-capabilities.md#intent-resolution-agent-ira)
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
@@ -467,7 +467,7 @@ Structured API consumers that already know the `operation_id` skip the IRA entir
 
 ### Semantic Validation Layer
 
-> **Specification:** [§Semantic Validation Layer](./01-core-capabilities.md#semantic-validation-layer-svl)
+> **Specification:** [§Semantic Validation Layer](./02-core-capabilities.md#semantic-validation-layer-svl)
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
@@ -505,7 +505,7 @@ class SemanticValidationLayer:
 
 ### Narrative Synthesis Agent
 
-> **Specification:** [§Narrative Synthesis Agent](./01-core-capabilities.md#narrative-synthesis-agent-nsa)
+> **Specification:** [§Narrative Synthesis Agent](./02-core-capabilities.md#narrative-synthesis-agent-nsa)
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
@@ -562,7 +562,7 @@ class NarrativeSynthesisAgent:
 
 ### Provenance Artifact Service (PAS)
 
-> **Specification:** [§Provenance Artifact Service](./01-core-capabilities.md#provenance-artifact-service-pas)
+> **Specification:** [§Provenance Artifact Service](./02-core-capabilities.md#provenance-artifact-service-pas)
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
@@ -606,7 +606,7 @@ class ProvenanceArtifactService:
 
 ### Semantic Metrics Repository (SMR)
 
-> **Specification:** [§Semantic Metrics Repository](./01-core-capabilities.md#semantic-metrics-repository-smr)
+> **Specification:** [§Semantic Metrics Repository](./02-core-capabilities.md#semantic-metrics-repository-smr)
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
@@ -660,7 +660,7 @@ The core metric definition. One document per approved metric version. The `statu
 
 `weight_metric_id` is required when `aggregation` is `"value_weighted_average"` (or any other weighted aggregation variant) and must reference the `metric_id` of an approved `analytical_metric` in the SMR. The SVL resolves and validates this reference at query time. If the weight metric is missing or unapproved, the query is rejected. The field is absent for non-weighted aggregations (`"sum"`, `"last"`, `"count"`, `"min"`, `"max"`, `"mean"`). The LQP generator emits a `weight_metric_id` key on the `metric_scan` node so that the execution backend can fetch the weighting values alongside the primary metric.
 
-`formula` stores the business-logic expression defined in the [SMR formula language](./01-core-capabilities.md#formula-language). It is the human-readable and audit-visible definition of what the metric computes. At query time the FQE resolves the formula against the `physical_mapping` to generate the backend-specific query; the formula itself is never executed directly. Metrics backed entirely by a pre-computed measure in a semantic layer (e.g. a Cube.js measure) may leave `formula` as an empty string and rely solely on `physical_mapping`.
+`formula` stores the business-logic expression defined in the [SMR formula language](./02-core-capabilities.md#formula-language). It is the human-readable and audit-visible definition of what the metric computes. At query time the FQE resolves the formula against the `physical_mapping` to generate the backend-specific query; the formula itself is never executed directly. Metrics backed entirely by a pre-computed measure in a semantic layer (e.g. a Cube.js measure) may leave `formula` as an empty string and rely solely on `physical_mapping`.
 
 #### SMR document type: `analytical_dimension`
 
@@ -895,7 +895,7 @@ class LQPGenerator:
 
 ### Role-Aware Projection Layer
 
-> **Specification:** [§Role-Aware Projection Layer](./01-core-capabilities.md#role-aware-projection-layer-rapl)
+> **Specification:** [§Role-Aware Projection Layer](./02-core-capabilities.md#role-aware-projection-layer-rapl)
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
@@ -1007,7 +1007,7 @@ class RoleAwareProjectionLayer:
 
 ### Semantic Controls Layer
 
-> **Specification:** [§Semantic Controls Layer](./01-core-capabilities.md#semantic-controls-layer-scl)
+> **Specification:** [§Semantic Controls Layer](./02-core-capabilities.md#semantic-controls-layer-scl)
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
@@ -1115,7 +1115,7 @@ class SemanticControlsLayer:
 
 ### Physical Query Planner (PQP)
 
-> **Specification:** [§Physical Query Planner](./01-core-capabilities.md#physical-query-planner-pqp)
+> **Specification:** [§Physical Query Planner](./02-core-capabilities.md#physical-query-planner-pqp)
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
@@ -1124,7 +1124,7 @@ class SemanticControlsLayer:
 | **Output** | A single **federated Trino SQL** statement | Starburst performs the cross-source join natively; no per-backend decomposition needed |
 | **Execution** | None | The PQP has no backend connectivity; it hands the federated SQL to the FQE (Starburst) |
 
-The Physical Query Planner receives the controls-approved LQP from the SCL and translates it into a single **federated Trino SQL** statement ready for Starburst to execute. For each `metric_scan` node it queries the SMR for the `physical_mapping` of the pinned metric definition version and binds it to a Starburst **catalog** reference (`catalog.schema.table`). It builds a Calcite relational tree from the LQP nodes — scans, joins, filters, time expansion, and sort — distributes the row scope filters, dimension filters, and column-mask directives into the statement, and emits Trino-dialect SQL. Because Starburst federates across catalogs natively, the PQP no longer decomposes the plan into per-backend sub-plans; the single statement references every catalog the query touches, and Starburst plans the cross-source join itself. This realises Chapter 1's PQP sub-plan/FQE execution contract inside Starburst — the per-source split happens in the engine rather than in application code. The PQP has no execution capability — it passes the federated SQL to the FQE.
+The Physical Query Planner receives the controls-approved LQP from the SCL and translates it into a single **federated Trino SQL** statement ready for Starburst to execute. For each `metric_scan` node it queries the SMR for the `physical_mapping` of the pinned metric definition version and binds it to a Starburst **catalog** reference (`catalog.schema.table`). It builds a Calcite relational tree from the LQP nodes — scans, joins, filters, time expansion, and sort — distributes the row scope filters, dimension filters, and column-mask directives into the statement, and emits Trino-dialect SQL. Because Starburst federates across catalogs natively, the PQP no longer decomposes the plan into per-backend sub-plans; the single statement references every catalog the query touches, and Starburst plans the cross-source join itself. This realises Chapter 2's PQP sub-plan/FQE execution contract inside Starburst — the per-source split happens in the engine rather than in application code. The PQP has no execution capability — it passes the federated SQL to the FQE.
 
 #### PQP input — approved LQP
 
@@ -1208,7 +1208,7 @@ The PQP passes the federated Trino SQL to the FQE.
 
 ### Federated Query Engine (FQE)
 
-> **Specification:** [§Federated Query Engine](./01-core-capabilities.md#federated-query-engine-fqe)
+> **Specification:** [§Federated Query Engine](./02-core-capabilities.md#federated-query-engine-fqe)
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
@@ -1304,7 +1304,7 @@ class FederatedQueryEngine:
 
 ### Data Visualization Language (DVL)
 
-> **Specification:** [§Data Visualization Language (DVL)](./01-core-capabilities.md#data-visualization-language-dvl)
+> **Specification:** [§Data Visualization Language (DVL)](./02-core-capabilities.md#data-visualization-language-dvl)
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
@@ -1364,7 +1364,7 @@ The evaluator matches the `COMPARISON` intent pattern and two-metric schema to t
 }
 ```
 
-Full DVL examples including the `type: "table"` spec are in [MCP Response Format](./01-core-capabilities.md#mcp-response-format). Full chart contract definitions are in [Data Visualization Language (DVL)](./01-core-capabilities.md#data-visualization-language-dvl).
+Full DVL examples including the `type: "table"` spec are in [MCP Response Format](./02-core-capabilities.md#mcp-response-format). Full chart contract definitions are in [Data Visualization Language (DVL)](./02-core-capabilities.md#data-visualization-language-dvl).
 
 ```python
 INTENT_CONTRACTS = {
@@ -1487,7 +1487,7 @@ if __name__ == "__main__":
 
 ### Analytical Lineage Store
 
-> **Specification:** [§Analytical Lineage Store (ALS)](./01-core-capabilities.md#analytical-lineage-store-als)
+> **Specification:** [§Analytical Lineage Store (ALS)](./02-core-capabilities.md#analytical-lineage-store-als)
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
@@ -1762,7 +1762,7 @@ Configuration is read from environment variables at startup. Required variables:
 | `PAS_SIGNING_KEY_ID` | Published key identifier included in artifact signature blocks (verification and rotation) |
 
 
-## 2.4 Infrastructure
+## 3.4 Infrastructure
 
 | Component | Choice | Rationale |
 |-----------|--------|-----------|
@@ -1800,9 +1800,9 @@ All platform services run in a dedicated Kubernetes namespace (`analytics`). Sta
 | **Activation** | `analyticalDomain` config triggers SMR import at initial platform setup | Bundle documents are written to the SMR in `proposed` state; Analytics Governance approves before metrics become resolvable |
 | **Customisation** | Full edit/override via Admin API after import | Customised definitions marked `source: "custom"` in the SMR document |
 
-Each bundle is a JSON array of SMR documents conforming to the schemas defined in [§Semantic Metrics Repository](./01-core-capabilities.md#semantic-metrics-repository-smr). Bundles are seeded into the SMR in `"proposed"` state at initial platform setup; the Analytics Governance approves each document before it becomes resolvable by the Semantic Validation Layer.
+Each bundle is a JSON array of SMR documents conforming to the schemas defined in [§Semantic Metrics Repository](./02-core-capabilities.md#semantic-metrics-repository-smr). Bundles are seeded into the SMR in `"proposed"` state at initial platform setup; the Analytics Governance approves each document before it becomes resolvable by the Semantic Validation Layer.
 
-> **Version format note:** Seed bundle documents use an integer `version` field (starting at `1`) as the bootstrap state. On first platform activation the platform converts these to semantic versioning (`"1.0.0"`). Subsequent versions follow semver — the `"2.1.0"` form used in Chapter 2 examples reflects a metric that has been through two major revisions post-activation.
+> **Version format note:** Seed bundle documents use an integer `version` field (starting at `1`) as the bootstrap state. On first platform activation the platform converts these to semantic versioning (`"1.0.0"`). Subsequent versions follow semver — the `"2.1.0"` form used in the worked examples reflects a metric that has been through two major revisions post-activation.
 
 #### Dimensions bundle (shared across all domains)
 

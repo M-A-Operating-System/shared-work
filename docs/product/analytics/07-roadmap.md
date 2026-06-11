@@ -1,4 +1,4 @@
-# AI Analytics Platform — Proposed Roadmap
+# 7. Proposed Roadmap
 
 This document describes one proposed sequence of deliverables for the AI Analytics Platform. It is not the only valid sequence and is not a committed delivery plan. Phase boundaries should be revisited as implementation proceeds, customer feedback is gathered, and technical constraints become clearer. Decisions to resequence or regroup phases should be recorded here; they do not require changes to the product specification.
 
@@ -290,4 +290,4 @@ This document describes one proposed sequence of deliverables for the AI Analyti
 </table>
 
 
-*This is a proposed delivery sequence, not a committed plan. For the product specification, see [README.md](./README.md) and the numbered chapter documents. For the proposed reference implementation stack, see [02-technical-implementation.md](./02-technical-implementation.md).*
+*This is a proposed delivery sequence, not a committed plan. For the product specification, see [README.md](./README.md) and the numbered chapter documents. For the proposed reference implementation stack, see [03-technical-implementation.md](./03-technical-implementation.md).*

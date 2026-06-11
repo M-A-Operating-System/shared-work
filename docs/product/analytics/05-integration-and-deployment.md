@@ -1,8 +1,8 @@
-# 3. Integration and Deployment
+# 5. Integration and Deployment
 
 This chapter covers the complete integration surface of the AI Analytics Platform: how consumers authenticate and call it, how platform administrators configure it, the financial services reference model it ships with, and the complementary ecosystem services that extend its capabilities. The platform is deliberately narrow in its external interface: a single MCP endpoint governs all consumer access, and a single Admin API governs all configuration. Complexity lives inside the controls pipeline, not in the integration contract.
 
-Component specifications (SMR, SVL, RAPL, SCL, FQE, DVL, NSA, Analytical Lineage Store (ALS)) are in [Chapter 1 -- Core Platform Capabilities](./01-core-capabilities.md). The reference implementation stack is in [Chapter 2 -- Proposed Technical Implementation](./02-technical-implementation.md).
+Component specifications (SMR, SVL, RAPL, SCL, FQE, DVL, NSA, Analytical Lineage Store (ALS)) are in [Chapter 2 -- Core Platform Capabilities](./02-core-capabilities.md). The reference implementation stack is in [Chapter 3 -- Proposed Technical Implementation](./03-technical-implementation.md).
 
 ---
 
@@ -182,7 +182,7 @@ The controls block controls the thresholds and compliance mode applied to every 
 | `blockedClassifications` | List of classification labels that trigger blocking when `classificationGating` is enabled. |
 | `requireLineageForExport` | When `true`, result export operations require a complete Provenance Artifact. Exports of results with incomplete provenance are blocked. |
 | `auditAllQueries` | When `true`, every query — including governance-blocked and authentication-failed requests — is written to the audit log. Platform-recommended setting is `true`. |
-| `complianceMode` | Configures the active regulatory ruleset and trace targets (e.g. `mifid2` writes to `analytics.mifid2_trace`; `basel3` writes LCR/NSFR snapshots to `analytics.regulatory_snapshots`). This setting determines **which** rules and trace tables are applied — it does not trigger Provenance Artifact generation. Escalation to the compliance tier is determined at runtime by two signals: `compliance_relevant: true` on the queried metrics AND the IRA classifying query intent as compliance-purpose. See [§Compliance Modes](./01-core-capabilities.md#compliance-modes). |
+| `complianceMode` | Configures the active regulatory ruleset and trace targets (e.g. `mifid2` writes to `analytics.mifid2_trace`; `basel3` writes LCR/NSFR snapshots to `analytics.regulatory_snapshots`). This setting determines **which** rules and trace tables are applied — it does not trigger Provenance Artifact generation. Escalation to the compliance tier is determined at runtime by two signals: `compliance_relevant: true` on the queried metrics AND the IRA classifying query intent as compliance-purpose. See [§Compliance Modes](./02-core-capabilities.md#compliance-modes). |
 
 ### Operational Settings
 
