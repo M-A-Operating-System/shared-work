@@ -304,7 +304,7 @@ The AI Consumers layer is responsible for providing the external access points t
 
 ### Example
 
-The user's question will be relayed by the conversational AI directly to the Analytics Engine with the user's authentication/identity token. The consumer will not interpret, translate, or structure the query — it will forward it as-is.
+The user's question will be relayed by the conversational AI directly to the Analytics Engine with the user's authentication/identity token. The consumer should not interpret, translate, or structure the query — it will forward it as-is.
 
 ```json
 POST /v1/mcp
@@ -340,7 +340,7 @@ The Analytics Engine will expose three tools. All analytical operations will be 
 
 **`list_operations(domain: str | None, auth_token: str)`** — Returns the SMR operation catalogue with operation IDs, display names, required parameters, supported metrics/dimensions, and execution profiles. Only operations the authenticated user is entitled to execute will be returned.
 
-**`drilldown(result_id: str, hierarchy: str, selected_value: str | None, auth_token: str)`** — Navigates into a dimension hierarchy from a prior result. The parent result's analytical context — operation, filters, and hierarchy position — will be inherited; governance will not. The derived query will re-run the full pipeline (fresh RAPL projection, SVL enforcement, SCL checks) and write its own lineage record linked to the parent `result_id`.
+**`drilldown(result_id: str, hierarchy: str, selected_value: str | None, auth_token: str)`** — Navigates into a dimension hierarchy from a prior result. The parent result's analytical context — operation, filters, and hierarchy position — will be inherited; governance should not be. The derived query will re-run the full pipeline (fresh RAPL projection, SVL enforcement, SCL checks) and write its own lineage record linked to the parent `result_id`.
 
 ### Execution Profiles
 
@@ -417,7 +417,7 @@ Every capability invocation will pass through the full controls pipeline: input 
 
 ### Example
 
-A structured `run_analytics` tool call will arrive from the AI Chat Platform. The MCP Capability Layer will validate the token signature, confirm the token has not expired, and extract the claims. For a natural language query it will route to the Intent Resolution Agent; for a structured call it will route directly to the Role-Aware Projection Layer. The MCP Capability Layer will not interpret the parameters or make any analytical decisions; it will validate, route, and wait.
+A structured `run_analytics` tool call will arrive from the AI Chat Platform. The MCP Capability Layer will validate the token signature, confirm the token has not expired, and extract the claims. For a natural language query it will route to the Intent Resolution Agent; for a structured call it will route directly to the Role-Aware Projection Layer. The MCP Capability Layer should not interpret the parameters or make any analytical decisions; it will validate, route, and wait.
 
 
 ## Intent Resolution Agent (IRA)
@@ -610,7 +610,7 @@ Every metric in the SMR will conform to the following schema. This is the author
 }
 ```
 
-All metric definitions will pass through a governance review and approval process before they are resolvable on the platform. A metric authored by a Metrics Modeller will not be queryable until it has been reviewed and approved by Analytics Governance.
+All metric definitions will pass through a governance review and approval process before they are resolvable on the platform. A metric authored by a Metrics Modeller should not be queryable until it has been reviewed and approved by Analytics Governance.
 
 ### Formula Language
 
@@ -618,7 +618,7 @@ The SMR formula language will express metric computation logic in terms of other
 
 ### SMR Authoring and Discovery
 
-The SMR and SDR will be independent stores, both housed within the Data Context Store (DCS). The SMR will be a separate store for metric definitions; it will reference the SDR's data definitions but will not extend or depend on it structurally. The DCS will be the external container that holds both.
+The SMR and SDR will be independent stores, both housed within the Data Context Store (DCS). The SMR will be a separate store for metric definitions; it will reference the SDR's data definitions but should not extend or depend on it structurally. The DCS will be the external container that holds both.
 
 Metric authoring will use the DCS's native versioning and approval workflow. Metrics Modellers will author `analytical_metric`, `analytical_dimension`, and `analytical_operation` JSON metadata definitions through the DCS authoring interface; Analytics Governance will approve them before they become resolvable.
 
@@ -637,7 +637,7 @@ When the request reaches the SVL, the SMR will be the catalogue every identifier
 
 The Role-Aware Projection Layer (RAPL) is responsible for computing the entitlement projection for every request before any query plan is compiled. It receives the resolved request and the caller's authentication/identity token, retrieves role definitions from the Data Entitlements Store, and merges all active roles into a single entitlement profile. Against that profile it makes five categories of decision: data access clearance, metric access, dimension access, row scope, and result set column masking. Entitlement is conferred by role membership against governed logical concepts, not by database permissions, keeping policies stable as the underlying physical implementation changes. The completed entitlement projection, covering approved metrics and dimensions, resolved row scope conditions, and registered column masks, is passed to the Semantic Validation Layer for enforcement. Every entitlement decision is written to the Analytical Lineage Store as an audit record at query time.
 
-Entitlement policies will be managed in the **Data Entitlements Store (DES)** — an independent external component. Policies will be defined at the **logical object and data element level**: granting or restricting access to named metrics, dimensions, and data elements as governed concepts, never to physical tables, schemas, or column names. Projection will not be optional and will not be bypassable; every request will pass through RAPL, sitting between the IRA and the SVL.
+Entitlement policies will be managed in the **Data Entitlements Store (DES)** — an independent external component. Policies will be defined at the **logical object and data element level**: granting or restricting access to named metrics, dimensions, and data elements as governed concepts, never to physical tables, schemas, or column names. Projection should not be optional and should not be bypassable; every request will pass through RAPL, sitting between the IRA and the SVL.
 
 ### Restriction Types
 
@@ -753,7 +753,7 @@ flowchart LR
     S1 --> S2 --> S3 --> S4 --> LQP
 ```
 
-**Stage 1 — Valid, Complete, Resolved & Compatible.** The request must be well-formed, fully populated, and resolvable against the SMR before any further processing occurs. Required fields must be present and correctly typed. The `operation_id` must resolve to an approved `analytical_operation` metadata definition. Every metric ID must resolve to an approved `analytical_metric` metadata definition, every dimension ID to an approved `analytical_dimension` metadata definition, and every dataset ID to an approved `analytical_dataset` metadata definition. Params must conform to the operation's `required_params` schema. Cross-entity compatibility will be validated in the same pass. Anything unregistered, unapproved, missing, or incompatible will be rejected here — the pipeline will not proceed.
+**Stage 1 — Valid, Complete, Resolved & Compatible.** The request must be well-formed, fully populated, and resolvable against the SMR before any further processing occurs. Required fields must be present and correctly typed. The `operation_id` must resolve to an approved `analytical_operation` metadata definition. Every metric ID must resolve to an approved `analytical_metric` metadata definition, every dimension ID to an approved `analytical_dimension` metadata definition, and every dataset ID to an approved `analytical_dataset` metadata definition. Params must conform to the operation's `required_params` schema. Cross-entity compatibility will be validated in the same pass. Anything unregistered, unapproved, missing, or incompatible will be rejected here — the pipeline should not proceed.
 
 **Stage 2 — Compliance Signal Evaluation.** The SVL will combine two independent signals to determine the compliance disposition of the request. Signal 1 will be the `compliance_relevant` flag on each resolved `analytical_metric` metadata definition, declared by the Metrics Modeller at registration. Signal 2 will be the IRA's compliance intent score (`compliance_purpose_score`) — classified from the user's natural language query at intent resolution and forwarded unchanged with the resolved request; structured calls, which bypass the IRA, declare compliance purpose explicitly via a `compliance_purpose` parameter. The SVL performs no classification of its own — it deterministically evaluates the forwarded score against `complianceIntentThreshold`. If both signals are active the request will be escalated to the full compliance tier and the Provenance Artifact Service will be invoked. Either signal alone is insufficient: the request proceeds on the standard governance path, and the state of both signals is recorded in the lineage record.
 
@@ -832,7 +832,7 @@ The five checks are logically independent: each is evaluated against the same ap
 | **Signal 1 — metric metadata** | `compliance_relevant` field on `analytical_metric` SMR definition | At least one resolved metric has `compliance_relevant: true`. Set by the Metrics Modeller at registration. |
 | **Signal 2 — AI intent classification** | IRA intent resolution — score evaluated deterministically at SVL Stage 2 | `compliance_purpose_score` ≥ `complianceIntentThreshold` (default 0.8, configurable). The IRA will classify the query's stated purpose from the natural language query at intent resolution and forward the score with the resolved request; the SVL will evaluate it against the threshold and set `compliance_purpose: true` if it is met. Structured calls declare compliance purpose explicitly. |
 
-When the Provenance Artifact is active, export of the result will be blocked until the artifact is confirmed written and sealed to the ALS. The `export_requires_lineage: true` flag in the response will signal this state to the consumer. The consumer will not present export affordances until the platform confirms sealing.
+When the Provenance Artifact is active, export of the result will be blocked until the artifact is confirmed written and sealed to the ALS. The `export_requires_lineage: true` flag in the response will signal this state to the consumer. The consumer should not present export affordances until the platform confirms sealing.
 
 Framework-specific validation rules — additional parameter requirements, data constraints, lineage record types, and NSA output constraints — are declared exclusively on the metric definition in the SMR via the metric's `regulatory_framework` attribute, set by the Metrics Modeller at registration. The SCL will read and apply these rules directly from the resolved metric definitions at query time. No regulatory framework logic is hardcoded in the SCL.
 
@@ -894,7 +894,7 @@ flowchart LR
 
 **Step 2 — Entitlement Filter Application.** Row scope filters and dimension filters from the LQP will be applied to each data source scope so that entitlement enforcement carries through to the physical layer. Column masking directives from the LQP's `column_masks` array will be carried forward in the execution plan for the FQE to apply to the assembled result.
 
-**Step 3 — Execution Plan Compilation.** The PQP will group metric nodes by data affinity and compile the resolved metric nodes, filters, time range expansion, and sort/limit expressions into a physical execution plan — an envelope containing one backend-specific sub-plan per data affinity group — ready for the FQE. The PQP will have no execution capability — it will not connect to data sources, manage timeouts, or assemble results. The FQE will own everything from that point forward.
+**Step 3 — Execution Plan Compilation.** The PQP will group metric nodes by data affinity and compile the resolved metric nodes, filters, time range expansion, and sort/limit expressions into a physical execution plan — an envelope containing one backend-specific sub-plan per data affinity group — ready for the FQE. The PQP will have no execution capability — it should not connect to data sources, manage timeouts, or assemble results. The FQE will own everything from that point forward.
 
 ### Example
 
@@ -1097,7 +1097,7 @@ The model used will be recorded in `narrative_status` in the lineage record.
 
 ### Feature Flag
 
-Narrative synthesis will be controlled by the `features.narrativeSynthesis` platform configuration flag. When disabled, the NSA will not be invoked and no `narrative` field will be included in the response. The default is enabled. Disabling narrative synthesis will have no effect on computation, lineage, or display spec generation.
+Narrative synthesis will be controlled by the `features.narrativeSynthesis` platform configuration flag. When disabled, the NSA should not be invoked and no `narrative` field will be included in the response. The default is enabled. Disabling narrative synthesis will have no effect on computation, lineage, or display spec generation.
 
 ### Example
 
@@ -1248,7 +1248,7 @@ The PAS will read the projection record, controls decision record, and execution
 
 ### Export Gate
 
-Until sealing is confirmed, export of the query result will be blocked. The PAS will set `export_requires_lineage: true` in the compliance block it returns to the MCP layer. The consumer will not present export affordances until the platform confirms sealing is complete.
+Until sealing is confirmed, export of the query result will be blocked. The PAS will set `export_requires_lineage: true` in the compliance block it returns to the MCP layer. The consumer should not present export affordances until the platform confirms sealing is complete.
 
 ### Compliance Block Structure
 
@@ -1332,7 +1332,7 @@ Column labels in table specifications will come from SMR metric and dimension `d
 
 ## External Components
 
-The following components will appear in the architecture diagram and interact with the Analytics Engine but will sit outside its boundary. They will not be built or owned by the Analytics Engine; they will be pre-existing or independently deployed services that the platform integrates with.
+The following components will appear in the architecture diagram and interact with the Analytics Engine but will sit outside its boundary. They should not be built or owned by the Analytics Engine; they will be pre-existing or independently deployed services that the platform integrates with.
 
 
 ### Conversational AI — Chat Front End
@@ -1346,7 +1346,7 @@ The AI Chat Platform will have no access to physical schemas, execution backends
 
 ### Semantic Data Repository (SDR)
 
-The Semantic Data Repository will be a pre-existing organisational component — the governed store of JSON-based data metadata definitions that describe the organisation's information assets. It will exist independently of the Analytics Platform and will not be built or owned by it. For most organisations it will already exist before the Analytics Platform is deployed.
+The Semantic Data Repository will be a pre-existing organisational component — the governed store of JSON-based data metadata definitions that describe the organisation's information assets. It will exist independently of the Analytics Platform and should not be built or owned by it. For most organisations it will already exist before the Analytics Platform is deployed.
 
 The SDR will contain the organisation's foundational data context: data models, object models, critical data elements, quality rules, physical schemas, and data lineage records — *what data exists and how it is structured*. The SMR will be a separate store for metric metadata definitions — *what the data means analytically* and how it should be calculated, aggregated, and governed. Both will be independent stores housed within the Data Context Store (DCS).
 
@@ -1357,9 +1357,9 @@ The `physical_mapping` fields in SMR metric definitions will resolve against SDR
 
 The Data Entitlements Store (DES) will be an independent external component that holds the organisation's data and analytics entitlement policies. It will be managed separately from the Analytics Engine and from the data platform — a dedicated governance control point.
 
-Entitlement policies will be declared at the **logical object and data element level**. A policy will grant or restrict access to a named metric, a named dimension, or a named data element as governed concepts. Policies will not reference physical tables, schemas, column names, or connection strings. This separation will ensure entitlements remain stable as the underlying physical implementation evolves, and remain comprehensible to business data owners, compliance teams, and governance teams who have no visibility into the data platform's internal structure.
+Entitlement policies will be declared at the **logical object and data element level**. A policy will grant or restrict access to a named metric, a named dimension, or a named data element as governed concepts. Policies should not reference physical tables, schemas, column names, or connection strings. This separation will ensure entitlements remain stable as the underlying physical implementation evolves, and remain comprehensible to business data owners, compliance teams, and governance teams who have no visibility into the data platform's internal structure.
 
-RAPL will read role definitions from the DES at query time, keyed on the role claims extracted from the caller's authentication/identity token. Changes to entitlement policies will not require changes to metric definitions, platform configuration, or backend schemas.
+RAPL will read role definitions from the DES at query time, keyed on the role claims extracted from the caller's authentication/identity token. Changes to entitlement policies should not require changes to metric definitions, platform configuration, or backend schemas.
 
 
 ### vega2img
@@ -1368,7 +1368,7 @@ RAPL will read role definitions from the DES at query time, keyed on the role cl
 
 `vega2img` will be deployed and registered independently of the Analytics Engine, registered directly with the AI consumer as a peer MCP server. The consumer will call it as a separate tool invocation, passing the `display_spec` returned by the `run_analytics` response. It will be stateless — it will have no access to the Analytics Engine, the SMR, or any execution backend. It will receive a self-contained DVL specification and return an image.
 
-`vega2img` will not be required for consumers that can natively render DVL specifications. Agentic pipelines that produce static report output will be the primary use case.
+`vega2img` should not be required for consumers that can natively render DVL specifications. Agentic pipelines that produce static report output will be the primary use case.
 
 
 *AI Analytics Platform — Product Design & Technical Specification · Confidential*
