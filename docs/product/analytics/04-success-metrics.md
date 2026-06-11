@@ -2,22 +2,22 @@
 
 Metrics are captured from day one at both the platform level and the application level. Governance health metrics are first-class success indicators. A platform that is highly used but poorly governed is not successful.
 
-Component definitions referenced in the metrics below (SMR, FQE, RAPL, SEG, NSE, Analytical Lineage Store (ALS)) are in [Chapter 2 -- Core Platform Capabilities](./02-core-capabilities.md). [Analytical Lineage Store (ALS)](./02-core-capabilities.md#analytical-lineage-store) · [Semantic Execution Governance](./02-core-capabilities.md#semantic-execution-governance) · [Narrative Synthesis Engine](./02-core-capabilities.md#narrative-synthesis-engine)
+Component definitions referenced in the metrics below (SMR, FQE, RAPL, SCL, NSA, ALS) are in [Chapter 2 — Core Platform Capabilities](./02-core-capabilities.md). [Analytical Lineage Store (ALS)](./02-core-capabilities.md#analytical-lineage-store-als) · [Semantic Controls Layer (SCL)](./02-core-capabilities.md#semantic-controls-layer-scl) · [Narrative Synthesis Agent (NSA)](./02-core-capabilities.md#narrative-synthesis-agent-nsa)
 
 
-## 6.1 Platform-Level Metrics
+## 4.1 Platform-Level Metrics
 
 | Metric | Definition | Target |
 |--------|-----------|--------|
 | **Platform uptime** | API availability (p99 end-to-end latency < 2s including FQE backend execution; error rate < 0.1%) | 99.9% |
-| **Governance block rate** | Queries blocked by governance checks ÷ total queries | Monitor — sustained > 15% warrants investigation; > 30% triggers mandatory configuration review (see §6.3) |
+| **Governance block rate** | Queries blocked by governance checks ÷ total queries | Monitor — sustained > 15% warrants investigation; > 30% triggers mandatory configuration review (see §4.3) |
 | **FQE error rate** | Queries with FQE execution errors ÷ total executed queries | < 2% |
-| **Cache hit rate** | Queries served from the FQE's internal result cache ÷ total executed queries. The result cache is an internal FQE component — this ratio is derived from the `cache_hit` field in the Analytical Lineage Store (ALS). | ≥ 35% by month 2 |
+| **Cache hit rate** | Queries served from the Result Cache ÷ total executed queries — derived from the `cache_hit` field in the Analytical Lineage Store (ALS) | ≥ 35% by month 2 |
 | **Lineage completeness** | Queries with complete lineage records ÷ total queries | **100%** — any deviation is a platform defect |
 | **SMR registry health** | Metrics with no owner OR not updated in 12 months ÷ total active metrics | < 5% |
 
 
-## 6.2 Application-Level Metrics
+## 4.2 Application-Level Metrics
 
 ### Usage
 
@@ -35,7 +35,7 @@ Component definitions referenced in the metrics below (SMR, FQE, RAPL, SEG, NSE,
 | Metric | Definition | Target |
 |--------|-----------|--------|
 | **Metric resolution success rate** | Queries where all requested metrics resolved from SMR ÷ total queries | ≥ 95% |
-| **Cost circuit breaker rate** | Queries blocked by cost limits ÷ total queries | < 5% — sustained > 10% triggers review |
+| **Data scale block rate** | Queries blocked by the SCL data scale check ÷ total queries | < 5% — sustained > 10% triggers review |
 | **Classification gate block rate** | Queries blocked by classification gate ÷ total queries | Monitored — any spike triggers security review |
 | **Entitlement error rate** | Queries with METRIC_NOT_ENTITLED or DIMENSION_NOT_ENTITLED errors ÷ total queries | < 3% |
 | **SMR approval backlog** | Metric definitions in `proposed` or `in_review` state > 7 days | 0 — all pending definitions reviewed within 7 days |
@@ -45,7 +45,7 @@ Component definitions referenced in the metrics below (SMR, FQE, RAPL, SEG, NSE,
 
 | Metric | Definition | Target |
 |--------|-----------|--------|
-| **Engine error rate** | Engine sub-plan failures ÷ total sub-plan executions (per engine) | < 1% per engine |
+| **Backend error rate** | Backend sub-plan failures ÷ total sub-plan executions (per backend) | < 1% per backend |
 | **Partial result rate** | Queries returning partial results (timeout on one or more sub-plans) | < 2% |
 | **Stale data rate** | Queries where a metric's data refresh cadence exceeded its SLA | < 5% |
 | **Cache freshness** | Cached results served beyond TTL ÷ cache hits | < 1% |
@@ -59,7 +59,7 @@ Component definitions referenced in the metrics below (SMR, FQE, RAPL, SEG, NSE,
 | **Narrative validation failure rate** | Narrative synthesis attempts failing post-generation validation | < 2% |
 
 
-## 6.3 Metric Interpretation
+## 4.3 Metric Interpretation
 
 ### Governance block rate
 
@@ -67,37 +67,37 @@ Component definitions referenced in the metrics below (SMR, FQE, RAPL, SEG, NSE,
 |-----------|---------------|
 | < 5% | Healthy — some queries are appropriately blocked |
 | 5–15% | Review recommended — entitlement or scope configuration may need tuning |
-| 15–30% | Likely misconfiguration — cost limits, entitlements, or scope too restrictive |
+| 15–30% | Likely misconfiguration — data scale limits, entitlements, or scope too restrictive |
 | > 30% | Configuration review mandatory — platform may be inaccessible to legitimate queries |
 
 **Lineage completeness** is measured as `completed_lineage ÷ total_queries`. Any value below 100% triggers an automated platform alert. Lineage gaps are platform defects, not acceptable operational variance.
 
-**SMR approval backlog** counts metric definitions in `proposed` or `in_review` state for more than 7 calendar days. A non-zero count triggers a notification to the Application Admin.
+**SMR approval backlog** counts metric definitions in `proposed` or `in_review` state for more than 7 calendar days. A non-zero count triggers a notification to Analytics Governance.
 
 
-## 6.4 Review Cadence
+## 4.4 Review Cadence
 
 | Cadence | Activity | Owner |
 |---------|----------|-------|
-| **Daily** | Lineage completeness check; FQE error rate; classification gate spike detection | Platform Engineering (automated) |
-| **Weekly** | WAU; governance block rate; SMR approval backlog; engine error rate per engine | Platform Engineering + Application Admin |
-| **Monthly** | Full metric review; query quality analysis; SMR health report; narrative validation rate | Platform team + Application Admins |
-| **Day 90** | WAU adoption assessment (50% target); drilldown adoption; export rate | Application Admin + Platform team |
-| **Quarterly** | SMR completeness; metric owner coverage; entitlement policy review | Application Admin + Metric Owners |
+| **Daily** | Lineage completeness check; FQE error rate; classification gate spike detection | Platform Admin (automated) |
+| **Weekly** | WAU; governance block rate; SMR approval backlog; backend error rate per backend | Platform Admin + Analytics Governance |
+| **Monthly** | Full metric review; query quality analysis; SMR health report; narrative validation rate | Platform Admin + Analytics Governance |
+| **Day 90** | WAU adoption assessment (50% target); drilldown adoption; export rate | Analytics Governance + Platform Admin |
+| **Quarterly** | SMR completeness; metric owner coverage; entitlement policy review | Analytics Governance + Metrics Modellers + Entitlements Manager |
 
 
-## 6.5 Analytics Dashboard
+## 4.5 Analytics Dashboard
 
-The Application Admin has access to a read-only dashboard showing:
+Analytics Governance has access to a read-only dashboard showing:
 
 - WAU trend (30-day rolling)
 - Query volume by intent pattern
-- Governance block rate trend with breakdown by circuit breaker type
+- Governance block rate trend with breakdown by controls check (data scale · complexity · classification · compliance · concurrency)
 - SMR metric resolution success rate
-- Execution engine error rate per engine
+- Execution backend error rate per backend
 - Cache hit rate trend
 - Top 10 most-queried metrics
 - Lineage completeness (always 100% or an active alert)
 - SMR approval backlog count
 
-Platform-level infrastructure metrics are visible to the Platform team only.
+Platform-level infrastructure metrics are visible to the Platform Admin only.
