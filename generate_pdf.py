@@ -259,9 +259,14 @@ def _flatten_toc_tokens(tokens: list, prefix: str, max_depth: int) -> list[tuple
     result = []
     for tok in tokens:
         if tok['level'] <= max_depth:
-            clean = re.sub(r'<[^>]+>', '', tok['name'])
+            # tok['name'] is the heading's inner HTML (already HTML-encoded by markdown).
+            # Unescape before re-escaping in _build_toc_html to avoid double-encoding.
+            clean = _html.unescape(re.sub(r'<[^>]+>', '', tok['name']))
             result.append((tok['level'], clean, prefix + tok['id']))
-        result.extend(_flatten_toc_tokens(tok.get('children', []), prefix, max_depth))
+            # Only recurse into children when the parent is within depth — children
+            # always have higher level numbers, so a parent at max_depth can't have
+            # in-range children and the whole subtree can be pruned.
+            result.extend(_flatten_toc_tokens(tok.get('children', []), prefix, max_depth))
     return result
 
 
@@ -315,12 +320,19 @@ def build_html(files: list[Path], title: str, meta: str,
         prefix = f"ch{i}-" if multi_chapter else ""
         all_toc_entries.extend(_flatten_toc_tokens(md.toc_tokens, prefix, toc_depth))
 
-        # Multi-chapter: prefix every heading id to prevent cross-chapter anchor
-        # collisions (e.g. two chapters each with an "## Overview" section).
+        # Multi-chapter: prefix every heading id and every in-body same-document
+        # href to prevent cross-chapter anchor collisions and keep navigation links
+        # pointing at the renamed targets (e.g. [see above](#overview) → #ch1-overview).
         if multi_chapter:
+            ch = f'ch{i}-'
             body = re.sub(
                 r'(<h[1-6]\b[^>]*?\bid=")([^"]+)(")',
-                lambda m: f'{m.group(1)}ch{i}-{m.group(2)}{m.group(3)}',
+                lambda m: f'{m.group(1)}{ch}{m.group(2)}{m.group(3)}',
+                body,
+            )
+            body = re.sub(
+                r'(<a\b[^>]*?\bhref="#)([^"]+)(")',
+                lambda m: f'{m.group(1)}{ch}{m.group(2)}{m.group(3)}',
                 body,
             )
 
@@ -571,6 +583,9 @@ tr          { page-break-inside: avoid; }
 .toc-h1 { margin-top: 3mm;   font-size: 10pt;  font-weight: 700; color: #1e3a6e; }
 .toc-h2 { margin-top: 1mm;   font-size: 9pt;   color: #374151; padding-left: 6mm; }
 .toc-h3 { margin-top: 0.5mm; font-size: 8.5pt; color: #6b7280; padding-left: 12mm; }
+.toc-h4 { margin-top: 0.25mm; font-size: 8pt;  color: #9ca3af; padding-left: 18mm; }
+.toc-h5 { margin-top: 0.25mm; font-size: 8pt;  color: #9ca3af; padding-left: 22mm; }
+.toc-h6 { margin-top: 0.25mm; font-size: 8pt;  color: #9ca3af; padding-left: 26mm; }
 .toc-list a {
     display: flex;
     text-decoration: none;
