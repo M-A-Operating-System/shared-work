@@ -188,6 +188,9 @@ jobs:
         # Pull --rebase before pushing so that if a queued run is behind the
         # run that just finished (and committed a PDF), this run incorporates
         # that commit rather than failing with a non-fast-forward error.
+        # -X theirs: when two queued runs both committed PDFs and rebase hits a
+        # binary conflict, prefer this run's freshly-generated file over the
+        # version already in master ("theirs" = the commit being replayed).
         run: |
-          git pull --rebase origin ${{ github.ref_name }}
+          git pull --rebase -X theirs origin ${{ github.ref_name }}
           git push
