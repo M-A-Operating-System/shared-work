@@ -1,4 +1,4 @@
-# 6. Appendix: Text-to-SQL and Semantic Analytics: Better Together
+# 5. Appendix: Text-to-SQL and Semantic Analytics: Better Together
 
 This appendix is a standalone reference for teams designing AI-powered analytics architectures. It can be read independently of the platform specification.
 

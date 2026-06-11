@@ -26,12 +26,11 @@ The platform eliminates Text-to-SQL as an architectural pattern for regulated an
 | [2. Core Capabilities](./02-core-capabilities.md) | Core Platform Capabilities | Platform roles, deep-dive specifications: SMR, Intent Layer, RAPL, Governance, FQE, Data Visualization Language (DVL), Output Format, Analytical Lineage Store (ALS), MCP Layer |
 | [3. Technical Implementation](./03-technical-implementation.md) | Proposed Technical Implementation | Reference stack with rationale: Cloudflare Workers, Apache Calcite, Vega-Lite, PostgreSQL lineage store, Anthropic Claude |
 | [4. Success Metrics](./04-success-metrics.md) | Success Metrics | Platform and application-level metrics, controls health indicators, review cadence |
-| [5. Integration and Deployment](./05-integration-and-deployment.md) | Integration and Deployment | Consumer integration surface, administrator configuration, the financial services reference model, and ecosystem services |
-| [6. Appendix](./06-text-to-sql-antipattern.md) | Text-to-SQL and Semantic Analytics: Better Together | Structural failure modes, SQL injection risks, and the complementary architecture where both tools coexist |
-| [7. Roadmap](./07-roadmap.md) | Platform Roadmap | Planned enhancements beyond the current release |
-| [8. Glossary](./08-glossary.md) | Glossary | Definitions for all named components, technical terms, abbreviations, and domain concepts used across this specification |
+| [5. Appendix](./05-text-to-sql-antipattern.md) | Text-to-SQL and Semantic Analytics: Better Together | Structural failure modes, SQL injection risks, and the complementary architecture where both tools coexist |
+| [6. Roadmap](./06-roadmap.md) | Platform Roadmap | Planned enhancements beyond the current release |
+| [7. Glossary](./07-glossary.md) | Glossary | Definitions for all named components, technical terms, abbreviations, and domain concepts used across this specification |
 
-Start with Chapter 1 (Overview) for executive and business context, then read Chapters 2–5 sequentially. Each chapter assumes the previous. The appendix may be read independently as a standalone reference for teams evaluating architectural options. The glossary may be consulted at any point.
+Start with Chapter 1 (Overview) for executive and business context, then read Chapters 2–4 sequentially. Each chapter assumes the previous. The appendix may be read independently as a standalone reference for teams evaluating architectural options. The glossary may be consulted at any point.
 
 ---
 
