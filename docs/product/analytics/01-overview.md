@@ -20,7 +20,7 @@ The natural starting point for organisations is Text-to-SQL: use an LLM to gener
 - **No reproducible calculation record** — SQL is generated fresh each time; two identical queries are not guaranteed to produce identical results
 - **No guaranteed entitlement enforcement** — access controls depend on the reliability of AI-generated query predicates, not a guaranteed enforcement layer
 
-Training LLMs on database schemas improves query accuracy in early trials but addresses the symptom — table knowledge — not the problem. The governance gap remains. The [Text-to-SQL appendix](./06-text-to-sql-antipattern.md) examines these failure modes in detail — and where Text-to-SQL does belong: as the exploration layer alongside the governed execution layer, with outputs promoted into the registry when they need to become reliable.
+Training LLMs on database schemas improves query accuracy in early trials but addresses the symptom — table knowledge — not the problem. The governance gap remains. The [Text-to-SQL appendix](./05-text-to-sql-antipattern.md) examines these failure modes in detail — and where Text-to-SQL does belong: as the exploration layer alongside the governed execution layer, with outputs promoted into the registry when they need to become reliable.
 
 ### The platform
 

@@ -206,6 +206,32 @@ async def validate_jwt(token: str) -> dict:
     ...
 ```
 
+#### Caller Identity Claims
+
+Every request carries a host-issued JWT in the `Authorization: Bearer <token>` header — the reference implementation's realisation of the authentication/identity token. Expired tokens are rejected immediately; tokens carrying no analytical role claim are denied (deny-by-default is an architectural property — there is no public-access fallback).
+
+**Required claims**
+
+| Claim | Type | Description |
+|-------|------|-------------|
+| `sub` | string | Caller's unique identifier within the organisation |
+| `org_id` | string | Must match the platform's registered organisation identifier |
+| `exp` | number | Token expiry timestamp |
+| Field named by `roleClaimField` | `string[]` | Analytical role array — consumed by the RAPL for metric, dimension, and row-level access |
+
+**Optional analytical claims**
+
+| Claim | Type | Description |
+|-------|------|-------------|
+| `managed_portfolios` | `string[]` | Portfolio IDs managed by the caller — resolved in row scope templates |
+| `entity_ids` | `string[]` | Legal entities the caller is associated with |
+| `display_name` | string | Display name for lineage records and the audit trail |
+| Any claim referenced in a role's row scope template | any | Any value referenced by `{{user.claim_name}}` |
+
+Tokens expire per the consuming application's standard session policy: the consumer issues a refreshed token and includes it on the next request — there is no platform-side re-authentication step. Long-running agentic consumers must supply fresh tokens before each preceding token's `exp`.
+
+**Agentic consumers.** Autonomous agents — scheduled pipelines, event-triggered monitors, report generators — integrate identically to interactive consumers. The host provisions service-level tokens scoped to the agent's role rather than a user's identity; the RAPL applies identical entitlement enforcement, so an agent cannot access data that a user with the same role cannot access. Every agent-initiated request is recorded in the ALS under the agent's `sub` claim, keeping agent queries distinguishable from user queries in the audit trail.
+
 #### Request Routing
 
 The MCP layer validates the JWT, then routes by call type. A **natural language** query is sent to the Intent Resolution Agent (IRA), which resolves it to an `operation_id` + `params` before the deterministic pipeline begins. A **structured** call (an explicit `operation_id` + `params`) bypasses the IRA and enters the deterministic pipeline directly. From that point the order is the same in both cases: `RAPL → SVL → SCL → PQP → FQE`.
@@ -247,6 +273,21 @@ class PipelineExecutor:
 ```
 
 #### Drilldown Service
+
+A consumer holding a `result_id` traverses hierarchies without re-specifying the original query:
+
+```json
+{
+  "tool": "drilldown",
+  "input": {
+    "result_id":      "res-20260518-093247-wk4n",
+    "hierarchy":      "asset_class_hierarchy",
+    "selected_value": "EQUITY"
+  }
+}
+```
+
+The service recovers the parent result's analytical context — operation, filters, hierarchy position — from the ALS; the consumer re-specifies nothing. Entitlements and controls are re-evaluated in full for the derived query (fresh RAPL projection, SVL enforcement, and the SCL's five checks), so a revoked entitlement takes effect immediately, even mid-drill-chain.
 
 ```python
 class DrilldownService:
@@ -365,6 +406,23 @@ if __name__ == "__main__":
     mcp.run(transport="streamable-http", host="0.0.0.0", port=8000)
 ```
 
+#### Response Envelope
+
+A successful call returns a JSON object containing the result data, the display specification, the optional narrative, and execution metadata for consumer telemetry:
+
+```json
+{
+  "result_id":   "res-20260518-093247-wk4n",
+  "lineage_ref": "lineage/acme-wealth/2026/05/18/res-20260518-093247-wk4n.json",
+  "data":        { "schema": [ "..." ], "rows": [ "..." ] },
+  "display_spec": { "type": "chart", "...": "..." },
+  "narrative":   { "lead": "...", "detail": "...", "anchoredTo": ["..."] },
+  "meta":        { "latencyMs": 1187, "cacheHit": false, "rowCount": 4 }
+}
+```
+
+Consumers branch on `display_spec.type` (`"chart"` → Vega-Lite rendering; `"table"` → data grid). The `narrative` field is present when `features.narrativeSynthesis` is enabled. The platform governs which contract is selected and how it is parameterised; the consumer governs how it is rendered.
+
 #### Error Handling
 
 All tool call failures return a structured error envelope. The MCP framework serialises Python exceptions as tool error responses; the platform maps exception classes to stable error codes before they leave the service boundary.
@@ -385,7 +443,8 @@ class ClassificationGateError(AnalyticsError):    code = "CLASSIFICATION_BLOCKED
 
 def handle_tool_error(exc: Exception) -> dict:
     # Input:  any exception raised inside a tool handler
-    # Output: { error: { code, message } } — safe to return to the AI consumer
+    # Output: { error: { code, message, result_id } } — safe to return to the AI consumer
+    # result_id is always present, even for blocked or failed requests
 
     # Known AnalyticsError subclasses map to stable error codes (see table above)
     # All other exceptions collapse to INTERNAL_ERROR — detail is never leaked to the consumer
@@ -405,6 +464,8 @@ Error code reference table:
 | `NARRATIVE_FAILED` | NSA | Return result without narrative; log for operator review |
 | `CLASSIFICATION_BLOCKED` | SCL | Inform user the requested metric requires elevated access |
 | `INTERNAL_ERROR` | Any | Log `result_id` if available; operator investigation required |
+
+Every error response carries a `result_id`, so every request — successful, blocked, or denied — appears in the audit trail and is reachable through the lineage API. The `message` field is human-readable and suitable for surfacing directly to end users or agentic decision loops.
 
 
 ### Intent Resolution Agent
@@ -1250,6 +1311,45 @@ After Starburst executes the federated query, the FQE returns a typed result env
 }
 ```
 
+#### Data Source Registration
+
+Execution backends are registered through the Admin API by the Integration Engineer. The registration record is the logical input — type, endpoint, authentication mode, capabilities, and the logical data affinities the backend serves; the platform materialises it as a Starburst catalog properties file plus an entry in the `physical_mapping.source` → catalog map.
+
+```json
+{
+  "executionBackends": [
+    {
+      "id": "primary-warehouse", "name": "Primary Data Warehouse",
+      "type": "sql_warehouse",
+      "endpoint": "https://internal.api/analytics/backends/warehouse",
+      "authType": "service-account",
+      "capabilities": ["aggregate", "filter", "join", "window", "timeseries"],
+      "dataAffinity": ["portfolio", "positions", "transactions", "benchmarks"],
+      "priority": 1, "enabled": true
+    },
+    {
+      "id": "risk-semantic-layer", "name": "Risk Metrics Semantic Layer",
+      "type": "semantic_layer",
+      "endpoint": "https://internal.api/analytics/backends/risk",
+      "authType": "service-account",
+      "capabilities": ["metric", "dimension", "filter"],
+      "dataAffinity": ["risk_metrics", "performance_attribution"],
+      "priority": 1, "enabled": true
+    }
+  ]
+}
+```
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `type` | Yes | Source type — `sql_warehouse`, `opendata_api`, `graph_api`, `semantic_layer`, `olap_engine`, `custom` — selects the Starburst connector |
+| `authType` | Yes | `service-account` (platform-held credential), `api-key`, or `bearer` (forwards the caller's token to the backend) |
+| `dataAffinity` | Yes | Logical data domains this backend serves — sub-plans whose metric `data_affinity` matches are routed here |
+| `capabilities` | Yes | Operations that may be routed to this backend: `aggregate`, `filter`, `join`, `window`, `timeseries`, `metric`, `traverse` |
+| `priority` | No | Selection order when multiple backends share a `dataAffinity` |
+
+Multiple backends may share a `dataAffinity`; selection uses `priority`, `capabilities`, and availability. With `authType: "bearer"` the caller's token is forwarded and backend-layer enforcement becomes the source system's responsibility — the platform's row-scope injection still applies upstream.
+
 #### Starburst catalog connectors
 
 Each registered source is exposed to Starburst as a catalog. The reference deployment configures at least the following connector types; any Trino-compatible connector may be added:
@@ -1707,6 +1807,19 @@ The Admin API is a REST service authenticated with a platform service token (Bea
 | `GET` | `/v1/admin/lineage/{result_id}` | Fetch a full lineage record from the object store by result ID. |
 | `GET` | `/v1/admin/health` | Platform health check — returns status of all registered backends and DCS connectivity. |
 
+**Admin Console.** A web-based Admin Console provides a visual interface over the same API surface; changes made in the console are identical in effect to the corresponding API calls and appear in the platform audit log.
+
+**Registration validation.** On submission of a backend registration or controls configuration change, the Admin API validates before accepting the record:
+
+| Validation | Description |
+|------------|-------------|
+| Backend reachability | Connectivity probe to the registered `endpoint`, confirmed within the configured timeout |
+| Data affinity consistency | Each `dataAffinity` value checked against the known logical domain registry — unrecognised labels generate a warning |
+| Role claim field | `roleClaimField` verified to be a non-empty string; a warning is surfaced if no token issued in the last 30 days contained that claim |
+| Metric resolution | Metrics whose `data_affinity` has no matching registered backend generate a resolution warning |
+
+Warnings do not block registration; errors (unreachable endpoint, invalid schema) block it until resolved.
+
 ```python
 async def handle_seed_bundle(request: Request) -> Response:
     # Input:  POST body — JSON array of analytical_metric / analytical_dimension / analytical_operation docs
@@ -1717,6 +1830,31 @@ async def handle_seed_bundle(request: Request) -> Response:
     # 3. Write to DCS; collect seeded/skipped/error counts
     ...
 ```
+
+
+### Platform Settings
+
+Alongside `controls_config`, a platform settings document configures analytical scope, model tiers, and feature flags:
+
+```json
+{
+  "type":   "platform_settings",
+  "org_id": "acme-wealth",
+  "scope": {
+    "analyticalDomain":     "wealth_management",
+    "fiscalYearStartMonth": 1
+  },
+  "models": {
+    "narrativeSynthesisModel": "fast"
+  },
+  "features": {
+    "naturalLanguageQuery": true, "governedDrilldown": true, "narrativeSynthesis": true,
+    "resultDownload": true, "benchmarkComparison": true, "regulatoryReporting": false
+  }
+}
+```
+
+`analyticalDomain` selects the Financial Services Reference Model bundles imported at setup. `fiscalYearStartMonth` anchors the fiscal calendar for time-relative metric expressions such as `YTD` and `FY`. The `models` block selects the NSA inference tier — `"fast"` (Haiku) or `"standard"` (Sonnet); see §Narrative Synthesis Agent. Feature flags toggle presentation capabilities without affecting the controls pipeline: disabling `narrativeSynthesis` removes the narrative from responses but has no effect on lineage, entitlement enforcement, or computation. Metric approval, ownership, and versioning are architectural behaviours of the SMR governance workflow, not settings — there are no toggles for them.
 
 
 ### Service Startup and Dependency Wiring
@@ -1799,6 +1937,19 @@ All platform services run in a dedicated Kubernetes namespace (`analytics`). Sta
 | **Distribution** | Bundled at installation; updatable from Semantic Registry Service | Air-gapped deployments supported |
 | **Activation** | `analyticalDomain` config triggers SMR import at initial platform setup | Bundle documents are written to the SMR in `proposed` state; Analytics Governance approves before metrics become resolvable |
 | **Customisation** | Full edit/override via Admin API after import | Customised definitions marked `source: "custom"` in the SMR document |
+
+The full reference model covers six primary domains, activated per domain via `analyticalDomain` / seed configuration:
+
+| Domain | Key metrics | Typical consumers |
+|--------|-------------|-------------------|
+| **Wealth management** | Portfolio return, tracking error, Sharpe ratio, benchmark return, active return, information ratio | Portfolio managers, private bankers |
+| **Risk management** | VaR 95/99, expected shortfall, beta, duration, convexity, issuer concentration | Risk officers, investment committees |
+| **Performance attribution** | Brinson attribution, factor attribution, sector attribution, active weight | Portfolio managers, analysts |
+| **Regulatory reporting** | LCR, NSFR, leverage ratio, capital ratios, RWA, concentration limits | Compliance teams, regulatory reporting |
+| **Banking** | NIM, RWA density, provision coverage, cost-to-income, deposit beta | Finance, treasury, credit risk |
+| **ESG** | Carbon intensity, ESG score, engagement coverage, exclusion exposure | Sustainability analysts, client reporting |
+
+The hierarchies shipped with the reference model — including the asset class, geography, and time hierarchies — become available for governed drilldown immediately upon approval of the associated dimension definitions. The bundles below illustrate the shared dimensions and three of the domains in full.
 
 Each bundle is a JSON array of SMR documents conforming to the schemas defined in [§Semantic Metrics Repository](./02-core-capabilities.md#semantic-metrics-repository-smr). Bundles are seeded into the SMR in `"proposed"` state at initial platform setup; the Analytics Governance approves each document before it becomes resolvable by the Semantic Validation Layer.
 
@@ -2341,8 +2492,25 @@ All regulatory metrics carry `"classification_level": "restricted"`, `"complianc
     "required_params":       ["metric_id", "entity_id", "reporting_date", "jurisdiction"],
     "supported_metrics":     ["lcr", "leverage_ratio", "nsfr"],
     "regulatory_framework":  ["<framework_id>"],
-    "required_feature_flag": "regulatory_reporting",
+    "required_feature_flag": "regulatoryReporting",
     "default_visualization": "TABLE_GOVERNED"
   }
 ]
 ```
+
+
+### Complementary Ecosystem Services
+
+Three optional ecosystem services extend the platform for financial services deployments. None is a hard dependency — the platform functions with any combination present or absent.
+
+| Service | Type | Activation | Primary benefit |
+|---------|------|------------|-----------------|
+| **Semantic Registry Service** | Config-time resource | Package import via the Admin API (`POST /v1/admin/smr/seed`) | Accelerated SMR setup from curated, version-controlled metric definition packages across the reference model domains |
+| **Regulatory Reference Service** | Runtime execution backend | Registered as a data source with `dataAffinity: ["regulatory"]` | Authoritative, always-current regulatory metric values and thresholds without internal maintenance |
+| **Benchmark Data Service** | Runtime execution backend | Registered as a data source with `dataAffinity: ["benchmarks"]` | Licensed benchmark data for comparison queries across equity, fixed income, multi-asset, factor, and custom blend indices |
+
+**Semantic Registry Service** — a curated, version-controlled library of pre-built metric definitions, dimension schemas, hierarchy definitions, measure group collections, formula documentation, and regulatory mappings, organised into domain packages. Administrators import packages through the Admin API rather than authoring definitions from scratch. Imported definitions enter the SMR as `proposed` and follow the normal approval workflow; modifications are tracked under `source: "custom"` and are never overwritten by package updates, which are notified and may be imported selectively as deltas. The Financial Services Reference Model bundled at installation is a snapshot of the relevant packages; the live service provides the most current definitions and packages beyond the core seed set.
+
+**Regulatory Reference Service** — a runtime execution backend serving the `regulatory` data affinity. Once registered, the FQE routes regulatory-domain sub-plans to it, ensuring threshold values (LCR, NSFR, leverage and capital ratios) are sourced from the authoritative service rather than host-maintained tables that may lag regulatory publication schedules. The service publishes update notifications when thresholds change. If it is unavailable, the FQE falls back to the next registered backend with `regulatory` affinity; with no fallback configured, regulatory sub-plans fail with a structured error — the platform never fabricates regulatory threshold values.
+
+**Benchmark Data Service** — a runtime execution backend serving the `benchmarks` data affinity: equity, fixed income, multi-asset, and factor indices, plus administrator-configured custom benchmark blends (component identifiers and weights, registered via the service's Admin API). The service operates under data licensing agreements with index providers and enforces per-index licensing entitlement checks; blended benchmarks are subject to the same enforcement as their component indices.

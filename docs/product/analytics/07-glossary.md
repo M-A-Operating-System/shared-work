@@ -1,4 +1,4 @@
-# 8. Glossary
+# 7. Glossary
 
 All named components, technical terms, abbreviations, and domain concepts used across the AI Analytics Platform documentation. Terms are sorted alphabetically. Cross-references to other glossary entries are shown in **bold**.
 
