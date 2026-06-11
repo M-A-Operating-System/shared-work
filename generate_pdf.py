@@ -254,6 +254,15 @@ def inject_mermaid(html: str, placeholders: dict[str, str]) -> str:
 
 # ---------- table of contents ----------
 
+def _collect_toc_ids(tokens: list) -> set[str]:
+    """Return the set of all heading anchor IDs at every depth."""
+    ids: set[str] = set()
+    for tok in tokens:
+        ids.add(tok['id'])
+        ids.update(_collect_toc_ids(tok.get('children', [])))
+    return ids
+
+
 def _flatten_toc_tokens(tokens: list, prefix: str, max_depth: int) -> list[tuple[int, str, str]]:
     """Recursively flatten markdown toc_tokens into (level, text, anchor_id) triples."""
     result = []
@@ -318,21 +327,29 @@ def build_html(files: list[Path], title: str, meta: str,
 
         # Collect headings for the TOC before reset() clears toc_tokens.
         prefix = f"ch{i}-" if multi_chapter else ""
+        chapter_ids = _collect_toc_ids(md.toc_tokens)
         all_toc_entries.extend(_flatten_toc_tokens(md.toc_tokens, prefix, toc_depth))
 
         # Multi-chapter: prefix every heading id and every in-body same-document
         # href to prevent cross-chapter anchor collisions and keep navigation links
         # pointing at the renamed targets (e.g. [see above](#overview) → #ch1-overview).
+        # Href rewriting is scoped to known heading IDs to avoid corrupting footnote
+        # back-refs or other non-heading anchors (e.g. <a href="#fnref:1">).
+        # Note: bare #anchors targeting a heading in a *different* chapter cannot be
+        # resolved and are left unchanged (they become broken links; writers should
+        # use ./file.md#anchor format for cross-chapter references instead).
         if multi_chapter:
-            ch = f'ch{i}-'
             body = re.sub(
-                r'(<h[1-6]\b[^>]*?\bid=")([^"]+)(")',
-                lambda m: f'{m.group(1)}{ch}{m.group(2)}{m.group(3)}',
+                r'(<h[1-6]\b[^>]*? id=")([^"]+)(")',
+                lambda m: f'{m.group(1)}{prefix}{m.group(2)}{m.group(3)}',
                 body,
             )
             body = re.sub(
                 r'(<a\b[^>]*?\bhref="#)([^"]+)(")',
-                lambda m: f'{m.group(1)}{ch}{m.group(2)}{m.group(3)}',
+                lambda m: (
+                    f'{m.group(1)}{prefix}{m.group(2)}{m.group(3)}'
+                    if m.group(2) in chapter_ids else m.group(0)
+                ),
                 body,
             )
 
