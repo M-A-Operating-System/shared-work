@@ -567,7 +567,7 @@ class NarrativeSynthesisAgent:
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
 | **Deployment** | In-process module within the `analytics-mcp` service | Invoked only for compliance-purpose queries — low volume; shares the S3 lineage bucket the service already writes to; no extra deployable |
-| **Signing** | ECDSA P-256 (SHA-256) via the `cryptography` library | Matches the artifact signature block in Chapter 0; any holder of the published public key can verify independently |
+| **Signing** | ECDSA P-256 (SHA-256) via the `cryptography` library | The concrete algorithm behind the design documents' cryptographic seal; any holder of the published public key can verify independently |
 | **Key management** | Private key injected from Vault / Kubernetes Secrets; public key published | Key never baked into container images; rotation via `key_id` |
 | **Sealing** | Artifact written to S3 as the `{result_id}_provenance.json` sibling document | Immutable from the moment of writing — same write-once semantics as lineage records |
 | **Export gate** | `export_requires_lineage: true` until the S3 write is confirmed | Consumer withholds export affordances until sealing is confirmed |
