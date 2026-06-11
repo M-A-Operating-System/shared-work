@@ -80,7 +80,9 @@ jobs:
           path: |
             ~/.npm-global
             ~/.cache/puppeteer
-          key: npm-mmdc-11.4.2-chrome-${{ runner.os }}
+          key: npm-mmdc-11.4.2-chrome-131.0.6778.204-${{ runner.os }}
+          restore-keys: |
+            npm-mmdc-11.4.2-chrome-${{ runner.os }}
 
       - name: Configure npm global prefix
         run: |
@@ -94,7 +96,8 @@ jobs:
           # Download the Chromium binary that mermaid-cli/puppeteer requires.
           # puppeteer-core does not auto-download Chrome on npm install, so we
           # fetch it explicitly here so it is captured in the cache above.
-          npx @puppeteer/browsers install chrome-headless-shell
+          # Version is pinned to match what mermaid-cli@11.4.2 / puppeteer-core expects.
+          npx @puppeteer/browsers install chrome-headless-shell@131.0.6778.204
 
       - name: Install pip dependencies
         run: pip install -r requirements.txt
