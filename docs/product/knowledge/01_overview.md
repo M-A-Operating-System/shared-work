@@ -10,7 +10,7 @@
 
 ## Problem Statement
 
-MAOS platform components — the DDA, the AI Agile pipeline, the Starburst NL2SQL server, and downstream agent systems — each carry their own local copies of prompts, skill definitions, agent personas, and reference documentation. There is no single authoritative location to publish, version, and retrieve these assets. When a prompt is updated, every consumer must be updated in lockstep. There is no discovery mechanism and no governed access pattern.
+MAOS platform components — MCP servers providing value-added capabilities, agent pipelines, and downstream agent systems — each carry their own local copies of prompts, skill definitions, agent personas, and reference documentation. There is no single authoritative location to publish, version, and retrieve these assets. When a prompt is updated, every consumer must be updated in lockstep. There is no discovery mechanism and no governed access pattern.
 
 ## Solution
 
@@ -36,28 +36,20 @@ A centralised MCP server exposing a structured knowledge directory over the Mode
 
 ## System Context
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                        MAOS Platform                            │
-│                                                                 │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────────────┐  │
-│  │  DDA AI Chat │  │  AI Agile    │  │  Starburst NL2SQL    │  │
-│  │  (MCP Client)│  │  Agents      │  │  MCP Server          │  │
-│  └──────┬───────┘  └──────┬───────┘  └──────────┬───────────┘  │
-│         └─────────────────┴──────────────────────┘             │
-│                           │  JSON-RPC 2.0                       │
-│                           │  Streamable HTTP / OAuth 2.1        │
-│                           ▼                                     │
-│              ┌────────────────────────┐                         │
-│              │  Knowledge MCP Server  │                         │
-│              └────────────┬───────────┘                         │
-│                           │  read-only filesystem mount         │
-│                           ▼                                     │
-│              ┌────────────────────────┐                         │
-│              │  Knowledge Directory   │                         │
-│              │  (Git-versioned)       │                         │
-│              └────────────────────────┘                         │
-└─────────────────────────────────────────────────────────────────┘
+```mermaid
+graph TD
+    subgraph MAOS Platform
+        A[MCP Client Application]
+        B[Agent Pipeline]
+        C[Value-Add MCP Server]
+        K[Knowledge MCP Server]
+        D[(Knowledge Directory\nGit-versioned)]
+    end
+
+    A -->|JSON-RPC 2.0\nStreamable HTTP / OAuth 2.1| K
+    B -->|JSON-RPC 2.0\nStreamable HTTP / OAuth 2.1| K
+    C -->|JSON-RPC 2.0\nStreamable HTTP / OAuth 2.1| K
+    K -->|read-only filesystem mount| D
 ```
 
 ## Protocol and Capability Declaration
@@ -96,9 +88,9 @@ Transport: Streamable HTTP (HTTPS + SSE). Message format: JSON-RPC 2.0. Auth: OA
 
 ## Consumers at Launch
 
-- DDA platform AI Chat
-- AI Agile pipeline agents (PDD Writer, Sizing Agent, Orchestrator)
-- Starburst NL2SQL MCP server
+- MCP client applications — chat interfaces and interactive tools
+- Agent pipelines — orchestrators and sub-agents performing multi-step workflows
+- Value-add MCP servers — servers that enrich their own capabilities with knowledge assets
 - Claude Code CLI sessions operating in MAOS context
 
 ---
@@ -117,10 +109,8 @@ Transport: Streamable HTTP (HTTPS + SSE). Message format: JSON-RPC 2.0. Auth: OA
 
 ## Open Decisions
 
-**OD-001 — Multi-tenancy scoping** (HIGH): Current `knowledge:read` scope grants full directory access to all clients. If multi-tenant deployments are required, per-sub-tree scoping will need a claims-based filtering mechanism. Recommendation: launch with flat scope, revisit when multi-tenant requirement is confirmed.
+**OD-001 — Search index persistence** (MEDIUM): Rebuild on startup is simple and always correct; acceptable if startup time is under 10 seconds. Recommendation: rebuild for v1.0, revisit if startup latency is a problem in practice.
 
-**OD-002 — Search index persistence** (MEDIUM): Rebuild on startup is simple and always correct; acceptable if startup time is under 10 seconds. Recommendation: rebuild for v1.0, revisit if startup latency is a problem in practice.
+**OD-002 — Write path for AI-generated content** (MEDIUM): Agents may eventually need to propose new knowledge content. Recommendation: implement via GitHub PR tool when a confirmed requirement exists — not in v1.0.
 
-**OD-003 — Write path for AI-generated content** (MEDIUM): Agents may eventually need to propose new knowledge content. Recommendation: implement via GitHub PR tool when a confirmed requirement exists — not in v1.0.
-
-**OD-004 — Prompt name collision** (LOW): Dotted name convention assumes application names are unique across the directory. Recommendation: use full dotted path including all domain segments as the prompt name to guarantee uniqueness.
+**OD-003 — Prompt name collision** (LOW): Dotted name convention assumes application names are unique across the directory. Recommendation: use full dotted path including all domain segments as the prompt name to guarantee uniqueness.
