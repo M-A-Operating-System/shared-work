@@ -68,8 +68,9 @@ graph TD
     end
 
     A -->|JSON-RPC 2.0\nStreamable HTTP / OAuth 2.1| K
+    A -->|MCP| C
     B -->|JSON-RPC 2.0\nStreamable HTTP / OAuth 2.1| K
-    C -->|JSON-RPC 2.0\nStreamable HTTP / OAuth 2.1| K
+    B -->|MCP| C
 ```
 
 ## Protocol and Capability Declaration
