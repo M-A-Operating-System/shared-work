@@ -141,31 +141,6 @@ Ten tools across five content-type pairs. All tools return a `content` array (te
 
 ---
 
-**`search_resource`** — full-text and metadata search across the knowledge directory.
-
-```json
-{
-  "name": "search_resource",
-  "description": "Full-text and metadata search. Scope by folder URI or content type filter. Returns ranked results with snippets.",
-  "inputSchema": {
-    "type": "object",
-    "properties": {
-      "query":         { "type": "string" },
-      "folder_uri":    { "type": "string", "pattern": "^file:///knowledge/" },
-      "content_types": { "type": "array",
-                         "items": { "type": "string",
-                                    "enum": ["resource","prompt","skill","command","agent"] }},
-      "mime_types":    { "type": "array", "items": { "type": "string" }},
-      "max_results":   { "type": "integer", "default": 10, "minimum": 1, "maximum": 50 }
-    },
-    "required": ["query"]
-  }
-}
-```
-
-`structuredContent`: `{ query, total_hits, results: [{ uri, name, title, content_type, mimeType, snippet, score }] }`
-
----
 
 ### Prompt Tools
 
