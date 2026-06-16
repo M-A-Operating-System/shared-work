@@ -1,5 +1,13 @@
 # 18 — Entry Points and Embedding Modes
 
+**Product:** AI Chat Platform  
+**Version:** 1.0  
+**Date:** 2026-06-16  
+**Author:** Andrew Bush / M&A Operating System
+
+---
+
+
 The AI Chat Platform is delivered through three distinct embedding modes, each with its own component, visual presentation, and conversation model. Host applications may deploy one, two, or all three modes simultaneously — they are independent components that share the same platform backend.
 
 ---

@@ -1,5 +1,13 @@
 # 10 — Content Rendering
 
+**Product:** AI Chat Platform  
+**Version:** 1.0  
+**Date:** 2026-06-16  
+**Author:** Andrew Bush / M&A Operating System
+
+---
+
+
 ## The rendering contract
 
 The platform's rendering pipeline is built on a single foundational assumption:

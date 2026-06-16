@@ -1,5 +1,13 @@
 # 00 — Host Application Configuration
 
+**Product:** AI Chat Platform  
+**Version:** 1.0  
+**Date:** 2026-06-16  
+**Author:** Andrew Bush / M&A Operating System
+
+---
+
+
 Every tenant on the AI Chat Platform is defined by a **JSON application config** provided by the host application at registration time. The config is the single source of truth for how the assistant behaves within that application — its identity, scope, tools, bindings, workflows, branding, and feature flags.
 
 ---
@@ -104,7 +112,7 @@ Defines the assistant's domain, what it should decline, and how it handles out-o
 
 | Field | Required | Description |
 |-------|----------|-------------|
-| `systemPrompt` | Yes | Base system prompt for the assistant. The platform appends tool descriptions, memory blocks, and platform-managed safety instructions. |
+| `systemPrompt` | Yes | Domain and persona prompt for the assistant. The platform prepends session context and behavioral constraint layers, and injects tool descriptions, communication style, and memory blocks before this content. See [06-model-configuration.md](./07-model-configuration.md) for the full layer ordering. |
 | `inScopeDescription` | Yes | Plain-language description of scope; used in the onboarding state and out-of-scope redirect messages |
 | `outOfScopeRedirect` | No | Custom message for out-of-scope queries. The platform uses a generic fallback if not set. |
 | `language` | No | BCP 47 language tag (default: `en`). Applies to UI strings and the assistant's response language hint. |
@@ -350,12 +358,29 @@ Describes how the platform should interpret user-profile claims for communicatio
       "concise":   "Keep responses to the essential point. Tables preferred over prose lists.",
       "standard":  "Provide sufficient context for the response to stand alone.",
       "detailed":  "Include full explanation, examples, and supporting detail."
+    },
+    "sessionContext": {
+      "displayNameField":   "name",
+      "emailField":         "email",
+      "roleField":          "job_title",
+      "organisationField":  "org_name"
     }
   }
 }
 ```
 
-The `styleField` and `verbosityField` values must match claim keys passed in the user's JWT payload via the authentication bridge. If a user's JWT contains no matching claim, the platform uses its default tone (no style injection). If `userProfile` is omitted from the config entirely, style personalisation is disabled for the tenant.
+The `styleField`, `verbosityField`, and `sessionContext` field values must match claim keys passed in the user's JWT payload via the authentication bridge. If a user's JWT contains no matching claim for a given field, that field is omitted from the injected context. If `userProfile` is omitted from the config entirely, style personalisation and session context user fields are both disabled for the tenant.
+
+### `userProfile.sessionContext` fields
+
+| Field | Required | Description |
+|---|---|---|
+| `displayNameField` | No | JWT claim key for the user's display name (e.g. `"name"`, `"display_name"`, `"full_name"`) |
+| `emailField` | No | JWT claim key for the user's email address |
+| `roleField` | No | JWT claim key for the user's job title or role |
+| `organisationField` | No | JWT claim key for the user's organisation or business unit |
+
+All four fields are optional. The platform always injects the assistant name, application name, session date/time, and config version regardless of whether `sessionContext` is configured. User identity fields are only injected when their corresponding claim is present in the JWT and mapped here. See [06-model-configuration.md](./07-model-configuration.md) for the full session context block specification.
 
 ---
 

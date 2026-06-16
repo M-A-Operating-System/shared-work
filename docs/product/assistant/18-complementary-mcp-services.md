@@ -1,6 +1,19 @@
 # 17 — Complementary MCP Services
 
+**Product:** AI Chat Platform  
+**Version:** 1.0  
+**Date:** 2026-06-16  
+**Author:** Andrew Bush / M&A Operating System
+
+---
+
+
 The AI Chat Platform assumes the availability of three ecosystem-level MCP services that operate alongside the platform and host application MCP servers. These services are not owned or operated by the AI Chat Platform itself, nor by individual host applications — they are shared infrastructure within the broader MCP ecosystem. The platform is designed to work with them, and host applications are expected to benefit from them, but none is a hard dependency for platform operation.
+
+Two of these services have full product specifications in this repository:
+
+- **[MCP Knowledge](../knowledge/01-overview.md)** — the centralised knowledge and skills server
+- **[MCP Internet Fetch & Search](../internet/01-overview.md)** — the controlled web search and page fetch server
 
 ---
 
@@ -55,17 +68,17 @@ The MCP Repository and the per-tenant tool registry ([13-mcp-tool-registry.md](.
 
 ---
 
-## MCP Resources Service
+## MCP Knowledge
 
 ### Overview
 
-The **MCP Resources Service** is a centralised MCP server that provides shared, reusable assets across the MCP ecosystem — skills, guidance documents, prompt templates, and other static artefacts that are useful across many different host applications and conversation types.
+**[MCP Knowledge](../knowledge/01-overview.md)** is a centralised MCP server that provides shared, reusable assets across the MCP ecosystem — skills, guidance documents, prompt templates, and other static artefacts that are useful across many different host applications and conversation types.
 
-Unlike the MCP Repository (which helps teams find and configure tools at setup time), the MCP Resources Service is a **runtime service** — it can be registered as an MCP server in a tenant's tool registry and invoked during user conversations to retrieve resources on demand.
+Unlike the MCP Repository (which helps teams find and configure tools at setup time), MCP Knowledge is a **runtime service** — it can be registered as an MCP server in a tenant's tool registry and invoked during user conversations to retrieve resources on demand.
 
-### What the MCP Resources Service provides
+### What the MCP Knowledge provides
 
-The MCP Resources Service organises its content into three categories:
+The MCP Knowledge organises its content into three categories:
 
 **Skills**
 Pre-built structured reasoning patterns that the assistant can invoke to approach complex tasks consistently. Skills are prompt fragments with defined input parameters and expected output structures. Examples include:
@@ -74,7 +87,7 @@ Pre-built structured reasoning patterns that the assistant can invoke to approac
 - Risk assessment scoring rubrics
 - Data quality evaluation methodologies
 
-Skills are not model-specific — they are designed to work across Anthropic, OpenAI, and Gemini models. When the assistant retrieves a skill from the MCP Resources Service, it uses the skill's prompt structure to guide its reasoning for that turn.
+Skills are not model-specific — they are designed to work across Anthropic, OpenAI, and Gemini models. When the assistant retrieves a skill from the MCP Knowledge, it uses the skill's prompt structure to guide its reasoning for that turn.
 
 **Guidance documents**
 Static reference documents that apply across many host applications and are impractical for each host to maintain independently. Examples include:
@@ -84,85 +97,86 @@ Static reference documents that apply across many host applications and are impr
 - Prompt engineering best practices for domain-specific applications
 - **Uncertainty handling guidance** — instructions for how the assistant should communicate the limits of its knowledge, signal when data may be outdated, and offer next steps (such as web search) when it cannot answer with confidence. This document is injected as a resource at session start by hosts that want consistent, domain-appropriate uncertainty behaviour beyond the platform's non-overridable baseline.
 
-Guidance documents are versioned by the MCP Resources Service. When retrieved in a conversation, the document version is recorded in the tool call log.
+Guidance documents are versioned by the MCP Knowledge. When retrieved in a conversation, the document version is recorded in the tool call log.
 
 **Prompt templates**
 Reusable prompt structures that host teams can adopt as starting points for guided workflows in their application config. These are published as MCP resource objects and can be retrieved, reviewed, and adapted before being embedded in the `workflows` section of a tenant's config.
 
-### How host applications integrate the MCP Resources Service
+### How host applications integrate the MCP Knowledge
 
-Host applications that want their end users to benefit from MCP Resources Service content register the service as an MCP server in their tenant's tool registry — typically as an `opt-in` server, since not every conversation will require it:
+Host applications that want their end users to benefit from MCP Knowledge content register the service as an MCP server in their tenant's tool registry — typically as an `opt-in` server, since not every conversation will require it:
 
 ```json
 {
-  "id":          "mcp-resources",
-  "name":        "Platform Resources",
-  "description": "Provides shared skills, guidance documents, and prompt templates from the platform ecosystem. Use when you need a structured reasoning approach, usage guidance, or reference material.",
-  "endpoint":    "https://resources.mcp-ecosystem.io/mcp",
+  "id":          "mcp-knowledge",
+  "name":        "MCP Knowledge",
+  "description": "Provides shared skills, guidance documents, and prompt templates from the platform knowledge base. Use when you need a structured reasoning approach, usage guidance, or reference material.",
+  "endpoint":    "https://knowledge-mcp.maoperatingsystem.com/mcp",
   "authType":    "bearer",
   "accessTier":  "opt-in",
   "roles":       []
 }
 ```
 
-The MCP Resources Service endpoint is published in the MCP Repository. The suggested `description` field text above is available in the Repository record and optimised for AI Chat Platform injection.
+The MCP Knowledge endpoint and connection details are documented in the [MCP Knowledge specification](../knowledge/README.md). The suggested `description` field text above is optimised for AI Chat Platform system prompt injection.
 
 ### Content governance
 
-The MCP Resources Service is governed by the platform ecosystem team responsible for its operation. Content goes through an editorial review before publication:
+The MCP Knowledge is governed by the platform ecosystem team responsible for its operation. Content goes through an editorial review before publication:
 - Skills and templates are tested against the platform's AI provider models before publication
 - Guidance documents are reviewed for accuracy and applicability across a range of host application types
 - All content is versioned; breaking changes to existing resources trigger a deprecation period before removal
 - Tenants that have retrieved a specific resource version continue to receive that version until they explicitly update to a newer version
 
-Host applications and their users cannot modify MCP Resources Service content. Feedback and content requests are submitted via the ecosystem's standard issue process.
+Host applications and their users cannot modify MCP Knowledge content. Feedback and content requests are submitted via the ecosystem's standard issue process.
 
 ### Relationship to the platform
 
-The MCP Resources Service is independent of the AI Chat Platform — the platform does not own or operate it. However, the platform is designed to work with it cleanly:
+The MCP Knowledge is independent of the AI Chat Platform — the platform does not own or operate it. However, the platform is designed to work with it cleanly:
 - Resources returned by the service are rendered using the platform's standard content rendering rules (prose, code blocks, data tables as appropriate)
 - Resource retrievals appear in the tool call disclosure card with the server name and tool name
 - Retrieved resources are added to the session artefact tray for download
 - Resource retrievals are included in the tenant's MCP tool error rate metric and improvement signal pipeline
 
-If the MCP Resources Service is unavailable, it behaves like any other unavailable opt-in MCP server — an error is shown in the tool call disclosure card, and the session continues without it.
+If the MCP Knowledge is unavailable, it behaves like any other unavailable opt-in MCP server — an error is shown in the tool call disclosure card, and the session continues without it.
 
 ---
 
-## Web Search Service
+## MCP Internet Fetch & Search
 
 ### Overview
 
-The **Web Search Service** is an ecosystem-level MCP server that provides the assistant with real-time access to web search results. It is registered as a host application MCP server like any other — the distinction is that it is a shared, ecosystem-managed service rather than a server built and operated by the host team.
+**[MCP Internet Fetch & Search](../internet/01-overview.md)** is an ecosystem-level MCP server that provides the assistant with real-time access to web search results and page content. It is registered as a host application MCP server like any other — the distinction is that it is a shared, ecosystem-managed service rather than a server built and operated by the host team.
 
-Web search complements the platform's primary data access pattern (structured MCP tool calls against the host application's own data) in situations where current information is needed that the host's tools and the model's training knowledge cannot provide — recent news, current pricing, up-to-date documentation, or any query that requires information beyond the host application's data scope.
+Web access complements the platform's primary data access pattern (structured MCP tool calls against the host application's own data) in situations where current information is needed that the host's tools and the model's training knowledge cannot provide — recent news, current pricing, up-to-date documentation, or any query that requires information beyond the host application's data scope.
 
-### What the Web Search Service provides
+### What the MCP Internet Fetch & Search provides
 
 | Tool | Description |
 |------|-------------|
-| `web_search` | Executes a web search query and returns a ranked list of results: title, URL, snippet, and publication date |
-| `fetch_page` | Retrieves and extracts the readable text content of a specific URL from search results or user-provided links |
+| `search` | Executes a web search query and returns a ranked list of results: title, URL, snippet, source domain, and site classification metadata |
+| `fetch` | Retrieves and returns the content of a specific URL in raw, markdown, chunked, or summarised format |
+| `fetch_authenticated` | Retrieves content from sites requiring authentication, using the caller's enterprise IdP or consumer OAuth credentials (v1+) |
 
 Results are returned as structured MCP tool output — they appear in a tool call disclosure card and are cited inline using the platform's standard source citation mechanism (superscript numerals linking to the disclosure card). The model does not present web results as its own knowledge.
 
-### How host applications integrate the Web Search Service
+### How host applications integrate the MCP Internet Fetch & Search
 
-Host applications register the Web Search Service as an MCP server in their tenant tool registry. It is typically configured as `opt-in` — the end user enables it per session when real-time information is needed — though hosts may configure it `always-on` if their use case depends on current information in every session:
+Host applications register the MCP Internet Fetch & Search as an MCP server in their tenant tool registry. It is typically configured as `opt-in` — the end user enables it per session when real-time information is needed — though hosts may configure it `always-on` if their use case depends on current information in every session:
 
 ```json
 {
-  "id":          "web-search",
-  "name":        "Web Search",
-  "description": "Searches the web for current information. Use when the user needs up-to-date facts, recent news, current documentation, or any information beyond the host application's data and the model's training knowledge. Always cite the source URL.",
-  "endpoint":    "https://search.mcp-ecosystem.io/mcp",
-  "authType":    "api-key",
+  "id":          "mcp-internet",
+  "name":        "MCP Internet Fetch & Search",
+  "description": "Searches the web and fetches page content for current information. Use when the user needs up-to-date facts, recent news, current documentation, or any information beyond the host application's data and the model's training knowledge. Always cite the source URL.",
+  "endpoint":    "https://<your-deployment>/mcp",
+  "authType":    "bearer",
   "accessTier":  "opt-in",
   "roles":       []
 }
 ```
 
-The Web Search Service endpoint and API key are available from the MCP Repository. The suggested `description` field text above is optimised for system prompt injection and is published in the Repository record.
+MCP Internet Fetch & Search is a self-hosted deployment — the endpoint is determined by the enterprise infrastructure team. Connection details and deployment guidance are documented in the [MCP Internet Fetch & Search specification](../internet/README.md).
 
 ### Transparency and citation
 
@@ -173,4 +187,4 @@ Web search results follow the platform's mandatory tool call transparency rules 
 
 ### Relationship to the platform
 
-The Web Search Service is independent of the AI Chat Platform. When unavailable, it behaves like any other unavailable MCP server — an error in the disclosure card and the session continues without it. Web results rendered as prose are subject to the platform's standard content rendering rules; results rendered as structured data (tables, lists) use the platform's data table rendering.
+The MCP Internet Fetch & Search is independent of the AI Chat Platform. When unavailable, it behaves like any other unavailable MCP server — an error in the disclosure card and the session continues without it. Web results rendered as prose are subject to the platform's standard content rendering rules; results rendered as structured data (tables, lists) use the platform's data table rendering.

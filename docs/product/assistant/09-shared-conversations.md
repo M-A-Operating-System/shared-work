@@ -1,5 +1,13 @@
 # 08 — Shared Conversations
 
+**Product:** AI Chat Platform  
+**Version:** 1.0  
+**Date:** 2026-06-16  
+**Author:** Andrew Bush / M&A Operating System
+
+---
+
+
 ## Overview
 
 Any conversation may be shared with other authenticated users **within the same tenant**. Sharing is **explicit and controlled** — there are no open links, no public access, and no anonymous participants. Every person in a shared conversation must hold an active account in the host application and be a member of the same tenant. The tenant boundary and its rationale are specified in [15-memory-and-recall.md — Recall and access scope](./15-memory-and-recall.md).

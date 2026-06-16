@@ -111,7 +111,7 @@ Transport: Streamable HTTP (HTTPS + SSE). Message format: JSON-RPC 2.0. Auth: OA
 
 ## Consumers at Launch
 
-- MCP client applications — chat interfaces and interactive tools
+- **[AI Chat Platform](../assistant/01-overview.md)** — the primary conversational AI front end; registers this server in its MCP tool registry as **MCP Knowledge** to provide end users with access to skills, guidance documents, and prompt templates during conversations
 - Agent pipelines — orchestrators and sub-agents performing multi-step workflows
 - Value-add MCP servers — servers that enrich their own capabilities with knowledge assets
 - Claude Code CLI sessions operating in MAOS context

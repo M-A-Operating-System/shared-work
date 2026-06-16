@@ -1,5 +1,13 @@
 # 11 — Audit and Storage
 
+**Product:** AI Chat Platform  
+**Version:** 1.0  
+**Date:** 2026-06-16  
+**Author:** Andrew Bush / M&A Operating System
+
+---
+
+
 ## Governing principle
 
 Conversations on the AI Chat Platform are **auditable records**, not transient chat logs. Every conversation turn is a self-contained, reproducible record. A reviewer can reconstruct what the user submitted, what files they provided, what tools were invoked, and what was produced — without referring to any external system (P4 — audit completeness).

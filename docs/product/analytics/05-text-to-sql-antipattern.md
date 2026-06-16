@@ -1,5 +1,13 @@
 # 5. Appendix: Text-to-SQL and Semantic Analytics: Better Together
 
+**Product:** AI Analytics Platform  
+**Version:** 2.0  
+**Date:** 2026-06-16  
+**Author:** Andrew Bush / M&A Operating System
+
+---
+
+
 This appendix is a standalone reference for teams designing AI-powered analytics architectures. It can be read independently of the platform specification.
 
 The central argument here is not that Text-to-SQL should be avoided. It is that large-scale analytics in a regulated environment needs both tools running alongside each other. Text-to-SQL is the exploration layer: fast, flexible, genuinely useful for ad-hoc analysis, hypothesis testing, and metric discovery. The semantic analytics engine is the governed execution layer: deterministic, auditable, with versioned metric definitions and enforced entitlements. The two work best as a connected system, with outputs promoted from exploration into the governed registry when they need to become reliable.

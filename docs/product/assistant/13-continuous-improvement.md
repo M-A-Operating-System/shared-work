@@ -1,5 +1,13 @@
 # 12 — Continuous Improvement
 
+**Product:** AI Chat Platform  
+**Version:** 1.0  
+**Date:** 2026-06-16  
+**Author:** Andrew Bush / M&A Operating System
+
+---
+
+
 ## Principle
 
 The AI Chat Platform is a living system. Every session generates signal data. **No change is applied automatically** — every recommendation enters a triage pipeline and requires human review before any change is deployed (P8 — human-gated improvement).

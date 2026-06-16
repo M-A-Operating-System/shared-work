@@ -1,5 +1,13 @@
 # 02 — Personas and User Journeys
 
+**Product:** AI Chat Platform  
+**Version:** 1.0  
+**Date:** 2026-06-16  
+**Author:** Andrew Bush / M&A Operating System
+
+---
+
+
 The AI Chat Platform is deployed by many different host applications across different domains. This document describes personas at two levels: **platform-level archetypes** (roles that exist across all deployments) and **illustrative host application journeys** (examples showing how different types of host app use the platform).
 
 ---

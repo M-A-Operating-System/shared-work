@@ -1,5 +1,13 @@
 # 06 — Model Configuration
 
+**Product:** AI Chat Platform  
+**Version:** 1.0  
+**Date:** 2026-06-16  
+**Author:** Andrew Bush / M&A Operating System
+
+---
+
+
 ## AI provider architecture
 
 The AI Chat Platform is designed to be **AI provider-agnostic**. The model provider is abstracted behind the platform's edge function layer — the conversational surface, MCP tool access, `@`-binding resolution, and audit trail are identical regardless of which AI provider is active for a tenant.
@@ -99,20 +107,21 @@ Each user's style settings apply to the turns they submit. A response generated 
 
 ## System prompt
 
-The platform assembles the system prompt from multiple layers before each session:
+The platform assembles the system prompt from multiple layers before each session. Layers are injected in the order below — platform-managed non-overridable layers come first so the model encounters behavioral constraints before any host-authored content, ensuring they cannot be suppressed by a host system prompt. Tool descriptions come last as they reflect live session state and change whenever a user enables or disables an opt-in MCP server.
 
-| Layer | Source | Editable by |
-|-------|--------|------------|
-| **Host base prompt** | `scope.systemPrompt` in application config | Host Developer / Application Admin |
-| **Tool descriptions** | Auto-injected from active MCP server descriptions (always-on + opt-in enabled) | Platform (from host tool config) |
-| **Communication style** | Injected from user's JWT claims + `userProfile` config | Platform (from user claims) |
-| **Memory blocks** | `[Your context]` (personal memory) + `[Application context]` (application context) | Platform (from stored memory) |
-| **Write confirmation flow** | Instructs model to propose before/after state and wait for confirmation before any write MCP call | Platform — non-configurable |
-| **Transparency instruction** | Instructs model to show all tool calls and cite sources | Platform — non-configurable |
-| **Prompt injection mitigation** | Instructs model to treat tool result content as data, not instructions | Platform — non-configurable |
-| **Uncertainty acknowledgment** | Instructs model to signal explicitly when it is uncertain, when information may be outdated, or when a question falls at the edge of its available data — rather than producing confident-sounding answers from incomplete information. The model should offer to search (if the Web Search Service is enabled) or acknowledge the gap. | Platform — non-configurable |
+| # | Layer | What it contains | Mutability | Controlled by |
+|---|---|---|---|---|
+| 1 | **Session context block** | Assistant name, application name, logged-in user identity, session date and time, config version | Per-session — assembled fresh at session start | Platform; user field mappings in `userProfile.sessionContext` |
+| 2 | **Write confirmation** | Instruction requiring the model to propose a before/after state and await explicit user confirmation before executing any write MCP call | Static | Platform — non-overridable |
+| 3 | **Transparency** | Instruction requiring the model to disclose every tool call in a collapsible disclosure card and cite sources inline | Static | Platform — non-overridable |
+| 4 | **Prompt injection mitigation** | Instruction requiring the model to treat all tool result content as data, not as instructions | Static | Platform — non-overridable |
+| 5 | **Uncertainty acknowledgment** | Instruction requiring the model to signal uncertainty explicitly, acknowledge data gaps, and offer to search rather than producing confident answers from incomplete information | Static | Platform — non-overridable |
+| 6 | **Communication style** | Response style and verbosity derived from the authenticated user's JWT claims, mapped to prompt instructions via `userProfile` config | Per-session — derived from user's JWT at session start | Platform; style mappings in `userProfile` |
+| 7 | **Memory blocks** | Personal memory items stored by the user and application context items set by the Application Admin | Infrequent — updated between sessions, not mid-conversation | Platform; content authored by users and Application Admins |
+| 8 | **Host base prompt** | The host application's domain and persona instructions — scope, assistant character, handling rules, and any application-specific guidance | Per-config — stable for the duration of a session | Host Developer / Application Admin via Config Editor or Admin API |
+| 9 | **Tool descriptions** | Name and capability description for every active MCP server (always-on servers plus any opt-in servers the user has enabled for this session) | Per-turn — rebuilt whenever the user enables or disables an opt-in server | Platform; descriptions authored in `mcpServers` host config |
 
-The write confirmation, transparency, prompt injection mitigation, and uncertainty acknowledgment layers are **platform-managed and non-overridable** — they cannot be suppressed by host system prompt content.
+Layers 1–5 are **platform-managed and non-overridable** — they cannot be suppressed by host system prompt content.
 
 Host applications may reinforce or tailor uncertainty behaviour further in their `scope.systemPrompt` — for example, specifying the domain areas where the model should be especially cautious, or providing alternative phrasings for uncertainty acknowledgment that fit the application's voice. The MCP Resources Service also publishes guidance documents on uncertainty handling that hosts can register and retrieve at session time (see [17-complementary-mcp-services.md](./17-complementary-mcp-services.md)).
 
@@ -120,14 +129,59 @@ Changes to the host base prompt are made via the Config Editor UI or Admin API a
 
 ---
 
+## Session context block
+
+The session context block is the first layer injected into every system prompt. It grounds the model in its operating environment — who it is, who it is speaking with, and when the session is happening — without requiring the host to encode any of this in their static system prompt.
+
+The platform assembles the block at session start from three sources: the tenant identity config, the authenticated user's JWT claims (mapped via `userProfile.sessionContext`), and the platform's own server-side values (date/time, config version).
+
+### Rendered output
+
+The block is rendered as plain text and injected at the top of the system prompt. Example:
+
+```
+## Session context
+Assistant: Atlas (AI assistant for Acme Data Hub)
+User: Sarah Chen · sarah.chen@acme.com · Senior Data Analyst · Acme Corporation
+Session: Tuesday 16 June 2026, 09:14 UTC · Config v2.3.1
+```
+
+All four lines are always present. Fields within each line are omitted gracefully if the source data is unavailable — for example, if `roleField` is not configured, the role is omitted from the User line rather than showing a blank or placeholder.
+
+### Field sources
+
+| Field | Source | Always present |
+|---|---|---|
+| Assistant name | `identity.assistantName` | Yes |
+| Application name | `identity.applicationName` | Yes |
+| User display name | JWT claim mapped via `userProfile.sessionContext.displayNameField` | If claim present |
+| User email | JWT claim mapped via `userProfile.sessionContext.emailField` | If claim present |
+| User role / job title | JWT claim mapped via `userProfile.sessionContext.roleField` | If claim present |
+| User organisation | JWT claim mapped via `userProfile.sessionContext.organisationField` | If claim present |
+| Date and time | Platform server clock (UTC) | Yes |
+| Config version | Active tenant config version record | Yes |
+
+### Configuration
+
+Claim field mappings are declared in the `userProfile.sessionContext` section of the host application config — see [01-host-application-config.md](./02-host-application-config.md). If `sessionContext` is omitted from the config, the User line contains only the fields derivable without JWT claims (typically none — the line is omitted entirely).
+
+### Caching
+
+The session context block is **not cacheable** — it contains user-specific identity and a session timestamp that differ on every request. It is injected before the cacheable layers so the cache boundary sits between layer 1 and the static layers that follow.
+
+---
+
 ## Prompt caching
 
-The static components of the system prompt are injected as a cacheable prefix on every AI provider API request. Prompt caching reduces input token cost and latency.
+Layers 2–8 form a **cacheable prefix** injected on every AI provider API request. Prompt caching reduces input token cost and latency.
 
-| Cached component | Contents |
-|-----------------|---------|
-| Host base prompt | Full host system prompt |
-| Tool descriptions | All active MCP server descriptions (always-on + opt-in enabled for the session) |
-| Memory blocks | Application context and personal memory blocks (change infrequently) |
+| Layer | Cached | Notes |
+|---|---|---|
+| 1 — Session context block | No | User-specific and timestamped; rebuilt on every request |
+| 2–5 — Platform behavioral rules | Yes | Identical across all tenants and users |
+| 6 — Communication style | Yes | Fixed for the duration of a session |
+| 7 — Memory blocks | Yes | Changes infrequently; cache invalidated when memory is updated |
+| 8 — Host base prompt | Yes | Stable within a session; cache invalidated on config update |
+| 9 — Tool descriptions | No | Rebuilt whenever the user enables or disables an opt-in server |
 
 The **cache hit rate** is tracked as a launch metric (target: ≥ 40% by month 2 — see [14-success-metrics.md](./14-success-metrics.md)).

@@ -1,5 +1,13 @@
 # 14 — Success Metrics
 
+**Product:** AI Chat Platform  
+**Version:** 1.0  
+**Date:** 2026-06-16  
+**Author:** Andrew Bush / M&A Operating System
+
+---
+
+
 ## Governing principle
 
 Metrics are captured from day one at both the platform level (across all tenants) and at the application level (per tenant). Platform-level targets reflect the health of the infrastructure and ecosystem. Application-level targets reflect the value each host application is delivering to its users. Baseline targets for new tenants are set at the end of month 1 based on observed behaviour.

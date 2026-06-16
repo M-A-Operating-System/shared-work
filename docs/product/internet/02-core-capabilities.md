@@ -34,6 +34,8 @@ A ranked list of results, each containing:
 - source domain
 - site classification metadata (category, reputation score, safety flag) — see Capability 4
 
+Each response also includes a **provenance block** recording: the query string, execution timestamp (UTC), backend identifier, result count before and after filtering, and a SHA-256 hash of the filtered result set. The provenance block is returned to the caller and independently written to the audit log.
+
 ### Behaviour
 The search backend is configurable at deployment time. The server abstracts the backend — callers issue a standard MCP tool call regardless of which backend is active. Results are filtered through the active entitlement policy before being returned; results for blocked or restricted domains are silently excluded from the response. Results whose site classification falls below configured safety thresholds are excluded or flagged according to deployment policy.
 
@@ -73,6 +75,8 @@ Accept a URL and return the page content in one of four caller-selected output f
 **Chunked** — The Markdown-converted content segmented into discrete chunks of a configurable size. Each chunk includes its index and the total chunk count. Enables agents to paginate through large pages without exceeding context window limits.
 
 **Summarised** — An LLM-generated summary of the page content. The server passes the Markdown-converted content to a configured language model and returns the summary. The model used is configurable at deployment time.
+
+All fetch formats return a **provenance block** alongside the content: the final URL (after redirects), fetch timestamp (UTC), raw content size in bytes, SHA-256 hash of the raw response body before format conversion, HTTP status code, and the original URL if a redirect occurred. The provenance block is returned to the caller and independently written to the audit log.
 
 ### Behaviour
 Before executing a fetch, the server checks the URL against the active entitlement policy. If the URL or its domain is on the deny list, the fetch is rejected and a policy response is returned. If the URL's site classification falls below the configured safety threshold, the fetch is rejected or the response is flagged according to deployment policy. Fetch is performed using the server's own HTTP client — no browser automation is required for static content. JavaScript-rendered pages require a configured browser automation backend.

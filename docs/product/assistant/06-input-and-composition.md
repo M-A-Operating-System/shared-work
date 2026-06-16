@@ -1,5 +1,13 @@
 # 05 — Input and Composition
 
+**Product:** AI Chat Platform  
+**Version:** 1.0  
+**Date:** 2026-06-16  
+**Author:** Andrew Bush / M&A Operating System
+
+---
+
+
 ## Free-form text input
 
 The primary input is a **multi-line natural-language text field**.
