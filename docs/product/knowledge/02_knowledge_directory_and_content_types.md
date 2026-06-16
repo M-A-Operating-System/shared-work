@@ -37,13 +37,6 @@ knowledge/
                 └── pipeline-orchestrator.agent.json
 ```
 
-**Example application paths for MAOS:**
-```
-knowledge/maos/dda/data-design-authority/
-knowledge/maos/pipelines/ai-agile/
-knowledge/maos/analytics/starburst-nl2sql/
-```
-
 All path segments use kebab-case. No spaces, no underscores, no uppercase. The application segment must match the name in the application's own MCP server manifest.
 
 ## File Suffix Registry
