@@ -230,7 +230,7 @@ You are the DDA Analyst — the Chief Data Officer's second brain...
 
 | Content Type | `resources/list` | `resources/read` | `prompts/list` | `prompts/get` | Tools |
 |---|---|---|---|---|---|
-| Resource | ✅ | ✅ raw content | — | — | `get_resource`, `search_resource` |
+| Resource | ✅ | ✅ raw content | — | — | `get_resource`, `search_resources` |
 | Prompt | ✅ raw file | ✅ raw content | ✅ with arguments | ✅ rendered `messages[]` | `get_prompt`, `list_prompts` |
 | Skill | ✅ all files | ✅ any file | ✅ SKILL.md as template | ✅ rendered SKILL.md | `get_skill` |
 | Command | ✅ raw file | ✅ raw content | ✅ as instruction | ✅ rendered instruction | `get_command` |

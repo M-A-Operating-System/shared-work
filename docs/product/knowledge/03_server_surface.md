@@ -115,7 +115,18 @@ Surfaces prompt, skill, command, and agent files as parameterised templates rend
 
 ## Tool Surface
 
-Ten tools across five content-type pairs. All tools return a `content` array (text summary for display) and a `structuredContent` object (full typed payload for programmatic use).
+All tools return a `content` array (text summary for display) and a `structuredContent` object (full typed payload for programmatic use).
+
+| Content Type | Search (Discovery) | List (Enumeration) | Read |
+|---|---|---|---|
+| All types | `search_knowledge` (v1), `hybrid_search`* (v2) | — | — |
+| Resource | `search_resources` | — | `get_resource` (+ `query` for chunks*) |
+| Prompt | `search_prompts` | `list_prompts` | `get_prompt` |
+| Skill | `search_skills` | `get_skill` (folder URI) | `get_skill` |
+| Command | `search_commands` | `get_command` (folder URI) | `get_command` |
+| Agent | `search_agents` | `list_agents` | `load_agent` |
+
+*v2 — requires pgvector infrastructure. Typed shortcuts delegate to `hybrid_search` in v2 deployments with no API change for callers.
 
 ### Resource Tools
 
@@ -442,8 +453,6 @@ Five convenience wrappers around `search_knowledge` with `content_types` pre-set
 ```
 
 `structuredContent`: `{ kind: "skill", name, title, version, uri, description, triggers, inputs, outputs, dependencies, files: [{ uri, role }], rendered_prompt }`
-
----
 
 ---
 

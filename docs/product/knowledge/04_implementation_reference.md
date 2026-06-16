@@ -80,18 +80,22 @@ knowledge-mcp-server/
 │       │   ├── middleware.py   # OAuth 2.1 + PKCE validation
 │       │   └── scopes.py       # Scope enforcement
 │       ├── registry/
-│       │   ├── scanner.py      # Filesystem scanner, content index
-│       │   ├── watcher.py      # watchfiles integration, notifications
-│       │   └── search.py       # SQLite FTS5 index manager
+│       │   ├── scanner.py          # Filesystem scanner, content index
+│       │   ├── watcher.py          # watchfiles integration, notifications
+│       │   ├── search.py           # SQLite FTS5 index manager
+│       │   ├── embeddings.py       # v2 — embedding generation, pgvector upsert
+│       │   └── chunker.py          # v2 — section/paragraph splitting strategy
 │       ├── primitives/
 │       │   ├── resources.py    # resources/* handlers
 │       │   └── prompts.py      # prompts/* handlers
 │       ├── tools/
-│       │   ├── resource_tools.py
+│       │   ├── resource_tools.py   # extend get_resource with query/top_k (v2)
 │       │   ├── prompt_tools.py
 │       │   ├── skill_tools.py
 │       │   ├── command_tools.py
-│       │   └── agent_tools.py
+│       │   ├── agent_tools.py
+│       │   ├── search_tools.py     # search_knowledge + five typed shortcuts
+│       │   └── search_tools_v2.py  # v2 — hybrid_search
 │       └── content/
 │           ├── types.py        # ContentKind enum, ContentEntry dataclass
 │           ├── resolver.py     # URI validation and path resolution
@@ -130,9 +134,20 @@ class Settings(BaseSettings):
     rate_limit_search_rpm:   int  = 20
     rate_limit_sse_connections: int = 5
 
+    # v2 — pgvector / hybrid search
+    supabase_url:               Optional[str] = None
+    supabase_service_key:       Optional[str] = None
+    embedding_model:            str           = "text-embedding-3-small"
+    embedding_dimensions:       int           = 1536
+    chunk_size_tokens:          int           = 512
+    chunk_overlap_tokens:       int           = 64
+    hybrid_search_enabled:      bool          = False  # set True when pgvector is provisioned
+
     class Config:
         env_prefix = "KNOWLEDGE_MCP_"
 ```
+
+> `hybrid_search` and chunk retrieval via `get_resource` both return `-32603` with message `"Not available — pgvector not configured"` when `hybrid_search_enabled` is `False`. `search_knowledge` and all typed shortcuts remain operational via FTS5 regardless of this flag.
 
 ### Content Types
 

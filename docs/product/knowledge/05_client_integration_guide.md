@@ -74,16 +74,17 @@ result = await session.call_tool("get_skill", {
 # result.structuredContent["entries"] — list of skill directories
 ```
 
-### Invoke a skill with arguments
+### Get a skill with rendered prompt
 
 ```python
-result = await session.call_tool("invoke_skill", {
-    "skill_name": "gmail-triage",
-    "app_uri":    "file:///knowledge/maos/dda/data-design-authority/skills/",
-    "arguments":  { "max_threads": "30", "lookback_hours": "48" }
+result = await session.call_tool("get_skill", {
+    "uri":       "file:///knowledge/maos/dda/data-design-authority/skills/gmail-triage/SKILL.md",
+    "arguments": { "max_threads": "30", "lookback_hours": "48" }
 })
 rendered_prompt = result.structuredContent["rendered_prompt"]
-# Inject into current conversation context
+triggers        = result.structuredContent["triggers"]
+dependencies    = result.structuredContent["dependencies"]
+# Inject rendered_prompt into current conversation context
 ```
 
 ### Load an agent before instantiation
@@ -103,7 +104,7 @@ memory_config = agent["memory"]
 ### Search then retrieve
 
 ```python
-search = await session.call_tool("search_resource", {
+search = await session.call_tool("search_knowledge", {
     "query":         "data retention",
     "folder_uri":    "file:///knowledge/maos/dda/data-design-authority/",
     "content_types": ["resource", "prompt"],
@@ -113,11 +114,23 @@ top_uri = search.structuredContent["results"][0]["uri"]
 content = await session.call_tool("get_resource", { "uri": top_uri })
 ```
 
+### Get relevant sections of a large document
+
+```python
+result = await session.call_tool("get_resource", {
+    "uri":   "file:///knowledge/maos/dda/data-design-authority/resources/data-model.md",
+    "query": "data retention policy minimum years",
+    "top_k": 3
+})
+chunks = result.structuredContent["chunks"]
+# chunks: [{ chunk_id, section_heading, text, similarity_score }]
+```
+
 ### Render a prompt template
 
 ```python
 result = await session.call_tool("get_prompt", {
-    "prompt_name": "maos.dda.data-design-authority.maturity-assessment",
+    "prompt_name": "file:///knowledge/maos/dda/data-design-authority/prompts/maturity-assessment.prompt.md",
     "arguments":   { "org_name": "Acme Corp", "scope": "Data Governance" }
 })
 messages = result.structuredContent["messages"]
@@ -141,13 +154,13 @@ await session.subscribe_resource(
 
 At session start: call `load_agent` with `dda-analyst` to retrieve system prompt and tool config; subscribe to the agent file URI; call `list_prompts` scoped to the prompts folder to populate the prompt picker.
 
-During session: use `get_prompt` to render selected templates; `search_resource` for knowledge lookup; `invoke_skill` when the user triggers a skill by phrase match against `triggers[]`.
+During session: use `get_prompt` to render prompt templates; `search_knowledge` for knowledge lookup; `get_skill` when the user triggers a skill by phrase match against `triggers[]` — `get_skill` returns the rendered prompt and typed metadata in one call.
 
 ### AI Agile Pipeline Orchestrator
 
 At pipeline start: call `load_agent` with `pipeline-orchestrator`; call `get_skill` for each skill in `agent.skills[]` to pre-cache SKILL.md content; subscribe to skill file URIs for invalidation.
 
-During execution: use `invoke_command` to resolve command strings before passing them to the DDA MCP server; use `get_resource` to retrieve reference schemas needed for validation steps.
+During execution: use `get_command` with arguments supplied — the `resolved_command` field in `structuredContent` returns the command string with arguments substituted, ready to pass to the target MCP server; use `get_resource` to retrieve reference schemas, supplying `query` to retrieve only relevant sections from large documents.
 
 ### Claude Code CLI Sessions
 
@@ -188,8 +201,8 @@ Cache the last successful response per URI with a 5-minute TTL. On connection fa
 
 **v1.2 — Discovery enhancements**
 
-- Tag-based filtering in `search_resource` — tags declared in front-matter
-- `triggers` index — `search_resource` searches skill and command `triggers[]` arrays for phrase-match discovery
+- Tag-based filtering in `search_knowledge` — tags declared in front-matter
+- `triggers` index — `search_knowledge` searches skill and command `triggers[]` arrays for phrase-match discovery
 - `list_applications` tool — lists all application nodes with entry counts per content type
 - Dependency graph resolution — `get_skill` and `load_agent` optionally resolve dependency chains
 
