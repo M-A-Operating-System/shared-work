@@ -1,3 +1,4 @@
+> [!CAUTION]
 > **Disclaimer:** The materials in this repository are provided as-is for accelerator and reference purposes only. They should not be relied upon for production systems or live business decision-making without independent review and professional adaptation. © M&A Operating System. All rights reserved.
 
 # M&A Operating System — Research & Product Accelerators
