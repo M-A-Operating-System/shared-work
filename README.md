@@ -44,7 +44,6 @@ flowchart TB
     end
 
     subgraph MCPServers["MCP Servers"]
-        CH[AI Chat Platform]
         KN[Knowledge MCP Server]
         AN[AI Analytics Platform]
         IN[Internet Access MCP Server]
@@ -77,17 +76,18 @@ flowchart TB
 
     click AN href "docs/product/analytics/01-overview.md"
     click KN href "docs/product/knowledge/01-overview.md"
-    click CH href "docs/product/assistant/01-overview.md"
     click IN href "docs/product/internet/01-overview.md"
     click ConvAI href "docs/product/assistant/01-overview.md"
 
     AgAI -->|MCP| AN
     AgAI -->|MCP| KN
-    AgAI -->|MCP| CH
     AgAI -->|MCP| IN
     AgAI -->|MCP| DM
     AgAI -->|LLM calls| GW
-    ConvAI -->|MCP| CH
+    ConvAI -->|MCP| AN
+    ConvAI -->|MCP| KN
+    ConvAI -->|MCP| IN
+    ConvAI -->|MCP| DM
     ConvAI -->|LLM calls| GW
 ```
 
