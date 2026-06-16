@@ -126,7 +126,7 @@ Transport: Streamable HTTP (HTTPS + SSE). Message format: JSON-RPC 2.0. Auth: OA
 | D-004 | SQLite FTS5 for search — no external search dependency in v1.0 |
 | D-005 | Five typed sub-folders are mandatory at every application leaf |
 | D-006 | `get_skill` returns `rendered_prompt` and `get_command` returns `resolved_command` in their `structuredContent` — no separate invoke tools are required |
-| D-007 | Dotted prompt name convention: `{domain}.{subdomain}.{app}.{name}` |
+| D-007 | Prompt names in `prompts/list` are file URIs — the same URI returned by `resources/list` for the same file. Uniqueness is guaranteed by the filesystem. |
 
 ## Open Decisions
 
@@ -134,6 +134,6 @@ Transport: Streamable HTTP (HTTPS + SSE). Message format: JSON-RPC 2.0. Auth: OA
 
 **OD-002 — Write path for AI-generated content** (MEDIUM): Agents may eventually need to propose new knowledge content. Recommendation: implement via GitHub PR tool when a confirmed requirement exists — not in v1.0.
 
-**OD-004 — Content entitlements** (MEDIUM): The current design assumes that all knowledge held within this service is non-sensitive and generally accessible to any authenticated client — even if a given piece of content is not relevant or useful to every consumer. No per-content or per-subtree access controls are implemented. If future requirements introduce sensitive content (e.g. restricted agent definitions, confidential process documentation, or proprietary prompt IP), a claims-based entitlement model scoped to directory sub-trees will be needed. Recommendation: proceed with open access for v1.0; revisit when a confirmed requirement for content-level access control exists.
+**OD-003 — Content entitlements** (MEDIUM): The current design assumes that all knowledge held within this service is non-sensitive and generally accessible to any authenticated client — even if a given piece of content is not relevant or useful to every consumer. No per-content or per-subtree access controls are implemented. If future requirements introduce sensitive content (e.g. restricted agent definitions, confidential process documentation, or proprietary prompt IP), a claims-based entitlement model scoped to directory sub-trees will be needed. Recommendation: proceed with open access for v1.0; revisit when a confirmed requirement for content-level access control exists.
 
-**OD-005 — Embedding model versioning** (MEDIUM, v2): The pgvector index is tied to a specific embedding model and dimension. Changing the model requires a full re-index. Store `embedding_model` and `embedding_dimensions` as metadata on every pgvector row from day one of v2 deployment so the server can detect stale embeddings after an upgrade.
+**OD-004 — Embedding model versioning** (MEDIUM, v2): The pgvector index is tied to a specific embedding model and dimension. Changing the model requires a full re-index. Store `embedding_model` and `embedding_dimensions` as metadata on every pgvector row from day one of v2 deployment so the server can detect stale embeddings after an upgrade.

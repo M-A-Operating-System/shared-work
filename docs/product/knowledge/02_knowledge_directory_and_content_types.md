@@ -166,16 +166,16 @@ Discrete, single-invocation executable definitions carrying a `command` string a
   "name":        "run-quality-check",
   "title":       "Run Data Quality Check",
   "version":     "1.0.0",
-  "description": "Executes the DDA quality gate against a target entity",
+  "description": "Executes a quality gate check against a target entity",
   "tags":        ["governance", "quality"],
-  "command":     "dda quality-check --entity {{entity_id}} --profile {{profile}}",
+  "command":     "quality-check --entity {{entity_id}} --profile {{profile}}",
   "arguments": [
     { "name": "entity_id", "type": "string",  "required": true  },
     { "name": "profile",   "type": "string",  "required": false, "default": "standard" }
   ],
   "returns":      "quality_report",
   "danger_level": "read-only",
-  "target_tool":  "dda-mcp-server"
+  "target_tool":  "target-mcp-server"
 }
 ```
 

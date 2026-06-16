@@ -119,14 +119,14 @@ All tools return a `content` array (text summary for display) and a `structuredC
 
 | Content Type | Search (Discovery) | List (Enumeration) | Read |
 |---|---|---|---|
-| All types | `search_knowledge` (v1), `hybrid_search`* (v2) | — | — |
+| All types | `search_knowledge` (v1), `search`* (v2) | — | — |
 | Resource | `search_resources` | — | `get_resource` (+ `query` for chunks*) |
 | Prompt | `search_prompts` | `list_prompts` | `get_prompt` |
 | Skill | `search_skills` | `get_skill` (folder URI) | `get_skill` |
 | Command | `search_commands` | `get_command` (folder URI) | `get_command` |
 | Agent | `search_agents` | `list_agents` | `load_agent` |
 
-*v2 — requires pgvector infrastructure. Typed shortcuts delegate to `hybrid_search` in v2 deployments with no API change for callers.
+*v2 — requires pgvector infrastructure. Typed shortcuts delegate to `search` in v2 deployments with no API change for callers.
 
 ### Resource Tools
 
@@ -170,7 +170,7 @@ All tools return a `content` array (text summary for display) and a `structuredC
   chunks: [{ chunk_id, section_heading?, text, similarity_score }] }
 ```
 
-> When `query` is supplied and `hybrid_search_enabled` is `False`, returns `-32603` with message `"Chunk retrieval not available — pgvector not configured"`.
+> When `query` is supplied and `search_enabled` is `False`, returns `-32603` with message `"Chunk retrieval not available — pgvector not configured"`.
 
 ---
 
@@ -180,7 +180,7 @@ All tools return a `content` array (text summary for display) and a `structuredC
 > file:///knowledge/maos/dda/data-design-authority/resources/data-model.md#chunk=3
 > ```
 >
-> A `resources/read` request or a `get_resource` call on a chunk URI returns only that chunk's text with `mimeType: text/plain`. `hybrid_search` results may include `resource_link` entries pointing to chunk URIs.
+> A `resources/read` request or a `get_resource` call on a chunk URI returns only that chunk's text with `mimeType: text/plain`. `search` results may include `resource_link` entries pointing to chunk URIs.
 
 ---
 
@@ -189,7 +189,7 @@ All tools return a `content` array (text summary for display) and a `structuredC
 ```json
 {
   "name": "search_knowledge",
-  "description": "Full-text and metadata search across the entire knowledge directory using SQLite FTS5. Searches all content types — resources, prompts, skills, commands, and agents — unless content_types is supplied to narrow scope. Searches file content, front-matter fields, and triggers[] arrays. Use typed shortcuts (search_skills, search_agents, etc.) when the content type is known. In v2, prefer hybrid_search for better recall.",
+  "description": "Full-text and metadata search across the entire knowledge directory using SQLite FTS5. Searches all content types — resources, prompts, skills, commands, and agents — unless content_types is supplied to narrow scope. Searches file content, front-matter fields, and triggers[] arrays. Use typed shortcuts (search_skills, search_agents, etc.) when the content type is known. In v2, prefer search for better recall.",
   "inputSchema": {
     "type": "object",
     "properties": {
@@ -356,12 +356,12 @@ Five convenience wrappers around `search_knowledge` with `content_types` pre-set
 
 ### v2 Tool
 
-**`hybrid_search`** *(v2 — requires pgvector infrastructure)*
+**`search`** *(v2 — requires pgvector infrastructure)*
 
 ```json
 {
-  "name": "hybrid_search",
-  "description": "v2 replacement for search_knowledge. Combines FTS5 keyword search and pgvector semantic search using Reciprocal Rank Fusion. Accepts identical parameters to search_knowledge — all typed shortcuts (search_skills, search_agents, etc.) delegate to hybrid_search in v2 deployments via content_types. Use search_knowledge when pgvector is unavailable. Requires v2 infrastructure (pgvector).",
+  "name": "search",
+  "description": "v2 replacement for search_knowledge. Combines FTS5 keyword search and pgvector semantic search using Reciprocal Rank Fusion. Accepts identical parameters to search_knowledge — all typed shortcuts (search_skills, search_agents, etc.) delegate to search in v2 deployments via content_types. Use search_knowledge when pgvector is unavailable. Requires v2 infrastructure (pgvector).",
   "inputSchema": {
     "type": "object",
     "properties": {
@@ -420,7 +420,7 @@ Five convenience wrappers around `search_knowledge` with `content_types` pre-set
     "type": "object",
     "properties": {
       "prompt_name": { "type": "string",
-                       "description": "Dotted name (e.g. maos.dda.data-design-authority.maturity-assessment) or folder URI" },
+                       "description": "File URI (e.g. file:///knowledge/maos/dda/data-design-authority/prompts/maturity-assessment.prompt.md) or folder URI" },
       "arguments":   { "type": "object", "additionalProperties": { "type": "string" } }
     },
     "required": ["prompt_name"]

@@ -78,8 +78,9 @@ result = await session.call_tool("get_skill", {
 
 ```python
 result = await session.call_tool("get_skill", {
-    "uri":       "file:///knowledge/maos/dda/data-design-authority/skills/gmail-triage/SKILL.md",
-    "arguments": { "max_threads": "30", "lookback_hours": "48" }
+    "skill_name": "gmail-triage",
+    "app_uri":    "file:///knowledge/maos/dda/data-design-authority/skills/",
+    "arguments":  { "max_threads": "30", "lookback_hours": "48" }
 })
 rendered_prompt = result.structuredContent["rendered_prompt"]
 triggers        = result.structuredContent["triggers"]

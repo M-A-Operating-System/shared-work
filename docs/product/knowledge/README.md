@@ -36,7 +36,7 @@
 **Tools:**
 
 ```
-search_knowledge    hybrid_search*
+search_knowledge    search*
 search_resources    search_prompts
 search_skills       search_commands
 search_agents
@@ -44,7 +44,7 @@ get_skill           get_command
 list_agents         load_agent
 get_resource        get_prompt
 ```
-* hybrid_search — v2, requires pgvector infrastructure
+* search — v2, requires pgvector infrastructure
 
 **Key rules:**
 - All URIs must begin with `file:///knowledge/`
