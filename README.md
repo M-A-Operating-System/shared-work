@@ -44,9 +44,8 @@ flowchart TB
     end
 
     subgraph MCPServers["MCP Servers"]
-        AN[AI Analytics Platform]
         KN[Knowledge MCP Server]
-        CH[AI Chat Platform]
+        AN[AI Analytics Platform]
         IN[Internet Access MCP Server]
     end
 
