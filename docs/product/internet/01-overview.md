@@ -106,3 +106,4 @@ No controlled mechanism exists. Users manually copy and paste web content into c
 | D-008 | OAuth 2.0 OBO flow for enterprise IdP; OAuth 2.1 with PKCE for consumer providers; no token passthrough permitted |
 | D-009 | Search backend is pluggable behind a standard internal interface |
 | D-010 | Classification backend is pluggable; most-restrictive-wins when multiple providers are configured |
+| D-011 | All successful search and fetch responses include a provenance block (URL/query, timestamp, size, content hash, backend) returned to the caller and independently recorded in the audit log — establishing a verifiable chain of custody from request to response |

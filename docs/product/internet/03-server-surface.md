@@ -66,9 +66,19 @@ Plain-text summary of result count and any applied filters.
     }
   ],
   "filter_applied": "boolean",
-  "total_before_filtering": "integer"
+  "total_before_filtering": "integer",
+  "provenance": {
+    "query": "string",
+    "executed_at": "string",
+    "backend": "string",
+    "result_count_returned": "integer",
+    "result_count_before_filtering": "integer",
+    "results_hash": "string"
+  }
 }
 ```
+
+`provenance.executed_at` is an ISO 8601 UTC timestamp. `provenance.results_hash` is a SHA-256 hex digest of the canonically serialised result set after filtering — enabling callers and audit systems to verify the result set has not been modified in transit. `provenance.backend` identifies the search backend that served the query (e.g. `searxng`, `brave`, `enterprise-index`).
 
 **Error conditions**
 
@@ -110,7 +120,6 @@ The fetched page content in the requested format.
 
 ```json
 {
-  "url": "string",
   "format": "string",
   "classification": {
     "category": "string",
@@ -119,9 +128,19 @@ The fetched page content in the requested format.
     "source": "string"
   },
   "chunk_index": "integer | null",
-  "chunk_total": "integer | null"
+  "chunk_total": "integer | null",
+  "provenance": {
+    "url": "string",
+    "fetched_at": "string",
+    "content_length_bytes": "integer",
+    "content_hash": "string",
+    "http_status": "integer",
+    "redirected_from": "string | null"
+  }
 }
 ```
+
+`provenance.fetched_at` is an ISO 8601 UTC timestamp. `provenance.content_hash` is a SHA-256 hex digest of the raw response body before any format conversion — enabling callers and audit systems to verify the content returned matches what the server received from the origin. `provenance.redirected_from` records the original URL when the target server issued a redirect.
 
 **Error conditions**
 
@@ -160,7 +179,7 @@ Fetch a URL using the caller's identity credentials. Available from v1. Applies 
 
 **Response shapes**
 
-Identical to `fetch`. An additional `auth_method` field is included in `structuredContent` indicating which authentication mode was used.
+Identical to `fetch`. An additional `auth_method` field is included in `structuredContent` indicating which authentication mode was used. The `provenance` block is always present and identical in structure to `fetch` — authentication does not alter provenance recording.
 
 **Error conditions**
 
@@ -186,9 +205,30 @@ All error conditions return a structured MCP tool response. No unhandled excepti
 }
 ```
 
+### Provenance
+
+Every successful `search`, `fetch`, and `fetch_authenticated` response includes a `provenance` block in `structuredContent`. The provenance block is the authoritative record of what was requested, when, and what was returned:
+
+| Field | Present in | Description |
+|---|---|---|
+| `query` | `search` | The exact query string submitted to the backend |
+| `executed_at` | `search` | ISO 8601 UTC timestamp of query execution |
+| `backend` | `search` | Identifier of the search backend that served the query |
+| `result_count_returned` | `search` | Number of results returned after filtering |
+| `result_count_before_filtering` | `search` | Number of results received from the backend before entitlement and classification filtering |
+| `results_hash` | `search` | SHA-256 hex digest of the canonically serialised filtered result set |
+| `url` | `fetch`, `fetch_authenticated` | Final URL fetched, after any server-side redirects |
+| `fetched_at` | `fetch`, `fetch_authenticated` | ISO 8601 UTC timestamp of the fetch |
+| `content_length_bytes` | `fetch`, `fetch_authenticated` | Size of the raw response body in bytes |
+| `content_hash` | `fetch`, `fetch_authenticated` | SHA-256 hex digest of the raw response body before format conversion |
+| `http_status` | `fetch`, `fetch_authenticated` | HTTP status code returned by the origin server |
+| `redirected_from` | `fetch`, `fetch_authenticated` | Original URL if a redirect occurred; `null` otherwise |
+
+The provenance block is returned to the caller in every successful response and is independently recorded in the audit log. This enables downstream consumers — agents, audit systems, and compliance tooling — to verify that the content they received matches what the server retrieved from the origin, and to establish an unambiguous chain of custody from request to response.
+
 ### Audit Logging
 
-Every tool call is logged with: timestamp, tool name, caller identity (where available), query or URL, entitlement outcome, classification outcome, and response status. Log destination is configurable at deployment time.
+Every tool call — including policy rejections, classification blocks, and authentication failures — is written to the audit log. Each audit log entry includes: timestamp, tool name, caller identity (where available), query or URL, entitlement outcome, classification outcome, response status, and the full provenance block for successful responses. Log destination is configurable at deployment time (stdout, file, or external log sink).
 
 ### Rate Limiting
 
