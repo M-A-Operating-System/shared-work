@@ -3,6 +3,8 @@
 **Version:** 1.0 | **Date:** 2026-06-16 | **Protocol:** MCP 2025-06-18  
 **Author:** Andrew Bush / M&A Operating System
 
+This server is the **MCP Knowledge** service referenced by the [AI Chat Platform](../assistant/01-overview.md). Host applications register it in their MCP tool registry to give end users access to skills, guidance documents, and prompt templates during conversations.
+
 ---
 
 ## Document Index

@@ -19,7 +19,7 @@ A self-hosted MCP server that exposes web search and page fetch as production-gr
 
 ## Primary Consumers
 
-**End users via AI assistants** — knowledge workers and professionals interacting with an AI interface that calls this server on their behalf. They receive current, grounded responses without leaving the conversation or performing manual retrieval.
+**[AI Chat Platform](../assistant/01-overview.md)** — the primary conversational AI front end; registers this server in its MCP tool registry as **MCP Internet Fetch & Search** to provide end users with real-time web search and page fetch during conversations.
 
 **Autonomous AI agents** — software agents executing within agentic pipelines or multi-agent orchestrations that require live internet content as a step in task execution. The agent issues tool calls and receives structured content without human involvement.
 
