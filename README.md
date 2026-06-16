@@ -47,7 +47,7 @@ flowchart TB
         KN[Knowledge MCP Server]
         AN[AI Analytics Platform]
         IN[Internet Access MCP Server]
-        DM[MCP Data Models]
+        DM[MCP Data Design]
     end
 
     subgraph DataSources["Data Sources"]
