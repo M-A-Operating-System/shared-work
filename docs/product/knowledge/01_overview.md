@@ -61,7 +61,7 @@ graph TD
     B[Agent Pipeline]
     C[Value-Add MCP Server]
 
-    subgraph KS["MCP Knowledge Server — scope of this document"]
+    subgraph KS["MCP Knowledge Server"]
         K[Knowledge MCP Server]
         D[(Knowledge Directory\nGit-versioned)]
         K -->|read-only filesystem mount| D
