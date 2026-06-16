@@ -63,9 +63,9 @@ flowchart TB
         L3[Gemini / Google]
     end
 
-    DB --> AN
-    DW --> AN
-    API --> AN
+    AN --> DB
+    AN --> DW
+    AN --> API
     GW --> L1
     GW --> L2
     GW --> L3
@@ -73,6 +73,7 @@ flowchart TB
     click AN href "docs/product/analytics/README.md"
     click KN href "docs/product/knowledge/README.md"
     click CH href "docs/product/assistant/README.md"
+    click ConvAI href "docs/product/assistant/README.md"
 
     AgAI -->|MCP| AN
     AgAI -->|MCP| KN
