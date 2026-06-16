@@ -16,6 +16,21 @@ MAOS platform components — MCP servers providing value-added capabilities, age
 
 A centralised MCP server exposing a structured knowledge directory over the Model Context Protocol. Every MAOS component and any authorised MCP client connects to this server to discover and consume resources, prompts, skills, commands, and agent definitions from one place. The server is the single source of truth for all reusable AI assets across the platform.
 
+---
+
+## Background: MCP Primitives
+
+The Model Context Protocol defines four core primitives that servers use to expose capabilities to clients. The Knowledge MCP Server uses all four.
+
+| Primitive | What it is | How this server uses it |
+|---|---|---|
+| **Resource** | Named content items a server exposes for clients to discover (`resources/list`) and read (`resources/read`). Identified by a URI. Can be files, database records, or any structured data. | Every file in the knowledge directory is surfaced as a resource addressable by its `file:///knowledge/...` URI — reference documents, skill packages, agent definitions, and more. |
+| **Prompt** | Parameterised message templates the server registers (`prompts/list`) and renders on demand (`prompts/get`). Arguments are substituted at render time; the result is a `messages[]` array ready for direct LLM submission. | Prompt templates, skill entry points, command definitions, and agent system prompts are all registered as prompts. A client calls `prompts/get` with arguments and receives a fully rendered message array. |
+| **Tool** | Callable functions the server exposes for clients and models to invoke. Each tool has a typed input schema; the server executes the function and returns `content` (display text) and `structuredContent` (typed payload). | Ten typed tools cover all five content categories — e.g. `invoke_skill` substitutes inputs into a SKILL.md template and returns a rendered prompt; `load_agent` returns a full agent definition with its rendered system prompt. |
+| **Notification** | Server-to-client push messages signalling state changes. Clients subscribe to specific resource URIs or to list-change events and receive notifications when content is added, removed, or updated. | When a file changes in the knowledge directory the server emits `notifications/resources/updated` to subscribed clients and `notifications/resources/list_changed` or `notifications/prompts/list_changed` when the set of entries changes. |
+
+---
+
 ## Design Principles
 
 **P1 — Single source of truth.** One server, one directory. No mirrors, no local copies that diverge.
