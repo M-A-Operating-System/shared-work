@@ -16,6 +16,8 @@ MAOS platform components — MCP servers providing value-added capabilities, age
 
 A centralised MCP server exposing a structured knowledge directory over the Model Context Protocol. Every MAOS component and any authorised MCP client connects to this server to discover and consume resources, prompts, skills, commands, and agent definitions from one place. The server is the single source of truth for all reusable AI assets across the platform.
 
+The design assumes that all content can be aligned to a knowledge hierarchy that mirrors the organisation itself — structured around the organisation's hierarchy, its existing business processes, and the applications and services that support them. This means the directory tree naturally reflects how the business is structured: domains map to business units or functions, sub-domains to teams or process areas, and application nodes to the specific systems and services in use. AI assets are authored and discovered in the same context as the work they support.
+
 ---
 
 ## Background: MCP Primitives
