@@ -102,7 +102,7 @@ flowchart TB
 | [AI Chat Platform](docs/product/assistant/README.md) | A white-label, embeddable conversational AI layer that any application can adopt. Host applications bring their own domain scope, MCP tooling, and branding. The platform provides the conversation engine, content rendering, audit storage, and memory management. | `docs/product/assistant/` |
 | [Knowledge MCP Server](docs/product/knowledge/README.md) | A centralised MCP server exposing a structured knowledge directory as resources, prompts, skills, commands, and agent definitions. Serves as the single source of truth for all reusable AI assets across the platform — eliminating local copies and providing governed access over the Model Context Protocol. | `docs/product/knowledge/` |
 | [Internet Access MCP Server](docs/product/internet/README.md) | A self-hosted MCP server that exposes web search and page fetch as production-grade, infrastructure-controlled capabilities. Built-in entitlements and site classification govern what internet content AI agents and users can access and consume. No external API dependency required for core operation. | `docs/product/internet/` |
-| MCP Data Design | The authoritative source of data definition and context needed by AI capabilities to understand and reliably consume data across an enterprise. Covers data model and object definitions, entity relationships, analytics definitions, organisational ownership constructs, and all other context required to interpret enterprise data correctly. | `docs/product/data-design/` |
+| MCP Data Design | The authoritative source of data definition and context needed by AI capabilities to understand and reliably consume data across an enterprise. Covers data model and object definitions, entity relationships, analytics definitions, organisational ownership constructs, and all other context required to interpret enterprise data correctly. | COMING SOON! |
 
 ---
 
@@ -116,7 +116,7 @@ docs/
     ├── assistant/                # AI Chat Platform specification
     ├── knowledge/                # Knowledge MCP Server specification
     ├── internet/                 # Internet Access MCP Server specification
-    └── data-design/              # MCP Data Design specification
+    └── data-design/              # COMING SOON! MCP Data Design specification
 ```
 
 ---
