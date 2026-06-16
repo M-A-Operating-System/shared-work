@@ -74,6 +74,12 @@ PRODUCTS = {
         "author": "Andrew Bush (www.maoperatingsystem.com/bio-andrew-bush)",
         "output": "analytics_product_design.pdf",
     },
+    "knowledge": {
+        "title":  "MAOS Knowledge MCP Server",
+        "meta":   "Draft v1.0 · June 2026",
+        "author": "Andrew Bush (www.maoperatingsystem.com/bio-andrew-bush)",
+        "output": "knowledge_product_design.pdf",
+    },
 }
 
 EXCLUDE = {"README.md"}
