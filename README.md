@@ -58,3 +58,9 @@ docs/
 ---
 
 *Confidential — internal distribution only*
+
+---
+
+## Keywords
+
+enterprise data strategy, practical AI, practical data, AI adoption, AI operationalization, AI readiness, enterprise analytics, analytics governance, semantic metrics, semantic layer, federated query, data architecture, information architecture, subject-based data modeling, data governance, operating model modernization, transformation execution, enterprise information management, knowledge management, AI agents, autonomous agents, conversational AI, MCP server, Model Context Protocol, agentic AI, AI chat platform, analytics platform, knowledge MCP server, data lineage, data quality, enterprise AI strategy, AI accelerator, data modernization, AI consulting, data consulting, boutique advisory, M&A Operating System
