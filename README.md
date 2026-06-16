@@ -41,16 +41,16 @@ graph TB
     AgAI[Agentic AI]
     ConvAI[Conversational AI]
 
-    subgraph MCPE["MCP-Enabled Ecosystem"]
-        subgraph MCP["MCP Servers"]
-            AN["AI Analytics Platform"]
-            KN["Knowledge MCP Server"]
-            CH["AI Chat Platform"]
+    subgraph Ecosystem["MCP-Enabled Ecosystem"]
+        subgraph MCPServers["MCP Servers"]
+            AN[AI Analytics Platform]
+            KN[Knowledge MCP Server]
+            CH[AI Chat Platform]
         end
 
         GW[AI Gateway]
 
-        subgraph LLMS["Large Language Models"]
+        subgraph LLMPool["Large Language Models"]
             L1[Claude / Anthropic]
             L2[GPT / OpenAI]
             L3[Gemini / Google]
@@ -64,8 +64,8 @@ graph TB
         GW --> L3
     end
 
-    AgAI -->|MCP| MCP
-    ConvAI -->|MCP| MCP
+    AgAI -->|MCP| MCPServers
+    ConvAI -->|MCP| MCPServers
 ```
 
 ---
