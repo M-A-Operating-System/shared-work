@@ -38,8 +38,10 @@ Our goal is simple: help organizations build practical, scalable, and trusted in
 
 ```mermaid
 flowchart TB
-    AgAI[Agentic AI]
-    ConvAI[Conversational AI]
+    subgraph Consumers["Consumers"]
+        AgAI[Agentic AI]
+        ConvAI[Conversational AI]
+    end
 
     subgraph Ecosystem["MCP-Enabled Ecosystem"]
         subgraph MCPServers["MCP Servers"]
@@ -48,7 +50,7 @@ flowchart TB
             CH[AI Chat Platform]
         end
 
-        GW[AI Gateway]
+        GW[LLM Gateway]
 
         subgraph LLMPool["Large Language Models"]
             L1[Claude / Anthropic]
@@ -56,9 +58,6 @@ flowchart TB
             L3[Gemini / Google]
         end
 
-        AN --> GW
-        KN --> GW
-        CH --> GW
         GW --> L1
         GW --> L2
         GW --> L3
@@ -67,9 +66,11 @@ flowchart TB
     AgAI -->|MCP| AN
     AgAI -->|MCP| KN
     AgAI -->|MCP| CH
+    AgAI -->|LLM calls| GW
     ConvAI -->|MCP| AN
     ConvAI -->|MCP| KN
     ConvAI -->|MCP| CH
+    ConvAI -->|LLM calls| GW
 ```
 
 ---
