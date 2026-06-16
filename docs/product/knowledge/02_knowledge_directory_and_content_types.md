@@ -83,6 +83,8 @@ file:///knowledge/maos/dda/data-design-authority/skills/gmail-triage/SKILL.md
 file:///knowledge/maos/dda/data-design-authority/
 ```
 
+> **Note:** While all content types are reachable via the generic URI scheme above, each typed content category also has its own dedicated entry points. Skills, prompts, commands, and agents can be discovered and retrieved through their respective typed tools (`get_skill`, `invoke_skill`, `get_prompt`, `list_prompts`, `get_command`, `invoke_command`, `list_agents`, `load_agent`) and via the `prompts/*` MCP primitives. These typed entry points return structured metadata, rendered templates, and resolved definitions — not just raw file content.
+
 ---
 
 ## Content Type Schemas
