@@ -67,8 +67,6 @@ graph TD
         K -->|read-only filesystem mount| D
     end
 
-    style KS fill:#fffde7,stroke:#f9a825,stroke-width:2px,color:#000
-
     A -->|JSON-RPC 2.0\nStreamable HTTP / OAuth 2.1| K
     B -->|JSON-RPC 2.0\nStreamable HTTP / OAuth 2.1| K
     C -->|JSON-RPC 2.0\nStreamable HTTP / OAuth 2.1| K
