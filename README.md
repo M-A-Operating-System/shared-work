@@ -34,6 +34,42 @@ Our goal is simple: help organizations build practical, scalable, and trusted in
 
 ---
 
+## Platform Architecture
+
+```mermaid
+graph TB
+    AgAI[Agentic AI]
+    ConvAI[Conversational AI]
+
+    subgraph MCPE["MCP-Enabled Ecosystem"]
+        subgraph MCP["MCP Servers"]
+            AN["AI Analytics Platform"]
+            KN["Knowledge MCP Server"]
+            CH["AI Chat Platform"]
+        end
+
+        GW[AI Gateway]
+
+        subgraph LLMS["Large Language Models"]
+            L1[Claude / Anthropic]
+            L2[GPT / OpenAI]
+            L3[Gemini / Google]
+        end
+
+        AN --> GW
+        KN --> GW
+        CH --> GW
+        GW --> L1
+        GW --> L2
+        GW --> L3
+    end
+
+    AgAI -->|MCP| MCP
+    ConvAI -->|MCP| MCP
+```
+
+---
+
 ## Product Areas
 
 | Product | Description | Specification |
