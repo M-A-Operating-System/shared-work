@@ -34,10 +34,10 @@ Our goal is simple: help organizations build practical, scalable, and trusted in
 
 ---
 
-## Platform Architecture
+## Practical AI and Data Ecosystem
 
 ```mermaid
-graph TB
+flowchart TB
     AgAI[Agentic AI]
     ConvAI[Conversational AI]
 
@@ -64,8 +64,12 @@ graph TB
         GW --> L3
     end
 
-    AgAI -->|MCP| MCPServers
-    ConvAI -->|MCP| MCPServers
+    AgAI -->|MCP| AN
+    AgAI -->|MCP| KN
+    AgAI -->|MCP| CH
+    ConvAI -->|MCP| AN
+    ConvAI -->|MCP| KN
+    ConvAI -->|MCP| CH
 ```
 
 ---
