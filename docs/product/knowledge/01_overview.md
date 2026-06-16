@@ -64,7 +64,9 @@ graph TD
     subgraph KS["MCP Knowledge Server"]
         K[Knowledge MCP Server]
         D[(Knowledge Directory\nGit-versioned)]
+        V[(Semantic Graph Index\nv2 only)]
         K -->|read-only filesystem mount| D
+        K -. v2 .-> V
     end
 
     A -->|JSON-RPC 2.0\nStreamable HTTP / OAuth 2.1| K
