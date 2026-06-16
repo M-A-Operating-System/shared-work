@@ -57,7 +57,7 @@ docs/
 
 ---
 
-*Confidential — internal distribution only*
+*Provided as a public research resource. Not intended for use in live or production environments without independent professional review and adaptation.*
 
 ---
 
