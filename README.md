@@ -76,9 +76,9 @@ flowchart TB
 
     click AN href "docs/product/analytics/01-overview.md"
     click KN href "docs/product/knowledge/01-overview.md"
-    click CH href "docs/product/assistant/00-overview.md"
+    click CH href "docs/product/assistant/01-overview.md"
     click IN href "docs/product/internet/01-overview.md"
-    click ConvAI href "docs/product/assistant/00-overview.md"
+    click ConvAI href "docs/product/assistant/01-overview.md"
 
     AgAI -->|MCP| AN
     AgAI -->|MCP| KN
