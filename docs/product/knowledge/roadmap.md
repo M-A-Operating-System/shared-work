@@ -181,9 +181,9 @@ No tool API changes. No knowledge content changes beyond the folder relocation.
 
 This version adds pgvector-backed semantic search and chunk retrieval. Nothing in the v1.x or v2.0 surface changes — v2.1 is purely additive.
 
-### New Capability: `hybrid_search`
+### New Capability: `search`
 
-Replaces `search_knowledge` as the standard discovery tool. Combines FTS5 keyword ranking and pgvector semantic ranking using Reciprocal Rank Fusion. Accepts identical parameters to `search_knowledge` — all typed shortcuts (`search_skills`, `search_agents` etc.) delegate to `hybrid_search` automatically once v2.1 is deployed. `search_knowledge` remains available as a fallback.
+Replaces `search_knowledge` as the standard discovery tool. Combines FTS5 keyword ranking and pgvector semantic ranking using Reciprocal Rank Fusion. Accepts identical parameters to `search_knowledge` — all typed shortcuts (`search_skills`, `search_agents` etc.) delegate to `search` automatically once v2.1 is deployed. `search_knowledge` remains available as a fallback.
 
 ```
 Input:  query, folder_uri?, content_types?, tags?, top_k
@@ -211,11 +211,11 @@ file:///knowledge/maos/dda/data-design-authority/resources/data-model.md#chunk=3
 | Supabase pgvector | `knowledge_vectors` schema — one embedding row per file, one per chunk |
 | `registry/embeddings.py` | Generates embeddings on reindex, upserts to pgvector with `embedding_model` and `embedding_dimensions` stored as row metadata |
 | `registry/chunker.py` | Section-based splitting for markdown (on `##` headings); sliding window with overlap for prose |
-| `tools/search_tools_v2.py` | Implements `hybrid_search`; `get_resource` chunk path handled in `resource_tools.py` |
+| `tools/search_tools_v2.py` | Implements `search`; `get_resource` chunk path handled in `resource_tools.py` |
 
 ### Graceful Degradation
 
-`hybrid_search` and chunk retrieval via `get_resource` are gated by `KNOWLEDGE_MCP_HYBRID_SEARCH_ENABLED=true`. When the flag is absent or false both return `-32603` with message `"Not available — pgvector not configured"`. All FTS5 tools remain fully operational.
+`search` and chunk retrieval via `get_resource` are gated by `KNOWLEDGE_MCP_SEARCH_ENABLED=true`. When the flag is absent or false both return `-32603` with message `"Not available — pgvector not configured"`. All FTS5 tools remain fully operational.
 
 ### Open Decision
 
@@ -290,8 +290,8 @@ The search/get boundary is stable across all versions. Search tools are discover
 │  v1.1 get_command (folder) → enumeration by folder         │
 │  v2.0 list_applications    → enumerate all app nodes       │
 │                                                             │
-│  v2.1 hybrid_search        → FTS5 + pgvector + RRF         │
-│       typed shortcuts delegate to hybrid_search in v2.1     │
+│  v2.1 search        → FTS5 + pgvector + RRF         │
+│       typed shortcuts delegate to search in v2.1     │
 └─────────────────────────┬───────────────────────────────────┘
                           │  URI
 ┌─────────────────────────▼───────────────────────────────────┐

@@ -14,6 +14,7 @@
 | 03 | [Server Surface](03_server_surface.md) | MCP primitives (resources, prompts, notifications) and all ten tools with input schemas and response shapes |
 | 04 | [Implementation Reference](04_implementation_reference.md) | Security model, project structure, key modules with typed Python, Docker deployment |
 | 05 | [Client Integration Guide](05_client_integration_guide.md) | Connection, common patterns, per-consumer guidance, error handling, roadmap |
+| — | [Roadmap](roadmap.md) | Version-by-version evolution from embedded single-app deployment through centralised platform, semantic search, and governed authoring |
 
 ---
 
