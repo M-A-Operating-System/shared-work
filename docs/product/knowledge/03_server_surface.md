@@ -129,18 +129,253 @@ Ten tools across five content-type pairs. All tools return a `content` array (te
     "type": "object",
     "properties": {
       "uri": { "type": "string", "description": "file:// URI. Must begin with file:///knowledge/.",
-               "pattern": "^file:///knowledge/" }
+               "pattern": "^file:///knowledge/" },
+      "query": {
+        "type": "string",
+        "description": "When supplied, activates chunk retrieval — returns the most relevant sections of the document ranked by similarity to this query rather than the full file content. Requires v2 infrastructure (pgvector). Ignored for directory URIs and binary files."
+      },
+      "top_k": {
+        "type": "integer",
+        "default": 3,
+        "minimum": 1,
+        "maximum": 10,
+        "description": "Number of chunks to return when query is supplied."
+      }
     },
     "required": ["uri"]
   }
 }
 ```
 
-`structuredContent` for a file: `{ uri, name, mimeType, size, lastModified, isDirectory: false, text | blob }`  
-`structuredContent` for a folder: `{ uri, isDirectory: true, entries: [{ uri, name, mimeType }] }`
+```
+// Whole file (query omitted)
+{ uri, name, mimeType, size, lastModified, isDirectory: false, text | blob }
+
+// Directory (trailing-slash URI)
+{ uri, isDirectory: true, entries: [{ uri, name, mimeType }] }
+
+// Chunk retrieval (query supplied, v2)
+{ uri, name, mimeType, isDirectory: false,
+  chunks: [{ chunk_id, section_heading?, text, similarity_score }] }
+```
+
+> When `query` is supplied and `hybrid_search_enabled` is `False`, returns `-32603` with message `"Chunk retrieval not available — pgvector not configured"`.
 
 ---
 
+> **Chunk-addressed URIs (v2):** Individual chunks are addressable via a fragment identifier on the file URI:
+>
+> ```
+> file:///knowledge/maos/dda/data-design-authority/resources/data-model.md#chunk=3
+> ```
+>
+> A `resources/read` request or a `get_resource` call on a chunk URI returns only that chunk's text with `mimeType: text/plain`. `hybrid_search` results may include `resource_link` entries pointing to chunk URIs.
+
+---
+
+**`search_knowledge`** — full-text and metadata search across the knowledge directory.
+
+```json
+{
+  "name": "search_knowledge",
+  "description": "Full-text and metadata search across the entire knowledge directory using SQLite FTS5. Searches all content types — resources, prompts, skills, commands, and agents — unless content_types is supplied to narrow scope. Searches file content, front-matter fields, and triggers[] arrays. Use typed shortcuts (search_skills, search_agents, etc.) when the content type is known. In v2, prefer hybrid_search for better recall.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "query": {
+        "type": "string",
+        "description": "Search terms or phrase. Matched against file content, title, description, and triggers[] arrays."
+      },
+      "folder_uri": {
+        "type": "string",
+        "pattern": "^file:///knowledge/",
+        "description": "Optional folder URI to restrict search scope."
+      },
+      "content_types": {
+        "type": "array",
+        "items": { "type": "string", "enum": ["resource","prompt","skill","command","agent"] },
+        "description": "Optional filter. Omit to search all content types."
+      },
+      "tags": {
+        "type": "array",
+        "items": { "type": "string" },
+        "description": "Filter by tags declared in front-matter. All supplied tags must be present (AND semantics)."
+      },
+      "fields": {
+        "type": "array",
+        "items": { "type": "string" },
+        "description": "Front-matter fields to include in each result. E.g. [\"version\", \"triggers\", \"dependencies\"]. Omit for default snippet-only results."
+      },
+      "max_results": {
+        "type": "integer",
+        "default": 10,
+        "minimum": 1,
+        "maximum": 50
+      }
+    },
+    "required": ["query"]
+  }
+}
+```
+
+`structuredContent`: `{ query, total_hits, results: [{ uri, name, title, content_type, mimeType, snippet, score, tags?, fields? }] }`
+
+---
+
+### Typed Search Shortcuts
+
+Five convenience wrappers around `search_knowledge` with `content_types` pre-set. These are thin wrappers — no independent index logic.
+
+---
+
+**`search_resources`** — scoped to `content_types: ["resource"]`
+
+```json
+{
+  "name": "search_resources",
+  "description": "Search the resources/ folder across the knowledge directory. Equivalent to search_knowledge with content_types set to resource.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "query":       { "type": "string" },
+      "folder_uri":  { "type": "string", "pattern": "^file:///knowledge/" },
+      "tags":        { "type": "array", "items": { "type": "string" } },
+      "max_results": { "type": "integer", "default": 10, "minimum": 1, "maximum": 50 }
+    },
+    "required": ["query"]
+  }
+}
+```
+
+`structuredContent`: `{ query, total_hits, results: [{ uri, name, mimeType, snippet, score }] }`
+
+---
+
+**`search_prompts`** — scoped to `content_types: ["prompt"]`
+
+```json
+{
+  "name": "search_prompts",
+  "description": "Search prompt templates across the knowledge directory. Equivalent to search_knowledge with content_types set to prompt. Returns arguments array in results.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "query":       { "type": "string" },
+      "folder_uri":  { "type": "string", "pattern": "^file:///knowledge/" },
+      "tags":        { "type": "array", "items": { "type": "string" } },
+      "max_results": { "type": "integer", "default": 10, "minimum": 1, "maximum": 50 }
+    },
+    "required": ["query"]
+  }
+}
+```
+
+`structuredContent`: `{ query, total_hits, results: [{ uri, name, title, arguments, snippet, score }] }`
+
+---
+
+**`search_skills`** — scoped to `content_types: ["skill"]`
+
+```json
+{
+  "name": "search_skills",
+  "description": "Search skill definitions across the knowledge directory. Equivalent to search_knowledge with content_types set to skill. Searches triggers[] arrays — phrase queries like 'run email triage' will surface matching skills. Returns triggers, dependencies, and inputs in results.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "query":       { "type": "string" },
+      "folder_uri":  { "type": "string", "pattern": "^file:///knowledge/" },
+      "tags":        { "type": "array", "items": { "type": "string" } },
+      "max_results": { "type": "integer", "default": 10, "minimum": 1, "maximum": 50 }
+    },
+    "required": ["query"]
+  }
+}
+```
+
+`structuredContent`: `{ query, total_hits, results: [{ uri, name, title, triggers, dependencies, inputs, snippet, score }] }`
+
+---
+
+**`search_commands`** — scoped to `content_types: ["command"]`
+
+```json
+{
+  "name": "search_commands",
+  "description": "Search command definitions across the knowledge directory. Equivalent to search_knowledge with content_types set to command. Returns danger_level and target_tool in results.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "query":       { "type": "string" },
+      "folder_uri":  { "type": "string", "pattern": "^file:///knowledge/" },
+      "tags":        { "type": "array", "items": { "type": "string" } },
+      "max_results": { "type": "integer", "default": 10, "minimum": 1, "maximum": 50 }
+    },
+    "required": ["query"]
+  }
+}
+```
+
+`structuredContent`: `{ query, total_hits, results: [{ uri, name, title, danger_level, target_tool, snippet, score }] }`
+
+---
+
+**`search_agents`** — scoped to `content_types: ["agent"]`
+
+```json
+{
+  "name": "search_agents",
+  "description": "Search agent definitions across the knowledge directory. Equivalent to search_knowledge with content_types set to agent. Returns model, tools_allowed, and skills in results.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "query":       { "type": "string" },
+      "folder_uri":  { "type": "string", "pattern": "^file:///knowledge/" },
+      "tags":        { "type": "array", "items": { "type": "string" } },
+      "max_results": { "type": "integer", "default": 10, "minimum": 1, "maximum": 50 }
+    },
+    "required": ["query"]
+  }
+}
+```
+
+`structuredContent`: `{ query, total_hits, results: [{ uri, name, title, model, tools_allowed, skills, snippet, score }] }`
+
+---
+
+### v2 Tool
+
+**`hybrid_search`** *(v2 — requires pgvector infrastructure)*
+
+```json
+{
+  "name": "hybrid_search",
+  "description": "v2 replacement for search_knowledge. Combines FTS5 keyword search and pgvector semantic search using Reciprocal Rank Fusion. Accepts identical parameters to search_knowledge — all typed shortcuts (search_skills, search_agents, etc.) delegate to hybrid_search in v2 deployments via content_types. Use search_knowledge when pgvector is unavailable. Requires v2 infrastructure (pgvector).",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "query": { "type": "string" },
+      "folder_uri": { "type": "string", "pattern": "^file:///knowledge/" },
+      "content_types": {
+        "type": "array",
+        "items": { "type": "string", "enum": ["resource","prompt","skill","command","agent"] },
+        "description": "Optional filter. Omit to search all content types."
+      },
+      "tags": {
+        "type": "array",
+        "items": { "type": "string" },
+        "description": "Filter by tags. All supplied tags must be present (AND semantics)."
+      },
+      "top_k": { "type": "integer", "default": 5, "minimum": 1, "maximum": 20 }
+    },
+    "required": ["query"]
+  }
+}
+```
+
+`structuredContent`: `{ query, results: [{ uri, name, title, content_type, snippet, rrf_score, keyword_rank, semantic_rank }] }`
+
+---
 
 ### Prompt Tools
 
