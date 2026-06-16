@@ -67,22 +67,22 @@ All five content types are surfaced as raw file content through the resource pri
 
 Surfaces prompt, skill, command, and agent files as parameterised templates rendered into `messages[]` arrays.
 
-**Prompt name convention:** `{domain}.{subdomain}.{app}.{name}` — uniquely identifies a prompt across the full directory. Typed content uses: `{domain}.{subdomain}.{app}.skill.{skill-name}`, `.command.{command-name}`, `.agent.{agent-name}`.
+**Prompt name convention:** The `name` field in every `prompts/list` entry is the file URI — identical to the URI returned by `resources/list` for the same file. This is the primary identifier across all MCP methods. `prompts/get` and all typed get tools accept the URI directly.
 
 **`prompts/list`** — all registered templates with their arguments arrays.
 
 ```json
 { "prompts": [
-    { "name": "maos.dda.data-design-authority.maturity-assessment",
+    { "name": "file:///knowledge/maos/dda/data-design-authority/prompts/maturity-assessment.prompt.md",
       "title": "Data Maturity Assessment",
       "arguments": [
         { "name": "org_name", "description": "Organisation name", "required": true },
-        { "name": "scope",    "description": "Assessment domain", "required": false }
+        { "name": "scope",    "description": "Assessment domain",  "required": false }
       ]},
-    { "name": "maos.dda.data-design-authority.skill.gmail-triage",
+    { "name": "file:///knowledge/maos/dda/data-design-authority/skills/gmail-triage/SKILL.md",
       "title": "Gmail Triage Skill",
       "arguments": [{ "name": "max_threads", "required": false }] },
-    { "name": "maos.dda.data-design-authority.agent.dda-analyst",
+    { "name": "file:///knowledge/maos/dda/data-design-authority/agents/dda-analyst.agent.md",
       "title": "DDA Data Analyst Agent — System Prompt", "arguments": [] }
 ]}
 ```
@@ -92,7 +92,7 @@ Surfaces prompt, skill, command, and agent files as parameterised templates rend
 ```json
 // Request
 { "method": "prompts/get",
-  "params": { "name": "maos.dda.data-design-authority.maturity-assessment",
+  "params": { "name": "file:///knowledge/maos/dda/data-design-authority/prompts/maturity-assessment.prompt.md",
               "arguments": { "org_name": "Acme Corp", "scope": "Data Governance" } } }
 
 // Response
@@ -235,26 +235,6 @@ Ten tools across five content-type pairs. All tools return a `content` array (te
 
 ---
 
-**`invoke_skill`** — renders SKILL.md ready for injection into the current conversation. Does not execute.
-
-```json
-{
-  "name": "invoke_skill",
-  "description": "Loads a skill and returns its SKILL.md as a rendered prompt ready for conversation injection. The model executes the skill steps. Arguments are substituted into {{input_name}} references.",
-  "inputSchema": {
-    "type": "object",
-    "properties": {
-      "skill_name": { "type": "string" },
-      "app_uri":    { "type": "string", "pattern": "^file:///knowledge/" },
-      "arguments":  { "type": "object", "additionalProperties": {} }
-    },
-    "required": ["skill_name"]
-  }
-}
-```
-
-`structuredContent`: `{ kind: "skill", name, version, rendered_prompt, messages: [{ role: "user", content }] }`
-
 ---
 
 ### Command Tools
@@ -276,29 +256,9 @@ Ten tools across five content-type pairs. All tools return a `content` array (te
 }
 ```
 
-`structuredContent`: `{ kind: "command", name, title, version, uri, description, command, arguments, returns, danger_level, target_tool }`
+`structuredContent`: `{ kind: "command", name, title, version, uri, description, command, arguments, returns, danger_level, target_tool, resolved_command, arguments_used }`
 
----
-
-**`invoke_command`** — resolves and substitutes a command string. Does not execute.
-
-```json
-{
-  "name": "invoke_command",
-  "description": "Resolves a command definition and substitutes arguments into the command string. Returns the resolved command for passing to the target tool. Does not execute.",
-  "inputSchema": {
-    "type": "object",
-    "properties": {
-      "command_name": { "type": "string" },
-      "app_uri":      { "type": "string", "pattern": "^file:///knowledge/" },
-      "arguments":    { "type": "object", "additionalProperties": {} }
-    },
-    "required": ["command_name"]
-  }
-}
-```
-
-`structuredContent`: `{ kind: "command", name, danger_level, target_tool, resolved_command, arguments_used }`
+> `resolved_command` contains the command string with supplied `arguments` substituted. Pass arguments to `get_command` to receive the resolved string in the same response — no separate tool is required.
 
 ---
 

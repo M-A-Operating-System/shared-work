@@ -83,7 +83,7 @@ file:///knowledge/maos/dda/data-design-authority/skills/gmail-triage/SKILL.md
 file:///knowledge/maos/dda/data-design-authority/
 ```
 
-> **Note:** While all content types are reachable via the generic URI scheme above, each typed content category also has its own dedicated entry points. Skills, prompts, commands, and agents can be discovered and retrieved through their respective typed tools (`get_skill`, `invoke_skill`, `get_prompt`, `list_prompts`, `get_command`, `invoke_command`, `list_agents`, `load_agent`) and via the `prompts/*` MCP primitives. These typed entry points return structured metadata, rendered templates, and resolved definitions — not just raw file content.
+> **Note:** While all content types are reachable via the generic URI scheme above, each typed content category also has its own dedicated entry points. Skills, prompts, commands, and agents can be discovered and retrieved through their respective typed tools (`get_skill`, `get_prompt`, `list_prompts`, `get_command`, `list_agents`, `load_agent`) and via the `prompts/*` MCP primitives. These typed entry points return structured metadata, rendered templates, and resolved definitions — not just raw file content.
 
 ---
 
@@ -104,6 +104,9 @@ name:        maturity-assessment       # kebab-case, unique within app
 title:       Data Maturity Assessment
 version:     1.1.0
 description: Guides an organisation through a structured data maturity survey
+tags:
+  - governance
+  - assessment
 arguments:
   - name:        org_name
     description: Organisation name
@@ -116,6 +119,8 @@ arguments:
 You are conducting a data maturity assessment for {{org_name}}.
 Scope: {{scope}}...
 ```
+
+**Prompt name convention:** The `name` field in `prompts/list` responses is the file URI — the same URI returned by `resources/list` for the same file. This eliminates a second identifier for the same resource. `prompts/get` and all typed get tools accept the URI directly. Uniqueness is guaranteed by the filesystem.
 
 **Rendering contract:** `prompts/get` and `get_prompt` substitute all `{{argument}}` references and return a `messages[]` array with a single `user` role message.
 
@@ -130,6 +135,9 @@ skill:       gmail-triage              # matches sub-directory name
 title:       Gmail Triage Skill
 version:     1.2.0
 description: Runs a Gmail triage and todo-management cycle
+tags:
+  - email
+  - productivity
 triggers:
   - "run email triage"
   - "check my inbox for todos"
@@ -153,7 +161,7 @@ files:
 ...step-by-step workflow instructions...
 ```
 
-**Rendering contract:** `invoke_skill` returns the rendered `SKILL.md` body as a `user` role message, with `{{input_name}}` references substituted.
+**Rendering contract:** `get_skill` returns the rendered `SKILL.md` body with `{{input_name}}` references substituted in the `rendered_prompt` field of `structuredContent`, alongside full typed metadata. No separate invocation tool exists.
 
 ### Command (`.cmd.json` / `.cmd.md`)
 
@@ -166,6 +174,7 @@ Discrete, single-invocation executable definitions carrying a `command` string a
   "title":       "Run Data Quality Check",
   "version":     "1.0.0",
   "description": "Executes the DDA quality gate against a target entity",
+  "tags":        ["governance", "quality"],
   "command":     "dda quality-check --entity {{entity_id}} --profile {{profile}}",
   "arguments": [
     { "name": "entity_id", "type": "string",  "required": true  },
@@ -185,7 +194,7 @@ Discrete, single-invocation executable definitions carrying a `command` string a
 | `write` | Creates or modifies state | Should present confirmation prompt |
 | `destructive` | Irreversibly modifies or deletes | Must require explicit confirmation |
 
-**Rendering contract:** `invoke_command` substitutes arguments into the `command` string and returns the resolved command. It does not execute.
+**Rendering contract:** `get_command` substitutes supplied arguments into the `command` string and returns the result in the `resolved_command` field of `structuredContent`. It does not execute. No separate invocation tool exists.
 
 ### Agent (`.agent.md` / `.agent.json`)
 
@@ -198,13 +207,16 @@ agent:       dda-analyst
 title:       DDA Data Analyst Agent
 version:     2.0.0
 description: Chief Data Officer's second brain
+tags:
+  - analyst
+  - governance
 model:       claude-sonnet-4-6
 temperature: 0.2
 tools_allowed:
   - get_resource
-  - search_resource
-  - invoke_skill
-  - invoke_command
+  - search_knowledge
+  - get_skill
+  - get_command
 memory:
   type:      supabase-pgvector
   namespace: dda-analyst
@@ -227,8 +239,8 @@ You are the DDA Analyst — the Chief Data Officer's second brain...
 |---|---|---|---|---|---|
 | Resource | ✅ | ✅ raw content | — | — | `get_resource`, `search_resource` |
 | Prompt | ✅ raw file | ✅ raw content | ✅ with arguments | ✅ rendered `messages[]` | `get_prompt`, `list_prompts` |
-| Skill | ✅ all files | ✅ any file | ✅ SKILL.md as template | ✅ rendered SKILL.md | `get_skill`, `invoke_skill` |
-| Command | ✅ raw file | ✅ raw content | ✅ as instruction | ✅ rendered instruction | `get_command`, `invoke_command` |
+| Skill | ✅ all files | ✅ any file | ✅ SKILL.md as template | ✅ rendered SKILL.md | `get_skill` |
+| Command | ✅ raw file | ✅ raw content | ✅ as instruction | ✅ rendered instruction | `get_command` |
 | Agent | ✅ raw file | ✅ raw content | ✅ system prompt | ✅ rendered system prompt | `load_agent`, `list_agents` |
 
 ---

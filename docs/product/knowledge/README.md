@@ -36,18 +36,22 @@
 **Tools:**
 
 ```
-get_resource        search_resource
-list_prompts        get_prompt
-get_skill           invoke_skill
-get_command         invoke_command
+search_knowledge    hybrid_search*
+search_resources    search_prompts
+search_skills       search_commands
+search_agents
+get_skill           get_command
 list_agents         load_agent
+get_resource        get_prompt
 ```
+* hybrid_search — v2, requires pgvector infrastructure
 
 **Key rules:**
 - All URIs must begin with `file:///knowledge/`
 - Trailing-slash folder URIs return directory listings from any tool or primitive
 - Server is read-only — no tool writes to the knowledge directory
 - OAuth 2.1 + PKCE required; tokens bound to this server via RFC 8707
+- Chunk retrieval is an extension of `get_resource` — supply a `query` parameter to receive ranked sections instead of the full file. No separate tool exists for chunking.
 - `MCP-Protocol-Version: 2025-06-18` header required on all HTTP requests
 
 ---
