@@ -20,7 +20,7 @@ All five content types are surfaced as raw file content through the resource pri
   "resources": [{
     "uri":          "file:///knowledge/maos/dda/data-design-authority/resources/get_started.md",
     "name":         "get_started.md",
-    "title":        "DDA Get Started / Onboarding Guide",
+    "title":        "DDA Get Started & Onboarding Guide",
     "mimeType":     "text/md",
     "size":         8192,
     "annotations":  { "audience": ["user", "assistant"], "priority": 0.8,
