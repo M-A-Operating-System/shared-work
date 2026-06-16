@@ -57,18 +57,21 @@ The Knowledge MCP Server changes this. It acts as a **central repository for all
 
 ```mermaid
 graph TD
-    subgraph MAOS Platform
-        A[MCP Client Application]
-        B[Agent Pipeline]
-        C[Value-Add MCP Server]
+    A[MCP Client Application]
+    B[Agent Pipeline]
+    C[Value-Add MCP Server]
+
+    subgraph KS["MCP Knowledge Server — scope of this document"]
         K[Knowledge MCP Server]
         D[(Knowledge Directory\nGit-versioned)]
+        K -->|read-only filesystem mount| D
     end
+
+    style KS fill:#fffde7,stroke:#f9a825,stroke-width:2px,color:#000
 
     A -->|JSON-RPC 2.0\nStreamable HTTP / OAuth 2.1| K
     B -->|JSON-RPC 2.0\nStreamable HTTP / OAuth 2.1| K
     C -->|JSON-RPC 2.0\nStreamable HTTP / OAuth 2.1| K
-    K -->|read-only filesystem mount| D
 ```
 
 ## Protocol and Capability Declaration
