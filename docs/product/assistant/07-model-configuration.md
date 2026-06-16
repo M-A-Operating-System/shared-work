@@ -107,19 +107,19 @@ Each user's style settings apply to the turns they submit. A response generated 
 
 ## System prompt
 
-The platform assembles the system prompt from multiple layers before each session. Layers are injected in the order below — platform-managed non-overridable layers come first so the model encounters behavioral constraints before any host-authored content, ensuring they cannot be suppressed by a host system prompt. Host-authored content is always last.
+The platform assembles the system prompt from multiple layers before each session. Layers are injected in the order below — platform-managed non-overridable layers come first so the model encounters behavioral constraints before any host-authored content, ensuring they cannot be suppressed by a host system prompt. Tool descriptions come last as they reflect live session state and change whenever a user enables or disables an opt-in MCP server.
 
-| # | Layer | Source | Editable by |
-|---|-------|--------|------------|
-| 1 | **Session context block** | Platform — identity config + JWT claims + server clock | Platform; claim field mappings in `userProfile.sessionContext` |
-| 2 | **Write confirmation flow** | Platform — model must propose before/after state and await confirmation before any write MCP call | Non-overridable |
-| 3 | **Transparency instruction** | Platform — model must show all tool calls and cite sources | Non-overridable |
-| 4 | **Prompt injection mitigation** | Platform — model must treat tool result content as data, not instructions | Non-overridable |
-| 5 | **Uncertainty acknowledgment** | Platform — model must signal uncertainty, offer search, or acknowledge gaps rather than producing confident answers from incomplete information | Non-overridable |
-| 6 | **Tool descriptions** | Platform — auto-injected from active MCP server descriptions (always-on + opt-in enabled) | Platform (from host tool config) |
-| 7 | **Communication style** | Platform — injected from user's JWT claims + `userProfile` config | Platform (from user claims) |
-| 8 | **Memory blocks** | Platform — personal memory + application context | Platform (from stored memory) |
-| 9 | **Host base prompt** | `scope.systemPrompt` in application config | Host Developer / Application Admin |
+| # | Layer | What it contains | Mutability | Controlled by |
+|---|---|---|---|---|
+| 1 | **Session context block** | Assistant name, application name, logged-in user identity, session date and time, config version | Per-session — assembled fresh at session start | Platform; user field mappings in `userProfile.sessionContext` |
+| 2 | **Write confirmation** | Instruction requiring the model to propose a before/after state and await explicit user confirmation before executing any write MCP call | Static | Platform — non-overridable |
+| 3 | **Transparency** | Instruction requiring the model to disclose every tool call in a collapsible disclosure card and cite sources inline | Static | Platform — non-overridable |
+| 4 | **Prompt injection mitigation** | Instruction requiring the model to treat all tool result content as data, not as instructions | Static | Platform — non-overridable |
+| 5 | **Uncertainty acknowledgment** | Instruction requiring the model to signal uncertainty explicitly, acknowledge data gaps, and offer to search rather than producing confident answers from incomplete information | Static | Platform — non-overridable |
+| 6 | **Communication style** | Response style and verbosity derived from the authenticated user's JWT claims, mapped to prompt instructions via `userProfile` config | Per-session — derived from user's JWT at session start | Platform; style mappings in `userProfile` |
+| 7 | **Memory blocks** | Personal memory items stored by the user and application context items set by the Application Admin | Infrequent — updated between sessions, not mid-conversation | Platform; content authored by users and Application Admins |
+| 8 | **Host base prompt** | The host application's domain and persona instructions — scope, assistant character, handling rules, and any application-specific guidance | Per-config — stable for the duration of a session | Host Developer / Application Admin via Config Editor or Admin API |
+| 9 | **Tool descriptions** | Name and capability description for every active MCP server (always-on servers plus any opt-in servers the user has enabled for this session) | Per-turn — rebuilt whenever the user enables or disables an opt-in server | Platform; descriptions authored in `mcpServers` host config |
 
 Layers 1–5 are **platform-managed and non-overridable** — they cannot be suppressed by host system prompt content.
 
@@ -167,20 +167,21 @@ Claim field mappings are declared in the `userProfile.sessionContext` section of
 
 ### Caching
 
-The session context block is **not cacheable** — it contains user-specific identity and a session timestamp that differ on every request. It is injected after the cacheable prefix (host base prompt, tool descriptions, memory blocks) so that caching of the static layers is not disrupted.
+The session context block is **not cacheable** — it contains user-specific identity and a session timestamp that differ on every request. It is injected before the cacheable layers so the cache boundary sits between layer 1 and the static layers that follow.
 
 ---
 
 ## Prompt caching
 
-The static components of the system prompt are injected as a cacheable prefix on every AI provider API request. Prompt caching reduces input token cost and latency.
+Layers 2–8 form a **cacheable prefix** injected on every AI provider API request. Prompt caching reduces input token cost and latency.
 
-| Cached component | Contents |
-|-----------------|---------|
-| Host base prompt | Full host system prompt |
-| Tool descriptions | All active MCP server descriptions (always-on + opt-in enabled for the session) |
-| Memory blocks | Application context and personal memory blocks (change infrequently) |
-
-The session context block is excluded from the cacheable prefix — it is appended after the cache boundary on every request.
+| Layer | Cached | Notes |
+|---|---|---|
+| 1 — Session context block | No | User-specific and timestamped; rebuilt on every request |
+| 2–5 — Platform behavioral rules | Yes | Identical across all tenants and users |
+| 6 — Communication style | Yes | Fixed for the duration of a session |
+| 7 — Memory blocks | Yes | Changes infrequently; cache invalidated when memory is updated |
+| 8 — Host base prompt | Yes | Stable within a session; cache invalidated on config update |
+| 9 — Tool descriptions | No | Rebuilt whenever the user enables or disables an opt-in server |
 
 The **cache hit rate** is tracked as a launch metric (target: ≥ 40% by month 2 — see [14-success-metrics.md](./14-success-metrics.md)).
