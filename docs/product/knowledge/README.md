@@ -9,11 +9,11 @@
 
 | # | Document | Contents |
 |---|---|---|
-| 01 | [Overview](01_overview.md) | Problem, design principles, system context, stack, decisions log, open decisions |
-| 02 | [Knowledge Directory and Content Types](02_knowledge_directory_and_content_types.md) | Folder layout, URI scheme, file schemas and rendering contracts for all five content types |
-| 03 | [Server Surface](03_server_surface.md) | MCP primitives (resources, prompts, notifications) and all ten tools with input schemas and response shapes |
-| 04 | [Implementation Reference](04_implementation_reference.md) | Security model, project structure, key modules with typed Python, Docker deployment |
-| 05 | [Client Integration Guide](05_client_integration_guide.md) | Connection, common patterns, per-consumer guidance, error handling, roadmap |
+| 01 | [Overview](01-overview.md) | Problem, design principles, system context, stack, decisions log, open decisions |
+| 02 | [Knowledge Directory and Content Types](02-knowledge-directory-and-content-types.md) | Folder layout, URI scheme, file schemas and rendering contracts for all five content types |
+| 03 | [Server Surface](03-server-surface.md) | MCP primitives (resources, prompts, notifications) and all ten tools with input schemas and response shapes |
+| 04 | [Implementation Reference](04-implementation-reference.md) | Security model, project structure, key modules with typed Python, Docker deployment |
+| 05 | [Client Integration Guide](05-client-integration-guide.md) | Connection, common patterns, per-consumer guidance, error handling, roadmap |
 | — | [Roadmap](roadmap.md) | Version-by-version evolution from embedded single-app deployment through centralised platform, semantic search, and governed authoring |
 
 ---

@@ -18,6 +18,7 @@ on:
           - analytics
           - assistant
           - knowledge
+          - internet
         default: ''
       pages:
         description: 'Space-separated chapter prefixes for a subset PDF, e.g. "02 04 08". Requires a product selection above. Leave blank for the full product.'
@@ -184,6 +185,7 @@ jobs:
           git add docs/product/analytics/analytics_product_design.pdf
           git add docs/product/assistant/assistant_product_design.pdf
           git add docs/product/knowledge/knowledge_product_design.pdf
+          git add docs/product/internet/internet_product_design.pdf
           git diff --cached --quiet || git commit -m "docs: regenerate all product PDFs [skip ci]"
 
       - name: Push

@@ -1,8 +1,9 @@
-# Internet Access MCP Server — Core Capabilities
+# 02 — Core Capabilities
 
-**Version:** 1.0
-**Date:** June 2026
-**Status:** Target State Design
+**Product:** MAOS Internet Access MCP Server  
+**Version:** 1.0  
+**Date:** 2026-06-16  
+**Author:** Andrew Bush / M&A Operating System
 
 ---
 

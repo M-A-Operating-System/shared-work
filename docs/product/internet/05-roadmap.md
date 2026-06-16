@@ -1,8 +1,9 @@
-# Internet Access MCP Server — Roadmap
+# 05 — Roadmap
 
-**Version:** 1.0
-**Date:** June 2026
-**Status:** Target State Design
+**Product:** MAOS Internet Access MCP Server  
+**Version:** 1.0  
+**Date:** 2026-06-16  
+**Author:** Andrew Bush / M&A Operating System
 
 ---
 
