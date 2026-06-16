@@ -28,29 +28,29 @@ The assistant has no platform-level name. Each host application names their own 
 
 ## Reading order
 
-Start at `00` and read through in sequence. Each document assumes you have read the previous one.
+Start at `01` and read through in sequence. Each document assumes you have read the previous one.
 
 | # | Document | Purpose |
 |---|----------|---------|
-| 00 | [00-overview.md](./00-overview.md) | Vision, what the platform is and is not, scope — **start here** |
-| 01 | [01-host-application-config.md](./01-host-application-config.md) | The JSON config schema every host application provides — the single most important reference for host developers |
-| 02 | [02-personas-and-journeys.md](./02-personas-and-journeys.md) | Platform-level and application-level user archetypes and journeys |
-| 03 | [03-design-principles.md](./03-design-principles.md) | Nine governing principles that take precedence over any feature decision |
-| 04 | [04-conversation-management.md](./04-conversation-management.md) | Conversation model, branching, search, context window management |
-| 05 | [05-input-and-composition.md](./05-input-and-composition.md) | Free-form input, `@`-binding, Display ID detection, document attachments, editing |
-| 06 | [06-model-configuration.md](./06-model-configuration.md) | Provider abstraction, model switching, communication style, system prompt |
-| 07 | [07-tool-access.md](./07-tool-access.md) | Host-registered MCP servers, always-on vs opt-in access, guided workflows, tool call transparency |
-| 08 | [08-shared-conversations.md](./08-shared-conversations.md) | Invitation model, participant rights, permission-scoped bindings, audit trail |
-| 09 | [09-interaction-design.md](./09-interaction-design.md) | Web component layout, responsive behaviour, thread anatomy, artefact tray, error states, accessibility |
-| 10 | [10-content-rendering.md](./10-content-rendering.md) | Rendering decision rules, content types, streaming behaviour |
-| 11 | [11-audit-and-storage.md](./11-audit-and-storage.md) | Multi-tenant storage model, retention, access control, DB schema reference |
-| 12 | [12-continuous-improvement.md](./12-continuous-improvement.md) | Improvement signals, issue pipeline, improvement cadence |
-| 13 | [13-mcp-tool-registry.md](./13-mcp-tool-registry.md) | Per-tenant tool registry, tool registration, relationship to complementary MCP services |
-| 14 | [14-success-metrics.md](./14-success-metrics.md) | Platform-level and application-level metrics, definitions, and targets |
-| 15 | [15-memory-and-recall.md](./15-memory-and-recall.md) | Personal memory, application context, recall scope |
-| 16 | [16-embedding-and-web-component.md](./16-embedding-and-web-component.md) | `<ai-chat>` web component API (Mode 2 — Inline Page): attributes, events, authentication bridge, CSP, sizing |
-| 17 | [17-complementary-mcp-services.md](./17-complementary-mcp-services.md) | MCP Repository and MCP Resources — ecosystem services that complement the platform |
-| 18 | [18-entry-points-and-embedding-modes.md](./18-entry-points-and-embedding-modes.md) | All three embedding modes: Floating Widget, Inline Page, and Form Field Assist |
+| 01 | [01-overview.md](./01-overview.md) | Vision, what the platform is and is not, scope — **start here** |
+| 02 | [02-host-application-config.md](./02-host-application-config.md) | The JSON config schema every host application provides — the single most important reference for host developers |
+| 03 | [03-personas-and-journeys.md](./03-personas-and-journeys.md) | Platform-level and application-level user archetypes and journeys |
+| 04 | [04-design-principles.md](./04-design-principles.md) | Nine governing principles that take precedence over any feature decision |
+| 05 | [05-conversation-management.md](./05-conversation-management.md) | Conversation model, branching, search, context window management |
+| 06 | [06-input-and-composition.md](./06-input-and-composition.md) | Free-form input, `@`-binding, Display ID detection, document attachments, editing |
+| 07 | [07-model-configuration.md](./07-model-configuration.md) | Provider abstraction, model switching, communication style, system prompt |
+| 08 | [08-tool-access.md](./08-tool-access.md) | Host-registered MCP servers, always-on vs opt-in access, guided workflows, tool call transparency |
+| 09 | [09-shared-conversations.md](./09-shared-conversations.md) | Invitation model, participant rights, permission-scoped bindings, audit trail |
+| 10 | [10-interaction-design.md](./10-interaction-design.md) | Web component layout, responsive behaviour, thread anatomy, artefact tray, error states, accessibility |
+| 11 | [11-content-rendering.md](./11-content-rendering.md) | Rendering decision rules, content types, streaming behaviour |
+| 12 | [12-audit-and-storage.md](./12-audit-and-storage.md) | Multi-tenant storage model, retention, access control, DB schema reference |
+| 13 | [13-continuous-improvement.md](./13-continuous-improvement.md) | Improvement signals, issue pipeline, improvement cadence |
+| 14 | [14-mcp-tool-registry.md](./14-mcp-tool-registry.md) | Per-tenant tool registry, tool registration, relationship to complementary MCP services |
+| 15 | [15-success-metrics.md](./15-success-metrics.md) | Platform-level and application-level metrics, definitions, and targets |
+| 16 | [16-memory-and-recall.md](./16-memory-and-recall.md) | Personal memory, application context, recall scope |
+| 17 | [17-embedding-and-web-component.md](./17-embedding-and-web-component.md) | `<ai-chat>` web component API (Mode 2 — Inline Page): attributes, events, authentication bridge, CSP, sizing |
+| 18 | [18-complementary-mcp-services.md](./18-complementary-mcp-services.md) | MCP Repository and MCP Resources — ecosystem services that complement the platform |
+| 19 | [19-entry-points-and-embedding-modes.md](./19-entry-points-and-embedding-modes.md) | All three embedding modes: Floating Widget, Inline Page, and Form Field Assist |
 | — | [ROADMAP.md](./ROADMAP.md) | Planned enhancements beyond the current release |
 
 ---
@@ -142,4 +142,4 @@ Start at `00` and read through in sequence. Each document assumes you have read 
 
 ---
 
-*AI Chat Platform — Product Design · Confidential*
+*Provided as a public research resource. Not intended for use in live or production environments without independent professional review and adaptation.*
