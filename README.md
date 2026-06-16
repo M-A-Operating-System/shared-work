@@ -1,8 +1,10 @@
-# M&A Operating System — Product Design Specifications
+# M&A Operating System — Research & Product Accelerators
 
-This repository contains the product design specification series for the **M&A Operating System** platform. Documents cover intended design, architecture, and behaviour and are intended for internal distribution across product, engineering, and design review functions.
+This repository contains research projects and product accelerator guides developed by M&A Operating System to fast-track client engagements under our **Practical AI** and **Practical Data** proprietary methodologies.
 
-These are living specifications. They reflect design intent at the time of publication and are updated as the platform evolves.
+The materials here — product design specifications, technical reference guides, and implementation frameworks — are used as starting points that we adapt and apply with clients to accelerate delivery rather than starting from scratch. They reflect real design decisions made in the field and are updated as our methodologies evolve.
+
+Documents are intended for internal distribution across advisory, product, engineering, and design review functions.
 
 ---
 
