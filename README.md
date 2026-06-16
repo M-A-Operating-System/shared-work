@@ -44,6 +44,7 @@ flowchart TB
     end
 
     subgraph MCPServers["MCP Servers"]
+        CH[AI Chat Platform]
         KN[Knowledge MCP Server]
         AN[AI Analytics Platform]
         IN[Internet Access MCP Server]
@@ -82,13 +83,11 @@ flowchart TB
 
     AgAI -->|MCP| AN
     AgAI -->|MCP| KN
+    AgAI -->|MCP| CH
     AgAI -->|MCP| IN
     AgAI -->|MCP| DM
     AgAI -->|LLM calls| GW
-    ConvAI -->|MCP| AN
-    ConvAI -->|MCP| KN
-    ConvAI -->|MCP| IN
-    ConvAI -->|MCP| DM
+    ConvAI -->|MCP| CH
     ConvAI -->|LLM calls| GW
 ```
 
