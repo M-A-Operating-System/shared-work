@@ -1,5 +1,13 @@
 # 15 — Memory and Recall
 
+**Product:** AI Chat Platform  
+**Version:** 1.0  
+**Date:** 2026-06-16  
+**Author:** Andrew Bush / M&A Operating System
+
+---
+
+
 ## Overview
 
 Memory and recall governs how the assistant retains standing context across sessions and how that context is scoped to the right users. Two memory controls work together:

@@ -1,5 +1,13 @@
 # 00 — Host Application Configuration
 
+**Product:** AI Chat Platform  
+**Version:** 1.0  
+**Date:** 2026-06-16  
+**Author:** Andrew Bush / M&A Operating System
+
+---
+
+
 Every tenant on the AI Chat Platform is defined by a **JSON application config** provided by the host application at registration time. The config is the single source of truth for how the assistant behaves within that application — its identity, scope, tools, bindings, workflows, branding, and feature flags.
 
 ---

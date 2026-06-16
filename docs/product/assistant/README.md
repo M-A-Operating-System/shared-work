@@ -1,12 +1,9 @@
 # AI Chat Platform — Product Design Specification
 
-|                    |                                                           |
-|--------------------|-----------------------------------------------------------|
-| **Document status**| Draft v1.0                                                |
-| **Product area**   | AI Chat Platform — embeddable white-label assistant layer |
-| **Author**         | Andrew Bush                                               |
-| **Date**           | May 2026                                                  |
-| **Audience**       | Product, design, and engineering — pre-build reference    |
+**Product:** AI Chat Platform  
+**Version:** 1.0  
+**Date:** 2026-06-16  
+**Author:** Andrew Bush / M&A Operating System
 
 ---
 

@@ -1,5 +1,13 @@
 # 16 — Embedding and Web Component (Mode 2 — Inline Page)
 
+**Product:** AI Chat Platform  
+**Version:** 1.0  
+**Date:** 2026-06-16  
+**Author:** Andrew Bush / M&A Operating System
+
+---
+
+
 ## Scope of this document
 
 This document covers the **`<ai-chat>` component** — the inline page embedding mode (Mode 2). It is the complete, full-featured conversation interface for use on dedicated assistant pages or embedded content sections.

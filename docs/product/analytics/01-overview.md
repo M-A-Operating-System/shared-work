@@ -1,5 +1,13 @@
 # 1. Overview: Governed Large-Scale Analytics and Data Mining
 
+**Product:** AI Analytics Platform  
+**Version:** 2.0  
+**Date:** 2026-06-16  
+**Author:** Andrew Bush / M&A Operating System
+
+---
+
+
 ## The Problem
 
 ### The challenge for large regulated organisations

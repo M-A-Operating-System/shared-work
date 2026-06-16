@@ -1,5 +1,13 @@
 # 4. Success Metrics
 
+**Product:** AI Analytics Platform  
+**Version:** 2.0  
+**Date:** 2026-06-16  
+**Author:** Andrew Bush / M&A Operating System
+
+---
+
+
 Metrics are captured from day one at both the platform level and the application level. Governance health metrics are first-class success indicators. A platform that is highly used but poorly governed is not successful.
 
 Component definitions referenced in the metrics below (SMR, FQE, RAPL, SCL, NSA, ALS) are in [Chapter 2 — Core Platform Capabilities](./02-core-capabilities.md). [Analytical Lineage Store (ALS)](./02-core-capabilities.md#analytical-lineage-store-als) · [Semantic Controls Layer (SCL)](./02-core-capabilities.md#semantic-controls-layer-scl) · [Narrative Synthesis Agent (NSA)](./02-core-capabilities.md#narrative-synthesis-agent-nsa)

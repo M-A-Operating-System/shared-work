@@ -1,5 +1,13 @@
 # 04 — Conversation Management
 
+**Product:** AI Chat Platform  
+**Version:** 1.0  
+**Date:** 2026-06-16  
+**Author:** Andrew Bush / M&A Operating System
+
+---
+
+
 ## Conversation model
 
 Each conversation is a **named, persistent thread** scoped to the authenticated user within their tenant. Key properties:

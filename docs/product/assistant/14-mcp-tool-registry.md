@@ -1,5 +1,13 @@
 # 13 — MCP Tool Registry
 
+**Product:** AI Chat Platform  
+**Version:** 1.0  
+**Date:** 2026-06-16  
+**Author:** Andrew Bush / M&A Operating System
+
+---
+
+
 ## Purpose
 
 The MCP tool registry is the **per-tenant runtime list of MCP servers** available in a session. It is derived directly from the `mcpServers` array in the tenant's application config — there is no separate registry file or database table beyond the config itself.

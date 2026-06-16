@@ -1,5 +1,13 @@
 # 7. Glossary
 
+**Product:** AI Analytics Platform  
+**Version:** 2.0  
+**Date:** 2026-06-16  
+**Author:** Andrew Bush / M&A Operating System
+
+---
+
+
 All named components, technical terms, abbreviations, and domain concepts used across the AI Analytics Platform documentation. Terms are sorted alphabetically. Cross-references to other glossary entries are shown in **bold**.
 
 | Term | Abbrev | Definition |

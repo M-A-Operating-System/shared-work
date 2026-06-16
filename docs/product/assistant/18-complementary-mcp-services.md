@@ -1,5 +1,13 @@
 # 17 — Complementary MCP Services
 
+**Product:** AI Chat Platform  
+**Version:** 1.0  
+**Date:** 2026-06-16  
+**Author:** Andrew Bush / M&A Operating System
+
+---
+
+
 The AI Chat Platform assumes the availability of three ecosystem-level MCP services that operate alongside the platform and host application MCP servers. These services are not owned or operated by the AI Chat Platform itself, nor by individual host applications — they are shared infrastructure within the broader MCP ecosystem. The platform is designed to work with them, and host applications are expected to benefit from them, but none is a hard dependency for platform operation.
 
 ---

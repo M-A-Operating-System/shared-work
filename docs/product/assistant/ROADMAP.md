@@ -2,10 +2,10 @@
 
 This file captures planned enhancements beyond the current release. Items here are named and scoped at a level sufficient for future prioritisation. Each requires a Product Design Document and platform team approval before build begins.
 
-|                    |                          |
-|--------------------|--------------------------|
-| **Current release**| v1 — multi-tenant embed, host config, MCP tool integration, full audit trail |
-| **Date**           | May 2026                 |
+**Product:** AI Chat Platform  
+**Version:** 1.0  
+**Date:** 2026-06-16  
+**Author:** Andrew Bush / M&A Operating System
 
 ---
 

@@ -1,12 +1,9 @@
 # AI Analytics Platform — Product Design & Technical Specification
 
-|                     |                                                                         |
-|---------------------|-------------------------------------------------------------------------|
-| **Document status** | Draft v2.0                                                              |
-| **Product area**    | AI Analytics Platform — governed analytical backend service             |
-| **Author**          | Andrew Bush                                                             |
-| **Date**            | May 2026                                                                |
-| **Audience**        | Enterprise-wide technical audience — product, architecture, engineering, compliance |
+**Product:** AI Analytics Platform  
+**Version:** 2.0  
+**Date:** 2026-06-16  
+**Author:** Andrew Bush / M&A Operating System
 
 ---
 

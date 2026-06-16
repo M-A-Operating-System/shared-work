@@ -1,5 +1,13 @@
 # 3. Reference Implementation
 
+**Product:** AI Analytics Platform  
+**Version:** 2.0  
+**Date:** 2026-06-16  
+**Author:** Andrew Bush / M&A Operating System
+
+---
+
+
 This chapter describes one reference implementation of the AI Analytics Platform. Stack choices are concrete but not prescriptive. The product specification is intentionally stack-agnostic. Any conformant implementation that satisfies the specified behaviours, governance guarantees, and interface contracts is valid. Technology substitutions at any layer require no changes to the product specification.
 
 The product specification (component behaviours, interface contracts, governance requirements) is in [Chapter 2 -- Core Platform Capabilities](./02-core-capabilities.md). The design principles governing every decision are in [Platform Overview — Design Principles](./01-overview.md#design-principles).

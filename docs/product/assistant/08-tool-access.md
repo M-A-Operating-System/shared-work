@@ -1,5 +1,13 @@
 # 07 — Tool Access
 
+**Product:** AI Chat Platform  
+**Version:** 1.0  
+**Date:** 2026-06-16  
+**Author:** Andrew Bush / M&A Operating System
+
+---
+
+
 ## Host-registered MCP servers
 
 The AI Chat Platform has **no built-in always-on tool**. Every MCP server available in a session is registered by the host application in the `mcpServers` section of the application config (see [01-host-application-config.md](./01-host-application-config.md)).

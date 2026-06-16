@@ -1,5 +1,13 @@
 # 03 — Design Principles
 
+**Product:** AI Chat Platform  
+**Version:** 1.0  
+**Date:** 2026-06-16  
+**Author:** Andrew Bush / M&A Operating System
+
+---
+
+
 These nine principles govern all design decisions for the AI Chat Platform. Where a proposed feature conflicts with a principle, the principle takes precedence. Deviations require an explicit decision record.
 
 ---
