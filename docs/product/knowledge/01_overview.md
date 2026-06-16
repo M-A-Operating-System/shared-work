@@ -4,7 +4,7 @@
 **Version:** 1.0  
 **Date:** 2026-06-16  
 **Protocol:** MCP 2025-06-18  
-**Author:** Andrew Bush / Fortium Partners  
+**Author:** Andrew Bush / M&A Operating System 
 
 ---
 
