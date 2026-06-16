@@ -81,12 +81,10 @@ flowchart TB
 
     AgAI -->|MCP| AN
     AgAI -->|MCP| KN
-    AgAI -->|MCP| CH
     AgAI -->|MCP| IN
     AgAI -->|LLM calls| GW
     ConvAI -->|MCP| AN
     ConvAI -->|MCP| KN
-    ConvAI -->|MCP| CH
     ConvAI -->|MCP| IN
     ConvAI -->|LLM calls| GW
 ```
