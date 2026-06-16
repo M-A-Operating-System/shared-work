@@ -89,17 +89,20 @@ EXCLUDE = {"README.md"}
 def get_ordered_files(docs_dir: Path) -> list[Path]:
     """Numbered docs in reading order, then ROADMAP.
 
-    Files whose stem contains '-ignore' are parked and excluded from the build.
+    Files whose stem contains '-ignore' or '_ignore' are parked and excluded from the build.
+    Supports both dash-separated (01-overview.md) and underscore-separated (01_overview.md) naming.
     """
     numbered = sorted(
-        [f for f in docs_dir.glob("[0-9][0-9]-*.md")
-         if f.name not in EXCLUDE and "-ignore" not in f.stem],
+        [f for f in docs_dir.glob("[0-9][0-9][_-]*.md")
+         if f.name not in EXCLUDE and "-ignore" not in f.stem and "_ignore" not in f.stem],
         key=lambda f: int(f.stem[:2]),
     )
-    roadmap = docs_dir / "ROADMAP.md"
     result = list(numbered)
-    if roadmap.exists() and "ROADMAP.md" not in EXCLUDE:
-        result.append(roadmap)
+    for roadmap_name in ("ROADMAP.md", "roadmap.md"):
+        roadmap = docs_dir / roadmap_name
+        if roadmap.exists() and roadmap_name not in EXCLUDE:
+            result.append(roadmap)
+            break
     return result
 
 # ---------- markdown processing ----------
