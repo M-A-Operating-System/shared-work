@@ -47,6 +47,7 @@ flowchart TB
         KN[Knowledge MCP Server]
         AN[AI Analytics Platform]
         IN[Internet Access MCP Server]
+        DM[MCP Data Models]
     end
 
     subgraph DataSources["Data Sources"]
@@ -82,10 +83,12 @@ flowchart TB
     AgAI -->|MCP| AN
     AgAI -->|MCP| KN
     AgAI -->|MCP| IN
+    AgAI -->|MCP| DM
     AgAI -->|LLM calls| GW
     ConvAI -->|MCP| AN
     ConvAI -->|MCP| KN
     ConvAI -->|MCP| IN
+    ConvAI -->|MCP| DM
     ConvAI -->|LLM calls| GW
 ```
 
