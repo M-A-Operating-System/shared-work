@@ -67,22 +67,22 @@ All five content types are surfaced as raw file content through the resource pri
 
 Surfaces prompt, skill, command, and agent files as parameterised templates rendered into `messages[]` arrays.
 
-**Prompt name convention:** `{domain}.{subdomain}.{app}.{name}` — uniquely identifies a prompt across the full directory. Typed content uses: `{domain}.{subdomain}.{app}.skill.{skill-name}`, `.command.{command-name}`, `.agent.{agent-name}`.
+**Prompt name convention:** The `name` field in every `prompts/list` entry is the file URI — identical to the URI returned by `resources/list` for the same file. This is the primary identifier across all MCP methods. `prompts/get` and all typed get tools accept the URI directly.
 
 **`prompts/list`** — all registered templates with their arguments arrays.
 
 ```json
 { "prompts": [
-    { "name": "maos.dda.data-design-authority.maturity-assessment",
+    { "name": "file:///knowledge/maos/dda/data-design-authority/prompts/maturity-assessment.prompt.md",
       "title": "Data Maturity Assessment",
       "arguments": [
         { "name": "org_name", "description": "Organisation name", "required": true },
-        { "name": "scope",    "description": "Assessment domain", "required": false }
+        { "name": "scope",    "description": "Assessment domain",  "required": false }
       ]},
-    { "name": "maos.dda.data-design-authority.skill.gmail-triage",
+    { "name": "file:///knowledge/maos/dda/data-design-authority/skills/gmail-triage/SKILL.md",
       "title": "Gmail Triage Skill",
       "arguments": [{ "name": "max_threads", "required": false }] },
-    { "name": "maos.dda.data-design-authority.agent.dda-analyst",
+    { "name": "file:///knowledge/maos/dda/data-design-authority/agents/dda-analyst.agent.md",
       "title": "DDA Data Analyst Agent — System Prompt", "arguments": [] }
 ]}
 ```
@@ -92,7 +92,7 @@ Surfaces prompt, skill, command, and agent files as parameterised templates rend
 ```json
 // Request
 { "method": "prompts/get",
-  "params": { "name": "maos.dda.data-design-authority.maturity-assessment",
+  "params": { "name": "file:///knowledge/maos/dda/data-design-authority/prompts/maturity-assessment.prompt.md",
               "arguments": { "org_name": "Acme Corp", "scope": "Data Governance" } } }
 
 // Response
@@ -115,7 +115,18 @@ Surfaces prompt, skill, command, and agent files as parameterised templates rend
 
 ## Tool Surface
 
-Ten tools across five content-type pairs. All tools return a `content` array (text summary for display) and a `structuredContent` object (full typed payload for programmatic use).
+All tools return a `content` array (text summary for display) and a `structuredContent` object (full typed payload for programmatic use).
+
+| Content Type | Search (Discovery) | List (Enumeration) | Read |
+|---|---|---|---|
+| All types | `search_knowledge` (v1), `search`* (v2) | — | — |
+| Resource | `search_resources` | — | `get_resource` (+ `query` for chunks*) |
+| Prompt | `search_prompts` | `list_prompts` | `get_prompt` |
+| Skill | `search_skills` | `get_skill` (folder URI) | `get_skill` |
+| Command | `search_commands` | `get_command` (folder URI) | `get_command` |
+| Agent | `search_agents` | `list_agents` | `load_agent` |
+
+*v2 — requires pgvector infrastructure. Typed shortcuts delegate to `search` in v2 deployments with no API change for callers.
 
 ### Resource Tools
 
@@ -129,41 +140,251 @@ Ten tools across five content-type pairs. All tools return a `content` array (te
     "type": "object",
     "properties": {
       "uri": { "type": "string", "description": "file:// URI. Must begin with file:///knowledge/.",
-               "pattern": "^file:///knowledge/" }
+               "pattern": "^file:///knowledge/" },
+      "query": {
+        "type": "string",
+        "description": "When supplied, activates chunk retrieval — returns the most relevant sections of the document ranked by similarity to this query rather than the full file content. Requires v2 infrastructure (pgvector). Ignored for directory URIs and binary files."
+      },
+      "top_k": {
+        "type": "integer",
+        "default": 3,
+        "minimum": 1,
+        "maximum": 10,
+        "description": "Number of chunks to return when query is supplied."
+      }
     },
     "required": ["uri"]
   }
 }
 ```
 
-`structuredContent` for a file: `{ uri, name, mimeType, size, lastModified, isDirectory: false, text | blob }`  
-`structuredContent` for a folder: `{ uri, isDirectory: true, entries: [{ uri, name, mimeType }] }`
+```
+// Whole file (query omitted)
+{ uri, name, mimeType, size, lastModified, isDirectory: false, text | blob }
+
+// Directory (trailing-slash URI)
+{ uri, isDirectory: true, entries: [{ uri, name, mimeType }] }
+
+// Chunk retrieval (query supplied, v2)
+{ uri, name, mimeType, isDirectory: false,
+  chunks: [{ chunk_id, section_heading?, text, similarity_score }] }
+```
+
+> When `query` is supplied and `search_enabled` is `False`, returns `-32603` with message `"Chunk retrieval not available — pgvector not configured"`.
 
 ---
 
-**`search_resource`** — full-text and metadata search across the knowledge directory.
+> **Chunk-addressed URIs (v2):** Individual chunks are addressable via a fragment identifier on the file URI:
+>
+> ```
+> file:///knowledge/maos/dda/data-design-authority/resources/data-model.md#chunk=3
+> ```
+>
+> A `resources/read` request or a `get_resource` call on a chunk URI returns only that chunk's text with `mimeType: text/plain`. `search` results may include `resource_link` entries pointing to chunk URIs.
+
+---
+
+**`search_knowledge`** — full-text and metadata search across the knowledge directory.
 
 ```json
 {
-  "name": "search_resource",
-  "description": "Full-text and metadata search. Scope by folder URI or content type filter. Returns ranked results with snippets.",
+  "name": "search_knowledge",
+  "description": "Full-text and metadata search across the entire knowledge directory using SQLite FTS5. Searches all content types — resources, prompts, skills, commands, and agents — unless content_types is supplied to narrow scope. Searches file content, front-matter fields, and triggers[] arrays. Use typed shortcuts (search_skills, search_agents, etc.) when the content type is known. In v2, prefer search for better recall.",
   "inputSchema": {
     "type": "object",
     "properties": {
-      "query":         { "type": "string" },
-      "folder_uri":    { "type": "string", "pattern": "^file:///knowledge/" },
-      "content_types": { "type": "array",
-                         "items": { "type": "string",
-                                    "enum": ["resource","prompt","skill","command","agent"] }},
-      "mime_types":    { "type": "array", "items": { "type": "string" }},
-      "max_results":   { "type": "integer", "default": 10, "minimum": 1, "maximum": 50 }
+      "query": {
+        "type": "string",
+        "description": "Search terms or phrase. Matched against file content, title, description, and triggers[] arrays."
+      },
+      "folder_uri": {
+        "type": "string",
+        "pattern": "^file:///knowledge/",
+        "description": "Optional folder URI to restrict search scope."
+      },
+      "content_types": {
+        "type": "array",
+        "items": { "type": "string", "enum": ["resource","prompt","skill","command","agent"] },
+        "description": "Optional filter. Omit to search all content types."
+      },
+      "tags": {
+        "type": "array",
+        "items": { "type": "string" },
+        "description": "Filter by tags declared in front-matter. All supplied tags must be present (AND semantics)."
+      },
+      "fields": {
+        "type": "array",
+        "items": { "type": "string" },
+        "description": "Front-matter fields to include in each result. E.g. [\"version\", \"triggers\", \"dependencies\"]. Omit for default snippet-only results."
+      },
+      "max_results": {
+        "type": "integer",
+        "default": 10,
+        "minimum": 1,
+        "maximum": 50
+      }
     },
     "required": ["query"]
   }
 }
 ```
 
-`structuredContent`: `{ query, total_hits, results: [{ uri, name, title, content_type, mimeType, snippet, score }] }`
+`structuredContent`: `{ query, total_hits, results: [{ uri, name, title, content_type, mimeType, snippet, score, tags?, fields? }] }`
+
+---
+
+### Typed Search Shortcuts
+
+Five convenience wrappers around `search_knowledge` with `content_types` pre-set. These are thin wrappers — no independent index logic.
+
+---
+
+**`search_resources`** — scoped to `content_types: ["resource"]`
+
+```json
+{
+  "name": "search_resources",
+  "description": "Search the resources/ folder across the knowledge directory. Equivalent to search_knowledge with content_types set to resource.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "query":       { "type": "string" },
+      "folder_uri":  { "type": "string", "pattern": "^file:///knowledge/" },
+      "tags":        { "type": "array", "items": { "type": "string" } },
+      "max_results": { "type": "integer", "default": 10, "minimum": 1, "maximum": 50 }
+    },
+    "required": ["query"]
+  }
+}
+```
+
+`structuredContent`: `{ query, total_hits, results: [{ uri, name, mimeType, snippet, score }] }`
+
+---
+
+**`search_prompts`** — scoped to `content_types: ["prompt"]`
+
+```json
+{
+  "name": "search_prompts",
+  "description": "Search prompt templates across the knowledge directory. Equivalent to search_knowledge with content_types set to prompt. Returns arguments array in results.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "query":       { "type": "string" },
+      "folder_uri":  { "type": "string", "pattern": "^file:///knowledge/" },
+      "tags":        { "type": "array", "items": { "type": "string" } },
+      "max_results": { "type": "integer", "default": 10, "minimum": 1, "maximum": 50 }
+    },
+    "required": ["query"]
+  }
+}
+```
+
+`structuredContent`: `{ query, total_hits, results: [{ uri, name, title, arguments, snippet, score }] }`
+
+---
+
+**`search_skills`** — scoped to `content_types: ["skill"]`
+
+```json
+{
+  "name": "search_skills",
+  "description": "Search skill definitions across the knowledge directory. Equivalent to search_knowledge with content_types set to skill. Searches triggers[] arrays — phrase queries like 'run email triage' will surface matching skills. Returns triggers, dependencies, and inputs in results.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "query":       { "type": "string" },
+      "folder_uri":  { "type": "string", "pattern": "^file:///knowledge/" },
+      "tags":        { "type": "array", "items": { "type": "string" } },
+      "max_results": { "type": "integer", "default": 10, "minimum": 1, "maximum": 50 }
+    },
+    "required": ["query"]
+  }
+}
+```
+
+`structuredContent`: `{ query, total_hits, results: [{ uri, name, title, triggers, dependencies, inputs, snippet, score }] }`
+
+---
+
+**`search_commands`** — scoped to `content_types: ["command"]`
+
+```json
+{
+  "name": "search_commands",
+  "description": "Search command definitions across the knowledge directory. Equivalent to search_knowledge with content_types set to command. Returns danger_level and target_tool in results.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "query":       { "type": "string" },
+      "folder_uri":  { "type": "string", "pattern": "^file:///knowledge/" },
+      "tags":        { "type": "array", "items": { "type": "string" } },
+      "max_results": { "type": "integer", "default": 10, "minimum": 1, "maximum": 50 }
+    },
+    "required": ["query"]
+  }
+}
+```
+
+`structuredContent`: `{ query, total_hits, results: [{ uri, name, title, danger_level, target_tool, snippet, score }] }`
+
+---
+
+**`search_agents`** — scoped to `content_types: ["agent"]`
+
+```json
+{
+  "name": "search_agents",
+  "description": "Search agent definitions across the knowledge directory. Equivalent to search_knowledge with content_types set to agent. Returns model, tools_allowed, and skills in results.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "query":       { "type": "string" },
+      "folder_uri":  { "type": "string", "pattern": "^file:///knowledge/" },
+      "tags":        { "type": "array", "items": { "type": "string" } },
+      "max_results": { "type": "integer", "default": 10, "minimum": 1, "maximum": 50 }
+    },
+    "required": ["query"]
+  }
+}
+```
+
+`structuredContent`: `{ query, total_hits, results: [{ uri, name, title, model, tools_allowed, skills, snippet, score }] }`
+
+---
+
+### v2 Tool
+
+**`search`** *(v2 — requires pgvector infrastructure)*
+
+```json
+{
+  "name": "search",
+  "description": "v2 replacement for search_knowledge. Combines FTS5 keyword search and pgvector semantic search using Reciprocal Rank Fusion. Accepts identical parameters to search_knowledge — all typed shortcuts (search_skills, search_agents, etc.) delegate to search in v2 deployments via content_types. Use search_knowledge when pgvector is unavailable. Requires v2 infrastructure (pgvector).",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "query": { "type": "string" },
+      "folder_uri": { "type": "string", "pattern": "^file:///knowledge/" },
+      "content_types": {
+        "type": "array",
+        "items": { "type": "string", "enum": ["resource","prompt","skill","command","agent"] },
+        "description": "Optional filter. Omit to search all content types."
+      },
+      "tags": {
+        "type": "array",
+        "items": { "type": "string" },
+        "description": "Filter by tags. All supplied tags must be present (AND semantics)."
+      },
+      "top_k": { "type": "integer", "default": 5, "minimum": 1, "maximum": 20 }
+    },
+    "required": ["query"]
+  }
+}
+```
+
+`structuredContent`: `{ query, results: [{ uri, name, title, content_type, snippet, rrf_score, keyword_rank, semantic_rank }] }`
 
 ---
 
@@ -199,7 +420,7 @@ Ten tools across five content-type pairs. All tools return a `content` array (te
     "type": "object",
     "properties": {
       "prompt_name": { "type": "string",
-                       "description": "Dotted name (e.g. maos.dda.data-design-authority.maturity-assessment) or folder URI" },
+                       "description": "File URI (e.g. file:///knowledge/maos/dda/data-design-authority/prompts/maturity-assessment.prompt.md) or folder URI" },
       "arguments":   { "type": "object", "additionalProperties": { "type": "string" } }
     },
     "required": ["prompt_name"]
@@ -235,28 +456,6 @@ Ten tools across five content-type pairs. All tools return a `content` array (te
 
 ---
 
-**`invoke_skill`** — renders SKILL.md ready for injection into the current conversation. Does not execute.
-
-```json
-{
-  "name": "invoke_skill",
-  "description": "Loads a skill and returns its SKILL.md as a rendered prompt ready for conversation injection. The model executes the skill steps. Arguments are substituted into {{input_name}} references.",
-  "inputSchema": {
-    "type": "object",
-    "properties": {
-      "skill_name": { "type": "string" },
-      "app_uri":    { "type": "string", "pattern": "^file:///knowledge/" },
-      "arguments":  { "type": "object", "additionalProperties": {} }
-    },
-    "required": ["skill_name"]
-  }
-}
-```
-
-`structuredContent`: `{ kind: "skill", name, version, rendered_prompt, messages: [{ role: "user", content }] }`
-
----
-
 ### Command Tools
 
 **`get_command`** — parsed command definition including command string, arguments, and danger level. Folder URI lists all commands.
@@ -276,29 +475,9 @@ Ten tools across five content-type pairs. All tools return a `content` array (te
 }
 ```
 
-`structuredContent`: `{ kind: "command", name, title, version, uri, description, command, arguments, returns, danger_level, target_tool }`
+`structuredContent`: `{ kind: "command", name, title, version, uri, description, command, arguments, returns, danger_level, target_tool, resolved_command, arguments_used }`
 
----
-
-**`invoke_command`** — resolves and substitutes a command string. Does not execute.
-
-```json
-{
-  "name": "invoke_command",
-  "description": "Resolves a command definition and substitutes arguments into the command string. Returns the resolved command for passing to the target tool. Does not execute.",
-  "inputSchema": {
-    "type": "object",
-    "properties": {
-      "command_name": { "type": "string" },
-      "app_uri":      { "type": "string", "pattern": "^file:///knowledge/" },
-      "arguments":    { "type": "object", "additionalProperties": {} }
-    },
-    "required": ["command_name"]
-  }
-}
-```
-
-`structuredContent`: `{ kind: "command", name, danger_level, target_tool, resolved_command, arguments_used }`
+> `resolved_command` contains the command string with supplied `arguments` substituted. Pass arguments to `get_command` to receive the resolved string in the same response — no separate tool is required.
 
 ---
 
