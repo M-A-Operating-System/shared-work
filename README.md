@@ -38,30 +38,41 @@ Our goal is simple: help organizations build practical, scalable, and trusted in
 
 ```mermaid
 flowchart TB
-    subgraph Consumers["Consumers"]
+    subgraph Consumers["AI Consumers"]
         AgAI[Agentic AI]
         ConvAI[Conversational AI]
     end
 
-    subgraph Ecosystem["MCP-Enabled Ecosystem"]
-        subgraph MCPServers["MCP Servers"]
-            AN[AI Analytics Platform]
-            KN[Knowledge MCP Server]
-            CH[AI Chat Platform]
-        end
-
-        GW[LLM Gateway]
-
-        subgraph LLMPool["Large Language Models"]
-            L1[Claude / Anthropic]
-            L2[GPT / OpenAI]
-            L3[Gemini / Google]
-        end
-
-        GW --> L1
-        GW --> L2
-        GW --> L3
+    subgraph MCPServers["MCP Servers"]
+        AN[AI Analytics Platform]
+        KN[Knowledge MCP Server]
+        CH[AI Chat Platform]
     end
+
+    subgraph DataSources["Data Sources"]
+        DB[(Databases)]
+        DW[(Data Warehouses)]
+        API[APIs & Services]
+    end
+
+    GW[LLM Gateway]
+
+    subgraph LLMPool["Large Language Models"]
+        L1[Claude / Anthropic]
+        L2[GPT / OpenAI]
+        L3[Gemini / Google]
+    end
+
+    DB --> AN
+    DW --> AN
+    API --> AN
+    GW --> L1
+    GW --> L2
+    GW --> L3
+
+    click AN href "docs/product/analytics/README.md"
+    click KN href "docs/product/knowledge/README.md"
+    click CH href "docs/product/assistant/README.md"
 
     AgAI -->|MCP| AN
     AgAI -->|MCP| KN
