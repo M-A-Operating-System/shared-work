@@ -322,9 +322,113 @@ def make_mermaid():
 
     return img
 
+# ═══════════════════════════════════════════════════════════════════════════
+#  02 — VEGA-LITE CHART
+# ═══════════════════════════════════════════════════════════════════════════
+BAR_FILL   = ( 99, 132, 255)
+BAR_FILL_2 = ( 54, 162, 235)
+AXIS_COL   = (200, 204, 210)
+TICK_COL   = (160, 165, 172)
+GRID_COL   = (238, 240, 243)
+
+def vegalite_rendered(draw, x0, y0, x1, y1, measure=False):
+    h = 180
+    if measure: return h
+    data = [("Q1", 42), ("Q2", 67), ("Q3", 55), ("Q4", 81)]
+    pad_l, pad_r, pad_t, pad_b = 36, 16, 16, 28
+    chart_x0 = x0 + pad_l
+    chart_x1 = x1 - pad_r
+    chart_y0 = y0 + pad_t
+    chart_y1 = y0 + h - pad_b
+    chart_w  = chart_x1 - chart_x0
+    chart_h  = chart_y1 - chart_y0
+    max_val  = 100
+    n = len(data)
+    bar_gap  = 14
+    bar_w    = (chart_w - bar_gap * (n + 1)) // n
+
+    # grid lines
+    for pct in [0, 25, 50, 75, 100]:
+        gy = chart_y1 - int(chart_h * pct / max_val)
+        draw.line([(chart_x0, gy), (chart_x1, gy)], fill=GRID_COL, width=1)
+        lbl = str(pct)
+        lf = UI(10)
+        lw = twidth(lbl, lf)
+        draw.text((chart_x0 - lw - 4, gy - 6), lbl, font=lf, fill=TICK_COL)
+
+    # axes
+    draw.line([(chart_x0, chart_y0), (chart_x0, chart_y1)], fill=AXIS_COL, width=1)
+    draw.line([(chart_x0, chart_y1), (chart_x1, chart_y1)], fill=AXIS_COL, width=1)
+
+    # bars + labels
+    for i, (label, val) in enumerate(data):
+        bx = chart_x0 + bar_gap * (i + 1) + bar_w * i
+        bar_h_px = int(chart_h * val / max_val)
+        by0 = chart_y1 - bar_h_px
+        rrect(draw, [bx, by0, bx+bar_w, chart_y1], 3, fill=BAR_FILL)
+        lf = UI(10)
+        lw = twidth(label, lf)
+        draw.text((bx + bar_w//2 - lw//2, chart_y1 + 4), label, font=lf, fill=TICK_COL)
+
+def vegalite_raw(draw, x0, y0, x1, y1, measure=False):
+    lines = [
+        ('```vega-lite',                            CODE_TEXT),
+        ('{',                                       CODE_TEXT),
+        ('  "$schema": "https://vega.github.io/",', CODE_BLUE),
+        ('  "mark": "bar",',                        CODE_GREEN),
+        ('  "data": { "values": [',                 CODE_TEXT),
+        ('    {"quarter":"Q1","value":42},',         CODE_YELLOW),
+        ('    {"quarter":"Q2","value":67},',         CODE_YELLOW),
+        ('    {"quarter":"Q3","value":55},',         CODE_YELLOW),
+        ('    {"quarter":"Q4","value":81}',          CODE_YELLOW),
+        ('  ] },',                                  CODE_TEXT),
+        ('  "encoding": {',                         CODE_TEXT),
+        ('    "x": {"field":"quarter"},',            CODE_BLUE),
+        ('    "y": {"field":"value"}',               CODE_BLUE),
+        ('  }',                                     CODE_TEXT),
+        ('}',                                       CODE_TEXT),
+        ('```',                                     CODE_TEXT),
+    ]
+    lh, pad = 17, 12
+    h = pad*2 + len(lines)*lh
+    if measure: return h
+    if draw: draw.rectangle([x0, y0, x1, y0+h], fill=CODE_BG)
+    mf = MONO_(11)
+    for i, (txt, col) in enumerate(lines):
+        if draw: draw.text((x0+14, y0+pad+i*lh), txt, font=mf, fill=col)
+
+def make_vegalite():
+    PANEL_W = 580
+    OUTER   = 36
+    GAP     = 48
+    W       = OUTER*2 + PANEL_W*2 + GAP
+
+    user_msg = "Can you show me our quarterly revenue as a chart?"
+    asst_msg = "Here's a bar chart of revenue across the four quarters:"
+    title    = "Vega-Lite Chart"
+
+    probe = Image.new("RGB", (W, 1000), PAGE_BG)
+    y_bot, embed_h = paint_thread(probe, OUTER, OUTER, PANEL_W,
+                                  user_msg, asst_msg, title,
+                                  'rendered', vegalite_rendered)
+    H = y_bot + OUTER
+
+    img = Image.new("RGB", (W, H), PAGE_BG)
+    paint_thread(img, OUTER, OUTER, PANEL_W,
+                 user_msg, asst_msg, title, 'rendered', vegalite_rendered)
+
+    draw = ImageDraw.Draw(img)
+    gx = OUTER + PANEL_W + GAP//2
+    draw.line([(gx, OUTER+10),(gx, H-OUTER-10)], fill=DIVIDER, width=1)
+
+    paint_thread(img, OUTER+PANEL_W+GAP, OUTER, PANEL_W,
+                 user_msg, asst_msg, title, 'raw', vegalite_raw,
+                 fixed_embed_h=embed_h)
+    return img
+
 # ── Run ────────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
-    renders = {"01-mermaid": make_mermaid}
+    renders = {"01-mermaid": make_mermaid, "02-vega-lite": make_vegalite}
     for name, fn in renders.items():
         path = os.path.join(OUT_DIR, f"{name}.png")
         fn().save(path)
