@@ -820,10 +820,193 @@ def make_json():
                  fixed_embed_h=embed_h)
     return img
 
+# ═══════════════════════════════════════════════════════════════════════════
+#  05 — MATH (KaTeX)
+# ═══════════════════════════════════════════════════════════════════════════
+MATH_BG      = (255, 255, 255)
+MATH_INK     = ( 22,  22,  22)
+MATH_ACCENT  = ( 30,  80, 180)   # blue for key symbols
+MATH_GRAY    = (120, 125, 135)   # dim parts
+MATH_DIVIDER = (225, 227, 232)
+
+def _draw_fraction(draw, cx, cy, num_txt, den_txt, fnt_main, fnt_small, ink):
+    """Draw a vertical fraction centred at cx, cy. Returns half-height used."""
+    nw = twidth(num_txt, fnt_small)
+    dw = twidth(den_txt, fnt_small)
+    bar_w = max(nw, dw) + 8
+    bar_h = 1
+    # numerator
+    draw.text((cx - nw//2, cy - 18), num_txt, font=fnt_small, fill=ink)
+    # bar
+    draw.line([(cx - bar_w//2, cy - 4), (cx + bar_w//2, cy - 4)], fill=ink, width=bar_h)
+    # denominator
+    draw.text((cx - dw//2, cy + 2), den_txt, font=fnt_small, fill=ink)
+    return 20   # half-height
+
+def _draw_sigma(draw, cx, cy, size, ink):
+    """Draw a simple Σ-like sum symbol."""
+    f = fnt(SANS, size)
+    sym = "Σ"
+    sw = twidth(sym, f)
+    draw.text((cx - sw//2, cy - size//2), sym, font=f, fill=ink)
+
+def math_rendered(draw, x0, y0, x1, y1, measure=False):
+    """
+    Render three display-math expressions in a KaTeX-style layout:
+      1. Bayes' theorem
+      2. Normal distribution PDF
+      3. Euler's identity
+    """
+    BLOCK_H  = 72   # height per expression block
+    PAD_V    = 16
+    h = PAD_V + BLOCK_H * 3 + PAD_V
+    if measure: return h
+    if draw is None: return
+
+    f_main  = fnt(SANS,      18)
+    f_small = fnt(SANS,      13)
+    f_tiny  = fnt(SANS,      11)
+    f_label = fnt(SANS_BOLD, 10)
+    f_bold  = fnt(SANS_BOLD, 18)
+    f_sym   = fnt(SANS,      22)
+    f_sub   = fnt(SANS,      10)
+
+    cx = (x0 + x1) // 2
+
+    # ── Block 1: Bayes' Theorem  P(A|B) = P(B|A)·P(A) / P(B) ──────────────
+    by = y0 + PAD_V + BLOCK_H // 2
+    label = "Bayes' Theorem"
+    lw = twidth(label, f_label)
+    draw.text((x0, y0 + PAD_V - 2), label, font=f_label, fill=MATH_GRAY)
+
+    # render as inline pieces around a fraction
+    # Left: "P(A|B) ="
+    lhs = "P(A|B) ="
+    lhs_w = twidth(lhs, f_main)
+    frac_cx = cx + lhs_w // 2 - 10
+    draw.text((cx - lhs_w//2 - 10, by - 10), lhs, font=f_main, fill=MATH_INK)
+
+    # Fraction: P(B|A)·P(A) over P(B)
+    fc = frac_cx + lhs_w // 2 + 32
+    _draw_fraction(draw, fc, by - 4, "P(B|A) · P(A)", "P(B)", f_small, f_small, MATH_INK)
+
+    # divider
+    div_y = y0 + PAD_V + BLOCK_H
+    draw.line([(x0, div_y), (x1, div_y)], fill=MATH_DIVIDER, width=1)
+
+    # ── Block 2: Normal Distribution PDF ─────────────────────────────────
+    by2 = div_y + BLOCK_H // 2
+    label2 = "Normal Distribution — Probability Density"
+    draw.text((x0, div_y + 6), label2, font=f_label, fill=MATH_GRAY)
+
+    # f(x) =
+    piece = "f(x) ="
+    pw = twidth(piece, f_main)
+    draw.text((cx - 110, by2 - 9), piece, font=f_main, fill=MATH_INK)
+
+    # fraction: 1 / (σ√2π)
+    fc2 = cx - 110 + pw + 28
+    _draw_fraction(draw, fc2, by2 - 4, "1", "σ√2π", f_small, f_small, MATH_INK)
+
+    # exp(...)
+    exp_x = fc2 + 40
+    draw.text((exp_x, by2 - 10), "exp", font=f_main, fill=MATH_INK)
+    ew = twidth("exp", f_main)
+
+    # superscript fraction: −(x−μ)² / 2σ²
+    sx = exp_x + ew + 2
+    sy = by2 - 20
+    draw.text((sx, sy), "−(x−μ)²", font=f_tiny, fill=MATH_ACCENT)
+    bar2_w = twidth("−(x−μ)²", f_tiny) + 4
+    draw.line([(sx - 2, sy + 13), (sx + bar2_w, sy + 13)], fill=MATH_ACCENT, width=1)
+    dw2 = twidth("2σ²", f_tiny)
+    draw.text((sx + bar2_w//2 - dw2//2, sy + 15), "2σ²", font=f_tiny, fill=MATH_ACCENT)
+
+    # divider
+    div_y2 = div_y + BLOCK_H
+    draw.line([(x0, div_y2), (x1, div_y2)], fill=MATH_DIVIDER, width=1)
+
+    # ── Block 3: Euler's Identity ─────────────────────────────────────────
+    by3 = div_y2 + BLOCK_H // 2
+    label3 = "Euler's Identity"
+    draw.text((x0, div_y2 + 6), label3, font=f_label, fill=MATH_GRAY)
+
+    # e^(iπ) + 1 = 0   — draw each glyph
+    parts = [
+        ("e", f_bold, MATH_ACCENT),
+        ("iπ", f_sub, MATH_ACCENT),   # superscript
+        ("  + 1 = 0", f_main, MATH_INK),
+    ]
+    total_w = (twidth("e", f_bold) + twidth("iπ", f_sub) +
+               twidth("  + 1 = 0", f_main))
+    tx = cx - total_w // 2
+
+    draw.text((tx, by3 - 10), "e", font=f_bold, fill=MATH_ACCENT)
+    ex = tx + twidth("e", f_bold)
+    draw.text((ex, by3 - 20), "iπ", font=f_sub, fill=MATH_ACCENT)
+    ex2 = ex + twidth("iπ", f_sub)
+    draw.text((ex2, by3 - 10), "  + 1 = 0", font=f_main, fill=MATH_INK)
+
+def math_raw(draw, x0, y0, x1, y1, measure=False):
+    lines = [
+        ("$$",                                          CODE_TEXT),
+        ("P(A|B) = \\frac{P(B|A) \\cdot P(A)}{P(B)}",  CODE_GREEN),
+        ("$$",                                          CODE_TEXT),
+        ("",                                            CODE_TEXT),
+        ("$$",                                          CODE_TEXT),
+        ("f(x) = \\frac{1}{\\sigma\\sqrt{2\\pi}}",      CODE_GREEN),
+        ("  \\exp\\!\\left(",                            CODE_GREEN),
+        ("    -\\frac{(x-\\mu)^2}{2\\sigma^2}",         CODE_BLUE),
+        ("  \\right)",                                  CODE_GREEN),
+        ("$$",                                          CODE_TEXT),
+        ("",                                            CODE_TEXT),
+        ("$$",                                          CODE_TEXT),
+        ("e^{i\\pi} + 1 = 0",                           CODE_YELLOW),
+        ("$$",                                          CODE_TEXT),
+    ]
+    lh, pad = 17, 12
+    h = pad*2 + len(lines)*lh
+    if measure: return h
+    if draw:
+        draw.rectangle([x0, y0, x1, y0+h], fill=CODE_BG)
+        mf = MONO_(10)
+        for i, (txt, col) in enumerate(lines):
+            draw.text((x0+12, y0+pad+i*lh), txt, font=mf, fill=col)
+
+def make_math():
+    PANEL_W = 580
+    OUTER   = 36
+    GAP     = 48
+    W       = OUTER*2 + PANEL_W*2 + GAP
+
+    user_msg = "Can you show me Bayes' theorem, the normal distribution PDF, and Euler's identity?"
+    asst_msg = "Here are the three expressions rendered in display math:"
+    title    = "Math — KaTeX"
+
+    probe = Image.new("RGB", (W, 1200), PAGE_BG)
+    y_bot, embed_h = paint_thread(probe, OUTER, OUTER, PANEL_W,
+                                  user_msg, asst_msg, title,
+                                  'rendered', math_rendered)
+    H = y_bot + OUTER
+
+    img = Image.new("RGB", (W, H), PAGE_BG)
+    paint_thread(img, OUTER, OUTER, PANEL_W,
+                 user_msg, asst_msg, title, 'rendered', math_rendered)
+
+    draw = ImageDraw.Draw(img)
+    gx = OUTER + PANEL_W + GAP//2
+    draw.line([(gx, OUTER+10),(gx, H-OUTER-10)], fill=DIVIDER, width=1)
+
+    paint_thread(img, OUTER+PANEL_W+GAP, OUTER, PANEL_W,
+                 user_msg, asst_msg, title, 'raw', math_raw,
+                 fixed_embed_h=embed_h)
+    return img
+
 # ── Run ────────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
     renders = {"01-mermaid": make_mermaid, "02-vega-lite": make_vegalite,
-               "03-data-table": make_table, "04-json-inspector": make_json}
+               "03-data-table": make_table, "04-json-inspector": make_json,
+               "05-math": make_math}
     for name, fn in renders.items():
         path = os.path.join(OUT_DIR, f"{name}.png")
         fn().save(path)
