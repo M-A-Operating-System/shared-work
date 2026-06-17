@@ -1115,7 +1115,7 @@ def markdown_rendered(draw, x0, y0, x1, y1, measure=False):
     x_after += twidth("48 %", f_bold)
     draw.text((x0 + x_after, y), " against the ", font=f_body, fill=MD_BODY)
     x_after += twidth(" against the ", f_body)
-    _md_inline_code(draw, x0 + x_after, y, "≥ 40 %", f_body)
+    _md_inline_code(draw, x0 + x_after, y, "≥ 40 %", 13)
     y += lh_body
     # link line
     draw.text((x0, y), "Full data: ", font=f_body, fill=MD_BODY)
@@ -1399,16 +1399,551 @@ def make_pdf():
     return img
 
 
+# ═══════════════════════════════════════════════════════════════════════════
+#  08 — FEEDBACK / DECISION CARD
+# ═══════════════════════════════════════════════════════════════════════════
+FB_QUESTION  = ( 17,  24,  39)
+FB_OPT_BG    = (255, 255, 255)
+FB_OPT_BDR   = (209, 213, 219)
+FB_OPT_TX    = ( 55,  65,  81)
+FB_HOV_BG    = (239, 246, 255)
+FB_HOV_BDR   = ( 96, 165, 250)
+FB_HOV_TX    = ( 37,  99, 235)
+FB_BTN_BG    = ( 37,  99, 235)
+FB_BTN_TX    = (255, 255, 255)
+FB_SKIP_TX   = (107, 114, 128)
+
+_FB_OPTIONS  = ["PDF Document", "Markdown", "Word Document", "CSV (data only)"]
+
+def feedback_rendered(draw, x0, y0, x1, y1, measure=False):
+    W       = x1 - x0
+    PAD     = 14
+    Q_H     = 22
+    GAP     = 12
+    OPT_H   = 32
+    OPT_GAP = 8
+    BTN_H   = 32
+    opts_h  = OPT_H * 2 + OPT_GAP
+    h = PAD + Q_H + GAP + opts_h + GAP + BTN_H + PAD
+    if measure: return h
+    if draw is None: return
+
+    y = y0 + PAD
+    draw.text((x0, y), "Which export format would you like?",
+              font=BOLD(13), fill=FB_QUESTION)
+    y += Q_H + GAP
+
+    col_w = (W - OPT_GAP) // 2
+    for i, opt in enumerate(_FB_OPTIONS):
+        col = i % 2
+        row = i // 2
+        ox  = x0 + col * (col_w + OPT_GAP)
+        oy  = y  + row * (OPT_H  + OPT_GAP)
+        hover = (i == 0)
+        bg  = FB_HOV_BG  if hover else FB_OPT_BG
+        bdr = FB_HOV_BDR if hover else FB_OPT_BDR
+        tx  = FB_HOV_TX  if hover else FB_OPT_TX
+        fw  = BOLD(12)   if hover else UI(12)
+        rrect(draw, [ox, oy, ox+col_w, oy+OPT_H], 5, fill=bg, outline=bdr, lw=1)
+        # radio circle
+        rc_x, rc_y = ox+13, oy+OPT_H//2
+        draw.ellipse([rc_x-6, rc_y-6, rc_x+6, rc_y+6], outline=bdr, width=1, fill=bg)
+        if hover:
+            draw.ellipse([rc_x-3, rc_y-3, rc_x+3, rc_y+3], fill=FB_HOV_TX)
+        draw.text((ox+27, oy+OPT_H//2-7), opt, font=fw, fill=tx)
+
+    y += opts_h + GAP
+    btn_w = 120
+    rrect(draw, [x0, y, x0+btn_w, y+BTN_H], 5, fill=FB_BTN_BG)
+    lbl = "Submit"
+    lw = twidth(lbl, BOLD(12))
+    draw.text((x0+btn_w//2-lw//2, y+BTN_H//2-8), lbl, font=BOLD(12), fill=FB_BTN_TX)
+    draw.text((x0+btn_w+14, y+BTN_H//2-7), "Skip", font=UI(12), fill=FB_SKIP_TX)
+
+def feedback_raw(draw, x0, y0, x1, y1, measure=False):
+    lines = [
+        ('```feedback-request',                              CODE_TEXT),
+        ('{',                                                CODE_TEXT),
+        ('  "question": "Which export format',               CODE_BLUE),
+        ('             would you like?",',                   CODE_BLUE),
+        ('  "options": [',                                   CODE_TEXT),
+        ('    { "id": "pdf",  "label": "PDF Document" },',   CODE_GREEN),
+        ('    { "id": "md",   "label": "Markdown" },',       CODE_GREEN),
+        ('    { "id": "docx", "label": "Word Document" },',  CODE_GREEN),
+        ('    { "id": "csv",  "label": "CSV (data only)" }', CODE_GREEN),
+        ('  ],',                                             CODE_TEXT),
+        ('  "multi":    false,',                             CODE_YELLOW),
+        ('  "required": true',                               CODE_YELLOW),
+        ('}',                                                CODE_TEXT),
+        ('```',                                              CODE_TEXT),
+    ]
+    lh, pad = 17, 12
+    h = pad*2 + len(lines)*lh
+    if measure: return h
+    if draw:
+        draw.rectangle([x0, y0, x1, y0+h], fill=CODE_BG)
+        mf = MONO_(10)
+        for i, (txt, col) in enumerate(lines):
+            draw.text((x0+12, y0+pad+i*lh), txt, font=mf, fill=col)
+
+def make_feedback():
+    PANEL_W = 580
+    OUTER   = 36
+    GAP     = 48
+    W       = OUTER*2 + PANEL_W*2 + GAP
+
+    user_msg = "I need to share the Q2 report with the board — what format options are there?"
+    asst_msg = "I can export the report in several formats. Which would you prefer?"
+    title    = "Decision Card"
+
+    probe = Image.new("RGB", (W, 1000), PAGE_BG)
+    y_bot, embed_h = paint_thread(probe, OUTER, OUTER, PANEL_W,
+                                  user_msg, asst_msg, title,
+                                  'rendered', feedback_rendered)
+    H = y_bot + OUTER
+    img = Image.new("RGB", (W, H), PAGE_BG)
+    paint_thread(img, OUTER, OUTER, PANEL_W,
+                 user_msg, asst_msg, title, 'rendered', feedback_rendered)
+    draw = ImageDraw.Draw(img)
+    gx = OUTER + PANEL_W + GAP//2
+    draw.line([(gx, OUTER+10),(gx, H-OUTER-10)], fill=DIVIDER, width=1)
+    paint_thread(img, OUTER+PANEL_W+GAP, OUTER, PANEL_W,
+                 user_msg, asst_msg, title, 'raw', feedback_raw,
+                 fixed_embed_h=embed_h)
+    return img
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+#  09 — WRITE-PROPOSAL CARD
+# ═══════════════════════════════════════════════════════════════════════════
+WP_BADGE_BG  = (252, 211,  77)
+WP_BADGE_TX  = ( 92,  61,   0)
+WP_DIFF_HDR  = (243, 244, 246)
+WP_DIFF_BDR  = (229, 231, 235)
+WP_DIFF_HTXT = ( 75,  85,  99)
+WP_KEY_TX    = (107, 114, 128)
+WP_VAL_TX    = ( 30,  41,  55)
+WP_CHG_BF    = (254, 226, 226)
+WP_CHG_AF    = (220, 252, 231)
+WP_CHG_TX    = ( 17,  24,  39)
+WP_IMPACT    = (107, 114, 128)
+WP_TOOL_TX   = ( 37,  99, 235)
+WP_BTN_PRI   = ( 37,  99, 235)
+WP_BTN_TX    = (255, 255, 255)
+WP_BTN_SBDR  = (209, 213, 219)
+
+def write_proposal_rendered(draw, x0, y0, x1, y1, measure=False):
+    W          = x1 - x0
+    PAD        = 14
+    BADGE_H    = 26
+    ACT_H      = 22
+    TOOL_H     = 20
+    GAP        = 10
+    DHDR_H     = 22
+    DROW_H     = 21
+    N_ROWS     = 3
+    IMPACT_H   = 20
+    BTN_H      = 32
+    h = (PAD + BADGE_H + GAP + ACT_H + GAP + TOOL_H + GAP +
+         DHDR_H + DROW_H*N_ROWS + GAP + IMPACT_H + GAP + BTN_H + PAD)
+    if measure: return h
+    if draw is None: return
+
+    y = y0 + PAD
+
+    # Badge + action heading
+    badge = "UPDATE"
+    bf    = BOLD(9)
+    bw    = twidth(badge, bf) + 12
+    rrect(draw, [x0, y, x0+bw, y+BADGE_H], 4, fill=WP_BADGE_BG)
+    draw.text((x0+6, y+BADGE_H//2-6), badge, font=bf, fill=WP_BADGE_TX)
+    y += BADGE_H + GAP
+
+    draw.text((x0, y), "Update target region for campaign CA-2041",
+              font=BOLD(13), fill=WP_CHG_TX)
+    y += ACT_H + GAP
+
+    draw.text((x0, y), "Tool: ", font=UI(11), fill=WP_KEY_TX)
+    tw = twidth("Tool: ", UI(11))
+    draw.text((x0+tw, y), "crm.updateCampaign", font=MONO_(11), fill=WP_TOOL_TX)
+    y += TOOL_H + GAP
+
+    # Before / after diff table
+    col_w = (W - 1) // 2
+    # header
+    draw.rectangle([x0, y, x1, y+DHDR_H], fill=WP_DIFF_HDR)
+    draw.line([(x0+col_w, y),(x0+col_w, y+DHDR_H+DROW_H*N_ROWS)], fill=WP_DIFF_BDR, width=1)
+    draw.rectangle([x0, y, x1, y+DHDR_H+DROW_H*N_ROWS], outline=WP_DIFF_BDR, width=1)
+    draw.text((x0+8, y+5), "Before", font=BOLD(10), fill=WP_DIFF_HTXT)
+    draw.text((x0+col_w+8, y+5), "After", font=BOLD(10), fill=WP_DIFF_HTXT)
+    y += DHDR_H
+
+    for key, bval, aval, changed in [
+        ("id",     "CA-2041", "CA-2041", False),
+        ("region", "AMER",    "EMEA",    True),
+        ("status", "draft",   "draft",   False),
+    ]:
+        bg_b = WP_CHG_BF if changed else (255,255,255)
+        bg_a = WP_CHG_AF if changed else (255,255,255)
+        draw.rectangle([x0,       y, x0+col_w, y+DROW_H], fill=bg_b)
+        draw.rectangle([x0+col_w+1, y, x1,     y+DROW_H], fill=bg_a)
+        draw.line([(x0, y+DROW_H),(x1, y+DROW_H)], fill=WP_DIFF_BDR, width=1)
+        kf  = UI(10)
+        vf  = BOLD(10) if changed else UI(10)
+        vtx = WP_CHG_TX if changed else WP_VAL_TX
+        kw  = twidth(key+":", kf) + 4
+        draw.text((x0+6,        y+5), key+":", font=kf, fill=WP_KEY_TX)
+        draw.text((x0+6+kw,     y+5), bval,   font=vf, fill=vtx)
+        draw.text((x0+col_w+6,  y+5), key+":", font=kf, fill=WP_KEY_TX)
+        draw.text((x0+col_w+6+kw, y+5), aval, font=vf, fill=vtx)
+        y += DROW_H
+
+    y += GAP
+    draw.text((x0, y), "⚠  1 campaign record will be modified. This action cannot be undone.",
+              font=UI(11), fill=WP_IMPACT)
+    y += IMPACT_H + GAP
+
+    # Buttons
+    pri_w = 140
+    rrect(draw, [x0, y, x0+pri_w, y+BTN_H], 5, fill=WP_BTN_PRI)
+    lbl  = "Apply changes"
+    lw   = twidth(lbl, BOLD(12))
+    draw.text((x0+pri_w//2-lw//2, y+BTN_H//2-8), lbl, font=BOLD(12), fill=WP_BTN_TX)
+    sx  = x0 + pri_w + 10
+    sw  = 76
+    rrect(draw, [sx, y, sx+sw, y+BTN_H], 5, fill=WHITE, outline=WP_BTN_SBDR, lw=1)
+    lbl2 = "Cancel"
+    lw2  = twidth(lbl2, UI(12))
+    draw.text((sx+sw//2-lw2//2, y+BTN_H//2-7), lbl2, font=UI(12), fill=WP_VAL_TX)
+
+def write_proposal_raw(draw, x0, y0, x1, y1, measure=False):
+    lines = [
+        ('```write-proposal',                              CODE_TEXT),
+        ('{',                                              CODE_TEXT),
+        ('  "operation": "update",',                       CODE_BLUE),
+        ('  "action": "Update target region',              CODE_BLUE),
+        ('            for campaign CA-2041",',             CODE_BLUE),
+        ('  "tool":   "crm.updateCampaign",',              CODE_GREEN),
+        ('  "before": {',                                  CODE_TEXT),
+        ('    "id":     "CA-2041",',                       CODE_YELLOW),
+        ('    "region": "AMER",',                          CODE_YELLOW),
+        ('    "status": "draft"',                          CODE_YELLOW),
+        ('  },',                                           CODE_TEXT),
+        ('  "after": {',                                   CODE_TEXT),
+        ('    "id":     "CA-2041",',                       CODE_GREEN),
+        ('    "region": "EMEA",',                          CODE_GREEN),
+        ('    "status": "draft"',                          CODE_GREEN),
+        ('  },',                                           CODE_TEXT),
+        ('  "impact": "1 campaign record',                 CODE_TEXT),
+        ('            will be modified."',                 CODE_TEXT),
+        ('}',                                              CODE_TEXT),
+        ('```',                                            CODE_TEXT),
+    ]
+    lh, pad = 16, 12
+    h = pad*2 + len(lines)*lh
+    if measure: return h
+    if draw:
+        draw.rectangle([x0, y0, x1, y0+h], fill=CODE_BG)
+        mf = MONO_(10)
+        for i, (txt, col) in enumerate(lines):
+            draw.text((x0+12, y0+pad+i*lh), txt, font=mf, fill=col)
+
+def make_write_proposal():
+    PANEL_W = 580
+    OUTER   = 36
+    GAP     = 48
+    W       = OUTER*2 + PANEL_W*2 + GAP
+
+    user_msg = "Move campaign CA-2041 from AMER to EMEA."
+    asst_msg = "I'll update the campaign region. Please review the change before I apply it:"
+    title    = "Write Proposal"
+
+    probe = Image.new("RGB", (W, 1200), PAGE_BG)
+    y_bot, embed_h = paint_thread(probe, OUTER, OUTER, PANEL_W,
+                                  user_msg, asst_msg, title,
+                                  'rendered', write_proposal_rendered)
+    H = y_bot + OUTER
+    img = Image.new("RGB", (W, H), PAGE_BG)
+    paint_thread(img, OUTER, OUTER, PANEL_W,
+                 user_msg, asst_msg, title, 'rendered', write_proposal_rendered)
+    draw = ImageDraw.Draw(img)
+    gx = OUTER + PANEL_W + GAP//2
+    draw.line([(gx, OUTER+10),(gx, H-OUTER-10)], fill=DIVIDER, width=1)
+    paint_thread(img, OUTER+PANEL_W+GAP, OUTER, PANEL_W,
+                 user_msg, asst_msg, title, 'raw', write_proposal_raw,
+                 fixed_embed_h=embed_h)
+    return img
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+#  10 — TOOL CALL DISCLOSURE
+# ═══════════════════════════════════════════════════════════════════════════
+DISC_HDR_BG  = (249, 250, 251)
+DISC_BDR     = (229, 231, 235)
+DISC_OK_BG   = (220, 252, 231)
+DISC_OK_TX   = ( 22, 101,  52)
+DISC_TOOL    = ( 37,  99, 235)
+DISC_KEY     = (107, 114, 128)
+DISC_VAL     = ( 30,  41,  55)
+DISC_TIME    = (156, 163, 175)
+DISC_SECT    = ( 75,  85,  99)
+
+def tool_disclosure_rendered(draw, x0, y0, x1, y1, measure=False):
+    HDR_H  = 34
+    PAD    = 10
+    ROW_H  = 18
+    SECT_H = 18
+    h = HDR_H + PAD + SECT_H + ROW_H*2 + PAD + 1 + PAD + SECT_H + ROW_H*2 + PAD
+    if measure: return h
+    if draw is None: return
+
+    y = y0
+
+    # Header
+    rrect(draw, [x0, y, x1, y+HDR_H], 5, fill=DISC_HDR_BG, outline=DISC_BDR, lw=1)
+    # chevron ▾
+    cx_, cy_ = x0+12, y+HDR_H//2
+    draw.polygon([(cx_-4,cy_-2),(cx_+4,cy_-2),(cx_,cy_+3)], fill=DISC_KEY)
+    # tool name
+    tx = x0 + 24
+    draw.text((tx, y+HDR_H//2-7), "crm.searchCampaigns", font=MONO_(11), fill=DISC_TOOL)
+    tw = twidth("crm.searchCampaigns", MONO_(11))
+    # status badge
+    bx  = tx + tw + 10
+    bgl = "✓  Completed"
+    bw  = twidth(bgl, UI(10)) + 14
+    bh  = 18
+    by_ = y + HDR_H//2 - bh//2
+    rrect(draw, [bx, by_, bx+bw, by_+bh], 9, fill=DISC_OK_BG)
+    draw.text((bx+7, by_+4), bgl, font=UI(10), fill=DISC_OK_TX)
+    # duration
+    draw.text((x1-50, y+HDR_H//2-7), "312 ms", font=UI(10), fill=DISC_TIME)
+
+    # Body (white rectangle covering border seam)
+    draw.rectangle([x0+1, y+HDR_H-1, x1-1, y+h-1], fill=WHITE)
+    draw.rectangle([x0, y+HDR_H, x1, y+h], outline=DISC_BDR, width=1)
+    draw.rectangle([x0+1, y+HDR_H, x1-1, y+h-1], fill=WHITE)
+
+    y += HDR_H + PAD
+
+    # Input section
+    draw.text((x0+PAD, y), "INPUT", font=BOLD(9), fill=DISC_SECT)
+    y += SECT_H
+    for key, val in [("status", '"active"'), ("region", '"EMEA"')]:
+        draw.text((x0+PAD, y), key+":", font=UI(10), fill=DISC_KEY)
+        kw = twidth(key+":", UI(10))
+        draw.text((x0+PAD+kw+6, y), val, font=MONO_(10), fill=DISC_VAL)
+        y += ROW_H
+
+    y += PAD
+    draw.line([(x0+PAD, y),(x1-PAD, y)], fill=DISC_BDR, width=1)
+    y += PAD + 1
+
+    # Output section
+    draw.text((x0+PAD, y), "OUTPUT", font=BOLD(9), fill=DISC_SECT)
+    y += SECT_H
+    for key, val in [("items", "Array[4]  — campaigns matching query"),
+                     ("total", "4")]:
+        draw.text((x0+PAD, y), key+":", font=UI(10), fill=DISC_KEY)
+        kw = twidth(key+":", UI(10))
+        draw.text((x0+PAD+kw+6, y), val, font=UI(10), fill=DISC_VAL)
+        y += ROW_H
+
+    # citation footnote
+    draw.text((x0+PAD, y+4),
+              "¹  Results cited inline in the response above",
+              font=UI(9), fill=DISC_TIME)
+
+def tool_disclosure_raw(draw, x0, y0, x1, y1, measure=False):
+    lines = [
+        ("// MCP tool call — input",                        CODE_TEXT),
+        ('{',                                               CODE_TEXT),
+        ('  "tool":   "crm.searchCampaigns",',              CODE_BLUE),
+        ('  "input":  {',                                   CODE_TEXT),
+        ('    "status": "active",',                         CODE_GREEN),
+        ('    "region": "EMEA"',                            CODE_GREEN),
+        ('  }',                                             CODE_TEXT),
+        ('}',                                               CODE_TEXT),
+        ('',                                                CODE_TEXT),
+        ("// MCP tool call — output",                       CODE_TEXT),
+        ('{',                                               CODE_TEXT),
+        ('  "items": [',                                    CODE_BLUE),
+        ('    {"id":"CA-2038","name":"EMEA Launch"},',       CODE_YELLOW),
+        ('    {"id":"CA-2039","name":"EU Growth"},',         CODE_YELLOW),
+        ('    {"id":"CA-2040","name":"DACH Expand"},',       CODE_YELLOW),
+        ('    {"id":"CA-2041","name":"UK Scale"}',           CODE_YELLOW),
+        ('  ],',                                            CODE_BLUE),
+        ('  "total": 4',                                    CODE_GREEN),
+        ('}',                                               CODE_TEXT),
+    ]
+    lh, pad = 16, 12
+    h = pad*2 + len(lines)*lh
+    if measure: return h
+    if draw:
+        draw.rectangle([x0, y0, x1, y0+h], fill=CODE_BG)
+        mf = MONO_(10)
+        for i, (txt, col) in enumerate(lines):
+            draw.text((x0+12, y0+pad+i*lh), txt, font=mf, fill=col)
+
+def make_tool_disclosure():
+    PANEL_W = 580
+    OUTER   = 36
+    GAP     = 48
+    W       = OUTER*2 + PANEL_W*2 + GAP
+
+    user_msg = "Show me all active campaigns in EMEA."
+    asst_msg = ("I searched for active campaigns in EMEA and found 4 results.¹  "
+                "Here are the matching campaigns:")
+    title    = "Tool Call"
+
+    probe = Image.new("RGB", (W, 1000), PAGE_BG)
+    y_bot, embed_h = paint_thread(probe, OUTER, OUTER, PANEL_W,
+                                  user_msg, asst_msg, title,
+                                  'rendered', tool_disclosure_rendered)
+    H = y_bot + OUTER
+    img = Image.new("RGB", (W, H), PAGE_BG)
+    paint_thread(img, OUTER, OUTER, PANEL_W,
+                 user_msg, asst_msg, title, 'rendered', tool_disclosure_rendered)
+    draw = ImageDraw.Draw(img)
+    gx = OUTER + PANEL_W + GAP//2
+    draw.line([(gx, OUTER+10),(gx, H-OUTER-10)], fill=DIVIDER, width=1)
+    paint_thread(img, OUTER+PANEL_W+GAP, OUTER, PANEL_W,
+                 user_msg, asst_msg, title, 'raw', tool_disclosure_raw,
+                 fixed_embed_h=embed_h)
+    return img
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+#  11 — SYNTAX-HIGHLIGHTED CODE BLOCK
+# ═══════════════════════════════════════════════════════════════════════════
+SYN_KW      = (197, 134, 192)
+SYN_STR     = (206, 145, 120)
+SYN_CMT     = (106, 153,  85)
+SYN_FUNC    = (220, 220, 170)
+SYN_TYPE    = ( 78, 201, 176)
+SYN_NUM     = (181, 206, 168)
+SYN_PUNC    = (204, 204, 204)
+SYN_LINE_NO = ( 90,  97, 109)
+SYN_LINE_HL = ( 30,  36,  46)
+LN_W        = 32
+
+_CODE_LINES = [
+    [("// Fetch active campaigns for a tenant", SYN_CMT)],
+    [("import ", SYN_KW), ("{ CRMClient } ", CODE_TEXT), ("from ", SYN_KW), ('"@acme/crm-sdk"', SYN_STR), (";", SYN_PUNC)],
+    [("", CODE_TEXT)],
+    [("async ", SYN_KW), ("function ", SYN_KW), ("getActiveCampaigns", SYN_FUNC), ("(", SYN_PUNC)],
+    [("  tenantId", CODE_TEXT), (": ", SYN_PUNC), ("string", SYN_TYPE), (",", SYN_PUNC)],
+    [("  region",   CODE_TEXT), (": ", SYN_PUNC), ('"AMER"', SYN_STR), (" | ", SYN_PUNC), ('"EMEA"', SYN_STR), (" | ", SYN_PUNC), ('"APAC"', SYN_STR)],
+    [(")", SYN_PUNC), (": ", SYN_PUNC), ("Promise", SYN_TYPE), ("<", SYN_PUNC), ("Campaign", SYN_TYPE), ("[]>", SYN_PUNC), (" {", SYN_PUNC)],
+    [("  const ", SYN_KW), ("client ", CODE_TEXT), ("= ", SYN_PUNC), ("new ", SYN_KW), ("CRMClient", SYN_TYPE), ("({ tenantId });", SYN_PUNC)],
+    [("  const ", SYN_KW), ("results ", CODE_TEXT), ("= ", SYN_PUNC), ("await ", SYN_KW), ("client.campaigns.", CODE_TEXT), ("list", SYN_FUNC), ("({", SYN_PUNC)],
+    [("    status", CODE_TEXT), (": ", SYN_PUNC), ('"active"', SYN_STR), (",", SYN_PUNC)],
+    [("    region,", CODE_TEXT)],
+    [("    limit",  CODE_TEXT), (": ", SYN_PUNC), ("100", SYN_NUM), (",", SYN_PUNC)],
+    [("  });", SYN_PUNC)],
+    [("  return ", SYN_KW), ("results.items;", CODE_TEXT)],
+    [("}", SYN_PUNC)],
+]
+
+def code_rendered(draw, x0, y0, x1, y1, measure=False):
+    LH  = 19
+    PAD = 12
+    h   = PAD*2 + len(_CODE_LINES)*LH
+    if measure: return h
+    if draw is None: return
+
+    draw.rectangle([x0, y0, x1, y0+h], fill=CODE_BG)
+    lang = "TypeScript"
+    lf   = UI(10)
+    lw_  = twidth(lang, lf)
+    draw.text((x1-lw_-6, y0+5), lang, font=lf, fill=SYN_LINE_NO)
+
+    mf = MONO_(11)
+    for i, segs in enumerate(_CODE_LINES):
+        ry = y0 + PAD + i*LH
+        if i == 8:
+            draw.rectangle([x0+LN_W+1, ry-1, x1, ry+LH-1], fill=SYN_LINE_HL)
+        # line number
+        ln  = str(i+1)
+        lnw = twidth(ln, mf)
+        draw.text((x0+LN_W-lnw-4, ry+1), ln, font=mf, fill=SYN_LINE_NO)
+        draw.line([(x0+LN_W, y0),(x0+LN_W, y0+h)], fill=(40,46,56), width=1)
+        # tokens
+        tx = x0 + LN_W + 10
+        for text, col in segs:
+            draw.text((tx, ry+1), text, font=mf, fill=col)
+            tx += twidth(text, mf)
+
+def code_raw(draw, x0, y0, x1, y1, measure=False):
+    raw_lines = [
+        ("```typescript",                                   CODE_TEXT),
+        ("// Fetch active campaigns for a tenant",          SYN_CMT),
+        ('import { CRMClient } from "@acme/crm-sdk";',     CODE_TEXT),
+        ("",                                                CODE_TEXT),
+        ("async function getActiveCampaigns(",              CODE_TEXT),
+        ("  tenantId: string,",                             CODE_TEXT),
+        ('  region: "AMER" | "EMEA" | "APAC"',             CODE_TEXT),
+        ("): Promise<Campaign[]> {",                        CODE_TEXT),
+        ("  const client = new CRMClient({ tenantId });",   CODE_TEXT),
+        ("  const results = await client.campaigns.list({", CODE_TEXT),
+        ('    status: "active",',                           CODE_TEXT),
+        ("    region,",                                     CODE_TEXT),
+        ("    limit: 100,",                                 CODE_TEXT),
+        ("  });",                                           CODE_TEXT),
+        ("  return results.items;",                         CODE_TEXT),
+        ("}",                                               CODE_TEXT),
+        ("```",                                             CODE_TEXT),
+    ]
+    lh, pad = 17, 12
+    h = pad*2 + len(raw_lines)*lh
+    if measure: return h
+    if draw:
+        draw.rectangle([x0, y0, x1, y0+h], fill=CODE_BG)
+        mf = MONO_(10)
+        for i, (txt, col) in enumerate(raw_lines):
+            draw.text((x0+12, y0+pad+i*lh), txt, font=mf, fill=col)
+
+def make_code():
+    PANEL_W = 580
+    OUTER   = 36
+    GAP     = 48
+    W       = OUTER*2 + PANEL_W*2 + GAP
+
+    user_msg = "Write a TypeScript function to fetch active campaigns for a tenant."
+    asst_msg = "Here's an async function using the CRM SDK that filters by status and region:"
+    title    = "Code Block"
+
+    probe = Image.new("RGB", (W, 1000), PAGE_BG)
+    y_bot, embed_h = paint_thread(probe, OUTER, OUTER, PANEL_W,
+                                  user_msg, asst_msg, title,
+                                  'rendered', code_rendered)
+    H = y_bot + OUTER
+    img = Image.new("RGB", (W, H), PAGE_BG)
+    paint_thread(img, OUTER, OUTER, PANEL_W,
+                 user_msg, asst_msg, title, 'rendered', code_rendered)
+    draw = ImageDraw.Draw(img)
+    gx = OUTER + PANEL_W + GAP//2
+    draw.line([(gx, OUTER+10),(gx, H-OUTER-10)], fill=DIVIDER, width=1)
+    paint_thread(img, OUTER+PANEL_W+GAP, OUTER, PANEL_W,
+                 user_msg, asst_msg, title, 'raw', code_raw,
+                 fixed_embed_h=embed_h)
+    return img
+
+
 # ── Run ────────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
     renders = {
-        "01-mermaid":        make_mermaid,
-        "02-vega-lite":      make_vegalite,
-        "03-data-table":     make_table,
-        "04-json-inspector": make_json,
-        "05-math":           make_math,
-        "06-markdown":       make_markdown,
-        "07-pdf":            make_pdf,
+        "01-mermaid":         make_mermaid,
+        "02-vega-lite":       make_vegalite,
+        "03-data-table":      make_table,
+        "04-json-inspector":  make_json,
+        "05-math":            make_math,
+        "06-markdown":        make_markdown,
+        "07-pdf":             make_pdf,
+        "08-feedback-card":   make_feedback,
+        "09-write-proposal":  make_write_proposal,
+        "10-tool-disclosure": make_tool_disclosure,
+        "11-code-block":      make_code,
     }
     for name, fn in renders.items():
         path = os.path.join(OUT_DIR, f"{name}.png")
