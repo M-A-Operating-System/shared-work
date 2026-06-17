@@ -1,197 +1,204 @@
-# CLAUDE.md — Knowledge Repository
+# Knowledge Repository — Instructions
+
+This is a MAOS Knowledge content repository. You are working here to create, review, and improve knowledge content that will be served to AI assistants, agent pipelines, and coding agents via the MAOS Knowledge MCP Server.
+
+Read these instructions before doing any work in this repository.
+
+---
 
 ## What this repository is
 
-This is a MAOS Knowledge Repository — a Git-versioned content directory served by the **MAOS Knowledge MCP Server**. The server exposes everything in this directory as resources, prompts, skills, commands, and agent definitions over the Model Context Protocol (MCP 2025-06-18). Any authorised MCP client — AI assistants, agent pipelines, coding agents — can discover and consume the content here in real time.
+Everything in this repository is exposed over the Model Context Protocol and consumed in real time by authorised MCP clients. When a file is merged to `main`, the MCP server detects the change and notifies all connected clients immediately. There are no local copies — this is the single source of truth.
+
+The server is **read-only at runtime**. It never writes files. All changes go through Git: feature branch → PR → merge.
 
 ---
 
 ## Your role
 
-You are helping to develop and maintain knowledge content in this repository. Your work is to:
-
-- Author new skills, commands, agents, prompts, and reference resources following the schemas below
-- Review and improve existing content for correctness, completeness, and consistency
-- Ensure all files conform to the required folder structure, file naming, and front-matter schemas
-
-The server is **read-only at runtime** — it never writes to this directory. All changes go through Git (feature branch → PR → merge to main). You author files here; the server detects changes automatically after merge and notifies all subscribed clients.
+- Create new skills, commands, agents, prompts, and resources when asked
+- Review existing content for correctness, completeness, and schema compliance
+- Never invent structure — follow the schemas in this file exactly
+- Never modify a file without bumping its `version` field
+- Never place files outside the five typed sub-folders (except support files inside a skill directory)
 
 ---
 
 ## Directory structure
 
-The tree is organised as a hierarchy: `domain → sub-domain → application`. The five typed sub-folders are mandatory at every application leaf.
+The tree follows a fixed hierarchy: `domain → sub-domain → application`. The five typed sub-folders below are mandatory at every application leaf.
 
 ```
 knowledge/
 └── {domain}/
     └── {sub-domain}/
-        └── {application}/          ← one node per application or MCP server
-            ├── resources/          ← reference documents, schemas, data files
-            ├── prompts/            ← parameterised LLM message templates
-            ├── skills/             ← multi-step workflow packages
-            ├── commands/           ← discrete executable definitions
-            └── agents/             ← autonomous actor specifications
+        └── {application}/
+            ├── resources/
+            ├── prompts/
+            ├── skills/
+            ├── commands/
+            └── agents/
 ```
 
-**Naming convention:** All path segments use `kebab-case`. No spaces, no underscores, no uppercase anywhere in the tree.
+**Naming rule:** Every path segment must be `kebab-case`. No spaces, no underscores, no uppercase anywhere in the tree.
 
 ---
 
-## Content type schemas
+## When to use each content type
 
-### Resource (`resources/`)
-
-Any file format. No required front-matter. Used for reference documents, glossaries, JSON schemas, and data files that agents and assistants retrieve and read.
-
-Create a resource when you have reference material consumers need to read — not execute. Nest files in sub-directories freely; the URI mirrors the filesystem path.
+| Use this | When you need |
+|---|---|
+| `resources/` | Reference material — documents, schemas, data files — that agents retrieve and read |
+| `prompts/` | A reusable, parameterised message template rendered into a `messages[]` array for LLM submission |
+| `skills/` | A named, multi-step workflow an agent can invoke by name |
+| `commands/` | A discrete, single-invocation executable with typed arguments and a danger declaration |
+| `agents/` | A persistent autonomous actor specification: persona, model, tools, memory, and skills |
 
 ---
 
-### Prompt (`prompts/` — `.prompt.md` or `.prompt.json`)
+## Schemas
 
-Parameterised templates rendered into a `messages[]` array for direct LLM submission. Use `{{argument_name}}` syntax for substitution points.
+Follow these schemas exactly. Do not add fields that are not listed. Do not omit required fields.
 
-**Required front-matter:**
+### Resource
+
+Any file in `resources/`. No required structure. Front-matter is optional and treated as metadata only.
+
+---
+
+### Prompt — `.prompt.md` or `.prompt.json`
 
 ```yaml
 ---
-name:        kebab-case-name          # unique within this application
-title:       Human-readable title
-version:     1.0.0
-description: One sentence describing what this prompt does
-tags:
-  - tag-one
-arguments:
+name:        kebab-case-name          # required — unique within this application
+title:       Human-readable title     # required
+version:     1.0.0                    # required — bump on every edit
+description: One sentence.            # required
+tags:                                 # optional
+  - tag
+arguments:                            # omit if none
   - name:        arg_name
-    description: What this argument represents
+    description: What this argument is
     required:    true
   - name:        optional_arg
-    description: What this argument represents
+    description: What this argument is
     required:    false
     default:     "default value"
 ---
 Prompt body. Reference arguments as {{arg_name}}.
 ```
 
-The prompt body follows the front-matter and is the raw LLM message content. The server substitutes all `{{argument}}` references at render time and returns a `messages[]` array with a single `user` role message.
+- Use `{{argument_name}}` syntax for all substitution points
+- The body is the raw LLM message content — write it as if speaking directly to the model
 
 ---
 
-### Skill (`skills/{skill-name}/SKILL.md`)
+### Skill — `skills/{skill-name}/SKILL.md`
 
-Multi-step workflow packages. Each skill is a sub-directory containing a required `SKILL.md` entry point plus any support files.
-
-**Required front-matter for `SKILL.md`:**
+Create a sub-directory named after the skill. `SKILL.md` is the only required file. Support files go in the same directory.
 
 ```yaml
 ---
-skill:       skill-name               # must match the sub-directory name exactly
-title:       Human-readable title
-version:     1.0.0
-description: One sentence describing what this skill does
-tags:
-  - tag-one
-triggers:
-  - "natural language phrase that activates this skill"
-inputs:
+skill:       skill-name               # required — must match the sub-directory name exactly
+title:       Human-readable title     # required
+version:     1.0.0                    # required — bump on every edit
+description: One sentence.            # required
+tags:                                 # optional
+  - tag
+triggers:                             # natural language phrases that activate this skill
+  - "phrase"
+inputs:                               # omit if none
   - name:        input_name
-    type:        string                # string | integer | boolean
+    type:        string               # string | integer | boolean
     required:    true
-    description: What this input represents
-outputs:
+    description: What this input is
+outputs:                              # omit if none
   - output_name
-dependencies:
-  - mcp-server-name                   # MCP servers this skill requires at runtime
-files:
-  - path:  support-file.py
-    role:  support
+dependencies:                         # MCP servers required at runtime; omit if none
+  - mcp-server-name
+files:                                # list any support files; omit if none
+  - path:        support-file.py
+    role:        support
     description: What this file does
 ---
 # Skill title
 
-Step-by-step instructions for executing this workflow. Reference inputs as {{input_name}}.
+Step-by-step workflow instructions. Reference inputs as {{input_name}}.
 ```
 
-The `skill:` front-matter field must match the sub-directory name. Support files in the same directory are accessible as resources individually.
+- The `skill:` field must match the sub-directory name — the server uses this to resolve the entry point
+- Write the body as explicit, numbered steps the executing agent will follow
 
 ---
 
-### Command (`commands/` — `.cmd.json` or `.cmd.md`)
-
-Discrete, single-invocation executable definitions. A command carries a `command` string with `{{argument}}` placeholders and a mandatory `danger_level` declaration.
-
-**JSON format (`.cmd.json`):**
+### Command — `.cmd.json` or `.cmd.md`
 
 ```json
 {
   "name":        "command-name",
   "title":       "Human-readable title",
   "version":     "1.0.0",
-  "description": "One sentence describing what this command does",
-  "tags":        ["tag-one"],
+  "description": "One sentence.",
+  "tags":        ["tag"],
   "command":     "tool-name action --flag {{arg_name}}",
   "arguments": [
     { "name": "arg_name",     "type": "string",  "required": true  },
     { "name": "optional_arg", "type": "string",  "required": false, "default": "standard" }
   ],
-  "returns":      "description of what the command returns",
+  "returns":      "description of return value",
   "danger_level": "read-only",
   "target_tool":  "target-mcp-server"
 }
 ```
 
-**Danger levels — must be accurate:**
+`danger_level` is mandatory and must be accurate — clients use it to decide whether to require user confirmation:
 
-| Level | Meaning | Client behaviour |
-|---|---|---|
-| `read-only` | No state mutation | May invoke without confirmation |
-| `write` | Creates or modifies state | Should present confirmation prompt |
-| `destructive` | Irreversibly modifies or deletes | Must require explicit user confirmation |
+| Value | Meaning |
+|---|---|
+| `read-only` | No state mutation |
+| `write` | Creates or modifies state |
+| `destructive` | Irreversibly modifies or deletes |
 
 ---
 
-### Agent (`agents/` — `.agent.md` or `.agent.json`)
-
-Persistent specifications of autonomous actors: persona, model, tool allowlist, memory configuration, and associated skills.
-
-**Required front-matter for `.agent.md`:**
+### Agent — `.agent.md` or `.agent.json`
 
 ```yaml
 ---
-agent:       agent-name
-title:       Human-readable title
-version:     1.0.0
-description: One sentence describing this agent's role
-tags:
-  - tag-one
-model:       claude-sonnet-4-6
-temperature: 0.3
-tools_allowed:
+agent:       agent-name               # required — kebab-case, unique within this application
+title:       Human-readable title     # required
+version:     1.0.0                    # required — bump on every edit
+description: One sentence.            # required
+tags:                                 # optional
+  - tag
+model:       provider/model-name      # required
+temperature: 0.3                      # required
+tools_allowed:                        # required — list only tools this agent needs
   - get_resource
   - search_knowledge
   - get_skill
-memory:
+memory:                               # omit if no persistent memory required
   type:      supabase-pgvector
   namespace: agent-name
   ttl_days:  90
-skills:
+skills:                               # omit if none
   - skill-name
-system_prompt_extends: base-agent-name   # optional — prepends a base agent's system prompt
+system_prompt_extends: base-agent     # optional — must reference an existing agent name
 ---
-System prompt body. Describe the agent's persona, operating scope, and behavioural constraints.
+System prompt body. Write the agent's persona, scope, and behavioural constraints here.
 ```
 
-If `system_prompt_extends` is set, it must reference an existing `agent:` name in this repository. The server prepends the base agent's system prompt before this agent's body.
+- If `system_prompt_extends` is set, it must name an existing agent in this repository — the server prepends that agent's system prompt before this body
+- List only the tools the agent genuinely needs in `tools_allowed` — do not grant broad access by default
 
 ---
 
-## Key rules
+## Rules
 
-- **Naming:** All path segments are `kebab-case`. No spaces, underscores, or uppercase anywhere in the tree.
-- **Skill entry point:** `SKILL.md` is the only recognised skill entry point. Its `skill:` front-matter field must match the sub-directory name.
-- **Versioning:** Every file carries a semver `version` field. Bump `PATCH` on every substantive edit; `MINOR` when adding new fields or arguments; `MAJOR` for breaking changes.
-- **danger_level:** Mandatory on all commands and must be accurate — clients use it to determine whether to require explicit user confirmation before invoking.
-- **system_prompt_extends:** Must reference an existing agent in this repository. The server will error on load if the reference cannot be resolved.
-- **File placement:** Do not create files outside the five typed sub-folders unless they are support files inside a `skills/{name}/` directory.
-- **No writes at runtime:** Never assume the server or any agent will write files here. All content changes go through Git.
+1. `kebab-case` for all path segments — no exceptions
+2. Every file must include a `version` field in semver; bump it on every substantive edit
+3. The `skill:` front-matter field must match the skill's sub-directory name exactly
+4. `danger_level` on every command is mandatory and must accurately reflect the operation's impact
+5. `system_prompt_extends` must reference an existing agent in this repository
+6. Support files belong only inside `skills/{name}/` — nowhere else outside the five typed folders
+7. Do not add fields that are not in the schema above — unknown fields are ignored by the server and create drift
