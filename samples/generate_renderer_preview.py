@@ -1002,11 +1002,414 @@ def make_math():
                  fixed_embed_h=embed_h)
     return img
 
+# ═══════════════════════════════════════════════════════════════════════════
+#  06 — MARKDOWN DOCUMENT
+# ═══════════════════════════════════════════════════════════════════════════
+MD_H1        = ( 13,  13,  13)
+MD_H2        = ( 30,  30,  30)
+MD_H3        = ( 50,  50,  50)
+MD_BODY      = ( 50,  55,  62)
+MD_MUTED     = (120, 126, 136)
+MD_CODE_BG   = (240, 242, 245)
+MD_CODE_TX   = (180,  50,  90)
+MD_BULLET    = ( 99, 102, 115)
+MD_RULE      = (220, 222, 226)
+MD_BOLD      = ( 13,  13,  13)
+MD_LINK      = ( 37, 99, 235)
+MD_DOC_BG    = (255, 255, 255)
+MD_DOC_FRAME = (232, 234, 237)
+
+def _md_inline_code(draw, x, y, text, font):
+    """Draw an inline code span. Returns x after the span."""
+    f = fnt(MONO, font.size - 1 if hasattr(font, 'size') else 10)
+    tw = twidth(text, f)
+    pad = 4
+    draw.rectangle([x - pad, y - 1, x + tw + pad, y + 14], fill=MD_CODE_BG)
+    draw.text((x, y + 1), text, font=f, fill=MD_CODE_TX)
+    return x + tw + pad * 2
+
+def markdown_rendered(draw, x0, y0, x1, y1, measure=False):
+    """Render a styled markdown document excerpt."""
+    W   = x1 - x0
+    PAD = 12
+    lh_body = 20
+    lh_h2   = 26
+
+    # content blocks:
+    # H1 title, rule, H2 + body x2, bullet list x4, H2 + body with inline code + bold
+    h = (
+        PAD +        # top
+        34 +         # H1
+        6  +         # gap after H1
+        1  +         # rule
+        16 +         # gap
+        22 +         # H2 "Executive Summary"
+        8  +         # gap
+        lh_body*3 +  # body paragraph (3 lines)
+        14 +         # gap
+        22 +         # H2 "Key Metrics"
+        8  +         # gap
+        lh_body*4 +  # 4 bullet items
+        14 +         # gap
+        22 +         # H2 "Technical Notes"
+        8  +         # gap
+        lh_body*2 +  # body with inline code/bold
+        PAD          # bottom
+    )
+    if measure: return h
+    if draw is None: return
+
+    y = y0 + PAD
+
+    f_h1   = fnt(SANS_BOLD, 20)
+    f_h2   = fnt(SANS_BOLD, 14)
+    f_body = fnt(SANS,      13)
+    f_bold = fnt(SANS_BOLD, 13)
+    f_mute = fnt(SANS,      11)
+
+    # H1
+    draw.text((x0, y), "Q2 Performance Review", font=f_h1, fill=MD_H1)
+    y += 34
+    # rule under H1
+    draw.line([(x0, y), (x1, y)], fill=MD_RULE, width=1)
+    y += 10
+
+    # meta line
+    draw.text((x0, y), "Andrew Bush  ·  June 2026  ·  v1.2", font=f_mute, fill=MD_MUTED)
+    y += 20
+
+    # H2 — Executive Summary
+    draw.text((x0, y), "Executive Summary", font=f_h2, fill=MD_H2)
+    y += lh_h2
+    body1 = ("Revenue grew 18 % quarter-on-quarter, driven by the EMEA region "
+             "expansion and the launch of the Atlas assistant tier. Operating "
+             "costs held flat at 34 % of revenue.")
+    y = draw_wrapped(draw, body1, x0, y, W, f_body, MD_BODY, lh=lh_body)
+    y += 14
+
+    # H2 — Key Metrics
+    draw.text((x0, y), "Key Metrics", font=f_h2, fill=MD_H2)
+    y += lh_h2
+    bullets = [
+        ("Revenue",  "£4.2 M  (+18 % QoQ)"),
+        ("MAU",      "12,400  (+31 % QoQ)"),
+        ("NPS",      "67  (up from 58 in Q1)"),
+        ("Uptime",   "99.96 %  (SLA: 99.9 %)"),
+    ]
+    for key, val in bullets:
+        # bullet dot
+        draw.ellipse([x0+2, y+7, x0+6, y+11], fill=MD_BULLET)
+        draw.text((x0 + 14, y), key + ": ", font=f_bold, fill=MD_BOLD)
+        kw = twidth(key + ": ", f_bold)
+        draw.text((x0 + 14 + kw, y), val, font=f_body, fill=MD_BODY)
+        y += lh_body
+    y += 14
+
+    # H2 — Technical Notes
+    draw.text((x0, y), "Technical Notes", font=f_h2, fill=MD_H2)
+    y += lh_h2
+    # line with inline code
+    draw.text((x0, y), "Cache hit rate reached ", font=f_body, fill=MD_BODY)
+    x_after = twidth("Cache hit rate reached ", f_body)
+    draw.text((x0 + x_after, y), "48 %", font=f_bold, fill=MD_BOLD)
+    x_after += twidth("48 %", f_bold)
+    draw.text((x0 + x_after, y), " against the ", font=f_body, fill=MD_BODY)
+    x_after += twidth(" against the ", f_body)
+    _md_inline_code(draw, x0 + x_after, y, "≥ 40 %", f_body)
+    y += lh_body
+    # link line
+    draw.text((x0, y), "Full data: ", font=f_body, fill=MD_BODY)
+    lx = twidth("Full data: ", f_body)
+    draw.text((x0 + lx, y), "analytics-dashboard → Q2 Report", font=f_body, fill=MD_LINK)
+    ly = y + 14
+    draw.line([(x0 + lx, ly), (x0 + lx + twidth("analytics-dashboard → Q2 Report", f_body), ly)],
+              fill=MD_LINK, width=1)
+
+def markdown_raw(draw, x0, y0, x1, y1, measure=False):
+    lines = [
+        ("# Q2 Performance Review",                          CODE_BLUE),
+        ("*Andrew Bush · June 2026 · v1.2*",                CODE_TEXT),
+        ("---",                                              CODE_TEXT),
+        ("",                                                 CODE_TEXT),
+        ("## Executive Summary",                             CODE_BLUE),
+        ("",                                                 CODE_TEXT),
+        ("Revenue grew 18 % quarter-on-quarter, driven by", CODE_TEXT),
+        ("the EMEA region expansion and the launch of the",  CODE_TEXT),
+        ("Atlas assistant tier. Operating costs held flat.",  CODE_TEXT),
+        ("",                                                 CODE_TEXT),
+        ("## Key Metrics",                                   CODE_BLUE),
+        ("",                                                 CODE_TEXT),
+        ("- **Revenue**: £4.2 M  (+18 % QoQ)",              CODE_GREEN),
+        ("- **MAU**: 12,400  (+31 % QoQ)",                   CODE_GREEN),
+        ("- **NPS**: 67  (up from 58 in Q1)",                CODE_GREEN),
+        ("- **Uptime**: 99.96 %  (SLA: 99.9 %)",            CODE_GREEN),
+        ("",                                                 CODE_TEXT),
+        ("## Technical Notes",                               CODE_BLUE),
+        ("",                                                 CODE_TEXT),
+        ("Cache hit rate reached **48 %** against the",      CODE_TEXT),
+        ("`≥ 40 %` target. Full data:",                      CODE_TEXT),
+        ("[analytics-dashboard → Q2 Report](https://...)",   CODE_YELLOW),
+    ]
+    lh, pad = 16, 12
+    h = pad*2 + len(lines)*lh
+    if measure: return h
+    if draw:
+        draw.rectangle([x0, y0, x1, y0+h], fill=CODE_BG)
+        mf = MONO_(10)
+        for i, (txt, col) in enumerate(lines):
+            draw.text((x0+12, y0+pad+i*lh), txt, font=mf, fill=col)
+
+def make_markdown():
+    PANEL_W = 580
+    OUTER   = 36
+    GAP     = 48
+    W       = OUTER*2 + PANEL_W*2 + GAP
+
+    user_msg = "Can you put together the Q2 performance summary as a document?"
+    asst_msg = "Here's the Q2 Performance Review document:"
+    title    = "Document"
+
+    probe = Image.new("RGB", (W, 1400), PAGE_BG)
+    y_bot, embed_h = paint_thread(probe, OUTER, OUTER, PANEL_W,
+                                  user_msg, asst_msg, title,
+                                  'rendered', markdown_rendered)
+    H = y_bot + OUTER
+
+    img = Image.new("RGB", (W, H), PAGE_BG)
+    paint_thread(img, OUTER, OUTER, PANEL_W,
+                 user_msg, asst_msg, title, 'rendered', markdown_rendered)
+
+    draw = ImageDraw.Draw(img)
+    gx = OUTER + PANEL_W + GAP//2
+    draw.line([(gx, OUTER+10),(gx, H-OUTER-10)], fill=DIVIDER, width=1)
+
+    paint_thread(img, OUTER+PANEL_W+GAP, OUTER, PANEL_W,
+                 user_msg, asst_msg, title, 'raw', markdown_raw,
+                 fixed_embed_h=embed_h)
+    return img
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+#  07 — PDF DOCUMENT ATTACHMENT
+# ═══════════════════════════════════════════════════════════════════════════
+PDF_PAGE_BG   = (255, 255, 255)
+PDF_PAGE_SHD  = (210, 212, 218)
+PDF_TOOLBAR   = (245, 246, 248)
+PDF_TOOL_BDR  = (224, 226, 230)
+PDF_BADGE_BG  = (220,  38,  38)   # red PDF badge
+PDF_BADGE_TX  = (255, 255, 255)
+PDF_ICON_BG   = (254, 226, 226)   # light red for file icon
+PDF_ICON_TX   = (220,  38,  38)
+PDF_ATTACH_BG = (249, 250, 251)
+PDF_ATTACH_BD = (229, 231, 235)
+PDF_BODY_TX   = ( 40,  40,  40)
+PDF_BODY_MUT  = (100, 105, 115)
+PDF_CTRL      = (120, 125, 135)
+PDF_CTRL_HOV  = ( 60,  65,  80)
+
+def _pdf_toolbar(draw, x0, y0, x1, toolbar_h, page, total_pages):
+    """Draw a minimal PDF viewer toolbar."""
+    draw.rectangle([x0, y0, x1, y0+toolbar_h], fill=PDF_TOOLBAR)
+    draw.line([(x0, y0+toolbar_h), (x1, y0+toolbar_h)], fill=PDF_TOOL_BDR, width=1)
+
+    f = fnt(SANS, 11)
+    fb = fnt(SANS_BOLD, 11)
+
+    # Left: page indicator
+    pg_txt = f"Page {page} of {total_pages}"
+    draw.text((x0+10, y0+toolbar_h//2-7), pg_txt, font=f, fill=PDF_CTRL)
+
+    # Centre: ‹ › nav arrows
+    cx = (x0 + x1) // 2
+    draw.text((cx - 28, y0+toolbar_h//2-8), "‹", font=fnt(SANS, 16), fill=PDF_CTRL_HOV)
+    draw.text((cx + 16, y0+toolbar_h//2-8), "›", font=fnt(SANS, 16), fill=PDF_CTRL_HOV)
+
+    # Right: zoom label
+    draw.text((x1 - 60, y0+toolbar_h//2-7), "100 %  ⊕  ⊖", font=f, fill=PDF_CTRL)
+
+def _pdf_page(draw, img, x0, y0, page_w, page_h):
+    """Draw a white page with shadow and realistic document content."""
+    # shadow
+    draw.rectangle([x0+3, y0+3, x0+page_w+3, y0+page_h+3], fill=PDF_PAGE_SHD)
+    # page
+    draw.rectangle([x0, y0, x0+page_w, y0+page_h], fill=PDF_PAGE_BG, outline=PDF_TOOL_BDR, width=1)
+
+    # Document content inside page
+    px, py = x0 + 18, y0 + 18
+    pw = page_w - 36
+
+    f_title = fnt(SANS_BOLD, 11)
+    f_h     = fnt(SANS_BOLD, 9)
+    f_body  = fnt(SANS,      8)
+    f_mute  = fnt(SANS,      7)
+
+    # logo placeholder + title block
+    draw.rectangle([px, py, px+28, py+12], fill=(220, 225, 240))
+    draw.text((px+32, py+1), "Acme Corporation", font=f_title, fill=PDF_BODY_TX)
+    draw.text((px+32, py+13), "Confidential — Internal Use Only", font=f_mute, fill=PDF_BODY_MUT)
+    draw.line([(px, py+26), (px+pw, py+26)], fill=PDF_TOOL_BDR, width=1)
+    py += 34
+
+    # H1 equivalent
+    draw.text((px, py), "Master Services Agreement", font=fnt(SANS_BOLD, 12), fill=PDF_BODY_TX)
+    py += 17
+    draw.text((px, py), "Effective Date: 1 July 2026  ·  Reference: MSA-2026-0042", font=f_mute, fill=PDF_BODY_MUT)
+    py += 16
+
+    # Section heading
+    draw.text((px, py), "1.  Definitions", font=f_h, fill=PDF_BODY_TX)
+    py += 13
+
+    # Body paragraph (narrow lines for realism)
+    para = ("In this Agreement, unless the context otherwise requires, the following terms shall "
+            "have the meanings set out below. \"Services\" means the software-as-a-service platform "
+            "and any professional services delivered by the Provider under each Order Form.")
+    words = para.split()
+    line, lines = [], []
+    for w in words:
+        test = ' '.join(line + [w])
+        if twidth(test, f_body) <= pw:
+            line.append(w)
+        else:
+            lines.append(' '.join(line))
+            line = [w]
+    if line: lines.append(' '.join(line))
+    for l in lines[:6]:
+        draw.text((px, py), l, font=f_body, fill=PDF_BODY_TX)
+        py += 11
+
+    py += 6
+    draw.text((px, py), "2.  Licence Grant", font=f_h, fill=PDF_BODY_TX)
+    py += 13
+    para2 = ("Subject to the terms of this Agreement and timely payment of all Fees, Provider "
+             "grants Customer a non-exclusive, non-transferable, worldwide licence to access "
+             "and use the Services during the Subscription Term.")
+    words2 = para2.split()
+    line2, lines2 = [], []
+    for w in words2:
+        test = ' '.join(line2 + [w])
+        if twidth(test, f_body) <= pw:
+            line2.append(w)
+        else:
+            lines2.append(' '.join(line2))
+            line2 = [w]
+    if line2: lines2.append(' '.join(line2))
+    for l in lines2[:4]:
+        draw.text((px, py), l, font=f_body, fill=PDF_BODY_TX)
+        py += 11
+
+def pdf_rendered(draw, x0, y0, x1, y1, measure=False):
+    TOOLBAR_H = 28
+    PAGE_W    = x1 - x0 - 20   # centred page with margin
+    PAGE_H    = int(PAGE_W * 1.3)
+    h = TOOLBAR_H + 12 + PAGE_H + 12
+    if measure: return h
+    if draw is None: return
+
+    # toolbar
+    _pdf_toolbar(draw, x0, y0, x1, TOOLBAR_H, 1, 8)
+
+    # page
+    px = x0 + 10
+    py = y0 + TOOLBAR_H + 12
+    _pdf_page(draw, draw._image if hasattr(draw, '_image') else None,
+              px, py, PAGE_W, PAGE_H)
+
+def pdf_raw(draw, x0, y0, x1, y1, measure=False):
+    """Raw view — attachment metadata card (no binary content)."""
+    CARD_H    = 64
+    INFO_H    = 80
+    PAD       = 12
+    h = PAD + CARD_H + PAD + INFO_H + PAD
+    if measure: return h
+    if draw is None: return
+
+    # Attachment card
+    cy0 = y0 + PAD
+    cy1 = cy0 + CARD_H
+    rrect(draw, [x0, cy0, x1, cy1], 6, fill=PDF_ATTACH_BG, outline=PDF_ATTACH_BD, lw=1)
+
+    # PDF file icon
+    ix0, iy0 = x0+12, cy0+10
+    ix1, iy1 = ix0+28, iy0+36
+    rrect(draw, [ix0, iy0, ix1, iy1], 3, fill=PDF_ICON_BG)
+    # dog-ear
+    draw.polygon([(ix1-8,iy0),(ix1,iy0+8),(ix1-8,iy0+8)], fill=(250,200,200))
+    draw.line([(ix1-8,iy0),(ix1-8,iy0+8),(ix1,iy0+8)], fill=PDF_ICON_TX, width=1)
+    # PDF label
+    f_badge = fnt(SANS_BOLD, 8)
+    draw.text((ix0+4, iy0+16), "PDF", font=f_badge, fill=PDF_ICON_TX)
+
+    # filename + meta
+    fx = ix1 + 12
+    draw.text((fx, cy0+10), "MSA-2026-0042.pdf", font=fnt(SANS_BOLD, 12), fill=PDF_BODY_TX)
+    draw.text((fx, cy0+27), "8 pages  ·  142 KB  ·  Uploaded 17 Jun 2026",
+              font=fnt(SANS, 10), fill=PDF_BODY_MUT)
+
+    # Open / Download buttons
+    btn_y = cy0 + 43
+    for label, bx in [("Open", fx), ("Download", fx+60)]:
+        bw = twidth(label, fnt(SANS, 10)) + 16
+        rrect(draw, [bx, btn_y, bx+bw, btn_y+18], 4,
+              fill=(255,255,255), outline=PDF_ATTACH_BD, lw=1)
+        draw.text((bx+8, btn_y+3), label, font=fnt(SANS, 10), fill=PDF_BODY_TX)
+
+    # Info block
+    iy0b = cy1 + PAD
+    draw.rectangle([x0, iy0b, x1, iy0b+INFO_H], fill=CODE_BG)
+    mf = MONO_(10)
+    meta_lines = [
+        ("# Attachment metadata",          CODE_TEXT),
+        ("filename:  MSA-2026-0042.pdf",   CODE_BLUE),
+        ("mime:      application/pdf",     CODE_GREEN),
+        ("pages:     8",                   CODE_YELLOW),
+        ("size:      142 KB",              CODE_YELLOW),
+        ("sha256:    3f9a…c14e",           CODE_TEXT),
+    ]
+    for i, (txt, col) in enumerate(meta_lines):
+        draw.text((x0+12, iy0b+8+i*12), txt, font=mf, fill=col)
+
+def make_pdf():
+    PANEL_W = 580
+    OUTER   = 36
+    GAP     = 48
+    W       = OUTER*2 + PANEL_W*2 + GAP
+
+    user_msg = "Here's the master services agreement — can you pull out the key obligations?"
+    asst_msg = "I can see the MSA you've attached. Here's the document preview:"
+    title    = "PDF Document"
+
+    probe = Image.new("RGB", (W, 1400), PAGE_BG)
+    y_bot, embed_h = paint_thread(probe, OUTER, OUTER, PANEL_W,
+                                  user_msg, asst_msg, title,
+                                  'rendered', pdf_rendered)
+    H = y_bot + OUTER
+
+    img = Image.new("RGB", (W, H), PAGE_BG)
+    paint_thread(img, OUTER, OUTER, PANEL_W,
+                 user_msg, asst_msg, title, 'rendered', pdf_rendered)
+
+    draw = ImageDraw.Draw(img)
+    gx = OUTER + PANEL_W + GAP//2
+    draw.line([(gx, OUTER+10),(gx, H-OUTER-10)], fill=DIVIDER, width=1)
+
+    paint_thread(img, OUTER+PANEL_W+GAP, OUTER, PANEL_W,
+                 user_msg, asst_msg, title, 'raw', pdf_raw,
+                 fixed_embed_h=embed_h)
+    return img
+
+
 # ── Run ────────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
-    renders = {"01-mermaid": make_mermaid, "02-vega-lite": make_vegalite,
-               "03-data-table": make_table, "04-json-inspector": make_json,
-               "05-math": make_math}
+    renders = {
+        "01-mermaid":        make_mermaid,
+        "02-vega-lite":      make_vegalite,
+        "03-data-table":     make_table,
+        "04-json-inspector": make_json,
+        "05-math":           make_math,
+        "06-markdown":       make_markdown,
+        "07-pdf":            make_pdf,
+    }
     for name, fn in renders.items():
         path = os.path.join(OUT_DIR, f"{name}.png")
         fn().save(path)
