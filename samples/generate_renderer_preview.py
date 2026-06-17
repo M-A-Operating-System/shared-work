@@ -644,10 +644,186 @@ def make_table():
                  fixed_embed_h=embed_h)
     return img
 
+# ═══════════════════════════════════════════════════════════════════════════
+#  04 — JSON INSPECTOR
+# ═══════════════════════════════════════════════════════════════════════════
+JSON_BG       = (255, 255, 255)
+JSON_KEY      = ( 14,  99, 156)    # blue key
+JSON_STR      = (198,  93,  93)    # red/salmon string
+JSON_NUM      = (100, 155,  80)    # green number
+JSON_BOOL     = (157,  99, 215)    # purple boolean
+JSON_NULL     = (157,  99, 215)
+JSON_PUNCT    = ( 80,  80,  80)    # brackets / braces
+JSON_EXPAND   = (180, 185, 195)    # triangle expand icon
+JSON_LINE     = (240, 241, 243)    # tree guide lines
+JSON_ROOT_BG  = (247, 248, 250)    # root header band
+JSON_BADGE_BG = (232, 237, 255)
+JSON_BADGE_TX = ( 60,  80, 180)
+JSON_HOVER    = (238, 242, 255)    # hover highlight (shown on first key)
+
+# Tree definition: (indent_level, key, value_text, value_color, expanded, children_count)
+# value_color=None means no inline value (object/array node)
+_JSON_NODES = [
+    # lvl  key                 value              color        badge
+    (0,    None,               None,              None,        "{}"),       # root object
+    (1,    "name",             '"Atlas"',         JSON_STR,    None),
+    (1,    "version",          '"2.3.1"',         JSON_STR,    None),
+    (1,    "active",           "true",            JSON_BOOL,   None),
+    (1,    "config",           None,              None,        "{}"),       # collapsed object
+    (2,    "provider",         '"anthropic"',     JSON_STR,    None),
+    (2,    "model",            '"powerful"',      JSON_STR,    None),
+    (2,    "maxTokens",        "4096",            JSON_NUM,    None),
+    (1,    "tools",            None,              None,        "[3]"),      # collapsed array
+    (2,    "0",                '"search"',        JSON_STR,    None),
+    (2,    "1",                '"calculator"',    JSON_STR,    None),
+    (2,    "2",                '"data-lookup"',   JSON_STR,    None),
+    (1,    "sessionId",        '"sess_9f2c"',     JSON_STR,    None),
+    (1,    "createdAt",        '"2026-06-17"',    JSON_STR,    None),
+]
+
+# Which nodes are visible in the rendered viewport
+# Root + name/version/active (expanded) + config (collapsed, no children shown)
+# + tools (collapsed, no children shown) + sessionId + createdAt
+_VISIBLE_NODES = [0, 1, 2, 3, 4, 8, 12, 13]   # indices into _JSON_NODES
+
+def _draw_triangle(draw, cx, cy, expanded, color):
+    """Draw a small disclosure triangle."""
+    if expanded:
+        draw.polygon([(cx-4,cy-2),(cx+4,cy-2),(cx,cy+3)], fill=color)
+    else:
+        draw.polygon([(cx-2,cy-4),(cx+3,cy),(cx-2,cy+4)], fill=color)
+
+def json_rendered(draw, x0, y0, x1, y1, measure=False):
+    ROW_H  = 22
+    PAD    = 10
+    INDENT = 16
+    total_rows = len(_VISIBLE_NODES)
+    h = PAD + ROW_H * total_rows + PAD
+    if measure: return h
+    if draw is None: return
+
+    f_key  = BOLD(11)
+    f_val  = UI(11)
+    f_bge  = UI(9)
+
+    for row_idx, node_idx in enumerate(_VISIBLE_NODES):
+        lvl, key, val, col, badge = _JSON_NODES[node_idx]
+        ry = y0 + PAD + row_idx * ROW_H
+
+        # hover highlight on first data row
+        if row_idx == 1:
+            draw.rectangle([x0-4, ry-1, x1+4, ry+ROW_H-3], fill=JSON_HOVER)
+
+        # indent guides
+        for d in range(1, lvl+1):
+            gx = x0 + PAD + (d-1)*INDENT + INDENT//2
+            draw.line([(gx, ry),(gx, ry+ROW_H)], fill=JSON_LINE, width=1)
+
+        tx = x0 + PAD + lvl * INDENT
+
+        # triangle for expandable nodes
+        is_obj_or_arr = (val is None)
+        if is_obj_or_arr:
+            expanded = (node_idx in [0, 4]) if row_idx > 0 else True
+            # root is always expanded in this view; config at idx 4 is also shown expanded
+            expanded = node_idx in [0]   # only root expanded; config+tools collapsed
+            _draw_triangle(draw, tx+5, ry+ROW_H//2, expanded, JSON_EXPAND)
+            tx += 14
+
+        # key
+        if key is not None:
+            draw.text((tx, ry+4), f'"{key}"', font=f_key, fill=JSON_KEY)
+            kw = twidth(f'"{key}"', f_key)
+            draw.text((tx+kw, ry+4), ": ", font=f_val, fill=JSON_PUNCT)
+            tx += kw + twidth(": ", f_val)
+
+        # value or badge
+        if val is not None:
+            draw.text((tx, ry+4), val, font=f_val, fill=col)
+        elif badge is not None:
+            # badge pill
+            bw = twidth(badge, f_bge) + 10
+            bh = 14
+            by = ry + ROW_H//2 - bh//2
+            rrect(draw, [tx, by, tx+bw, by+bh], 4, fill=JSON_BADGE_BG)
+            draw.text((tx+5, by+3), badge, font=f_bge, fill=JSON_BADGE_TX)
+
+def json_raw(draw, x0, y0, x1, y1, measure=False):
+    lines = [
+        ('```json',                             CODE_TEXT),
+        ('{',                                   CODE_TEXT),
+        ('  "name": "Atlas",',                  CODE_TEXT),
+        ('  "version": "2.3.1",',               CODE_TEXT),
+        ('  "active": true,',                   CODE_TEXT),
+        ('  "config": {',                       CODE_TEXT),
+        ('    "provider": "anthropic",',         CODE_TEXT),
+        ('    "model": "powerful",',             CODE_TEXT),
+        ('    "maxTokens": 4096',               CODE_TEXT),
+        ('  },',                                CODE_TEXT),
+        ('  "tools": [',                        CODE_TEXT),
+        ('    "search",',                       CODE_TEXT),
+        ('    "calculator",',                   CODE_TEXT),
+        ('    "data-lookup"',                   CODE_TEXT),
+        ('  ],',                                CODE_TEXT),
+        ('  "sessionId": "sess_9f2c",',         CODE_TEXT),
+        ('  "createdAt": "2026-06-17"',         CODE_TEXT),
+        ('}',                                   CODE_TEXT),
+        ('```',                                 CODE_TEXT),
+    ]
+    # syntax-colour the lines
+    def colour(txt):
+        t = txt.strip()
+        if t.startswith('"') and '":' in t:
+            k, rest = t.split(':', 1)
+            return [(CODE_BLUE, txt[:len(txt)-len(t)]+k+':'),
+                    (CODE_TEXT, ' '),
+                    (CODE_GREEN if '"' in rest else
+                     CODE_YELLOW if any(c.isdigit() for c in rest) else
+                     JSON_BOOL, rest.strip().rstrip(','))]
+        return [(CODE_TEXT, txt)]
+
+    lh, pad = 16, 12
+    h = pad*2 + len(lines)*lh
+    if measure: return h
+    if draw:
+        draw.rectangle([x0, y0, x1, y0+h], fill=CODE_BG)
+        mf = MONO_(10)
+        for i, (txt, _) in enumerate(lines):
+            draw.text((x0+12, y0+pad+i*lh), txt, font=mf, fill=CODE_TEXT)
+
+def make_json():
+    PANEL_W = 580
+    OUTER   = 36
+    GAP     = 48
+    W       = OUTER*2 + PANEL_W*2 + GAP
+
+    user_msg = "What does the current assistant config look like?"
+    asst_msg = "Here's the active configuration object for this session:"
+    title    = "JSON Inspector"
+
+    probe = Image.new("RGB", (W, 1000), PAGE_BG)
+    y_bot, embed_h = paint_thread(probe, OUTER, OUTER, PANEL_W,
+                                  user_msg, asst_msg, title,
+                                  'rendered', json_rendered)
+    H = y_bot + OUTER
+
+    img = Image.new("RGB", (W, H), PAGE_BG)
+    paint_thread(img, OUTER, OUTER, PANEL_W,
+                 user_msg, asst_msg, title, 'rendered', json_rendered)
+
+    draw = ImageDraw.Draw(img)
+    gx = OUTER + PANEL_W + GAP//2
+    draw.line([(gx, OUTER+10),(gx, H-OUTER-10)], fill=DIVIDER, width=1)
+
+    paint_thread(img, OUTER+PANEL_W+GAP, OUTER, PANEL_W,
+                 user_msg, asst_msg, title, 'raw', json_raw,
+                 fixed_embed_h=embed_h)
+    return img
+
 # ── Run ────────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
     renders = {"01-mermaid": make_mermaid, "02-vega-lite": make_vegalite,
-               "03-data-table": make_table}
+               "03-data-table": make_table, "04-json-inspector": make_json}
     for name, fn in renders.items():
         path = os.path.join(OUT_DIR, f"{name}.png")
         fn().save(path)
