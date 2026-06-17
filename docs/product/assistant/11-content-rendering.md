@@ -62,20 +62,21 @@ The rendering engine evaluates each content block in an assistant response in pr
 |----------|---------|------------|
 | 1 | Tool call event (`mcp_tool_use` / `mcp_tool_result`) or MCP `elicitation/create` event | **Tool call disclosure** card / **Feedback request** card |
 | 2 | Fenced block tag matching a registered host renderer (`renderers[].trigger`) | **Custom host renderer** — host-provided ES module; see below |
-| 3 | Fenced block tagged ` ```feedback-request ` | **Feedback request card** — blocking interactive prompt; streaming pauses until user responds |
-| 4 | Fenced block tagged ` ```document ` | **Document canvas** — opens in right panel canvas; reference card in thread |
-| 5 | Fenced block tagged ` ```mermaid ` | **Mermaid diagram** — SVG, expandable, exportable |
-| 6 | Fenced block tagged ` ```vega-lite ` | **Vega-Lite chart** — interactive, responsive |
-| 7 | Fenced block tagged ` ```math ` or `$$...$$` display block | **Math expression** — KaTeX rendered display block |
-| 8 | Fenced block tagged ` ```json ` | **JSON inspector** — collapsible tree, copy-to-clipboard |
-| 9 | Fenced block tagged ` ```csv ` or ` ```table ` | **Data table** — sortable, filterable, paginated, CSV export |
-| 10 | Any other fenced block | **Syntax-highlighted code** — Prism, copy-to-clipboard, line numbers > 5 lines |
-| 11 | Inline `$...$` within prose | **Inline math** — KaTeX rendered inline |
-| 12 | All other content | **Rich markdown prose** — GFM |
+| 3 | Fenced block tagged ` ```write-proposal ` | **Write proposal card** — blocking before/after confirmation card; streaming pauses until user confirms or cancels |
+| 4 | Fenced block tagged ` ```feedback-request ` | **Feedback request card** — blocking interactive prompt; streaming pauses until user responds |
+| 5 | Fenced block tagged ` ```document ` | **Document canvas** — opens in right panel canvas; reference card in thread |
+| 6 | Fenced block tagged ` ```mermaid ` | **Mermaid diagram** — SVG, expandable, exportable |
+| 7 | Fenced block tagged ` ```vega-lite ` | **Vega-Lite chart** — interactive, responsive |
+| 8 | Fenced block tagged ` ```math ` or `$$...$$` display block | **Math expression** — KaTeX rendered display block |
+| 9 | Fenced block tagged ` ```json ` | **JSON inspector** — collapsible tree, copy-to-clipboard |
+| 10 | Fenced block tagged ` ```csv ` or ` ```table ` | **Data table** — sortable, filterable, paginated, CSV export |
+| 11 | Any other fenced block | **Syntax-highlighted code** — Prism, copy-to-clipboard, line numbers > 5 lines |
+| 12 | Inline `$...$` within prose | **Inline math** — KaTeX rendered inline |
+| 13 | All other content | **Rich markdown prose** — GFM |
 
-> **Note — priority 1 is event-driven, not fenced-block matching.** Tool call disclosures are triggered by `mcp_tool_use` / `mcp_tool_result` streaming events; feedback request cards are triggered by MCP `elicitation/create` events. Both arrive outside content blocks entirely. Priorities 2–12 are evaluated against the fenced block tag of each content block. The two mechanisms do not compete — protocol events are always rendered as their respective cards regardless of block content.
+> **Note — priority 1 is event-driven, not fenced-block matching.** Tool call disclosures are triggered by `mcp_tool_use` / `mcp_tool_result` streaming events; feedback request cards are triggered by MCP `elicitation/create` events. Both arrive outside content blocks entirely. Priorities 2–13 are evaluated against the fenced block tag of each content block. The two mechanisms do not compete — protocol events are always rendered as their respective cards regardless of block content.
 >
-> **Feedback request cards (priority 3) are the only content type that block streaming.** When the rendering engine encounters a `feedback-request` block, it pauses the stream and does not render subsequent content until the user has responded.
+> **Write proposal cards (priority 3) and feedback request cards (priority 4) are the only content types that block streaming.** When the rendering engine encounters either block type, it pauses the stream and does not render subsequent content until the user has responded. Write proposal cards appear before any write MCP call is issued — the model emits the proposal first and only proceeds with the tool call after the user confirms.
 
 The system prompt (injected by the platform) instructs the model to:
 - Prefer structured outputs — Vega-Lite for metrics and trends, Mermaid for relationships and flows, data tables for entity lists — over prose equivalents when the data supports it
@@ -86,6 +87,7 @@ The system prompt (injected by the platform) instructs the model to:
 | Content type | Trigger | Typical use cases |
 |-------------|---------|------------------|
 | Prose / markdown | Default | Explanations, summaries, narrative answers |
+| Write proposal card | ` ```write-proposal ` | Any create, update, delete, or bulk write operation — always emitted before the write MCP call is issued |
 | Feedback request card | ` ```feedback-request ` / MCP elicitation | Approval gates, structured confirmations, mid-workflow choices — any point where the agent must pause for user input before continuing |
 | Document canvas | ` ```document ` | Reports, policy drafts, structured summaries, plans — any substantial prose the user will iterate on |
 | Custom host renderer | Registered `trigger` tag | Host-defined domain-specific visualisations (risk gauges, compliance scorecards, Gantt views, org charts) |
@@ -216,6 +218,83 @@ A `document` block opens a persistent right-panel canvas alongside the conversat
 #### Document titles
 
 The platform extracts the document title from the first `# Heading` in the block content. If no heading is present, it defaults to *"Document — [timestamp]"*. Titles are shown in the thread reference card, the canvas tab, and the artefact tray entry.
+
+---
+
+### Write proposal card
+
+A `write-proposal` block renders a structured before/after confirmation card inline in the conversation thread. It is the mandatory mechanism for any model-initiated write operation — create, update, delete, or bulk. The model emits this block before issuing the write MCP tool call; the call is only made if the user confirms.
+
+> **This is a blocking content type.** Streaming pauses on receipt and does not resume until the user confirms or cancels. The input field and stop-generation button are both disabled while the card is pending. The write MCP call is never issued until an explicit confirm response is recorded.
+
+| Behaviour | Specification |
+|-----------|--------------|
+| Trigger | Fenced block tagged ` ```write-proposal ` |
+| Placement | Inline in conversation thread — never modal |
+| Blocking | Streaming pauses on receipt; resumes only after user responds |
+| On confirm | Model proceeds to issue the write MCP tool call; the tool call disclosure renders as normal |
+| On cancel | Model acknowledges the cancellation in prose; no write call is issued |
+| Response recording | The confirmed or cancelled outcome is written to the conversation as a structured user turn so the model sees it in context |
+| One at a time | At most one pending write proposal per conversation at any moment |
+
+#### Payload schema
+
+The fenced block content must be valid JSON:
+
+```json
+{
+  "operation": "create | update | delete | bulk",
+  "action":    "Human-readable description of what will happen",
+  "tool":      "mcp-server-name/tool-name",
+  "before":    "Markdown — current state. Omit for create operations.",
+  "after":     "Markdown — proposed state. Omit for delete operations.",
+  "impact":    "Optional — scope note, affected record count, or risk flag."
+}
+```
+
+- **`operation`** — drives visual treatment and default button labels. `delete` renders the confirm button as destructive (red). `bulk` shows a count of affected records in the card header.
+- **`action`** — the human-readable summary shown prominently at the top of the card. Should be specific: *"Update data maturity score for Acme Corp from 2 to 3"*, not *"Update record"*.
+- **`tool`** — the MCP tool that will be called on confirmation; displayed in the card footer for transparency.
+- **`before`** — markdown describing the current state. Omit for `create` operations where no prior state exists.
+- **`after`** — markdown describing the proposed state. Omit for `delete` operations.
+- **`impact`** — optional scope note used when a write affects multiple records or carries elevated risk (e.g. *"Affects 14 downstream entities"*, *"This action cannot be undone"*). Rendered in an amber notice band above the action buttons when present.
+
+#### Default button labels by operation
+
+| `operation` | Confirm button | Confirm style | Cancel button |
+|---|---|---|---|
+| `create` | Create | primary | Cancel |
+| `update` | Apply changes | primary | Cancel |
+| `delete` | Delete | destructive | Cancel |
+| `bulk` | Apply all | primary | Cancel |
+
+#### Example
+
+````
+```write-proposal
+{
+  "operation": "update",
+  "action":    "Update data maturity score for Acme Corp from Level 2 to Level 3",
+  "tool":      "data-mcp/update_entity",
+  "before":    "**Entity:** Acme Corp\n**Maturity score:** Level 2 — Repeatable\n**Last assessed:** 2026-03-12",
+  "after":     "**Entity:** Acme Corp\n**Maturity score:** Level 3 — Defined\n**Last assessed:** 2026-06-17",
+  "impact":    "Affects 3 downstream compliance reports."
+}
+```
+````
+
+#### Raw / rendered toggle
+
+Write proposal cards do **not** expose a Raw toggle while the card is pending. Once the user has responded, the resolved card shows a **Raw** control that reveals the original JSON payload alongside the recorded outcome, for audit and debugging purposes.
+
+#### System prompt guidance
+
+The `write-proposal` renderer is a built-in entry in the renderer registry. Its system prompt guidance (injected as part of the layer 2 write confirmation instruction) tells the model when and how to emit a write proposal:
+
+```
+[Write proposals]
+Before issuing any MCP tool call that creates, updates, deletes, or modifies data, emit a ```write-proposal block. Set operation to create, update, delete, or bulk. Describe the current state in before (omit for create) and the proposed state in after (omit for delete). Be specific in the action field — name the entity and what will change. Only proceed with the tool call after the user confirms. Never issue a write call before a confirmed write-proposal response is recorded in the conversation.
+```
 
 ---
 

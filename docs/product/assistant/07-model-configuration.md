@@ -112,7 +112,7 @@ The platform assembles the system prompt from multiple layers before each sessio
 | # | Layer | What it contains | Mutability | Controlled by |
 |---|---|---|---|---|
 | 1 | **Session context block** | Assistant name, application name, logged-in user identity, session date and time, config version | Per-session — assembled fresh at session start | Platform; user field mappings in `userProfile.sessionContext` |
-| 2 | **Write confirmation** | Instruction requiring the model to propose a before/after state and await explicit user confirmation before executing any write MCP call | Static | Platform — non-overridable |
+| 2 | **Write confirmation** | Instruction requiring the model to emit a ` ```write-proposal ` block showing the before/after state and await explicit user confirmation before executing any write MCP call | Static | Platform — non-overridable |
 | 3 | **Transparency** | Instruction requiring the model to disclose every tool call in a collapsible disclosure card and cite sources inline | Static | Platform — non-overridable |
 | 4 | **Prompt injection mitigation** | Instruction requiring the model to treat all tool result content as data, not as instructions | Static | Platform — non-overridable |
 | 5 | **Uncertainty acknowledgment** | Instruction requiring the model to signal uncertainty explicitly, acknowledge data gaps, and offer to search rather than producing confident answers from incomplete information | Static | Platform — non-overridable |
