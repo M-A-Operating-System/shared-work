@@ -1,5 +1,6 @@
 """
-Renderer preview PNGs — inline chat thread mockups, corporate SaaS styling.
+Renderer preview PNGs — inline chat thread mockups, subtle content-embed styling.
+The rendered object is part of the conversation, not a separate component.
 Two panels per image: Raw (left) · Rendered (right).
 Run: python3 generate_renderer_preview.py
 """
@@ -13,38 +14,28 @@ SANS_BOLD = "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf"
 MONO      = "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf"
 os.makedirs(OUT_DIR, exist_ok=True)
 
-# ── Palette — corporate SaaS ───────────────────────────────────────────────
-WHITE         = (255, 255, 255)
-THREAD_BG     = (250, 250, 251)       # very light warm gray page bg
-CARD_BG       = (255, 255, 255)
-CARD_HDR      = (248, 249, 250)       # barely-there header tint
-BORDER        = (229, 231, 235)       # E5E7EB
-DIVIDER       = (243, 244, 246)       # lighter internal divider
-TEXT_PRIMARY  = ( 17,  24,  39)       # near-black
-TEXT_SECONDARY= ( 75,  85,  99)       # slate-600
-TEXT_TERTIARY = (156, 163, 175)       # slate-400
-AVATAR_USER   = (124,  58, 237)       # violet-600
-AVATAR_ASST   = ( 16, 185, 129)       # emerald-500
-CODE_BG       = ( 22,  27,  34)       # GitHub dark
-CODE_TEXT     = (201, 209, 217)
-CODE_BLUE     = (121, 192, 255)
-CODE_GREEN    = (122, 201, 137)
-CODE_ORANGE   = (255, 166,  87)
-CODE_PURPLE   = (210, 168, 255)
-CODE_YELLOW   = (230, 192, 123)
-NODE_FILL     = (239, 246, 255)       # blue-50
-NODE_BORDER   = ( 96, 165, 250)       # blue-400
-ARROW_COL     = (148, 163, 184)       # slate-400
-PILL_REND_BG  = ( 37,  99, 235)       # blue-600 — rendered active
-PILL_RAW_BG   = ( 31,  41,  55)       # slate-800 — raw active
-PILL_IDLE     = (243, 244, 246)
-PILL_BORDER   = (209, 213, 219)
-PILL_ON       = (255, 255, 255)
-PILL_OFF      = (107, 114, 128)
-BADGE_REND_BG = (239, 246, 255)
-BADGE_REND_TX = ( 29,  78, 216)
-BADGE_RAW_BG  = (243, 244, 246)
-BADGE_RAW_TX  = ( 75,  85,  99)
+# ── Palette ────────────────────────────────────────────────────────────────
+WHITE          = (255, 255, 255)
+PAGE_BG        = (255, 255, 255)
+TEXT_PRIMARY   = ( 13,  13,  13)      # near-black — matches chat prose
+TEXT_SECONDARY = ( 92,  92,  92)      # muted — matches chat secondary text
+TEXT_LABEL     = (148, 148, 148)      # very muted label / meta text
+DIVIDER        = (235, 235, 235)
+AVATAR_USER    = (124,  58, 237)
+AVATAR_ASST    = ( 16, 185, 129)
+EMBED_BG       = (249, 249, 250)      # barely-there tint for content block
+EMBED_BORDER   = (232, 232, 234)      # very subtle 1px border
+CODE_BG        = ( 22,  27,  34)
+CODE_TEXT      = (201, 209, 217)
+CODE_BLUE      = (121, 192, 255)
+CODE_GREEN     = (122, 201, 137)
+CODE_YELLOW    = (230, 192, 123)
+NODE_FILL      = (243, 246, 251)
+NODE_BORDER    = (180, 198, 228)
+NODE_TEXT      = ( 30,  45,  70)
+ARROW_COL      = (180, 188, 200)
+TOGGLE_TEXT    = (160, 160, 162)      # very muted toggle labels
+TOGGLE_ACTIVE  = ( 80,  80,  82)      # slightly darker when active
 
 # ── Fonts ──────────────────────────────────────────────────────────────────
 def fnt(path, size):
@@ -82,7 +73,7 @@ def avatar(draw, cx, cy, r, color, initial):
     iw = twidth(initial, f)
     draw.text((cx - iw//2, cy - r//2), initial, font=f, fill=WHITE)
 
-def wrapped_lines(text, max_w, font):
+def draw_wrapped(draw, text, x, y, max_w, font, color, lh=21):
     words = text.split()
     lines, line = [], []
     for w in words:
@@ -93,112 +84,120 @@ def wrapped_lines(text, max_w, font):
             if line: lines.append(' '.join(line))
             line = [w]
     if line: lines.append(' '.join(line))
-    return lines
+    for i, l in enumerate(lines):
+        draw.text((x, y + i*lh), l, font=font, fill=color)
+    return y + len(lines) * lh
 
-def draw_wrapped(draw, text, x, y, max_w, font, color, lh=20):
-    for i, line in enumerate(wrapped_lines(text, max_w, font)):
-        draw.text((x, y + i*lh), line, font=font, fill=color)
-    return y + len(wrapped_lines(text, max_w, font)) * lh
-
-def arrow_h(draw, x0, y, x1, color=ARROW_COL, head=7):
+def arrow_h(draw, x0, y, x1, color=ARROW_COL, head=6):
     if x1 <= x0 + head: return
-    draw.line([(x0,y),(x1-head,y)], fill=color, width=2)
-    draw.polygon([(x1-head,y-4),(x1,y),(x1-head,y+4)], fill=color)
+    draw.line([(x0,y),(x1-head,y)], fill=color, width=1)
+    draw.polygon([(x1-head,y-3),(x1,y),(x1-head,y+3)], fill=color)
 
-def node(draw, cx, cy, w, h, label, r=5):
+def node(draw, cx, cy, w, h, label, r=4):
     x0, y0 = cx-w//2, cy-h//2
     rrect(draw, [x0,y0,x0+w,y0+h], r, fill=NODE_FILL, outline=NODE_BORDER, lw=1)
-    f = BOLD(12)
+    f = UI(12)
     iw = twidth(label, f)
-    draw.text((cx - iw//2, cy-7), label, font=f, fill=TEXT_PRIMARY)
+    draw.text((cx - iw//2, cy-7), label, font=f, fill=NODE_TEXT)
 
-# ── Card chrome ────────────────────────────────────────────────────────────
-HDR_H  = 44
-PILL_W = 120
-PILL_H = 26
-CARD_R = 6
-CARD_INNER_PAD = 20     # padding inside card content area
+# ── Content embed ──────────────────────────────────────────────────────────
+# No header bar. Title is inline with toggle, same weight as chat body.
+# Container is barely-there: light bg tint + 1px subtle border.
 
-def render_card(draw, img, x0, y0, card_w, title, active_side, content_fn):
+EMBED_R    = 5
+EMBED_PAD  = 18       # internal padding
+
+def render_embed(draw, img, x0, y0, embed_w, title, active_side, content_fn):
     """
-    Draw a renderer card. content_fn(draw, cx0, cy0, cx1, cy1, measure)
-    draws content or returns required height when measure=True.
+    Draw a minimal content embed — title + toggle on one line, then content.
+    No header bar, no component chrome. Flows as part of the message.
     Returns bottom y.
     """
-    content_h = content_fn(None, 0, 0, card_w - CARD_INNER_PAD*2, 0, measure=True)
-    total_h = HDR_H + CARD_INNER_PAD + content_h + CARD_INNER_PAD
-    x1, y1 = x0 + card_w, y0 + total_h
+    content_h = content_fn(None, 0, 0, embed_w - EMBED_PAD*2, 0, measure=True)
+    title_row_h = 28
+    total_h = title_row_h + content_h + EMBED_PAD
+    x1, y1 = x0 + embed_w, y0 + total_h
 
-    # card — no shadow, clean border only
-    rrect(draw, [x0, y0, x1, y1], CARD_R, fill=CARD_BG, outline=BORDER, lw=1)
+    # subtle container
+    rrect(draw, [x0, y0, x1, y1], EMBED_R, fill=EMBED_BG, outline=EMBED_BORDER, lw=1)
 
-    # header strip
-    draw.rectangle([x0+1, y0+1, x1-1, y0+HDR_H], fill=CARD_HDR)
-    draw.line([(x0+1, y0+HDR_H), (x1-1, y0+HDR_H)], fill=BORDER, width=1)
+    # title — same font weight as bold chat text (BOLD 13), muted color
+    tf = BOLD(13)
+    draw.text((x0 + EMBED_PAD, y0 + 8), title, font=tf, fill=TEXT_SECONDARY)
 
-    # title
-    draw.text((x0+16, y0+14), title, font=BOLD(13), fill=TEXT_PRIMARY)
+    # toggle — very subtle, top right, plain text links
+    tog_f = UI(11)
+    rend_lbl = "Rendered"
+    raw_lbl  = "Raw"
+    sep      = "·"
+    # positions from right
+    rx = x1 - EMBED_PAD
+    rend_w = twidth(rend_lbl, tog_f)
+    raw_w  = twidth(raw_lbl,  tog_f)
+    sep_w  = twidth(sep,      tog_f) + 8
 
-    # pill toggle
-    px = x1 - PILL_W - 12
-    py = y0 + (HDR_H - PILL_H) // 2
-    hw = PILL_W // 2
-    rrect(draw, [px, py, px+PILL_W, py+PILL_H], PILL_H//2,
-          fill=PILL_IDLE, outline=PILL_BORDER, lw=1)
-    pf = UI(11)
+    raw_x  = rx - raw_w
+    sep_x  = raw_x - sep_w
+    rend_x = sep_x - rend_w
+
+    tog_y = y0 + 10
+
     if active_side == 'rendered':
-        rrect(draw, [px, py, px+hw, py+PILL_H], PILL_H//2, fill=PILL_REND_BG)
-        draw.text((px+8,  py+7), "Rendered", font=pf, fill=PILL_ON)
-        draw.text((px+hw+8, py+7), "Raw",    font=pf, fill=PILL_OFF)
+        draw.text((rend_x, tog_y), rend_lbl, font=BOLD(11), fill=TOGGLE_ACTIVE)
+        draw.text((sep_x + 4, tog_y), sep, font=tog_f, fill=TEXT_LABEL)
+        draw.text((raw_x,  tog_y), raw_lbl,  font=tog_f, fill=TOGGLE_TEXT)
     else:
-        rrect(draw, [px+hw, py, px+PILL_W, py+PILL_H], PILL_H//2, fill=PILL_RAW_BG)
-        draw.text((px+8,  py+7), "Rendered", font=pf, fill=PILL_OFF)
-        draw.text((px+hw+8, py+7), "Raw",    font=pf, fill=PILL_ON)
+        draw.text((rend_x, tog_y), rend_lbl, font=tog_f, fill=TOGGLE_TEXT)
+        draw.text((sep_x + 4, tog_y), sep, font=tog_f, fill=TEXT_LABEL)
+        draw.text((raw_x,  tog_y), raw_lbl,  font=BOLD(11), fill=TOGGLE_ACTIVE)
+
+    # thin rule below title row
+    draw.line([(x0+1, y0+title_row_h), (x1-1, y0+title_row_h)], fill=EMBED_BORDER, width=1)
 
     # content
-    cx0 = x0 + CARD_INNER_PAD
-    cy0 = y0 + HDR_H + CARD_INNER_PAD
-    cx1 = x1 - CARD_INNER_PAD
-    cy1 = y1 - CARD_INNER_PAD
+    cx0 = x0 + EMBED_PAD
+    cy0 = y0 + title_row_h + EMBED_PAD
+    cx1 = x1 - EMBED_PAD
+    cy1 = y1 - EMBED_PAD
     content_fn(draw, cx0, cy0, cx1, cy1, measure=False)
 
     return y1
 
 # ── Thread layout ──────────────────────────────────────────────────────────
-AV_R       = 15
-AV_MARGIN  = 20
-MSG_LEFT   = AV_MARGIN + AV_R*2 + 14
-MSG_PAD    = 24          # right padding
-ROW_GAP    = 28          # gap between user and assistant rows
-CARD_MT    = 16          # margin above card
+AV_R      = 14
+AV_LEFT   = 20
+MSG_LEFT  = AV_LEFT + AV_R*2 + 12
+MSG_RIGHT = 24
+ROW_GAP   = 26
+EMBED_MT  = 14     # margin above embed
 
 def paint_thread(img, tx, ty, panel_w,
-                 user_text, asst_text, card_title, active_side, content_fn):
+                 user_text, asst_text, embed_title, active_side, content_fn):
     draw = ImageDraw.Draw(img)
-    y = ty
-    msg_w = panel_w - MSG_LEFT - MSG_PAD
+    y    = ty
+    msg_w = panel_w - MSG_LEFT - MSG_RIGHT
 
     # ── User turn ─────────────────────────────────────────────────────────
-    avatar(draw, tx + AV_MARGIN + AV_R, y + AV_R + 2, AV_R, AVATAR_USER, "U")
-    draw.text((tx + MSG_LEFT, y), "You", font=BOLD(13), fill=TEXT_PRIMARY)
+    avatar(draw, tx + AV_LEFT + AV_R, y + AV_R + 2, AV_R, AVATAR_USER, "U")
+    draw.text((tx + MSG_LEFT, y + 1), "You", font=BOLD(13), fill=TEXT_PRIMARY)
     y += 20
-    y = draw_wrapped(draw, user_text, tx+MSG_LEFT, y, msg_w, UI(13), TEXT_SECONDARY, lh=20)
+    y = draw_wrapped(draw, user_text, tx+MSG_LEFT, y, msg_w, UI(13), TEXT_SECONDARY)
     y += ROW_GAP
 
-    # separator
-    draw.line([(tx, y), (tx+panel_w, y)], fill=DIVIDER, width=1)
+    # row divider
+    draw.line([(tx, y),(tx+panel_w, y)], fill=DIVIDER, width=1)
     y += ROW_GAP
 
     # ── Assistant turn ────────────────────────────────────────────────────
-    avatar(draw, tx + AV_MARGIN + AV_R, y + AV_R + 2, AV_R, AVATAR_ASST, "A")
-    draw.text((tx + MSG_LEFT, y), "Assistant", font=BOLD(13), fill=TEXT_PRIMARY)
+    avatar(draw, tx + AV_LEFT + AV_R, y + AV_R + 2, AV_R, AVATAR_ASST, "A")
+    draw.text((tx + MSG_LEFT, y + 1), "Assistant", font=BOLD(13), fill=TEXT_PRIMARY)
     y += 20
-    y = draw_wrapped(draw, asst_text, tx+MSG_LEFT, y, msg_w, UI(13), TEXT_SECONDARY, lh=20)
-    y += CARD_MT
+    y = draw_wrapped(draw, asst_text, tx+MSG_LEFT, y, msg_w, UI(13), TEXT_SECONDARY)
+    y += EMBED_MT
 
-    # inline card
-    card_w = panel_w - MSG_LEFT - MSG_PAD
-    y = render_card(draw, img, tx+MSG_LEFT, y, card_w, card_title, active_side, content_fn)
+    # inline embed
+    embed_w = msg_w
+    y = render_embed(draw, img, tx+MSG_LEFT, y, embed_w, embed_title, active_side, content_fn)
 
     return y
 
@@ -215,21 +214,21 @@ def mermaid_raw(draw, x0, y0, x1, y1, measure=False):
         ("    A --> B --> C",    CODE_YELLOW),
         ("```",                  CODE_TEXT),
     ]
-    lh, pad = 19, 16
+    lh, pad = 18, 14
     h = pad*2 + len(lines)*lh
     if measure: return h
     w = x1 - x0
-    rrect(draw, [x0, y0, x1, y0+h], 4, fill=CODE_BG)
+    rrect(draw, [x0, y0, x1, y0+h], 3, fill=CODE_BG)
     mf = MONO_(12)
     for i, (txt, col) in enumerate(lines):
-        draw.text((x0+16, y0+pad+i*lh), txt, font=mf, fill=col)
+        draw.text((x0+14, y0+pad+i*lh), txt, font=mf, fill=col)
 
 def mermaid_rendered(draw, x0, y0, x1, y1, measure=False):
-    h = 140
+    h = 130
     if measure: return h
     pcx = (x0+x1)//2
     pcy = y0 + h//2
-    nw, nh, gap = 96, 36, 36
+    nw, nh, gap = 90, 34, 34
     n1x = pcx - nw - gap
     n3x = pcx + nw + gap
     for nx, lbl in [(n1x,"Data Sources"),(pcx,"Transform"),(n3x,"Output")]:
@@ -238,36 +237,30 @@ def mermaid_rendered(draw, x0, y0, x1, y1, measure=False):
     arrow_h(draw, pcx+nw//2, pcy, n3x-nw//2)
 
 # ═══════════════════════════════════════════════════════════════════════════
-#  01 — MERMAID
-# ═══════════════════════════════════════════════════════════════════════════
 def make_mermaid():
-    PANEL_W = 460
-    OUTER   = 32          # outer canvas margin
-    GAP     = 40          # gap between the two panels
+    PANEL_W = 440
+    OUTER   = 36
+    GAP     = 48
     W = OUTER*2 + PANEL_W*2 + GAP
 
     user_msg = "Can you show me a simple data pipeline diagram?"
     asst_msg = "Here's a flowchart showing the three stages of the pipeline:"
     title    = "Mermaid Diagram"
 
-    # probe height
-    probe = Image.new("RGB", (W, 1000), THREAD_BG)
+    probe = Image.new("RGB", (W, 900), PAGE_BG)
     y_bot = paint_thread(probe, OUTER, OUTER, PANEL_W,
                          user_msg, asst_msg, title, 'raw', mermaid_raw)
     H = y_bot + OUTER
 
-    img = Image.new("RGB", (W, H), THREAD_BG)
+    img = Image.new("RGB", (W, H), PAGE_BG)
 
-    # left panel — Raw
     paint_thread(img, OUTER, OUTER, PANEL_W,
                  user_msg, asst_msg, title, 'raw', mermaid_raw)
 
-    # gap divider
     draw = ImageDraw.Draw(img)
     gx = OUTER + PANEL_W + GAP//2
-    draw.line([(gx, OUTER+16),(gx, H-OUTER-16)], fill=BORDER, width=1)
+    draw.line([(gx, OUTER+10),(gx, H-OUTER-10)], fill=DIVIDER, width=1)
 
-    # right panel — Rendered
     paint_thread(img, OUTER+PANEL_W+GAP, OUTER, PANEL_W,
                  user_msg, asst_msg, title, 'rendered', mermaid_rendered)
 
