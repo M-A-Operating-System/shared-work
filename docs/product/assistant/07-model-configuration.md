@@ -137,29 +137,41 @@ The platform assembles the block at session start from three sources: the tenant
 
 ### Rendered output
 
-The block is rendered as plain text and injected at the top of the system prompt. Example:
+The block is rendered as a JSON object and injected at the top of the system prompt inside a fenced code block labelled `session-context`. JSON is used so the model can parse fields unambiguously without relying on prose formatting. Example:
 
+````
+```session-context
+{
+  "assistant": "Atlas",
+  "application": "Acme Data Hub",
+  "user": {
+    "name": "Sarah Chen",
+    "email": "sarah.chen@acme.com",
+    "role": "Senior Data Analyst",
+    "organisation": "Acme Corporation"
+  },
+  "session": {
+    "timestamp": "2026-06-16T09:14:00Z",
+    "config_version": "2.3.1"
+  }
+}
 ```
-## Session context
-Assistant: Atlas (AI assistant for Acme Data Hub)
-User: Sarah Chen · sarah.chen@acme.com · Senior Data Analyst · Acme Corporation
-Session: Tuesday 16 June 2026, 09:14 UTC · Config v2.3.1
-```
+````
 
-All four lines are always present. Fields within each line are omitted gracefully if the source data is unavailable — for example, if `roleField` is not configured, the role is omitted from the User line rather than showing a blank or placeholder.
+All top-level keys are always present. Fields within the `user` object are omitted when the corresponding JWT claim is not present or the mapping is not configured — for example, if `roleField` is not configured, `role` is omitted rather than appearing as `null`.
 
 ### Field sources
 
-| Field | Source | Always present |
+| JSON field | Source | Always present |
 |---|---|---|
-| Assistant name | `identity.assistantName` | Yes |
-| Application name | `identity.applicationName` | Yes |
-| User display name | JWT claim mapped via `userProfile.sessionContext.displayNameField` | If claim present |
-| User email | JWT claim mapped via `userProfile.sessionContext.emailField` | If claim present |
-| User role / job title | JWT claim mapped via `userProfile.sessionContext.roleField` | If claim present |
-| User organisation | JWT claim mapped via `userProfile.sessionContext.organisationField` | If claim present |
-| Date and time | Platform server clock (UTC) | Yes |
-| Config version | Active tenant config version record | Yes |
+| `assistant` | `identity.assistantName` | Yes |
+| `application` | `identity.applicationName` | Yes |
+| `user.name` | JWT claim mapped via `userProfile.sessionContext.displayNameField` | If claim present |
+| `user.email` | JWT claim mapped via `userProfile.sessionContext.emailField` | If claim present |
+| `user.role` | JWT claim mapped via `userProfile.sessionContext.roleField` | If claim present |
+| `user.organisation` | JWT claim mapped via `userProfile.sessionContext.organisationField` | If claim present |
+| `session.timestamp` | Platform server clock (ISO 8601 UTC) | Yes |
+| `session.config_version` | Active tenant config version record | Yes |
 
 ### Configuration
 
