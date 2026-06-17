@@ -1019,9 +1019,9 @@ MD_LINK      = ( 37, 99, 235)
 MD_DOC_BG    = (255, 255, 255)
 MD_DOC_FRAME = (232, 234, 237)
 
-def _md_inline_code(draw, x, y, text, font):
+def _md_inline_code(draw, x, y, text, base_size=13):
     """Draw an inline code span. Returns x after the span."""
-    f = fnt(MONO, font.size - 1 if hasattr(font, 'size') else 10)
+    f = MONO_(base_size - 2)
     tw = twidth(text, f)
     pad = 4
     draw.rectangle([x - pad, y - 1, x + tw + pad, y + 14], fill=MD_CODE_BG)
