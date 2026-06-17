@@ -426,9 +426,191 @@ def make_vegalite():
                  fixed_embed_h=embed_h)
     return img
 
+# ═══════════════════════════════════════════════════════════════════════════
+#  03 — DATA TABLE
+# ═══════════════════════════════════════════════════════════════════════════
+TBL_HDR_BG   = (247, 248, 250)
+TBL_HDR_TX   = ( 55,  65,  81)
+TBL_ROW_ALT  = (252, 252, 253)
+TBL_BORDER   = (229, 231, 235)
+TBL_TX       = ( 31,  41,  55)
+TBL_MUTED    = (107, 114, 128)
+SORT_ACTIVE  = ( 99, 102, 241)
+FILTER_BG    = (255, 255, 255)
+FILTER_BDR   = (209, 213, 219)
+ROW_NUM_COL  = (180, 185, 195)
+STATUS_GREEN = (220, 252, 231)
+STATUS_GTXT  = ( 22, 101,  52)
+STATUS_RED   = (254, 226, 226)
+STATUS_RTXT  = (153,  27,  27)
+STATUS_GRAY  = (243, 244, 246)
+STATUS_GTXT2 = ( 75,  85,  99)
+
+COLS      = ["Name", "Department", "Score", "Status"]
+COL_W     = [110, 120, 68, 80]   # relative widths — scaled to fit
+ROW_NUM_W = 32
+ROWS = [
+    ("Alice Chen",   "Engineering", "94", "Active"),
+    ("Bob Martin",   "Marketing",   "78", "Active"),
+    ("Carol White",  "Finance",     "85", "On Leave"),
+    ("David Kim",    "Engineering", "91", "Active"),
+    ("Emma Davis",   "Marketing",   "72", "Inactive"),
+]
+
+def _status_badge(draw, cx, cy, text):
+    if text == "Active":
+        bg, tx = STATUS_GREEN, STATUS_GTXT
+    elif text == "Inactive":
+        bg, tx = STATUS_RED, STATUS_RTXT
+    else:
+        bg, tx = STATUS_GRAY, STATUS_GTXT2
+    f = UI(10)
+    tw = twidth(text, f)
+    bw, bh = tw + 12, 16
+    bx, by = cx - bw//2, cy - bh//2
+    rrect(draw, [bx, by, bx+bw, by+bh], 8, fill=bg)
+    draw.text((bx+6, by+3), text, font=f, fill=tx)
+
+def table_rendered(draw, x0, y0, x1, y1, measure=False):
+    ROW_H    = 28
+    HDR_H    = 30
+    FILT_H   = 26
+    FOOT_H   = 24
+    n_rows   = len(ROWS)
+    h = HDR_H + FILT_H + ROW_H * n_rows + FOOT_H
+    if measure: return h
+
+    W = x1 - x0
+    total_col_w = sum(COL_W)
+    scale = (W - ROW_NUM_W) / total_col_w
+    cws = [int(w * scale) for w in COL_W]
+    cws[-1] = W - ROW_NUM_W - sum(cws[:-1])   # absorb rounding
+
+    def col_x(i):
+        return x0 + ROW_NUM_W + sum(cws[:i])
+
+    # outer border
+    draw.rectangle([x0, y0, x1, y0+h], outline=TBL_BORDER, width=1)
+
+    # ── Header row ─────────────────────────────────────────────────────────
+    draw.rectangle([x0, y0, x1, y0+HDR_H], fill=TBL_HDR_BG)
+    draw.line([(x0, y0+HDR_H), (x1, y0+HDR_H)], fill=TBL_BORDER, width=1)
+
+    # row-num column header (blank)
+    draw.line([(x0+ROW_NUM_W, y0), (x0+ROW_NUM_W, y0+HDR_H)], fill=TBL_BORDER, width=1)
+
+    hf = BOLD(11)
+    for i, (col, cw) in enumerate(zip(COLS, cws)):
+        cx0 = col_x(i)
+        cy  = y0 + HDR_H//2 - 6
+        draw.text((cx0+8, cy), col, font=hf, fill=TBL_HDR_TX)
+        # sort icon — active on "Score" (col 2), others show neutral
+        sx = col_x(i) + cw - 14
+        sy = y0 + HDR_H//2
+        if i == 2:   # active sort column
+            draw.polygon([(sx,sy+3),(sx+5,sy-3),(sx+10,sy+3)], fill=SORT_ACTIVE)
+        else:
+            draw.polygon([(sx,sy+2),(sx+5,sy-2),(sx+10,sy+2)], fill=(200,202,208))
+        # col divider
+        if i < len(COLS)-1:
+            draw.line([(col_x(i+1), y0), (col_x(i+1), y0+HDR_H+FILT_H)], fill=TBL_BORDER, width=1)
+
+    # ── Filter row ─────────────────────────────────────────────────────────
+    fy0 = y0 + HDR_H
+    draw.rectangle([x0, fy0, x1, fy0+FILT_H], fill=WHITE)
+    draw.line([(x0, fy0+FILT_H), (x1, fy0+FILT_H)], fill=TBL_BORDER, width=1)
+    ff = UI(10)
+    for i, cw in enumerate(cws):
+        fx0 = col_x(i) + 6
+        fx1 = col_x(i) + cw - 8
+        fiy0 = fy0 + 4
+        fiy1 = fy0 + FILT_H - 4
+        rrect(draw, [fx0, fiy0, fx1, fiy1], 3, fill=FILTER_BG, outline=FILTER_BDR, lw=1)
+        draw.text((fx0+5, fiy0+3), "Filter…", font=ff, fill=(196,198,204))
+
+    # ── Data rows ──────────────────────────────────────────────────────────
+    rf = UI(12)
+    rny0 = y0 + HDR_H + FILT_H
+    for r, row in enumerate(ROWS):
+        ry0 = rny0 + r * ROW_H
+        ry1 = ry0 + ROW_H
+        bg = WHITE if r % 2 == 0 else TBL_ROW_ALT
+        draw.rectangle([x0, ry0, x1, ry1], fill=bg)
+        draw.line([(x0, ry1), (x1, ry1)], fill=TBL_BORDER, width=1)
+        # row number
+        rn = str(r+1)
+        rnw = twidth(rn, rf)
+        draw.text((x0 + ROW_NUM_W//2 - rnw//2, ry0 + ROW_H//2 - 7), rn, font=rf, fill=ROW_NUM_COL)
+        draw.line([(x0+ROW_NUM_W, ry0), (x0+ROW_NUM_W, ry1)], fill=TBL_BORDER, width=1)
+        # cells
+        for i, (val, cw) in enumerate(zip(row, cws)):
+            cx0 = col_x(i)
+            cy  = ry0 + ROW_H//2 - 7
+            if i == 3:   # status badge
+                _status_badge(draw, cx0 + cw//2, ry0 + ROW_H//2, val)
+            else:
+                draw.text((cx0+8, cy), val, font=rf, fill=TBL_TX)
+            if i < len(COLS)-1:
+                draw.line([(col_x(i+1), ry0), (col_x(i+1), ry1)], fill=TBL_BORDER, width=1)
+
+    # ── Footer ─────────────────────────────────────────────────────────────
+    foot_y = rny0 + len(ROWS)*ROW_H
+    draw.rectangle([x0, foot_y, x1, foot_y+FOOT_H], fill=TBL_HDR_BG)
+    draw.line([(x0, foot_y), (x1, foot_y)], fill=TBL_BORDER, width=1)
+    draw.text((x0+10, foot_y+6), f"Showing 1–{len(ROWS)} of {len(ROWS)}", font=UI(10), fill=TBL_MUTED)
+
+def table_raw(draw, x0, y0, x1, y1, measure=False):
+    lines = [
+        ("```csv",                                      CODE_TEXT),
+        ("Name,Department,Score,Status",                CODE_BLUE),
+        ("Alice Chen,Engineering,94,Active",            CODE_GREEN),
+        ("Bob Martin,Marketing,78,Active",              CODE_GREEN),
+        ("Carol White,Finance,85,On Leave",             CODE_YELLOW),
+        ("David Kim,Engineering,91,Active",             CODE_GREEN),
+        ("Emma Davis,Marketing,72,Inactive",            CODE_TEXT),
+        ("```",                                         CODE_TEXT),
+    ]
+    lh, pad = 18, 14
+    h = pad*2 + len(lines)*lh
+    if measure: return h
+    if draw: draw.rectangle([x0, y0, x1, y0+h], fill=CODE_BG)
+    mf = MONO_(12)
+    for i, (txt, col) in enumerate(lines):
+        if draw: draw.text((x0+14, y0+pad+i*lh), txt, font=mf, fill=col)
+
+def make_table():
+    PANEL_W = 580
+    OUTER   = 36
+    GAP     = 48
+    W       = OUTER*2 + PANEL_W*2 + GAP
+
+    user_msg = "Can you show me the team scores in a table?"
+    asst_msg = "Here's the full team breakdown with scores and status:"
+    title    = "Data Table"
+
+    probe = Image.new("RGB", (W, 1000), PAGE_BG)
+    y_bot, embed_h = paint_thread(probe, OUTER, OUTER, PANEL_W,
+                                  user_msg, asst_msg, title,
+                                  'rendered', table_rendered)
+    H = y_bot + OUTER
+
+    img = Image.new("RGB", (W, H), PAGE_BG)
+    paint_thread(img, OUTER, OUTER, PANEL_W,
+                 user_msg, asst_msg, title, 'rendered', table_rendered)
+
+    draw = ImageDraw.Draw(img)
+    gx = OUTER + PANEL_W + GAP//2
+    draw.line([(gx, OUTER+10),(gx, H-OUTER-10)], fill=DIVIDER, width=1)
+
+    paint_thread(img, OUTER+PANEL_W+GAP, OUTER, PANEL_W,
+                 user_msg, asst_msg, title, 'raw', table_raw,
+                 fixed_embed_h=embed_h)
+    return img
+
 # ── Run ────────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
-    renders = {"01-mermaid": make_mermaid, "02-vega-lite": make_vegalite}
+    renders = {"01-mermaid": make_mermaid, "02-vega-lite": make_vegalite,
+               "03-data-table": make_table}
     for name, fn in renders.items():
         path = os.path.join(OUT_DIR, f"{name}.png")
         fn().save(path)
