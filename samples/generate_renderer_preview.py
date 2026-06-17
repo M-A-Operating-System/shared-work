@@ -288,7 +288,7 @@ def mermaid_raw(draw, x0, y0, x1, y1, measure=False):
 
 # ═══════════════════════════════════════════════════════════════════════════
 def make_mermaid():
-    PANEL_W = 440
+    PANEL_W = 580
     OUTER   = 36
     GAP     = 48
     W       = OUTER*2 + PANEL_W*2 + GAP
