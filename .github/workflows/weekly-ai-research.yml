@@ -43,7 +43,7 @@ jobs:
       # SEARCH_TAVILY_KEY → Tavily research search
       - name: Run weekly research
         env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.LMM_CLAUDE_KEY }}
           SEARCH_EXA_KEY: ${{ secrets.SEARCH_EXA_KEY }}
           SEARCH_TAVILY_KEY: ${{ secrets.SEARCH_TAVILY_KEY }}
         run: python .github/scripts/run_weekly_research.py
