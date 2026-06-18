@@ -24,7 +24,7 @@ If no MCP servers are registered, the assistant operates in **prompt-only mode**
 | **Always-on** | Active in every session; cannot be disabled by the end user. Designated by setting `accessTier: "always-on"` in the server's config entry. Host applications should designate as always-on only the MCP servers that should be available to all sessions without user action. |
 | **Opt-in** | Off by default; enabled by the end user per session via the tool selection panel. Does not persist across sessions. Designated by `accessTier: "opt-in"`. |
 
-The always-on tier should be used sparingly. Each always-on tool's description is injected into the system prompt on every session, consuming token budget. Opt-in tools inject their description only when enabled.
+Use the always-on tier sparingly. Each always-on tool's description is injected into the system prompt every session, consuming token budget. Opt-in tools inject their description only when enabled.
 
 #### Role-based tool access
 
@@ -149,7 +149,7 @@ Participants cannot access MCP tools beyond their own permission level. If a too
 
 ### Complementary MCP services in tool context
 
-Beyond host-registered MCP servers, three platform-level ecosystem services are available for integration:
+Three platform-level ecosystem services extend the tool registry beyond host-registered servers:
 
 - **MCP Repository** — Host teams use this during configuration to discover and browse available MCP tools before registering them. It is not directly invoked in conversations but informs the tool registry setup.
 - **MCP Knowledge** — Provides centralised skills, guidance documents, and reusable prompt artefacts. Host applications may choose to register MCP Knowledge as an opt-in or always-on server, making its capabilities available during conversations.
@@ -170,7 +170,7 @@ When a session starts, the platform resolves the active registry from the tenant
 2. Makes `opt-in` servers available in the tool selection panel (but not active)
 3. Injects descriptions for active servers into the system prompt
 
-This document covers the registry model, how host teams populate it, the relationship to the MCP Repository complementary service, and how the registry interacts with MCP Knowledge.
+This section covers the registry model, how host teams populate it, its relationship to the MCP Repository, and how it interacts with MCP Knowledge.
 
 ---
 
@@ -269,7 +269,7 @@ The MCP Repository is a read-only browsing surface at config time — it is not 
 
 **MCP Knowledge** is a complementary ecosystem service that provides centralised skills, guidance documents, and reusable prompt artefacts for use across the MCP ecosystem (see [08-platform-operations.md](./08-platform-operations.md)).
 
-Host applications may register MCP Knowledge as an MCP server in their tenant registry (typically as an `opt-in` server). When registered and activated in a session:
+Host applications register MCP Knowledge as an MCP server in their tenant registry (typically `opt-in`). When registered and activated in a session:
 - The model can invoke MCP Knowledge to retrieve platform-standard skills, guidance documents, and reusable prompt patterns
 - Resources returned appear as MCP tool results in the conversation thread with the standard tool call disclosure card
 - Resources are added to the session artefact tray for download

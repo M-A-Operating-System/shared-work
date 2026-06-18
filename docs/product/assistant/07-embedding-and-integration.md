@@ -533,19 +533,7 @@ document.querySelectorAll('ai-chat-field').forEach((field) => {
 
 ## The `<ai-chat>` inline component
 
-### Scope of this document
-
-This document covers the **`<ai-chat>` component** — the inline page embedding mode (Mode 2). It is the complete, full-featured conversation interface for use on dedicated assistant pages or embedded content sections.
-
-The AI Chat Platform has three distinct embedding modes. For the full picture, see [07-embedding-and-integration.md](./07-embedding-and-integration.md):
-
-| Mode | Component | Description |
-|------|-----------|-------------|
-| **1 — Floating Widget** | `<ai-chat-widget>` | FAB + collapsible mini/full panel, persists across pages |
-| **2 — Inline Page** | `<ai-chat>` | This document — full three-zone layout embedded in a page |
-| **3 — Form Field Assist** | `<ai-chat-field>` | Ephemeral contextual popover scoped to a form field |
-
-Modes 1 and 2 share conversation history. Mode 3 is ephemeral and fully independent.
+`<ai-chat>` is Mode 2 — the complete, full-featured conversation interface for dedicated assistant pages or embedded content sections. Modes 1 and 2 share conversation history. Mode 3 is ephemeral and fully independent.
 
 ---
 

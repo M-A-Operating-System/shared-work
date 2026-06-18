@@ -27,7 +27,7 @@ The **AI Chat Platform** enables any application to give its users a persistent,
 
 ### The assistant has no platform name
 
-The platform has no end-user-facing name. Every tenant names their own assistant in their application config (`identity.assistantName`). End users see only that name — they are not exposed to the underlying platform. This document uses **[AssistantName]** as a placeholder wherever the assistant name would appear.
+The platform has no end-user-facing name. Every tenant names their own assistant in their application config (`identity.assistantName`). End users see only that name. **[AssistantName]** is used as a placeholder throughout this spec wherever the assistant name would appear.
 
 ---
 
@@ -137,7 +137,7 @@ The platform has no end-user-facing name. Every tenant names their own assistant
 | **AI provider** | Provider-agnostic abstraction exposing three model tiers: `fast`, `standard` (default), `powerful`. The platform maps tiers to the tenant's configured provider's current models. Multiple providers planned — see [ROADMAP.md](./ROADMAP.md). |
 | **Platform storage** | Relational database with row-level security for conversation records; object storage for binary artefacts. |
 | **Platform edge function** | JWT handling, AI provider API request construction, SSE stream passthrough, MCP call routing. Provider-agnostic interface. |
-| **Host authentication** | The host application issues JWTs for its users. The platform validates these tokens and trusts the embedded claims. No re-authentication is performed by the platform. |
+| **Host authentication** | The host application issues JWTs for its users. The platform validates these tokens and trusts the embedded claims. The platform performs no re-authentication. |
 | **Host MCP server(s)** | The host's registered MCP endpoints providing data access and action capabilities. |
 | **MCP Repository** | Complementary ecosystem service — discoverable registry of available MCP tools. |
 | **MCP Knowledge** | Complementary ecosystem service — centralised skills, guidance documents, and reusable prompt artefacts. |
@@ -147,7 +147,7 @@ The platform has no end-user-facing name. Every tenant names their own assistant
 
 ## Personas and user journeys
 
-The AI Chat Platform is deployed by many different host applications across different domains. This document describes personas at two levels: **platform-level archetypes** (roles that exist across all deployments) and **illustrative host application journeys** (examples showing how different types of host app use the platform).
+Personas are described at two levels: **platform-level archetypes** (roles that exist across all deployments) and **illustrative host application journeys** (examples of how different host applications use the platform).
 
 ---
 

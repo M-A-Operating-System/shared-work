@@ -142,7 +142,7 @@ When a canvas document is opened, the panel automatically switches to the **Canv
 
 ### Responsive and mobile design
 
-Mobile-first and responsive layout is a core platform standard. The following covers layout behaviour at each breakpoint when the component is mounted at full-page width.
+Mobile-first responsive layout is a core platform standard. Layout behaviour at each breakpoint assumes the component is mounted at full-page width.
 
 | Viewport | Layout |
 |----------|--------|
@@ -801,7 +801,7 @@ The onboarding state is shown once per user — it is not shown again once the u
 
 ### Accessibility
 
-WCAG 2.1 AA compliance is a platform requirement. The following are platform-specific additions.
+WCAG 2.1 AA compliance is a platform requirement. Platform-specific additions:
 
 | Requirement | Specification |
 |-------------|--------------|
@@ -987,7 +987,7 @@ The system prompt (injected by the platform) instructs the model to:
 
 #### Custom host renderer
 
-Host applications may register custom content renderers in the `renderers` section of their application config (see [02-host-config.md](./02-host-config.md)). When the model produces a fenced block tagged with a registered `trigger`, the platform loads and invokes the host's renderer module.
+Host applications register custom content renderers in the `renderers` section of their application config (see [02-host-config.md](./02-host-config.md)). When the model produces a fenced block tagged with a registered `trigger`, the platform loads and invokes the host's renderer module.
 
 ##### Module loading
 

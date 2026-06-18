@@ -9,14 +9,14 @@
 
 ## AI provider architecture
 
-The AI Chat Platform is designed to be **AI provider-agnostic**. The model provider is abstracted behind the platform's edge function layer — the conversational surface, MCP tool access, `@`-binding resolution, and audit trail are identical regardless of which provider is active.
+The AI Chat Platform is **AI provider-agnostic**. The model provider is abstracted behind the platform's edge function layer — the conversational surface, MCP tool access, `@`-binding resolution, and audit trail are identical regardless of which provider is active.
 
 | Release | Provider examples |
 |---------|-----------------|
 | **v1 (current)** | One AI provider configured per tenant — host selects from the platform's supported providers at tenant registration |
 | **Planned** | Multiple providers available for selection; model capability parity validated across providers before enablement |
 
-Host applications select provider as well as model tier at the tenant level. See [ROADMAP.md](./ROADMAP.md) for the multi-provider timeline.
+Host applications select provider and model tier at the tenant level. See [ROADMAP.md](./ROADMAP.md) for the multi-provider timeline.
 
 ---
 

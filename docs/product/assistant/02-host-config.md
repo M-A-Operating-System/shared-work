@@ -281,7 +281,7 @@ Workflow prompts are host-managed — users cannot create or modify them.
 
 ## `renderers`
 
-Host applications may register **custom content renderers** that the platform loads at runtime. When the model produces a fenced code block tagged with a registered renderer's trigger, the platform invokes the host's renderer instead of its built-in pipeline. This enables domain-specific visualisations — risk gauges, org charts, Gantt views, financial waterfall charts, compliance scorecards — that the platform's built-in renderers do not cover.
+Host applications can register **custom content renderers** that the platform loads at runtime. When the model produces a fenced code block tagged with a registered renderer's trigger, the platform invokes the host's renderer instead of its built-in pipeline. This enables domain-specific visualisations — risk gauges, org charts, Gantt views, financial waterfall charts, compliance scorecards — that the platform's built-in renderers do not cover.
 
 See [06-interface-and-rendering.md](./06-interface-and-rendering.md) for the full runtime rendering contract and system prompt guidance injection.
 

@@ -240,7 +240,7 @@ Host applications that configure an improvement webhook receive structured JSON 
 
 #### Improvement webhook (optional)
 
-Host applications may configure an improvement webhook endpoint in the Platform Admin API. When configured:
+Host applications configure an improvement webhook endpoint via the Platform Admin API. When configured:
 - Qualifying improvement signals (above threshold or explicit user reports) trigger a POST to the webhook URL with a structured JSON payload
 - The payload includes: `tenant_id`, `signal_type`, `turn_summary`, `remediation_recommendation`, `issue_id`
 - Authentication: the platform signs webhook payloads with an HMAC key provided at registration
@@ -400,7 +400,7 @@ Platform-level metrics (cross-tenant) are visible to the Platform team only.
 
 ## Complementary MCP services
 
-The AI Chat Platform assumes the availability of three ecosystem-level MCP services that operate alongside the platform and host application MCP servers. These services are not owned or operated by the AI Chat Platform itself, nor by individual host applications — they are shared infrastructure within the broader MCP ecosystem. The platform is designed to work with them, and host applications are expected to benefit from them, but none is a hard dependency for platform operation.
+Three ecosystem-level MCP services operate alongside the platform and host application MCP servers. They are shared infrastructure — not owned by the platform or by individual host applications. None is a hard dependency for platform operation, but host applications benefit from registering them.
 
 Two of these services have full product specifications in this repository:
 
@@ -479,7 +479,7 @@ Pre-built structured reasoning patterns that the assistant can invoke to approac
 - Risk assessment scoring rubrics
 - Data quality evaluation methodologies
 
-Skills are not model-specific — they are designed to work across Anthropic, OpenAI, and Gemini models. When the assistant retrieves a skill from the MCP Knowledge, it uses the skill's prompt structure to guide its reasoning for that turn.
+Skills are not model-specific — they work across Anthropic, OpenAI, and Gemini models. When the assistant retrieves a skill from the MCP Knowledge, it uses the skill's prompt structure to guide its reasoning for that turn.
 
 **Guidance documents**
 Static reference documents that apply across many host applications and are impractical for each host to maintain independently. Examples include:
@@ -524,7 +524,7 @@ Host applications and their users cannot modify MCP Knowledge content. Feedback 
 
 #### Relationship to the platform
 
-The MCP Knowledge is independent of the AI Chat Platform — the platform does not own or operate it. However, the platform is designed to work with it cleanly:
+MCP Knowledge is independent of the AI Chat Platform — the platform does not own or operate it. The platform integrates with it cleanly:
 - Resources returned by the service are rendered using the platform's standard content rendering rules (prose, code blocks, data tables as appropriate)
 - Resource retrievals appear in the tool call disclosure card with the server name and tool name
 - Retrieved resources are added to the session artefact tray for download
