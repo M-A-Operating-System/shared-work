@@ -106,7 +106,7 @@ This file captures planned enhancements beyond the current release. Items here a
 | Item | Description |
 |------|-------------|
 | MCP Repository growth | Increase the number of published, verified MCP servers in the Repository across more domains (HR, finance, engineering, legal, customer success). |
-| MCP Resources Service expansion | Add more skills, guidance documents, and prompt templates to the MCP Resources Service, with category-level browsing and search. |
+| MCP Knowledge expansion | Add more skills, guidance documents, and prompt templates to MCP Knowledge, with category-level browsing and search. |
 | MCP server scaffolding tool | CLI tool that generates a boilerplate MCP server codebase for a given set of capabilities, reducing the time for host teams to publish their own server to the MCP Repository. |
 | Cross-tenant MCP benchmarking | Anonymised, aggregated MCP tool error rate and latency benchmarks across tenants using the same server — helps host teams identify whether their server performance is typical or an outlier. |
 

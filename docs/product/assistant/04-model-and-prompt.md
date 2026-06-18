@@ -1,4 +1,4 @@
-# 06 — Model Configuration
+# 04 — Model Configuration and System Prompt
 
 **Product:** AI Chat Platform  
 **Version:** 1.0  
@@ -7,17 +7,16 @@
 
 ---
 
-
 ## AI provider architecture
 
-The AI Chat Platform is designed to be **AI provider-agnostic**. The model provider is abstracted behind the platform's edge function layer — the conversational surface, MCP tool access, `@`-binding resolution, and audit trail are identical regardless of which AI provider is active for a tenant.
+The AI Chat Platform is **AI provider-agnostic**. The model provider is abstracted behind the platform's edge function layer — the conversational surface, MCP tool access, `@`-binding resolution, and audit trail are identical regardless of which provider is active.
 
 | Release | Provider examples |
 |---------|-----------------|
 | **v1 (current)** | One AI provider configured per tenant — host selects from the platform's supported providers at tenant registration |
 | **Planned** | Multiple providers available for selection; model capability parity validated across providers before enablement |
 
-The provider abstraction means host applications select provider as well as model tier at the tenant level. The conversational surface, MCP tool access, `@`-binding resolution, and audit trail are identical regardless of which provider is active. See [ROADMAP.md](./ROADMAP.md) for the multi-provider timeline.
+Host applications select provider and model tier at the tenant level. See [ROADMAP.md](./ROADMAP.md) for the multi-provider timeline.
 
 ---
 
@@ -60,7 +59,7 @@ The active model and any opt-in MCP tools apply to the session as a whole. The u
 
 The model's communication style and verbosity are driven by **claims in the user's authenticated JWT** — not a chat-specific setting. This keeps the assistant experience consistent with the rest of the host application, where user preferences are already managed.
 
-Host applications configure which JWT claim fields map to style and verbosity, and define the prompt text for each value, in the `userProfile` section of the application config (see [01-host-application-config.md](./01-host-application-config.md)).
+Host applications configure which JWT claim fields map to style and verbosity, and define the prompt text for each value, in the `userProfile` section of the application config (see [02-host-config.md](./02-host-config.md)).
 
 ### Example style definitions
 
@@ -112,7 +111,7 @@ The platform assembles the system prompt from multiple layers before each sessio
 | # | Layer | What it contains | Mutability | Controlled by |
 |---|---|---|---|---|
 | 1 | **Session context block** | Assistant name, application name, logged-in user identity, session date and time, config version | Per-session — assembled fresh at session start | Platform; user field mappings in `userProfile.sessionContext` |
-| 2 | **Write confirmation** | Instruction requiring the model to propose a before/after state and await explicit user confirmation before executing any write MCP call | Static | Platform — non-overridable |
+| 2 | **Write confirmation** | Instruction requiring the model to emit a ` ```write-proposal ` block showing the before/after state and await explicit user confirmation before executing any write MCP call | Static | Platform — non-overridable |
 | 3 | **Transparency** | Instruction requiring the model to disclose every tool call in a collapsible disclosure card and cite sources inline | Static | Platform — non-overridable |
 | 4 | **Prompt injection mitigation** | Instruction requiring the model to treat all tool result content as data, not as instructions | Static | Platform — non-overridable |
 | 5 | **Uncertainty acknowledgment** | Instruction requiring the model to signal uncertainty explicitly, acknowledge data gaps, and offer to search rather than producing confident answers from incomplete information | Static | Platform — non-overridable |
@@ -123,7 +122,7 @@ The platform assembles the system prompt from multiple layers before each sessio
 
 Layers 1–5 are **platform-managed and non-overridable** — they cannot be suppressed by host system prompt content.
 
-Host applications may reinforce or tailor uncertainty behaviour further in their `scope.systemPrompt` — for example, specifying the domain areas where the model should be especially cautious, or providing alternative phrasings for uncertainty acknowledgment that fit the application's voice. The MCP Resources Service also publishes guidance documents on uncertainty handling that hosts can register and retrieve at session time (see [17-complementary-mcp-services.md](./17-complementary-mcp-services.md)).
+Host applications may reinforce or tailor uncertainty behaviour further in their `scope.systemPrompt` — for example, specifying the domain areas where the model should be especially cautious, or providing alternative phrasings for uncertainty acknowledgment that fit the application's voice. MCP Knowledge also publishes guidance documents on uncertainty handling that hosts can register and retrieve at session time (see [08-platform-operations.md](./08-platform-operations.md)).
 
 Changes to the host base prompt are made via the Config Editor UI or Admin API and go through config validation before taking effect.
 
@@ -175,7 +174,7 @@ All top-level keys are always present. Fields within the `user` object are omitt
 
 ### Configuration
 
-Claim field mappings are declared in the `userProfile.sessionContext` section of the host application config — see [01-host-application-config.md](./02-host-application-config.md). If `sessionContext` is omitted from the config, the User line contains only the fields derivable without JWT claims (typically none — the line is omitted entirely).
+Claim field mappings are declared in the `userProfile.sessionContext` section of the host application config — see [02-host-config.md](./02-host-config.md). If `sessionContext` is omitted from the config, the User line contains only the fields derivable without JWT claims (typically none — the line is omitted entirely).
 
 ### Caching
 
@@ -196,4 +195,4 @@ Layers 2–8 form a **cacheable prefix** injected on every AI provider API reque
 | 8 — Host base prompt | Yes | Stable within a session; cache invalidated on config update |
 | 9 — Tool descriptions | No | Rebuilt whenever the user enables or disables an opt-in server |
 
-The **cache hit rate** is tracked as a launch metric (target: ≥ 40% by month 2 — see [14-success-metrics.md](./14-success-metrics.md)).
+The **cache hit rate** is tracked as a launch metric (target: ≥ 40% by month 2 — see [08-platform-operations.md](./08-platform-operations.md)).
