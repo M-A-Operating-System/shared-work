@@ -21,14 +21,16 @@ jobs:
       - uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          ref: master   # always run against master regardless of dispatch trigger
 
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
           cache: pip
+          cache-dependency-path: .github/scripts/requirements.txt
 
       - name: Install dependencies
-        run: pip install anthropic requests
+        run: pip install -r .github/scripts/requirements.txt
 
       - name: Configure git
         run: |
@@ -60,5 +62,5 @@ jobs:
           fi
           DATE=$(date -u +%Y-%m-%d)
           git commit -m "research: weekly catalog update ${DATE} [skip ci]"
-          git pull --rebase -X theirs origin ${{ github.ref_name }}
-          git push
+          git pull --rebase -X theirs origin master
+          git push origin master

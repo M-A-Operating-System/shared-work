@@ -23,6 +23,7 @@ import sys
 import time
 import requests
 from datetime import datetime, timezone
+from html.parser import HTMLParser
 from pathlib import Path
 
 import anthropic
@@ -31,8 +32,8 @@ import anthropic
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 RESEARCH_DIR = REPO_ROOT / "docs" / "research"
 RESEARCH_FILE = RESEARCH_DIR / "research.json"
-SCHEMA_FILE = RESEARCH_DIR / "research.schema.json"
-INVENTORY_FILE = RESEARCH_DIR / "inventory.json"   # seed source if research.json absent
+SCHEMA_FILE = RESEARCH_DIR / "inventory.schema.json"  # research.schema.json not yet created
+INVENTORY_FILE = RESEARCH_DIR / "inventory.json"      # seed source if research.json absent
 INSTRUCTIONS_FILE = RESEARCH_DIR / "weekly-agentic-ai-research.md"
 RUNS_DIR = RESEARCH_DIR / "runs"
 SOURCES_DIR = RESEARCH_DIR / "sources"
@@ -90,7 +91,32 @@ def tavily_search(query: str, max_results: int = 5, search_depth: str = "advance
     return resp.json()
 
 
-def web_fetch(url: str, max_chars: int = 6000) -> str:
+class _TextExtractor(HTMLParser):
+    """Strips HTML tags, scripts and styles; returns readable text."""
+    def __init__(self):
+        super().__init__()
+        self._parts: list[str] = []
+        self._skip = False
+
+    def handle_starttag(self, tag, attrs):
+        if tag in ("script", "style", "nav", "header", "footer", "noscript"):
+            self._skip = True
+
+    def handle_endtag(self, tag):
+        if tag in ("script", "style", "nav", "header", "footer", "noscript"):
+            self._skip = False
+
+    def handle_data(self, data):
+        if not self._skip:
+            stripped = data.strip()
+            if stripped:
+                self._parts.append(stripped)
+
+    def text(self) -> str:
+        return " ".join(self._parts)
+
+
+def web_fetch(url: str, max_chars: int = 8000) -> str:
     try:
         resp = requests.get(
             url,
@@ -98,7 +124,9 @@ def web_fetch(url: str, max_chars: int = 6000) -> str:
             headers={"User-Agent": "Mozilla/5.0 ResearchBot/1.0"},
         )
         resp.raise_for_status()
-        return resp.text[:max_chars]
+        parser = _TextExtractor()
+        parser.feed(resp.text)
+        return parser.text()[:max_chars]
     except Exception as exc:
         return f"fetch error: {exc}"
 
@@ -285,20 +313,47 @@ When all research is complete, call write_output once with:
     messages = [{"role": "user", "content": "Run the weekly AI research catalog update."}]
 
     final_output = None
-    max_iterations = 60
+    max_iterations = 30
+    _interleaved_beta = ["interleaved-thinking-2025-05-14"]
+    _use_beta = True  # disabled automatically if the API rejects it
 
-    for iteration in range(1, max_iterations + 1):
-        print(f"\n[iter {iteration}] calling model...")
-
-        response = client.messages.create(
+    def call_api(msgs: list) -> anthropic.types.Message:
+        kwargs = dict(
             model="claude-opus-4-8",
             max_tokens=16000,
             thinking={"type": "enabled", "budget_tokens": 10000},
             system=system,
             tools=tools,
-            messages=messages,
-            betas=["interleaved-thinking-2025-05-14"],
+            messages=msgs,
         )
+        for attempt in range(4):
+            try:
+                return client.messages.create(
+                    **kwargs,
+                    **({"betas": _interleaved_beta} if _use_beta else {}),
+                )
+            except anthropic.BadRequestError as exc:
+                if _use_beta and "beta" in str(exc).lower():
+                    nonlocal _use_beta  # type: ignore[misc]
+                    _use_beta = False
+                    print("  interleaved-thinking beta rejected — retrying without it")
+                    continue
+                raise
+            except anthropic.RateLimitError:
+                wait = 5 * (2 ** attempt)
+                print(f"  rate limited — retrying in {wait}s...")
+                time.sleep(wait)
+        raise RuntimeError("Rate limit retries exhausted")
+
+    for iteration in range(1, max_iterations + 1):
+        print(f"\n[iter {iteration}] calling model...")
+
+        # Prune old exchanges to stay within context window.
+        # Always keep the first (user task) message + the last 16 messages.
+        if len(messages) > 17:
+            messages = messages[:1] + messages[-16:]
+
+        response = call_api(messages)
 
         block_types = [b.type for b in response.content]
         print(f"  stop_reason={response.stop_reason}  blocks={block_types}")
