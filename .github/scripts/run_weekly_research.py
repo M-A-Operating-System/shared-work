@@ -32,7 +32,7 @@ import anthropic
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 RESEARCH_DIR = REPO_ROOT / "docs" / "research"
 RESEARCH_FILE = RESEARCH_DIR / "research.json"
-SCHEMA_FILE = RESEARCH_DIR / "inventory.schema.json"  # research.schema.json not yet created
+SCHEMA_FILE = RESEARCH_DIR / "research.schema.json"
 INVENTORY_FILE = RESEARCH_DIR / "inventory.json"      # seed source if research.json absent
 INSTRUCTIONS_FILE = RESEARCH_DIR / "weekly-agentic-ai-research.md"
 RUNS_DIR = RESEARCH_DIR / "runs"
