@@ -1,0 +1,64 @@
+name: Weekly AI Research
+
+on:
+  schedule:
+    - cron: '0 6 * * 1'   # Monday 06:00 UTC
+  workflow_dispatch:
+
+# Queue concurrent runs rather than cancel them so no run is lost.
+concurrency:
+  group: research-commit-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  research:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install anthropic requests
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      # ── Research ──────────────────────────────────────────────────────────────
+      # Uses whichever search keys are present: both, one, or neither.
+      # SEARCH_EXA_KEY    → Exa neural/semantic search
+      # SEARCH_TAVILY_KEY → Tavily research search
+      - name: Run weekly research
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          SEARCH_EXA_KEY: ${{ secrets.SEARCH_EXA_KEY }}
+          SEARCH_TAVILY_KEY: ${{ secrets.SEARCH_TAVILY_KEY }}
+        run: python .github/scripts/run_weekly_research.py
+
+      # ── Table ─────────────────────────────────────────────────────────────────
+      - name: Generate research table
+        run: python docs/research/generate_md.py
+
+      # ── Commit ────────────────────────────────────────────────────────────────
+      - name: Commit and push
+        run: |
+          git add docs/research/
+          if git diff --staged --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+          DATE=$(date -u +%Y-%m-%d)
+          git commit -m "research: weekly catalog update ${DATE} [skip ci]"
+          git pull --rebase -X theirs origin ${{ github.ref_name }}
+          git push
