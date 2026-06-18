@@ -9,15 +9,13 @@
 
 ## Overview
 
-### Vision
-
-#### Conversational AI for any application
+### Conversational AI for any application
 
 The **AI Chat Platform** enables any application to give its users a persistent, context-aware conversational interface — without building AI infrastructure. The experience is modelled on the best native AI desktop applications: rich rendered output, transparent tool usage, and a conversation that remembers where you left off. It is not a general-purpose assistant layer — each deployment is a **specialist** tuned to its host application's domain.
 
 > **Governing intent:** Give any application team the ability to drop a production-grade AI assistant into their product within days — fully branded, scoped to their domain, connected to their data, and backed by a complete audit trail.
 
-#### What the platform is and is not
+### What the platform is and is not
 
 | It is | It is not |
 |-------|-----------|
@@ -27,7 +25,7 @@ The **AI Chat Platform** enables any application to give its users a persistent,
 | A controlled, host-configured MCP integration surface | An open API that allows arbitrary tool connections without host approval |
 | A read-and-write assistant — queries, reasoning, and actions via host-registered MCP tools | A system that bypasses host application security models or acts without user confirmation |
 
-#### The assistant has no platform name
+### The assistant has no platform name
 
 The platform has no end-user-facing name. Every tenant names their own assistant in their application config (`identity.assistantName`). End users see only that name — they are not exposed to the underlying platform. This document uses **[AssistantName]** as a placeholder wherever the assistant name would appear.
 
@@ -63,7 +61,7 @@ The platform has no end-user-facing name. Every tenant names their own assistant
 - Rich content rendering: diagrams, chart specifications (SCL), structured data, syntax-highlighted code, formatted prose, mathematical notation
 - Continuous improvement signal capture and per-tenant improvement issue pipeline
 - Full audit trail per turn: raw prompt, resolved prompt, tool call log, output artefacts, token counts
-- Complementary MCP ecosystem services: MCP Repository (tool discovery), MCP Resources (shared skills and artefacts), and Web Search (real-time web search)
+- Complementary MCP ecosystem services: MCP Repository (tool discovery), MCP Knowledge (shared skills and artefacts), and MCP Internet Fetch & Search (real-time web search)
 
 #### Out of scope
 
@@ -128,7 +126,7 @@ The platform has no end-user-facing name. Every tenant names their own assistant
 
 **Host MCP Servers** are the host application's data and action providers. The platform routes tool calls to these servers and surfaces the results transparently in the conversation thread.
 
-**Complementary MCP Services** — the MCP Repository, MCP Resources Service, and Web Search Service — are ecosystem-level services that operate alongside both the platform and host MCP servers. They are not owned by the platform or by individual host applications. See [08-platform-operations.md](./08-platform-operations.md).
+**Complementary MCP Services** — the MCP Repository, MCP Knowledge, and MCP Internet Fetch & Search — are ecosystem-level services that operate alongside both the platform and host MCP servers. They are not owned by the platform or by individual host applications. See [08-platform-operations.md](./08-platform-operations.md).
 
 ---
 
@@ -142,8 +140,8 @@ The platform has no end-user-facing name. Every tenant names their own assistant
 | **Host authentication** | The host application issues JWTs for its users. The platform validates these tokens and trusts the embedded claims. No re-authentication is performed by the platform. |
 | **Host MCP server(s)** | The host's registered MCP endpoints providing data access and action capabilities. |
 | **MCP Repository** | Complementary ecosystem service — discoverable registry of available MCP tools. |
-| **MCP Resources Service** | Complementary ecosystem service — centralised skills, static resources, and reusable prompt artefacts. |
-| **Web Search Service** | Complementary ecosystem service — real-time web search and page retrieval; registered by hosts as an opt-in or always-on MCP server. |
+| **MCP Knowledge** | Complementary ecosystem service — centralised skills, guidance documents, and reusable prompt artefacts. |
+| **MCP Internet Fetch & Search** | Complementary ecosystem service — real-time web search and page retrieval; registered by hosts as an opt-in or always-on MCP server. |
 
 ---
 

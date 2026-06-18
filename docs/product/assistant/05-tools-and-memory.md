@@ -152,8 +152,8 @@ Participants cannot access MCP tools beyond their own permission level. If a too
 Beyond host-registered MCP servers, three platform-level ecosystem services are available for integration:
 
 - **MCP Repository** — Host teams use this during configuration to discover and browse available MCP tools before registering them. It is not directly invoked in conversations but informs the tool registry setup.
-- **MCP Resources Service** — Provides centralised skills, static resources, and reusable prompt artefacts. Host applications may choose to register the MCP Resources Service as an opt-in or always-on server, making its capabilities available during conversations.
-- **Web Search Service** — Provides real-time web search and page retrieval. Registered by host applications as an opt-in or always-on MCP server for sessions that need current information beyond the host's own data.
+- **MCP Knowledge** — Provides centralised skills, guidance documents, and reusable prompt artefacts. Host applications may choose to register MCP Knowledge as an opt-in or always-on server, making its capabilities available during conversations.
+- **MCP Internet Fetch & Search** — Provides real-time web search and page retrieval. Registered by host applications as an opt-in or always-on MCP server for sessions that need current information beyond the host's own data.
 
 See [08-platform-operations.md](./08-platform-operations.md) for full descriptions of all three services.
 
@@ -170,18 +170,13 @@ When a session starts, the platform resolves the active registry from the tenant
 2. Makes `opt-in` servers available in the tool selection panel (but not active)
 3. Injects descriptions for active servers into the system prompt
 
-This document covers the registry model, how host teams populate it, the relationship to the MCP Repository complementary service, and how the registry interacts with the MCP Resources Service.
+This document covers the registry model, how host teams populate it, the relationship to the MCP Repository complementary service, and how the registry interacts with MCP Knowledge.
 
 ---
 
 ### Access tiers
 
-| Tier | Behaviour |
-|------|-----------|
-| **Always-on** | Active in every session; description injected into system prompt automatically; user cannot disable |
-| **Opt-in** | Off by default; user activates per session via tool selection panel; description injected only when active; does not persist across sessions |
-
-Use `always-on` for servers that are foundational to the assistant's usefulness (e.g. the host application's primary data API). Use `opt-in` for servers that are situationally useful but not needed in every session (e.g. a warehouse query tool, an external analytics service).
+Access tier behaviour is the same as described in [Tool access → Access tiers](#access-tiers) above. Use `always-on` for servers that are foundational to the assistant's usefulness (e.g. the host application's primary data API). Use `opt-in` for servers that are situationally useful but not needed in every session (e.g. a warehouse query tool, an external analytics service).
 
 ---
 
@@ -204,7 +199,7 @@ The registry is the `mcpServers` array in the application config. Each entry:
 
 The `enabled` field allows stubs to be added before an endpoint is production-ready. Setting `enabled: false` keeps the entry in the config but excludes it from session resolution — the tool does not appear in the tool selection panel and its description is never injected.
 
-Full field reference is in [02-host-config.md — mcpServers](./02-host-config.md).
+Full field reference is in [02-host-config.md § mcpServers](./02-host-config.md#mcpservers).
 
 ---
 
@@ -270,16 +265,16 @@ The MCP Repository is a read-only browsing surface at config time — it is not 
 
 ---
 
-### Relationship to the MCP Resources Service
+### Relationship to MCP Knowledge
 
-The **MCP Resources Service** is a complementary ecosystem service that provides centralised skills, static resources, and reusable prompt artefacts for use across the MCP ecosystem (see [08-platform-operations.md](./08-platform-operations.md)).
+**MCP Knowledge** is a complementary ecosystem service that provides centralised skills, guidance documents, and reusable prompt artefacts for use across the MCP ecosystem (see [08-platform-operations.md](./08-platform-operations.md)).
 
-Host applications may register the MCP Resources Service as an MCP server in their tenant registry (typically as an `opt-in` server). When registered and activated in a session:
-- The model can invoke the MCP Resources Service to retrieve platform-standard skills, guidance documents, and reusable prompt patterns
+Host applications may register MCP Knowledge as an MCP server in their tenant registry (typically as an `opt-in` server). When registered and activated in a session:
+- The model can invoke MCP Knowledge to retrieve platform-standard skills, guidance documents, and reusable prompt patterns
 - Resources returned appear as MCP tool results in the conversation thread with the standard tool call disclosure card
 - Resources are added to the session artefact tray for download
 
-The MCP Resources Service endpoint is published in the MCP Repository.
+The MCP Knowledge endpoint is published in the MCP Repository.
 
 ---
 

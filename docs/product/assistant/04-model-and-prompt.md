@@ -9,14 +9,14 @@
 
 ## AI provider architecture
 
-The AI Chat Platform is designed to be **AI provider-agnostic**. The model provider is abstracted behind the platform's edge function layer — the conversational surface, MCP tool access, `@`-binding resolution, and audit trail are identical regardless of which AI provider is active for a tenant.
+The AI Chat Platform is designed to be **AI provider-agnostic**. The model provider is abstracted behind the platform's edge function layer — the conversational surface, MCP tool access, `@`-binding resolution, and audit trail are identical regardless of which provider is active.
 
 | Release | Provider examples |
 |---------|-----------------|
 | **v1 (current)** | One AI provider configured per tenant — host selects from the platform's supported providers at tenant registration |
 | **Planned** | Multiple providers available for selection; model capability parity validated across providers before enablement |
 
-The provider abstraction means host applications select provider as well as model tier at the tenant level. The conversational surface, MCP tool access, `@`-binding resolution, and audit trail are identical regardless of which provider is active. See [ROADMAP.md](./ROADMAP.md) for the multi-provider timeline.
+Host applications select provider as well as model tier at the tenant level. See [ROADMAP.md](./ROADMAP.md) for the multi-provider timeline.
 
 ---
 
@@ -122,7 +122,7 @@ The platform assembles the system prompt from multiple layers before each sessio
 
 Layers 1–5 are **platform-managed and non-overridable** — they cannot be suppressed by host system prompt content.
 
-Host applications may reinforce or tailor uncertainty behaviour further in their `scope.systemPrompt` — for example, specifying the domain areas where the model should be especially cautious, or providing alternative phrasings for uncertainty acknowledgment that fit the application's voice. The MCP Resources Service also publishes guidance documents on uncertainty handling that hosts can register and retrieve at session time (see [08-platform-operations.md](./08-platform-operations.md)).
+Host applications may reinforce or tailor uncertainty behaviour further in their `scope.systemPrompt` — for example, specifying the domain areas where the model should be especially cautious, or providing alternative phrasings for uncertainty acknowledgment that fit the application's voice. MCP Knowledge also publishes guidance documents on uncertainty handling that hosts can register and retrieve at session time (see [08-platform-operations.md](./08-platform-operations.md)).
 
 Changes to the host base prompt are made via the Config Editor UI or Admin API and go through config validation before taking effect.
 

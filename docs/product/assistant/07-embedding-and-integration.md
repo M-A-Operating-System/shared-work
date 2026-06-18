@@ -136,7 +136,7 @@ Clicking the expand icon (↗) from the mini state transitions to the full conve
 └────────────────────────────────────────────────────────────┘
 ```
 
-The full state renders the complete three-zone layout from `09-interaction-design.md`. The conversation active in mini state is the conversation shown on transition — no context is lost.
+The full state renders the complete three-zone layout described in [06-interface-and-rendering.md](./06-interface-and-rendering.md). The conversation active in mini state is the conversation shown on transition — no context is lost.
 
 **Full state behaviours:**
 

@@ -119,7 +119,7 @@ Defines the assistant's domain, what it should decline, and how it handles out-o
 ### System prompt authoring guidelines
 
 - Establish the assistant's persona and domain clearly in the first 200 tokens
-- Do not include tool descriptions — they are injected automatically at session start
+- Do not include tool descriptions — they are injected automatically when the tool is active
 - Do not include memory blocks — injected automatically
 - Do not attempt to override platform safety, audit, or tool-transparency instructions
 - Keep under 3,000 tokens to leave headroom for injected context, memory blocks, and tool descriptions
@@ -491,7 +491,7 @@ Configures the **Mode 1 floating widget** (`<ai-chat-widget>`) behaviour for thi
     "defaultState":            "mini",
     "fabIcon":                 "chat-bubble",
     "showBadge":               true,
-    "returningUserThreshold":  14400
+    "returningUserThreshold":  4
   }
 }
 ```
@@ -501,7 +501,7 @@ Configures the **Mode 1 floating widget** (`<ai-chat-widget>`) behaviour for thi
 | `defaultState` | `"mini"` | Initial expansion state when the user opens the widget for the first time in a browser session. Accepted values: `"mini"` (compact panel, ~400 × 600 px) or `"full"` (full-panel overlay). |
 | `fabIcon` | `"chat-bubble"` | Icon displayed on the floating action button. Platform icon name or absolute URL to an SVG. |
 | `showBadge` | `true` | Whether to show an unread-indicator badge on the FAB when the assistant has produced a new response while the widget is collapsed. |
-| `returningUserThreshold` | `14400` | Idle time in seconds before a returning user's mini-widget shows a compact re-entry card (summarising the last conversation and offering quick actions) rather than the new-conversation home state. Default: 14 400 seconds (4 hours). Set to `0` to always show the re-entry card when a prior conversation exists. |
+| `returningUserThreshold` | `4` | Idle time in hours before a returning user's mini-widget shows a compact re-entry card (summarising the last conversation and offering quick actions) rather than the new-conversation home state. Default: 4 hours. Set to `0` to always show the re-entry card when a prior conversation exists. |
 
 ---
 

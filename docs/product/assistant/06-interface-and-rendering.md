@@ -383,10 +383,10 @@ On submit, an improvement signal is captured against the specific turn (see [08-
 |---------|---------|--------|--------|
 | 👍 Thumbs up | Appears on hover | Always visible below the response | Records a positive improvement signal against the turn. One-click — no dialog. Fills on selection; toggleable. |
 | 👎 Thumbs down | Appears on hover | Always visible below the response | Opens the report dialog (same as user message report). Records a negative signal on submit. |
-| Regenerate | Appears on hover | Always visible below the response | Creates a new branch from this turn (see doc 04). |
+| Regenerate | Appears on hover | Always visible below the response | Creates a new branch from this turn (see [03-conversations-and-input.md](./03-conversations-and-input.md)). |
 | Copy full response | Appears on hover | Always visible below the response | Copies the full response text to clipboard. |
 
-Both thumbs signals feed the improvement pipeline (doc 12). Thumbs up signals are used to identify high-quality turns for reference; thumbs down signals trigger the same improvement signal workflow as the explicit report.
+Both thumbs signals feed the improvement pipeline (see [08-platform-operations.md](./08-platform-operations.md)). Thumbs up signals are used to identify high-quality turns for reference; thumbs down signals trigger the same improvement signal workflow as the explicit report.
 
 #### Assistant responses
 
