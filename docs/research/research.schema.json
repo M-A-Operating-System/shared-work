@@ -1,0 +1,171 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://maoperatingsystem.com/schemas/regulated-agentic-ai-research.schema.json",
+  "title": "Regulated Agentic AI Research Catalog",
+  "description": "JSON Schema for a function-first research catalog of enterprise AI products/functions, capabilities, and reference implementations.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "research_version",
+    "research_name",
+    "description",
+    "products"
+  ],
+  "properties": {
+    "research_version": {
+      "type": "string"
+    },
+    "research_name": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$"
+    },
+    "description": {
+      "type": "string"
+    },
+    "products": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/product"
+      }
+    }
+  },
+  "$defs": {
+    "product": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "product_name",
+        "display_name",
+        "domain",
+        "description",
+        "reference_implementations",
+        "capabilities"
+      ],
+      "properties": {
+        "product_name": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "description": "Canonical lowercase product/function name such as assistant, gateway, knowledge, retrieval, definition or validation."
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "domain": {
+          "type": "string",
+          "enum": [
+            "experience",
+            "knowledge",
+            "agentic",
+            "integration",
+            "governance",
+            "operations"
+          ]
+        },
+        "description": {
+          "type": "string"
+        },
+        "reference_implementations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/reference_implementation"
+          }
+        },
+        "capabilities": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/capability"
+          }
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*$"
+          }
+        }
+      }
+    },
+    "reference_implementation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "vendor",
+        "implementation_type"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "vendor": {
+          "type": "string"
+        },
+        "implementation_type": {
+          "type": "string",
+          "enum": [
+            "commercial",
+            "open_source",
+            "cloud_service",
+            "mcp_server",
+            "internal",
+            "framework"
+          ]
+        },
+        "deployment_models": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "saas",
+              "private_cloud",
+              "on_prem",
+              "self_hosted",
+              "managed_cloud",
+              "embedded",
+              "api",
+              "github",
+              "desktop",
+              "open_standard",
+              "paper"
+            ]
+          }
+        },
+        "url": {
+          "type": "string"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "capability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "capability_name",
+        "display_name",
+        "description"
+      ],
+      "properties": {
+        "capability_name": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "regulated_relevance": {
+          "type": "string"
+        },
+        "required": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}
