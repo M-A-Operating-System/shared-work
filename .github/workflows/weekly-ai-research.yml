@@ -53,14 +53,19 @@ jobs:
         run: python docs/research/generate_md.py
 
       # ── Commit ────────────────────────────────────────────────────────────────
+      # Only the four known research output paths are ever staged.
+      # Nothing outside docs/research/ can be committed by this job.
       - name: Commit and push
         run: |
-          git add docs/research/
+          DATE=$(date -u +%Y-%m-%d)
+          git add docs/research/research.json
+          git add docs/research/research-table.md
+          git add "docs/research/runs/${DATE}.md"
+          git add "docs/research/sources/${DATE}.json"
           if git diff --staged --quiet; then
             echo "No changes to commit."
             exit 0
           fi
-          DATE=$(date -u +%Y-%m-%d)
           git commit -m "research: weekly catalog update ${DATE} [skip ci]"
           git pull --rebase -X theirs origin master
           git push origin master
