@@ -1,4 +1,4 @@
-# 00 — Host Application Configuration
+# 02 — Host Application Configuration
 
 **Product:** AI Chat Platform  
 **Version:** 1.0  
@@ -6,7 +6,6 @@
 **Author:** Andrew Bush / M&A Operating System
 
 ---
-
 
 Every tenant on the AI Chat Platform is defined by a **JSON application config** provided by the host application at registration time. The config is the single source of truth for how the assistant behaves within that application — its identity, scope, tools, bindings, workflows, branding, and feature flags.
 
@@ -91,7 +90,7 @@ Design tokens applied to the `<ai-chat>` web component. The platform's default d
 }
 ```
 
-All colour values accept hex, RGB, or HSL. Logo assets must be SVG or PNG and served from a CSP-compatible origin declared in the host's Content Security Policy. See [16-embedding-and-web-component.md](./16-embedding-and-web-component.md) for CSP requirements.
+All colour values accept hex, RGB, or HSL. Logo assets must be SVG or PNG and served from a CSP-compatible origin declared in the host's Content Security Policy. See [07-embedding-and-integration.md](./07-embedding-and-integration.md) for CSP requirements.
 
 ---
 
@@ -112,7 +111,7 @@ Defines the assistant's domain, what it should decline, and how it handles out-o
 
 | Field | Required | Description |
 |-------|----------|-------------|
-| `systemPrompt` | Yes | Domain and persona prompt for the assistant. The platform prepends session context and behavioral constraint layers, and injects tool descriptions, communication style, and memory blocks before this content. See [06-model-configuration.md](./07-model-configuration.md) for the full layer ordering. |
+| `systemPrompt` | Yes | Domain and persona prompt for the assistant. The platform prepends session context and behavioral constraint layers, and injects tool descriptions, communication style, and memory blocks before this content. See [04-model-and-prompt.md](./04-model-and-prompt.md) for the full layer ordering. |
 | `inScopeDescription` | Yes | Plain-language description of scope; used in the onboarding state and out-of-scope redirect messages |
 | `outOfScopeRedirect` | No | Custom message for out-of-scope queries. The platform uses a generic fallback if not set. |
 | `language` | No | BCP 47 language tag (default: `en`). Applies to UI strings and the assistant's response language hint. |
@@ -173,7 +172,7 @@ Defines the object types that end users can reference via `@`-binding in the inp
 
 The `searchEndpoint` is called with the authenticated user's bearer token forwarded in the `Authorization` header. The host endpoint is responsible for filtering results to objects the user is permitted to access. The platform does not enforce bindable-type permissions independently — it trusts the host's endpoint response.
 
-In shared conversations, if a binding chip resolves to an object another participant cannot access (because that participant's search endpoint would not have returned it), the restricted participant sees the chip labelled **[Restricted object]**. See [08-shared-conversations.md](./08-shared-conversations.md).
+In shared conversations, if a binding chip resolves to an object another participant cannot access (because that participant's search endpoint would not have returned it), the restricted participant sees the chip labelled **[Restricted object]**. See [05-tools-and-memory.md](./05-tools-and-memory.md).
 
 ---
 
@@ -181,7 +180,7 @@ In shared conversations, if a binding chip resolves to an object another partici
 
 Registers the MCP servers available within this tenant. The platform assumes no MCP servers by default — hosts must register at least one for the assistant to be useful beyond its system prompt knowledge.
 
-Host teams can discover and browse available MCP servers in the **MCP Repository** (see [17-complementary-mcp-services.md](./17-complementary-mcp-services.md)) before registering them here.
+Host teams can discover and browse available MCP servers in the **MCP Repository** (see [08-platform-operations.md](./08-platform-operations.md)) before registering them here.
 
 ```json
 {
@@ -284,7 +283,7 @@ Workflow prompts are host-managed — users cannot create or modify them.
 
 Host applications may register **custom content renderers** that the platform loads at runtime. When the model produces a fenced code block tagged with a registered renderer's trigger, the platform invokes the host's renderer instead of its built-in pipeline. This enables domain-specific visualisations — risk gauges, org charts, Gantt views, financial waterfall charts, compliance scorecards — that the platform's built-in renderers do not cover.
 
-See [10-content-rendering.md](./10-content-rendering.md) for the full runtime rendering contract and system prompt guidance injection.
+See [06-interface-and-rendering.md](./06-interface-and-rendering.md) for the full runtime rendering contract and system prompt guidance injection.
 
 ```json
 {
@@ -314,7 +313,7 @@ See [10-content-rendering.md](./10-content-rendering.md) for the full runtime re
 
 ### Origin registration
 
-The `moduleUrl` origin must be declared during tenant registration (or updated via the Platform Admin API). At config submission, the platform validates that the declared origin is reachable and that the module can be loaded. Modules served from unregistered origins are rejected. The host's CSP `script-src` must include the renderer origin — see [16-embedding-and-web-component.md](./16-embedding-and-web-component.md).
+The `moduleUrl` origin must be declared during tenant registration (or updated via the Platform Admin API). At config submission, the platform validates that the declared origin is reachable and that the module can be loaded. Modules served from unregistered origins are rejected. The host's CSP `script-src` must include the renderer origin — see [07-embedding-and-integration.md](./07-embedding-and-integration.md).
 
 ---
 
@@ -333,7 +332,7 @@ The `moduleUrl` origin must be declared during tenant registration (or updated v
 
 | Field | Required | Description |
 |-------|----------|-------------|
-| `defaultModel` | Yes | Model tier used for new conversations unless the user switches. Accepted values: `"fast"`, `"standard"`, `"powerful"`. See [06-model-configuration.md](./06-model-configuration.md) for tier profiles. |
+| `defaultModel` | Yes | Model tier used for new conversations unless the user switches. Accepted values: `"fast"`, `"standard"`, `"powerful"`. See [04-model-and-prompt.md](./04-model-and-prompt.md) for tier profiles. |
 | `allowedModels` | Yes | Array of model tiers users may switch to. Must include `defaultModel`. |
 | `userCanSwitch` | No | Whether users can switch model tier mid-conversation (default: `true`). Set to `false` to lock all sessions to `defaultModel`. |
 | `provider` | Yes | AI provider identifier. The platform maps tier names to the provider's current models. Multiple providers planned — see [ROADMAP.md](./ROADMAP.md). |
@@ -342,7 +341,7 @@ The `moduleUrl` origin must be declared during tenant registration (or updated v
 
 ## `userProfile`
 
-Describes how the platform should interpret user-profile claims for communication style personalisation. These claims are passed via the authentication bridge (see [16-embedding-and-web-component.md](./16-embedding-and-web-component.md)).
+Describes how the platform should interpret user-profile claims for communication style personalisation. These claims are passed via the authentication bridge (see [07-embedding-and-integration.md](./07-embedding-and-integration.md)).
 
 ```json
 {
@@ -380,13 +379,13 @@ The `styleField`, `verbosityField`, and `sessionContext` field values must match
 | `roleField` | No | JWT claim key for the user's job title or role |
 | `organisationField` | No | JWT claim key for the user's organisation or business unit |
 
-All four fields are optional. The platform always injects the assistant name, application name, session date/time, and config version regardless of whether `sessionContext` is configured. User identity fields are only injected when their corresponding claim is present in the JWT and mapped here. See [06-model-configuration.md](./07-model-configuration.md) for the full session context block specification.
+All four fields are optional. The platform always injects the assistant name, application name, session date/time, and config version regardless of whether `sessionContext` is configured. User identity fields are only injected when their corresponding claim is present in the JWT and mapped here. See [04-model-and-prompt.md](./04-model-and-prompt.md) for the full session context block specification.
 
 ---
 
 ## `memory`
 
-Configures the memory system for this tenant. See [15-memory-and-recall.md](./15-memory-and-recall.md) for the full behaviour specification.
+Configures the memory system for this tenant. See [05-tools-and-memory.md](./05-tools-and-memory.md) for the full behaviour specification.
 
 ```json
 {
@@ -484,7 +483,7 @@ Feature flags that enable or disable platform capabilities for this tenant.
 
 ## `widget`
 
-Configures the **Mode 1 floating widget** (`<ai-chat-widget>`) behaviour for this tenant. Applies only when the host embeds the floating widget web component — ignored for Mode 2 (`<ai-chat>`) and Mode 3 (`<ai-chat-field>`) deployments. See [18-entry-points-and-embedding-modes.md](./18-entry-points-and-embedding-modes.md) for full widget behaviour.
+Configures the **Mode 1 floating widget** (`<ai-chat-widget>`) behaviour for this tenant. Applies only when the host embeds the floating widget web component — ignored for Mode 2 (`<ai-chat>`) and Mode 3 (`<ai-chat-field>`) deployments. See [07-embedding-and-integration.md](./07-embedding-and-integration.md) for full widget behaviour.
 
 ```json
 {

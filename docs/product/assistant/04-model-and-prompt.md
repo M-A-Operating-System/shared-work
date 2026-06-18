@@ -1,4 +1,4 @@
-# 06 — Model Configuration
+# 04 — Model Configuration and System Prompt
 
 **Product:** AI Chat Platform  
 **Version:** 1.0  
@@ -6,7 +6,6 @@
 **Author:** Andrew Bush / M&A Operating System
 
 ---
-
 
 ## AI provider architecture
 
@@ -60,7 +59,7 @@ The active model and any opt-in MCP tools apply to the session as a whole. The u
 
 The model's communication style and verbosity are driven by **claims in the user's authenticated JWT** — not a chat-specific setting. This keeps the assistant experience consistent with the rest of the host application, where user preferences are already managed.
 
-Host applications configure which JWT claim fields map to style and verbosity, and define the prompt text for each value, in the `userProfile` section of the application config (see [01-host-application-config.md](./01-host-application-config.md)).
+Host applications configure which JWT claim fields map to style and verbosity, and define the prompt text for each value, in the `userProfile` section of the application config (see [02-host-config.md](./02-host-config.md)).
 
 ### Example style definitions
 
@@ -123,7 +122,7 @@ The platform assembles the system prompt from multiple layers before each sessio
 
 Layers 1–5 are **platform-managed and non-overridable** — they cannot be suppressed by host system prompt content.
 
-Host applications may reinforce or tailor uncertainty behaviour further in their `scope.systemPrompt` — for example, specifying the domain areas where the model should be especially cautious, or providing alternative phrasings for uncertainty acknowledgment that fit the application's voice. The MCP Resources Service also publishes guidance documents on uncertainty handling that hosts can register and retrieve at session time (see [17-complementary-mcp-services.md](./17-complementary-mcp-services.md)).
+Host applications may reinforce or tailor uncertainty behaviour further in their `scope.systemPrompt` — for example, specifying the domain areas where the model should be especially cautious, or providing alternative phrasings for uncertainty acknowledgment that fit the application's voice. The MCP Resources Service also publishes guidance documents on uncertainty handling that hosts can register and retrieve at session time (see [08-platform-operations.md](./08-platform-operations.md)).
 
 Changes to the host base prompt are made via the Config Editor UI or Admin API and go through config validation before taking effect.
 
@@ -175,7 +174,7 @@ All top-level keys are always present. Fields within the `user` object are omitt
 
 ### Configuration
 
-Claim field mappings are declared in the `userProfile.sessionContext` section of the host application config — see [01-host-application-config.md](./02-host-application-config.md). If `sessionContext` is omitted from the config, the User line contains only the fields derivable without JWT claims (typically none — the line is omitted entirely).
+Claim field mappings are declared in the `userProfile.sessionContext` section of the host application config — see [02-host-config.md](./02-host-config.md). If `sessionContext` is omitted from the config, the User line contains only the fields derivable without JWT claims (typically none — the line is omitted entirely).
 
 ### Caching
 
@@ -196,4 +195,4 @@ Layers 2–8 form a **cacheable prefix** injected on every AI provider API reque
 | 8 — Host base prompt | Yes | Stable within a session; cache invalidated on config update |
 | 9 — Tool descriptions | No | Rebuilt whenever the user enables or disables an opt-in server |
 
-The **cache hit rate** is tracked as a launch metric (target: ≥ 40% by month 2 — see [14-success-metrics.md](./14-success-metrics.md)).
+The **cache hit rate** is tracked as a launch metric (target: ≥ 40% by month 2 — see [08-platform-operations.md](./08-platform-operations.md)).

@@ -1,4 +1,4 @@
-# 18 — Entry Points and Embedding Modes
+# 07 — Embedding and Integration
 
 **Product:** AI Chat Platform  
 **Version:** 1.0  
@@ -7,12 +7,13 @@
 
 ---
 
+## Entry points and embedding modes
 
 The AI Chat Platform is delivered through three distinct embedding modes, each with its own component, visual presentation, and conversation model. Host applications may deploy one, two, or all three modes simultaneously — they are independent components that share the same platform backend.
 
 ---
 
-## Mode overview
+### Mode overview
 
 | Mode | Component | Conversation model | Persistence | Primary use |
 |------|-----------|--------------------|-------------|-------------|
@@ -24,15 +25,15 @@ Modes 1 and 2 are **persistent conversation modes** — they share the same conv
 
 ---
 
-## Mode 1 — Floating Widget
+### Mode 1 — Floating Widget
 
-### Overview
+#### Overview
 
 The floating widget provides always-available assistant access without requiring the user to navigate away from their current page. It is anchored to a corner of the viewport and overlays the host application's content. It has three states: **collapsed** (FAB only), **mini** (compact chat panel), and **full** (complete conversation interface).
 
-### States
+#### States
 
-#### Collapsed state — the FAB
+##### Collapsed state — the FAB
 
 The widget renders as a **floating action button** (FAB) in the configured corner of the viewport (default: bottom-right). The FAB carries:
 
@@ -53,7 +54,7 @@ Badge is suppressed when `showBadge: false` is set in the widget config.
 
 Clicking the FAB transitions to the mini state.
 
-#### Mini state — compact chat panel
+##### Mini state — compact chat panel
 
 The mini state is a compact, non-blocking chat panel anchored above the FAB. Default dimensions: **380px wide × 520px tall**, configurable via the `widget` config section. The panel is elevated above host application content with a shadow; it does not push or reflow page content.
 
@@ -114,7 +115,7 @@ The mini state is a compact, non-blocking chat panel anchored above the FAB. Def
 | ↗ Expand icon | Transitions to full state (see below) |
 | × Close icon | Collapses to FAB; does not end the conversation |
 
-#### Full state — complete conversation interface
+##### Full state — complete conversation interface
 
 Clicking the expand icon (↗) from the mini state transitions to the full conversation interface. The full state renders as a **large modal overlay** occupying most of the viewport:
 
@@ -148,15 +149,15 @@ The full state renders the complete three-zone layout from `09-interaction-desig
 | Collapse | ↙ icon collapses back to mini state; × closes to FAB |
 | Page navigation | If the user navigates while full state is open, full state collapses to mini state automatically |
 
-### Conversation continuity between mini and full
+#### Conversation continuity between mini and full
 
 There is no transition cost when moving between mini and full states. The same conversation is active in both views, and they share state in real time — a response streaming in mini state continues streaming when the user expands to full state.
 
-### Floating widget across page navigation
+#### Floating widget across page navigation
 
 The floating widget persists across client-side page navigation (SPA routing). It retains the current conversation and streaming state as the user moves between pages. On hard page reload, the widget remounts and restores the most recently active conversation.
 
-### Web component
+#### Web component
 
 ```html
 <!-- Place once in the host application shell / layout -->
@@ -167,7 +168,7 @@ The floating widget persists across client-side page navigation (SPA routing). I
 ></ai-chat-widget>
 ```
 
-#### Widget-specific HTML attributes
+##### Widget-specific HTML attributes
 
 | Attribute | Default | Description |
 |-----------|---------|-------------|
@@ -178,16 +179,16 @@ The floating widget persists across client-side page navigation (SPA routing). I
 | `offset-x` | `24` | Horizontal margin from the viewport edge in pixels |
 | `offset-y` | `24` | Vertical margin from the viewport edge in pixels |
 
-#### Widget-specific events
+##### Widget-specific events
 
 | Event | Detail | Description |
 |-------|--------|-------------|
 | `widget-expanded` | `{ state: 'mini' \| 'full' }` | Widget transitioned from collapsed to mini or full |
 | `widget-collapsed` | `{ previousState: 'mini' \| 'full' }` | Widget collapsed to FAB |
 
-All other events from `16-embedding-and-web-component.md` (`binding-click`, `turn-complete`, `token-expired`, etc.) fire identically from `<ai-chat-widget>`.
+All other events from `07-embedding-and-integration.md` (`binding-click`, `turn-complete`, `token-expired`, etc.) fire identically from `<ai-chat-widget>`.
 
-### Browser notifications
+#### Browser notifications
 
 When `showBadge` is enabled, the widget can optionally request the **Web Notifications API** permission to surface a browser notification when a shared conversation receives a new message and the widget is collapsed. This is relevant when the user is on a different browser tab or has the host application in the background.
 
@@ -199,7 +200,7 @@ When `showBadge` is enabled, the widget can optionally request the **Web Notific
 | Denial handling | If the user declines or revokes permission, the badge count remains the only unread signal. No fallback prompt is shown. |
 | Host control | `showBadge: false` in the widget config suppresses both badge and browser notifications entirely. |
 
-### Config
+#### Config
 
 The `widget` config section in the application config controls widget-level defaults:
 
@@ -223,13 +224,13 @@ The `widget` config section in the application config controls widget-level defa
 
 ---
 
-## Mode 2 — Inline Page
+### Mode 2 — Inline Page
 
-### Overview
+#### Overview
 
-The inline page mode embeds the assistant as a first-class content block within a host application page. It uses the `<ai-chat>` component described in full in `16-embedding-and-web-component.md`. It is the **richest and most capable** embedding mode — the full three-zone layout with no constraints on features or content rendering.
+The inline page mode embeds the assistant as a first-class content block within a host application page. It uses the `<ai-chat>` component described in full in `07-embedding-and-integration.md`. It is the **richest and most capable** embedding mode — the full three-zone layout with no constraints on features or content rendering.
 
-### Mode 2 in host application context
+#### Mode 2 in host application context
 
 The `<ai-chat>` component occupies its mounting point only — the host application retains full ownership of its navigation, header, and page shell.
 
@@ -271,11 +272,11 @@ The `<ai-chat>` component occupies its mounting point only — the host applicat
 └──────────────────────────────────────────────────────────────────────┘
 ```
 
-### Conversation model
+#### Conversation model
 
 Mode 2 shares conversation history fully with Mode 1. The same history panel, the same conversation list, the same threads — a user moving between a dedicated assistant page (Mode 2) and the floating widget (Mode 1) sees the same conversations in both. There is no concept of "page-scoped" conversations in Mode 2.
 
-### Typical placements
+#### Typical placements
 
 | Placement | Description |
 |-----------|-------------|
@@ -283,7 +284,7 @@ Mode 2 shares conversation history fully with Mode 1. The same history panel, th
 | Split-panel page | The host application page is split: content on the left, assistant on the right. The component is mounted in a fixed-width right panel (minimum 480px recommended). |
 | Tab within a page | The assistant occupies one tab of a tabbed page. The component mounts/unmounts on tab switch — component state is restored on remount via the platform API. |
 
-### Relationship to Mode 1
+#### Relationship to Mode 1
 
 A host application that deploys both `<ai-chat>` and `<ai-chat-widget>` on the same page will have two simultaneous conversation views. This is an unusual configuration but is supported. Both components connect to the same platform backend with the same `tenant_id` and `user_id` — changes in one are reflected in the other in real time.
 
@@ -291,9 +292,9 @@ For most host applications, Mode 1 (floating widget) is deployed site-wide in th
 
 ---
 
-## Mode 3 — Form Field Assist
+### Mode 3 — Form Field Assist
 
-### Overview
+#### Overview
 
 The Form Field Assist provides contextual, ephemeral AI assistance scoped to an individual form field. It appears as a small icon or button adjacent to the field and opens a **compact contextual popover** when activated. The interaction is entirely transactional — there is no conversation history, no history panel, and no persistent thread. When the popover closes, the session is discarded.
 
@@ -304,7 +305,7 @@ Form Field Assist is designed for tasks like:
 - *"Translate this text into French"*
 - *"Summarise this paragraph more concisely"*
 
-### Trigger presentation
+#### Trigger presentation
 
 The trigger can be presented in two ways, depending on the host application's UI:
 
@@ -338,7 +339,7 @@ A button or link appears below or beside the field. The host application styles 
 
 The trigger variant is configured via the `trigger` attribute on the component (see Web component below).
 
-### Popover layout
+#### Popover layout
 
 ```
 ┌──────────────────────────────────────┐
@@ -359,7 +360,7 @@ The trigger variant is configured via the `trigger` attribute on the component (
 
 Default popover dimensions: **320px wide × flexible height** (grows with conversation, max 480px, then scrolls). The popover anchors to the trigger element and repositions automatically to stay within the viewport.
 
-### Ephemeral session model
+#### Ephemeral session model
 
 | Property | Specification |
 |----------|--------------|
@@ -375,7 +376,7 @@ Default popover dimensions: **320px wide × flexible height** (grows with conver
 | Application context | Always injected — org terminology and standing context is relevant to field composition |
 | Improvement signals | Captured and attributed to the tenant; no turn-level audit trail (ephemeral session not persisted) |
 
-### Context injection
+#### Context injection
 
 When the popover opens, the platform assembles a field-specific system prompt from:
 
@@ -395,7 +396,7 @@ Task: Help the user compose or refine the content for this field.
 
 The field context block keeps the model tightly focused on the field's purpose. The model does not reference other conversations or memory items not explicitly injected.
 
-### Write-back behaviour
+#### Write-back behaviour
 
 When `write-back` is configured for a field, a **write-back bar** appears at the bottom of the popover after each assistant response that contains renderable text content.
 
@@ -415,7 +416,7 @@ Write-back format is configurable per field:
 | `html` | WYSIWYG editors |
 | `json` | Structured data fields |
 
-### Web component
+#### Web component
 
 Two component variants are provided:
 
@@ -451,7 +452,7 @@ Two component variants are provided:
 ></ai-chat-field>
 ```
 
-#### `<ai-chat-field>` attributes
+##### `<ai-chat-field>` attributes
 
 | Attribute | Required | Description |
 |-----------|----------|-------------|
@@ -469,7 +470,7 @@ Two component variants are provided:
 | `inject-personal-memory` | No | `"true"` injects the user's personal memory into the field session. Useful for fields where personal preferences or role context are relevant. Default: `"false"`. |
 | `placeholder-prompt` | No | Pre-filled text shown in the input field on first open (e.g. `"Describe this product in 2–3 sentences"`). Helps orient the user. |
 
-#### `<ai-chat-field>` events
+##### `<ai-chat-field>` events
 
 | Event | Detail payload | Description |
 |-------|---------------|-------------|
@@ -479,7 +480,7 @@ Two component variants are provided:
 | `field-closed` | `{ fieldLabel, messageCount }` | Fired when the popover closes |
 | `token-expired` | — | Identical to other component variants — host refreshes via `updateToken()` |
 
-#### `<ai-chat-field>` JavaScript API
+##### `<ai-chat-field>` JavaScript API
 
 | Method | Description |
 |--------|-------------|
@@ -488,7 +489,7 @@ Two component variants are provided:
 | `updateToken(token)` | Refresh the user JWT — same as other components |
 | `setFieldValue(value)` | Update the `field-value` context without reopening the popover |
 
-### Handling `field-insert`
+#### Handling `field-insert`
 
 ```javascript
 document.querySelectorAll('ai-chat-field').forEach((field) => {
@@ -505,7 +506,7 @@ document.querySelectorAll('ai-chat-field').forEach((field) => {
 
 ---
 
-## Cross-mode design decisions
+### Cross-mode design decisions
 
 | Decision | Rationale |
 |----------|-----------|
@@ -519,7 +520,7 @@ document.querySelectorAll('ai-chat-field').forEach((field) => {
 
 ---
 
-## Summary: which component to use
+### Summary: which component to use
 
 | Scenario | Component |
 |----------|-----------|
@@ -527,3 +528,294 @@ document.querySelectorAll('ai-chat-field').forEach((field) => {
 | Build a dedicated assistant page or embed a full assistant panel | `<ai-chat>` (Mode 2) |
 | Add contextual AI assistance to individual form fields | `<ai-chat-field>` (Mode 3) |
 | All three simultaneously | All three components can coexist — they share the same auth and platform backend |
+
+---
+
+## The `<ai-chat>` inline component
+
+### Scope of this document
+
+This document covers the **`<ai-chat>` component** — the inline page embedding mode (Mode 2). It is the complete, full-featured conversation interface for use on dedicated assistant pages or embedded content sections.
+
+The AI Chat Platform has three distinct embedding modes. For the full picture, see [07-embedding-and-integration.md](./07-embedding-and-integration.md):
+
+| Mode | Component | Description |
+|------|-----------|-------------|
+| **1 — Floating Widget** | `<ai-chat-widget>` | FAB + collapsible mini/full panel, persists across pages |
+| **2 — Inline Page** | `<ai-chat>` | This document — full three-zone layout embedded in a page |
+| **3 — Form Field Assist** | `<ai-chat-field>` | Ephemeral contextual popover scoped to a form field |
+
+Modes 1 and 2 share conversation history. Mode 3 is ephemeral and fully independent.
+
+---
+
+### Overview
+
+The `<ai-chat>` component is a **custom HTML element** that host applications embed within their own UI. The component is self-contained — it manages its own state, handles streaming, renders content, and communicates with the platform API independently of the host application's framework.
+
+Host applications include the component script once and configure it via HTML attributes and a JavaScript API. No framework-specific adapters are required; the component works in any modern web environment.
+
+---
+
+### Quick start
+
+```html
+<!-- 1. Include the component script -->
+<script type="module" src="https://chat-platform.io/sdk/v1/ai-chat.js"></script>
+
+<!-- 2. Mount the component -->
+<ai-chat
+  tenant-id="acme-corp"
+  user-token="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  theme="light"
+></ai-chat>
+```
+
+The component renders at 100% of its container's width and height. Host applications control sizing via the container element.
+
+---
+
+### HTML attributes
+
+| Attribute | Required | Type | Description |
+|-----------|----------|------|-------------|
+| `tenant-id` | Yes | string | The tenant's registered `tenantId` from the application config |
+| `user-token` | Yes | string | The host-authenticated user's JWT. Must contain the required claims (see Authentication bridge). Refreshed by calling `updateToken()`. |
+| `theme` | No | `"light"` \| `"dark"` | Initial colour scheme. Defaults to `"light"`. Dark mode is not supported in v1 — this attribute is reserved. |
+| `locale` | No | string | BCP 47 locale tag (e.g. `"en-GB"`). Overrides the tenant config `scope.language` for UI strings. |
+| `initial-conversation-id` | No | string | Opens a specific conversation on mount instead of the default new/recent conversation. Useful for deep-linking from the host application. |
+
+---
+
+### Authentication bridge
+
+The platform does not authenticate users independently. The host application authenticates its users and passes the result to the component as a **signed JWT** via the `user-token` attribute.
+
+#### Required JWT claims
+
+| Claim | Type | Description |
+|-------|------|-------------|
+| `sub` | string | User's unique identifier within the tenant |
+| `email` | string | User's email address (used for invitation search) |
+| `name` | string | User's display name (shown in shared conversation attribution) |
+| `tenant_id` | string | Must match the `tenant-id` attribute — enforced server-side |
+| `exp` | number | JWT expiry time — the component checks this and fires `token-expired` when within 60 seconds of expiry |
+
+#### Optional JWT claims
+
+| Claim | Type | Description |
+|-------|------|-------------|
+| Any field in `userProfile.styleField` | string | Communication style value (e.g. `"business"`) |
+| Any field in `userProfile.verbosityField` | string | Response verbosity value (e.g. `"concise"`) |
+| Any role identifiers listed in MCP server `roles` | string[] | Role claims used to enforce MCP server access restrictions |
+| `avatar_url` | string | URL to the user's avatar image (used in shared conversation thread) |
+
+#### JWT signature verification
+
+The platform verifies the JWT signature against the JWKS endpoint registered by the host application at tenant registration time. Tokens signed with keys not in the registered JWKS are rejected.
+
+#### Token refresh
+
+```javascript
+const chat = document.querySelector('ai-chat');
+
+// Listen for token expiry warning
+chat.addEventListener('token-expired', async () => {
+  const newToken = await yourAuthService.refreshToken();
+  chat.updateToken(newToken);
+});
+```
+
+`updateToken(token)` updates the active token without remounting the component. The user's session and conversation state are preserved.
+
+---
+
+### JavaScript API
+
+Access the component's API via a reference to the element:
+
+```javascript
+const chat = document.querySelector('ai-chat');
+```
+
+#### Methods
+
+| Method | Parameters | Description |
+|--------|-----------|-------------|
+| `updateToken(token)` | `token: string` | Refresh the user's JWT without remounting |
+| `openConversation(id)` | `id: string` | Navigate to a specific conversation by ID |
+| `startNewConversation()` | — | Open a new conversation, clearing the current one |
+| `setLocale(locale)` | `locale: string` | Change the UI locale at runtime |
+
+#### Properties
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `currentConversationId` | `string \| null` | The ID of the currently open conversation |
+| `isStreaming` | `boolean` | Whether the assistant is currently generating a response |
+
+---
+
+### Events
+
+The component fires custom events on the element. Listen with `addEventListener`.
+
+| Event | Detail payload | Description |
+|-------|---------------|-------------|
+| `binding-click` | `{ typeId, objectId, displayId, name }` | Fired when a user clicks a binding chip. The host application should handle navigation to the object's detail page. |
+| `conversation-created` | `{ conversationId, title }` | Fired when a new conversation is created |
+| `conversation-opened` | `{ conversationId, title }` | Fired when an existing conversation is opened |
+| `turn-complete` | `{ conversationId, turnId, model, tokenCounts }` | Fired when an assistant response completes (not on partial/stopped) |
+| `tool-invoked` | `{ conversationId, turnId, serverId, toolName, status }` | Fired on each MCP tool invocation completion |
+| `token-expired` | — | Fired when the user's JWT is within 60 seconds of expiry |
+| `error` | `{ code, message }` | Fired on component-level errors (auth failure, network error, config error) |
+| `csat-submitted` | `{ conversationId, score, comment }` | Fired when a user submits a CSAT rating |
+
+#### Handling `binding-click`
+
+```javascript
+chat.addEventListener('binding-click', (event) => {
+  const { typeId, objectId, displayId, name } = event.detail;
+
+  switch (typeId) {
+    case 'data_domain':
+      router.navigate(`/domains/${objectId}`);
+      break;
+    case 'policy':
+      router.navigate(`/policies/${objectId}`);
+      break;
+    default:
+      console.log('Unhandled binding type:', typeId);
+  }
+});
+```
+
+---
+
+### Sizing and layout
+
+The `<ai-chat>` component renders at **100% width and 100% height of its containing element**. The host application controls the component's footprint by sizing the container.
+
+#### Full-page embedding
+
+```css
+/* Host application styles */
+.chat-page {
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+```
+
+```html
+<div class="chat-page">
+  <ai-chat tenant-id="..." user-token="..."></ai-chat>
+</div>
+```
+
+#### Side panel embedding
+
+```css
+.chat-panel {
+  width: 480px;
+  height: 100%;
+  border-left: 1px solid var(--border-color);
+}
+```
+
+```html
+<aside class="chat-panel">
+  <ai-chat tenant-id="..." user-token="..."></ai-chat>
+</aside>
+```
+
+#### Minimum dimensions
+
+| Dimension | Minimum |
+|-----------|---------|
+| Width | 320px |
+| Height | 400px |
+
+Below these minimums the component renders a fallback state: *"This panel is too small to display the assistant. Please expand the window."*
+
+#### Breakpoint behaviour in containers
+
+When the component is mounted in a container narrower than the desktop breakpoint (< 1280px), it uses the container width rather than the viewport width to determine which layout to apply. A 480px side panel will use the tablet layout regardless of the overall page width.
+
+---
+
+### Content Security Policy (CSP)
+
+The `<ai-chat>` component requires the following CSP directives on the host page:
+
+```
+script-src    https://chat-platform.io [renderer module origins];
+connect-src   https://api.chat-platform.io wss://api.chat-platform.io;
+frame-src     'none';
+img-src       https://cdn.chat-platform.io [host CDN origins];
+style-src     https://chat-platform.io 'nonce-{page-nonce}';
+```
+
+Additionally:
+- Any URLs provided in the `branding` config (`logoUrl`, `faviconUrl`) must be included in `img-src`.
+- Each origin hosting a custom renderer module (from `renderers[].moduleUrl` in the application config) must be included in `script-src`. Renderer modules are loaded via dynamic `import()` at runtime and are subject to the host page's CSP. A module blocked by CSP will cause that renderer to fall back to syntax-highlighted code — the platform will not bypass CSP.
+
+The component itself does not use `eval`, `inline-script`, or `blob:` URLs. All platform assets are loaded from `https://chat-platform.io` or `https://cdn.chat-platform.io`. Renderer modules are loaded from host-provided origins only.
+
+---
+
+### React / Vue / Angular integration
+
+The web component works without framework adapters. Framework-specific wrappers are provided for convenience:
+
+**React:**
+```jsx
+import { AiChat } from '@chat-platform/react';
+
+<AiChat
+  tenantId="acme-corp"
+  userToken={jwt}
+  onBindingClick={({ typeId, objectId }) => navigate(`/${typeId}/${objectId}`)}
+/>
+```
+
+**Vue:**
+```vue
+<AiChat
+  tenant-id="acme-corp"
+  :user-token="jwt"
+  @binding-click="handleBindingClick"
+/>
+```
+
+**Angular:**
+```html
+<ai-chat
+  tenant-id="acme-corp"
+  [attr.user-token]="jwt"
+  (binding-click)="handleBindingClick($event)"
+></ai-chat>
+```
+
+---
+
+### Security considerations
+
+#### JWT forwarding
+
+The `user-token` attribute value is passed as a bearer token to the platform API on every request. It must:
+- Be issued by the host application's authenticated session (never a long-lived API key)
+- Have a short expiry (recommended: 15 minutes)
+- Be refreshed via `updateToken()` before expiry
+
+#### Preventing attribute injection
+
+Do not interpolate untrusted user input into the `tenant-id` or `user-token` attributes. Both are validated server-side, but attribute injection could result in failed sessions or user confusion.
+
+#### CORS
+
+The platform API enforces CORS. Only origins registered at tenant registration time are permitted to make requests. The host application must register all deployment origins (development, staging, production) during tenant setup.
+
+#### Iframe considerations
+
+The component must not be embedded within an `<iframe>` — this prevents the platform from accessing the host page's cookies and local storage required for session management. The component is designed for direct DOM embedding only.
