@@ -9,14 +9,20 @@ on:
     paths:
       - 'docs/research/research.json'
       - 'docs/research/research.schema.json'
+  workflow_dispatch:
 
 jobs:
   validate:
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    permissions:
+      contents: write
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          ref: master
 
       - uses: actions/setup-python@v5
         with:
@@ -66,3 +72,22 @@ jobs:
 
           print(f"Integrity checks passed — no duplicate product names")
           EOF
+
+      # ── Table ─────────────────────────────────────────────────────────────────
+      - name: Regenerate research table
+        run: python docs/research/generate_md.py
+
+      # ── Commit ────────────────────────────────────────────────────────────────
+      - name: Commit updated table
+        if: github.event_name != 'pull_request'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/research/research-table.md
+          if git diff --staged --quiet; then
+            echo "Table unchanged — nothing to commit."
+          else
+            git commit -m "docs(research): regenerate research table [skip ci]"
+            git pull --rebase -X theirs origin master
+            git push origin master
+          fi
