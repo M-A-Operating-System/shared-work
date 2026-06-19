@@ -60,7 +60,7 @@ jobs:
         run: python docs/research/generate_md.py
 
       # ── Commit ────────────────────────────────────────────────────────────────
-      # Only the four known research output paths are ever staged.
+      # Only the five known research output paths are ever staged.
       # Nothing outside docs/research/ can be committed by this job.
       - name: Commit and push
         run: |
