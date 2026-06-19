@@ -338,6 +338,10 @@ When all research is complete, call write_output once with:
 
     final_output = None
     max_iterations = 30
+    total_input_tokens = 0
+    total_output_tokens = 0
+    total_cache_read_tokens = 0
+    total_cache_write_tokens = 0
 
     def call_api(msgs: list) -> anthropic.types.Message:
         for attempt in range(4):
@@ -368,8 +372,19 @@ When all research is complete, call write_output once with:
 
         response = call_api(messages)
 
+        u = response.usage
+        iter_in  = getattr(u, "input_tokens", 0) or 0
+        iter_out = getattr(u, "output_tokens", 0) or 0
+        iter_cr  = getattr(u, "cache_read_input_tokens", 0) or 0
+        iter_cw  = getattr(u, "cache_creation_input_tokens", 0) or 0
+        total_input_tokens  += iter_in
+        total_output_tokens += iter_out
+        total_cache_read_tokens  += iter_cr
+        total_cache_write_tokens += iter_cw
+
         block_types = [b.type for b in response.content]
         print(f"  stop_reason={response.stop_reason}  blocks={block_types}")
+        print(f"  tokens  in={iter_in}  out={iter_out}  cache_read={iter_cr}  cache_write={iter_cw}")
 
         assistant_content = [serialise_block(b) for b in response.content]
         messages.append({"role": "assistant", "content": assistant_content})
@@ -443,6 +458,14 @@ When all research is complete, call write_output once with:
     )
     print(f"Written : docs/research/sources/{TODAY}.json")
 
+    print("\n── Token usage ───────────────────────────────────────────────────────────")
+    print(f"  Input tokens       : {total_input_tokens:,}")
+    print(f"  Output tokens      : {total_output_tokens:,}")
+    if total_cache_read_tokens or total_cache_write_tokens:
+        print(f"  Cache read tokens  : {total_cache_read_tokens:,}")
+        print(f"  Cache write tokens : {total_cache_write_tokens:,}")
+    print(f"  Total tokens       : {total_input_tokens + total_output_tokens:,}")
+    print("──────────────────────────────────────────────────────────────────────────")
     print("\nResearch run complete.")
 
 
