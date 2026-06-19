@@ -67,9 +67,9 @@ jobs:
           DATE=$(date -u +%Y-%m-%d)
           git add docs/research/research.json
           git add docs/research/research-table.md
-          git add docs/research/rotation.json
-          git add "docs/research/runs/${DATE}.md"
-          git add "docs/research/sources/${DATE}.json"
+          [ -f docs/research/rotation.json ] && git add docs/research/rotation.json || true
+          [ -f "docs/research/runs/${DATE}.md" ] && git add "docs/research/runs/${DATE}.md" || true
+          [ -f "docs/research/sources/${DATE}.json" ] && git add "docs/research/sources/${DATE}.json" || true
           if git diff --staged --quiet; then
             echo "No changes to commit."
             exit 0
