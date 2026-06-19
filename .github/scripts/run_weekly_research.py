@@ -345,7 +345,8 @@ When all research is complete, call write_output once with:
                 return client.messages.create(
                     model="claude-opus-4-8",
                     max_tokens=16000,
-                    thinking={"type": "enabled", "budget_tokens": 10000},
+                    thinking={"type": "adaptive"},
+                    output_config={"effort": "high"},
                     system=system,
                     tools=tools,
                     messages=msgs,
