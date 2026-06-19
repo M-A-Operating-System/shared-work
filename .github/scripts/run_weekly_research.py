@@ -342,6 +342,7 @@ When all research is complete, call write_output once with:
     _use_beta = True  # disabled automatically if the API rejects it
 
     def call_api(msgs: list) -> anthropic.types.Message:
+        nonlocal _use_beta
         kwargs = dict(
             model="claude-opus-4-8",
             max_tokens=16000,
@@ -358,7 +359,6 @@ When all research is complete, call write_output once with:
                 )
             except anthropic.BadRequestError as exc:
                 if _use_beta and "beta" in str(exc).lower():
-                    nonlocal _use_beta  # type: ignore[misc]
                     _use_beta = False
                     print("  interleaved-thinking beta rejected — retrying without it")
                     continue
