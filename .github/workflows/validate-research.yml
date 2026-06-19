@@ -1,0 +1,68 @@
+name: Validate Research Catalog
+
+on:
+  push:
+    paths:
+      - 'docs/research/research.json'
+      - 'docs/research/research.schema.json'
+  pull_request:
+    paths:
+      - 'docs/research/research.json'
+      - 'docs/research/research.schema.json'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: .github/scripts/requirements.txt
+
+      - name: Install dependencies
+        run: pip install jsonschema
+
+      - name: Validate research.json against schema
+        run: |
+          python - << 'EOF'
+          import json, sys
+          from pathlib import Path
+          import jsonschema
+
+          catalog = json.loads(Path("docs/research/research.json").read_text(encoding="utf-8"))
+          schema  = json.loads(Path("docs/research/research.schema.json").read_text(encoding="utf-8"))
+
+          try:
+              jsonschema.validate(catalog, schema)
+          except jsonschema.ValidationError as e:
+              print(f"::error file=docs/research/research.json::Validation failed: {e.message}")
+              print(f"  Path: {' > '.join(str(p) for p in e.absolute_path)}")
+              sys.exit(1)
+
+          products = catalog.get("products", [])
+          print(f"Validation passed — {len(products)} products")
+
+          # basic integrity checks
+          names = [p["product_name"] for p in products]
+          dupes = [n for n in names if names.count(n) > 1]
+          if dupes:
+              print(f"::error file=docs/research/research.json::Duplicate product_names: {set(dupes)}")
+              sys.exit(1)
+
+          missing_urls = [
+              f"{p['product_name']} / {r['name']}"
+              for p in products
+              for r in p.get("reference_implementations", [])
+              if not r.get("url")
+          ]
+          if missing_urls:
+              for m in missing_urls:
+                  print(f"::warning file=docs/research/research.json::Missing URL: {m}")
+
+          print(f"Integrity checks passed — no duplicate product names")
+          EOF
