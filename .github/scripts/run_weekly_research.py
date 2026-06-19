@@ -268,7 +268,7 @@ def run_tool(name: str, tool_input: dict) -> str:
 
 def serialise_block(block) -> dict:
     if block.type == "thinking":
-        return {"type": "thinking", "thinking": block.thinking}
+        return {"type": "thinking", "thinking": block.thinking, "signature": block.signature}
     if block.type == "text":
         return {"type": "text", "text": block.text}
     if block.type == "tool_use":
