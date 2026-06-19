@@ -4,6 +4,12 @@ on:
   schedule:
     - cron: '0 6 * * 1'   # Monday 06:00 UTC
   workflow_dispatch:
+    inputs:
+      skip_research:
+        description: 'Skip research phase and only regenerate the table from existing research.json'
+        required: false
+        type: boolean
+        default: false
 
 # Queue concurrent runs rather than cancel them so no run is lost.
 concurrency:
@@ -42,6 +48,7 @@ jobs:
       # SEARCH_EXA_KEY    → Exa neural/semantic search
       # SEARCH_TAVILY_KEY → Tavily research search
       - name: Run weekly research
+        if: ${{ github.event_name != 'workflow_dispatch' || !inputs.skip_research }}
         env:
           ANTHROPIC_API_KEY: ${{ secrets.LMM_CLAUDE_KEY }}
           SEARCH_EXA_KEY: ${{ secrets.SEARCH_EXA_KEY }}
@@ -60,6 +67,7 @@ jobs:
           DATE=$(date -u +%Y-%m-%d)
           git add docs/research/research.json
           git add docs/research/research-table.md
+          git add docs/research/rotation.json
           git add "docs/research/runs/${DATE}.md"
           git add "docs/research/sources/${DATE}.json"
           if git diff --staged --quiet; then
