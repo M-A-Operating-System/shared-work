@@ -338,31 +338,18 @@ When all research is complete, call write_output once with:
 
     final_output = None
     max_iterations = 30
-    _interleaved_beta = ["interleaved-thinking-2025-05-14"]
-    _use_beta = True  # disabled automatically if the API rejects it
 
     def call_api(msgs: list) -> anthropic.types.Message:
-        nonlocal _use_beta
-        kwargs = dict(
-            model="claude-opus-4-8",
-            max_tokens=16000,
-            thinking={"type": "enabled", "budget_tokens": 10000},
-            system=system,
-            tools=tools,
-            messages=msgs,
-        )
         for attempt in range(4):
             try:
                 return client.messages.create(
-                    **kwargs,
-                    **({"betas": _interleaved_beta} if _use_beta else {}),
+                    model="claude-opus-4-8",
+                    max_tokens=16000,
+                    thinking={"type": "enabled", "budget_tokens": 10000},
+                    system=system,
+                    tools=tools,
+                    messages=msgs,
                 )
-            except anthropic.BadRequestError as exc:
-                if _use_beta and "beta" in str(exc).lower():
-                    _use_beta = False
-                    print("  interleaved-thinking beta rejected — retrying without it")
-                    continue
-                raise
             except anthropic.RateLimitError:
                 wait = 5 * (2 ** attempt)
                 print(f"  rate limited — retrying in {wait}s...")
