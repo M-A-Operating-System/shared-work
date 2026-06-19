@@ -71,6 +71,28 @@
           ],
           "url": "https://openwebui.com",
           "notes": "Open source AI chat and assistant interface."
+        },
+        {
+          "name": "Amazon Q Business",
+          "vendor": "Amazon Web Services",
+          "implementation_type": "commercial",
+          "deployment_models": [
+            "saas",
+            "managed_cloud"
+          ],
+          "url": "https://aws.amazon.com/q/business/",
+          "notes": "Enterprise generative AI assistant for business knowledge, applications and workflows."
+        },
+        {
+          "name": "Google Agentspace",
+          "vendor": "Google",
+          "implementation_type": "commercial",
+          "deployment_models": [
+            "saas",
+            "managed_cloud"
+          ],
+          "url": "https://cloud.google.com/products/agentspace",
+          "notes": "Enterprise AI agent and assistant experience over organizational knowledge and applications."
         }
       ],
       "capabilities": [
@@ -185,6 +207,20 @@
           "description": "Monitors assistant activity, usage and adoption.",
           "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
           "required": true
+        },
+        {
+          "capability_name": "assistant_evaluation",
+          "display_name": "Assistant Evaluation",
+          "description": "Evaluates configured assistants before and after publishing.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "assistant_lifecycle",
+          "display_name": "Assistant Lifecycle",
+          "description": "Manages assistant creation, publishing, review, retirement and replacement.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
         }
       ],
       "tags": [
@@ -276,6 +312,27 @@
           ],
           "url": "https://claude.ai",
           "notes": "Project knowledge and context organization."
+        },
+        {
+          "name": "Notion",
+          "vendor": "Notion",
+          "implementation_type": "commercial",
+          "deployment_models": [
+            "saas"
+          ],
+          "url": "https://www.notion.com",
+          "notes": "Workspace and knowledge repository often used for internal documentation and reusable knowledge assets."
+        },
+        {
+          "name": "SharePoint",
+          "vendor": "Microsoft",
+          "implementation_type": "commercial",
+          "deployment_models": [
+            "saas",
+            "managed_cloud"
+          ],
+          "url": "https://www.microsoft.com/microsoft-365/sharepoint/collaboration",
+          "notes": "Enterprise document and knowledge repository."
         }
       ],
       "capabilities": [
@@ -362,6 +419,20 @@
           "description": "Searches reusable knowledge assets.",
           "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
           "required": true
+        },
+        {
+          "capability_name": "playbook_repository",
+          "display_name": "Playbook Repository",
+          "description": "Stores reusable operational playbooks for assistants, agents and teams.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "policy_repository",
+          "display_name": "Policy Repository",
+          "description": "Stores reusable policy documents and AI-use guidance.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
         }
       ],
       "tags": [
@@ -446,6 +517,39 @@
           ],
           "url": "https://www.helicone.ai",
           "notes": "Open source LLM observability and gateway-oriented platform."
+        },
+        {
+          "name": "Amazon Bedrock",
+          "vendor": "Amazon Web Services",
+          "implementation_type": "cloud_service",
+          "deployment_models": [
+            "managed_cloud",
+            "api"
+          ],
+          "url": "https://aws.amazon.com/bedrock/",
+          "notes": "Managed foundation model platform with model access, guardrails and enterprise controls."
+        },
+        {
+          "name": "Azure AI Foundry",
+          "vendor": "Microsoft",
+          "implementation_type": "cloud_service",
+          "deployment_models": [
+            "managed_cloud",
+            "api"
+          ],
+          "url": "https://ai.azure.com",
+          "notes": "Enterprise platform for building, routing, governing and operating AI applications and models."
+        },
+        {
+          "name": "Google Vertex AI",
+          "vendor": "Google",
+          "implementation_type": "cloud_service",
+          "deployment_models": [
+            "managed_cloud",
+            "api"
+          ],
+          "url": "https://cloud.google.com/vertex-ai",
+          "notes": "Managed AI platform for model access, deployment, governance and operations."
         }
       ],
       "capabilities": [
@@ -532,6 +636,34 @@
           "description": "Provides consistent policy, routing and service error responses.",
           "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
           "required": true
+        },
+        {
+          "capability_name": "model_fallback",
+          "display_name": "Model Fallback",
+          "description": "Routes requests to fallback models when primary models are unavailable or unsuitable.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "provider_abstraction",
+          "display_name": "Provider Abstraction",
+          "description": "Provides a consistent access layer across multiple AI model providers.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "request_redaction",
+          "display_name": "Request Redaction",
+          "description": "Redacts restricted data from prompts before model invocation.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "response_redaction",
+          "display_name": "Response Redaction",
+          "description": "Redacts restricted data from model responses before delivery.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
         }
       ],
       "tags": [
@@ -540,7 +672,8 @@
         "governance",
         "cost",
         "entitlement",
-        "mcp"
+        "mcp",
+        "api"
       ]
     },
     {
@@ -1236,6 +1369,26 @@
           ],
           "url": "https://mastra.ai",
           "notes": "Agent framework for TypeScript applications."
+        },
+        {
+          "name": "Google Agent Development Kit",
+          "vendor": "Google",
+          "implementation_type": "open_source",
+          "deployment_models": [
+            "self_hosted"
+          ],
+          "url": "https://google.github.io/adk-docs/",
+          "notes": "Open source framework for building and orchestrating agents."
+        },
+        {
+          "name": "Semantic Kernel",
+          "vendor": "Microsoft",
+          "implementation_type": "open_source",
+          "deployment_models": [
+            "self_hosted"
+          ],
+          "url": "https://learn.microsoft.com/semantic-kernel/",
+          "notes": "Open source SDK for integrating AI models, tools, functions and agentic workflows."
         }
       ],
       "capabilities": [
@@ -1285,6 +1438,20 @@
           "capability_name": "structured_recovery",
           "display_name": "Structured Recovery",
           "description": "Recovers from tool, policy or execution failures.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "approval_gate",
+          "display_name": "Approval Gate",
+          "description": "Requires approval before executing sensitive workflow steps.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "event_driven_execution",
+          "display_name": "Event-Driven Execution",
+          "description": "Triggers workflows and agents from events.",
           "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
           "required": true
         }
@@ -1395,6 +1562,27 @@
           "description": "Captures trust, provenance and risk metadata.",
           "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
           "required": true
+        },
+        {
+          "capability_name": "server_lifecycle",
+          "display_name": "Server Lifecycle",
+          "description": "Manages MCP server onboarding, update, deprecation and retirement.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "server_rating",
+          "display_name": "Server Rating",
+          "description": "Captures quality or trust ratings for MCP servers.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": false
+        },
+        {
+          "capability_name": "server_risk_scoring",
+          "display_name": "Server Risk Scoring",
+          "description": "Scores MCP servers based on provenance, permissions, behavior and trust signals.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
         }
       ],
       "tags": [
@@ -1490,6 +1678,41 @@
           "description": "Describes reusable prompts exposed by servers.",
           "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
           "required": true
+        },
+        {
+          "capability_name": "elicitation",
+          "display_name": "Elicitation",
+          "description": "Supports structured information requests from MCP servers to users or clients.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": false
+        },
+        {
+          "capability_name": "mcp_authentication",
+          "display_name": "MCP Authentication",
+          "description": "Authenticates MCP clients and servers.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "mcp_authorization",
+          "display_name": "MCP Authorization",
+          "description": "Authorizes MCP tool, resource and prompt access.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "sampling_control",
+          "display_name": "Sampling Control",
+          "description": "Controls MCP sampling behavior and model invocation patterns.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "structured_tool_output",
+          "display_name": "Structured Tool Output",
+          "description": "Returns structured tool outputs for reliable downstream processing.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
         }
       ],
       "tags": [
@@ -1582,6 +1805,27 @@
           "capability_name": "tool_metadata_scanning",
           "display_name": "Tool Metadata Scanning",
           "description": "Scans MCP tool metadata for risk indicators.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "permission_review",
+          "display_name": "Permission Review",
+          "description": "Reviews permissions requested by MCP servers and tools.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "server_admission",
+          "display_name": "Server Admission",
+          "description": "Admits only approved MCP servers into enterprise environments.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "tool_risk_classification",
+          "display_name": "Tool Risk Classification",
+          "description": "Classifies tools according to operational, data and security risk.",
           "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
           "required": true
         }
@@ -1867,6 +2111,26 @@
           ],
           "url": "https://www.evidentlyai.com",
           "notes": "ML and data monitoring and testing platform."
+        },
+        {
+          "name": "Pandera",
+          "vendor": "Union.ai",
+          "implementation_type": "open_source",
+          "deployment_models": [
+            "self_hosted"
+          ],
+          "url": "https://pandera.readthedocs.io",
+          "notes": "DataFrame validation library for Python data workflows."
+        },
+        {
+          "name": "Pydantic",
+          "vendor": "Pydantic",
+          "implementation_type": "open_source",
+          "deployment_models": [
+            "self_hosted"
+          ],
+          "url": "https://docs.pydantic.dev",
+          "notes": "Data validation library used for structured Python models and APIs."
         }
       ],
       "capabilities": [
@@ -1925,6 +2189,20 @@
           "description": "Uses AI to suggest validation rules for human review.",
           "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
           "required": false
+        },
+        {
+          "capability_name": "schema_validation",
+          "display_name": "Schema Validation",
+          "description": "Validates data structures against schemas.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "type_validation",
+          "display_name": "Type Validation",
+          "description": "Validates data types and structured object fields.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
         }
       ],
       "tags": [
@@ -2125,6 +2403,27 @@
           ],
           "url": "https://www.prefect.io",
           "notes": "Workflow orchestration platform."
+        },
+        {
+          "name": "SQLMesh",
+          "vendor": "Tobiko Data",
+          "implementation_type": "open_source",
+          "deployment_models": [
+            "self_hosted",
+            "managed_cloud"
+          ],
+          "url": "https://sqlmesh.com",
+          "notes": "Data transformation framework with virtual data environments and model governance."
+        },
+        {
+          "name": "dlt",
+          "vendor": "dltHub",
+          "implementation_type": "open_source",
+          "deployment_models": [
+            "self_hosted"
+          ],
+          "url": "https://dlthub.com",
+          "notes": "Open source data loading and pipeline framework."
         }
       ],
       "capabilities": [
@@ -2167,6 +2466,20 @@
           "capability_name": "incremental_processing",
           "display_name": "Incremental Processing",
           "description": "Processes only changed data where possible.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "change_impact_testing",
+          "display_name": "Change Impact Testing",
+          "description": "Tests downstream impact of transformation changes before release.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "environment_management",
+          "display_name": "Environment Management",
+          "description": "Manages development, test and production data transformation environments.",
           "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
           "required": true
         }
@@ -2778,6 +3091,27 @@
           ],
           "url": "https://opentelemetry.io",
           "notes": "Observability framework."
+        },
+        {
+          "name": "Datadog",
+          "vendor": "Datadog",
+          "implementation_type": "commercial",
+          "deployment_models": [
+            "saas"
+          ],
+          "url": "https://www.datadoghq.com",
+          "notes": "Monitoring and observability platform."
+        },
+        {
+          "name": "Grafana",
+          "vendor": "Grafana Labs",
+          "implementation_type": "open_source",
+          "deployment_models": [
+            "self_hosted",
+            "managed_cloud"
+          ],
+          "url": "https://grafana.com",
+          "notes": "Observability platform used for metrics, logs, traces and dashboards."
         }
       ],
       "capabilities": [
@@ -2827,6 +3161,20 @@
           "capability_name": "incident_management",
           "display_name": "Incident Management",
           "description": "Manages operational incidents.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "service_level_monitoring",
+          "display_name": "Service Level Monitoring",
+          "description": "Monitors service levels for AI and data systems.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "trace_correlation",
+          "display_name": "Trace Correlation",
+          "description": "Correlates traces across models, tools, agents, APIs and data systems.",
           "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
           "required": true
         }
@@ -2939,6 +3287,20 @@
           "description": "Monitors AI adoption across the enterprise.",
           "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
           "required": true
+        },
+        {
+          "capability_name": "control_monitoring",
+          "display_name": "Control Monitoring",
+          "description": "Monitors whether AI controls are operating as expected.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "exception_monitoring",
+          "display_name": "Exception Monitoring",
+          "description": "Monitors policy, entitlement, validation and execution exceptions.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
         }
       ],
       "tags": [
@@ -3004,6 +3366,27 @@
           ],
           "url": "https://www.confident-ai.com",
           "notes": "LLM evaluation framework."
+        },
+        {
+          "name": "Giskard",
+          "vendor": "Giskard",
+          "implementation_type": "open_source",
+          "deployment_models": [
+            "self_hosted",
+            "saas"
+          ],
+          "url": "https://www.giskard.ai",
+          "notes": "AI testing and evaluation platform."
+        },
+        {
+          "name": "TruLens",
+          "vendor": "TruEra",
+          "implementation_type": "open_source",
+          "deployment_models": [
+            "self_hosted"
+          ],
+          "url": "https://www.trulens.org",
+          "notes": "Open source LLM application evaluation framework."
         }
       ],
       "capabilities": [
@@ -3046,6 +3429,20 @@
           "capability_name": "red_teaming",
           "display_name": "Red Teaming",
           "description": "Tests AI systems for adversarial or unsafe behavior.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "groundedness_evaluation",
+          "display_name": "Groundedness Evaluation",
+          "description": "Evaluates whether outputs are grounded in supplied context or retrieved evidence.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "safety_evaluation",
+          "display_name": "Safety Evaluation",
+          "description": "Evaluates outputs for safety, toxicity, bias and policy violations.",
           "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
           "required": true
         }
@@ -3306,6 +3703,27 @@
           ],
           "url": "https://mastra.ai",
           "notes": "TypeScript agent framework."
+        },
+        {
+          "name": "Azure AI Foundry Agent Service",
+          "vendor": "Microsoft",
+          "implementation_type": "cloud_service",
+          "deployment_models": [
+            "managed_cloud",
+            "api"
+          ],
+          "url": "https://learn.microsoft.com/azure/ai-foundry/agents/",
+          "notes": "Managed service for building and running enterprise agents."
+        },
+        {
+          "name": "Google Vertex AI Agent Builder",
+          "vendor": "Google",
+          "implementation_type": "cloud_service",
+          "deployment_models": [
+            "managed_cloud"
+          ],
+          "url": "https://cloud.google.com/products/agent-builder",
+          "notes": "Managed platform for building and deploying AI agents."
         }
       ],
       "capabilities": [
@@ -3341,6 +3759,20 @@
           "capability_name": "result_consolidation",
           "display_name": "Result Consolidation",
           "description": "Combines intermediate results into final outputs.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "action_monitoring",
+          "display_name": "Action Monitoring",
+          "description": "Monitors agent actions and tool invocations during execution.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "sandboxed_execution",
+          "display_name": "Sandboxed Execution",
+          "description": "Runs tools or code in controlled execution environments.",
           "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
           "required": true
         }
@@ -3637,6 +4069,27 @@
           "description": "Publishes API documentation and access patterns.",
           "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
           "required": true
+        },
+        {
+          "capability_name": "api_audit_logging",
+          "display_name": "API Audit Logging",
+          "description": "Logs API activity for review, audit and compliance.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "api_key_management",
+          "display_name": "API Key Management",
+          "description": "Manages API keys and service credentials.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "api_policy_enforcement",
+          "display_name": "API Policy Enforcement",
+          "description": "Applies access, usage and governance policies at the API layer.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
         }
       ],
       "tags": [
@@ -3792,6 +4245,433 @@
         "deterministic",
         "agentic",
         "regulated"
+      ]
+    },
+    {
+      "product_name": "catalog",
+      "display_name": "Data Catalog",
+      "domain": "knowledge",
+      "description": "Discovers, documents, organizes and governs enterprise data assets, metadata, ownership, lineage, quality signals and usage context.",
+      "reference_implementations": [
+        {
+          "name": "Alation Data Catalog",
+          "vendor": "Alation",
+          "implementation_type": "commercial",
+          "deployment_models": [
+            "saas",
+            "managed_cloud"
+          ],
+          "url": "https://www.alation.com",
+          "notes": "Enterprise data catalog and governance platform."
+        },
+        {
+          "name": "Atlan",
+          "vendor": "Atlan",
+          "implementation_type": "commercial",
+          "deployment_models": [
+            "saas",
+            "managed_cloud"
+          ],
+          "url": "https://atlan.com",
+          "notes": "Active metadata and data catalog platform."
+        },
+        {
+          "name": "Collibra",
+          "vendor": "Collibra",
+          "implementation_type": "commercial",
+          "deployment_models": [
+            "saas",
+            "managed_cloud"
+          ],
+          "url": "https://www.collibra.com",
+          "notes": "Enterprise data catalog and governance platform."
+        },
+        {
+          "name": "DataHub",
+          "vendor": "DataHub",
+          "implementation_type": "open_source",
+          "deployment_models": [
+            "self_hosted",
+            "managed_cloud"
+          ],
+          "url": "https://datahub.com",
+          "notes": "Open source metadata and data catalog platform with MCP support."
+        },
+        {
+          "name": "Microsoft Purview",
+          "vendor": "Microsoft",
+          "implementation_type": "commercial",
+          "deployment_models": [
+            "saas",
+            "managed_cloud"
+          ],
+          "url": "https://www.microsoft.com/security/business/microsoft-purview",
+          "notes": "Data governance, catalog, lineage and compliance platform."
+        },
+        {
+          "name": "OpenMetadata",
+          "vendor": "OpenMetadata",
+          "implementation_type": "open_source",
+          "deployment_models": [
+            "self_hosted",
+            "managed_cloud"
+          ],
+          "url": "https://open-metadata.org",
+          "notes": "Open source metadata, catalog and data governance platform."
+        }
+      ],
+      "capabilities": [
+        {
+          "capability_name": "asset_discovery",
+          "display_name": "Asset Discovery",
+          "description": "Discovers enterprise data assets across systems.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "catalog_search",
+          "display_name": "Catalog Search",
+          "description": "Searches data assets, metadata and definitions.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "data_asset_catalog",
+          "display_name": "Data Asset Catalog",
+          "description": "Catalogs datasets, tables, files, reports, metrics and other data assets.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "data_certification",
+          "display_name": "Data Certification",
+          "description": "Marks data assets as certified, trusted or fit for use.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "data_lineage",
+          "display_name": "Data Lineage",
+          "description": "Captures lineage between sources, transformations and consumers.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "data_ownership",
+          "display_name": "Data Ownership",
+          "description": "Documents owners, stewards and accountable teams for data assets.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "data_usage_tracking",
+          "display_name": "Data Usage Tracking",
+          "description": "Tracks how data assets are used by users, systems and agents.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "metadata_management",
+          "display_name": "Metadata Management",
+          "description": "Manages technical and business metadata.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        }
+      ],
+      "tags": [
+        "catalog",
+        "data",
+        "governance",
+        "knowledge",
+        "metadata"
+      ]
+    },
+    {
+      "product_name": "governance",
+      "display_name": "AI Governance",
+      "domain": "governance",
+      "description": "Defines, manages and supervises AI policies, risks, controls, approvals, evidence and compliance processes across the enterprise AI ecosystem.",
+      "reference_implementations": [
+        {
+          "name": "Credo AI",
+          "vendor": "Credo AI",
+          "implementation_type": "commercial",
+          "deployment_models": [
+            "saas"
+          ],
+          "url": "https://www.credo.ai",
+          "notes": "AI governance, risk and compliance platform."
+        },
+        {
+          "name": "Holistic AI",
+          "vendor": "Holistic AI",
+          "implementation_type": "commercial",
+          "deployment_models": [
+            "saas"
+          ],
+          "url": "https://www.holisticai.com",
+          "notes": "AI governance, risk and compliance platform."
+        },
+        {
+          "name": "IBM watsonx.governance",
+          "vendor": "IBM",
+          "implementation_type": "commercial",
+          "deployment_models": [
+            "saas",
+            "managed_cloud"
+          ],
+          "url": "https://www.ibm.com/products/watsonx-governance",
+          "notes": "AI governance and model lifecycle governance platform."
+        },
+        {
+          "name": "Microsoft Purview",
+          "vendor": "Microsoft",
+          "implementation_type": "commercial",
+          "deployment_models": [
+            "saas",
+            "managed_cloud"
+          ],
+          "url": "https://www.microsoft.com/security/business/microsoft-purview",
+          "notes": "Governance, compliance and risk management platform."
+        },
+        {
+          "name": "TrustBolt AI Adoption and Governance Platform",
+          "vendor": "TrustBolt",
+          "implementation_type": "commercial",
+          "deployment_models": [
+            "saas",
+            "private_cloud",
+            "api"
+          ],
+          "url": "https://www.trustbolt.ai",
+          "notes": "Enterprise AI adoption and governance platform for assistants, gateways, entitlements, monitoring and cost controls."
+        }
+      ],
+      "capabilities": [
+        {
+          "capability_name": "ai_policy_management",
+          "display_name": "AI Policy Management",
+          "description": "Defines and manages enterprise AI policies.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "approval_management",
+          "display_name": "Approval Management",
+          "description": "Manages approvals for AI use cases, models, assistants and agents.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "control_mapping",
+          "display_name": "Control Mapping",
+          "description": "Maps AI risks to controls and evidence.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "evidence_management",
+          "display_name": "Evidence Management",
+          "description": "Collects evidence for AI governance, audit and compliance.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "governance_reporting",
+          "display_name": "Governance Reporting",
+          "description": "Reports governance status, risks, controls and compliance posture.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "regulatory_mapping",
+          "display_name": "Regulatory Mapping",
+          "description": "Maps AI controls to regulatory obligations and internal policies.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "risk_assessment",
+          "display_name": "Risk Assessment",
+          "description": "Assesses AI risks across models, assistants, agents and use cases.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "use_case_inventory",
+          "display_name": "Use Case Inventory",
+          "description": "Maintains inventory of AI use cases and related risks.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        }
+      ],
+      "tags": [
+        "ai",
+        "compliance",
+        "governance",
+        "regulated",
+        "risk"
+      ]
+    },
+    {
+      "product_name": "model",
+      "display_name": "Foundation Model Platform",
+      "domain": "operations",
+      "description": "Provides managed access to foundation models, embeddings, multimodal models, deployment endpoints and model lifecycle controls.",
+      "reference_implementations": [
+        {
+          "name": "Amazon Bedrock",
+          "vendor": "Amazon Web Services",
+          "implementation_type": "cloud_service",
+          "deployment_models": [
+            "managed_cloud",
+            "api"
+          ],
+          "url": "https://aws.amazon.com/bedrock/",
+          "notes": "Managed foundation model access and governance platform."
+        },
+        {
+          "name": "Anthropic Claude API",
+          "vendor": "Anthropic",
+          "implementation_type": "commercial",
+          "deployment_models": [
+            "api",
+            "saas"
+          ],
+          "url": "https://docs.anthropic.com",
+          "notes": "API access to Claude foundation models."
+        },
+        {
+          "name": "Azure AI Foundry",
+          "vendor": "Microsoft",
+          "implementation_type": "cloud_service",
+          "deployment_models": [
+            "managed_cloud",
+            "api"
+          ],
+          "url": "https://ai.azure.com",
+          "notes": "Managed model catalog, deployment and AI application platform."
+        },
+        {
+          "name": "Google Gemini API",
+          "vendor": "Google",
+          "implementation_type": "commercial",
+          "deployment_models": [
+            "api",
+            "saas"
+          ],
+          "url": "https://ai.google.dev",
+          "notes": "API access to Gemini models."
+        },
+        {
+          "name": "Google Vertex AI Model Garden",
+          "vendor": "Google",
+          "implementation_type": "cloud_service",
+          "deployment_models": [
+            "managed_cloud",
+            "api"
+          ],
+          "url": "https://cloud.google.com/model-garden",
+          "notes": "Managed model catalog and deployment platform."
+        },
+        {
+          "name": "Hugging Face",
+          "vendor": "Hugging Face",
+          "implementation_type": "commercial",
+          "deployment_models": [
+            "saas",
+            "self_hosted",
+            "api"
+          ],
+          "url": "https://huggingface.co",
+          "notes": "Model hub and deployment ecosystem for open and commercial models."
+        },
+        {
+          "name": "Ollama",
+          "vendor": "Ollama",
+          "implementation_type": "open_source",
+          "deployment_models": [
+            "self_hosted"
+          ],
+          "url": "https://ollama.com",
+          "notes": "Local model runtime for open models."
+        },
+        {
+          "name": "OpenAI Platform",
+          "vendor": "OpenAI",
+          "implementation_type": "commercial",
+          "deployment_models": [
+            "api",
+            "saas"
+          ],
+          "url": "https://platform.openai.com",
+          "notes": "API and platform services for OpenAI models, embeddings, tools and assistants."
+        }
+      ],
+      "capabilities": [
+        {
+          "capability_name": "embedding_generation",
+          "display_name": "Embedding Generation",
+          "description": "Generates embeddings for search, retrieval and analytics workflows.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "model_benchmarking",
+          "display_name": "Model Benchmarking",
+          "description": "Benchmarks models against technical and business criteria.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "model_catalog",
+          "display_name": "Model Catalog",
+          "description": "Maintains an approved catalog of available models.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "model_deployment",
+          "display_name": "Model Deployment",
+          "description": "Deploys models for enterprise use.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "model_endpoint",
+          "display_name": "Model Endpoint",
+          "description": "Provides callable endpoints for approved models.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "model_lifecycle",
+          "display_name": "Model Lifecycle",
+          "description": "Manages model onboarding, review, approval, retirement and replacement.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "model_risk_review",
+          "display_name": "Model Risk Review",
+          "description": "Supports model risk review before enterprise use.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "multimodal_model_access",
+          "display_name": "Multimodal Model Access",
+          "description": "Provides access to models that support text, image, audio or other modalities.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": false
+        }
+      ],
+      "tags": [
+        "ai",
+        "foundation_model",
+        "llm",
+        "model",
+        "operations"
       ]
     }
   ]
