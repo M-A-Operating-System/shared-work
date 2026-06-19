@@ -24,14 +24,16 @@ def bullet_list(items):
             desc = item.get("description") or item.get("notes") or ""
             vendor = item.get("vendor", "")
 
+            url = item.get("url", "")
             label = name
             if vendor:
                 label = f"{name} ({vendor})"
+            linked = f"[{label}]({url})" if url else label
 
             if desc:
-                lines.append(f"- **{label}**: {desc}")
+                lines.append(f"- **{linked}**: {desc}")
             else:
-                lines.append(f"- **{label}**")
+                lines.append(f"- **{linked}**")
         else:
             lines.append(f"- {str(item)}")
 
