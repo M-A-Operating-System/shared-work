@@ -65,10 +65,7 @@ jobs:
           SEARCH_TAVILY_KEY: ${{ secrets.SEARCH_TAVILY_KEY }}
         run: python .github/scripts/run_weekly_research.py
 
-      # ── Aggregate + Table ──────────────────────────────────────────────────────
-      - name: Aggregate product files
-        run: python docs/research/aggregate.py
-
+      # ── Table ─────────────────────────────────────────────────────────────────
       - name: Generate research table
         run: python docs/research/generate_md.py
 

@@ -6,8 +6,8 @@ import html
 import sys
 
 
-INPUT_FILE = Path("docs/research/research.json")
-OUTPUT_FILE = Path("docs/research/research-table.md")
+PRODUCTS_DIR = Path("docs/research/products")
+OUTPUT_FILE  = Path("docs/research/research-table.md")
 
 
 def bullet_list(items):
@@ -20,14 +20,12 @@ def bullet_list(items):
         if isinstance(item, str):
             lines.append(f"- {item}")
         elif isinstance(item, dict):
-            name = item.get("name") or item.get("capability_name") or item.get("display_name") or ""
-            desc = item.get("description") or item.get("notes") or ""
+            name   = item.get("name") or item.get("capability_name") or item.get("display_name") or ""
+            desc   = item.get("description") or item.get("notes") or ""
             vendor = item.get("vendor", "")
+            url    = item.get("url", "")
 
-            url = item.get("url", "")
-            label = name
-            if vendor:
-                label = f"{name} ({vendor})"
+            label  = f"{name} ({vendor})" if vendor else name
             linked = f"[{label}]({url})" if url else label
 
             if desc:
@@ -47,35 +45,42 @@ def escape_cell(value):
 
 
 def main():
-    if not INPUT_FILE.exists():
-        print(f"Input file not found: {INPUT_FILE}", file=sys.stderr)
+    if not PRODUCTS_DIR.exists():
+        print(f"Products directory not found: {PRODUCTS_DIR}", file=sys.stderr)
         sys.exit(1)
 
-    data = json.loads(INPUT_FILE.read_text(encoding="utf-8"))
-    products = data.get("products", [])
+    product_files = sorted(
+        f for f in PRODUCTS_DIR.rglob("*.json") if f.name != "_meta.json"
+    )
+
+    if not product_files:
+        print("No product files found.", file=sys.stderr)
+        sys.exit(1)
+
+    products = [json.loads(f.read_text(encoding="utf-8")) for f in product_files]
 
     lines = [
         "# AI Research Catalog",
         "",
         "| Product | Display Name | Domain | Description | Reference Implementations | Capabilities | Tags |",
-        "|---|---|---|---|---|---|---|"
+        "|---|---|---|---|---|---|---|",
     ]
 
     for product in products:
         product_name = escape_cell(product.get("product_name", ""))
         display_name = escape_cell(product.get("display_name", ""))
-        domain = escape_cell(product.get("domain", ""))
-        description = escape_cell(product.get("description", ""))
-        refs = bullet_list(product.get("reference_implementations", []))
+        domain       = escape_cell(product.get("domain", ""))
+        description  = escape_cell(product.get("description", ""))
+        refs         = bullet_list(product.get("reference_implementations", []))
         capabilities = bullet_list(product.get("capabilities", []))
-        tags = ", ".join(product.get("tags", []))
+        tags         = ", ".join(product.get("tags", []))
 
         lines.append(
             f"| {product_name} | {display_name} | {domain} | {description} | {refs} | {capabilities} | {escape_cell(tags)} |"
         )
 
     OUTPUT_FILE.write_text("\n".join(lines), encoding="utf-8")
-    print(f"Wrote {OUTPUT_FILE}")
+    print(f"Wrote {OUTPUT_FILE} ({len(products)} products)")
 
 
 if __name__ == "__main__":
