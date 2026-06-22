@@ -477,6 +477,7 @@ When research is complete, call finish_research with your findings and sources.
         max_iterations=PHASE1_MAX_ITERATIONS,
         tokens=tokens,
         search_budget=PHASE1_MAX_SEARCH_CALLS,
+        create_kwargs={"max_tokens": 8096},
     )
 
     if result:
