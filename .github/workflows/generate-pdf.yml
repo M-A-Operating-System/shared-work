@@ -1,11 +1,11 @@
-name: Generate PDFs
+name: Generate Product PDFs
 
 on:
   push:
     branches:
       - master
     paths:
-      - 'docs/**'
+      - 'docs/product/**'
       - 'generate_pdf.py'
   workflow_dispatch:
     inputs:
