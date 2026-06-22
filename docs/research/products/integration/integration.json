@@ -1,0 +1,133 @@
+{
+  "product_name": "integration",
+  "display_name": "Data Integration",
+  "domain": "integration",
+  "description": "Moves, synchronizes, streams and federates data across enterprise systems.",
+  "reference_implementations": [
+    {
+      "name": "Airbyte",
+      "vendor": "Airbyte",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "self_hosted",
+        "managed_cloud"
+      ],
+      "url": "https://airbyte.com",
+      "notes": "Data movement and connector platform."
+    },
+    {
+      "name": "Fivetran",
+      "vendor": "Fivetran",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas"
+      ],
+      "url": "https://www.fivetran.com",
+      "notes": "Managed data movement platform."
+    },
+    {
+      "name": "Kafka",
+      "vendor": "Apache",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "self_hosted",
+        "managed_cloud"
+      ],
+      "url": "https://kafka.apache.org",
+      "notes": "Distributed event streaming platform."
+    },
+    {
+      "name": "Redpanda",
+      "vendor": "Redpanda",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "self_hosted",
+        "managed_cloud"
+      ],
+      "url": "https://redpanda.com",
+      "notes": "Kafka-compatible streaming data platform."
+    },
+    {
+      "name": "Debezium",
+      "vendor": "Debezium",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "self_hosted"
+      ],
+      "url": "https://debezium.io",
+      "notes": "Change data capture platform."
+    },
+    {
+      "name": "Striim",
+      "vendor": "Striim",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas",
+        "managed_cloud"
+      ],
+      "url": "https://www.striim.com",
+      "notes": "Real-time data integration and streaming platform."
+    },
+    {
+      "name": "Starburst",
+      "vendor": "Starburst",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas",
+        "self_hosted"
+      ],
+      "url": "https://www.starburst.io",
+      "notes": "Data lakehouse analytics and federation platform."
+    }
+  ],
+  "capabilities": [
+    {
+      "capability_name": "data_acquisition",
+      "display_name": "Data Acquisition",
+      "description": "Acquires data from source systems.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "cdc",
+      "display_name": "Change Data Capture",
+      "description": "Captures changes from source systems.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "streaming",
+      "display_name": "Streaming",
+      "description": "Streams data events in real time.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "synchronization",
+      "display_name": "Synchronization",
+      "description": "Synchronizes data between systems.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "federation",
+      "display_name": "Federation",
+      "description": "Queries across systems without copying all data.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "virtualization",
+      "display_name": "Virtualization",
+      "description": "Provides virtualized access to distributed data.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    }
+  ],
+  "tags": [
+    "integration",
+    "data",
+    "streaming",
+    "federation"
+  ]
+}

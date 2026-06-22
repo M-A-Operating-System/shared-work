@@ -1,0 +1,146 @@
+{
+  "product_name": "definition",
+  "display_name": "Data Definition",
+  "domain": "knowledge",
+  "description": "Manages business definitions, data definitions, metric definitions, logical models, semantic meaning and data context for human and agentic consumers.",
+  "reference_implementations": [
+    {
+      "name": "M&A Operating System Data Design Authority",
+      "vendor": "M&A Operating System",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas",
+        "managed_cloud"
+      ],
+      "url": "https://www.maoperatingsystem.com/dda",
+      "notes": "Data Design Authority for data model management, data context and governed data definitions."
+    },
+    {
+      "name": "DataHub",
+      "vendor": "DataHub",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "self_hosted",
+        "managed_cloud"
+      ],
+      "url": "https://datahub.com",
+      "notes": "Metadata platform that exposes data context including lineage, ownership, business definitions, quality signals and usage patterns."
+    },
+    {
+      "name": "OpenMetadata",
+      "vendor": "OpenMetadata",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "self_hosted",
+        "managed_cloud"
+      ],
+      "url": "https://open-metadata.org",
+      "notes": "Open source metadata, catalog and data collaboration platform."
+    },
+    {
+      "name": "Collibra",
+      "vendor": "Collibra",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas",
+        "managed_cloud"
+      ],
+      "url": "https://www.collibra.com",
+      "notes": "Enterprise data governance and catalog platform."
+    },
+    {
+      "name": "Atlan",
+      "vendor": "Atlan",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas",
+        "managed_cloud"
+      ],
+      "url": "https://atlan.com",
+      "notes": "Active metadata and data catalog platform."
+    },
+    {
+      "name": "dbt Semantic Layer",
+      "vendor": "dbt Labs",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas",
+        "managed_cloud"
+      ],
+      "url": "https://www.getdbt.com/product/semantic-layer",
+      "notes": "Semantic metric and business definition layer."
+    }
+  ],
+  "capabilities": [
+    {
+      "capability_name": "business_glossary",
+      "display_name": "Business Glossary",
+      "description": "Defines business terms and meanings.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "data_dictionary",
+      "display_name": "Data Dictionary",
+      "description": "Documents fields, structures and data elements.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "metric_definition",
+      "display_name": "Metric Definition",
+      "description": "Defines KPIs, metrics, calculations and business rules.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "semantic_definition",
+      "display_name": "Semantic Definition",
+      "description": "Defines semantic meaning for metrics, dimensions, entities and relationships.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "entity_definition",
+      "display_name": "Entity Definition",
+      "description": "Defines enterprise business entities.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "relationship_definition",
+      "display_name": "Relationship Definition",
+      "description": "Defines relationships between entities or data concepts.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "ownership_metadata",
+      "display_name": "Ownership Metadata",
+      "description": "Documents owners, stewards and accountable teams.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "usage_context",
+      "display_name": "Usage Context",
+      "description": "Captures how data assets are used and interpreted.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "lineage_context",
+      "display_name": "Lineage Context",
+      "description": "Provides lineage context for data definitions and transformations.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    }
+  ],
+  "tags": [
+    "definition",
+    "data_context",
+    "glossary",
+    "semantic",
+    "regulated"
+  ]
+}

@@ -1,0 +1,130 @@
+{
+  "product_name": "registry",
+  "display_name": "MCP Registry",
+  "domain": "integration",
+  "description": "Central discovery and metadata service for MCP servers, tools, agents and reusable AI building blocks.",
+  "reference_implementations": [
+    {
+      "name": "Official MCP Registry",
+      "vendor": "Model Context Protocol",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "managed_cloud",
+        "api"
+      ],
+      "url": "https://modelcontextprotocol.io/registry/about",
+      "notes": "Official centralized metadata repository for publicly accessible MCP servers."
+    },
+    {
+      "name": "PulseMCP",
+      "vendor": "PulseMCP",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas"
+      ],
+      "url": "https://www.pulsemcp.com",
+      "notes": "MCP server discovery and directory service."
+    },
+    {
+      "name": "Smithery",
+      "vendor": "Smithery",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas"
+      ],
+      "url": "https://smithery.ai",
+      "notes": "MCP server registry and deployment platform."
+    },
+    {
+      "name": "Glama",
+      "vendor": "Glama",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas"
+      ],
+      "url": "https://glama.ai",
+      "notes": "MCP server directory and ecosystem tooling."
+    },
+    {
+      "name": "awesome-mcp",
+      "vendor": "Community",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "github"
+      ],
+      "url": "https://github.com/punkpeye/awesome-mcp-servers",
+      "notes": "Community list of MCP servers."
+    }
+  ],
+  "capabilities": [
+    {
+      "capability_name": "server_discovery",
+      "display_name": "Server Discovery",
+      "description": "Finds available MCP servers and tools.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "namespace_verification",
+      "display_name": "Namespace Verification",
+      "description": "Verifies server namespaces and ownership.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "server_metadata",
+      "display_name": "Server Metadata",
+      "description": "Stores MCP server metadata.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "installation_metadata",
+      "display_name": "Installation Metadata",
+      "description": "Provides installation and configuration metadata.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "version_discovery",
+      "display_name": "Version Discovery",
+      "description": "Discovers server versions and compatibility.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "trust_metadata",
+      "display_name": "Trust Metadata",
+      "description": "Captures trust, provenance and risk metadata.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "server_lifecycle",
+      "display_name": "Server Lifecycle",
+      "description": "Manages MCP server onboarding, update, deprecation and retirement.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "server_rating",
+      "display_name": "Server Rating",
+      "description": "Captures quality or trust ratings for MCP servers.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": false
+    },
+    {
+      "capability_name": "server_risk_scoring",
+      "display_name": "Server Risk Scoring",
+      "description": "Scores MCP servers based on provenance, permissions, behavior and trust signals.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    }
+  ],
+  "tags": [
+    "mcp",
+    "registry",
+    "discovery",
+    "integration"
+  ]
+}

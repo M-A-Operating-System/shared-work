@@ -1,0 +1,108 @@
+{
+  "product_name": "costing",
+  "display_name": "AI Cost Management",
+  "domain": "operations",
+  "description": "Manages, forecasts and allocates AI model and platform costs across users, teams, tools and agents.",
+  "reference_implementations": [
+    {
+      "name": "TrustBolt Cost Management",
+      "vendor": "TrustBolt",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas",
+        "private_cloud"
+      ],
+      "url": "https://www.trustbolt.ai",
+      "notes": "AI cost management including quotas, usage analysis and model cost visibility."
+    },
+    {
+      "name": "Portkey",
+      "vendor": "Portkey",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas"
+      ],
+      "url": "https://portkey.ai",
+      "notes": "AI usage and cost controls."
+    },
+    {
+      "name": "Helicone",
+      "vendor": "Helicone",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "saas",
+        "self_hosted"
+      ],
+      "url": "https://www.helicone.ai",
+      "notes": "LLM observability and cost tracking."
+    },
+    {
+      "name": "Langfuse",
+      "vendor": "Langfuse",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "saas",
+        "self_hosted"
+      ],
+      "url": "https://langfuse.com",
+      "notes": "LLM usage and cost tracking."
+    }
+  ],
+  "capabilities": [
+    {
+      "capability_name": "usage_metering",
+      "display_name": "Usage Metering",
+      "description": "Meters model and platform usage.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "cost_allocation",
+      "display_name": "Cost Allocation",
+      "description": "Allocates costs to users, teams, departments or products.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "budget_management",
+      "display_name": "Budget Management",
+      "description": "Manages AI budgets.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "budget_enforcement",
+      "display_name": "Budget Enforcement",
+      "description": "Enforces budget limits.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "quota_management",
+      "display_name": "Quota Management",
+      "description": "Manages usage quotas.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "cost_forecasting",
+      "display_name": "Cost Forecasting",
+      "description": "Forecasts future AI cost.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "chargeback_reporting",
+      "display_name": "Chargeback Reporting",
+      "description": "Reports usage and cost for chargeback or showback.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    }
+  ],
+  "tags": [
+    "cost",
+    "operations",
+    "finops",
+    "ai"
+  ]
+}

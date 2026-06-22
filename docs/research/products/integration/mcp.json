@@ -1,0 +1,130 @@
+{
+  "product_name": "mcp",
+  "display_name": "Model Context Protocol",
+  "domain": "integration",
+  "description": "Standard protocol and integration pattern for connecting AI applications and agents to external tools, data and systems.",
+  "reference_implementations": [
+    {
+      "name": "Model Context Protocol",
+      "vendor": "Anthropic and MCP Contributors",
+      "implementation_type": "framework",
+      "deployment_models": [
+        "open_standard"
+      ],
+      "url": "https://modelcontextprotocol.io",
+      "notes": "Open protocol for connecting AI applications to tools and context."
+    },
+    {
+      "name": "FastMCP",
+      "vendor": "FastMCP",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "self_hosted"
+      ],
+      "url": "https://gofastmcp.com",
+      "notes": "Framework for building MCP servers."
+    },
+    {
+      "name": "DataHub MCP Server",
+      "vendor": "DataHub",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "self_hosted"
+      ],
+      "url": "https://datahub.com/resources/datahub-mcp-server-overview/",
+      "notes": "MCP server for enterprise data context."
+    }
+  ],
+  "capabilities": [
+    {
+      "capability_name": "tool_connection",
+      "display_name": "Tool Connection",
+      "description": "Connects AI clients to tools through MCP.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "resource_connection",
+      "display_name": "Resource Connection",
+      "description": "Connects AI clients to external resources.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "server_protocol",
+      "display_name": "Server Protocol",
+      "description": "Defines MCP server interaction patterns.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "client_protocol",
+      "display_name": "Client Protocol",
+      "description": "Defines MCP client interaction patterns.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "tool_schema",
+      "display_name": "Tool Schema",
+      "description": "Describes callable tools and inputs.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "resource_schema",
+      "display_name": "Resource Schema",
+      "description": "Describes accessible resources.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "prompt_schema",
+      "display_name": "Prompt Schema",
+      "description": "Describes reusable prompts exposed by servers.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "elicitation",
+      "display_name": "Elicitation",
+      "description": "Supports structured information requests from MCP servers to users or clients.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": false
+    },
+    {
+      "capability_name": "mcp_authentication",
+      "display_name": "MCP Authentication",
+      "description": "Authenticates MCP clients and servers.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "mcp_authorization",
+      "display_name": "MCP Authorization",
+      "description": "Authorizes MCP tool, resource and prompt access.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "sampling_control",
+      "display_name": "Sampling Control",
+      "description": "Controls MCP sampling behavior and model invocation patterns.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "structured_tool_output",
+      "display_name": "Structured Tool Output",
+      "description": "Returns structured tool outputs for reliable downstream processing.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    }
+  ],
+  "tags": [
+    "mcp",
+    "integration",
+    "tools",
+    "agents"
+  ]
+}

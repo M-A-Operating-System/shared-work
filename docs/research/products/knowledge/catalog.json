@@ -1,0 +1,139 @@
+{
+  "product_name": "catalog",
+  "display_name": "Data Catalog",
+  "domain": "knowledge",
+  "description": "Discovers, documents, organizes and governs enterprise data assets, metadata, ownership, lineage, quality signals and usage context.",
+  "reference_implementations": [
+    {
+      "name": "Alation Data Catalog",
+      "vendor": "Alation",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas",
+        "managed_cloud"
+      ],
+      "url": "https://www.alation.com",
+      "notes": "Enterprise data catalog and governance platform."
+    },
+    {
+      "name": "Atlan",
+      "vendor": "Atlan",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas",
+        "managed_cloud"
+      ],
+      "url": "https://atlan.com",
+      "notes": "Active metadata and data catalog platform."
+    },
+    {
+      "name": "Collibra",
+      "vendor": "Collibra",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas",
+        "managed_cloud"
+      ],
+      "url": "https://www.collibra.com",
+      "notes": "Enterprise data catalog and governance platform."
+    },
+    {
+      "name": "DataHub",
+      "vendor": "DataHub",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "self_hosted",
+        "managed_cloud"
+      ],
+      "url": "https://datahub.com",
+      "notes": "Open source metadata and data catalog platform with MCP support."
+    },
+    {
+      "name": "Microsoft Purview",
+      "vendor": "Microsoft",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas",
+        "managed_cloud"
+      ],
+      "url": "https://www.microsoft.com/security/business/microsoft-purview",
+      "notes": "Data governance, catalog, lineage and compliance platform."
+    },
+    {
+      "name": "OpenMetadata",
+      "vendor": "OpenMetadata",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "self_hosted",
+        "managed_cloud"
+      ],
+      "url": "https://open-metadata.org",
+      "notes": "Open source metadata, catalog and data governance platform."
+    }
+  ],
+  "capabilities": [
+    {
+      "capability_name": "asset_discovery",
+      "display_name": "Asset Discovery",
+      "description": "Discovers enterprise data assets across systems.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "catalog_search",
+      "display_name": "Catalog Search",
+      "description": "Searches data assets, metadata and definitions.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "data_asset_catalog",
+      "display_name": "Data Asset Catalog",
+      "description": "Catalogs datasets, tables, files, reports, metrics and other data assets.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "data_certification",
+      "display_name": "Data Certification",
+      "description": "Marks data assets as certified, trusted or fit for use.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "data_lineage",
+      "display_name": "Data Lineage",
+      "description": "Captures lineage between sources, transformations and consumers.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "data_ownership",
+      "display_name": "Data Ownership",
+      "description": "Documents owners, stewards and accountable teams for data assets.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "data_usage_tracking",
+      "display_name": "Data Usage Tracking",
+      "description": "Tracks how data assets are used by users, systems and agents.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "metadata_management",
+      "display_name": "Metadata Management",
+      "description": "Manages technical and business metadata.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    }
+  ],
+  "tags": [
+    "catalog",
+    "data",
+    "governance",
+    "knowledge",
+    "metadata"
+  ]
+}

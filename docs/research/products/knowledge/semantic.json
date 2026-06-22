@@ -1,0 +1,111 @@
+{
+  "product_name": "semantic",
+  "display_name": "Semantic Analytics",
+  "domain": "knowledge",
+  "description": "Governed business-level semantic layer for metrics, dimensions, entities and analytical queries.",
+  "reference_implementations": [
+    {
+      "name": "dbt Semantic Layer",
+      "vendor": "dbt Labs",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas",
+        "managed_cloud"
+      ],
+      "url": "https://www.getdbt.com/product/semantic-layer",
+      "notes": "Semantic layer for metrics and governed analytics."
+    },
+    {
+      "name": "MetricFlow",
+      "vendor": "dbt Labs",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "self_hosted"
+      ],
+      "url": "https://github.com/dbt-labs/metricflow",
+      "notes": "Open source semantic layer and metric query engine."
+    },
+    {
+      "name": "Cube",
+      "vendor": "Cube Dev",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "saas",
+        "self_hosted"
+      ],
+      "url": "https://cube.dev",
+      "notes": "Semantic layer and analytics API platform."
+    },
+    {
+      "name": "Malloy",
+      "vendor": "Malloy",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "self_hosted"
+      ],
+      "url": "https://www.malloydata.dev",
+      "notes": "Semantic data modeling and query language."
+    },
+    {
+      "name": "Looker Semantic Model",
+      "vendor": "Google",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas",
+        "managed_cloud"
+      ],
+      "url": "https://cloud.google.com/looker",
+      "notes": "BI semantic modeling layer."
+    }
+  ],
+  "capabilities": [
+    {
+      "capability_name": "metric_layer",
+      "display_name": "Metric Layer",
+      "description": "Defines and serves governed metrics.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "dimension_modeling",
+      "display_name": "Dimension Modeling",
+      "description": "Defines reusable analytical dimensions.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "semantic_query",
+      "display_name": "Semantic Query",
+      "description": "Allows querying through business semantics rather than physical schema.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "governed_text_to_sql",
+      "display_name": "Governed Text-to-SQL",
+      "description": "Constrains natural-language analytics through governed semantic context.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "analytics_api",
+      "display_name": "Analytics API",
+      "description": "Provides API access to governed analytics.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "metric_management",
+      "display_name": "Metric Management",
+      "description": "Manages lifecycle, definitions and ownership of metrics.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    }
+  ],
+  "tags": [
+    "semantic",
+    "analytics",
+    "metrics",
+    "governed"
+  ]
+}

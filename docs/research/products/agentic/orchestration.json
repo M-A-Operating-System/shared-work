@@ -1,0 +1,173 @@
+{
+  "product_name": "orchestration",
+  "display_name": "Agent Orchestration",
+  "domain": "agentic",
+  "description": "Coordinates agent execution, workflow state, tool calls, approvals, retries and long-running tasks.",
+  "reference_implementations": [
+    {
+      "name": "LangGraph",
+      "vendor": "LangChain",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "self_hosted",
+        "managed_cloud"
+      ],
+      "url": "https://www.langchain.com/langgraph",
+      "notes": "Agent orchestration framework."
+    },
+    {
+      "name": "Microsoft Agent Framework",
+      "vendor": "Microsoft",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "self_hosted",
+        "managed_cloud"
+      ],
+      "url": "https://github.com/microsoft/agent-framework",
+      "notes": "Framework for building AI agents."
+    },
+    {
+      "name": "OpenAI Agents SDK",
+      "vendor": "OpenAI",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "self_hosted",
+        "api"
+      ],
+      "url": "https://openai.github.io/openai-agents-python/",
+      "notes": "SDK for building agentic workflows."
+    },
+    {
+      "name": "Temporal",
+      "vendor": "Temporal",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "self_hosted",
+        "managed_cloud"
+      ],
+      "url": "https://temporal.io",
+      "notes": "Durable execution platform."
+    },
+    {
+      "name": "CrewAI",
+      "vendor": "CrewAI",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "self_hosted",
+        "managed_cloud"
+      ],
+      "url": "https://www.crewai.com",
+      "notes": "Multi-agent orchestration framework."
+    },
+    {
+      "name": "AutoGen",
+      "vendor": "Microsoft",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "self_hosted"
+      ],
+      "url": "https://github.com/microsoft/autogen",
+      "notes": "Multi-agent framework."
+    },
+    {
+      "name": "Mastra",
+      "vendor": "Mastra",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "self_hosted"
+      ],
+      "url": "https://mastra.ai",
+      "notes": "Agent framework for TypeScript applications."
+    },
+    {
+      "name": "Google Agent Development Kit",
+      "vendor": "Google",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "self_hosted"
+      ],
+      "url": "https://google.github.io/adk-docs/",
+      "notes": "Open source framework for building and orchestrating agents."
+    },
+    {
+      "name": "Semantic Kernel",
+      "vendor": "Microsoft",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "self_hosted"
+      ],
+      "url": "https://learn.microsoft.com/semantic-kernel/",
+      "notes": "Open source SDK for integrating AI models, tools, functions and agentic workflows."
+    }
+  ],
+  "capabilities": [
+    {
+      "capability_name": "durable_execution",
+      "display_name": "Durable Execution",
+      "description": "Maintains execution state across long-running or interrupted workflows.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "state_management",
+      "display_name": "State Management",
+      "description": "Maintains workflow or agent state.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "human_approval",
+      "display_name": "Human Approval",
+      "description": "Supports human approval gates within agent workflows.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "branching_workflows",
+      "display_name": "Branching Workflows",
+      "description": "Supports conditional workflow paths.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "multi_agent_coordination",
+      "display_name": "Multi-Agent Coordination",
+      "description": "Coordinates multiple agents working together.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "tool_call_planning",
+      "display_name": "Tool Call Planning",
+      "description": "Plans tool usage during task execution.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "structured_recovery",
+      "display_name": "Structured Recovery",
+      "description": "Recovers from tool, policy or execution failures.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "approval_gate",
+      "display_name": "Approval Gate",
+      "description": "Requires approval before executing sensitive workflow steps.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "event_driven_execution",
+      "display_name": "Event-Driven Execution",
+      "description": "Triggers workflows and agents from events.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    }
+  ],
+  "tags": [
+    "agentic",
+    "workflow",
+    "orchestration"
+  ]
+}

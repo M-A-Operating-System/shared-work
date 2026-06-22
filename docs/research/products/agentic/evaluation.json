@@ -1,0 +1,144 @@
+{
+  "product_name": "evaluation",
+  "display_name": "AI Evaluation",
+  "domain": "agentic",
+  "description": "Evaluates prompts, assistants, agents, tools, workflows and model outputs for quality, safety and reliability.",
+  "reference_implementations": [
+    {
+      "name": "LangSmith",
+      "vendor": "LangChain",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas"
+      ],
+      "url": "https://www.langchain.com/langsmith",
+      "notes": "LLM app testing, tracing and evaluation."
+    },
+    {
+      "name": "Promptfoo",
+      "vendor": "Promptfoo",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "self_hosted"
+      ],
+      "url": "https://www.promptfoo.dev",
+      "notes": "Open source LLM evaluation and red teaming framework."
+    },
+    {
+      "name": "OpenAI Evals",
+      "vendor": "OpenAI",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "self_hosted"
+      ],
+      "url": "https://github.com/openai/evals",
+      "notes": "Framework for evaluating LLM behavior."
+    },
+    {
+      "name": "Ragas",
+      "vendor": "Exploding Gradients",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "self_hosted"
+      ],
+      "url": "https://www.ragas.io",
+      "notes": "Evaluation framework for RAG applications."
+    },
+    {
+      "name": "DeepEval",
+      "vendor": "Confident AI",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "self_hosted",
+        "saas"
+      ],
+      "url": "https://www.confident-ai.com",
+      "notes": "LLM evaluation framework."
+    },
+    {
+      "name": "Giskard",
+      "vendor": "Giskard",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "self_hosted",
+        "saas"
+      ],
+      "url": "https://www.giskard.ai",
+      "notes": "AI testing and evaluation platform."
+    },
+    {
+      "name": "TruLens",
+      "vendor": "TruEra",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "self_hosted"
+      ],
+      "url": "https://www.trulens.org",
+      "notes": "Open source LLM application evaluation framework."
+    }
+  ],
+  "capabilities": [
+    {
+      "capability_name": "prompt_evaluation",
+      "display_name": "Prompt Evaluation",
+      "description": "Evaluates prompt quality and behavior.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "response_evaluation",
+      "display_name": "Response Evaluation",
+      "description": "Evaluates AI-generated responses.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "rag_evaluation",
+      "display_name": "RAG Evaluation",
+      "description": "Evaluates retrieval-augmented generation pipelines.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "agent_evaluation",
+      "display_name": "Agent Evaluation",
+      "description": "Evaluates agent workflows and tool use.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "regression_testing",
+      "display_name": "Regression Testing",
+      "description": "Tests for regressions across prompt, model or tool changes.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "red_teaming",
+      "display_name": "Red Teaming",
+      "description": "Tests AI systems for adversarial or unsafe behavior.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "groundedness_evaluation",
+      "display_name": "Groundedness Evaluation",
+      "description": "Evaluates whether outputs are grounded in supplied context or retrieved evidence.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "safety_evaluation",
+      "display_name": "Safety Evaluation",
+      "description": "Evaluates outputs for safety, toxicity, bias and policy violations.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    }
+  ],
+  "tags": [
+    "evaluation",
+    "testing",
+    "agentic",
+    "quality"
+  ]
+}

@@ -1,0 +1,228 @@
+{
+  "product_name": "assistant",
+  "display_name": "AI Assistant",
+  "domain": "experience",
+  "description": "Configured conversational AI application combining chat UI, instructions, resources, prompts, skills, agent definitions, models, governance controls, and collaboration features.",
+  "reference_implementations": [
+    {
+      "name": "TrustBolt AI Adoption and Governance Platform",
+      "vendor": "TrustBolt",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas",
+        "private_cloud",
+        "api"
+      ],
+      "url": "https://www.trustbolt.ai",
+      "notes": "Enterprise AI adoption and governance platform with a single end-user AI experience, multi-model access, prompt oversight, teams, history, sharing and cost controls."
+    },
+    {
+      "name": "OpenAI GPTs",
+      "vendor": "OpenAI",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas"
+      ],
+      "url": "https://chatgpt.com/gpts",
+      "notes": "Configurable assistant experiences built on ChatGPT."
+    },
+    {
+      "name": "ChatGPT Enterprise",
+      "vendor": "OpenAI",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas"
+      ],
+      "url": "https://openai.com/chatgpt/enterprise/",
+      "notes": "Enterprise conversational AI assistant platform."
+    },
+    {
+      "name": "Claude Projects",
+      "vendor": "Anthropic",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas"
+      ],
+      "url": "https://claude.ai",
+      "notes": "Project-based assistant workspaces for Claude."
+    },
+    {
+      "name": "Microsoft Copilot Studio",
+      "vendor": "Microsoft",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas",
+        "managed_cloud"
+      ],
+      "url": "https://www.microsoft.com/microsoft-copilot/microsoft-copilot-studio",
+      "notes": "Platform for creating enterprise copilots and agents."
+    },
+    {
+      "name": "OpenWebUI",
+      "vendor": "OpenWebUI",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "self_hosted"
+      ],
+      "url": "https://openwebui.com",
+      "notes": "Open source AI chat and assistant interface."
+    },
+    {
+      "name": "Amazon Q Business",
+      "vendor": "Amazon Web Services",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas",
+        "managed_cloud"
+      ],
+      "url": "https://aws.amazon.com/q/business/",
+      "notes": "Enterprise generative AI assistant for business knowledge, applications and workflows."
+    },
+    {
+      "name": "Google Agentspace",
+      "vendor": "Google",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas",
+        "managed_cloud"
+      ],
+      "url": "https://cloud.google.com/products/agentspace",
+      "notes": "Enterprise AI agent and assistant experience over organizational knowledge and applications."
+    }
+  ],
+  "capabilities": [
+    {
+      "capability_name": "chat_ui",
+      "display_name": "Chat UI",
+      "description": "Provides the conversational user interface for interacting with assistants, agents, tools and models.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "assistant_configuration",
+      "display_name": "Assistant Configuration",
+      "description": "Configures assistant instructions, model access, tools, prompts, resources and policies.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "instruction_management",
+      "display_name": "Instruction Management",
+      "description": "Defines and manages system, developer and assistant instructions.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "resource_attachment",
+      "display_name": "Resource Attachment",
+      "description": "Attaches approved documents, data sources or knowledge resources to an assistant.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "prompt_attachment",
+      "display_name": "Prompt Attachment",
+      "description": "Associates reusable prompts with an assistant.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "skill_attachment",
+      "display_name": "Skill Attachment",
+      "description": "Associates reusable skills or actions with an assistant.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "agent_definition",
+      "display_name": "Agent Definition",
+      "description": "Defines the role, purpose, tools and behavior of an AI agent or assistant.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "model_selection",
+      "display_name": "Model Selection",
+      "description": "Allows selection of approved models for an assistant or conversation.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "model_switching",
+      "display_name": "Model Switching",
+      "description": "Allows switching between approved models within a consistent assistant experience.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": false
+    },
+    {
+      "capability_name": "conversation_history",
+      "display_name": "Conversation History",
+      "description": "Stores previous assistant conversations for continuity, review and reuse.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "conversation_search",
+      "display_name": "Conversation Search",
+      "description": "Searches historical assistant conversations.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": false
+    },
+    {
+      "capability_name": "conversation_sharing",
+      "display_name": "Conversation Sharing",
+      "description": "Shares conversations or outputs with approved users or teams.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": false
+    },
+    {
+      "capability_name": "assistant_publishing",
+      "display_name": "Assistant Publishing",
+      "description": "Publishes configured assistants for controlled user or team access.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "assistant_versioning",
+      "display_name": "Assistant Versioning",
+      "description": "Tracks versions of assistant definitions and configurations.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "assistant_entitlements",
+      "display_name": "Assistant Entitlements",
+      "description": "Controls which users or groups can access specific assistants.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "assistant_monitoring",
+      "display_name": "Assistant Monitoring",
+      "description": "Monitors assistant activity, usage and adoption.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "assistant_evaluation",
+      "display_name": "Assistant Evaluation",
+      "description": "Evaluates configured assistants before and after publishing.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "assistant_lifecycle",
+      "display_name": "Assistant Lifecycle",
+      "description": "Manages assistant creation, publishing, review, retirement and replacement.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    }
+  ],
+  "tags": [
+    "experience",
+    "assistant",
+    "chat",
+    "agentic",
+    "regulated"
+  ]
+}

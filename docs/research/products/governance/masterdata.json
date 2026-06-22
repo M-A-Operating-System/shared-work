@@ -1,0 +1,93 @@
+{
+  "product_name": "masterdata",
+  "display_name": "Master Data",
+  "domain": "governance",
+  "description": "Manages master and reference data, golden records, concordance and survivorship across systems.",
+  "reference_implementations": [
+    {
+      "name": "Reltio",
+      "vendor": "Reltio",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas"
+      ],
+      "url": "https://www.reltio.com",
+      "notes": "Cloud-native MDM platform."
+    },
+    {
+      "name": "Semarchy",
+      "vendor": "Semarchy",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas",
+        "managed_cloud"
+      ],
+      "url": "https://www.semarchy.com",
+      "notes": "MDM and data management platform."
+    },
+    {
+      "name": "Profisee",
+      "vendor": "Profisee",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "managed_cloud"
+      ],
+      "url": "https://profisee.com",
+      "notes": "MDM platform."
+    },
+    {
+      "name": "Informatica MDM",
+      "vendor": "Informatica",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas",
+        "managed_cloud"
+      ],
+      "url": "https://www.informatica.com",
+      "notes": "Enterprise MDM platform."
+    }
+  ],
+  "capabilities": [
+    {
+      "capability_name": "golden_record",
+      "display_name": "Golden Record",
+      "description": "Creates authoritative entity records.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "survivorship",
+      "display_name": "Survivorship",
+      "description": "Determines authoritative values across sources.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "concordance",
+      "display_name": "Concordance",
+      "description": "Maps records and identifiers across systems.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "reference_data_management",
+      "display_name": "Reference Data Management",
+      "description": "Manages approved reference data values.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "master_data_governance",
+      "display_name": "Master Data Governance",
+      "description": "Governs lifecycle and ownership of master data.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    }
+  ],
+  "tags": [
+    "master_data",
+    "reference_data",
+    "mdm",
+    "governance"
+  ]
+}

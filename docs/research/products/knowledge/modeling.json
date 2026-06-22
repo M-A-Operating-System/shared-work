@@ -1,0 +1,126 @@
+{
+  "product_name": "modeling",
+  "display_name": "Data Model Repository",
+  "domain": "knowledge",
+  "description": "Repository and management function for conceptual, logical, physical, canonical and subject-based data models.",
+  "reference_implementations": [
+    {
+      "name": "M&A Operating System Data Design Authority",
+      "vendor": "M&A Operating System",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas",
+        "managed_cloud"
+      ],
+      "url": "https://www.maoperatingsystem.com/dda",
+      "notes": "Data model management and data design authority."
+    },
+    {
+      "name": "erwin Data Modeler",
+      "vendor": "Quest",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "desktop",
+        "managed_cloud"
+      ],
+      "url": "https://www.quest.com/products/erwin-data-modeler/",
+      "notes": "Enterprise data modeling tool."
+    },
+    {
+      "name": "SAP PowerDesigner",
+      "vendor": "SAP",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "desktop",
+        "on_prem"
+      ],
+      "url": "https://www.sap.com",
+      "notes": "Enterprise modeling and architecture tool."
+    },
+    {
+      "name": "Hackolade",
+      "vendor": "Hackolade",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "desktop",
+        "managed_cloud"
+      ],
+      "url": "https://hackolade.com",
+      "notes": "Data modeling platform with support for modern data stores."
+    },
+    {
+      "name": "dbdiagram",
+      "vendor": "Holistics",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas"
+      ],
+      "url": "https://dbdiagram.io",
+      "notes": "Database diagram and DBML modeling tool."
+    }
+  ],
+  "capabilities": [
+    {
+      "capability_name": "logical_model_repository",
+      "display_name": "Logical Model Repository",
+      "description": "Stores and manages logical data models.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "subject_model_repository",
+      "display_name": "Subject Model Repository",
+      "description": "Stores subject-based data models.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "canonical_model_repository",
+      "display_name": "Canonical Model Repository",
+      "description": "Stores canonical data model definitions.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "physical_model_repository",
+      "display_name": "Physical Model Repository",
+      "description": "Stores physical schemas and database structures.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "data_contract_repository",
+      "display_name": "Data Contract Repository",
+      "description": "Stores data contracts between producers and consumers.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "schema_versioning",
+      "display_name": "Schema Versioning",
+      "description": "Versions schemas, models and contracts.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "model_discovery",
+      "display_name": "Model Discovery",
+      "description": "Allows users and agents to discover available models.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "model_governance",
+      "display_name": "Model Governance",
+      "description": "Controls approvals, lifecycle and stewardship of models.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    }
+  ],
+  "tags": [
+    "data_model",
+    "modeling",
+    "dda",
+    "context"
+  ]
+}

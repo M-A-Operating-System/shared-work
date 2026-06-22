@@ -1,0 +1,161 @@
+{
+  "product_name": "model",
+  "display_name": "Foundation Model Platform",
+  "domain": "operations",
+  "description": "Provides managed access to foundation models, embeddings, multimodal models, deployment endpoints and model lifecycle controls.",
+  "reference_implementations": [
+    {
+      "name": "Amazon Bedrock",
+      "vendor": "Amazon Web Services",
+      "implementation_type": "cloud_service",
+      "deployment_models": [
+        "managed_cloud",
+        "api"
+      ],
+      "url": "https://aws.amazon.com/bedrock/",
+      "notes": "Managed foundation model access and governance platform."
+    },
+    {
+      "name": "Anthropic Claude API",
+      "vendor": "Anthropic",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "api",
+        "saas"
+      ],
+      "url": "https://docs.anthropic.com",
+      "notes": "API access to Claude foundation models."
+    },
+    {
+      "name": "Azure AI Foundry",
+      "vendor": "Microsoft",
+      "implementation_type": "cloud_service",
+      "deployment_models": [
+        "managed_cloud",
+        "api"
+      ],
+      "url": "https://ai.azure.com",
+      "notes": "Managed model catalog, deployment and AI application platform."
+    },
+    {
+      "name": "Google Gemini API",
+      "vendor": "Google",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "api",
+        "saas"
+      ],
+      "url": "https://ai.google.dev",
+      "notes": "API access to Gemini models."
+    },
+    {
+      "name": "Google Vertex AI Model Garden",
+      "vendor": "Google",
+      "implementation_type": "cloud_service",
+      "deployment_models": [
+        "managed_cloud",
+        "api"
+      ],
+      "url": "https://cloud.google.com/model-garden",
+      "notes": "Managed model catalog and deployment platform."
+    },
+    {
+      "name": "Hugging Face",
+      "vendor": "Hugging Face",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas",
+        "self_hosted",
+        "api"
+      ],
+      "url": "https://huggingface.co",
+      "notes": "Model hub and deployment ecosystem for open and commercial models."
+    },
+    {
+      "name": "Ollama",
+      "vendor": "Ollama",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "self_hosted"
+      ],
+      "url": "https://ollama.com",
+      "notes": "Local model runtime for open models."
+    },
+    {
+      "name": "OpenAI Platform",
+      "vendor": "OpenAI",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "api",
+        "saas"
+      ],
+      "url": "https://platform.openai.com",
+      "notes": "API and platform services for OpenAI models, embeddings, tools and assistants."
+    }
+  ],
+  "capabilities": [
+    {
+      "capability_name": "embedding_generation",
+      "display_name": "Embedding Generation",
+      "description": "Generates embeddings for search, retrieval and analytics workflows.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "model_benchmarking",
+      "display_name": "Model Benchmarking",
+      "description": "Benchmarks models against technical and business criteria.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "model_catalog",
+      "display_name": "Model Catalog",
+      "description": "Maintains an approved catalog of available models.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "model_deployment",
+      "display_name": "Model Deployment",
+      "description": "Deploys models for enterprise use.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "model_endpoint",
+      "display_name": "Model Endpoint",
+      "description": "Provides callable endpoints for approved models.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "model_lifecycle",
+      "display_name": "Model Lifecycle",
+      "description": "Manages model onboarding, review, approval, retirement and replacement.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "model_risk_review",
+      "display_name": "Model Risk Review",
+      "description": "Supports model risk review before enterprise use.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "multimodal_model_access",
+      "display_name": "Multimodal Model Access",
+      "description": "Provides access to models that support text, image, audio or other modalities.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": false
+    }
+  ],
+  "tags": [
+    "ai",
+    "foundation_model",
+    "llm",
+    "model",
+    "operations"
+  ]
+}

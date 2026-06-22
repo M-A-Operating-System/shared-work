@@ -1,0 +1,107 @@
+{
+  "product_name": "entitlement",
+  "display_name": "AI Entitlement",
+  "domain": "governance",
+  "description": "Controls user, group, agent, model, tool, assistant and data access for enterprise AI ecosystems.",
+  "reference_implementations": [
+    {
+      "name": "TrustBolt AI Adoption and Governance Platform",
+      "vendor": "TrustBolt",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas",
+        "private_cloud"
+      ],
+      "url": "https://www.trustbolt.ai",
+      "notes": "AI entitlements for model and platform access."
+    },
+    {
+      "name": "Okta",
+      "vendor": "Okta",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas"
+      ],
+      "url": "https://www.okta.com",
+      "notes": "Identity and access management platform."
+    },
+    {
+      "name": "Microsoft Entra ID",
+      "vendor": "Microsoft",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas",
+        "managed_cloud"
+      ],
+      "url": "https://www.microsoft.com/security/business/identity-access/microsoft-entra-id",
+      "notes": "Identity and access management platform."
+    },
+    {
+      "name": "Auth0",
+      "vendor": "Okta",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas"
+      ],
+      "url": "https://auth0.com",
+      "notes": "Identity platform for applications."
+    }
+  ],
+  "capabilities": [
+    {
+      "capability_name": "user_entitlements",
+      "display_name": "User Entitlements",
+      "description": "Controls AI access by user.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "group_entitlements",
+      "display_name": "Group Entitlements",
+      "description": "Controls AI access by group or role.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "model_entitlements",
+      "display_name": "Model Entitlements",
+      "description": "Controls model access.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "assistant_entitlements",
+      "display_name": "Assistant Entitlements",
+      "description": "Controls assistant access.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "tool_entitlements",
+      "display_name": "Tool Entitlements",
+      "description": "Controls tool access.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "data_entitlements",
+      "display_name": "Data Entitlements",
+      "description": "Controls access to data resources.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "policy_assignment",
+      "display_name": "Policy Assignment",
+      "description": "Assigns policies to users, groups, tools or agents.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    }
+  ],
+  "tags": [
+    "entitlement",
+    "identity",
+    "access",
+    "governance"
+  ]
+}

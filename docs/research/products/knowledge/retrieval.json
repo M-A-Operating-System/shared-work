@@ -1,0 +1,139 @@
+{
+  "product_name": "retrieval",
+  "display_name": "Knowledge Retrieval",
+  "domain": "knowledge",
+  "description": "Search and retrieval layer that allows assistants and agents to access approved enterprise knowledge and data context.",
+  "reference_implementations": [
+    {
+      "name": "Azure AI Search",
+      "vendor": "Microsoft",
+      "implementation_type": "cloud_service",
+      "deployment_models": [
+        "managed_cloud",
+        "api"
+      ],
+      "url": "https://azure.microsoft.com/products/ai-services/ai-search",
+      "notes": "Managed enterprise search service with vector and hybrid retrieval."
+    },
+    {
+      "name": "OpenSearch",
+      "vendor": "OpenSearch Project",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "self_hosted",
+        "managed_cloud"
+      ],
+      "url": "https://opensearch.org",
+      "notes": "Open source search and analytics engine."
+    },
+    {
+      "name": "Elasticsearch",
+      "vendor": "Elastic",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas",
+        "self_hosted",
+        "managed_cloud"
+      ],
+      "url": "https://www.elastic.co/elasticsearch",
+      "notes": "Search and vector search platform."
+    },
+    {
+      "name": "Weaviate",
+      "vendor": "Weaviate",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "saas",
+        "self_hosted"
+      ],
+      "url": "https://weaviate.io",
+      "notes": "Vector database and semantic search platform."
+    },
+    {
+      "name": "Qdrant",
+      "vendor": "Qdrant",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "saas",
+        "self_hosted"
+      ],
+      "url": "https://qdrant.tech",
+      "notes": "Vector database and similarity search engine."
+    },
+    {
+      "name": "Pinecone",
+      "vendor": "Pinecone",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas"
+      ],
+      "url": "https://www.pinecone.io",
+      "notes": "Managed vector database."
+    }
+  ],
+  "capabilities": [
+    {
+      "capability_name": "semantic_search",
+      "display_name": "Semantic Search",
+      "description": "Finds relevant content using meaning-based search.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "hybrid_search",
+      "display_name": "Hybrid Search",
+      "description": "Combines keyword and semantic search.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "metadata_filtering",
+      "display_name": "Metadata Filtering",
+      "description": "Filters retrieval results using metadata.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "permission_aware_retrieval",
+      "display_name": "Permission-Aware Retrieval",
+      "description": "Restricts retrieval to authorized content.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "lineage_aware_retrieval",
+      "display_name": "Lineage-Aware Retrieval",
+      "description": "Uses lineage context to improve retrieval quality.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "quality_signal_filtering",
+      "display_name": "Quality Signal Filtering",
+      "description": "Filters retrieval results based on quality and trust signals.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "citation_generation",
+      "display_name": "Citation Generation",
+      "description": "Returns source references with retrieved content.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "ranking",
+      "display_name": "Ranking",
+      "description": "Ranks retrieved content for relevance and trust.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    }
+  ],
+  "tags": [
+    "retrieval",
+    "rag",
+    "search",
+    "vector",
+    "knowledge"
+  ]
+}

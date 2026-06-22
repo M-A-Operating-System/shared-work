@@ -1,0 +1,160 @@
+{
+  "product_name": "validation",
+  "display_name": "Data Validation",
+  "domain": "governance",
+  "description": "Validates data quality, expectations, rules, constraints and fitness-for-use before consumption by analytics systems, assistants or agents.",
+  "reference_implementations": [
+    {
+      "name": "Great Expectations",
+      "vendor": "Great Expectations",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "self_hosted",
+        "managed_cloud"
+      ],
+      "url": "https://greatexpectations.io",
+      "notes": "Data validation and expectation management platform."
+    },
+    {
+      "name": "Soda",
+      "vendor": "Soda",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas",
+        "self_hosted"
+      ],
+      "url": "https://www.soda.io",
+      "notes": "Data quality and validation platform."
+    },
+    {
+      "name": "Deequ",
+      "vendor": "AWS Labs",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "self_hosted"
+      ],
+      "url": "https://github.com/awslabs/deequ",
+      "notes": "Library for defining unit tests for data."
+    },
+    {
+      "name": "dbt Tests",
+      "vendor": "dbt Labs",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "self_hosted",
+        "managed_cloud"
+      ],
+      "url": "https://docs.getdbt.com/docs/build/data-tests",
+      "notes": "Data testing within dbt projects."
+    },
+    {
+      "name": "Evidently",
+      "vendor": "Evidently AI",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "self_hosted",
+        "saas"
+      ],
+      "url": "https://www.evidentlyai.com",
+      "notes": "ML and data monitoring and testing platform."
+    },
+    {
+      "name": "Pandera",
+      "vendor": "Union.ai",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "self_hosted"
+      ],
+      "url": "https://pandera.readthedocs.io",
+      "notes": "DataFrame validation library for Python data workflows."
+    },
+    {
+      "name": "Pydantic",
+      "vendor": "Pydantic",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "self_hosted"
+      ],
+      "url": "https://docs.pydantic.dev",
+      "notes": "Data validation library used for structured Python models and APIs."
+    }
+  ],
+  "capabilities": [
+    {
+      "capability_name": "rule_validation",
+      "display_name": "Rule Validation",
+      "description": "Validates data against defined business or technical rules.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "expectation_management",
+      "display_name": "Expectation Management",
+      "description": "Defines and manages data expectations.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "contract_validation",
+      "display_name": "Contract Validation",
+      "description": "Validates data against data contracts.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "certification",
+      "display_name": "Certification",
+      "description": "Certifies data as fit for use.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "acceptance_testing",
+      "display_name": "Acceptance Testing",
+      "description": "Tests data assets against acceptance criteria.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "unexpected_row_retrieval",
+      "display_name": "Unexpected Row Retrieval",
+      "description": "Retrieves rows that failed validation.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "validation_scheduling",
+      "display_name": "Validation Scheduling",
+      "description": "Schedules recurring validation runs.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "ai_assisted_rule_generation",
+      "display_name": "AI-Assisted Rule Generation",
+      "description": "Uses AI to suggest validation rules for human review.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": false
+    },
+    {
+      "capability_name": "schema_validation",
+      "display_name": "Schema Validation",
+      "description": "Validates data structures against schemas.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "type_validation",
+      "display_name": "Type Validation",
+      "description": "Validates data types and structured object fields.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    }
+  ],
+  "tags": [
+    "validation",
+    "quality",
+    "data",
+    "governance"
+  ]
+}

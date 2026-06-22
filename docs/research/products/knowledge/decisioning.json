@@ -1,0 +1,69 @@
+{
+  "product_name": "decisioning",
+  "display_name": "AI Decisioning",
+  "domain": "knowledge",
+  "description": "Defines, manages and visualises enterprise decision logic as structured, deterministic decision trees and semantic decision definitions, enabling consistent, auditable, human-readable decision outcomes for business rules, policy and agentic workflows.",
+  "reference_implementations": [
+    {
+      "name": "Draw Decision Tree",
+      "vendor": "Draw Decision Tree",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas"
+      ],
+      "url": "https://www.drawdecisiontree.com",
+      "notes": "Visual decision tree authoring and management platform for building semantic decision definitions and deterministic decision outcomes."
+    }
+  ],
+  "capabilities": [
+    {
+      "capability_name": "semantic_decision_definition",
+      "display_name": "Semantic Decision Definition",
+      "description": "Defines decision logic using structured, human-readable semantic definitions that capture intent, conditions and outcomes.",
+      "regulated_relevance": "Supports explainable, auditable decision-making required in regulated environments.",
+      "required": true
+    },
+    {
+      "capability_name": "deterministic_decision_outcomes",
+      "display_name": "Deterministic Decision Outcomes",
+      "description": "Evaluates decision trees to produce consistent, repeatable outcomes given the same inputs, eliminating non-deterministic AI inference for governed decisions.",
+      "regulated_relevance": "Critical for regulated industries requiring consistent, defensible and reproducible decision outputs.",
+      "required": true
+    },
+    {
+      "capability_name": "decision_tree_visualization",
+      "display_name": "Decision Tree Visualization",
+      "description": "Renders decision trees as interactive visual diagrams for authoring, review, testing and communication to business stakeholders.",
+      "regulated_relevance": "Supports human review and sign-off of decision logic in regulated change processes.",
+      "required": true
+    },
+    {
+      "capability_name": "decision_versioning",
+      "display_name": "Decision Versioning",
+      "description": "Tracks versions of decision trees and definitions to support change management and audit.",
+      "regulated_relevance": "Required for regulated audit trails and change governance.",
+      "required": true
+    },
+    {
+      "capability_name": "decision_testing",
+      "display_name": "Decision Testing",
+      "description": "Tests decision trees against expected inputs and outcomes to validate logic before deployment.",
+      "regulated_relevance": "Supports pre-production validation of business rules and policies.",
+      "required": false
+    },
+    {
+      "capability_name": "decision_publishing",
+      "display_name": "Decision Publishing",
+      "description": "Publishes approved decision definitions for consumption by applications, agents and agentic workflows.",
+      "regulated_relevance": "Enables governed, controlled release of decision logic.",
+      "required": false
+    }
+  ],
+  "tags": [
+    "decisioning",
+    "knowledge",
+    "deterministic",
+    "agentic",
+    "regulated"
+  ]
+}

@@ -1,0 +1,100 @@
+{
+  "product_name": "connector",
+  "display_name": "Enterprise Connector",
+  "domain": "integration",
+  "description": "Connects assistants, agents and data platforms to enterprise systems, applications and data sources.",
+  "reference_implementations": [
+    {
+      "name": "MCP Servers",
+      "vendor": "MCP Ecosystem",
+      "implementation_type": "mcp_server",
+      "deployment_models": [
+        "self_hosted",
+        "managed_cloud"
+      ],
+      "url": "https://modelcontextprotocol.io",
+      "notes": "MCP server ecosystem for connecting AI clients to tools and data."
+    },
+    {
+      "name": "Airbyte Connectors",
+      "vendor": "Airbyte",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "self_hosted",
+        "managed_cloud"
+      ],
+      "url": "https://airbyte.com",
+      "notes": "Data connectors for source and destination systems."
+    },
+    {
+      "name": "Zapier",
+      "vendor": "Zapier",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas"
+      ],
+      "url": "https://zapier.com",
+      "notes": "Application automation and connector platform."
+    },
+    {
+      "name": "Workato",
+      "vendor": "Workato",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas"
+      ],
+      "url": "https://www.workato.com",
+      "notes": "Enterprise automation and integration platform."
+    }
+  ],
+  "capabilities": [
+    {
+      "capability_name": "system_connection",
+      "display_name": "System Connection",
+      "description": "Connects to enterprise systems.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "tool_exposure",
+      "display_name": "Tool Exposure",
+      "description": "Exposes system capabilities as tools.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "credential_management",
+      "display_name": "Credential Management",
+      "description": "Manages credentials required for connections.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "permission_mapping",
+      "display_name": "Permission Mapping",
+      "description": "Maps enterprise permissions to connector access.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "connector_catalog",
+      "display_name": "Connector Catalog",
+      "description": "Catalogs available connectors.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "connector_monitoring",
+      "display_name": "Connector Monitoring",
+      "description": "Monitors connector health and usage.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    }
+  ],
+  "tags": [
+    "connector",
+    "integration",
+    "mcp",
+    "tools"
+  ]
+}

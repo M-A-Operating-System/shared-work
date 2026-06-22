@@ -1,0 +1,91 @@
+{
+  "product_name": "context",
+  "display_name": "Data Context",
+  "domain": "knowledge",
+  "description": "Provides structured business and technical context so AI systems understand enterprise data meaning, provenance, usage, ownership and constraints.",
+  "reference_implementations": [
+    {
+      "name": "M&A Operating System Data Design Authority",
+      "vendor": "M&A Operating System",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas",
+        "managed_cloud"
+      ],
+      "url": "https://www.maoperatingsystem.com/dda",
+      "notes": "Data Design Authority for managing data context and data model repositories."
+    },
+    {
+      "name": "DataHub MCP Server",
+      "vendor": "DataHub",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "self_hosted",
+        "managed_cloud"
+      ],
+      "url": "https://datahub.com/resources/datahub-mcp-server-overview/",
+      "notes": "MCP server exposing enterprise data context to agents."
+    },
+    {
+      "name": "OpenMetadata",
+      "vendor": "OpenMetadata",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "self_hosted"
+      ],
+      "url": "https://open-metadata.org",
+      "notes": "Metadata, governance and data context platform."
+    }
+  ],
+  "capabilities": [
+    {
+      "capability_name": "metadata_access",
+      "display_name": "Metadata Access",
+      "description": "Provides structured access to metadata for humans, assistants and agents.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "quality_signal_access",
+      "display_name": "Quality Signal Access",
+      "description": "Exposes data quality signals to users and agents.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "lineage_access",
+      "display_name": "Lineage Access",
+      "description": "Provides lineage context for data assets and transformations.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "trust_signal_access",
+      "display_name": "Trust Signal Access",
+      "description": "Exposes trust, certification or fitness-for-use signals.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "definition_resolution",
+      "display_name": "Definition Resolution",
+      "description": "Resolves data elements to business definitions and context.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "context_api",
+      "display_name": "Context API",
+      "description": "Provides API access to enterprise data context.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    }
+  ],
+  "tags": [
+    "context",
+    "metadata",
+    "mcp",
+    "data",
+    "ai_ready"
+  ]
+}

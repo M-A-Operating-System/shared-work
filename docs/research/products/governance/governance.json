@@ -1,0 +1,127 @@
+{
+  "product_name": "governance",
+  "display_name": "AI Governance",
+  "domain": "governance",
+  "description": "Defines, manages and supervises AI policies, risks, controls, approvals, evidence and compliance processes across the enterprise AI ecosystem.",
+  "reference_implementations": [
+    {
+      "name": "Credo AI",
+      "vendor": "Credo AI",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas"
+      ],
+      "url": "https://www.credo.ai",
+      "notes": "AI governance, risk and compliance platform."
+    },
+    {
+      "name": "Holistic AI",
+      "vendor": "Holistic AI",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas"
+      ],
+      "url": "https://www.holisticai.com",
+      "notes": "AI governance, risk and compliance platform."
+    },
+    {
+      "name": "IBM watsonx.governance",
+      "vendor": "IBM",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas",
+        "managed_cloud"
+      ],
+      "url": "https://www.ibm.com/products/watsonx-governance",
+      "notes": "AI governance and model lifecycle governance platform."
+    },
+    {
+      "name": "Microsoft Purview",
+      "vendor": "Microsoft",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas",
+        "managed_cloud"
+      ],
+      "url": "https://www.microsoft.com/security/business/microsoft-purview",
+      "notes": "Governance, compliance and risk management platform."
+    },
+    {
+      "name": "TrustBolt AI Adoption and Governance Platform",
+      "vendor": "TrustBolt",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas",
+        "private_cloud",
+        "api"
+      ],
+      "url": "https://www.trustbolt.ai",
+      "notes": "Enterprise AI adoption and governance platform for assistants, gateways, entitlements, monitoring and cost controls."
+    }
+  ],
+  "capabilities": [
+    {
+      "capability_name": "ai_policy_management",
+      "display_name": "AI Policy Management",
+      "description": "Defines and manages enterprise AI policies.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "approval_management",
+      "display_name": "Approval Management",
+      "description": "Manages approvals for AI use cases, models, assistants and agents.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "control_mapping",
+      "display_name": "Control Mapping",
+      "description": "Maps AI risks to controls and evidence.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "evidence_management",
+      "display_name": "Evidence Management",
+      "description": "Collects evidence for AI governance, audit and compliance.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "governance_reporting",
+      "display_name": "Governance Reporting",
+      "description": "Reports governance status, risks, controls and compliance posture.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "regulatory_mapping",
+      "display_name": "Regulatory Mapping",
+      "description": "Maps AI controls to regulatory obligations and internal policies.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "risk_assessment",
+      "display_name": "Risk Assessment",
+      "description": "Assesses AI risks across models, assistants, agents and use cases.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "use_case_inventory",
+      "display_name": "Use Case Inventory",
+      "description": "Maintains inventory of AI use cases and related risks.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    }
+  ],
+  "tags": [
+    "ai",
+    "compliance",
+    "governance",
+    "regulated",
+    "risk"
+  ]
+}

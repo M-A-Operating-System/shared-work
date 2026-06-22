@@ -1,0 +1,124 @@
+{
+  "product_name": "monitoring",
+  "display_name": "AI Monitoring",
+  "domain": "governance",
+  "description": "Monitors AI usage, behavior, risks, controls, model activity and policy compliance.",
+  "reference_implementations": [
+    {
+      "name": "TrustBolt AI Adoption and Governance Platform",
+      "vendor": "TrustBolt",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas",
+        "private_cloud"
+      ],
+      "url": "https://www.trustbolt.ai",
+      "notes": "AI usage, prompt and cost monitoring."
+    },
+    {
+      "name": "LangSmith",
+      "vendor": "LangChain",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas"
+      ],
+      "url": "https://www.langchain.com/langsmith",
+      "notes": "LLM application observability, testing and monitoring."
+    },
+    {
+      "name": "Langfuse",
+      "vendor": "Langfuse",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "saas",
+        "self_hosted"
+      ],
+      "url": "https://langfuse.com",
+      "notes": "Open source LLM observability."
+    },
+    {
+      "name": "Arize AI",
+      "vendor": "Arize",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas"
+      ],
+      "url": "https://arize.com",
+      "notes": "AI observability platform."
+    },
+    {
+      "name": "WhyLabs",
+      "vendor": "WhyLabs",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas"
+      ],
+      "url": "https://whylabs.ai",
+      "notes": "AI and data monitoring platform."
+    }
+  ],
+  "capabilities": [
+    {
+      "capability_name": "usage_monitoring",
+      "display_name": "Usage Monitoring",
+      "description": "Monitors AI usage across users, teams and systems.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "risk_monitoring",
+      "display_name": "Risk Monitoring",
+      "description": "Monitors AI risk indicators.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "policy_monitoring",
+      "display_name": "Policy Monitoring",
+      "description": "Monitors policy compliance.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "prompt_monitoring",
+      "display_name": "Prompt Monitoring",
+      "description": "Monitors prompt activity and patterns.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "response_monitoring",
+      "display_name": "Response Monitoring",
+      "description": "Monitors response quality and safety indicators.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "adoption_monitoring",
+      "display_name": "Adoption Monitoring",
+      "description": "Monitors AI adoption across the enterprise.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "control_monitoring",
+      "display_name": "Control Monitoring",
+      "description": "Monitors whether AI controls are operating as expected.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "exception_monitoring",
+      "display_name": "Exception Monitoring",
+      "description": "Monitors policy, entitlement, validation and execution exceptions.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    }
+  ],
+  "tags": [
+    "monitoring",
+    "governance",
+    "ai",
+    "risk"
+  ]
+}

@@ -1,0 +1,233 @@
+{
+  "product_name": "gateway",
+  "display_name": "LLM Gateway",
+  "domain": "governance",
+  "description": "Governed access layer between users, assistants, agents, enterprise tools and AI models.",
+  "reference_implementations": [
+    {
+      "name": "TrustBolt AI Adoption and Governance Platform",
+      "vendor": "TrustBolt",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas",
+        "private_cloud",
+        "api"
+      ],
+      "url": "https://www.trustbolt.ai",
+      "notes": "Enterprise AI gateway and governance platform with model access, prompt tracking, cost management, quotas and entitlements."
+    },
+    {
+      "name": "LiteLLM",
+      "vendor": "BerriAI",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "self_hosted",
+        "api"
+      ],
+      "url": "https://www.litellm.ai",
+      "notes": "Open source LLM gateway and proxy framework."
+    },
+    {
+      "name": "Portkey",
+      "vendor": "Portkey",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas",
+        "managed_cloud",
+        "api"
+      ],
+      "url": "https://portkey.ai",
+      "notes": "AI gateway and observability platform."
+    },
+    {
+      "name": "Cloudflare AI Gateway",
+      "vendor": "Cloudflare",
+      "implementation_type": "cloud_service",
+      "deployment_models": [
+        "managed_cloud",
+        "api"
+      ],
+      "url": "https://developers.cloudflare.com/ai-gateway/",
+      "notes": "Managed AI gateway for observability, caching and controls."
+    },
+    {
+      "name": "Kong AI Gateway",
+      "vendor": "Kong",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "managed_cloud",
+        "self_hosted",
+        "api"
+      ],
+      "url": "https://konghq.com",
+      "notes": "API gateway with AI gateway capabilities."
+    },
+    {
+      "name": "Helicone",
+      "vendor": "Helicone",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "saas",
+        "self_hosted"
+      ],
+      "url": "https://www.helicone.ai",
+      "notes": "Open source LLM observability and gateway-oriented platform."
+    },
+    {
+      "name": "Amazon Bedrock",
+      "vendor": "Amazon Web Services",
+      "implementation_type": "cloud_service",
+      "deployment_models": [
+        "managed_cloud",
+        "api"
+      ],
+      "url": "https://aws.amazon.com/bedrock/",
+      "notes": "Managed foundation model platform with model access, guardrails and enterprise controls."
+    },
+    {
+      "name": "Azure AI Foundry",
+      "vendor": "Microsoft",
+      "implementation_type": "cloud_service",
+      "deployment_models": [
+        "managed_cloud",
+        "api"
+      ],
+      "url": "https://ai.azure.com",
+      "notes": "Enterprise platform for building, routing, governing and operating AI applications and models."
+    },
+    {
+      "name": "Google Vertex AI",
+      "vendor": "Google",
+      "implementation_type": "cloud_service",
+      "deployment_models": [
+        "managed_cloud",
+        "api"
+      ],
+      "url": "https://cloud.google.com/vertex-ai",
+      "notes": "Managed AI platform for model access, deployment, governance and operations."
+    }
+  ],
+  "capabilities": [
+    {
+      "capability_name": "model_routing",
+      "display_name": "Model Routing",
+      "description": "Routes requests to approved models based on policy, user, workload, risk or cost.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "model_entitlements",
+      "display_name": "Model Entitlements",
+      "description": "Controls which users, groups, agents or tools can access specific models.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "prompt_controls",
+      "display_name": "Prompt Controls",
+      "description": "Applies enterprise prompt controls before requests are sent to models.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "policy_enforcement",
+      "display_name": "Policy Enforcement",
+      "description": "Applies governance policies to model, tool and data access.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "content_filtering",
+      "display_name": "Content Filtering",
+      "description": "Inspects prompts and responses for unsafe or restricted content.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "cost_tracking",
+      "display_name": "Cost Tracking",
+      "description": "Tracks model usage and cost across users, teams, tools and agents.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "quota_management",
+      "display_name": "Quota Management",
+      "description": "Applies usage limits by user, team, model, assistant or function.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "usage_reporting",
+      "display_name": "Usage Reporting",
+      "description": "Reports AI usage, adoption, consumption and cost trends.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "mcp_server_policy",
+      "display_name": "MCP Server Policy",
+      "description": "Controls which MCP servers and tools may be used by users or agents.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "tool_guardrails",
+      "display_name": "Tool Guardrails",
+      "description": "Controls and constrains tool invocation by assistants and agents.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "identity_propagation",
+      "display_name": "Identity Propagation",
+      "description": "Propagates user, service or agent identity across model and tool calls.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "structured_error_handling",
+      "display_name": "Structured Error Handling",
+      "description": "Provides consistent policy, routing and service error responses.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "model_fallback",
+      "display_name": "Model Fallback",
+      "description": "Routes requests to fallback models when primary models are unavailable or unsuitable.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "provider_abstraction",
+      "display_name": "Provider Abstraction",
+      "description": "Provides a consistent access layer across multiple AI model providers.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "request_redaction",
+      "display_name": "Request Redaction",
+      "description": "Redacts restricted data from prompts before model invocation.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "response_redaction",
+      "display_name": "Response Redaction",
+      "description": "Redacts restricted data from model responses before delivery.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    }
+  ],
+  "tags": [
+    "gateway",
+    "llm",
+    "governance",
+    "cost",
+    "entitlement",
+    "mcp",
+    "api"
+  ]
+}

@@ -1,0 +1,104 @@
+{
+  "product_name": "visualization",
+  "display_name": "Data Visualization",
+  "domain": "experience",
+  "description": "Creates dashboards, reports, charts and embedded analytics for enterprise users and AI-assisted workflows.",
+  "reference_implementations": [
+    {
+      "name": "Power BI",
+      "vendor": "Microsoft",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas",
+        "managed_cloud"
+      ],
+      "url": "https://powerbi.microsoft.com",
+      "notes": "BI and dashboard platform."
+    },
+    {
+      "name": "Tableau",
+      "vendor": "Salesforce",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas",
+        "managed_cloud"
+      ],
+      "url": "https://www.tableau.com",
+      "notes": "Data visualization and analytics platform."
+    },
+    {
+      "name": "Looker",
+      "vendor": "Google",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas",
+        "managed_cloud"
+      ],
+      "url": "https://cloud.google.com/looker",
+      "notes": "BI and semantic modeling platform."
+    },
+    {
+      "name": "Apache Superset",
+      "vendor": "Apache",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "self_hosted"
+      ],
+      "url": "https://superset.apache.org",
+      "notes": "Open source BI and visualization platform."
+    },
+    {
+      "name": "Vega-Lite",
+      "vendor": "Vega",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "embedded"
+      ],
+      "url": "https://vega.github.io/vega-lite/",
+      "notes": "Declarative visualization grammar."
+    }
+  ],
+  "capabilities": [
+    {
+      "capability_name": "dashboarding",
+      "display_name": "Dashboarding",
+      "description": "Creates dashboards for business users.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "reporting",
+      "display_name": "Reporting",
+      "description": "Creates scheduled and ad hoc reports.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "embedded_analytics",
+      "display_name": "Embedded Analytics",
+      "description": "Embeds analytics into applications.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "chart_generation",
+      "display_name": "Chart Generation",
+      "description": "Generates charts from data and intent.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "visual_explanation",
+      "display_name": "Visual Explanation",
+      "description": "Explains data visually through charts and annotations.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    }
+  ],
+  "tags": [
+    "visualization",
+    "analytics",
+    "dashboard",
+    "experience"
+  ]
+}

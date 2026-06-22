@@ -1,0 +1,111 @@
+{
+  "product_name": "analytics",
+  "display_name": "Analytics",
+  "domain": "knowledge",
+  "description": "Provides governed analytical access, query generation, KPI analysis and AI-enabled insights over enterprise data.",
+  "reference_implementations": [
+    {
+      "name": "ThoughtSpot",
+      "vendor": "ThoughtSpot",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas"
+      ],
+      "url": "https://www.thoughtspot.com",
+      "notes": "AI-enabled analytics and search-driven BI platform."
+    },
+    {
+      "name": "Power BI",
+      "vendor": "Microsoft",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas",
+        "managed_cloud"
+      ],
+      "url": "https://powerbi.microsoft.com",
+      "notes": "Business intelligence and analytics platform."
+    },
+    {
+      "name": "Tableau",
+      "vendor": "Salesforce",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas",
+        "managed_cloud"
+      ],
+      "url": "https://www.tableau.com",
+      "notes": "Analytics and visualization platform."
+    },
+    {
+      "name": "Sigma",
+      "vendor": "Sigma",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas"
+      ],
+      "url": "https://www.sigmacomputing.com",
+      "notes": "Cloud analytics and BI platform."
+    },
+    {
+      "name": "Cube",
+      "vendor": "Cube Dev",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "self_hosted",
+        "saas"
+      ],
+      "url": "https://cube.dev",
+      "notes": "Semantic layer and analytics API."
+    }
+  ],
+  "capabilities": [
+    {
+      "capability_name": "analytics_generation",
+      "display_name": "Analytics Generation",
+      "description": "Generates analytical results from user intent.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "governed_query",
+      "display_name": "Governed Query",
+      "description": "Runs queries through governed models or semantic layers.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "kpi_analysis",
+      "display_name": "KPI Analysis",
+      "description": "Analyzes KPIs and metric trends.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "drilldown",
+      "display_name": "Drilldown",
+      "description": "Drills into supporting data and dimensions.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "explanation_generation",
+      "display_name": "Explanation Generation",
+      "description": "Generates explanations of analytical results.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "decision_support",
+      "display_name": "Decision Support",
+      "description": "Supports business decisions using governed analytics.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    }
+  ],
+  "tags": [
+    "analytics",
+    "bi",
+    "semantic",
+    "data"
+  ]
+}

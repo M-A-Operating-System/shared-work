@@ -1,0 +1,162 @@
+{
+  "product_name": "observability",
+  "display_name": "AI and Data Observability",
+  "domain": "operations",
+  "description": "Monitors AI systems, data systems, pipelines, agents, model activity and operational health.",
+  "reference_implementations": [
+    {
+      "name": "Monte Carlo",
+      "vendor": "Monte Carlo",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas"
+      ],
+      "url": "https://www.montecarlodata.com",
+      "notes": "Data observability platform."
+    },
+    {
+      "name": "Datafold",
+      "vendor": "Datafold",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas"
+      ],
+      "url": "https://www.datafold.com",
+      "notes": "Data quality and observability platform."
+    },
+    {
+      "name": "OpenLineage",
+      "vendor": "OpenLineage",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "self_hosted"
+      ],
+      "url": "https://openlineage.io",
+      "notes": "Open standard for lineage metadata."
+    },
+    {
+      "name": "Langfuse",
+      "vendor": "Langfuse",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "saas",
+        "self_hosted"
+      ],
+      "url": "https://langfuse.com",
+      "notes": "LLM observability platform."
+    },
+    {
+      "name": "Arize Phoenix",
+      "vendor": "Arize",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "self_hosted",
+        "saas"
+      ],
+      "url": "https://phoenix.arize.com",
+      "notes": "AI tracing and observability platform."
+    },
+    {
+      "name": "OpenTelemetry",
+      "vendor": "CNCF",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "self_hosted"
+      ],
+      "url": "https://opentelemetry.io",
+      "notes": "Observability framework."
+    },
+    {
+      "name": "Datadog",
+      "vendor": "Datadog",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas"
+      ],
+      "url": "https://www.datadoghq.com",
+      "notes": "Monitoring and observability platform."
+    },
+    {
+      "name": "Grafana",
+      "vendor": "Grafana Labs",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "self_hosted",
+        "managed_cloud"
+      ],
+      "url": "https://grafana.com",
+      "notes": "Observability platform used for metrics, logs, traces and dashboards."
+    }
+  ],
+  "capabilities": [
+    {
+      "capability_name": "pipeline_health",
+      "display_name": "Pipeline Health",
+      "description": "Monitors pipeline operational health.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "freshness_monitoring",
+      "display_name": "Freshness Monitoring",
+      "description": "Monitors data freshness.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "lineage_tracking",
+      "display_name": "Lineage Tracking",
+      "description": "Tracks lineage across systems and pipelines.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "impact_analysis",
+      "display_name": "Impact Analysis",
+      "description": "Assesses downstream impact of data or system changes.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "agent_tracing",
+      "display_name": "Agent Tracing",
+      "description": "Traces agent execution and tool calls.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "model_observability",
+      "display_name": "Model Observability",
+      "description": "Monitors model usage and behavior.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "incident_management",
+      "display_name": "Incident Management",
+      "description": "Manages operational incidents.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "service_level_monitoring",
+      "display_name": "Service Level Monitoring",
+      "description": "Monitors service levels for AI and data systems.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "trace_correlation",
+      "display_name": "Trace Correlation",
+      "description": "Correlates traces across models, tools, agents, APIs and data systems.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    }
+  ],
+  "tags": [
+    "observability",
+    "monitoring",
+    "data",
+    "ai"
+  ]
+}

@@ -1,0 +1,110 @@
+{
+  "product_name": "quality",
+  "display_name": "Data Quality",
+  "domain": "governance",
+  "description": "Profiles, monitors, scores and manages data quality issues across enterprise data assets.",
+  "reference_implementations": [
+    {
+      "name": "Monte Carlo",
+      "vendor": "Monte Carlo",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas"
+      ],
+      "url": "https://www.montecarlodata.com",
+      "notes": "Data observability and quality platform."
+    },
+    {
+      "name": "Bigeye",
+      "vendor": "Bigeye",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas"
+      ],
+      "url": "https://www.bigeye.com",
+      "notes": "Data observability and quality monitoring."
+    },
+    {
+      "name": "Ataccama",
+      "vendor": "Ataccama",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas",
+        "managed_cloud"
+      ],
+      "url": "https://www.ataccama.com",
+      "notes": "Data quality, master data and governance platform."
+    },
+    {
+      "name": "Informatica Data Quality",
+      "vendor": "Informatica",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas",
+        "managed_cloud"
+      ],
+      "url": "https://www.informatica.com",
+      "notes": "Enterprise data quality platform."
+    },
+    {
+      "name": "Soda",
+      "vendor": "Soda",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas",
+        "self_hosted"
+      ],
+      "url": "https://www.soda.io",
+      "notes": "Data quality and validation platform."
+    }
+  ],
+  "capabilities": [
+    {
+      "capability_name": "profiling",
+      "display_name": "Profiling",
+      "description": "Profiles data values, distributions and patterns.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "quality_monitoring",
+      "display_name": "Quality Monitoring",
+      "description": "Monitors quality signals over time.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "quality_scoring",
+      "display_name": "Quality Scoring",
+      "description": "Scores data quality and trust.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "anomaly_detection",
+      "display_name": "Anomaly Detection",
+      "description": "Detects unusual data quality patterns.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "remediation_tracking",
+      "display_name": "Remediation Tracking",
+      "description": "Tracks remediation of data quality issues.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "quality_signal_publishing",
+      "display_name": "Quality Signal Publishing",
+      "description": "Publishes quality signals for downstream consumers and agents.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    }
+  ],
+  "tags": [
+    "quality",
+    "data",
+    "governance"
+  ]
+}

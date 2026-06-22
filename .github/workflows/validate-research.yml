@@ -3,10 +3,12 @@ name: Validate Research Catalog
 on:
   push:
     paths:
+      - 'docs/research/products/**'
       - 'docs/research/research.json'
       - 'docs/research/research.schema.json'
   pull_request:
     paths:
+      - 'docs/research/products/**'
       - 'docs/research/research.json'
       - 'docs/research/research.schema.json'
   workflow_dispatch:
@@ -32,6 +34,10 @@ jobs:
 
       - name: Install dependencies
         run: pip install jsonschema
+
+      # ── Aggregate ─────────────────────────────────────────────────────────────
+      - name: Aggregate product files into research.json
+        run: python docs/research/aggregate.py
 
       - name: Validate research.json against schema
         run: |
@@ -83,11 +89,12 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/research/research.json
           git add docs/research/research-table.md
           if git diff --staged --quiet; then
-            echo "Table unchanged — nothing to commit."
+            echo "Nothing to commit."
           else
-            git commit -m "docs(research): regenerate research table [skip ci]"
+            git commit -m "docs(research): aggregate products and regenerate table [skip ci]"
             git pull --rebase -X theirs origin master
             git push origin master
           fi

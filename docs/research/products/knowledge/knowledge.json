@@ -1,0 +1,212 @@
+{
+  "product_name": "knowledge",
+  "display_name": "AI Knowledge Repository",
+  "domain": "knowledge",
+  "description": "Repository and management layer for reusable AI knowledge assets including resources, prompts, skills, agent definitions, instructions, templates, playbooks and enterprise context.",
+  "reference_implementations": [
+    {
+      "name": "TrustBolt AI Adoption and Governance Platform",
+      "vendor": "TrustBolt",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas",
+        "private_cloud",
+        "api"
+      ],
+      "url": "https://www.trustbolt.ai",
+      "notes": "Platform capabilities relevant to reusable AI knowledge, prompts, team assets and governed AI adoption."
+    },
+    {
+      "name": "GitHub",
+      "vendor": "GitHub",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas",
+        "managed_cloud"
+      ],
+      "url": "https://github.com",
+      "notes": "Repository platform often used to manage prompts, specifications, skills and agent definitions as code."
+    },
+    {
+      "name": "Confluence",
+      "vendor": "Atlassian",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas",
+        "managed_cloud"
+      ],
+      "url": "https://www.atlassian.com/software/confluence",
+      "notes": "Enterprise knowledge and documentation platform."
+    },
+    {
+      "name": "DataHub",
+      "vendor": "DataHub",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "self_hosted",
+        "managed_cloud"
+      ],
+      "url": "https://datahub.com",
+      "notes": "Metadata and data context platform with MCP server support."
+    },
+    {
+      "name": "OpenMetadata",
+      "vendor": "OpenMetadata",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "self_hosted",
+        "managed_cloud"
+      ],
+      "url": "https://open-metadata.org",
+      "notes": "Open source metadata and data catalog platform."
+    },
+    {
+      "name": "OpenAI GPT Knowledge",
+      "vendor": "OpenAI",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas"
+      ],
+      "url": "https://openai.com",
+      "notes": "Knowledge attachments for configured GPTs."
+    },
+    {
+      "name": "Claude Projects",
+      "vendor": "Anthropic",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas"
+      ],
+      "url": "https://claude.ai",
+      "notes": "Project knowledge and context organization."
+    },
+    {
+      "name": "Notion",
+      "vendor": "Notion",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas"
+      ],
+      "url": "https://www.notion.com",
+      "notes": "Workspace and knowledge repository often used for internal documentation and reusable knowledge assets."
+    },
+    {
+      "name": "SharePoint",
+      "vendor": "Microsoft",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas",
+        "managed_cloud"
+      ],
+      "url": "https://www.microsoft.com/microsoft-365/sharepoint/collaboration",
+      "notes": "Enterprise document and knowledge repository."
+    }
+  ],
+  "capabilities": [
+    {
+      "capability_name": "resource_repository",
+      "display_name": "Resource Repository",
+      "description": "Stores reusable documents, resources and contextual assets for assistants and agents.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "prompt_repository",
+      "display_name": "Prompt Repository",
+      "description": "Stores reusable prompts and prompt templates.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "skill_repository",
+      "display_name": "Skill Repository",
+      "description": "Stores reusable skills, actions or tool-use definitions.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "agent_repository",
+      "display_name": "Agent Repository",
+      "description": "Stores reusable agent and assistant definitions.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "instruction_repository",
+      "display_name": "Instruction Repository",
+      "description": "Stores reusable instruction sets and system guidance.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "template_repository",
+      "display_name": "Template Repository",
+      "description": "Stores reusable templates for assistants, agents, prompts or workflows.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "version_management",
+      "display_name": "Version Management",
+      "description": "Versions knowledge assets, prompts, skills, instructions and definitions.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "approval_workflow",
+      "display_name": "Approval Workflow",
+      "description": "Supports review and approval before publishing knowledge assets.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "knowledge_discovery",
+      "display_name": "Knowledge Discovery",
+      "description": "Allows users and agents to find reusable knowledge assets.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "knowledge_sharing",
+      "display_name": "Knowledge Sharing",
+      "description": "Allows approved sharing of knowledge assets across users, teams or domains.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "knowledge_entitlements",
+      "display_name": "Knowledge Entitlements",
+      "description": "Controls who can access, publish, edit or use knowledge assets.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "knowledge_search",
+      "display_name": "Knowledge Search",
+      "description": "Searches reusable knowledge assets.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "playbook_repository",
+      "display_name": "Playbook Repository",
+      "description": "Stores reusable operational playbooks for assistants, agents and teams.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "policy_repository",
+      "display_name": "Policy Repository",
+      "description": "Stores reusable policy documents and AI-use guidance.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    }
+  ],
+  "tags": [
+    "knowledge",
+    "prompts",
+    "resources",
+    "skills",
+    "agentic"
+  ]
+}

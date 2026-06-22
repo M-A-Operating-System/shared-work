@@ -1,0 +1,92 @@
+{
+  "product_name": "standardization",
+  "display_name": "Data Standardization",
+  "domain": "governance",
+  "description": "Standardizes, maps, harmonizes and classifies enterprise data into consistent representations.",
+  "reference_implementations": [
+    {
+      "name": "Informatica",
+      "vendor": "Informatica",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas",
+        "managed_cloud"
+      ],
+      "url": "https://www.informatica.com",
+      "notes": "Enterprise data management and standardization platform."
+    },
+    {
+      "name": "Reltio",
+      "vendor": "Reltio",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas"
+      ],
+      "url": "https://www.reltio.com",
+      "notes": "MDM and data unification platform."
+    },
+    {
+      "name": "Semarchy",
+      "vendor": "Semarchy",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas",
+        "managed_cloud"
+      ],
+      "url": "https://www.semarchy.com",
+      "notes": "Master data and data management platform."
+    },
+    {
+      "name": "Profisee",
+      "vendor": "Profisee",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "managed_cloud"
+      ],
+      "url": "https://profisee.com",
+      "notes": "Master data management platform."
+    }
+  ],
+  "capabilities": [
+    {
+      "capability_name": "taxonomy_management",
+      "display_name": "Taxonomy Management",
+      "description": "Manages taxonomies and controlled vocabularies.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "code_mapping",
+      "display_name": "Code Mapping",
+      "description": "Maps codes and values between systems.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "classification",
+      "display_name": "Classification",
+      "description": "Classifies data into standard categories.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "harmonization",
+      "display_name": "Harmonization",
+      "description": "Harmonizes inconsistent source representations.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "canonical_representation",
+      "display_name": "Canonical Representation",
+      "description": "Creates canonical representations across systems.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    }
+  ],
+  "tags": [
+    "standardization",
+    "reference_data",
+    "governance"
+  ]
+}

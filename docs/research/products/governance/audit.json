@@ -1,0 +1,108 @@
+{
+  "product_name": "audit",
+  "display_name": "AI Audit",
+  "domain": "governance",
+  "description": "Records AI activity, decisions, prompts, tool calls, data access and responses for review, supervision and compliance.",
+  "reference_implementations": [
+    {
+      "name": "TrustBolt AI Adoption and Governance Platform",
+      "vendor": "TrustBolt",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas",
+        "private_cloud"
+      ],
+      "url": "https://www.trustbolt.ai",
+      "notes": "Prompt and usage oversight for AI adoption."
+    },
+    {
+      "name": "Langfuse",
+      "vendor": "Langfuse",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "saas",
+        "self_hosted"
+      ],
+      "url": "https://langfuse.com",
+      "notes": "LLM observability and tracing platform."
+    },
+    {
+      "name": "Arize Phoenix",
+      "vendor": "Arize",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "self_hosted",
+        "saas"
+      ],
+      "url": "https://phoenix.arize.com",
+      "notes": "Open source AI observability and tracing."
+    },
+    {
+      "name": "OpenTelemetry",
+      "vendor": "CNCF",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "self_hosted"
+      ],
+      "url": "https://opentelemetry.io",
+      "notes": "Observability standard used for traces, metrics and logs."
+    }
+  ],
+  "capabilities": [
+    {
+      "capability_name": "prompt_logging",
+      "display_name": "Prompt Logging",
+      "description": "Logs prompts sent to AI systems.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "response_logging",
+      "display_name": "Response Logging",
+      "description": "Logs model responses.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "tool_call_logging",
+      "display_name": "Tool Call Logging",
+      "description": "Logs tool calls made by assistants or agents.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "agent_decision_logging",
+      "display_name": "Agent Decision Logging",
+      "description": "Logs agent decisions and reasoning artifacts where available.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "data_access_logging",
+      "display_name": "Data Access Logging",
+      "description": "Logs data access by users, tools or agents.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "audit_review",
+      "display_name": "Audit Review",
+      "description": "Supports review of AI events and activity.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "retention_policy",
+      "display_name": "Retention Policy",
+      "description": "Applies retention rules to audit records.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    }
+  ],
+  "tags": [
+    "audit",
+    "governance",
+    "compliance",
+    "regulated"
+  ]
+}

@@ -1,0 +1,115 @@
+{
+  "product_name": "attestation",
+  "display_name": "MCP Attestation",
+  "domain": "governance",
+  "description": "Trust and verification layer for admitting MCP servers, tools and agents into a controlled enterprise environment.",
+  "reference_implementations": [
+    {
+      "name": "mcp-attested",
+      "vendor": "Community",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "self_hosted"
+      ],
+      "url": "https://github.com",
+      "notes": "Reference pattern for attested MCP server access."
+    },
+    {
+      "name": "Internal MCP Admission Service",
+      "vendor": "Internal",
+      "implementation_type": "internal",
+      "deployment_models": [
+        "private_cloud"
+      ],
+      "notes": "Enterprise-specific control for MCP server and tool admission."
+    },
+    {
+      "name": "MCP-38 Threat Taxonomy",
+      "vendor": "Research",
+      "implementation_type": "framework",
+      "deployment_models": [
+        "paper"
+      ],
+      "url": "https://arxiv.org/abs/2603.18063",
+      "notes": "Research taxonomy for MCP threats and controls."
+    }
+  ],
+  "capabilities": [
+    {
+      "capability_name": "server_attestation",
+      "display_name": "Server Attestation",
+      "description": "Verifies MCP server identity, integrity and trust.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "tool_allowlisting",
+      "display_name": "Tool Allowlisting",
+      "description": "Allows only approved tools to be invoked.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "trust_root_verification",
+      "display_name": "Trust Root Verification",
+      "description": "Verifies server or tool trust roots.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "sensitivity_classification",
+      "display_name": "Sensitivity Classification",
+      "description": "Classifies tools and data by sensitivity.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "tamper_evident_logging",
+      "display_name": "Tamper-Evident Logging",
+      "description": "Records events in tamper-evident form.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "deny_by_default_enforcement",
+      "display_name": "Deny-by-Default Enforcement",
+      "description": "Denies unapproved tools, servers or actions by default.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "tool_metadata_scanning",
+      "display_name": "Tool Metadata Scanning",
+      "description": "Scans MCP tool metadata for risk indicators.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "permission_review",
+      "display_name": "Permission Review",
+      "description": "Reviews permissions requested by MCP servers and tools.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "server_admission",
+      "display_name": "Server Admission",
+      "description": "Admits only approved MCP servers into enterprise environments.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "tool_risk_classification",
+      "display_name": "Tool Risk Classification",
+      "description": "Classifies tools according to operational, data and security risk.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    }
+  ],
+  "tags": [
+    "mcp",
+    "security",
+    "governance",
+    "attestation"
+  ]
+}

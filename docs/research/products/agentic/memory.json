@@ -1,0 +1,82 @@
+{
+  "product_name": "memory",
+  "display_name": "Agent Memory",
+  "domain": "agentic",
+  "description": "Stores, retrieves and manages durable context, user preferences, task history and agent state.",
+  "reference_implementations": [
+    {
+      "name": "Mem0",
+      "vendor": "Mem0",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "self_hosted",
+        "saas"
+      ],
+      "url": "https://mem0.ai",
+      "notes": "Memory layer for AI applications."
+    },
+    {
+      "name": "Zep",
+      "vendor": "Zep",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "self_hosted",
+        "saas"
+      ],
+      "url": "https://www.getzep.com",
+      "notes": "Memory server for AI agents."
+    },
+    {
+      "name": "LangGraph Memory",
+      "vendor": "LangChain",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "self_hosted"
+      ],
+      "url": "https://langchain-ai.github.io/langgraph/",
+      "notes": "Memory patterns for LangGraph agents."
+    }
+  ],
+  "capabilities": [
+    {
+      "capability_name": "conversation_memory",
+      "display_name": "Conversation Memory",
+      "description": "Stores and retrieves conversation context.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "user_memory",
+      "display_name": "User Memory",
+      "description": "Stores durable user preferences and facts subject to policy.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "task_memory",
+      "display_name": "Task Memory",
+      "description": "Stores task progress and intermediate state.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "memory_retrieval",
+      "display_name": "Memory Retrieval",
+      "description": "Retrieves relevant memories for a task.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "memory_governance",
+      "display_name": "Memory Governance",
+      "description": "Applies policies to memory storage and retrieval.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    }
+  ],
+  "tags": [
+    "memory",
+    "agentic",
+    "context"
+  ]
+}

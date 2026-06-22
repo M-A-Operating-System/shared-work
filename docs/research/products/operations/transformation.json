@@ -1,0 +1,169 @@
+{
+  "product_name": "transformation",
+  "display_name": "Data Transformation",
+  "domain": "operations",
+  "description": "Transforms, prepares and structures data through pipelines, transformations, models and data product generation.",
+  "reference_implementations": [
+    {
+      "name": "dbt",
+      "vendor": "dbt Labs",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "self_hosted",
+        "managed_cloud"
+      ],
+      "url": "https://www.getdbt.com",
+      "notes": "Analytics engineering and transformation framework."
+    },
+    {
+      "name": "Apache Spark",
+      "vendor": "Apache",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "self_hosted",
+        "managed_cloud"
+      ],
+      "url": "https://spark.apache.org",
+      "notes": "Distributed data processing engine."
+    },
+    {
+      "name": "Apache Flink",
+      "vendor": "Apache",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "self_hosted",
+        "managed_cloud"
+      ],
+      "url": "https://flink.apache.org",
+      "notes": "Stream processing framework."
+    },
+    {
+      "name": "Dataform",
+      "vendor": "Google",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "managed_cloud"
+      ],
+      "url": "https://cloud.google.com/dataform",
+      "notes": "SQL workflow and transformation service."
+    },
+    {
+      "name": "Dagster",
+      "vendor": "Dagster Labs",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "self_hosted",
+        "managed_cloud"
+      ],
+      "url": "https://dagster.io",
+      "notes": "Data orchestration platform."
+    },
+    {
+      "name": "Airflow",
+      "vendor": "Apache",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "self_hosted",
+        "managed_cloud"
+      ],
+      "url": "https://airflow.apache.org",
+      "notes": "Workflow orchestration platform."
+    },
+    {
+      "name": "Prefect",
+      "vendor": "Prefect",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "self_hosted",
+        "managed_cloud"
+      ],
+      "url": "https://www.prefect.io",
+      "notes": "Workflow orchestration platform."
+    },
+    {
+      "name": "SQLMesh",
+      "vendor": "Tobiko Data",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "self_hosted",
+        "managed_cloud"
+      ],
+      "url": "https://sqlmesh.com",
+      "notes": "Data transformation framework with virtual data environments and model governance."
+    },
+    {
+      "name": "dlt",
+      "vendor": "dltHub",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "self_hosted"
+      ],
+      "url": "https://dlthub.com",
+      "notes": "Open source data loading and pipeline framework."
+    }
+  ],
+  "capabilities": [
+    {
+      "capability_name": "pipeline_management",
+      "display_name": "Pipeline Management",
+      "description": "Manages data transformation pipelines.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "workflow_orchestration",
+      "display_name": "Workflow Orchestration",
+      "description": "Orchestrates transformation workflows.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "transformation_testing",
+      "display_name": "Transformation Testing",
+      "description": "Tests data transformations.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "data_product_generation",
+      "display_name": "Data Product Generation",
+      "description": "Generates curated data products.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "dependency_management",
+      "display_name": "Dependency Management",
+      "description": "Manages dependencies between transformation jobs.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "incremental_processing",
+      "display_name": "Incremental Processing",
+      "description": "Processes only changed data where possible.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "change_impact_testing",
+      "display_name": "Change Impact Testing",
+      "description": "Tests downstream impact of transformation changes before release.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "environment_management",
+      "display_name": "Environment Management",
+      "description": "Manages development, test and production data transformation environments.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    }
+  ],
+  "tags": [
+    "transformation",
+    "pipeline",
+    "data",
+    "operations"
+  ]
+}

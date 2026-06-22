@@ -1,0 +1,133 @@
+{
+  "product_name": "api",
+  "display_name": "AI API Layer",
+  "domain": "integration",
+  "description": "Provides API access to AI functions, models, tools, assistants, agents, analytics and governed enterprise capabilities.",
+  "reference_implementations": [
+    {
+      "name": "TrustBolt API",
+      "vendor": "TrustBolt",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "api",
+        "saas",
+        "private_cloud"
+      ],
+      "url": "https://www.trustbolt.ai",
+      "notes": "API access to governed AI platform capabilities."
+    },
+    {
+      "name": "OpenAI API",
+      "vendor": "OpenAI",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "api",
+        "saas"
+      ],
+      "url": "https://platform.openai.com",
+      "notes": "API access to OpenAI models and tools."
+    },
+    {
+      "name": "Anthropic API",
+      "vendor": "Anthropic",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "api",
+        "saas"
+      ],
+      "url": "https://docs.anthropic.com",
+      "notes": "API access to Claude models."
+    },
+    {
+      "name": "Kong Gateway",
+      "vendor": "Kong",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "self_hosted",
+        "managed_cloud"
+      ],
+      "url": "https://konghq.com",
+      "notes": "Enterprise API gateway."
+    },
+    {
+      "name": "Apigee",
+      "vendor": "Google",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "managed_cloud"
+      ],
+      "url": "https://cloud.google.com/apigee",
+      "notes": "API management platform."
+    }
+  ],
+  "capabilities": [
+    {
+      "capability_name": "api_gateway",
+      "display_name": "API Gateway",
+      "description": "Routes and manages API requests.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "api_authentication",
+      "display_name": "API Authentication",
+      "description": "Authenticates API callers.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "api_authorization",
+      "display_name": "API Authorization",
+      "description": "Authorizes API access.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "rate_limiting",
+      "display_name": "Rate Limiting",
+      "description": "Limits request rate.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "api_usage_reporting",
+      "display_name": "API Usage Reporting",
+      "description": "Reports API usage.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "developer_portal",
+      "display_name": "Developer Portal",
+      "description": "Publishes API documentation and access patterns.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "api_audit_logging",
+      "display_name": "API Audit Logging",
+      "description": "Logs API activity for review, audit and compliance.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "api_key_management",
+      "display_name": "API Key Management",
+      "description": "Manages API keys and service credentials.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "api_policy_enforcement",
+      "display_name": "API Policy Enforcement",
+      "description": "Applies access, usage and governance policies at the API layer.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    }
+  ],
+  "tags": [
+    "api",
+    "integration",
+    "gateway"
+  ]
+}

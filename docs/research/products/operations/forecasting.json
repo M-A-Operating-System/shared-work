@@ -1,0 +1,80 @@
+{
+  "product_name": "forecasting",
+  "display_name": "AI Forecasting",
+  "domain": "operations",
+  "description": "Forecasts AI usage, cost, demand, capacity and operational trends.",
+  "reference_implementations": [
+    {
+      "name": "TrustBolt Cost Management",
+      "vendor": "TrustBolt",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas",
+        "private_cloud"
+      ],
+      "url": "https://www.trustbolt.ai",
+      "notes": "AI usage and cost trend analysis."
+    },
+    {
+      "name": "Monte Carlo",
+      "vendor": "Monte Carlo",
+      "implementation_type": "commercial",
+      "deployment_models": [
+        "saas"
+      ],
+      "url": "https://www.montecarlodata.com",
+      "notes": "Data observability trends and operational signals."
+    },
+    {
+      "name": "Custom FinOps Forecasting",
+      "vendor": "Internal",
+      "implementation_type": "internal",
+      "deployment_models": [
+        "private_cloud"
+      ],
+      "notes": "Internal forecasting models for AI and data platform operations."
+    }
+  ],
+  "capabilities": [
+    {
+      "capability_name": "usage_forecasting",
+      "display_name": "Usage Forecasting",
+      "description": "Forecasts future platform or model usage.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "cost_forecasting",
+      "display_name": "Cost Forecasting",
+      "description": "Forecasts future cost.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "capacity_forecasting",
+      "display_name": "Capacity Forecasting",
+      "description": "Forecasts capacity requirements.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "trend_analysis",
+      "display_name": "Trend Analysis",
+      "description": "Analyzes historical trends.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "demand_modeling",
+      "display_name": "Demand Modeling",
+      "description": "Models expected future demand.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    }
+  ],
+  "tags": [
+    "forecasting",
+    "operations",
+    "cost"
+  ]
+}

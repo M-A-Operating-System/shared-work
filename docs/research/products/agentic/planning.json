@@ -1,0 +1,93 @@
+{
+  "product_name": "planning",
+  "display_name": "Agent Planning",
+  "domain": "agentic",
+  "description": "Plans actions, tool calls, subtasks and execution paths for agents and agentic workflows.",
+  "reference_implementations": [
+    {
+      "name": "LangGraph",
+      "vendor": "LangChain",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "self_hosted",
+        "managed_cloud"
+      ],
+      "url": "https://www.langchain.com/langgraph",
+      "notes": "Agent workflow and planning patterns."
+    },
+    {
+      "name": "CrewAI",
+      "vendor": "CrewAI",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "self_hosted",
+        "managed_cloud"
+      ],
+      "url": "https://www.crewai.com",
+      "notes": "Role-based multi-agent planning."
+    },
+    {
+      "name": "AutoGen",
+      "vendor": "Microsoft",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "self_hosted"
+      ],
+      "url": "https://github.com/microsoft/autogen",
+      "notes": "Multi-agent conversation and planning framework."
+    },
+    {
+      "name": "OpenAI Agents SDK",
+      "vendor": "OpenAI",
+      "implementation_type": "open_source",
+      "deployment_models": [
+        "self_hosted",
+        "api"
+      ],
+      "url": "https://openai.github.io/openai-agents-python/",
+      "notes": "Agent SDK with tool and handoff patterns."
+    }
+  ],
+  "capabilities": [
+    {
+      "capability_name": "task_decomposition",
+      "display_name": "Task Decomposition",
+      "description": "Breaks objectives into subtasks.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "tool_selection",
+      "display_name": "Tool Selection",
+      "description": "Selects tools required to complete a task.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "execution_plan",
+      "display_name": "Execution Plan",
+      "description": "Creates plans for task execution.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "plan_revision",
+      "display_name": "Plan Revision",
+      "description": "Revises plans based on results or failures.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    },
+    {
+      "capability_name": "dependency_planning",
+      "display_name": "Dependency Planning",
+      "description": "Plans task dependencies and sequencing.",
+      "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+      "required": true
+    }
+  ],
+  "tags": [
+    "planning",
+    "agentic",
+    "tools"
+  ]
+}
