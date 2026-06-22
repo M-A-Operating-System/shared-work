@@ -22,6 +22,7 @@ jobs:
     timeout-minutes: 45
     permissions:
       contents: write
+      pull-requests: write
 
     steps:
       - uses: actions/checkout@v4
@@ -43,6 +44,15 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
+      # ── Branch ────────────────────────────────────────────────────────────────
+      - name: Create research branch
+        run: |
+          DATE=$(date -u +%Y%m%d)
+          BRANCH="research-${DATE}"
+          git checkout -b "$BRANCH"
+          echo "BRANCH=${BRANCH}" >> "$GITHUB_ENV"
+          echo "DATE=$(date -u +%Y-%m-%d)" >> "$GITHUB_ENV"
+
       # ── Research ──────────────────────────────────────────────────────────────
       # Uses whichever search keys are present: both, one, or neither.
       # SEARCH_EXA_KEY    → Exa neural/semantic search
@@ -55,18 +65,21 @@ jobs:
           SEARCH_TAVILY_KEY: ${{ secrets.SEARCH_TAVILY_KEY }}
         run: python .github/scripts/run_weekly_research.py
 
-      # ── Table ─────────────────────────────────────────────────────────────────
+      # ── Aggregate + Table ──────────────────────────────────────────────────────
+      - name: Aggregate product files
+        run: python docs/research/aggregate.py
+
       - name: Generate research table
         run: python docs/research/generate_md.py
 
       # ── Commit ────────────────────────────────────────────────────────────────
-      # Only the five known research output paths are ever staged.
+      # Only known research output paths are ever staged.
       # Nothing outside docs/research/ can be committed by this job.
-      - name: Commit and push
+      - name: Commit to research branch
         run: |
-          DATE=$(date -u +%Y-%m-%d)
           git add docs/research/research.json
           git add docs/research/research-table.md
+          git add docs/research/products/
           [ -f docs/research/rotation.json ] && git add docs/research/rotation.json || true
           [ -f "docs/research/runs/${DATE}.md" ] && git add "docs/research/runs/${DATE}.md" || true
           [ -f "docs/research/sources/${DATE}.json" ] && git add "docs/research/sources/${DATE}.json" || true
@@ -74,6 +87,42 @@ jobs:
             echo "No changes to commit."
             exit 0
           fi
-          git commit -m "research: weekly catalog update ${DATE} [skip ci]"
-          git pull --rebase -X theirs origin master
-          git push origin master
+          git commit -m "research: catalog update ${DATE}"
+          git push -u origin "$BRANCH"
+
+      # ── Pull Request ───────────────────────────────────────────────────────────
+      - name: Open pull request
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Skip if nothing was pushed (no changes)
+          git ls-remote --exit-code origin "$BRANCH" || exit 0
+
+          SKIP_FLAG="${{ inputs.skip_research }}"
+          if [ "$SKIP_FLAG" = "true" ]; then
+            TITLE="research: regenerate table ${DATE}"
+            BODY="Table-only regeneration run — research phase was skipped."
+          else
+            TITLE="research: catalog update ${DATE}"
+            BODY="Weekly AI research run for ${DATE}.
+
+Domains rotated this run are noted in the run log at \`docs/research/runs/${DATE}.md\`.
+
+**Review checklist**
+- [ ] New or updated products look accurate
+- [ ] Reference implementation URLs are valid
+- [ ] No unintended products removed
+- [ ] Schema validation passed (CI check)"
+          fi
+
+          gh pr create \
+            --base master \
+            --head "$BRANCH" \
+            --title "$TITLE" \
+            --body "$BODY" \
+            --label "research" 2>/dev/null || \
+          gh pr create \
+            --base master \
+            --head "$BRANCH" \
+            --title "$TITLE" \
+            --body "$BODY"
