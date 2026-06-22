@@ -52,9 +52,12 @@ TODAY = datetime.now(timezone.utc).strftime("%Y-%m-%d")
 # Domain rotation — 1/3 of catalog domains per run, cycling on every run.
 # Works correctly regardless of whether runs are daily, weekly, or monthly.
 DOMAIN_ROTATION = [
-    ["experience", "knowledge"],
-    ["agentic", "integration"],
-    ["governance", "operations"],
+    ["experience"],
+    ["knowledge"],
+    ["agentic"],
+    ["integration"],
+    ["governance"],
+    ["operations"],
 ]
 
 # ── Run budgets (tune here) ────────────────────────────────────────────────────
