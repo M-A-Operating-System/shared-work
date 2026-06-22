@@ -1,0 +1,95 @@
+{
+  "date": "2026-06-22",
+  "sources": [
+    {
+      "title": "Introducing the Google Cloud Knowledge Catalog",
+      "url": "https://cloud.google.com/blog/products/data-analytics/introducing-the-google-cloud-knowledge-catalog",
+      "relevance": "New GA product (April 2026): universal context engine for AI agents built on Dataplex. New reference implementation for catalog and context products."
+    },
+    {
+      "title": "Announcing General Availability and Open Sourcing of Unity Catalog Business Semantics",
+      "url": "https://www.databricks.com/blog/redefining-semantics-data-layer-future-bi-and-ai",
+      "relevance": "GA warehouse-native semantic layer. New reference implementation for semantic, definition, and knowledge products. Open-sourced in Apache Spark."
+    },
+    {
+      "title": "What's new with Unity Catalog at Data + AI Summit 2026",
+      "url": "https://www.databricks.com/blog/whats-new-unity-catalog-data-ai-summit-2026",
+      "relevance": "Unity AI Gateway and Governance Hub announcements. Relevant to catalog, context, and governance/gateway products."
+    },
+    {
+      "title": "Snowflake Semantic Views: Native Semantic Views for AI-Powered BI",
+      "url": "https://www.snowflake.com/en/blog/engineering/native-semantic-views-ai-bi/",
+      "relevance": "New reference implementation for semantic product. Warehouse-native semantic layer consumed by Cortex Agents."
+    },
+    {
+      "title": "Snowflake Delivers Semantic View Autopilot",
+      "url": "https://www.businesswire.com/news/home/20260203233912/en/Snowflake-Delivers-Semantic-View-Autopilot-as-the-Foundation-for-Trusted-Scalable-Enterprise-Ready-AI",
+      "relevance": "Semantic View Autopilot (Feb 2026): AI-assisted semantic model generation. New capability: semantic_autopilot."
+    },
+    {
+      "title": "Graph RAG and Knowledge Graphs: The New Standard for Enterprise AI Search in 2026",
+      "url": "https://polyglotsoft.dev/en/blog/graph-rag-knowledge-graph-enterprise-ai-2026",
+      "relevance": "Architecture guide for Graph RAG in enterprise. Supports graph_retrieval and knowledge_graph_repository capabilities."
+    },
+    {
+      "title": "Microsoft GraphRAG Project",
+      "url": "https://microsoft.github.io/graphrag/",
+      "relevance": "Open-source reference implementation for knowledge graph construction and hierarchical RAG retrieval."
+    },
+    {
+      "title": "Azure-Samples/graphrag-accelerator",
+      "url": "https://github.com/Azure-Samples/graphrag-accelerator",
+      "relevance": "One-click Azure deployment of GraphRAG. Reference implementation supporting graph_retrieval capability."
+    },
+    {
+      "title": "Graph-Augmented RAG Patterns with Azure HorizonDB",
+      "url": "https://learn.microsoft.com/en-us/azure/horizondb/ai/graph-rag",
+      "relevance": "Azure-native graph RAG combining vector search with knowledge graph traversal. New reference implementation for retrieval."
+    },
+    {
+      "title": "Secure multi-tenant RAG with Amazon Bedrock and Verified Permissions",
+      "url": "https://aws.amazon.com/blogs/architecture/secure-multi-tenant-rag-with-amazon-bedrock-and-verified-permissions/",
+      "relevance": "Published June 22, 2026. Permission-aware multi-tenant RAG pattern. Reinforces permission_aware_retrieval capability and supports governance/entitlement intersection."
+    },
+    {
+      "title": "Permission-Aware Retrieval: Why Access Control in Enterprise RAG Must Live in the Vector Layer",
+      "url": "https://tianpan.co/blog/2026-05-04-permission-aware-retrieval-enterprise-rag-access-control",
+      "relevance": "Architecture rationale for permission-aware retrieval at vector layer. Supports retrieval product capability hardening."
+    },
+    {
+      "title": "Securing the Agent: Vendor-Neutral, Multitenant Enterprise Retrieval and Tool Use",
+      "url": "https://arxiv.org/html/2605.05287",
+      "relevance": "Academic paper on secure multi-tenant enterprise RAG. Supports query_decomposition and permission_aware_retrieval capabilities."
+    },
+    {
+      "title": "Best Semantic Layer Tools For BI and AI Agents 2026 (Atlan)",
+      "url": "https://atlan.com/know/best-semantic-layer-tools/",
+      "relevance": "Market overview positioning Atlan as context layer governing AI agent consumption of semantic definitions. Relevant to catalog and semantic products."
+    },
+    {
+      "title": "Enterprise AI Needs a Semantic Layer for Governed Data",
+      "url": "https://www.strategy.com/software/blog/why-enterprise-ai-needs-a-semantic-layer-for-governed-data",
+      "relevance": "June 2026 analysis. Governance rationale for semantic layer in enterprise AI. Supports semantic and definition products."
+    },
+    {
+      "title": "Knowledge Graph RAG: Agentic Crawling and Graph Construction in Enterprise Documents",
+      "url": "https://arxiv.org/abs/2604.14220",
+      "relevance": "Research on agentic knowledge graph construction from enterprise documents (March 2026). Supports knowledge_graph_repository and graph_retrieval capabilities."
+    },
+    {
+      "title": "Snowflake Cortex Agents Documentation",
+      "url": "https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-agents",
+      "relevance": "Fully managed agentic platform using Semantic Views for governed analytics. Reference implementation for semantic product."
+    },
+    {
+      "title": "Enterprise Knowledge Agents: What Comes After Search",
+      "url": "https://blog.continuus.ai/enterprise-knowledge-agents-financial-services",
+      "relevance": "May 2026 analysis of knowledge agent trend in financial services. Context for knowledge product evolution."
+    },
+    {
+      "title": "Knowledge Management Platform as Single Source of Truth for Enterprise",
+      "url": "https://www.persistent.com/blogs/knowledge-management-platform-as-the-single-source-of-truth-for-enterprise/",
+      "relevance": "Ontology-guided architecture with Neo4j knowledge graph for enterprise knowledge management. Supports ontology_management capability."
+    }
+  ]
+}
