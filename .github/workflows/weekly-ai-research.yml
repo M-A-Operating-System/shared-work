@@ -1,4 +1,4 @@
-name: Weekly AI Research
+name: AI Research Catalog Update
 
 on:
   schedule:
@@ -95,34 +95,24 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Skip if nothing was pushed (no changes)
           git ls-remote --exit-code origin "$BRANCH" || exit 0
 
-          SKIP_FLAG="${{ inputs.skip_research }}"
-          if [ "$SKIP_FLAG" = "true" ]; then
+          if [ "${{ inputs.skip_research }}" = "true" ]; then
             TITLE="research: regenerate table ${DATE}"
-            BODY="Table-only regeneration run — research phase was skipped."
+            printf 'Table-only regeneration run — research phase was skipped.\n' > /tmp/pr-body.md
           else
             TITLE="research: catalog update ${DATE}"
-            BODY="Weekly AI research run for ${DATE}.
-
-Domains rotated this run are noted in the run log at \`docs/research/runs/${DATE}.md\`.
-
-**Review checklist**
-- [ ] New or updated products look accurate
-- [ ] Reference implementation URLs are valid
-- [ ] No unintended products removed
-- [ ] Schema validation passed (CI check)"
+            printf '## Review checklist\n- [ ] New or updated products look accurate\n- [ ] Reference implementation URLs are valid\n- [ ] No unintended products removed\n- [ ] Schema validation passed (CI check)\n\nRun log: `docs/research/runs/%s.md`\n' "$DATE" > /tmp/pr-body.md
           fi
 
           gh pr create \
             --base master \
             --head "$BRANCH" \
             --title "$TITLE" \
-            --body "$BODY" \
+            --body-file /tmp/pr-body.md \
             --label "research" 2>/dev/null || \
           gh pr create \
             --base master \
             --head "$BRANCH" \
             --title "$TITLE" \
-            --body "$BODY"
+            --body-file /tmp/pr-body.md
