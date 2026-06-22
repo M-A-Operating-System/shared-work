@@ -496,10 +496,15 @@ def run_update_phase(
     domains: list[str],
     tokens: TokenCounter,
 ) -> dict | None:
+    # Send only the products relevant to the current domains to reduce output size.
+    catalog = json.loads(catalog_json)
+    in_scope = [p for p in catalog.get("products", []) if p.get("domain") in domains]
+    scope_json = json.dumps(in_scope, indent=2, ensure_ascii=False)
+
     system_text = f"""You are an enterprise AI catalog maintainer. Today is {TODAY}.
 
-Apply the research findings below to update docs/research/research.json.
-Only update products in these domains: {', '.join(domains)}.
+Apply the research findings below to update the in-scope products in docs/research/research.json.
+Only touch products in these domains: {', '.join(domains)}.
 Follow catalog rules: function-first naming, one primary domain per product,
 no duplicates, vendor-agnostic descriptions, regulated-industry focus.
 
@@ -508,36 +513,46 @@ Research findings:
 {findings_markdown}
 ---
 
-Current catalog (docs/research/research.json):
+In-scope products (domains: {', '.join(domains)}):
 ```json
-{catalog_json}
+{scope_json}
 ```
 
-Schema (docs/research/research.schema.json):
+Schema excerpt for product structure (docs/research/research.schema.json):
 ```json
 {schema_json}
 ```
 
-Call write_output once with the complete updated catalog (full object, not a diff)
-and a concise markdown run log.
+Call write_output ONCE with:
+- updated_products: the complete updated array of in-scope products only
+  (include unchanged products too — this replaces the domain slice entirely).
+  Do NOT include products from other domains.
+- run_log_markdown: concise markdown run summary.
 """
 
     tools = [{
         "name": "write_output",
-        "description": "Write the final updated catalog and run log. Call exactly once.",
+        "description": (
+            "Write the updated in-scope products and run log. "
+            "updated_products must be the full array of products for the scoped domains only."
+        ),
         "input_schema": {
             "type": "object",
             "properties": {
-                "updated_catalog": {
-                    "type": "object",
-                    "description": "Complete updated research.json — full object, must validate against schema.",
+                "updated_products": {
+                    "type": "array",
+                    "description": (
+                        "Complete array of updated products for the in-scope domains. "
+                        "Must include all products in those domains, not just changed ones."
+                    ),
+                    "items": {"type": "object"},
                 },
                 "run_log_markdown": {
                     "type": "string",
                     "description": f"Run summary for docs/research/runs/{TODAY}.md",
                 },
             },
-            "required": ["updated_catalog", "run_log_markdown"],
+            "required": ["updated_products", "run_log_markdown"],
         },
     }]
 
@@ -546,7 +561,7 @@ and a concise markdown run log.
         model="claude-opus-4-8",
         system_text=system_text,
         tools=tools,
-        initial_message="Apply the research findings and write the updated catalog.",
+        initial_message="Apply the research findings and write the updated in-scope products.",
         terminal_tool="write_output",
         max_iterations=PHASE2_MAX_ITERATIONS,
         tokens=tokens,
@@ -556,6 +571,16 @@ and a concise markdown run log.
             "output_config": {"effort": "high"},
         },
     )
+
+
+# ── Merge delta into full catalog ─────────────────────────────────────────────
+
+def merge_updated_products(catalog: dict, updated_products: list, domains: list[str]) -> dict:
+    """Replace in-scope products with the updated slice; preserve all others."""
+    out_of_scope = [p for p in catalog.get("products", []) if p.get("domain") not in domains]
+    merged = dict(catalog)
+    merged["products"] = out_of_scope + updated_products
+    return merged
 
 
 # ── Main ───────────────────────────────────────────────────────────────────────
@@ -608,10 +633,15 @@ def main() -> None:
         print("ERROR: write_output was never called.", file=sys.stderr)
         sys.exit(1)
 
-    updated = final_output.get("updated_catalog")
-    if not updated:
-        print("ERROR: updated_catalog missing or empty.", file=sys.stderr)
+    updated_products = final_output.get("updated_products")
+    if not updated_products:
+        print("ERROR: updated_products missing or empty.", file=sys.stderr)
         sys.exit(1)
+
+    # Merge the in-scope delta back into the full catalog
+    full_catalog = json.loads(catalog_json)
+    updated = merge_updated_products(full_catalog, updated_products, domains)
+    print(f"Merged  : {len(updated_products)} in-scope products + {len(updated['products']) - len(updated_products)} unchanged")
 
     if schema_json:
         try:
