@@ -561,7 +561,7 @@ Call write_output ONCE with:
 
     return _agentic_loop(
         client,
-        model="claude-opus-4-8",
+        model="claude-sonnet-4-6",
         system_text=system_text,
         tools=tools,
         initial_message="Apply the research findings and write the updated in-scope products.",
@@ -570,8 +570,6 @@ Call write_output ONCE with:
         tokens=tokens,
         create_kwargs={
             "max_tokens": 16000,
-            "thinking": {"type": "adaptive"},
-            "output_config": {"effort": "high"},
         },
     )
 
@@ -627,7 +625,7 @@ def main() -> None:
         print("WARNING: Phase 1 produced no findings.")
 
     # ── Phase 2 ────────────────────────────────────────────────────────────────
-    print("\n════ Phase 2 — Catalog update  (claude-opus-4-8) ════")
+    print("\n════ Phase 2 — Catalog update  (claude-sonnet-4-6) ════")
     final_output = run_update_phase(
         client, catalog_json, schema_json, findings_markdown, sources, domains, tokens,
     )
