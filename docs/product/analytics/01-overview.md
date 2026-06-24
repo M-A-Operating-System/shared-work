@@ -10,19 +10,19 @@
 
 ## The Problem
 
-### The challenge for large regulated organisations
+### The challenge for large regulated organizations
 
-Large organisations operating in regulated industries — financial services, healthcare, energy, pharmaceuticals, defence — share a common analytical problem. Their decisions depend on metrics that are not simple aggregations: they are versioned, regulated, formula-specific computations that must be calculated identically across every report, every system, and every user session. Any deviation is an error. In financial services this means portfolio return calculations, VaR models, and capital ratios. In healthcare it means clinical outcome metrics and safety indicators. In energy it means emissions calculations and grid reliability metrics. The domain changes; the structural problem does not.
+Large organizations operating in regulated industries — financial services, healthcare, energy, pharmaceuticals, defense — share a common analytical problem. Their decisions depend on metrics that are not simple aggregations: they are versioned, regulated, formula-specific computations that must be calculated identically across every report, every system, and every user session. Any deviation is an error. In financial services this means portfolio return calculations, VaR models, and capital ratios. In healthcare it means clinical outcome metrics and safety indicators. In energy it means emissions calculations and grid reliability metrics. The domain changes; the structural problem does not.
 
 The consequence is a structural bottleneck. Business users cannot access the data they need without going through a specialist intermediary. Developers translate business requirements into SQL. Data engineers maintain the pipelines. Analysts mediate between business questions and physical data. This is not a resourcing problem; it is an architectural one. Decision-making slows to the analysts' capacity. Strategic questions queue behind routine reporting. Insight arrives days or weeks after the moment it was needed.
 
-The regulatory dimension sharpens this further. An analytical result in a regulated organisation is not just a number: it is an assertion. When a regulator asks how a figure was calculated, the answer must be reproducible, version-controlled, and complete. When the same metric appears in submissions across two jurisdictions, it must resolve to exactly the same formula. These are not quality aspirations. They are legal requirements. An organisation that cannot produce computation provenance for its regulatory submissions is not merely technically incomplete. It is legally exposed.
+The regulatory dimension sharpens this further. An analytical result in a regulated organization is not just a number: it is an assertion. When a regulator asks how a figure was calculated, the answer must be reproducible, version-controlled, and complete. When the same metric appears in submissions across two jurisdictions, it must resolve to exactly the same formula. These are not quality aspirations. They are legal requirements. An organization that cannot produce computation provenance for its regulatory submissions is not merely technically incomplete. It is legally exposed.
 
 ### The opportunity
 
 AI assistants and agents today handle small-scale data access well: retrieving records, checking statuses, calling predefined calculations. The next step — large-scale analytics and data mining across governed, regulation-sensitive data — requires something more. A portfolio manager asking for returns versus benchmark across all equity strategies, a risk officer monitoring VaR breaches across multiple entities, a clinical analyst extracting a year of patient outcome data: these are not record lookups. They are governed analytical computations.
 
-The natural starting point for organisations is Text-to-SQL: use an LLM to generate SQL queries and run them directly against production data. For ad hoc, low-stakes exploration this has merit. For governed large-scale analytics in regulated organisations it has three structural failures that no amount of tuning resolves:
+The natural starting point for organizations is Text-to-SQL: use an LLM to generate SQL queries and run them directly against production data. For ad hoc, low-stakes exploration this has merit. For governed large-scale analytics in regulated organizations it has three structural failures that no amount of tuning resolves:
 
 - **No approved analytics and metrics definitions** — the AI infers what "Portfolio Return" means at query time; the same question can produce a different calculation in a different session
 - **No reproducible calculation record** — SQL is generated fresh each time; two identical queries are not guaranteed to produce identical results
@@ -32,9 +32,9 @@ Training LLMs on database schemas improves query accuracy in early trials but ad
 
 ### The platform
 
-The AI Analytics Platform is a governed computation engine that gives AI systems correct, auditable access to an organisation's regulated metrics and datasets — without exposing database schemas, without generating SQL, and without compromising entitlement enforcement. AI interacts exclusively with approved analytics and metrics definitions in the Semantic Metrics Repository: versioned metric definitions, governed dataset contracts, and enforced entitlements. The platform handles all deterministic computation, access control, and audit recording behind a single governed API.
+The AI Analytics Platform is a governed computation engine that gives AI systems correct, auditable access to an organization's regulated metrics and datasets — without exposing database schemas, without generating SQL, and without compromising entitlement enforcement. AI interacts exclusively with approved analytics and metrics definitions in the Semantic Metrics Repository: versioned metric definitions, governed dataset contracts, and enforced entitlements. The platform handles all deterministic computation, access control, and audit recording behind a single governed API.
 
-A defining design objective is that the platform operates across any data warehouse, data source, or analytical tool within a large enterprise environment. It is not tied to a single application schema, a single data model, or localised AI model training on a specific database. Instead, it relies on **centrally governed analytics and data definitions** — registered once in the Semantic Metrics Repository and the Semantic Data Repository — that describe what metrics mean and how they are calculated in terms that are independent of any physical implementation. A metric defined once in the SMR is queryable across every registered data source, and its definition travels with it regardless of which backend holds the underlying data. This is the architectural property that makes cross-platform analytical consistency possible at enterprise scale: the governance layer, not the data layer, is the source of truth.
+A defining design objective is that the platform operates across any data warehouse, data source, or analytical tool within a large enterprise environment. It is not tied to a single application schema, a single data model, or localized AI model training on a specific database. Instead, it relies on **centrally governed analytics and data definitions** — registered once in the Semantic Metrics Repository and the Semantic Data Repository — that describe what metrics mean and how they are calculated in terms that are independent of any physical implementation. A metric defined once in the SMR is queryable across every registered data source, and its definition travels with it regardless of which backend holds the underlying data. This is the architectural property that makes cross-platform analytical consistency possible at enterprise scale: the governance layer, not the data layer, is the source of truth.
 
 In practice: a portfolio manager asks "show me portfolio returns versus benchmark for my equity portfolios this quarter" in plain English and receives a governed, role-constrained, auditable result with the full computation record attached. A data science pipeline extracts millions of rows of position data under the same entitlement and audit controls. A treasury analyst produces an LCR figure for a regulatory submission and receives, automatically, a regulator-ready compliance artifact set alongside the result. The analyst bottleneck breaks. Regulatory requirements hold.
 
@@ -47,7 +47,7 @@ The platform addresses the following challenges that Text-to-SQL and MCP impleme
 | Computation provenance for regulatory review | Full audit record for every result: intent → definitions → entitlements → plan → execution → result |
 | Entitlement enforcement that AI cannot bypass | Enforced at the analytical layer before any database is contacted — not dependent on AI query generation reliability |
 | Metric governance and change management | Every metric definition is version-controlled with an approval workflow and full change history |
-| Multi-source analytical federation | A single governed interface routes queries across SQL warehouses, APIs, graph databases, and any registered data source — not tied to a single application schema, data model, or localised AI training |
+| Multi-source analytical federation | A single governed interface routes queries across SQL warehouses, APIs, graph databases, and any registered data source — not tied to a single application schema, data model, or localized AI training |
 | Cross-platform metric consistency | Analytics and data definitions are registered centrally and are independent of physical implementation — the same metric is queryable identically across every backend in the enterprise |
 | Large dataset access for AI agents and data mining pipelines | Large datasets returned to agents and pipelines under the same entitlement and audit controls as analytical queries |
 
@@ -59,8 +59,8 @@ This is not a new category. The industry has built governed semantic computation
 |---|---|
 | BI semantic layers | Governed business-metric layers that resolve business terms to approved calculations above the warehouse |
 | OLAP engines | Pre-aggregated multidimensional cubes serving dimensional analytical queries |
-| Modern metrics layers | Code-defined semantic layers that centralise metric definitions for downstream tools |
-| Data virtualisation | Federated query layers presenting multiple physical sources through one logical interface |
+| Modern metrics layers | Code-defined semantic layers that centralize metric definitions for downstream tools |
+| Data virtualization | Federated query layers presenting multiple physical sources through one logical interface |
 | Domain-specific engines | Risk engines, actuarial engines, pricing engines, fraud detection engines |
 
 All share a common design pattern. Rather than searching tables and returning rows, a semantic computation layer interprets business concepts, applies approved calculations, enforces dimensional hierarchies and access controls, and returns governed analytical responses. When a CFO asks *"what was our adjusted EBITDA by region last quarter?"*, the analytical engine resolves the business concept, applies the approved formula, enforces access controls, and returns a governed result — not a set of database rows.
@@ -76,19 +76,19 @@ A defining characteristic of this architecture is that **the Analytics Engine ne
 
 The Analytics Engine contains exactly two targeted uses of AI, both strictly bounded:
 
-1. **Intent resolution** — the Intent Resolution Agent (IRA) is the first step in the pipeline and a contained, bounded AI component. It receives a natural language question, retrieves candidate operations from the SMR catalogue using embedding similarity (RAG), and uses a language model to rank them and bind the user's parameters — mapping the question to one or more registered analytics definitions in the SMR. The language model selects from the governed inventory; it does not construct queries or access data. As part of the same step, the IRA classifies whether the user's stated purpose is compliance-driven — the second signal of the two-signal compliance trigger — and asks the user to clarify when the purpose is ambiguous.
+1. **Intent resolution** — the Intent Resolution Agent (IRA) is the first step in the pipeline and a contained, bounded AI component. It receives a natural language question, retrieves candidate operations from the SMR catalog using embedding similarity (RAG), and uses a language model to rank them and bind the user's parameters — mapping the question to one or more registered analytics definitions in the SMR. The language model selects from the governed inventory; it does not construct queries or access data. As part of the same step, the IRA classifies whether the user's stated purpose is compliance-driven — the second signal of the two-signal compliance trigger — and asks the user to clarify when the purpose is ambiguous.
 
 2. **Narrative synthesis** — after computation completes, the Narrative Synthesis Agent (NSA) makes a single, tightly-scoped language model call to produce a brief plain-language summary of the result, anchored strictly to the computed values. It is told what the data shows; it cannot introduce figures, comparisons, or interpretations not present in the result.
 
-All computation between these two steps — validation, entitlement enforcement, controls, physical query construction, execution, and visualisation — is entirely deterministic and contains no AI.
+All computation between these two steps — validation, entitlement enforcement, controls, physical query construction, execution, and visualization — is entirely deterministic and contains no AI.
 
 | It is | It is not |
 |-------|-----------|
 | A governed computation platform — the same question, data, and access permissions always produce the same answer | An AI query generator — the Analytics Engine never uses AI to construct SQL or analytical queries |
 | A governed analytics and data mining platform — metric queries, large dataset retrieval, and drilldown under a unified controls pipeline | A general-purpose SQL interface, BI tool replacement, or user interface |
-| A platform with two tightly-bounded AI steps: intent resolution (selecting the right governed definition) and narrative synthesis (summarising the computed result) | A system where AI influences computation, query construction, or result values |
+| A platform with two tightly-bounded AI steps: intent resolution (selecting the right governed definition) and narrative synthesis (summarizing the computed result) | A system where AI influences computation, query construction, or result values |
 | A governed metric registry — every queryable metric is registered, approved, and version-controlled | A system that infers metric definitions at query time |
-| An enterprise-wide platform — works across any data warehouse or source in the organisation, governed by central definitions not tied to any single application or schema | A single-application or single-warehouse analytics tool — not dependent on localised AI training or a specific data model |
+| An enterprise-wide platform — works across any data warehouse or source in the organization, governed by central definitions not tied to any single application or schema | A single-application or single-warehouse analytics tool — not dependent on localized AI training or a specific data model |
 
 All AI systems access the platform through a single channel — an API layer built on MCP (Model Context Protocol), an open standard for connecting AI systems to tools and data. Conversational assistants, autonomous agents, data mining pipelines, and custom applications all enter through this channel and traverse the same controls pipeline. There is no alternative path. Every AI-initiated request produces an audit record. This is the architectural guarantee that makes AI-driven analytics safe to operate in a regulated environment.
 
@@ -105,7 +105,7 @@ Ten principles govern all design decisions. Where a proposed feature conflicts w
 | **P4 — Complete analytical lineage** | Every result carries a complete, queryable record of how the analytics engine used individual data elements to produce it — every definition, every access decision, every sub-result. |
 | **P5 — Role-aware by default** | Deny-by-default is an architectural property: an unauthenticated or unentitled request is always blocked before any analytical processing begins. Access restrictions are injected at the query level, not applied as a post-retrieval filter. |
 | **P6 — Governed narrative** | Plain-language summaries are anchored exclusively to values in the computed result. Hallucinated financial metrics are a regulatory and reputational risk; the architecture makes them impossible, not merely unlikely. |
-| **P7 — Deterministic visualisation** | Chart type selection is governed by a registered set of chart contracts. The AI does not select chart types — the same analytical pattern always produces the same chart across users, sessions, and time. |
+| **P7 — Deterministic visualization** | Chart type selection is governed by a registered set of chart contracts. The AI does not select chart types — the same analytical pattern always produces the same chart across users, sessions, and time. |
 | **P8 — Explainability at every layer** | Users and compliance functions can inspect what was queried, why, and with what results at every layer of the stack. An intent confirmation step shows resolved intent before execution; a lineage inspector exposes every step in human-readable form. |
 | **P9 — Administrator sovereignty within governance bounds** | Platform administrators control data sources, metric definitions, access policies, and governance thresholds — but may not lower governance minimums below platform floors. There is no bypass mode. |
 | **P10 — Deterministic computation, not generation** | Analytical results are computed from approved analytics and metrics definitions, never generated by an AI model. The same structured request, with the same access permissions and data, always returns the same result. |
@@ -189,7 +189,7 @@ In the platform approach, every request routes through the API layer, traverses 
 
 The platform's scope spans two independent dimensions that together define the full range of governed analytical work.
 
-**Output type — visualisation or dataset**
+**Output type — visualization or dataset**
 Some requests are best answered with a chart or summary: a portfolio manager wants to see returns versus benchmark, not a raw table of numbers. Others require a structured dataset: a data science pipeline needs millions of rows of position data for model retraining, and a chart is irrelevant. Both output types traverse the same controls pipeline. The difference is resolved by the Data Visualization Language (DVL) at query time — chart or table is determined by the intent and result shape, not by the user or the AI.
 
 **Governance tier — business analytics or full-provenance**
@@ -199,12 +199,12 @@ These two dimensions define four possible result types. The platform handles all
 
 | | Standard governance | Full-provenance (compliance) |
 |---|---|---|
-| **Visualisation** | Business analytics chart — metric query with chart output | Compliance chart with regulatory trace and export controls |
+| **Visualization** | Business analytics chart — metric query with chart output | Compliance chart with regulatory trace and export controls |
 | **Dataset** | Data mining table — governed large dataset retrieval | Compliance dataset with regulatory trace and export controls |
 
 ### End-to-End Examples
 
-Four queries traced through every stage illustrate the query space in practice. The first is a routine business analytics question — metric query with visualisation output, standard governance. The second is a multi-source business question — metrics federated across two independent backends, assembled into a single governed result. The third is a data mining request from an autonomous agent — large dataset retrieval with table output, standard governance. The fourth is a regulatory submission request — the same controls pipeline with compliance artifact escalation triggered automatically by the two-signal model.
+Four queries traced through every stage illustrate the query space in practice. The first is a routine business analytics question — metric query with visualization output, standard governance. The second is a multi-source business question — metrics federated across two independent backends, assembled into a single governed result. The third is a data mining request from an autonomous agent — large dataset retrieval with table output, standard governance. The fourth is a regulatory submission request — the same controls pipeline with compliance artifact escalation triggered automatically by the two-signal model.
 
 
 #### Example 1 — Portfolio performance (business analytics query)
@@ -237,7 +237,7 @@ The platform resolves both metrics against the Semantic Metrics Repository. Port
 -- Metric & Entitlement Resolution
 portfolio_return  →  definition v2.1.0: (end_market_value - start_market_value + cash_flows) / start_market_value
 benchmark_return  →  portfolio.registered_default_benchmark.period_return
-entitlements:        user_scope → [authorised_portfolio_list]
+entitlements:        user_scope → [authorized_portfolio_list]
 ```
 
 **4 · Query planning, governance, and execution**
@@ -254,7 +254,7 @@ FROM     portfolio_fact        p
 JOIN     benchmark_timeseries  b  ON p.default_benchmark_id = b.benchmark_id
 WHERE    p.asset_class  = 'equity'
   AND    p.period       = current_quarter()
-  AND    p.portfolio_id IN (/* authorised_portfolio_list */)
+  AND    p.portfolio_id IN (/* authorized_portfolio_list */)
 GROUP BY p.portfolio_id, b.period_return;
 
 -- Execution Response
@@ -307,7 +307,7 @@ filters:        as_of = today
 ```
 
 **3 · Metric and entitlement resolution**
-`var_95` and `risk_factor_contribution` resolve to their approved registry definitions — VaR is a versioned, formula-specific computation that must be calculated identically across every report. The metrics carry different data affinities, so they are served by two independent backends: VaR metrics are registered against the risk engine execution backend; portfolio metadata and limits are registered against the primary data warehouse. The user's entitlement scope is projected, restricting results to portfolios within the risk officer's authorised coverage.
+`var_95` and `risk_factor_contribution` resolve to their approved registry definitions — VaR is a versioned, formula-specific computation that must be calculated identically across every report. The metrics carry different data affinities, so they are served by two independent backends: VaR metrics are registered against the risk engine execution backend; portfolio metadata and limits are registered against the primary data warehouse. The user's entitlement scope is projected, restricting results to portfolios within the risk officer's authorized coverage.
 
 ```
 -- Metric & Entitlement Resolution
@@ -317,11 +317,11 @@ risk_factor_contribution →  definition v2.0: factor decomposition of excess Va
 backend_routing:
   var_95, risk_factor_contribution  →  risk_engine_backend
   var_limit, portfolio_metadata     →  primary_data_warehouse
-entitlements: user_scope → [authorised_portfolio_list]
+entitlements: user_scope → [authorized_portfolio_list]
 ```
 
 **4 · Query planning, governance, and execution**
-The Physical Query Planner compiles the Logical Query Plan into a physical execution plan referencing both data sources — the risk engine and the primary data warehouse — with the authorised portfolio scope applied at the physical layer. The Federated Query Engine executes the plan, handling the cross-source join and assembling the result — breach status and dominant contributing factor per portfolio — before passing it downstream. The execution is recorded in the lineage store, with the assembled result linked to both source queries.
+The Physical Query Planner compiles the Logical Query Plan into a physical execution plan referencing both data sources — the risk engine and the primary data warehouse — with the authorized portfolio scope applied at the physical layer. The Federated Query Engine executes the plan, handling the cross-source join and assembling the result — breach status and dominant contributing factor per portfolio — before passing it downstream. The execution is recorded in the lineage store, with the assembled result linked to both source queries.
 
 ```sql
 -- Physical execution: cross-source join on portfolio_id
@@ -336,7 +336,7 @@ FROM     risk_engine.var_daily_positions r
 JOIN     dw_prod.portfolio_governance.var_limits l
   ON     r.portfolio_id = l.portfolio_id
 WHERE    r.as_of_date   = current_date
-  AND    r.portfolio_id IN (/* authorised_portfolio_list */)
+  AND    r.portfolio_id IN (/* authorized_portfolio_list */)
 ORDER BY r.var_95_value DESC;
 
 -- Execution Response
@@ -387,7 +387,7 @@ pagination:     page_size = 10,000 rows
 ```
 
 **2 · Dataset and entitlement resolution**
-The dataset identifier resolves against an approved `analytical_dataset` contract in the Semantic Metrics Repository — only registered, approved datasets are retrievable. The contract declares the dataset's approved field set. The agent's access permissions are projected: results restricted to authorised portfolios, fields exceeding the agent's data classification ceiling excluded.
+The dataset identifier resolves against an approved `analytical_dataset` contract in the Semantic Metrics Repository — only registered, approved datasets are retrievable. The contract declares the dataset's approved field set. The agent's access permissions are projected: results restricted to authorized portfolios, fields exceeding the agent's data classification ceiling excluded.
 
 ```
 -- Dataset & Entitlement Resolution
@@ -395,12 +395,12 @@ approved_fields:
   portfolio_id  |  instrument_id  |  asset_class
   daily_pnl     |  market_value   |  duration  |  currency  |  position_date
 entitlements:
-  row_scope:     agent authorised portfolio list
+  row_scope:     agent authorized portfolio list
   field_ceiling: agent data classification level applied
 ```
 
 **3 · Query planning, governance, and execution**
-The Semantic Controls Layer validates the retrieval plan against its five checks — data scale (estimated scan volume), complexity, classification, compliance, and concurrency — and all checks pass. The Physical Query Planner constructs a paginated retrieval plan across the approved field set, restricted to the agent's authorised portfolios; the Federated Query Engine then executes it page by page under the same controls, enforcing the entitlement scope and field ceiling on every page. An audit record is written for the full retrieval — recording exactly which data was returned to which agent under which access permissions.
+The Semantic Controls Layer validates the retrieval plan against its five checks — data scale (estimated scan volume), complexity, classification, compliance, and concurrency — and all checks pass. The Physical Query Planner constructs a paginated retrieval plan across the approved field set, restricted to the agent's authorized portfolios; the Federated Query Engine then executes it page by page under the same controls, enforcing the entitlement scope and field ceiling on every page. An audit record is written for the full retrieval — recording exactly which data was returned to which agent under which access permissions.
 
 ```sql
 -- Physical execution (FQE output)
@@ -409,7 +409,7 @@ SELECT   portfolio_id, instrument_id, asset_class,
 FROM     positions_fact
 WHERE    asset_class   = 'fixed_income'
   AND    position_date BETWEEN current_date - INTERVAL '12 months' AND current_date
-  AND    portfolio_id  IN (/* agent_authorised_portfolio_list */)
+  AND    portfolio_id  IN (/* agent_authorized_portfolio_list */)
 ORDER BY portfolio_id, position_date
 LIMIT    10000  OFFSET :page_offset;
 
@@ -454,7 +454,7 @@ A treasury analyst asks: *"Prepare our LCR figures for the regulatory submission
 ```
 
 **2 · Intent resolution and compliance classification**
-The Intent Resolution Agent (IRA) resolves the operation and metric from the SMR catalogue and classifies the stated purpose: the phrase *"for the regulatory submission"* exceeds the configured compliance intent threshold. Compliance purpose is recorded and carried through the full pipeline.
+The Intent Resolution Agent (IRA) resolves the operation and metric from the SMR catalog and classifies the stated purpose: the phrase *"for the regulatory submission"* exceeds the configured compliance intent threshold. Compliance purpose is recorded and carried through the full pipeline.
 
 ```
 -- Semantic Intent Resolution
@@ -478,7 +478,7 @@ escalation: ENHANCED compliance artifact tier  -- both signals required
 ```
 
 **4 · Query planning, governance, and execution**
-Compliance-purpose queries are never served from cache — a fresh computation is required for every regulatory submission. The controls layer constructs the query with cache bypass enforced. On completion, it writes a regulatory trace record to the compliance-specific audit store (in addition to the standard compliance provenance record), enforces export controls until the complete compliance provenance record exists, and validates the result's data classification against the user's authorised ceiling. The treasury analyst receives both the governed LCR result and a complete, regulator-ready audit trail — automatically.
+Compliance-purpose queries are never served from cache — a fresh computation is required for every regulatory submission. The controls layer constructs the query with cache bypass enforced. On completion, it writes a regulatory trace record to the compliance-specific audit store (in addition to the standard compliance provenance record), enforces export controls until the complete compliance provenance record exists, and validates the result's data classification against the user's authorized ceiling. The treasury analyst receives both the governed LCR result and a complete, regulator-ready audit trail — automatically.
 
 ```sql
 -- Physical execution (FQE output — cache bypass enforced, compliance_purpose = true)
@@ -489,7 +489,7 @@ SELECT   h.entity_id,
 FROM     hqla_inventory         h
 JOIN     net_cash_outflow_30d   c  ON h.entity_id = c.entity_id
 WHERE    h.as_of_date  = :submission_date
-  AND    h.entity_id   IN (/* authorised_scope */)
+  AND    h.entity_id   IN (/* authorized_scope */)
 GROUP BY h.entity_id;
 
 -- Execution Response

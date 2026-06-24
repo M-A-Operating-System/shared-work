@@ -21,16 +21,16 @@ The platform will operate across three distinct planes: an **analytical plane** 
 |------|-------|------------|
 | **Analytical End User** | Analytical | Ask governed analytical questions via natural language; receive role-constrained results without knowledge of data structures or metric identifiers |
 | **Power Analyst** | Analytical | Multi-dimensional exploration, governed drilldown, lineage inspection, result export |
-| **Data Modeller** | Controls | Will own semantic data definitions in the SDR: logical data elements, object models, business definitions, critical data elements, and physical schema mappings. Will ensure the organisation's data assets are accurately described and structured — the foundational layer on which metric definitions are built |
-| **Metrics Modeller** | Controls | Will own semantic metrics and analytics definitions in the SMR: key performance metrics, analytics operations, trend analysis constructs, and insight definitions. Must combine domain knowledge — what does this metric mean in this business context — with modelling precision: how it is calculated, from which sources, under which dimensional hierarchies, and with which access policies |
-| **Entitlements Manager** | Controls | Responsible for defining and maintaining the organisation's data entitlement policies: who may perform which actions on which data elements, analytics definitions, and business process metrics. Will configure the metric access sets, dimension access sets, row scope, and column masks that RAPL enforces at query time |
-| **Analytics Governance** | Controls | Overall accountability for the governance, integrity, and outcomes of the analytics platform. Will own SMR registry health, approve semantic definition changes from Metrics Modellers, oversee entitlement policy governance, and be accountable for the quality, accuracy, and completeness of analytical outputs across the organisation. The final authority on what is defined, who can access it, and whether the platform is delivering the right outcomes. Must be in place before go-live — without this role the registry has no approval authority and the platform cannot serve any query |
+| **Data Modeller** | Controls | Will own semantic data definitions in the SDR: logical data elements, object models, business definitions, critical data elements, and physical schema mappings. Will ensure the organization's data assets are accurately described and structured — the foundational layer on which metric definitions are built |
+| **Metrics Modeller** | Controls | Will own semantic metrics and analytics definitions in the SMR: key performance metrics, analytics operations, trend analysis constructs, and insight definitions. Must combine domain knowledge — what does this metric mean in this business context — with modeling precision: how it is calculated, from which sources, under which dimensional hierarchies, and with which access policies |
+| **Entitlements Manager** | Controls | Responsible for defining and maintaining the organization's data entitlement policies: who may perform which actions on which data elements, analytics definitions, and business process metrics. Will configure the metric access sets, dimension access sets, row scope, and column masks that RAPL enforces at query time |
+| **Analytics Governance** | Controls | Overall accountability for the governance, integrity, and outcomes of the analytics platform. Will own SMR registry health, approve semantic definition changes from Metrics Modellers, oversee entitlement policy governance, and be accountable for the quality, accuracy, and completeness of analytical outputs across the organization. The final authority on what is defined, who can access it, and whether the platform is delivering the right outcomes. Must be in place before go-live — without this role the registry has no approval authority and the platform cannot serve any query |
 | **Integration Engineer** | Controls | Will register execution backends, maintain connection configuration, and declare the physical mappings that the Federated Query Engine resolves at execution time. Operates through configuration interfaces only — not the query path |
 | **Platform Admin** | Infrastructure | Will be responsible for platform health, deployment, infrastructure-level governance, and technical platform configuration including controls settings, feature flags, and deployment configuration. Will implement the technical policies and settings determined by Analytics Governance. Has no query interface into analytical data |
 
 **Roles are not mutually exclusive.** A single individual may hold multiple roles; the platform will evaluate entitlements from the combined claims on the caller's authentication/identity token at query time.
 
-The **Data Modeller** and **Metrics Modeller** are the critical pre-conditions for everything downstream. No analytical query can be served against a metric that has not been modelled, registered, and approved. The Data Modeller will establish the foundational data definitions in the SDR — without accurate data structure definitions, metric definitions cannot be built. The Metrics Modeller will build on that foundation to define the analytical layer in the SMR — without registered, approved metric definitions, the controls pipeline, the entitlement layer, the lineage store, and the Data Visualization Language (DVL) have nothing to operate on. Analytics Governance will hold final approval authority over both layers.
+The **Data Modeller** and **Metrics Modeller** are the critical pre-conditions for everything downstream. No analytical query can be served against a metric that has not been modeled, registered, and approved. The Data Modeller will establish the foundational data definitions in the SDR — without accurate data structure definitions, metric definitions cannot be built. The Metrics Modeller will build on that foundation to define the analytical layer in the SMR — without registered, approved metric definitions, the controls pipeline, the entitlement layer, the lineage store, and the Data Visualization Language (DVL) have nothing to operate on. Analytics Governance will hold final approval authority over both layers.
 
 ### Role × Feature Access
 
@@ -72,7 +72,7 @@ flowchart TD
     subgraph analytics["Analytics Engine"]
         direction TB
         MCP["<b>API/MCP Interface</b>\nMCP server runtime · tool/resource/prompt presentation · identity token validation"]
-        IRA["<b>Intent Resolution Agent (IRA)</b>\nRAG over SMR catalogue · LLM intent ranking · compliance intent score · confirmation gate\nnatural language → resolved operation_id + params"]
+        IRA["<b>Intent Resolution Agent (IRA)</b>\nRAG over SMR catalog · LLM intent ranking · compliance intent score · confirmation gate\nnatural language → resolved operation_id + params"]
         RAPL["<b>Role-Aware Projection Layer (RAPL)</b>\nentitlement decisions · metric/dimension access · row scope · column masks\nreads role definitions from DES"]
         SVL["<b>Semantic Validation Layer (SVL)</b>\nSMR resolution · schema validation · entitlement enforcement · LQP generation\nentirely deterministic — no AI"]
         SCL["<b>Semantic Controls Layer (SCL)</b>\ndata scale · complexity · classification · compliance · concurrency"]
@@ -145,7 +145,7 @@ flowchart TD
     style analytics fill:#dbeafe,stroke:#93c5fd
 ```
 
-The Analytics Engine will be a single MCP server exposing three analytical tools (`run_analytics`, `list_operations`, `drilldown`) through a single MCP Capability Layer endpoint. It will contain exactly two bounded AI steps: the Intent Resolution Agent (IRA), which will identify the right governed operation from the user's natural language query, and the Narrative Synthesis Agent (NSA), which will summarise the computed result in plain text after execution. All stages between them — RAPL, SVL, SCL, PQP, and FQE — will be entirely deterministic. The same resolved intent, access permissions, and data will always produce the same query plan, the same execution, and the same result.
+The Analytics Engine will be a single MCP server exposing three analytical tools (`run_analytics`, `list_operations`, `drilldown`) through a single MCP Capability Layer endpoint. It will contain exactly two bounded AI steps: the Intent Resolution Agent (IRA), which will identify the right governed operation from the user's natural language query, and the Narrative Synthesis Agent (NSA), which will summarize the computed result in plain text after execution. All stages between them — RAPL, SVL, SCL, PQP, and FQE — will be entirely deterministic. The same resolved intent, access permissions, and data will always produce the same query plan, the same execution, and the same result.
 
 For conversational consumers, the user's natural language query will be forwarded directly to the Analytics Engine. Intent resolution — selecting the right governed operation and binding parameters — will happen inside the engine's IRA. The Analytics Engine will return the display specification, structured data, and governed narrative; the AI Chat Platform will render the result. Structured API consumers (agents, custom UIs) may call `run_analytics` with an explicit `operation_id` and `params`, bypassing the IRA entirely.
 
@@ -157,8 +157,8 @@ The `vega2img` service will sit outside the Analytics Platform boundary as an op
 |---|-----------|---------|
 | 1 | **AI Consumers** | External access points: conversational AI, autonomous agents and pipelines, and custom applications. One governed entry point and one controls pipeline for all three — consumption mode never changes the trust model. |
 | 2 | **MCP Capability Layer (MCP)** | Single governed entry point. Validates the caller's authentication/identity token, routes natural language queries to the IRA or structured calls to the RAPL, and assembles the structured tool response. |
-| 3 | **Intent Resolution Agent (IRA)** | Bounded AI step translating natural language into a validated operation request via RAG over the SMR catalogue. Scores compliance intent; returns confirmation cards when intent or purpose is ambiguous. |
-| 4 | **Semantic Metrics Repository (SMR)** | Governing catalogue of every resolvable analytical concept: versioned, approved definitions for metrics, dimensions, hierarchies, operations, and datasets. |
+| 3 | **Intent Resolution Agent (IRA)** | Bounded AI step translating natural language into a validated operation request via RAG over the SMR catalog. Scores compliance intent; returns confirmation cards when intent or purpose is ambiguous. |
+| 4 | **Semantic Metrics Repository (SMR)** | Governing catalog of every resolvable analytical concept: versioned, approved definitions for metrics, dimensions, hierarchies, operations, and datasets. |
 | 5 | **Role-Aware Projection Layer (RAPL)** | Computes the entitlement projection from DES role definitions: data access, metric and dimension access, row scope, and column masks. Writes the projection record to the ALS. |
 | 6 | **Semantic Validation Layer (SVL)** | Validates the request against approved SMR definitions, enforces the entitlement projection, and compiles the platform-agnostic LQP. Entirely deterministic — no AI. |
 | 7 | **Semantic Controls Layer (SCL)** | Applies the five checks — data scale, complexity, classification, compliance, concurrency — assigns the timeout budget, and writes the signed controls decision record before releasing the LQP to the PQP. |
@@ -219,7 +219,7 @@ sequenceDiagram
             MCP->>RAPL: operation_id + params + explicit compliance_purpose + identity token
         end
 
-        RAPL->>RAPL: validate token · extract role claims<br/>(defence in depth — re-validates the boundary check)
+        RAPL->>RAPL: validate token · extract role claims<br/>(defense in depth — re-validates the boundary check)
         RAPL->>DES: retrieve role definitions
         DES-->>RAPL: data access domains · metric/dimension access sets<br/>row scope templates · column masks · classification ceilings
         note over RAPL: Merge role definitions · APPROVE/DENY per metric and dimension<br/>Resolve row scope templates against token claims · register column masks
@@ -302,11 +302,11 @@ The computation pipeline (RAPL → SVL → SCL → PQP → FQE) will be entirely
 
 ## AI Consumers
 
-The AI Consumers layer is responsible for providing the external access points through which governed analytical requests reach the platform. It encompasses three consumer types: conversational AI platforms that mediate natural language queries, autonomous agents and scheduled pipelines that submit structured requests, and custom applications that call the platform via host-issued tokens. All three consumer types share a single governed entry point and a single controls pipeline; consumption mode affects only the caller's interaction pattern, not the trust model applied. For natural language queries, the consumer forwards the query and the caller's authentication/identity token to the Analytics Engine, which handles intent resolution internally. For structured requests, consumers supply an explicit operation identifier and parameters, bypassing intent resolution and routing directly to the entitlement layer. In all cases, the consumer receives a structured MCP tool response containing a display specification, result data, a governed narrative, and a lineage reference.
+The AI Consumers layer is responsible for providing the external access points through which governed analytical requests reach the platform. It encompasses three consumer types: conversational AI platforms that mediate natural language queries, autonomous agents and scheduled pipelines that submit structured requests, and custom applications that call the platform via host-issued tokens. All three consumer types share a single governed entry point and a single controls pipeline; consumption mode affects only the caller's interaction pattern, not the trust model applied. For natural language queries, the consumer forward the query and the caller's authentication/identity token to the Analytics Engine, which handles intent resolution internally. For structured requests, consumers supply an explicit operation identifier and parameters, bypassing intent resolution and routing directly to the entitlement layer. In all cases, the consumer receives a structured MCP tool response containing a display specification, result data, a governed narrative, and a lineage reference.
 
 **Natural language path.** When a user asks an analytical question, the consumer will forward the natural language query and the user's authentication/identity token to the Analytics Engine. The engine's IRA will handle operation selection, parameter binding, and if intent is ambiguous will return a confirmation card before proceeding to execution.
 
-**Structured path.** Consumers that construct explicit `operation_id` + `params` payloads (agentic pipelines, custom analytics UIs, integration tests) will call `run_analytics` with structured arguments directly. The `list_operations` tool will return the entitled operation catalogue for consumers that build their own operation selection UI. Structured calls will bypass the IRA and route directly to the RAPL.
+**Structured path.** Consumers that construct explicit `operation_id` + `params` payloads (agentic pipelines, custom analytics UIs, integration tests) will call `run_analytics` with structured arguments directly. The `list_operations` tool will return the entitled operation catalog for consumers that build their own operation selection UI. Structured calls will bypass the IRA and route directly to the RAPL.
 
 **Response assembly.** The conversation engine will render the DVL display specification inline. The `narrative` object in the response will contain the governed summary produced by the NSA. The `result_id` will be retained for any follow-up `drilldown` call or lineage inspection.
 
@@ -340,19 +340,19 @@ The Analytics Engine will process the request end-to-end and return a structured
 
 The MCP Capability Layer (MCP) is responsible for providing the single governed entry point through which all AI consumers access the platform's analytical capabilities. It receives tool call requests over MCP Streamable HTTP transport, validates the caller's authentication/identity token, and routes the request to either the Intent Resolution Agent for natural language queries or directly to the Role-Aware Projection Layer for structured calls. Each exposed tool represents a bounded, named operation with a typed input schema and a governed execution path. There is no privileged or alternative execution path; all consumers receive the same controls-validated results regardless of how they access the platform. The MCP layer assembles and returns a structured tool response containing the DVL display specification, result data, governed narrative, lineage reference, and, where applicable, a sealed compliance block.
 
-### Tool Catalogue
+### Tool Catalog
 
-The Analytics Engine will expose three tools. All analytical operations will be SMR-catalogue driven — the code will be the execution engine, not the operation registry. The SMR will own every operation definition: what parameters it needs, what metrics and dimensions it supports, and which presentation stages it invokes via its `execution_profile`.
+The Analytics Engine will expose three tools. All analytical operations will be SMR-catalog driven — the code will be the execution engine, not the operation registry. The SMR will own every operation definition: what parameters it needs, what metrics and dimensions it supports, and which presentation stages it invokes via its `execution_profile`.
 
 **`run_analytics(operation_id: str, params: dict, auth_token: str)`** — Executes any SMR-registered operation. The operation's `execution_profile` in the SMR will determine which presentation stages run after the full controls pipeline completes.
 
-**`list_operations(domain: str | None, auth_token: str)`** — Returns the SMR operation catalogue with operation IDs, display names, required parameters, supported metrics/dimensions, and execution profiles. Only operations the authenticated user is entitled to execute will be returned.
+**`list_operations(domain: str | None, auth_token: str)`** — Returns the SMR operation catalog with operation IDs, display names, required parameters, supported metrics/dimensions, and execution profiles. Only operations the authenticated user is entitled to execute will be returned.
 
 **`drilldown(result_id: str, hierarchy: str, selected_value: str | None, auth_token: str)`** — Navigates into a dimension hierarchy from a prior result. The parent result's analytical context — operation, filters, and hierarchy position — will be inherited; governance should not be. The derived query will re-run the full pipeline (fresh RAPL projection, SVL enforcement, SCL checks) and write its own lineage record linked to the parent `result_id`.
 
 ### Execution Profiles
 
-Each SMR operation will carry an `execution_profile` defined in its `analytical_operation` entry in the SMR catalogue. This will tell the pipeline executor which presentation stages to invoke after execution. No presentation depth will be hardcoded in the MCP layer — it will always be determined by the SMR catalogue.
+Each SMR operation will carry an `execution_profile` defined in its `analytical_operation` entry in the SMR catalog. This will tell the pipeline executor which presentation stages to invoke after execution. No presentation depth will be hardcoded in the MCP layer — it will always be determined by the SMR catalog.
 
 The deterministic pipeline — Auth → IRA (natural-language queries only) → RAPL → SVL → SCL → PQP → FQE → Lineage — runs in full for every profile, without exception ([P2](./01-overview.md#design-principles): there is no fast path). Profiles vary only what happens after the FQE assembles the result:
 
@@ -432,7 +432,7 @@ A structured `run_analytics` tool call will arrive from the AI Chat Platform. Th
 
 > **Governing principles:** [P2 — Controls before execution](./01-overview.md#design-principles) · [P10 — Deterministic computation, not generation](./01-overview.md#design-principles)
 
-The Intent Resolution Agent (IRA) is responsible for translating a natural language query into a structured, validated operation request. It receives the natural language query and the caller's authentication/identity token from the MCP Capability Layer and retrieves candidate operations from the SMR catalogue using embedding similarity search. A language model ranks the candidates, binds parameters to the leading operation, and derives a presentation preview indicating the anticipated chart type and axis structure. When the top candidate exceeds the confidence threshold, the resolved intent is forwarded directly to the Role-Aware Projection Layer. When intent is ambiguous, ranked candidate cards are returned to the consumer for selection or conversational refinement before execution proceeds. The IRA also classifies whether the query's stated purpose is compliance-driven, producing the compliance intent score that forms Signal 2 of the two-signal compliance trigger; when the purpose is ambiguous, it clarifies through the same confirmation card flow. The IRA is the only AI step in the pre-computation pipeline and produces no output visible to the end user once intent is resolved.
+The Intent Resolution Agent (IRA) is responsible for translating a natural language query into a structured, validated operation request. It receives the natural language query and the caller's authentication/identity token from the MCP Capability Layer and retrieves candidate operations from the SMR catalog using embedding similarity search. A language model ranks the candidates, binds parameters to the leading operation, and derives a presentation preview indicating the anticipated chart type and axis structure. When the top candidate exceeds the confidence threshold, the resolved intent is forwarded directly to the Role-Aware Projection Layer. When intent is ambiguous, ranked candidate cards are returned to the consumer for selection or conversational refinement before execution proceeds. The IRA also classifies whether the query's stated purpose is compliance-driven, producing the compliance intent score that forms Signal 2 of the two-signal compliance trigger; when the purpose is ambiguous, it clarifies through the same confirmation card flow. The IRA is the only AI step in the pre-computation pipeline and produces no output visible to the end user once intent is resolved.
 
 ### Intent Resolution Pipeline
 
@@ -458,7 +458,7 @@ flowchart LR
 
 At registration time, each `analytical_operation` and `analytical_metric` definition in the SMR will be embedded: the operation name, description, example phrasings, required parameters, and associated metric descriptions will be concatenated and encoded as a dense vector stored alongside the definition.
 
-When a query arrives, the IRA will encode the natural language input and perform a vector similarity search against the SMR operation embeddings. The top-K candidate operations and their associated metric definitions will be retrieved. Only these candidates — not the full catalogue — will be injected into the LLM ranking prompt.
+When a query arrives, the IRA will encode the natural language input and perform a vector similarity search against the SMR operation embeddings. The top-K candidate operations and their associated metric definitions will be retrieved. Only these candidates — not the full catalog — will be injected into the LLM ranking prompt.
 
 ### LLM Intent Ranking
 
@@ -501,14 +501,14 @@ Each candidate card will include a `presentation_hint` block derived from the op
 |---|---|
 | `chart_type` | Predicted chart type — `bar`, `line`, `heatmap`, `scatter`, `table` |
 | `primary_dimension` | The field that will appear on the X axis or as the primary grouping |
-| `measures` | Metric fields that will appear as Y axis values or colour encoding |
-| `series_by` | Dimension used to create series or colour bands (if applicable) |
+| `measures` | Metric fields that will appear as Y axis values or color encoding |
+| `series_by` | Dimension used to create series or color bands (if applicable) |
 
 The `presentation_hint` will be a pre-execution estimate. The DVL will produce the authoritative display specification after execution, based on the actual result shape. The hint is informational only.
 
 ### Structured API Path
 
-Consumers that construct explicit `operation_id` + `params` (agentic pipelines, custom analytics UIs, integration tests) will call `run_analytics` with a structured payload directly. MCP will route these calls directly to the RAPL, bypassing the IRA. The `list_operations` tool will return the full entitled operation catalogue for consumers that build their own operation selection UI.
+Consumers that construct explicit `operation_id` + `params` (agentic pipelines, custom analytics UIs, integration tests) will call `run_analytics` with a structured payload directly. MCP will route these calls directly to the RAPL, bypassing the IRA. The `list_operations` tool will return the full entitled operation catalog for consumers that build their own operation selection UI.
 
 ### Example
 
@@ -636,7 +636,7 @@ The Analytics Engine will query the SMR directly at request time — the SVL wil
 
 ### Example
 
-When the request reaches the SVL, the SMR will be the catalogue every identifier is resolved against. The SVL will ask the SMR to resolve the `compare_portfolios` operation, then resolve `portfolio_return` and `benchmark_return` as `analytical_metric` documents. The SMR will confirm both are approved for the `portfolio_manager` role and return their definitions, including `data_affinity` (`portfolio`), `required_dimensions` (`portfolio_id`, `time_period`), and `aggregation` (`value_weighted_average`). `asset_class` will resolve as an approved `analytical_dimension` document with an approved filter operator (`eq`). If either metric document were absent or not in `"status": "approved"` state, the SVL would return `METRIC_NOT_FOUND` and the pipeline would stop.
+When the request reaches the SVL, the SMR will be the catalog every identifier is resolved against. The SVL will ask the SMR to resolve the `compare_portfolios` operation, then resolve `portfolio_return` and `benchmark_return` as `analytical_metric` documents. The SMR will confirm both are approved for the `portfolio_manager` role and return their definitions, including `data_affinity` (`portfolio`), `required_dimensions` (`portfolio_id`, `time_period`), and `aggregation` (`value_weighted_average`). `asset_class` will resolve as an approved `analytical_dimension` document with an approved filter operator (`eq`). If either metric document were absent or not in `"status": "approved"` state, the SVL would return `METRIC_NOT_FOUND` and the pipeline would stop.
 
 
 ## Role-Aware Projection Layer (RAPL)
@@ -675,7 +675,7 @@ flowchart LR
     START --> S1 --> S2 --> S3 --> S4 --> S5 --> S6 --> S7
 ```
 
-**Stage 1 — Token Validation.** Validate the caller's authentication/identity token: signature, expiry, and org claim. This deliberately re-validates the check already performed at the MCP Capability Layer boundary — defence in depth, so the RAPL's guarantees do not depend on the entry layer's correctness. **DENY** — request rejected immediately if any check fails. No further processing occurs on an invalid token.
+**Stage 1 — Token Validation.** Validate the caller's authentication/identity token: signature, expiry, and org claim. This deliberately re-validates the check already performed at the MCP Capability Layer boundary — defense in depth, so the RAPL's guarantees do not depend on the entry layer's correctness. **DENY** — request rejected immediately if any check fails. No further processing occurs on an invalid token.
 
 **Stage 2 — Role Claim Extraction.** Extract the user's analytical role claims from the validated token using the configured `roleClaimField`. **DENY** — if no valid analytical role claims are present the request is rejected.
 
@@ -716,7 +716,7 @@ RAPL will support at least the following column masking modes. The platform is e
 | `null_replacement` | Column value replaced with `null` |
 | `redacted_label` | Column value replaced with `"[REDACTED]"` |
 | `excluded` | Column omitted entirely from the result schema |
-| `hash_replacement` | Column value replaced with a deterministic one-way hash — preserves group-by and join behaviour without revealing the underlying value |
+| `hash_replacement` | Column value replaced with a deterministic one-way hash — preserves group-by and join behavior without revealing the underlying value |
 
 ### Entitlement Audit
 
@@ -956,14 +956,14 @@ flowchart LR
 
 **Step 1 — Plan Reception.** The FQE will receive the physical execution plan from the PQP and validate that every required data source is registered and available before proceeding.
 
-**Step 2 — Cache Check.** The FQE will check the result cache using the canonical LQP signature as the cache key — a SHA-256 over the serialised plan. Because the plan embeds the resolved row scope filter nodes and the `column_masks` array, entitlement isolation is structural: two users with different effective entitlements produce different plans and therefore different keys, while users with identical entitlements and identical queries share cache entries. On a cache hit, the cached result is returned directly — steps 3–5 are skipped, but the execution record (Step 6) is written for every query, recording its cache status. Compliance-purpose queries bypass the cache and are always freshly executed.
+**Step 2 — Cache Check.** The FQE will check the result cache using the canonical LQP signature as the cache key — a SHA-256 over the serialized plan. Because the plan embeds the resolved row scope filter nodes and the `column_masks` array, entitlement isolation is structural: two users with different effective entitlements produce different plans and therefore different keys, while users with identical entitlements and identical queries share cache entries. On a cache hit, the cached result is returned directly — steps 3–5 are skipped, but the execution record (Step 6) is written for every query, recording its cache status. Compliance-purpose queries bypass the cache and are always freshly executed.
 
 **Step 3 — Execution.** The FQE will execute the plan's sub-plans concurrently, each against its registered data source, enforcing the `queryTimeoutSeconds` budget assigned by the SCL. The FQE will support connectivity to data sources of at least the following types:
 
 | Data source type | Typical use |
 |---|---|
 | SQL warehouse or lakehouse | Primary performance, position, and risk data |
-| Semantic layer | Pre-modelled governed metrics |
+| Semantic layer | Pre-modeled governed metrics |
 | REST / OpenData API | Reference data and third-party feeds |
 | Graph data store | Relationship and counterparty data |
 | OLAP engine | Pre-aggregated dimensional data |
@@ -1016,9 +1016,9 @@ The FQE will write an execution record to the Analytical Lineage Store (ALS) and
 
 ## Data Visualization Language (DVL)
 
-> **Governing principles:** [P7 — Deterministic visualisation](./01-overview.md#design-principles)
+> **Governing principles:** [P7 — Deterministic visualization](./01-overview.md#design-principles)
 
-The Data Visualization Language (DVL) is responsible for producing a deterministic display specification for every analytical result. It receives the assembled result from the Federated Query Engine and classifies it against a taxonomy of registered intent patterns. The ontology evaluator matches the result shape and intent classification against registered chart contracts in order of specificity, returning the highest-scoring match as the display specification. The AI model does not select chart types; the DVL makes the final binding decision, ensuring the same analytical pattern produces the same chart type across all users, sessions, and model versions. The TABLE_GOVERNED contract serves as an unconditional fallback, ensuring every query receives a valid display specification regardless of result shape. The intent pattern taxonomy and chart contract registry are initial sets, expected to be extended as the platform's visualisation vocabulary grows over time.
+The Data Visualization Language (DVL) is responsible for producing a deterministic display specification for every analytical result. It receives the assembled result from the Federated Query Engine and classifies it against a taxonomy of registered intent patterns. The ontology evaluator matches the result shape and intent classification against registered chart contracts in order of specificity, returning the highest-scoring match as the display specification. The AI model does not select chart types; the DVL makes the final binding decision, ensuring the same analytical pattern produces the same chart type across all users, sessions, and model versions. The TABLE_GOVERNED contract serves as an unconditional fallback, ensuring every query receives a valid display specification regardless of result shape. The intent pattern taxonomy and chart contract registry are initial sets, expected to be extended as the platform's visualization vocabulary grows over time.
 
 ### Intent Pattern Taxonomy
 
@@ -1036,19 +1036,19 @@ Intent patterns are registered classifications in the DVL. The initial set is de
 
 ### Chart Contract Table
 
-Chart contracts are registered specifications in the DVL, each binding an intent pattern to a chart type, axis assignments, and interaction semantics. The initial set is defined below; new contracts will be registered as the platform's visualisation vocabulary is extended.
+Chart contracts are registered specifications in the DVL, each binding an intent pattern to a chart type, axis assignments, and interaction semantics. The initial set is defined below; new contracts will be registered as the platform's visualization vocabulary is extended.
 
-Contracts govern structure — chart type, axis assignments, encodings, and interaction semantics. Colour palettes are not part of the contract: they come from the platform's theme configuration, deterministic within a deployment and brandable across deployments.
+Contracts govern structure — chart type, axis assignments, encodings, and interaction semantics. Color palettes are not part of the contract: they come from the platform's theme configuration, deterministic within a deployment and brandable across deployments.
 
 | Contract name | Intent patterns matched | Chart type | Key axis assignments | Interaction semantics |
 |---|---|---|---|---|
-| `BAR_MULTI_SERIES_COMPARISON` | `COMPARISON` | Bar | X: primary categorical dimension (sorted by primary metric DESC); Y: metric value; Colour: metric series or secondary dimension | Click: drilldown; Hover: tooltip; Selection: multi-point |
-| `LINE_TIME_SERIES_TREND` | `TREND` | Line | X: temporal dimension; Y: metric value; Colour: metric series; Reference line: injected if `compare_to` present | Hover: crosshair tooltip; Click data point: surface lineage; Brush: zoom X-axis |
-| `HEATMAP_THRESHOLD_MATRIX` | `THRESHOLD` | Heatmap | X: first categorical dimension; Y: second categorical dimension; Colour: metric as % of threshold (diverging scale, midpoint at 100% of limit) | Click cell: drilldown into dimension intersection |
-| `HISTOGRAM_DISTRIBUTION` | `DISTRIBUTION` | Histogram | X: binned metric value; Y: frequency count; Colour: single series, with optional categorical split into overlaid series | Hover: bin range and count; Brush: zoom X-axis |
-| `TREEMAP_COMPOSITION` | `COMPOSITION` | Treemap | Area: proportional to metric value; Colour: secondary metric (diverging scale); Label: dimension value + metric value | Click tile: drilldown to next hierarchy level; Hover: tooltip with all metrics |
-| `WATERFALL_ATTRIBUTION` | `ATTRIBUTION` | Waterfall | X: contribution dimension; Y: contribution value (positive/negative); Colour: positive (green), negative (red), total (grey) | Hover: contribution value and percentage |
-| `SCATTER_RISK_RETURN` | `RELATIONSHIP` | Scatter | X: first metric (conventionally risk); Y: second metric (conventionally return); Colour: categorical dimension; Size: optional third metric | Hover: all metric values; Reference lines: quadrant boundaries from benchmark values if present |
+| `BAR_MULTI_SERIES_COMPARISON` | `COMPARISON` | Bar | X: primary categorical dimension (sorted by primary metric DESC); Y: metric value; Color: metric series or secondary dimension | Click: drilldown; Hover: tooltip; Selection: multi-point |
+| `LINE_TIME_SERIES_TREND` | `TREND` | Line | X: temporal dimension; Y: metric value; Color: metric series; Reference line: injected if `compare_to` present | Hover: crosshair tooltip; Click data point: surface lineage; Brush: zoom X-axis |
+| `HEATMAP_THRESHOLD_MATRIX` | `THRESHOLD` | Heatmap | X: first categorical dimension; Y: second categorical dimension; Color: metric as % of threshold (diverging scale, midpoint at 100% of limit) | Click cell: drilldown into dimension intersection |
+| `HISTOGRAM_DISTRIBUTION` | `DISTRIBUTION` | Histogram | X: binned metric value; Y: frequency count; Color: single series, with optional categorical split into overlaid series | Hover: bin range and count; Brush: zoom X-axis |
+| `TREEMAP_COMPOSITION` | `COMPOSITION` | Treemap | Area: proportional to metric value; Color: secondary metric (diverging scale); Label: dimension value + metric value | Click tile: drilldown to next hierarchy level; Hover: tooltip with all metrics |
+| `WATERFALL_ATTRIBUTION` | `ATTRIBUTION` | Waterfall | X: contribution dimension; Y: contribution value (positive/negative); Color: positive (green), negative (red), total (grey) | Hover: contribution value and percentage |
+| `SCATTER_RISK_RETURN` | `RELATIONSHIP` | Scatter | X: first metric (conventionally risk); Y: second metric (conventionally return); Color: categorical dimension; Size: optional third metric | Hover: all metric values; Reference lines: quadrant boundaries from benchmark values if present |
 | `TABLE_GOVERNED` | Fallback (any) | Table | All result columns; column labels from SMR; inline sparklines for temporal metrics | Column sorting; column filtering; export to CSV and JSON |
 
 ### Override Mechanism
@@ -1088,7 +1088,7 @@ The NSA will produce three output fields:
 
 | Field | Description |
 |---|---|
-| `narrative.lead` | A single sentence summarising the top-level finding |
+| `narrative.lead` | A single sentence summarizing the top-level finding |
 | `narrative.detail` | Two to four sentences covering the most significant data points, one per dimension value or notable comparison |
 | `narrative.anchoredTo` | An array of dimension value identifiers from the result that the narrative references — used for post-generation validation |
 
@@ -1128,7 +1128,7 @@ Post-generation validation will confirm every verbatim numeric value cited in th
 
 > **Governing principles:** [P4 — Complete analytical lineage](./01-overview.md#design-principles) · [P8 — Explainability at every layer](./01-overview.md#design-principles)
 
-The Analytical Lineage Store (ALS) is responsible for providing a complete, immutable record of how every analytical result was produced. It receives three writes per query: an entitlement projection record written by the Role-Aware Projection Layer when the projection is computed, a controls decision record written by the Semantic Controls Layer before execution begins, and a full execution record written by the Federated Query Engine after execution completes. A request denied at any stage still leaves the records written up to that point — blocked queries are never absent from the audit trail. Each lineage record captures the original request, the SMR metric definition versions resolved, the entitlement projection in force, the controls decisions applied, the physical sub-plans executed, and the visualisation contract and narrative status. Records are written once and never mutated; corrections are made via new amendment documents that reference the original record. The store supports regulatory audit export via a filtered query API, with digitally signed export packages available for compliance review. Retention periods are configurable per deployment, governed by the organisation's regulatory retention obligations.
+The Analytical Lineage Store (ALS) is responsible for providing a complete, immutable record of how every analytical result was produced. It receives three writes per query: an entitlement projection record written by the Role-Aware Projection Layer when the projection is computed, a controls decision record written by the Semantic Controls Layer before execution begins, and a full execution record written by the Federated Query Engine after execution completes. A request denied at any stage still leaves the records written up to that point — blocked queries are never absent from the audit trail. Each lineage record captures the original request, the SMR metric definition versions resolved, the entitlement projection in force, the controls decisions applied, the physical sub-plans executed, and the visualization contract and narrative status. Records are written once and never mutated; corrections are made via new amendment documents that reference the original record. The store supports regulatory audit export via a filtered query API, with digitally signed export packages available for compliance review. Retention periods are configurable per deployment, governed by the organization's regulatory retention obligations.
 
 ### Storage Design
 
@@ -1140,7 +1140,7 @@ A thin relational database search index will hold only scalar fields required fo
 
 | Element | Storage | Content |
 |---|---|---|
-| Lineage record | Object store — `lineage/{org_id}/{yyyy}/{mm}/{dd}/{result_id}.json` | Complete chain: tool call parameters → SMR resolution → projection record → LQP → controls decision → FQE execution record → result schema → visualisation contract → narrative synthesis status |
+| Lineage record | Object store — `lineage/{org_id}/{yyyy}/{mm}/{dd}/{result_id}.json` | Complete chain: tool call parameters → SMR resolution → projection record → LQP → controls decision → FQE execution record → result schema → visualization contract → narrative synthesis status |
 | SMR snapshot | Embedded in lineage record (`resolved_metrics`) | For each metric in the query: metric ID, SMR definition version at query time |
 | Projection record | Object store — written by RAPL at projection time, linked by `intent_id`/`lqp_id` | Roles, requested metrics, projected metrics, blocked metrics, row scope, column masks |
 | FQE execution record | Embedded in lineage record (`execution`) | Data sources used, queries executed, latencies, scan volume, cache hit status |
@@ -1171,7 +1171,7 @@ Every lineage document will be stored under an `org_id`-prefixed key in the obje
 
 | Rule | Specification |
 |---|---|
-| Query records | Configurable per deployment — set to satisfy the organisation's regulatory retention obligations. The reference implementation shows sample values. |
+| Query records | Configurable per deployment — set to satisfy the organization's regulatory retention obligations. The reference implementation shows sample values. |
 | Lineage records | Retained at least as long as the corresponding query record. Cannot be deleted independently. |
 | SMR metric versions | Retained indefinitely — metric version history must be preserved for lineage reconstruction. |
 | Controls events | Retained at least as long as query records. |
@@ -1230,7 +1230,7 @@ Three lineage writes will occur for each query — the projection record at RAPL
                        "values": ["GLOB_EQ_OPP","UK_CORE_INC","ASIA_PAC_GRW","EUR_BAL_INC"] }],
     "column_masks": []
   },
-  "visualisation":    { "contract": "BAR_MULTI_SERIES_COMPARISON" },
+  "visualization":    { "contract": "BAR_MULTI_SERIES_COMPARISON" },
   "narrative_status": { "generated": true, "validation": "passed" },
   "created_at":       "2026-05-18T09:32:47Z",
   "expires_at":       "2033-05-18T09:32:47Z"
@@ -1345,7 +1345,7 @@ The following components will appear in the architecture diagram and interact wi
 
 ### Conversational AI — Chat Front End
 
-The AI Chat Platform will be the conversational consumer of the Analytics Engine. It will relay natural language questions from users to the Analytics Engine and render the structured results it receives. Intent resolution — identifying which governed operation matches the user's question and binding its parameters — will be performed inside the Analytics Engine by the IRA. The AI Chat Platform will perform no NL translation and will have no dependency on the SMR operation catalogue.
+The AI Chat Platform will be the conversational consumer of the Analytics Engine. It will relay natural language questions from users to the Analytics Engine and render the structured results it receives. Intent resolution — identifying which governed operation matches the user's question and binding its parameters — will be performed inside the Analytics Engine by the IRA. The AI Chat Platform will perform no NL translation and will have no dependency on the SMR operation catalog.
 
 The AI Chat Platform will forward the user's natural language query and authentication/identity token to the Analytics Engine via `run_analytics`. If the Analytics Engine returns candidate cards, the AI Chat Platform will render them to the user and re-submit with the `intent_session_id` and the chosen `selected_candidate` index when the user approves. It will render the DVL `display_spec` inline, surface the governed `narrative` as the assistant's reply, and retain the `result_id` for follow-up `drilldown` calls.
 
@@ -1354,16 +1354,16 @@ The AI Chat Platform will have no access to physical schemas, execution backends
 
 ### Semantic Data Repository (SDR)
 
-The Semantic Data Repository will be a pre-existing organisational component — the governed store of JSON-based data metadata definitions that describe the organisation's information assets. It will exist independently of the Analytics Platform and should not be built or owned by it. For most organisations it will already exist before the Analytics Platform is deployed.
+The Semantic Data Repository will be a pre-existing organizational component — the governed store of JSON-based data metadata definitions that describe the organization's information assets. It will exist independently of the Analytics Platform and should not be built or owned by it. For most organizations it will already exist before the Analytics Platform is deployed.
 
-The SDR will contain the organisation's foundational data context: data models, object models, critical data elements, quality rules, physical schemas, and data lineage records — *what data exists and how it is structured*. The SMR will be a separate store for metric metadata definitions — *what the data means analytically* and how it should be calculated, aggregated, and governed. Both will be independent stores housed within the Data Context Store (DCS).
+The SDR will contain the organization's foundational data context: data models, object models, critical data elements, quality rules, physical schemas, and data lineage records — *what data exists and how it is structured*. The SMR will be a separate store for metric metadata definitions — *what the data means analytically* and how it should be calculated, aggregated, and governed. Both will be independent stores housed within the Data Context Store (DCS).
 
 The `physical_mapping` fields in SMR metric definitions will resolve against SDR schema metadata to identify the physical tables and columns that back each metric. The DCS search index (spanning both SMR and SDR) will support the `list_operations` tool and the IRA's vector similarity search over SMR operation and metric embeddings.
 
 
 ### Data Entitlements Store (DES)
 
-The Data Entitlements Store (DES) will be an independent external component that holds the organisation's data and analytics entitlement policies. It will be managed separately from the Analytics Engine and from the data platform — a dedicated governance control point.
+The Data Entitlements Store (DES) will be an independent external component that holds the organization's data and analytics entitlement policies. It will be managed separately from the Analytics Engine and from the data platform — a dedicated governance control point.
 
 Entitlement policies will be declared at the **logical object and data element level**. A policy will grant or restrict access to a named metric, a named dimension, or a named data element as governed concepts. Policies should not reference physical tables, schemas, column names, or connection strings. This separation will ensure entitlements remain stable as the underlying physical implementation evolves, and remain comprehensible to business data owners, compliance teams, and governance teams who have no visibility into the data platform's internal structure.
 

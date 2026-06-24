@@ -90,7 +90,7 @@ Design tokens applied to the `<ai-chat>` web component. The platform's default d
 }
 ```
 
-All colour values accept hex, RGB, or HSL. Logo assets must be SVG or PNG and served from a CSP-compatible origin declared in the host's Content Security Policy. See [07-embedding-and-integration.md](./07-embedding-and-integration.md) for CSP requirements.
+All color values accept hex, RGB, or HSL. Logo assets must be SVG or PNG and served from a CSP-compatible origin declared in the host's Content Security Policy. See [07-embedding-and-integration.md](./07-embedding-and-integration.md) for CSP requirements.
 
 ---
 
@@ -172,7 +172,7 @@ Defines the object types that end users can reference via `@`-binding in the inp
 
 The `searchEndpoint` is called with the authenticated user's bearer token forwarded in the `Authorization` header. The host endpoint is responsible for filtering results to objects the user is permitted to access. The platform does not enforce bindable-type permissions independently — it trusts the host's endpoint response.
 
-In shared conversations, if a binding chip resolves to an object another participant cannot access (because that participant's search endpoint would not have returned it), the restricted participant sees the chip labelled **[Restricted object]**. See [05-tools-and-memory.md](./05-tools-and-memory.md).
+In shared conversations, if a binding chip resolves to an object another participant cannot access (because that participant's search endpoint would not have returned it), the restricted participant sees the chip labeled **[Restricted object]**. See [05-tools-and-memory.md](./05-tools-and-memory.md).
 
 ---
 
@@ -231,7 +231,7 @@ Guided workflows are host-defined conversation starters that launch a structured
     {
       "id":          "governance-health-check",
       "name":        "Governance Health Check",
-      "description": "Summarise governance coverage, quality gaps, and policy compliance across a selected domain.",
+      "description": "Summarize governance coverage, quality gaps, and policy compliance across a selected domain.",
       "icon":        "activity",
       "prompt":      "Run a governance health check for {{domain}}. Cover: (1) entity coverage, (2) data quality completeness, (3) ownership gaps, (4) classification compliance. Present as an executive summary with a traffic-light status for each area.",
       "parameters": [
@@ -250,7 +250,7 @@ Guided workflows are host-defined conversation starters that launch a structured
       "name":        "Weekly Status Report",
       "description": "Generate a plain-language weekly status summary for a selected team.",
       "icon":        "calendar",
-      "prompt":      "Generate a weekly status report for {{team}}. Summarise open actions, recent completions, and any blockers.",
+      "prompt":      "Generate a weekly status report for {{team}}. Summarize open actions, recent completions, and any blockers.",
       "parameters": [
         {
           "id":       "team",
@@ -281,7 +281,7 @@ Workflow prompts are host-managed — users cannot create or modify them.
 
 ## `renderers`
 
-Host applications can register **custom content renderers** that the platform loads at runtime. When the model produces a fenced code block tagged with a registered renderer's trigger, the platform invokes the host's renderer instead of its built-in pipeline. This enables domain-specific visualisations — risk gauges, org charts, Gantt views, financial waterfall charts, compliance scorecards — that the platform's built-in renderers do not cover.
+Host applications can register **custom content renderers** that the platform loads at runtime. When the model produces a fenced code block tagged with a registered renderer's trigger, the platform invokes the host's renderer instead of its built-in pipeline. This enables domain-specific visualizations — risk gauges, org charts, Gantt views, financial waterfall charts, compliance scorecards — that the platform's built-in renderers do not cover.
 
 See [06-interface-and-rendering.md](./06-interface-and-rendering.md) for the full runtime rendering contract and system prompt guidance injection.
 
@@ -292,7 +292,7 @@ See [06-interface-and-rendering.md](./06-interface-and-rendering.md) for the ful
       "id":                   "risk-gauge",
       "trigger":              "risk-gauge",
       "name":                 "Risk Gauge",
-      "description":          "Interactive risk score gauge with traffic-light colouring",
+      "description":          "Interactive risk score gauge with traffic-light coloring",
       "moduleUrl":            "https://cdn.acme.com/ai-renderers/risk-gauge.js",
       "exportName":           "RiskGaugeRenderer",
       "systemPromptGuidance": "Use a ```risk-gauge block when asked for a risk score or risk assessment. The block must contain a JSON object: { \"score\": <0–100>, \"label\": \"<risk level label>\", \"breakdown\": [ { \"factor\": \"<name>\", \"score\": <0–100> } ] }. Only use this block when a numeric risk score is directly requested."
@@ -341,7 +341,7 @@ The `moduleUrl` origin must be declared during tenant registration (or updated v
 
 ## `userProfile`
 
-Describes how the platform should interpret user-profile claims for communication style personalisation. These claims are passed via the authentication bridge (see [07-embedding-and-integration.md](./07-embedding-and-integration.md)).
+Describes how the platform should interpret user-profile claims for communication style personalization. These claims are passed via the authentication bridge (see [07-embedding-and-integration.md](./07-embedding-and-integration.md)).
 
 ```json
 {
@@ -362,13 +362,13 @@ Describes how the platform should interpret user-profile claims for communicatio
       "displayNameField":   "name",
       "emailField":         "email",
       "roleField":          "job_title",
-      "organisationField":  "org_name"
+      "organizationField":  "org_name"
     }
   }
 }
 ```
 
-The `styleField`, `verbosityField`, and `sessionContext` field values must match claim keys passed in the user's JWT payload via the authentication bridge. If a user's JWT contains no matching claim for a given field, that field is omitted from the injected context. If `userProfile` is omitted from the config entirely, style personalisation and session context user fields are both disabled for the tenant.
+The `styleField`, `verbosityField`, and `sessionContext` field values must match claim keys passed in the user's JWT payload via the authentication bridge. If a user's JWT contains no matching claim for a given field, that field is omitted from the injected context. If `userProfile` is omitted from the config entirely, style personalization and session context user fields are both disabled for the tenant.
 
 ### `userProfile.sessionContext` fields
 
@@ -377,7 +377,7 @@ The `styleField`, `verbosityField`, and `sessionContext` field values must match
 | `displayNameField` | No | JWT claim key for the user's display name (e.g. `"name"`, `"display_name"`, `"full_name"`) |
 | `emailField` | No | JWT claim key for the user's email address |
 | `roleField` | No | JWT claim key for the user's job title or role |
-| `organisationField` | No | JWT claim key for the user's organisation or business unit |
+| `organizationField` | No | JWT claim key for the user's organization or business unit |
 
 All four fields are optional. The platform always injects the assistant name, application name, session date/time, and config version regardless of whether `sessionContext` is configured. User identity fields are only injected when their corresponding claim is present in the JWT and mapped here. See [04-model-and-prompt.md](./04-model-and-prompt.md) for the full session context block specification.
 
@@ -385,7 +385,7 @@ All four fields are optional. The platform always injects the assistant name, ap
 
 ## `memory`
 
-Configures the memory system for this tenant. See [05-tools-and-memory.md](./05-tools-and-memory.md) for the full behaviour specification.
+Configures the memory system for this tenant. See [05-tools-and-memory.md](./05-tools-and-memory.md) for the full behavior specification.
 
 ```json
 {
@@ -454,7 +454,7 @@ Feature flags that enable or disable platform capabilities for this tenant.
     "applicationContext":   true,
     "csatSurvey":           true,
     "csatSampleRate":       0.20,
-    "artefactTray":         true,
+    "artifactTray":         true,
     "starterWorkflows":     ["governance-health-check"],
     "starterQuestions": [
       "What are the highest-priority issues right now?",
@@ -475,7 +475,7 @@ Feature flags that enable or disable platform capabilities for this tenant.
 | `applicationContext` | `true` | Enable Application Context (managed by Application Admin) |
 | `csatSurvey` | `true` | Enable post-session CSAT rating prompt |
 | `csatSampleRate` | `0.20` | Fraction of sessions shown the CSAT prompt (0.0–1.0) |
-| `artefactTray` | `true` | Enable the session artefact tray panel |
+| `artifactTray` | `true` | Enable the session artifact tray panel |
 | `starterWorkflows` | `[]` | Workflow IDs shown as suggested starters on the onboarding screen (references `workflows[].id`) |
 | `starterQuestions` | `[]` | Plain-text starter questions shown on onboarding (up to 3, shown only if `starterWorkflows` is empty or alongside them) |
 
@@ -483,7 +483,7 @@ Feature flags that enable or disable platform capabilities for this tenant.
 
 ## `widget`
 
-Configures the **Mode 1 floating widget** (`<ai-chat-widget>`) behaviour for this tenant. Applies only when the host embeds the floating widget web component — ignored for Mode 2 (`<ai-chat>`) and Mode 3 (`<ai-chat-field>`) deployments. See [07-embedding-and-integration.md](./07-embedding-and-integration.md) for full widget behaviour.
+Configures the **Mode 1 floating widget** (`<ai-chat-widget>`) behavior for this tenant. Applies only when the host embeds the floating widget web component — ignored for Mode 2 (`<ai-chat>`) and Mode 3 (`<ai-chat-field>`) deployments. See [07-embedding-and-integration.md](./07-embedding-and-integration.md) for full widget behavior.
 
 ```json
 {
@@ -501,7 +501,7 @@ Configures the **Mode 1 floating widget** (`<ai-chat-widget>`) behaviour for thi
 | `defaultState` | `"mini"` | Initial expansion state when the user opens the widget for the first time in a browser session. Accepted values: `"mini"` (compact panel, ~400 × 600 px) or `"full"` (full-panel overlay). |
 | `fabIcon` | `"chat-bubble"` | Icon displayed on the floating action button. Platform icon name or absolute URL to an SVG. |
 | `showBadge` | `true` | Whether to show an unread-indicator badge on the FAB when the assistant has produced a new response while the widget is collapsed. |
-| `returningUserThreshold` | `4` | Idle time in hours before a returning user's mini-widget shows a compact re-entry card (summarising the last conversation and offering quick actions) rather than the new-conversation home state. Default: 4 hours. Set to `0` to always show the re-entry card when a prior conversation exists. |
+| `returningUserThreshold` | `4` | Idle time in hours before a returning user's mini-widget shows a compact re-entry card (summarizing the last conversation and offering quick actions) rather than the new-conversation home state. Default: 4 hours. Set to `0` to always show the re-entry card when a prior conversation exists. |
 
 ---
 

@@ -14,7 +14,7 @@ All remote connections use TLS. HTTP is rejected in all environments. The `MCP-P
 
 ### Authentication
 
-OAuth 2.1 with PKCE (S256 method, mandatory) for all remote clients. Token issuance is delegated to an external authorisation server. Every access token is bound to this server via the RFC 8707 resource indicator:
+OAuth 2.1 with PKCE (S256 method, mandatory) for all remote clients. Token issuance is delegated to an external authorization server. Every access token is bound to this server via the RFC 8707 resource indicator:
 
 ```
 resource=https://knowledge-mcp.maoperatingsystem.com

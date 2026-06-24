@@ -19,7 +19,7 @@ If no MCP servers are registered, the assistant operates in **prompt-only mode**
 
 #### Access tiers
 
-| Tier | Behaviour |
+| Tier | Behavior |
 |------|-----------|
 | **Always-on** | Active in every session; cannot be disabled by the end user. Designated by setting `accessTier: "always-on"` in the server's config entry. Host applications should designate as always-on only the MCP servers that should be available to all sessions without user action. |
 | **Opt-in** | Off by default; enabled by the end user per session via the tool selection panel. Does not persist across sessions. Designated by `accessTier: "opt-in"`. |
@@ -152,7 +152,7 @@ Participants cannot access MCP tools beyond their own permission level. If a too
 Three platform-level ecosystem services extend the tool registry beyond host-registered servers:
 
 - **MCP Repository** — Host teams use this during configuration to discover and browse available MCP tools before registering them. It is not directly invoked in conversations but informs the tool registry setup.
-- **MCP Knowledge** — Provides centralised skills, guidance documents, and reusable prompt artefacts. Host applications may choose to register MCP Knowledge as an opt-in or always-on server, making its capabilities available during conversations.
+- **MCP Knowledge** — Provides centralized skills, guidance documents, and reusable prompt artifacts. Host applications may choose to register MCP Knowledge as an opt-in or always-on server, making its capabilities available during conversations.
 - **MCP Internet Fetch & Search** — Provides real-time web search and page retrieval. Registered by host applications as an opt-in or always-on MCP server for sessions that need current information beyond the host's own data.
 
 See [08-platform-operations.md](./08-platform-operations.md) for full descriptions of all three services.
@@ -176,7 +176,7 @@ This section covers the registry model, how host teams populate it, its relation
 
 ### Access tiers
 
-Access tier behaviour is the same as described in [Tool access → Access tiers](#access-tiers) above. Use `always-on` for servers that are foundational to the assistant's usefulness (e.g. the host application's primary data API). Use `opt-in` for servers that are situationally useful but not needed in every session (e.g. a warehouse query tool, an external analytics service).
+Access tier behavior is the same as described in [Tool access → Access tiers](#access-tiers) above. Use `always-on` for servers that are foundational to the assistant's usefulness (e.g. the host application's primary data API). Use `opt-in` for servers that are situationally useful but not needed in every session (e.g. a warehouse query tool, an external analytics service).
 
 ---
 
@@ -250,7 +250,7 @@ Tool registry changes are versioned as part of the overall application config (s
 
 ### Relationship to the MCP Repository
 
-The **MCP Repository** is a complementary ecosystem service (see [08-platform-operations.md](./08-platform-operations.md)) that provides a discoverable catalogue of available MCP servers — both from the platform ecosystem and from external contributors.
+The **MCP Repository** is a complementary ecosystem service (see [08-platform-operations.md](./08-platform-operations.md)) that provides a discoverable catalog of available MCP servers — both from the platform ecosystem and from external contributors.
 
 The relationship to the per-tenant registry is:
 
@@ -267,12 +267,12 @@ The MCP Repository is a read-only browsing surface at config time — it is not 
 
 ### Relationship to MCP Knowledge
 
-**MCP Knowledge** is a complementary ecosystem service that provides centralised skills, guidance documents, and reusable prompt artefacts for use across the MCP ecosystem (see [08-platform-operations.md](./08-platform-operations.md)).
+**MCP Knowledge** is a complementary ecosystem service that provides centralized skills, guidance documents, and reusable prompt artifacts for use across the MCP ecosystem (see [08-platform-operations.md](./08-platform-operations.md)).
 
 Host applications register MCP Knowledge as an MCP server in their tenant registry (typically `opt-in`). When registered and activated in a session:
 - The model can invoke MCP Knowledge to retrieve platform-standard skills, guidance documents, and reusable prompt patterns
 - Resources returned appear as MCP tool results in the conversation thread with the standard tool call disclosure card
-- Resources are added to the session artefact tray for download
+- Resources are added to the session artifact tray for download
 
 The MCP Knowledge endpoint is published in the MCP Repository.
 
@@ -297,7 +297,7 @@ Memory and recall governs how the assistant retains standing context across sess
 | Control | Purpose | Scope |
 |---------|---------|-------|
 | **Personal memory** | Standing context about the individual user — role, focus areas, preferences, and corrections | That user only |
-| **Application context** | Standing context about the organisation/application — terminology, structure, governance decisions, standing guidance | All users within the same tenant |
+| **Application context** | Standing context about the organization/application — terminology, structure, governance decisions, standing guidance | All users within the same tenant |
 
 A third control — **recall scope** — determines who a user can share a conversation with: only users within the same tenant.
 
@@ -327,7 +327,7 @@ Personal memory is managed on the **My Memory** tab within the assistant's profi
 | **Search / filter** | Full-text search across item titles and content; filter by category and status. |
 | **Add item** | Free-text input — user types the memory item in plain language, optionally assigns a category, confirms, and it is saved as Active. |
 | **Extract from conversation** | User-initiated only. See [Extraction process](#extraction-process) below. |
-| **Token budget indicator** | Shows current usage against the tenant-configured token budget (e.g. `640 / 2,000 tokens`) with a colour-coded bar. |
+| **Token budget indicator** | Shows current usage against the tenant-configured token budget (e.g. `640 / 2,000 tokens`) with a color-coded bar. |
 | **Clear all** | Archives all items (moves to Inactive) after confirmation. Does not permanently delete — archived items remain in the audit trail. |
 
 #### Personal memory item categories
@@ -338,7 +338,7 @@ Host applications configure memory categories in `memory.personalMemory.categori
 |----------|---------|
 | **Role** | Job title, domain ownership, team membership |
 | **Preference** | Preferred response style, scope defaults, output format preferences |
-| **Correction** | Organisation-specific term overrides; corrections to the assistant's default assumptions |
+| **Correction** | Organization-specific term overrides; corrections to the assistant's default assumptions |
 | **Context** | Current focus areas, active projects, known constraints |
 
 #### Personal memory item lifecycle
@@ -361,7 +361,7 @@ Items are never permanently deleted — the record is retained with `status = ar
 
 1. User opens the conversation picker (full-text search across their conversation history)
 2. User selects a past conversation
-3. A dedicated **fast-tier model** call analyses the selected conversation using a structured extraction prompt — it identifies discrete, self-contained statements of user context worth persisting (role declarations, expressed preferences, corrections made, constraints stated)
+3. A dedicated **fast-tier model** call analyzes the selected conversation using a structured extraction prompt — it identifies discrete, self-contained statements of user context worth persisting (role declarations, expressed preferences, corrections made, constraints stated)
 4. The assistant presents a **review panel** showing each proposed item with: suggested text, suggested category, estimated token cost, and source conversation reference
 5. User accepts, edits, or discards each proposal **individually** — there is no bulk accept
 6. Accepted items are saved as Active; discarded proposals are not stored
@@ -370,7 +370,7 @@ The extraction call is a separate API call — it does not affect the conversati
 
 #### Token budget
 
-Personal memory is injected into the system prompt as a labelled `[Your context]` block. The budget is configurable per tenant via `memory.personalMemory.tokenBudget` (default: 2,000 tokens). When the budget is exceeded, the user is warned and the oldest items are marked Inactive — the user decides which items to reactivate or remove.
+Personal memory is injected into the system prompt as a labeled `[Your context]` block. The budget is configurable per tenant via `memory.personalMemory.tokenBudget` (default: 2,000 tokens). When the budget is exceeded, the user is warned and the oldest items are marked Inactive — the user decides which items to reactivate or remove.
 
 #### What personal memory cannot contain
 
@@ -378,7 +378,7 @@ Personal memory is injected into the system prompt as a labelled `[Your context]
 - Other users' personal information
 - Instructions that would override the platform system prompt — the platform prompt takes precedence
 
-#### Injection behaviour
+#### Injection behavior
 
 When personal memory is enabled, the `[Your context]` block is injected into the system prompt at session start. It appears in the conversation header as a collapsed indicator: **"Your context active [2 items · 640 tokens] ↗"** — click to expand and inspect the full content.
 
@@ -388,9 +388,9 @@ When personal memory is enabled, the `[Your context]` block is injected into the
 
 #### Purpose
 
-Application context gives the assistant organisation-wide context that applies to all users and sessions within the tenant. It provides ground truth for terminology, structure, and standing decisions that the assistant would otherwise have to infer or ask about. Examples:
+Application context gives the assistant organization-wide context that applies to all users and sessions within the tenant. It provides ground truth for terminology, structure, and standing decisions that the assistant would otherwise have to infer or ask about. Examples:
 
-- *"Our organisation uses 'account' to refer to customer records. 'Account' does not mean a financial account."*
+- *"Our organization uses 'account' to refer to customer records. 'Account' does not mean a financial account."*
 - *"The Customer domain is the master domain. All other domains reference it for shared definitions."*
 - *"Data owner assignments are reviewed quarterly — an assignment may be up to 90 days out of date."*
 - *"The Finance domain is under an active regulatory review. Flag any Finance domain queries before providing assessments."*
@@ -415,18 +415,18 @@ Host applications configure application context categories in `memory.applicatio
 
 | Category | Examples |
 |----------|---------|
-| **Terminology** | Organisation-specific term definitions; overrides to common terms |
-| **Structure** | Organisational hierarchy, domain ownership, team structure |
+| **Terminology** | Organization-specific term definitions; overrides to common terms |
+| **Structure** | Organizational hierarchy, domain ownership, team structure |
 | **Policy** | Standing governance decisions, active reviews, classification conventions |
 | **Domain context** | Known data quality issues, known gaps, recency caveats |
 
 #### Token budget
 
-Application context is injected as a labelled `[Application context]` block in the system prompt. The budget is configurable per tenant via `memory.applicationContext.tokenBudget` (default: 4,000 tokens). Items are injected in category order and by effective date (newest first) within category.
+Application context is injected as a labeled `[Application context]` block in the system prompt. The budget is configurable per tenant via `memory.applicationContext.tokenBudget` (default: 4,000 tokens). Items are injected in category order and by effective date (newest first) within category.
 
 #### Visibility for all users
 
-Application context is visible (read-only) to all authenticated users within the tenant from the conversation header indicator. Users can see exactly what organisation-wide context the assistant is working with in any session. They cannot edit it.
+Application context is visible (read-only) to all authenticated users within the tenant from the conversation header indicator. Users can see exactly what organization-wide context the assistant is working with in any session. They cannot edit it.
 
 #### Approval pipeline
 
@@ -488,7 +488,7 @@ The combined 6,000-token memory budget is included in the prompt cache — the c
 
 A user can only share a conversation with — and recall shared context alongside — other users **within the same tenant**. This is a hard boundary enforced at the data layer.
 
-| Boundary | Behaviour |
+| Boundary | Behavior |
 |----------|-----------|
 | Conversation sharing | Invitation search returns users within the authenticated user's tenant only. Cross-tenant results are excluded. |
 | Application context | The `[Application context]` block is scoped to the authenticated user's tenant. Context from one tenant is never injected into another tenant's sessions. |
@@ -496,7 +496,7 @@ A user can only share a conversation with — and recall shared context alongsid
 
 #### Why this boundary exists
 
-Conversation threads accumulate context about an organisation's operations, decisions, and data. Permitting cross-tenant access to this context would violate data confidentiality. The tenant boundary is a design constraint, not a configurable option.
+Conversation threads accumulate context about an organization's operations, decisions, and data. Permitting cross-tenant access to this context would violate data confidentiality. The tenant boundary is a design constraint, not a configurable option.
 
 ---
 
@@ -598,7 +598,7 @@ In a shared conversation thread, each message bubble carries the **author's name
 | Message source | Display |
 |---------------|---------|
 | Active user's messages | Right-aligned, muted bubble |
-| Other participants' messages | Left-aligned, with a distinct colour per participant (generated from the host's primary brand colour) |
+| Other participants' messages | Left-aligned, with a distinct color per participant (generated from the host's primary brand color) |
 | Model responses | Left-aligned as the assistant — never attributed to a user |
 
 The model label (and, on hover, the name of the user who submitted the preceding message) is visible on each assistant response.
@@ -610,7 +610,7 @@ The model label (and, on hover, the name of the user who submitted the preceding
 Each user's `@`-binding typeahead is **scoped to their own permissions** (as enforced by the host's `searchEndpoint`). A participant cannot bind to an object they cannot access in the host application.
 
 If a user submits a message containing a binding to an object that another participant **cannot access**:
-- The restricted participant sees the binding chip labelled **"[Restricted object]"**
+- The restricted participant sees the binding chip labeled **"[Restricted object]"**
 - They do not see the resolved context that was injected into the model prompt
 - The tool call disclosure for any resulting MCP call shows `[Restricted — insufficient permissions]` on the result summary for that participant
 
@@ -636,7 +636,7 @@ The active model and any opt-in MCP tools **apply to the session as a whole** �
 
 The **share icon** in the input area opens the participant management panel. From this panel, any participant may:
 
-| Action | Behaviour |
+| Action | Behavior |
 |--------|----------|
 | Search for users | Search within the authenticated user's tenant by name or email — cross-tenant results are excluded |
 | Invite a user | Sends in-platform notification to the named user |

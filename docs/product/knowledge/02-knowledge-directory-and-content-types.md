@@ -41,7 +41,7 @@ All path segments use kebab-case. No spaces, no underscores, no uppercase. The a
 
 ## File Suffix Registry
 
-| Folder | Recognised Suffixes | Content Type |
+| Folder | Recognized Suffixes | Content Type |
 |---|---|---|
 | `resources/` | `*` (any) | Resource |
 | `prompts/` | `.prompt.md`, `.prompt.json` | Prompt |
@@ -59,7 +59,7 @@ All content is addressed using `file://` URIs rooted at `file:///knowledge/`. Th
 file:///knowledge/{domain}/{sub-domain}/{app}/{kind}/{+path}
 ```
 
-**Folder URI behaviour:** Passing a trailing-slash URI to any list, read, or get operation returns all direct children scoped to that folder. This is uniform across all content types and all MCP methods. Directory entries are identified with MIME type `inode/directory`.
+**Folder URI behavior:** Passing a trailing-slash URI to any list, read, or get operation returns all direct children scoped to that folder. This is uniform across all content types and all MCP methods. Directory entries are identified with MIME type `inode/directory`.
 
 **Example URIs:**
 ```
@@ -96,13 +96,13 @@ Parameterised templates rendered into a `messages[]` array for direct LLM submis
 name:        maturity-assessment       # kebab-case, unique within app
 title:       Data Maturity Assessment
 version:     1.1.0
-description: Guides an organisation through a structured data maturity survey
+description: Guides an organization through a structured data maturity survey
 tags:
   - governance
   - assessment
 arguments:
   - name:        org_name
-    description: Organisation name
+    description: Organization name
     required:    true
   - name:        scope
     description: Assessment domain
@@ -181,7 +181,7 @@ Discrete, single-invocation executable definitions carrying a `command` string a
 
 **Danger levels:**
 
-| Level | Meaning | Client Behaviour |
+| Level | Meaning | Client Behavior |
 |---|---|---|
 | `read-only` | No state mutation | May invoke without confirmation |
 | `write` | Creates or modifies state | Should present confirmation prompt |

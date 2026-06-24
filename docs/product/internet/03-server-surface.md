@@ -22,7 +22,7 @@ Transport: stdio (local deployments) and Streamable HTTP with SSE (remote and mu
     "title":   "MAOS Internet Access MCP Server",
     "version": "1.0.0"
   },
-  "instructions": "Provides controlled internet search and page fetch. All requests are subject to entitlement and site classification policy. Use search to retrieve ranked web results, fetch to retrieve page content in raw, markdown, chunked, or summarised format. Authenticated fetch requires a valid identity token and is available from v1."
+  "instructions": "Provides controlled internet search and page fetch. All requests are subject to entitlement and site classification policy. Use search to retrieve ranked web results, fetch to retrieve page content in raw, markdown, chunked, or summarized format. Authenticated fetch requires a valid identity token and is available from v1."
 }
 ```
 
@@ -78,7 +78,7 @@ Plain-text summary of result count and any applied filters.
 }
 ```
 
-`provenance.executed_at` is an ISO 8601 UTC timestamp. `provenance.results_hash` is a SHA-256 hex digest of the canonically serialised result set after filtering — enabling callers and audit systems to verify the result set has not been modified in transit. `provenance.backend` identifies the search backend that served the query (e.g. `searxng`, `brave`, `enterprise-index`).
+`provenance.executed_at` is an ISO 8601 UTC timestamp. `provenance.results_hash` is a SHA-256 hex digest of the canonically serialized result set after filtering — enabling callers and audit systems to verify the result set has not been modified in transit. `provenance.backend` identifies the search backend that served the query (e.g. `searxng`, `brave`, `enterprise-index`).
 
 **Error conditions**
 
@@ -99,7 +99,7 @@ Fetch a URL and return page content in the requested output format, subject to e
 | Parameter | Type | Required | Description |
 |---|---|---|---|
 | `url` | string | Yes | The URL to fetch |
-| `format` | enum | No | Output format: `raw`, `markdown`, `chunked`, `summarised`. Default: `markdown` |
+| `format` | enum | No | Output format: `raw`, `markdown`, `chunked`, `summarized`. Default: `markdown` |
 | `chunk_size` | integer | No | Token or character limit per chunk; only used when `format` is `chunked` |
 | `start_chunk` | integer | No | Chunk index to begin from; enables pagination through large pages |
 
@@ -110,7 +110,7 @@ Fetch a URL and return page content in the requested output format, subject to e
 | `raw` | Unprocessed HTTP response body; all HTML, scripts, and structure preserved |
 | `markdown` | Page content converted to clean Markdown; navigation, advertisements, and boilerplate stripped |
 | `chunked` | Markdown content segmented into discrete chunks; each chunk includes its index and total chunk count |
-| `summarised` | LLM-generated summary of the page content; requires a configured LLM backend |
+| `summarized` | LLM-generated summary of the page content; requires a configured LLM backend |
 
 **Response — `content`**
 
@@ -150,7 +150,7 @@ The fetched page content in the requested format.
 | URL blocked by site classification | `classification_rejection` |
 | Target server non-200 response | `fetch_error` with HTTP status code |
 | Target server timeout | `timeout_error` |
-| `summarised` format with no LLM backend configured | `capability_unavailable` |
+| `summarized` format with no LLM backend configured | `capability_unavailable` |
 | `start_chunk` beyond available chunks | `chunk_out_of_range` |
 
 ---
@@ -164,7 +164,7 @@ Fetch a URL using the caller's identity credentials. Available from v1. Applies 
 | Parameter | Type | Required | Description |
 |---|---|---|---|
 | `url` | string | Yes | The URL to fetch |
-| `format` | enum | No | Output format: `raw`, `markdown`, `chunked`, `summarised`. Default: `markdown` |
+| `format` | enum | No | Output format: `raw`, `markdown`, `chunked`, `summarized`. Default: `markdown` |
 | `chunk_size` | integer | No | Token or character limit per chunk |
 | `start_chunk` | integer | No | Chunk index to begin from |
 | `token` | string | No | Bearer token from the enterprise IdP; used for OBO token exchange if the target resource requires a different audience |
@@ -174,8 +174,8 @@ Fetch a URL using the caller's identity credentials. Available from v1. Applies 
 | Mode | Mechanism |
 |---|---|
 | Enterprise IdP | Bearer token accepted from any OIDC-compliant provider; OBO exchange performed for resources requiring a different token audience |
-| Consumer OAuth (v2) | OAuth 2.1 with PKCE; access token from the authorisation code flow stored in session context |
-| Cookie/session forwarding (v2) | Serialised session state (cookies, localStorage) replayed against the target URL |
+| Consumer OAuth (v2) | OAuth 2.1 with PKCE; access token from the authorization code flow stored in session context |
+| Cookie/session forwarding (v2) | Serialized session state (cookies, localStorage) replayed against the target URL |
 
 **Response shapes**
 
@@ -191,7 +191,7 @@ Identical to `fetch`. An additional `auth_method` field is included in `structur
 
 ---
 
-## Cross-Cutting Behaviours
+## Cross-Cutting Behaviors
 
 ### Error Response Shape
 
@@ -216,7 +216,7 @@ Every successful `search`, `fetch`, and `fetch_authenticated` response includes 
 | `backend` | `search` | Identifier of the search backend that served the query |
 | `result_count_returned` | `search` | Number of results returned after filtering |
 | `result_count_before_filtering` | `search` | Number of results received from the backend before entitlement and classification filtering |
-| `results_hash` | `search` | SHA-256 hex digest of the canonically serialised filtered result set |
+| `results_hash` | `search` | SHA-256 hex digest of the canonically serialized filtered result set |
 | `url` | `fetch`, `fetch_authenticated` | Final URL fetched, after any server-side redirects |
 | `fetched_at` | `fetch`, `fetch_authenticated` | ISO 8601 UTC timestamp of the fetch |
 | `content_length_bytes` | `fetch`, `fetch_authenticated` | Size of the raw response body in bytes |

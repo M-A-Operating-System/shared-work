@@ -224,7 +224,7 @@ def _render_mermaid(source: str) -> str | None:
         data         = _b64.b64encode(out_path.read_bytes()).decode()
 
     # Inline width/height bypass WeasyPrint's broken max-width+max-height+height:auto
-    # aspect-ratio resolution — explicit dimensions are always honoured correctly.
+    # aspect-ratio resolution — explicit dimensions are always honored correctly.
     style = f"width:{w_mm:.1f}mm;height:{h_mm:.1f}mm"
     return f'<img src="data:image/png;base64,{data}" class="mermaid-img" style="{style}" alt="Diagram">'
 
@@ -841,7 +841,7 @@ def generate_pages(product_name: str, page_prefixes: list[str],
     print(f"Done → {output}  ({size_mb:.1f} MB)")
 
     # Publish the output path for GitHub Actions step chaining (single-chapter only,
-    # matching the behaviour of generate_page() for the --page flag).
+    # matching the behavior of generate_page() for the --page flag).
     if len(page_prefixes) == 1 and out_name is None:
         _emit_github_output(output)
 

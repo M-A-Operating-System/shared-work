@@ -16,7 +16,7 @@ This server is the **MCP Knowledge** service referenced by the [AI Chat Platform
 | 03 | [Server Surface](03-server-surface.md) | MCP primitives (resources, prompts, notifications) and all ten tools with input schemas and response shapes |
 | 04 | [Implementation Reference](04-implementation-reference.md) | Security model, project structure, key modules with typed Python, Docker deployment |
 | 05 | [Client Integration Guide](05-client-integration-guide.md) | Connection, common patterns, per-consumer guidance, error handling, roadmap |
-| — | [Roadmap](roadmap.md) | Version-by-version evolution from embedded single-app deployment through centralised platform, semantic search, and governed authoring |
+| — | [Roadmap](roadmap.md) | Version-by-version evolution from embedded single-app deployment through centralized platform, semantic search, and governed authoring |
 
 ---
 

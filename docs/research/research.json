@@ -3195,7 +3195,7 @@
       "product_name": "decisioning",
       "display_name": "AI Decisioning",
       "domain": "knowledge",
-      "description": "Defines, manages and visualises enterprise decision logic as structured, deterministic decision trees and semantic decision definitions, enabling consistent, auditable, human-readable decision outcomes for business rules, policy and agentic workflows.",
+      "description": "Defines, manages and visualizes enterprise decision logic as structured, deterministic decision trees and semantic decision definitions, enabling consistent, auditable, human-readable decision outcomes for business rules, policy and agentic workflows.",
       "reference_implementations": [
         {
           "name": "Draw Decision Tree",

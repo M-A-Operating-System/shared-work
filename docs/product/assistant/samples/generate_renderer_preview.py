@@ -770,8 +770,8 @@ def json_raw(draw, x0, y0, x1, y1, measure=False):
         ('}',                                   CODE_TEXT),
         ('```',                                 CODE_TEXT),
     ]
-    # syntax-colour the lines
-    def colour(txt):
+    # syntax-color the lines
+    def color(txt):
         t = txt.strip()
         if t.startswith('"') and '":' in t:
             k, rest = t.split(':', 1)
@@ -830,7 +830,7 @@ MATH_GRAY    = (120, 125, 135)   # dim parts
 MATH_DIVIDER = (225, 227, 232)
 
 def _draw_fraction(draw, cx, cy, num_txt, den_txt, fnt_main, fnt_small, ink):
-    """Draw a vertical fraction centred at cx, cy. Returns half-height used."""
+    """Draw a vertical fraction centered at cx, cy. Returns half-height used."""
     nw = twidth(num_txt, fnt_small)
     dw = twidth(den_txt, fnt_small)
     bar_w = max(nw, dw) + 8
@@ -1219,7 +1219,7 @@ def _pdf_toolbar(draw, x0, y0, x1, toolbar_h, page, total_pages):
     pg_txt = f"Page {page} of {total_pages}"
     draw.text((x0+10, y0+toolbar_h//2-7), pg_txt, font=f, fill=PDF_CTRL)
 
-    # Centre: ‹ › nav arrows
+    # Center: ‹ › nav arrows
     cx = (x0 + x1) // 2
     draw.text((cx - 28, y0+toolbar_h//2-8), "‹", font=fnt(SANS, 16), fill=PDF_CTRL_HOV)
     draw.text((cx + 16, y0+toolbar_h//2-8), "›", font=fnt(SANS, 16), fill=PDF_CTRL_HOV)
@@ -1279,10 +1279,10 @@ def _pdf_page(draw, img, x0, y0, page_w, page_h):
         py += 11
 
     py += 6
-    draw.text((px, py), "2.  Licence Grant", font=f_h, fill=PDF_BODY_TX)
+    draw.text((px, py), "2.  License Grant", font=f_h, fill=PDF_BODY_TX)
     py += 13
     para2 = ("Subject to the terms of this Agreement and timely payment of all Fees, Provider "
-             "grants Customer a non-exclusive, non-transferable, worldwide licence to access "
+             "grants Customer a non-exclusive, non-transferable, worldwide license to access "
              "and use the Services during the Subscription Term.")
     words2 = para2.split()
     line2, lines2 = [], []
@@ -1300,7 +1300,7 @@ def _pdf_page(draw, img, x0, y0, page_w, page_h):
 
 def pdf_rendered(draw, x0, y0, x1, y1, measure=False):
     TOOLBAR_H = 28
-    PAGE_W    = x1 - x0 - 20   # centred page with margin
+    PAGE_W    = x1 - x0 - 20   # centered page with margin
     PAGE_H    = int(PAGE_W * 1.3)
     h = TOOLBAR_H + 12 + PAGE_H + 12
     if measure: return h

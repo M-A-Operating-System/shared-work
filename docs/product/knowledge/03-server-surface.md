@@ -76,7 +76,7 @@ Surfaces prompt, skill, command, and agent files as parameterised templates rend
     { "name": "file:///knowledge/maos/dda/data-design-authority/prompts/maturity-assessment.prompt.md",
       "title": "Data Maturity Assessment",
       "arguments": [
-        { "name": "org_name", "description": "Organisation name", "required": true },
+        { "name": "org_name", "description": "Organization name", "required": true },
         { "name": "scope",    "description": "Assessment domain",  "required": false }
       ]},
     { "name": "file:///knowledge/maos/dda/data-design-authority/skills/gmail-triage/SKILL.md",

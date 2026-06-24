@@ -73,7 +73,7 @@ Host applications define their own style values and descriptions. Below is an ex
 
 ### Response verbosity
 
-| Verbosity value | Behaviour |
+| Verbosity value | Behavior |
 |----------------|----------|
 | `concise` | Direct answers; minimal preamble; tables preferred over prose lists |
 | `standard` | Balanced explanation with supporting context |
@@ -122,7 +122,7 @@ The platform assembles the system prompt from multiple layers before each sessio
 
 Layers 1–5 are **platform-managed and non-overridable** — they cannot be suppressed by host system prompt content.
 
-Host applications may reinforce or tailor uncertainty behaviour further in their `scope.systemPrompt` — for example, specifying the domain areas where the model should be especially cautious, or providing alternative phrasings for uncertainty acknowledgment that fit the application's voice. MCP Knowledge also publishes guidance documents on uncertainty handling that hosts can register and retrieve at session time (see [08-platform-operations.md](./08-platform-operations.md)).
+Host applications may reinforce or tailor uncertainty behavior further in their `scope.systemPrompt` — for example, specifying the domain areas where the model should be especially cautious, or providing alternative phrasings for uncertainty acknowledgment that fit the application's voice. MCP Knowledge also publishes guidance documents on uncertainty handling that hosts can register and retrieve at session time (see [08-platform-operations.md](./08-platform-operations.md)).
 
 Changes to the host base prompt are made via the Config Editor UI or Admin API and go through config validation before taking effect.
 
@@ -136,7 +136,7 @@ The platform assembles the block at session start from three sources: the tenant
 
 ### Rendered output
 
-The block is rendered as a JSON object and injected at the top of the system prompt inside a fenced code block labelled `session-context`. JSON is used so the model can parse fields unambiguously without relying on prose formatting. Example:
+The block is rendered as a JSON object and injected at the top of the system prompt inside a fenced code block labeled `session-context`. JSON is used so the model can parse fields unambiguously without relying on prose formatting. Example:
 
 ````
 ```session-context
@@ -147,7 +147,7 @@ The block is rendered as a JSON object and injected at the top of the system pro
     "name": "Sarah Chen",
     "email": "sarah.chen@acme.com",
     "role": "Senior Data Analyst",
-    "organisation": "Acme Corporation"
+    "organization": "Acme Corporation"
   },
   "session": {
     "timestamp": "2026-06-16T09:14:00Z",
@@ -168,7 +168,7 @@ All top-level keys are always present. Fields within the `user` object are omitt
 | `user.name` | JWT claim mapped via `userProfile.sessionContext.displayNameField` | If claim present |
 | `user.email` | JWT claim mapped via `userProfile.sessionContext.emailField` | If claim present |
 | `user.role` | JWT claim mapped via `userProfile.sessionContext.roleField` | If claim present |
-| `user.organisation` | JWT claim mapped via `userProfile.sessionContext.organisationField` | If claim present |
+| `user.organization` | JWT claim mapped via `userProfile.sessionContext.organizationField` | If claim present |
 | `session.timestamp` | Platform server clock (ISO 8601 UTC) | Yes |
 | `session.config_version` | Active tenant config version record | Yes |
 

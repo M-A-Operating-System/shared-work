@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Weekly AI research catalog update — two-phase, cost-optimised.
+Weekly AI research catalog update — two-phase, cost-optimized.
 
 Phase 1  claude-sonnet-4-6  Search and gather findings for the current
                              domain rotation. Catalog summary (not full JSON)
@@ -9,7 +9,7 @@ Phase 2  claude-opus-4-8    Update catalog JSON from Phase 1 findings.
                              Full catalog + schema in cached system prompt.
                              High-effort adaptive thinking.
 
-Cost optimisations:
+Cost optimizations:
   1. Prompt caching on system prompts in both phases
   2. Catalog summary (not full JSON) passed to Phase 1
   3. Slim search results: title + url + excerpt only
@@ -225,9 +225,9 @@ def web_fetch(url: str, max_chars: int = 5000) -> str:
         return f"fetch error: {exc}"
 
 
-# ── Block serialiser ───────────────────────────────────────────────────────────
+# ── Block serializer ───────────────────────────────────────────────────────────
 
-def serialise_block(block) -> dict:
+def serialize_block(block) -> dict:
     if block.type == "thinking":
         return {"type": "thinking", "thinking": block.thinking, "signature": block.signature}
     if block.type == "text":
@@ -319,7 +319,7 @@ def _agentic_loop(
         block_types = [b.type for b in response.content]
         print(f"  stop_reason={response.stop_reason}  blocks={block_types}")
 
-        messages.append({"role": "assistant", "content": [serialise_block(b) for b in response.content]})
+        messages.append({"role": "assistant", "content": [serialize_block(b) for b in response.content]})
 
         tool_uses = [b for b in response.content if b.type == "tool_use"]
         if not tool_uses:
@@ -420,7 +420,7 @@ When research is complete, call finish_research with your findings and sources.
     if tavily_available:
         tools.append({
             "name": "tavily_search",
-            "description": "Research-optimised web search via Tavily.",
+            "description": "Research-optimized web search via Tavily.",
             "input_schema": {
                 "type": "object",
                 "properties": {

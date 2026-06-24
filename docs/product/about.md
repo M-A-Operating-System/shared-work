@@ -1,6 +1,6 @@
 # About This Document
 
-This document is part of the **M&A Operating System** product design specification series. It describes the intended design, architecture, and behaviour of the platform within. It is intended for internal distribution across product, engineering, and design review functions.
+This document is part of the **M&A Operating System** product design specification series. It describes the intended design, architecture, and behavior of the platform within. It is intended for internal distribution across product, engineering, and design review functions.
 
 This is a living specification. It reflects design intent at the time of publication and will be updated as the product evolves.
 

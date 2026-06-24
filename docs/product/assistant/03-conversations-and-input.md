@@ -68,7 +68,7 @@ A search field at the top of the history panel searches across all the authentic
 | User message text | "Compare error rates for `@{Payment Service}`" |
 | Assistant response text | "The Payment Service had three error spikes in the last hour" |
 
-#### Search behaviour
+#### Search behavior
 
 - Results are returned in **relevance order** with the matching excerpt highlighted.
 - Selecting a result opens the conversation **at the matching turn**.
@@ -90,24 +90,24 @@ A conversation may not exceed **100 turns** (configurable per tenant up to the p
 
 Before the turn limit is reached, the active context window may fill based on message length and attachment size. When a conversation reaches **80% of the model's context window** (160K tokens on current 200K context models), a **persistent warning banner** appears in the conversation header:
 
-> *"This conversation is getting long. Older turns are being summarised automatically to keep [AssistantName] running. [View summary ↗]"*
+> *"This conversation is getting long. Older turns are being summarized automatically to keep [AssistantName] running. [View summary ↗]"*
 
 The warning is persistent (not dismissible) and remains visible until the conversation ends or is branched.
 
-#### Automatic summarisation — default behaviour
+#### Automatic summarization — default behavior
 
-When the context window reaches **80%**, the platform **automatically summarises the oldest turns** to free space, without requiring user action.
+When the context window reaches **80%**, the platform **automatically summarizes the oldest turns** to free space, without requiring user action.
 
-| Element | Behaviour |
+| Element | Behavior |
 |---------|----------|
-| What gets summarised | Oldest turns first — the earliest 40% of turns are summarised; the most recent 60% are always kept verbatim in the context window |
+| What gets summarized | Oldest turns first — the earliest 40% of turns are summarized; the most recent 60% are always kept verbatim in the context window |
 | Summary model | A separate **fast-tier model** API call generates the summary before the next user turn is processed |
 | Summary format | Structured: **Key entities discussed** · **Key findings** · **Decisions or conclusions reached** · **Unresolved questions** |
-| Visibility | A **condensation marker** is inserted in the conversation thread: *"↑ N turns summarised — [tap to expand]"* |
+| Visibility | A **condensation marker** is inserted in the conversation thread: *"↑ N turns summarized — [tap to expand]"* |
 | Expansion | Tapping the marker shows the full structured summary inline |
 | Audit trail | Original turn content is **always retained in full** in `assistant.turns`. Summarisation affects only the active context window sent to the AI provider, not stored data. |
-| Frequency | Re-summarises incrementally on each subsequent turn that would exceed the context limit |
-| Injection | Summary injected as a `[Context from earlier turns]` block at the top of the conversation context — clearly labelled so the model treats it as historical context |
+| Frequency | Re-summarizes incrementally on each subsequent turn that would exceed the context limit |
+| Injection | Summary injected as a `[Context from earlier turns]` block at the top of the conversation context — clearly labeled so the model treats it as historical context |
 
 #### Manual branch — user-initiated
 
@@ -132,7 +132,7 @@ The platform queries the active model's context limit at session start and calcu
 
 ---
 
-### History panel organisation
+### History panel organization
 
 ```
 ┌─────────────────────────────┐
@@ -171,9 +171,9 @@ The platform queries the active model's context limit at session start and calcu
 
 Users may search within the currently open conversation to locate a specific turn or content. Accessible via **`Cmd/Ctrl + F`** while the conversation area is focused.
 
-| Behaviour | Specification |
+| Behavior | Specification |
 |-----------|--------------|
-| Scope | Full text of all turns in the current conversation — user messages, assistant responses, and artefact names |
+| Scope | Full text of all turns in the current conversation — user messages, assistant responses, and artifact names |
 | Presentation | Matching text highlighted in-thread; navigation arrows to move between matches |
 | Turn navigation | Each match shows the turn number and jumps the scroll position to that turn |
 | Close | `Escape` or clicking outside the search bar dismisses it |
@@ -188,7 +188,7 @@ In-conversation search is distinct from the cross-conversation search in the his
 
 The primary input is a **multi-line natural-language text field**.
 
-| Behaviour | Specification |
+| Behavior | Specification |
 |-----------|--------------|
 | Growth | Field grows to five lines before scrolling internally |
 | Submit | `Cmd/Ctrl + Enter` |
@@ -231,7 +231,7 @@ Any object type the host application defines is bindable. The platform imposes n
 
 Binding chips for objects that are marked inactive in the host application's search endpoint response (`inactive: true`) are rendered in a **greyed-out style** with an `(inactive)` suffix.
 
-| Behaviour | Specification |
+| Behavior | Specification |
 |-----------|--------------|
 | Chip appearance | Grey fill and muted text; `(inactive)` suffix; object type icon retained |
 | Resolution | The chip still resolves — the `contextTemplate` is populated and the model receives the resolved context, including the inactive status |
@@ -274,9 +274,9 @@ Inactive objects appear below active results with a greyed style:
               │  🗄 Finance Domain  (inactive)  DOM-004  │
 ```
 
-#### Typeahead behaviour
+#### Typeahead behavior
 
-| Behaviour | Specification |
+| Behavior | Specification |
 |-----------|--------------|
 | Match | Fuzzy match from the first character after `@` |
 | Ranking | Host-configured rank order (ascending `rank` field in `bindableTypes`); alphabetical within type when `rank` values are equal |
@@ -289,7 +289,7 @@ Inactive objects appear below active results with a greyed style:
 
 When a conversation is shared, each participant's typeahead is scoped to their own permissions (as enforced by the host's `searchEndpoint`). A participant cannot bind to an object they cannot access in the host application.
 
-If a submitted message contains a binding to an object that another participant cannot access, the restricted participant sees the chip labelled **"[Restricted object]"** — they do not see the resolved context that was injected into the model prompt. See [05-tools-and-memory.md](./05-tools-and-memory.md).
+If a submitted message contains a binding to an object that another participant cannot access, the restricted participant sees the chip labeled **"[Restricted object]"** — they do not see the resolved context that was injected into the model prompt. See [05-tools-and-memory.md](./05-tools-and-memory.md).
 
 ---
 
@@ -348,15 +348,15 @@ Images may be attached directly or **pasted from the clipboard** (`Cmd/Ctrl+V` w
 The input area displays a running attachment budget indicator: *"42 MB of 100 MB used"*. When the conversation budget is full:
 - The attachment button is disabled
 - A notice appears: *"Attachment limit reached for this conversation. Start a new conversation to attach more files."*
-- Previously attached files remain available in the artefact tray
+- Previously attached files remain available in the artifact tray
 
-#### Artefact retention
+#### Artifact retention
 
-Attached files are **stored in full** in platform storage as part of the conversation audit trail. They are downloadable from the artefact tray for the lifetime of the conversation record and are not deleted when the user closes the session.
+Attached files are **stored in full** in platform storage as part of the conversation audit trail. They are downloadable from the artifact tray for the lifetime of the conversation record and are not deleted when the user closes the session.
 
 #### Document display in the conversation
 
-Attached documents appear in the user message bubble as a labelled file card: format icon, file name, and page/sheet count. Documents are not rendered inline.
+Attached documents appear in the user message bubble as a labeled file card: format icon, file name, and page/sheet count. Documents are not rendered inline.
 
 ```
 ┌────────────────────────────────────────────────────────────┐
@@ -365,7 +365,7 @@ Attached documents appear in the user message bubble as a labelled file card: fo
 │  │   32 pages           │  │   3 sheets                 │  │
 │  └──────────────────────┘  └────────────────────────────┘  │
 │                                                            │
-│  Summarise the key governance findings and compare         │  ← Message text
+│  Summarize the key governance findings and compare         │  ← Message text
 │  against the Finance domain metrics.                       │
 └────────────────────────────────────────────────────────────┘
 ```
@@ -400,7 +400,7 @@ When the model references a specific section of an attached document, it cites b
 
 An **edit icon** is associated with each past user message. On desktop it appears on hover; on mobile it is always visible below the message (no hover state). Long-pressing the message on mobile also opens the message action menu.
 
-| Action | Behaviour |
+| Action | Behavior |
 |--------|----------|
 | Click edit icon | Inline edit field opens, pre-populated with the original text |
 | `@`-binding chips | Preserved in the edit field; editable |

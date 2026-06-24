@@ -14,9 +14,9 @@ MAOS platform components — MCP servers providing value-added capabilities, age
 
 ## Solution
 
-A centralised MCP server exposing a structured knowledge directory over the Model Context Protocol. Every MAOS component and any authorised MCP client connects to this server to discover and consume resources, prompts, skills, commands, and agent definitions from one place. The server is the single source of truth for all reusable AI assets across the platform.
+A centralized MCP server exposing a structured knowledge directory over the Model Context Protocol. Every MAOS component and any authorized MCP client connects to this server to discover and consume resources, prompts, skills, commands, and agent definitions from one place. The server is the single source of truth for all reusable AI assets across the platform.
 
-The design assumes that all content can be aligned to a knowledge hierarchy that mirrors the organisation itself — structured around the organisation's hierarchy, its existing business processes, and the applications and services that support them. This means the directory tree naturally reflects how the business is structured: domains map to business units or functions, sub-domains to teams or process areas, and application nodes to the specific systems and services in use. AI assets are authored and discovered in the same context as the work they support.
+The design assumes that all content can be aligned to a knowledge hierarchy that mirrors the organization itself — structured around the organization's hierarchy, its existing business processes, and the applications and services that support them. This means the directory tree naturally reflects how the business is structured: domains map to business units or functions, sub-domains to teams or process areas, and application nodes to the specific systems and services in use. AI assets are authored and discovered in the same context as the work they support.
 
 ---
 
@@ -24,14 +24,14 @@ The design assumes that all content can be aligned to a knowledge hierarchy that
 
 The Model Context Protocol defines four core primitives that servers use to expose capabilities to clients. In a typical MCP deployment each server manages its own primitives locally — prompts, skills, and agent definitions live alongside the code that uses them, with no shared authoring location or distribution mechanism.
 
-The Knowledge MCP Server changes this. It acts as a **central repository for all MCP primitives across the ecosystem** — a single, Git-versioned location where primitives are authored, reviewed, and published once, then consumed by any authorised MCP client, agent, or server on the network. When a prompt or skill is updated, every consumer receives the change automatically through MCP notifications. No local copies, no lockstep updates, no drift.
+The Knowledge MCP Server changes this. It acts as a **central repository for all MCP primitives across the ecosystem** — a single, Git-versioned location where primitives are authored, reviewed, and published once, then consumed by any authorized MCP client, agent, or server on the network. When a prompt or skill is updated, every consumer receives the change automatically through MCP notifications. No local copies, no lockstep updates, no drift.
 
-| Primitive | What it is | How the Knowledge Server centralises it |
+| Primitive | What it is | How the Knowledge Server centralizes it |
 |---|---|---|
 | **Resource** | Named content items a server exposes for clients to discover (`resources/list`) and read (`resources/read`). Identified by a URI. Can be files, database records, or any structured data. | Every reference document, schema, and configuration file in the knowledge directory is versioned in Git and surfaced as a resource addressable by its `file:///knowledge/...` URI — one authoritative copy available to all consumers. |
 | **Prompt** | Parameterised message templates the server registers (`prompts/list`) and renders on demand (`prompts/get`). Arguments are substituted at render time; the result is a `messages[]` array ready for direct LLM submission. | Prompt templates, skill entry points, command definitions, and agent system prompts are all authored in one place, version-controlled, and distributed on demand. Any MCP client calls `prompts/get` and receives a fully rendered message array — no local template management required. |
 | **Tool** | Callable functions the server exposes for clients and models to invoke. Each tool has a typed input schema; the server executes the function and returns `content` (display text) and `structuredContent` (typed payload). | Ten typed tools give the wider ecosystem structured, type-safe access to every content category — skills, commands, agents, prompts, and resources — without each consumer needing to implement its own parsing or rendering logic. |
-| **Notification** | Server-to-client push messages signalling state changes. Clients subscribe to specific resource URIs or to list-change events and receive notifications when content is added, removed, or updated. | When any file in the knowledge directory changes, subscribed clients across the entire ecosystem are notified instantly — eliminating polling and ensuring every agent and server is always working from the latest published version. |
+| **Notification** | Server-to-client push messages signaling state changes. Clients subscribe to specific resource URIs or to list-change events and receive notifications when content is added, removed, or updated. | When any file in the knowledge directory changes, subscribed clients across the entire ecosystem are notified instantly — eliminating polling and ensuring every agent and server is always working from the latest published version. |
 
 ---
 
@@ -45,9 +45,9 @@ The Knowledge MCP Server changes this. It acts as a **central repository for all
 
 **P4 — Type-safe content.** Five distinct content types — resources, prompts, skills, commands, agents — each with a defined schema, discovery path, and rendering contract.
 
-**P5 — Folder URI consistency.** Passing a folder URI to any list, read, or get operation returns all entries scoped to that folder. This behaviour is uniform across all content types and all tools.
+**P5 — Folder URI consistency.** Passing a folder URI to any list, read, or get operation returns all entries scoped to that folder. This behavior is uniform across all content types and all tools.
 
-**P6 — Read-only enforcement.** The server never writes to the knowledge directory. All mutation is performed by authorised humans or deployment pipelines operating through version control.
+**P6 — Read-only enforcement.** The server never writes to the knowledge directory. All mutation is performed by authorized humans or deployment pipelines operating through version control.
 
 **P7 — OAuth 2.1 on all remote connections.** Every token is bound to this specific server via RFC 8707. No token sharing across servers.
 

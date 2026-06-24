@@ -62,7 +62,7 @@ When both signals are true, the SEG triggers additional governance outputs as pa
 
 - **Regulatory trace record** — written to the compliance-mode-specific trace table (e.g. `analytics.mifid2_trace`, `analytics.regulatory_snapshots`) in addition to the standard lineage record
 - **Lineage-gated export** — export of the result is blocked until a complete lineage record exists (`requireLineageForExport` enforced automatically, not a configurable option)
-- **Classification ceiling enforcement** — the assembled result's classification level is validated against the requesting user's authorised ceiling before the result is returned
+- **Classification ceiling enforcement** — the assembled result's classification level is validated against the requesting user's authorized ceiling before the result is returned
 - **Business justification prompt** — if the compliance mode requires it (e.g. MiFID II client-data queries), a structured justification is requested before execution proceeds
 - **Compliance metadata in response** — the MCP response includes a `compliance` block alongside the standard `narrative`, `data`, and `display_spec` fields, containing: `compliance_purpose: true`, `regulatory_trace_id`, `artifact_set_version`, `triggered_by` (which metric IDs and compliance modes contributed)
 
@@ -74,7 +74,7 @@ When both signals are true, the SEG triggers additional governance outputs as pa
 
 - **Remove** the Compliance Analyst column from the Persona × Feature Matrix — it is not a distinct persona
 - **Rewrite Journey C** to remove the `compliance_analyst` JWT role claim requirement. The new journey: a user queries LCR and NSFR, the IRA classifies the intent as compliance-purpose, both metrics are flagged `compliance_relevant: true`, SEG escalates automatically and returns the full compliance artifact set alongside the standard result. No special role claim required.
-- Update the persona prose to remove the sentence describing Compliance Analyst as a specialised Power Analyst — the concept dissolves. Any entitled user querying compliance-relevant metrics for a compliance purpose receives the enhanced artifacts.
+- Update the persona prose to remove the sentence describing Compliance Analyst as a specialized Power Analyst — the concept dissolves. Any entitled user querying compliance-relevant metrics for a compliance purpose receives the enhanced artifacts.
 
 ### Chapter 3 — Core Platform Capabilities
 

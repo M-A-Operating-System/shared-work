@@ -39,7 +39,7 @@ The widget renders as a **floating action button** (FAB) in the configured corne
 
 - The assistant's icon or initial (from `identity.logoUrl` or the first letter of `identity.assistantName`)
 - An unread **badge** count when there are new messages in a shared conversation the user has not viewed
-- A subtle pulse animation when the assistant is mid-stream in a minimised conversation
+- A subtle pulse animation when the assistant is mid-stream in a minimized conversation
 
 ```
                                    ┌───────┐
@@ -74,7 +74,7 @@ The mini state is a compact, non-blocking chat panel anchored above the FAB. Def
 └──────────────────────────────────────┘
 ```
 
-**Mini state behaviours:**
+**Mini state behaviors:**
 
 | Element | Specification |
 |---------|--------------|
@@ -126,7 +126,7 @@ Clicking the expand icon (↗) from the mini state transitions to the full conve
 │ History  │                                 │ Conversation  │
 │ panel    │     Conversation area           │ panel         │
 │          │                                 │               │
-│ My       │  (full 3-zone layout)           │ Artefacts     │
+│ My       │  (full 3-zone layout)           │ Artifacts     │
 │ Convs    │                                 │ Participants  │
 │          │                                 │ Token summary │
 │ Shared   │                                 │               │
@@ -138,14 +138,14 @@ Clicking the expand icon (↗) from the mini state transitions to the full conve
 
 The full state renders the complete three-zone layout described in [06-interface-and-rendering.md](./06-interface-and-rendering.md). The conversation active in mini state is the conversation shown on transition — no context is lost.
 
-**Full state behaviours:**
+**Full state behaviors:**
 
-| Behaviour | Specification |
+| Behavior | Specification |
 |-----------|--------------|
 | Layout | Complete three-zone layout: history panel + conversation area + conversation panel |
-| Modal dimensions | Default: `min(90vw, 1200px)` wide × `min(90vh, 860px)` tall, centred in viewport |
+| Modal dimensions | Default: `min(90vw, 1200px)` wide × `min(90vh, 860px)` tall, centered in viewport |
 | Background | Host page dimmed (overlay) but not blocked — user can click outside to collapse to mini state |
-| Transition | Smooth expand animation from mini panel position to modal centre |
+| Transition | Smooth expand animation from mini panel position to modal center |
 | Collapse | ↙ icon collapses back to mini state; × closes to FAB |
 | Page navigation | If the user navigates while full state is open, full state collapses to mini state automatically |
 
@@ -192,7 +192,7 @@ All other events from `07-embedding-and-integration.md` (`binding-click`, `turn-
 
 When `showBadge` is enabled, the widget can optionally request the **Web Notifications API** permission to surface a browser notification when a shared conversation receives a new message and the widget is collapsed. This is relevant when the user is on a different browser tab or has the host application in the background.
 
-| Behaviour | Specification |
+| Behavior | Specification |
 |-----------|--------------|
 | Permission request | The widget never requests notification permission proactively. Permission is only requested when the user explicitly opts in — via a *"Notify me of shared conversation activity"* control in the conversations panel. |
 | Notification payload | *"[Participant name] replied in [conversation title]"* — no message content in the notification for privacy |
@@ -303,7 +303,7 @@ Form Field Assist is designed for tasks like:
 - *"Suggest a title based on these bullet points"*
 - *"Explain what this field is asking for"*
 - *"Translate this text into French"*
-- *"Summarise this paragraph more concisely"*
+- *"Summarize this paragraph more concisely"*
 
 #### Trigger presentation
 
@@ -348,7 +348,7 @@ The trigger variant is configured via the `trigger` attribute on the component (
 │                                      │
 │  [Compact conversation area]         │  ← Ephemeral thread
 │  No history panel                    │    (messages for this
-│  No artefact tray                    │     session only)
+│  No artifact tray                    │     session only)
 │  No shared conversations             │
 │                                      │
 ├──────────────────────────────────────┤
@@ -369,7 +369,7 @@ Default popover dimensions: **320px wide × flexible height** (grows with conver
 | Shared conversations | Not available |
 | Model switching | Not available — uses the tenant's `defaultModel` |
 | Workflow Library | Not available |
-| Artefact tray | Not available (individual outputs can be inserted or copied) |
+| Artifact tray | Not available (individual outputs can be inserted or copied) |
 | `@`-binding typeahead | Available — useful for referencing application objects in the field context |
 | MCP tools | Always-on tools are available by default; can be disabled per-field via `tools-disabled` attribute |
 | Personal memory | Not injected by default; optionally enabled via `inject-personal-memory` attribute |
@@ -396,11 +396,11 @@ Task: Help the user compose or refine the content for this field.
 
 The field context block keeps the model tightly focused on the field's purpose. The model does not reference other conversations or memory items not explicitly injected.
 
-#### Write-back behaviour
+#### Write-back behavior
 
 When `write-back` is configured for a field, a **write-back bar** appears at the bottom of the popover after each assistant response that contains renderable text content.
 
-| Control | Behaviour |
+| Control | Behavior |
 |---------|----------|
 | **Insert into field** | Fires the `field-insert` event with the response content. The host application handles this event to update the field value. |
 | **Copy** | Copies the response text to the clipboard. No host event required. |
@@ -569,7 +569,7 @@ The component renders at 100% of its container's width and height. Host applicat
 |-----------|----------|------|-------------|
 | `tenant-id` | Yes | string | The tenant's registered `tenantId` from the application config |
 | `user-token` | Yes | string | The host-authenticated user's JWT. Must contain the required claims (see Authentication bridge). Refreshed by calling `updateToken()`. |
-| `theme` | No | `"light"` \| `"dark"` | Initial colour scheme. Defaults to `"light"`. Dark mode is not supported in v1 — this attribute is reserved. |
+| `theme` | No | `"light"` \| `"dark"` | Initial color scheme. Defaults to `"light"`. Dark mode is not supported in v1 — this attribute is reserved. |
 | `locale` | No | string | BCP 47 locale tag (e.g. `"en-GB"`). Overrides the tenant config `scope.language` for UI strings. |
 | `initial-conversation-id` | No | string | Opens a specific conversation on mount instead of the default new/recent conversation. Useful for deep-linking from the host application. |
 
@@ -726,7 +726,7 @@ The `<ai-chat>` component renders at **100% width and 100% height of its contain
 
 Below these minimums the component renders a fallback state: *"This panel is too small to display the assistant. Please expand the window."*
 
-#### Breakpoint behaviour in containers
+#### Breakpoint behavior in containers
 
 When the component is mounted in a container narrower than the desktop breakpoint (< 1280px), it uses the container width rather than the viewport width to determine which layout to apply. A 480px side panel will use the tablet layout regardless of the overall page width.
 
