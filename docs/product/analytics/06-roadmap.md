@@ -45,7 +45,7 @@ This document describes one proposed sequence of deliverables for the AI Analyti
 </tr>
 <tr>
 <td>MCP Capability Layer</td>
-<td>Build new Python service using FastMCP + Uvicorn (ASGI); deploy as a Kubernetes pod; implement JWT validation middleware at request ingress rejecting unauthenticated requests before any platform processing; implement three <code>@mcp.tool()</code> handlers (<code>run_analytics</code>, <code>list_operations</code>, <code>drilldown</code>) routing through the shared pipeline (<code>validate_jwt → ira.resolve → rapl.project → svl.validate → scl.approve → pqp.plan → fqe.execute → assemble_response</code>); implement MCP resource handlers serving knowledge artifacts from the Knowledge Store (<code>guide://</code> and <code>skills://</code> URIs — no JWT required, no controls pipeline); implement two <code>@mcp.prompt()</code> templates (standard analytical assistant, regulatory reporting assistant); build per-user capability manifest endpoint reflecting feature-flag state and entitlement-gated tool availability</td>
+<td>Build new Python service using an MCP server framework over ASGI; deploy as a Kubernetes pod; implement JWT validation middleware at request ingress rejecting unauthenticated requests before any platform processing; implement three <code>@mcp.tool()</code> handlers (<code>run_analytics</code>, <code>list_operations</code>, <code>drilldown</code>) routing through the shared pipeline (<code>validate_jwt → ira.resolve → rapl.project → svl.validate → scl.approve → pqp.plan → fqe.execute → assemble_response</code>); implement MCP resource handlers serving knowledge artifacts from the Knowledge Store (<code>guide://</code> and <code>skills://</code> URIs — no JWT required, no controls pipeline); implement two <code>@mcp.prompt()</code> templates (standard analytical assistant, regulatory reporting assistant); build per-user capability manifest endpoint reflecting feature-flag state and entitlement-gated tool availability</td>
 </tr>
 <tr>
 <td>Semantic Validation Layer</td>
@@ -61,7 +61,7 @@ This document describes one proposed sequence of deliverables for the AI Analyti
 </tr>
 <tr>
 <td>Federated Query Engine (FQE)</td>
-<td>Integrate Apache Calcite as the SQL sub-plan optimiser; implement pluggable backend adapter interface; build SQL warehouse adapter with connection pooling for Snowflake, BigQuery, Databricks, Redshift, Trino, and PostgreSQL; build semantic layer adapter for dbt MetricFlow and Cube.js; build OpenData REST/OData adapter; implement in-process result fan-out, sub-plan execution, and assembly; add a result cache keyed on SHA-256 of the LQP with TTL configurable per metric refresh cadence</td>
+<td>Integrate a SQL sub-plan optimiser; implement pluggable backend adapter interface; build SQL warehouse / lakehouse adapters with connection pooling; build a semantic-layer adapter; build an OpenData REST/OData adapter; implement in-process result fan-out, sub-plan execution, and assembly; add a result cache keyed on SHA-256 of the LQP with TTL configurable per metric refresh cadence</td>
 </tr>
 <tr>
 <td>Data Visualization Language (DVL)</td>
@@ -69,7 +69,7 @@ This document describes one proposed sequence of deliverables for the AI Analyti
 </tr>
 <tr>
 <td>Narrative Synthesis Engine</td>
-<td>Build new service implementing two prompt templates (standard: Claude Haiku for ≤5 metrics / ≤3 dimensions; complex: Claude Sonnet for attribution, multi-portfolio, and regulatory queries); construct prompt exclusively from the assembled result set — no user query text, no physical schema; implement post-generation numeric leakage validator that rejects any value in the narrative not present in the result set; implement single regeneration attempt on validation failure before returning an error</td>
+<td>Build new service implementing two prompt templates (standard: a fast narrative model for ≤5 metrics / ≤3 dimensions; complex: a higher-capability model for attribution, multi-portfolio, and regulatory queries); construct prompt exclusively from the assembled result set — no user query text, no physical schema; implement post-generation numeric leakage validator that rejects any value in the narrative not present in the result set; implement single regeneration attempt on validation failure before returning an error</td>
 </tr>
 <tr>
 <td>Analytical Lineage Store (ALS)</td>
@@ -77,7 +77,7 @@ This document describes one proposed sequence of deliverables for the AI Analyti
 </tr>
 <tr>
 <td>vega2img Rendering Service</td>
-<td>Build as a standalone MCP server (not part of the Analytics Platform); implement Vite + vega-embed + headless Chromium via Playwright; expose DVL spec rendering (Vega-Lite v5 → SVG or PNG) and <code>type: "table"</code> rendering via styled HTML template as MCP tools; consumers (AI Chat Platform, agentic consumers) register vega2img as a peer MCP server alongside the Analytics Platform — the Analytics Platform does not call vega2img directly</td>
+<td>Build as a standalone MCP server (not part of the Analytics Platform); implement a headless-browser rendering pipeline; expose DVL spec rendering (Vega-Lite v5 → SVG or PNG) and <code>type: "table"</code> rendering via styled HTML template as MCP tools; consumers (AI Chat Platform, agentic consumers) register vega2img as a peer MCP server alongside the Analytics Platform — the Analytics Platform does not call vega2img directly</td>
 </tr>
 <tr>
 <td>Knowledge Store</td>
@@ -110,7 +110,7 @@ This document describes one proposed sequence of deliverables for the AI Analyti
 <td rowspan="3">3</td>
 <td rowspan="3"><strong>SMR Authoring Assistance</strong></td>
 <td>Natural Language → Metric Draft Generator</td>
-<td>Add <code>POST /v1/smr/draft</code> endpoint to the Platform Admin API accepting a prose description; implement Claude Sonnet prompt that generates a structured SMR YAML draft (<code>id</code>, <code>label</code>, <code>formula</code>, <code>aggregation</code>, <code>dimensions</code>, <code>data.domain</code>, <code>units</code>, <code>description</code>) with output validated against the SMR JSON schema before being returned; write the validated draft to the SMR in <code>proposed</code> state; block activation until Application Admin approval is recorded</td>
+<td>Add <code>POST /v1/smr/draft</code> endpoint to the Platform Admin API accepting a prose description; implement a higher-capability model prompt that generates a structured SMR YAML draft (<code>id</code>, <code>label</code>, <code>formula</code>, <code>aggregation</code>, <code>dimensions</code>, <code>data.domain</code>, <code>units</code>, <code>description</code>) with output validated against the SMR JSON schema before being returned; write the validated draft to the SMR in <code>proposed</code> state; block activation until Application Admin approval is recorded</td>
 <td rowspan="3">Metric owners propose new definitions in plain English without writing YAML; the platform detects duplicates and structural conflicts automatically before a draft enters the approval workflow</td>
 </tr>
 <tr>

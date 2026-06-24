@@ -21,7 +21,7 @@ The platform eliminates Text-to-SQL as an architectural pattern for regulated an
 |---------|-------|---------|
 | [1. Overview](./01-overview.md) | Governed Large-Scale Analytics and Data Mining | Problem space, platform introduction, design principles, and end-to-end worked examples |
 | [2. Core Capabilities](./02-core-capabilities.md) | Core Platform Capabilities | Platform roles, deep-dive specifications: SMR, Intent Layer, RAPL, Governance, FQE, Data Visualization Language (DVL), Output Format, Analytical Lineage Store (ALS), MCP Layer |
-| [3. Technical Implementation](./03-technical-implementation.md) | Proposed Technical Implementation | Reference stack with rationale: Cloudflare Workers, Apache Calcite, Vega-Lite, PostgreSQL lineage store, Anthropic Claude |
+| [3. Technical Implementation](./03-technical-implementation.md) | Proposed Technical Implementation | Reference stack with rationale: serverless edge compute, a SQL plan optimiser, Vega-Lite rendering, a relational lineage store, and a hosted LLM |
 | [4. Success Metrics](./04-success-metrics.md) | Success Metrics | Platform and application-level metrics, controls health indicators, review cadence |
 | [5. Appendix](./05-text-to-sql-antipattern.md) | Text-to-SQL and Semantic Analytics: Better Together | Structural failure modes, SQL injection risks, and the complementary architecture where both tools coexist |
 | [6. Roadmap](./06-roadmap.md) | Platform Roadmap | Planned enhancements beyond the current release |

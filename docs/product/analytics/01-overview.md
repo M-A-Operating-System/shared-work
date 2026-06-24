@@ -55,12 +55,12 @@ The platform addresses the following challenges that Text-to-SQL and MCP impleme
 
 This is not a new category. The industry has built governed semantic computation layers for decades across a broad range of platforms:
 
-| Category | Examples |
+| Category | Description |
 |---|---|
-| BI semantic layers | Business Objects Universe, MicroStrategy Semantic Layer, Cognos Framework Manager |
-| OLAP engines | Essbase, SAP BW, Microsoft SSAS |
-| Modern metrics layers | dbt Semantic Models, Cube, AtScale |
-| Data virtualisation | Denodo, Starburst |
+| BI semantic layers | Governed business-metric layers that resolve business terms to approved calculations above the warehouse |
+| OLAP engines | Pre-aggregated multidimensional cubes serving dimensional analytical queries |
+| Modern metrics layers | Code-defined semantic layers that centralise metric definitions for downstream tools |
+| Data virtualisation | Federated query layers presenting multiple physical sources through one logical interface |
 | Domain-specific engines | Risk engines, actuarial engines, pricing engines, fraud detection engines |
 
 All share a common design pattern. Rather than searching tables and returning rows, a semantic computation layer interprets business concepts, applies approved calculations, enforces dimensional hierarchies and access controls, and returns governed analytical responses. When a CFO asks *"what was our adjusted EBITDA by region last quarter?"*, the analytical engine resolves the business concept, applies the approved formula, enforces access controls, and returns a governed result — not a set of database rows.
