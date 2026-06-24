@@ -45,7 +45,7 @@ This document describes one proposed sequence of deliverables for the AI Analyti
 </tr>
 <tr>
 <td>MCP Capability Layer</td>
-<td>Build new Python service using an MCP server framework over ASGI; deploy as a Kubernetes pod; implement JWT validation middleware at request ingress rejecting unauthenticated requests before any platform processing; implement three <code>@mcp.tool()</code> handlers (<code>run_analytics</code>, <code>list_operations</code>, <code>drilldown</code>) routing through the shared pipeline (<code>validate_jwt → ira.resolve → rapl.project → svl.validate → scl.approve → pqp.plan → fqe.execute → assemble_response</code>); implement MCP resource handlers serving knowledge artifacts from the Knowledge Store (<code>guide://</code> and <code>skills://</code> URIs — no JWT required, no controls pipeline); implement two <code>@mcp.prompt()</code> templates (standard analytical assistant, regulatory reporting assistant); build per-user capability manifest endpoint reflecting feature-flag state and entitlement-gated tool availability</td>
+<td>Build new Python service using an MCP server framework over ASGI; deploy as a containerised service; implement JWT validation middleware at request ingress rejecting unauthenticated requests before any platform processing; implement three <code>@mcp.tool()</code> handlers (<code>run_analytics</code>, <code>list_operations</code>, <code>drilldown</code>) routing through the shared pipeline (<code>validate_jwt → ira.resolve → rapl.project → svl.validate → scl.approve → pqp.plan → fqe.execute → assemble_response</code>); implement MCP resource handlers serving knowledge artifacts from the Knowledge Store (<code>guide://</code> and <code>skills://</code> URIs — no JWT required, no controls pipeline); implement two <code>@mcp.prompt()</code> templates (standard analytical assistant, regulatory reporting assistant); build per-user capability manifest endpoint reflecting feature-flag state and entitlement-gated tool availability</td>
 </tr>
 <tr>
 <td>Semantic Validation Layer</td>
@@ -53,7 +53,7 @@ This document describes one proposed sequence of deliverables for the AI Analyti
 </tr>
 <tr>
 <td>Role-Aware Projection Layer</td>
-<td>Build new service implementing JWT claim extraction (<code>roles</code>, <code>managed_portfolios</code>, <code>entity_ids</code>); implement role definition template store in PostgreSQL; build row predicate injector that materialises WHERE clause conditions from role templates and attaches them to the LQP before FQE dispatch; implement column mask registry and apply masks at result assembly; enforce <code>defaultDenyAll: true</code> — return <code>ENTITLEMENT_DENIED</code> for any user with no matching role before any query executes</td>
+<td>Build new service implementing JWT claim extraction (<code>roles</code>, <code>managed_portfolios</code>, <code>entity_ids</code>); implement role definition template store in a relational database; build row predicate injector that materialises WHERE clause conditions from role templates and attaches them to the LQP before FQE dispatch; implement column mask registry and apply masks at result assembly; enforce <code>defaultDenyAll: true</code> — return <code>ENTITLEMENT_DENIED</code> for any user with no matching role before any query executes</td>
 </tr>
 <tr>
 <td>Semantic Controls Layer</td>
@@ -65,7 +65,7 @@ This document describes one proposed sequence of deliverables for the AI Analyti
 </tr>
 <tr>
 <td>Data Visualization Language (DVL)</td>
-<td>Define eight named chart contracts in a versioned contract registry (multi-series bar, time-series line, heatmap, treemap, scatter, waterfall, stacked bar, ranked bar); implement deterministic chart selector that maps result schema shape and intent pattern to a contract — no LLM invocation; implement DVL display spec generator producing Vega-Lite v5 JSON conforming to the selected contract; add <code>type: "table"</code> extension for tabular results</td>
+<td>Define eight named chart contracts in a versioned contract registry (multi-series bar, time-series line, heatmap, treemap, scatter, waterfall, stacked bar, ranked bar); implement deterministic chart selector that maps result schema shape and intent pattern to a contract — no LLM invocation; implement DVL display spec generator producing DVL chart grammar JSON conforming to the selected contract; add <code>type: "table"</code> extension for tabular results</td>
 </tr>
 <tr>
 <td>Narrative Synthesis Engine</td>
@@ -73,15 +73,15 @@ This document describes one proposed sequence of deliverables for the AI Analyti
 </tr>
 <tr>
 <td>Analytical Lineage Store (ALS)</td>
-<td>Provision S3-compatible object store bucket with date-partitioned key structure (<code>lineage/{org_id}/{yyyy}/{mm}/{dd}/{result_id}.json</code>); implement write-once JSON document serialiser covering the full query record (request payload, resolved metric versions, controls decision, sub-plans, assembled result, DVL display spec, compliance metadata); implement write path called by the Semantic Controls Layer before any backend execution and by the FQE on completion; create lightweight <code>analytics.lineage_index</code> PostgreSQL table (scalar fields only — no JSON payloads) for future search queries; configure object lifecycle policy for 7-year default retention; post-hoc compliance annotations written as sibling amendment documents, never mutating the original record</td>
+<td>Provision an object store bucket with date-partitioned key structure (<code>lineage/{org_id}/{yyyy}/{mm}/{dd}/{result_id}.json</code>); implement write-once JSON document serialiser covering the full query record (request payload, resolved metric versions, controls decision, sub-plans, assembled result, DVL display spec, compliance metadata); implement write path called by the Semantic Controls Layer before any backend execution and by the FQE on completion; create a lightweight <code>analytics.lineage_index</code> relational table (scalar fields only — no JSON payloads) for future search queries; configure object lifecycle policy for 7-year default retention; post-hoc compliance annotations written as sibling amendment documents, never mutating the original record</td>
 </tr>
 <tr>
 <td>vega2img Rendering Service</td>
-<td>Build as a standalone MCP server (not part of the Analytics Platform); implement a headless-browser rendering pipeline; expose DVL spec rendering (Vega-Lite v5 → SVG or PNG) and <code>type: "table"</code> rendering via styled HTML template as MCP tools; consumers (AI Chat Platform, agentic consumers) register vega2img as a peer MCP server alongside the Analytics Platform — the Analytics Platform does not call vega2img directly</td>
+<td>Build as a standalone MCP server (not part of the Analytics Platform); implement a headless-browser rendering pipeline; expose DVL spec rendering (DVL chart spec → SVG or PNG) and <code>type: "table"</code> rendering via styled HTML template as MCP tools; consumers (AI Chat Platform, agentic consumers) register vega2img as a peer MCP server alongside the Analytics Platform — the Analytics Platform does not call vega2img directly</td>
 </tr>
 <tr>
 <td>Knowledge Store</td>
-<td>Provision S3-compatible object store with versioned Markdown artifact storage; author and bundle default content at installation: platform overview guide, analytical domain reference (six domains), query pattern examples, skills definitions for portfolio performance review, risk analysis, and regulatory reporting, and compliance guides for MiFID II and Basel III/IV; implement versioned read path consumed by MCP resource handlers (URI-to-path mapping: <code>guide://analytics/platform-overview</code> → <code>guide/analytics/platform-overview.md</code>); add knowledge artifact CRUD endpoints to the Platform Admin API so administrators can add, update, or override content without modifying platform defaults</td>
+<td>Provision a versioned object store for Markdown artifact storage; author and bundle default content at installation: platform overview guide, analytical domain reference (six domains), query pattern examples, skills definitions for portfolio performance review, risk analysis, and regulatory reporting, and compliance guides for MiFID II and Basel III/IV; implement versioned read path consumed by MCP resource handlers (URI-to-path mapping: <code>guide://analytics/platform-overview</code> → <code>guide/analytics/platform-overview.md</code>); add knowledge artifact CRUD endpoints to the Platform Admin API so administrators can add, update, or override content without modifying platform defaults</td>
 </tr>
 
 <!-- ── Phase 2 ── -->
@@ -89,12 +89,12 @@ This document describes one proposed sequence of deliverables for the AI Analyti
 <td rowspan="4">2</td>
 <td rowspan="4"><strong>Automated Monitoring and Alerts</strong></td>
 <td>Scheduled Query Service</td>
-<td>Create <code>scheduled_queries</code> table in PostgreSQL storing cron expression, owner <code>sub</code>, and validated MCP tool call parameters; implement Kubernetes CronJob controller that reads pending schedules and dispatches them through the full controls pipeline using the stored owner JWT claims at runtime; write results to the Analytical Lineage Store (ALS) and result artefact store on completion</td>
+<td>Create <code>scheduled_queries</code> table in a relational store storing cron expression, owner <code>sub</code>, and validated MCP tool call parameters; implement a scheduled job controller that reads pending schedules and dispatches them through the full controls pipeline using the stored owner JWT claims at runtime; write results to the Analytical Lineage Store (ALS) and result artefact store on completion</td>
 <td rowspan="4">Risk officers and portfolio managers receive automated push notifications when a metric breaches its defined threshold — no manual query required; every alert payload carries a lineage reference to the underlying computation</td>
 </tr>
 <tr>
 <td>Alert Threshold Engine</td>
-<td>Create <code>alert_thresholds</code> table in PostgreSQL linked to scheduled queries; implement threshold evaluator service that iterates each result row after FQE assembly and evaluates up to ten conditions per query using <code>gt</code>, <code>lt</code>, <code>gte</code>, <code>lte</code>, <code>eq</code>, <code>pct_change_gt</code> operators; write a breach event record to the Analytical Lineage Store (ALS) for each triggered condition and enqueue a delivery job</td>
+<td>Create <code>alert_thresholds</code> table in a relational store linked to scheduled queries; implement threshold evaluator service that iterates each result row after FQE assembly and evaluates up to ten conditions per query using <code>gt</code>, <code>lt</code>, <code>gte</code>, <code>lte</code>, <code>eq</code>, <code>pct_change_gt</code> operators; write a breach event record to the Analytical Lineage Store (ALS) for each triggered condition and enqueue a delivery job</td>
 </tr>
 <tr>
 <td>Push Delivery Service</td>
@@ -127,16 +127,16 @@ This document describes one proposed sequence of deliverables for the AI Analyti
 <td rowspan="5">4</td>
 <td rowspan="5"><strong>Cross-Session Memory</strong></td>
 <td>User Preference Store</td>
-<td>Create <code>user_preferences</code> table in PostgreSQL scoped by <code>org_id + sub</code>; extend the Intent Resolution Agent to read preference defaults (default time period, dimensions, chart type overrides, measure groups) and apply them as parameter defaults at intent resolution, overridable per individual query; expose preference CRUD via the Platform Admin API</td>
+<td>Create <code>user_preferences</code> table in a relational store scoped by <code>org_id + sub</code>; extend the Intent Resolution Agent to read preference defaults (default time period, dimensions, chart type overrides, measure groups) and apply them as parameter defaults at intent resolution, overridable per individual query; expose preference CRUD via the Platform Admin API</td>
 <td rowspan="5">Returning users find their analytical context pre-applied; saved queries surface SMR changes as explicit staleness warnings before execution rather than producing silently incorrect results</td>
 </tr>
 <tr>
 <td>Saved Query Registry</td>
-<td>Create <code>saved_queries</code> table in PostgreSQL storing validated MCP tool call parameters (not natural language); implement version reference columns linking each saved query to the SMR metric and dimension version IDs used at save time; add <code>needs_review</code> flag set by the SMR change event handler; implement platform-level promotion flag controlled by Application Admin role; expose saved query CRUD via the Platform Admin API</td>
+<td>Create <code>saved_queries</code> table in a relational store storing validated MCP tool call parameters (not natural language); implement version reference columns linking each saved query to the SMR metric and dimension version IDs used at save time; add <code>needs_review</code> flag set by the SMR change event handler; implement platform-level promotion flag controlled by Application Admin role; expose saved query CRUD via the Platform Admin API</td>
 </tr>
 <tr>
 <td>Favourite Metrics Index</td>
-<td>Create <code>user_favourites</code> table in PostgreSQL scoped by <code>org_id + sub</code>; extend the <code>list_operations</code> response to sort favourited metric IDs to the top of results; extend the Intent Resolution Agent disambiguation logic to prefer favourited metrics in tie-breaking; extend the SMR browser to visually distinguish favourited metrics</td>
+<td>Create <code>user_favourites</code> table in a relational store scoped by <code>org_id + sub</code>; extend the <code>list_operations</code> response to sort favourited metric IDs to the top of results; extend the Intent Resolution Agent disambiguation logic to prefer favourited metrics in tie-breaking; extend the SMR browser to visually distinguish favourited metrics</td>
 </tr>
 <tr>
 <td>My Workspace UI</td>
@@ -161,11 +161,11 @@ This document describes one proposed sequence of deliverables for the AI Analyti
 </tr>
 <tr>
 <td>Insight Configuration UI</td>
-<td>Add new Admin Console section for per-metric anomaly detection configuration; build form for baseline window size, sensitivity (N standard deviations), minimum signal strength threshold (to suppress low-significance noise), and role-level opt-in/opt-out toggles; persist configuration to a new <code>anomaly_config</code> table in PostgreSQL</td>
+<td>Add new Admin Console section for per-metric anomaly detection configuration; build form for baseline window size, sensitivity (N standard deviations), minimum signal strength threshold (to suppress low-significance noise), and role-level opt-in/opt-out toggles; persist configuration to a new <code>anomaly_config</code> table in a relational store</td>
 </tr>
 <tr>
 <td>Push Delivery Service</td>
-<td>Extend existing Push Delivery Service (Phase 2) to handle a new <code>insight_card</code> delivery job type; implement insight card payload serialiser including insight category (anomaly / trend / peer comparison), metric ID and label, observed value vs. baseline, Haiku-generated narrative anchored to the anomaly data, and <code>result_id</code> for lineage inspection; reuse existing delivery adapters and retry infrastructure</td>
+<td>Extend existing Push Delivery Service (Phase 2) to handle a new <code>insight_card</code> delivery job type; implement insight card payload serialiser including insight category (anomaly / trend / peer comparison), metric ID and label, observed value vs. baseline, a model-generated narrative anchored to the anomaly data, and <code>result_id</code> for lineage inspection; reuse existing delivery adapters and retry infrastructure</td>
 </tr>
 
 <!-- ── Phase 6 ── -->
@@ -173,7 +173,7 @@ This document describes one proposed sequence of deliverables for the AI Analyti
 <td rowspan="4">6</td>
 <td rowspan="4"><strong>Collaborative Sessions</strong></td>
 <td>Session Sharing Service</td>
-<td>Create <code>shared_sessions</code> and <code>session_participants</code> tables in PostgreSQL; implement session creation, participant invitation (by <code>sub</code> claim with 24-hour signed join tokens), and owner-controlled access revocation; build session event log capturing all joins, queries, annotations, and exports under individual participant identities; expose session management via the Platform Admin API</td>
+<td>Create <code>shared_sessions</code> and <code>session_participants</code> tables in a relational store; implement session creation, participant invitation (by <code>sub</code> claim with 24-hour signed join tokens), and owner-controlled access revocation; build session event log capturing all joins, queries, annotations, and exports under individual participant identities; expose session management via the Platform Admin API</td>
 <td rowspan="4">Portfolio managers and risk officers co-explore data in a shared governed session — each participant's results governed by their own entitlements — and export a lineage-referenced PDF pack for investment committee or regulatory review</td>
 </tr>
 <tr>
@@ -182,11 +182,11 @@ This document describes one proposed sequence of deliverables for the AI Analyti
 </tr>
 <tr>
 <td>Annotation Layer</td>
-<td>Create <code>session_annotations</code> table in PostgreSQL linked to session and result card IDs; implement annotation CRUD API scoped to active session participants; extend the session event log to record annotation events under the annotating participant's identity; include annotations in session export payloads</td>
+<td>Create <code>session_annotations</code> table in a relational store linked to session and result card IDs; implement annotation CRUD API scoped to active session participants; extend the session event log to record annotation events under the annotating participant's identity; include annotations in session export payloads</td>
 </tr>
 <tr>
 <td>Session Export Service</td>
-<td>Create new export service that assembles a complete session into a structured PDF using vega2img for chart rendering and a Pandoc-based document pipeline for layout; implement ZIP export producing PDF + per-result JSON + lineage URL manifest; enforce that every exported result includes its <code>result_id</code> and lineage URL; write an export artefact record to the audit trail</td>
+<td>Create new export service that assembles a complete session into a structured PDF using vega2img for chart rendering and a document rendering pipeline for layout; implement ZIP export producing PDF + per-result JSON + lineage URL manifest; enforce that every exported result includes its <code>result_id</code> and lineage URL; write an export artefact record to the audit trail</td>
 </tr>
 
 <!-- ── Phase 7 ── -->
@@ -203,7 +203,7 @@ This document describes one proposed sequence of deliverables for the AI Analyti
 </tr>
 <tr>
 <td>Benchmark Data Service Adapter</td>
-<td>Implement new FQE backend adapter registering the Benchmark Data Service with <code>dataAffinity: ["benchmarks"]</code>; add a licensing record table in PostgreSQL; implement licensing check in the adapter before any index data is returned, returning <code>BENCHMARK_NOT_LICENSED</code> for unlicensed indices; implement custom benchmark blend registration via the Benchmark Data Service Admin API, storing blend IDs accessible through the <code>benchmark</code> dimension field</td>
+<td>Implement new FQE backend adapter registering the Benchmark Data Service with <code>dataAffinity: ["benchmarks"]</code>; add a licensing record table in a relational store; implement licensing check in the adapter before any index data is returned, returning <code>BENCHMARK_NOT_LICENSED</code> for unlicensed indices; implement custom benchmark blend registration via the Benchmark Data Service Admin API, storing blend IDs accessible through the <code>benchmark</code> dimension field</td>
 </tr>
 
 <!-- ── Phase 8 ── -->
@@ -224,7 +224,7 @@ This document describes one proposed sequence of deliverables for the AI Analyti
 </tr>
 <tr>
 <td>SEC Regulation BI Compliance Mode</td>
-<td>Implement SEC Reg BI handler in the Compliance Mode Framework; inject an additional system-level instruction into the Narrative Synthesis Engine prompt prohibiting investment recommendation language; extend the NSE post-generation validator to detect recommendation language patterns and trigger a single regeneration attempt; add <code>suitability_record_id</code> as a required parameter for advisory queries in the Semantic Validation Layer schema, blocking execution with a structured error if absent</td>
+<td>Implement SEC Reg BI handler in the Compliance Mode Framework; inject an additional system-level instruction into the Narrative Synthesis Engine prompt prohibiting investment recommendation language; extend the NSA post-generation validator to detect recommendation language patterns and trigger a single regeneration attempt; add <code>suitability_record_id</code> as a required parameter for advisory queries in the Semantic Validation Layer schema, blocking execution with a structured error if absent</td>
 </tr>
 
 <!-- ── Phase 9 ── -->
@@ -241,7 +241,7 @@ This document describes one proposed sequence of deliverables for the AI Analyti
 </tr>
 <tr>
 <td>Cross-Backend Drilldown Lineage</td>
-<td>Extend the <code>lineage_records</code> table schema to add columns for affinity boundary crossing: parent backend ID, child backend ID, dimension key used for the join; extend the lineage record writer to capture both backends' sub-plans and raw responses in the existing JSONB sub-plans column</td>
+<td>Extend the <code>lineage_records</code> table schema to add columns for affinity boundary crossing: parent backend ID, child backend ID, dimension key used for the join; extend the lineage record writer to capture both backends' sub-plans and raw responses in the existing JSON sub-plans column</td>
 </tr>
 
 <!-- ── Phase 10 ── -->
@@ -258,7 +258,7 @@ This document describes one proposed sequence of deliverables for the AI Analyti
 </tr>
 <tr>
 <td>Scenario Comparison Parameter</td>
-<td>Add <code>scenario_definitions</code> table to the SMR PostgreSQL schema; extend the Platform Admin API with scenario definition CRUD; extend the Semantic Validation Layer JSON schema to add a <code>scenario</code> parameter referencing a registered scenario ID; extend the FQE result assembly layer to perform scenario delta computation, producing a three-column result set (actual value, scenario value, delta) from a single query execution</td>
+<td>Add a <code>scenario_definitions</code> table to the SMR schema; extend the Platform Admin API with scenario definition CRUD; extend the Semantic Validation Layer JSON schema to add a <code>scenario</code> parameter referencing a registered scenario ID; extend the FQE result assembly layer to perform scenario delta computation, producing a three-column result set (actual value, scenario value, delta) from a single query execution</td>
 </tr>
 <tr>
 <td>Inline Composite Benchmark</td>
@@ -275,7 +275,7 @@ This document describes one proposed sequence of deliverables for the AI Analyti
 </tr>
 <tr>
 <td>Lineage Query REST API</td>
-<td>Add new read-only API surface to the Analytical Lineage Store (ALS) service: <code>GET /v1/lineage/{result_id}</code> fetches the full JSON document from the object store by key; <code>POST /v1/lineage/search</code> queries the <code>analytics.lineage_index</code> PostgreSQL table for matching <code>result_id</code>s (filterable by <code>user_sub</code>, <code>time_range</code>, <code>compliance_mode</code>, <code>error_code</code>), then fetches full documents from the object store for each match; <code>GET /v1/lineage/{result_id}/sub-plans</code> returns the <code>sub_plans</code> field from the fetched object store document; enforce JWT scoping so users retrieve only their own records; extend to platform-wide search for Platform Admin role</td>
+<td>Add new read-only API surface to the Analytical Lineage Store (ALS) service: <code>GET /v1/lineage/{result_id}</code> fetches the full JSON document from the object store by key; <code>POST /v1/lineage/search</code> queries the <code>analytics.lineage_index</code> relational table for matching <code>result_id</code>s (filterable by <code>user_sub</code>, <code>time_range</code>, <code>compliance_mode</code>, <code>error_code</code>), then fetches full documents from the object store for each match; <code>GET /v1/lineage/{result_id}/sub-plans</code> returns the <code>sub_plans</code> field from the fetched object store document; enforce JWT scoping so users retrieve only their own records; extend to platform-wide search for Platform Admin role</td>
 </tr>
 <tr>
 <td>GraphQL API Gateway</td>
@@ -287,11 +287,11 @@ This document describes one proposed sequence of deliverables for the AI Analyti
 </tr>
 <tr>
 <td>FQE Adaptive Planning</td>
-<td>Add <code>backend_latency_stats</code> table to PostgreSQL; extend the FQE to record observed p50 and p95 execution latency per backend after every query; implement adaptive routing logic that compares current observed latency against the rolling baseline and reroutes to the next registered backend with matching <code>dataAffinity</code> when degradation exceeds a configurable multiplier; log all routing decisions in the lineage record's <code>meta.backendsUsed</code> field</td>
+<td>Add a <code>backend_latency_stats</code> table to a relational store; extend the FQE to record observed p50 and p95 execution latency per backend after every query; implement adaptive routing logic that compares current observed latency against the rolling baseline and reroutes to the next registered backend with matching <code>dataAffinity</code> when degradation exceeds a configurable multiplier; log all routing decisions in the lineage record's <code>meta.backendsUsed</code> field</td>
 </tr>
 <tr>
 <td>Materialised View Registration</td>
-<td>Create <code>materialised_views</code> table in PostgreSQL storing named pre-computed result templates (metric IDs, dimensions, time expression) with a cron refresh schedule; extend the Scheduled Query Service to execute registered materialised view refreshes and write results to a dedicated cache store; extend the FQE query matcher to detect when an incoming LQP matches a registered materialised view and route to the cache store; extend the Semantic Controls Layer performance impact estimator to apply an 800-unit performance impact reduction for matched materialised view queries</td>
+<td>Create a <code>materialised_views</code> table in a relational store storing named pre-computed result templates (metric IDs, dimensions, time expression) with a cron refresh schedule; extend the Scheduled Query Service to execute registered materialised view refreshes and write results to a dedicated cache store; extend the FQE query matcher to detect when an incoming LQP matches a registered materialised view and route to the cache store; extend the Semantic Controls Layer performance impact estimator to apply an 800-unit performance impact reduction for matched materialised view queries</td>
 </tr>
 
 </tbody>
