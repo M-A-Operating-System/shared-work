@@ -21,7 +21,7 @@ The platform eliminates Text-to-SQL as an architectural pattern for regulated an
 |---------|-------|---------|
 | [1. Overview](./01-overview.md) | Governed Large-Scale Analytics and Data Mining | Problem space, platform introduction, design principles, and end-to-end worked examples |
 | [2. Core Capabilities](./02-core-capabilities.md) | Core Platform Capabilities | Platform roles, deep-dive specifications: SMR, Intent Layer, RAPL, Governance, FQE, Data Visualization Language (DVL), Output Format, Analytical Lineage Store (ALS), MCP Layer |
-| [3. Technical Implementation](./03-technical-implementation.md) | Proposed Technical Implementation | Reference stack with rationale: serverless edge compute, a SQL plan optimiser, Vega-Lite rendering, a relational lineage store, and a hosted LLM |
+| [3. Technical Implementation](./03-technical-implementation.md) | Proposed Technical Implementation | Reference stack with rationale: serverless edge compute, a SQL plan optimizer, Vega-Lite rendering, a relational lineage store, and a hosted LLM |
 | [4. Success Metrics](./04-success-metrics.md) | Success Metrics | Platform and application-level metrics, controls health indicators, review cadence |
 | [5. Appendix](./05-text-to-sql-antipattern.md) | Text-to-SQL and Semantic Analytics: Better Together | Structural failure modes, SQL injection risks, and the complementary architecture where both tools coexist |
 | [6. Roadmap](./06-roadmap.md) | Platform Roadmap | Planned enhancements beyond the current release |
@@ -35,7 +35,7 @@ Start with Chapter 1 (Overview) for executive and business context, then read Ch
 
 | Term | Definition |
 |------|------------|
-| **[Semantic Metrics Repository (SMR)](./02-core-capabilities.md#semantic-metrics-registry)** | The governing catalogue of all resolvable analytical concepts for the organisation — metrics, dimensions, hierarchies, measure groups, and domains. Nothing is queryable that is not registered. |
+| **[Semantic Metrics Repository (SMR)](./02-core-capabilities.md#semantic-metrics-registry)** | The governing catalog of all resolvable analytical concepts for the organization — metrics, dimensions, hierarchies, measure groups, and domains. Nothing is queryable that is not registered. |
 | **[Logical Query Plan (LQP)](./02-core-capabilities.md#semantic-validation-layer-svl)** | Engine-agnostic DAG of analytical operations produced by the Semantic Validation Layer (SVL). No physical backend references. |
 | **[Federated Query Engine (FQE)](./02-core-capabilities.md#federated-query-planner)** | The only component with knowledge of physical backends. Decomposes the LQP into sub-plans, routes by data domain affinity, executes in parallel, assembles results. |
 | **[Role-Aware Projection Layer (RAPL)](./02-core-capabilities.md#role-aware-projection-layer)** | Semantic-tier entitlement enforcement. Applies metric access filters, dimension access filters, row predicates, and column masks — before any query plan is compiled. |

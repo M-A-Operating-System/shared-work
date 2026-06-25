@@ -39,7 +39,7 @@ The server operates within a two-layer control model.
 
 **Layer 2 — Server-managed controls.** Entitlements and site classification operating specifically against AI interactions — governing what content the server will search, fetch, and return to agents and interfaces. These controls are additive to the enterprise perimeter, not a replacement for it.
 
-This layering means the server can be deployed within an organisation that already enforces outbound internet policy, and the server's own controls then address the AI-specific access surface on top of that foundation.
+This layering means the server can be deployed within an organization that already enforces outbound internet policy, and the server's own controls then address the AI-specific access surface on top of that foundation.
 
 ---
 
@@ -62,7 +62,7 @@ graph TD
         SB[Search Backend]
         FB[Fetch Backend]
         CB[Classification Backend]
-        LB[LLM Backend\nsummarised fetch]
+        LB[LLM Backend\nsummarized fetch]
     end
 
     EP[Enterprise Perimeter\nNetwork / Proxy / Firewall]
@@ -100,7 +100,7 @@ No controlled mechanism exists. Users manually copy and paste web content into c
 | D-002 | Search and fetch are the MVP; entitlements and site classification are included in MVP as safety controls, not Phase 2 features |
 | D-003 | Site classification is a safety gate — content that fails classification is blocked server-side before being returned to the LLM |
 | D-004 | Classification metadata is returned alongside permitted content in all responses, even when content passes the safety threshold |
-| D-005 | Four fetch output formats in target state: raw, markdown, chunked, summarised |
+| D-005 | Four fetch output formats in target state: raw, markdown, chunked, summarized |
 | D-006 | Server-managed controls are explicitly additive to enterprise perimeter controls, not a replacement |
 | D-007 | Authenticated fetch targets enterprise IdP (v1) and consumer OAuth providers (v2); not included in MVP |
 | D-008 | OAuth 2.0 OBO flow for enterprise IdP; OAuth 2.1 with PKCE for consumer providers; no token passthrough permitted |

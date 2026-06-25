@@ -27,7 +27,7 @@ This server is the **MCP Internet Fetch & Search** service referenced by the [AI
 | Tool | Available From | Description |
 |---|---|---|
 | `search` | MVP | Web search returning ranked, filtered results |
-| `fetch` | MVP | Page fetch in raw, markdown, chunked, or summarised format |
+| `fetch` | MVP | Page fetch in raw, markdown, chunked, or summarized format |
 | `fetch_authenticated` | v1 | Fetch with enterprise IdP or consumer OAuth credentials |
 
 **Key rules:**

@@ -2,7 +2,7 @@
 
 **Date:** 2026-06-16
 
-This roadmap describes the evolution from a simple embedded knowledge folder co-located with a single application, through to a centralised governed knowledge platform serving the full MAOS suite. Each version is independently deployable and leaves the API surface of prior versions intact.
+This roadmap describes the evolution from a simple embedded knowledge folder co-located with a single application, through to a centralized governed knowledge platform serving the full MAOS suite. Each version is independently deployable and leaves the API surface of prior versions intact.
 
 ---
 
@@ -164,12 +164,12 @@ Applications that adopted the flat v1.x URI convention update their client confi
 
 - Dedicated knowledge Git repository with CD pipeline syncing main branch to the server's mounted filesystem
 - `watchfiles` now serves multiple consumers — `listChanged` and `updated` notifications fan out to all subscribed clients
-- Shared OAuth 2.1 authorisation server; per-application scopes available but flat `knowledge:read` remains the default
+- Shared OAuth 2.1 authorization server; per-application scopes available but flat `knowledge:read` remains the default
 
 ### Migration Path
 
 1. Create `knowledge-repo` and move each application's `knowledge/` folder to its namespaced sub-tree
-2. Deploy the centralised knowledge MCP server pointing at the new repo mount
+2. Deploy the centralized knowledge MCP server pointing at the new repo mount
 3. Update each application's MCP client configuration to point at the shared server endpoint and the new URI root
 4. Remove the embedded server from each application's `docker-compose.yml`
 

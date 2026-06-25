@@ -78,7 +78,7 @@ Target state supported classification sources:
 
 ## Summarisation Backend
 
-The summarised fetch output format requires a configured language model backend. The LLM backend is pluggable and configured at deployment time. Deployments that do not configure an LLM backend return an error for summarised fetch requests.
+The summarized fetch output format requires a configured language model backend. The LLM backend is pluggable and configured at deployment time. Deployments that do not configure an LLM backend return an error for summarized fetch requests.
 
 ---
 
@@ -111,7 +111,7 @@ The summarised fetch output format requires a configured language model backend.
 
 ## Locale
 
-The server itself has no locale-specific behaviour. Search result language preferences are passed through to the backend where supported. Fetch content is returned in the language of the source page. No translation capability is provided by the server.
+The server itself has no locale-specific behavior. Search result language preferences are passed through to the backend where supported. Fetch content is returned in the language of the source page. No translation capability is provided by the server.
 
 ---
 

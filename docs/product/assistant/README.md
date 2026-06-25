@@ -34,7 +34,7 @@ Start at `01` and read through in sequence. Each document assumes you have read 
 | 03 | [03-conversations-and-input.md](./03-conversations-and-input.md) | Conversation model, branching, search, context window; free-form input, `@`-binding, Display ID detection, attachments, editing |
 | 04 | [04-model-and-prompt.md](./04-model-and-prompt.md) | Provider abstraction, model switching, communication style, system prompt layers, session context block |
 | 05 | [05-tools-and-memory.md](./05-tools-and-memory.md) | Host-registered MCP servers, tool registry, guided workflows, transparency; personal memory and application context; shared conversations |
-| 06 | [06-interface-and-rendering.md](./06-interface-and-rendering.md) | Web component layout, responsive behaviour, thread anatomy, artefact tray, accessibility; rendering decision rules and content types |
+| 06 | [06-interface-and-rendering.md](./06-interface-and-rendering.md) | Web component layout, responsive behavior, thread anatomy, artifact tray, accessibility; rendering decision rules and content types |
 | 07 | [07-embedding-and-integration.md](./07-embedding-and-integration.md) | All three embedding modes (Floating Widget, Inline Page, Form Field Assist) and the `<ai-chat>` component API: attributes, events, auth bridge, CSP, sizing |
 | 08 | [08-platform-operations.md](./08-platform-operations.md) | Audit and storage, continuous improvement, success metrics, complementary MCP services |
 | — | [ROADMAP.md](./ROADMAP.md) | Planned enhancements beyond the current release |
@@ -55,7 +55,7 @@ Start at `01` and read through in sequence. Each document assumes you have read 
 | **Web component** | The `<ai-chat>` custom element that host applications embed in their UI |
 | **Authentication bridge** | The mechanism by which the host application passes the authenticated user's identity and claims to the web component |
 | **MCP Repository** | A complementary platform service providing a discoverable registry of available MCP tools that tenants can browse and register |
-| **MCP Knowledge** | The [MAOS Knowledge MCP Server](../knowledge/01-overview.md) — centralised skills, guidance documents, and prompt templates across the MCP ecosystem |
+| **MCP Knowledge** | The [MAOS Knowledge MCP Server](../knowledge/01-overview.md) — centralized skills, guidance documents, and prompt templates across the MCP ecosystem |
 | **MCP Internet Fetch & Search** | The [MAOS Internet Access MCP Server](../internet/01-overview.md) — controlled web search and page fetch; registered by hosts as an opt-in or always-on MCP server |
 | **`<ai-chat>`** | Mode 2 web component — full inline assistant embedded in a host app page |
 | **`<ai-chat-widget>`** | Mode 1 web component — floating FAB that expands to a mini/full chat panel; persists across pages |

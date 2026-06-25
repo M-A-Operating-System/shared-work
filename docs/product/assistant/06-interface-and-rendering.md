@@ -16,8 +16,8 @@ The AI Chat Platform is delivered as an `<ai-chat>` web component that host appl
 | Zone | Location within component | Contents |
 |------|--------------------------|---------|
 | **History panel** | Left sidebar | Conversation list — **My Conversations** and **Shared With Me** (reverse-chronological); conversation search; pinned conversations; new conversation button; workflow library access |
-| **Conversation area** | Centre — primary | Message thread, streaming responses, rendered content, input area |
-| **Conversation panel** | Right sidebar | **Canvas** (active when a document is open for iteration); attachments and artefacts; participant list and share management; session token summary |
+| **Conversation area** | Center — primary | Message thread, streaming responses, rendered content, input area |
+| **Conversation panel** | Right sidebar | **Canvas** (active when a document is open for iteration); attachments and artifacts; participant list and share management; session token summary |
 
 #### Desktop layout (≥ 1280px)
 
@@ -27,15 +27,15 @@ The AI Chat Platform is delivered as an `<ai-chat>` web component that host appl
 ├─────────────┬───────────────────────────┬────────────────────┤
 │ History     │                           │ Conversation panel │
 │             │    Conversation area      │                    │
-│ [🔍 Search]│                           │ Canvas  Artefacts  │
+│ [🔍 Search]│                           │ Canvas  Artifacts  │
 │             │  ┌─────────────────────┐  │ Participants    ∑  │
 │ ▾ My Convs │  │ 🔧 Tool call card   │  ├────────────────────┤
 │   — Today   │  └─────────────────────┘  │                    │
 │   Conv 1    │  ┌─────────────────────┐  │  [Active canvas    │
-│   Conv 2    │  │ Assistant response  │  │   or artefact      │
+│   Conv 2    │  │ Assistant response  │  │   or artifact      │
 │   — Yesterday│  │ [👍][👎][↻][⎘]  │  │   panel content]   │
 │   Conv 3    │  └─────────────────────┘  │                    │
-│             │                           │ — Artefacts —      │
+│             │                           │ — Artifacts —      │
 │ ▾ Shared   │  ┌─────────────────────┐  │  📄 report.pdf     │
 │   Conv A    │  │ User message bubble │  │  📊 chart.xlsx     │
 │             │  └─────────────────────┘  │                    │
@@ -93,7 +93,7 @@ When clicked, a workflow from the library opens a parameter form (if the workflo
 │ [🔍 Search workflows…]               │
 ├──────────────────────────────────────┤
 │ ⚡ Governance Health Check           │
-│   Summarise coverage and quality     │
+│   Summarize coverage and quality     │
 │   gaps across a selected domain. [→] │
 ├──────────────────────────────────────┤
 │ 📅 Weekly Status Report              │
@@ -112,7 +112,7 @@ Selecting a workflow with parameters opens a parameter form before launch:
 ┌──────────────────────────────────────┐
 │ ← Governance Health Check            │
 ├──────────────────────────────────────┤
-│ Summarise governance coverage,       │
+│ Summarize governance coverage,       │
 │ quality gaps, and policy compliance  │
 │ across a selected domain.            │
 ├──────────────────────────────────────┤
@@ -132,7 +132,7 @@ The right panel is scoped entirely to the **active conversation** and switches b
 | Tab | Contents | When active |
 |-----|---------|-------------|
 | **Canvas** | The active working document — editable, versioned, iteratable | Whenever a canvas document is open in the conversation |
-| **Attachments & Artefacts** | All input documents and output artefacts in submission order | Always available |
+| **Attachments & Artifacts** | All input documents and output artifacts in submission order | Always available |
 | **Participants** | Participant list (shared conversations); invite control; leave / remove actions | Always available |
 | **Session summary** | Running token totals (`14 turns · 18,430 tokens`) with tooltip expanding to input / output / cached breakdown | Always available |
 
@@ -142,7 +142,7 @@ When a canvas document is opened, the panel automatically switches to the **Canv
 
 ### Responsive and mobile design
 
-Mobile-first responsive layout is a core platform standard. Layout behaviour at each breakpoint assumes the component is mounted at full-page width.
+Mobile-first responsive layout is a core platform standard. Layout behavior at each breakpoint assumes the component is mounted at full-page width.
 
 | Viewport | Layout |
 |----------|--------|
@@ -163,7 +163,7 @@ The history panel collapses to an icon-only rail. Hovering an icon reveals its l
 ├──────┬────────────────────────────────┬──────────────────────┤
 │  ☰   │                                │ Conversation panel   │
 │  🔍  │     Conversation area          │                      │
-│  ─── │                                │ Canvas  Artefacts    │
+│  ─── │                                │ Canvas  Artifacts    │
 │  ●   │  ┌──────────────────────────┐  │ Participants    ∑    │
 │  ●   │  │ Assistant response       │  ├──────────────────────┤
 │  ─── │  │ [👍][👎][↻][⎘]         │  │                      │
@@ -251,7 +251,7 @@ Single-column; history and conversation panels as full-height bottom-sheet drawe
 
 The input toolbar presents all controls in a **single row above the text field**, within thumb reach. When horizontal space is tight, secondary controls (model chip, profile indicator) collapse behind an overflow icon — the paperclip (attachment) and send/stop button are **never** moved to overflow.
 
-| Control | Mobile behaviour |
+| Control | Mobile behavior |
 |---------|----------------|
 | Paperclip / attachment | Opens the native mobile file picker (camera roll, Files app, camera capture) |
 | Tool selection | Opens a full-screen bottom sheet listing available MCP tools |
@@ -259,7 +259,7 @@ The input toolbar presents all controls in a **single row above the text field**
 | Text input | Grows to 3 lines maximum on mobile (vs. 5 on desktop) |
 | Submit | Large dedicated tap target — always visible |
 
-#### Keyboard and viewport behaviour
+#### Keyboard and viewport behavior
 
 When the software keyboard raises on mobile, the conversation thread scrolls to keep the latest turn visible above the input area. The input area stays pinned to the top of the keyboard. The `@`-binding typeahead panel appears above the keyboard.
 
@@ -297,7 +297,7 @@ When the software keyboard raises on mobile, the conversation thread scrolls to 
 #### Other participants' messages (shared conversations only)
 
 - Left-aligned
-- Distinct colour per participant (derived from host primary brand colour)
+- Distinct color per participant (derived from host primary brand color)
 - Author name and avatar above the bubble
 
 #### Message timestamps
@@ -396,7 +396,7 @@ Each assistant response carries:
 |---------|---------|--------|
 | Metadata line | Appears on hover — model label + token counts + (in shared sessions) submitting user's name | Revealed on tap of the response bubble |
 | Feedback row (👍 👎 Regenerate Copy) | Appears on hover | Always visible below the response |
-| Artefact chips | *"Added to artefacts ↗"* beneath each generated block | Same |
+| Artifact chips | *"Added to artifacts ↗"* beneath each generated block | Same |
 
 #### Suggested follow-ups
 
@@ -474,11 +474,11 @@ Opened via the ⚙ icon in the input area:
 
 ---
 
-### Session artefact tray
+### Session artifact tray
 
-The artefact tray accumulates every input and output artefact produced during a conversation. It persists for the full lifetime of the conversation record.
+The artifact tray accumulates every input and output artifact produced during a conversation. It persists for the full lifetime of the conversation record.
 
-#### Artefact classes
+#### Artifact classes
 
 | Class | Direction | Examples |
 |-------|-----------|---------|
@@ -501,9 +501,9 @@ Each tray entry shows:
 - Download button
 - Preview link
 
-Users may **rename** tray entries. A **"Download all"** control packages all artefacts as a zip archive.
+Users may **rename** tray entries. A **"Download all"** control packages all artifacts as a zip archive.
 
-Canvas documents in the artefact tray carry an additional **"Open in canvas"** action that re-opens the document in the canvas panel for further editing, regardless of which turn produced it.
+Canvas documents in the artifact tray carry an additional **"Open in canvas"** action that re-opens the document in the canvas panel for further editing, regardless of which turn produced it.
 
 ---
 
@@ -513,11 +513,11 @@ The canvas is the platform's working-document surface — a persistent, editable
 
 #### What opens in canvas
 
-The model uses a ` ```document ` fenced block to produce canvas-eligible output. The platform's non-overridable system prompt layer instructs the model to use `document` blocks for substantial, document-like prose outputs — reports, summaries, plans, policy drafts, specifications, structured analyses — where the user is likely to want to refine rather than simply read and move on.
+The model uses a ` ```document ` fenced block to produce canvas-eligible output. The platform's non-overridable system prompt layer instructs the model to use `document` blocks for substantial, document-like prose outputs — reports, summaries, plans, policy drafts, specifications, structured analyzes — where the user is likely to want to refine rather than simply read and move on.
 
-Non-prose outputs (Mermaid diagrams, Vega-Lite charts, data tables, code blocks, JSON) remain as inline thread content and artefact tray entries. They do not open in canvas.
+Non-prose outputs (Mermaid diagrams, Vega-Lite charts, data tables, code blocks, JSON) remain as inline thread content and artifact tray entries. They do not open in canvas.
 
-Users may also manually promote any text artefact in the tray to canvas by clicking **"Open in canvas"** on that tray entry.
+Users may also manually promote any text artifact in the tray to canvas by clicking **"Open in canvas"** on that tray entry.
 
 #### Canvas panel layout
 
@@ -536,7 +536,7 @@ Users may also manually promote any text artefact in the tray to canvas by click
 └───────────────────────────────────────┴─┘
 ```
 
-| Element | Behaviour |
+| Element | Behavior |
 |---------|----------|
 | **Document title** | Auto-generated from document content; editable inline by clicking |
 | **Version indicator** | Shows current version (v1, v2 …); clicking opens a version history dropdown listing every model-generated and user-edited version with timestamp. Selecting a prior version restores it as a new version (no destructive overwrites). |
@@ -637,9 +637,9 @@ A conversation may produce more than one canvas document. Each is a separate tab
 
 The canvas panel is only available in **full state**. In the mini state, canvas documents show as reference cards in the thread with an *"Expand for canvas view ↗"* note. Transitioning to full state opens the canvas panel for the active document.
 
-#### Canvas and the artefact tray
+#### Canvas and the artifact tray
 
-All canvas document versions are stored in the artefact tray as versioned entries. The tray shows the latest version with a version count badge (e.g. `v4`). Individual versions are downloadable from the version history dropdown in the canvas panel.
+All canvas document versions are stored in the artifact tray as versioned entries. The tray shows the latest version with a version count badge (e.g. `v4`). Individual versions are downloadable from the version history dropdown in the canvas panel.
 
 ---
 
@@ -720,12 +720,12 @@ The onboarding state is shown once per user — it is not shown again once the u
 | State | Presentation | User action |
 |-------|-------------|------------|
 | Model timeout | Inline error card with retry button | Retry re-submits the last message |
-| Send failure (network) | Failed user message styled with error colour + inline retry icon | Tap/click retry to resend |
+| Send failure (network) | Failed user message styled with error color + inline retry icon | Tap/click retry to resend |
 | Connection lost | Non-blocking banner below the conversation header: *"Connection lost — reconnecting…"*; animated reconnect indicator. Banner updates to *"Reconnected"* (auto-dismisses after 3s) on restore. | Wait; drafts are preserved locally |
 | MCP tool failure | Tool call disclosure shows error status and raw detail | Rephrase or copy error to report |
 | Always-on MCP server unavailable | Degraded-mode banner; session continues in text-only mode | Model answers from system prompt context only |
 | Opt-in MCP server unavailable | Error in tool call disclosure | Disable the failing server for the session |
-| Context window limit (80%) | Subtle warning in conversation header | Branch to new thread or accept auto-summarisation |
+| Context window limit (80%) | Subtle warning in conversation header | Branch to new thread or accept auto-summarization |
 | Out-of-scope query | Model explains scope boundary and suggests reformulation | No error state — graceful redirect |
 | Auth session expired | Modal overlay prompting re-authentication | Re-auth restores session and full conversation history |
 | Unsupported file type | Inline notice on file selection | User prompted to use a supported format |
@@ -808,7 +808,7 @@ WCAG 2.1 AA compliance is a platform requirement. Platform-specific additions:
 | Mermaid SVG alt text | Descriptive alt text generated by the model for each Mermaid diagram |
 | Conversation thread live region | The thread is an `aria-live` region — streaming responses and new shared conversation messages are announced to screen readers |
 | `@`-binding typeahead | Fully keyboard-navigable (arrow keys, Enter/Tab to select, Escape to dismiss); focus returns to input field on selection or dismissal |
-| Branding token contrast | Platform validates that host-provided colour tokens meet WCAG 2.1 AA contrast ratios at config submission |
+| Branding token contrast | Platform validates that host-provided color tokens meet WCAG 2.1 AA contrast ratios at config submission |
 | `prefers-reduced-motion` | When the OS-level reduced motion preference is active: streaming text renders immediately (no character-by-character animation); panel slide transitions are instant; the thinking indicator uses a static label instead of the animated three-dot pulse; the FAB pulse animation on stream-in-progress is suppressed; Mermaid and Vega-Lite render-in animations are disabled |
 | Focus management | When a shared conversation message arrives, focus is not stolen from the input field. The unread badge and "Jump to latest" button are announced via the live region. Focus only moves to new content on explicit user action. |
 | Modal focus trap | All modal overlays (full widget state, diagram full-screen, write confirmation) implement a focus trap — Tab cycles only within the modal; Escape dismisses |
@@ -882,7 +882,7 @@ The prompt appears as a **non-blocking floating card** anchored to the bottom-ri
 - Non-blocking — does not prevent input
 - Dismissible (Skip or click outside)
 - Skipping is not counted as a negative signal
-- On mobile: appears as a bottom sheet centred in the viewport
+- On mobile: appears as a bottom sheet centered in the viewport
 
 The rating and optional comment are stored in `assistant.conversations.csat_score` and `assistant.conversations.csat_comment`.
 
@@ -962,7 +962,7 @@ The rendering engine evaluates each content block in an assistant response in pr
 
 The system prompt (injected by the platform) instructs the model to:
 - Prefer structured outputs — Vega-Lite for metrics and trends, Mermaid for relationships and flows, data tables for entity lists — over prose equivalents when the data supports it
-- Use `document` blocks for substantial prose outputs (reports, summaries, plans, policy drafts, analyses) where the user is likely to iterate across multiple turns rather than simply read once
+- Use `document` blocks for substantial prose outputs (reports, summaries, plans, policy drafts, analyzes) where the user is likely to iterate across multiple turns rather than simply read once
 
 #### Content type quick reference
 
@@ -972,7 +972,7 @@ The system prompt (injected by the platform) instructs the model to:
 | Write proposal card | ` ```write-proposal ` | Any create, update, delete, or bulk write operation — always emitted before the write MCP call is issued |
 | Feedback request card | ` ```feedback-request ` / MCP elicitation | Approval gates, structured confirmations, mid-workflow choices — any point where the agent must pause for user input before continuing |
 | Document canvas | ` ```document ` | Reports, policy drafts, structured summaries, plans — any substantial prose the user will iterate on |
-| Custom host renderer | Registered `trigger` tag | Host-defined domain-specific visualisations (risk gauges, compliance scorecards, Gantt views, org charts) |
+| Custom host renderer | Registered `trigger` tag | Host-defined domain-specific visualizations (risk gauges, compliance scorecards, Gantt views, org charts) |
 | Mermaid diagram | ` ```mermaid ` | Entity relationships, process flows, system dependencies, hierarchies |
 | Vega-Lite chart | ` ```vega-lite ` | Metrics, trends, distributions, comparisons |
 | Math expression | ` ```math ` / `$$...$$` / `$...$` | Scoring formulas, ratios, statistical expressions, metric definitions |
@@ -989,7 +989,7 @@ The system prompt (injected by the platform) instructs the model to:
 
 Every MCP tool invocation renders as a collapsible disclosure card inline in the conversation thread. Cards appear automatically from streaming events — they are not fenced blocks. Full specification is in [05-tools-and-memory.md](./05-tools-and-memory.md#tool-call-transparency).
 
-| Behaviour | Specification |
+| Behavior | Specification |
 |-----------|--------------|
 | Trigger | `mcp_tool_use` / `mcp_tool_result` streaming events |
 | Default state | Collapsed — tool name, status icon, and result summary visible |
@@ -1021,7 +1021,7 @@ interface HostRenderer {
   dispose?(): void;
 
   // Optional — if present, called by the platform when the user downloads from the
-  // artefact tray. The returned Blob is used instead of the raw fenced block source,
+  // artifact tray. The returned Blob is used instead of the raw fenced block source,
   // allowing the renderer to export a rendered image, PDF, or structured file.
   getExportBlob?(): Promise<Blob>;
 }
@@ -1056,7 +1056,7 @@ For each registered renderer, the platform injects the renderer's `systemPromptG
 
 All registered renderer guidance blocks are appended together in the order they appear in the `renderers` config array. They are injected after tool descriptions and before memory blocks in the assembled system prompt.
 
-##### Fallback behaviour
+##### Fallback behavior
 
 If the renderer module fails to load, or if `render()` throws, the platform:
 
@@ -1093,15 +1093,15 @@ The model produces:
 ```
 ````
 
-The platform calls `RiskGaugeRenderer.render(container, content, context)`. The renderer parses the JSON and renders a gauge widget into `container`. The raw JSON is stored in the artefact tray.
+The platform calls `RiskGaugeRenderer.render(container, content, context)`. The renderer parses the JSON and renders a gauge widget into `container`. The raw JSON is stored in the artifact tray.
 
 ---
 
 #### Document canvas
 
-A `document` block opens a persistent right-panel canvas alongside the conversation thread. The canvas is designed for substantial prose outputs — reports, summaries, plans, policy drafts, analyses — that the user is likely to iterate on across multiple turns rather than simply read once.
+A `document` block opens a persistent right-panel canvas alongside the conversation thread. The canvas is designed for substantial prose outputs — reports, summaries, plans, policy drafts, analyzes — that the user is likely to iterate on across multiple turns rather than simply read once.
 
-| Behaviour | Specification |
+| Behavior | Specification |
 |-----------|--------------|
 | Trigger | Fenced block tagged ` ```document ` |
 | Panel | Opens in a right-panel canvas; the conversation thread continues uninterrupted in the left panel |
@@ -1109,13 +1109,13 @@ A `document` block opens a persistent right-panel canvas alongside the conversat
 | Multiple documents | Each `document` block from the same conversation opens as a tab in the canvas panel. Switching tabs does not navigate the conversation |
 | Iteration | Subsequent turns that produce a revised `document` block replace the active canvas content in-place; the prior version is accessible via the version history control (last 10 revisions retained) |
 | Export | Full document downloadable as Markdown or plain text from the canvas toolbar; PDF export via browser print |
-| Artefact | Document source stored in turn record; added to artefact tray with document title as label |
+| Artifact | Document source stored in turn record; added to artifact tray with document title as label |
 | Mobile | Canvas panel opens as a full-screen overlay; a back button returns to the conversation thread |
 | Empty state | If the model produces a `document` block with no content, the canvas shows a *"No content"* placeholder and the thread reference card is omitted |
 
 ##### Document titles
 
-The platform extracts the document title from the first `# Heading` in the block content. If no heading is present, it defaults to *"Document — [timestamp]"*. Titles are shown in the thread reference card, the canvas tab, and the artefact tray entry.
+The platform extracts the document title from the first `# Heading` in the block content. If no heading is present, it defaults to *"Document — [timestamp]"*. Titles are shown in the thread reference card, the canvas tab, and the artifact tray entry.
 
 ---
 
@@ -1125,14 +1125,14 @@ A `write-proposal` block renders a structured before/after confirmation card inl
 
 > **This is a blocking content type.** Streaming pauses on receipt and does not resume until the user confirms or cancels. The input field and stop-generation button are both disabled while the card is pending. The write MCP call is never issued until an explicit confirm response is recorded.
 
-| Behaviour | Specification |
+| Behavior | Specification |
 |-----------|--------------|
 | Trigger | Fenced block tagged ` ```write-proposal ` |
 | Placement | Inline in conversation thread — never modal |
 | Blocking | Streaming pauses on receipt; resumes only after user responds |
 | On confirm | Model proceeds to issue the write MCP tool call; the tool call disclosure renders as normal |
 | On cancel | Model acknowledges the cancellation in prose; no write call is issued |
-| Response recording | The confirmed or cancelled outcome is written to the conversation as a structured user turn so the model sees it in context |
+| Response recording | The confirmed or canceled outcome is written to the conversation as a structured user turn so the model sees it in context |
 | One at a time | At most one pending write proposal per conversation at any moment |
 
 ![Write proposal card — rendered before/after confirmation card alongside its raw JSON source](./samples/renderer-previews/09-write-proposal.png)
@@ -1204,7 +1204,7 @@ A `feedback-request` block renders an interactive confirmation card inline in th
 
 > **This is the only blocking content type.** Streaming pauses at a `feedback-request` block and does not resume until the user selects a response. The input field is disabled while the card is pending. The stop-generation button is also hidden — a pending feedback card is not cancellable by stop; it must be explicitly declined via a `Cancel` or `Reject` option in the card itself.
 
-| Behaviour | Specification |
+| Behavior | Specification |
 |-----------|--------------|
 | Trigger | Fenced block tagged ` ```feedback-request `, or MCP `elicitation/create` event |
 | Placement | Inline in conversation thread — never modal, never toast |
@@ -1228,7 +1228,7 @@ The fenced block content must be valid JSON:
 ```
 
 - **`prompt`** — the question or description displayed at the top of the card. Should state clearly what action is being requested or what decision the user is making.
-- **`options`** — one to four labelled choices. At least one is required. `style` drives visual weight: `primary` (brand colour, default action), `destructive` (red, irreversible or high-risk action), `secondary` (neutral, cancel or deferral).
+- **`options`** — one to four labeled choices. At least one is required. `style` drives visual weight: `primary` (brand color, default action), `destructive` (red, irreversible or high-risk action), `secondary` (neutral, cancel or deferral).
 - **`allowFreeText`** — if `true`, a text input appears below the option buttons, allowing the user to type a custom response in addition to or instead of selecting a button. The typed response is included in the recorded turn.
 
 ##### Option design guidelines
@@ -1236,7 +1236,7 @@ The fenced block content must be valid JSON:
 | Pattern | Options | Notes |
 |---------|---------|-------|
 | Simple approval gate | `Approve` (primary) + `Reject` (destructive) | Use for irreversible or high-impact actions |
-| Multi-choice | 2–4 labelled options, one primary | Use when there are meaningful alternatives, not just yes/no |
+| Multi-choice | 2–4 labeled options, one primary | Use when there are meaningful alternatives, not just yes/no |
 | With escape hatch | Any options + `Cancel` (secondary) | Include whenever doing nothing is a valid choice |
 | Guided free text | 1–2 options + `allowFreeText: true` | Use when sensible defaults exist but the user may need to specify |
 
@@ -1252,7 +1252,7 @@ The feedback request card is the platform's implementation of [MCP Elicitation](
 | Form mode (JSON Schema input) | Single-question flows → feedback request card; multi-field forms → `document` block with a form layout |
 | URL mode (external redirect for OAuth, payments) | Platform opens the URL in a new tab / webview; this is *not* handled by the feedback card |
 | Titled enum options | `label` field on each option — human-readable text, not the machine `id` |
-| Multi-select enum | Not yet supported by the feedback card; multi-select flows should use a data table or document block until the MCP multi-select spec stabilises |
+| Multi-select enum | Not yet supported by the feedback card; multi-select flows should use a data table or document block until the MCP multi-select spec stabilizes |
 
 ##### Raw / rendered toggle
 
@@ -1264,15 +1264,15 @@ Feedback request cards do **not** expose a Raw toggle while the card is pending 
 
 #### Mermaid diagram
 
-| Behaviour | Specification |
+| Behavior | Specification |
 |-----------|--------------|
 | Rendering | SVG via Mermaid.js |
-| Default display | Full-width in conversation thread, collapsed to thumbnail in artefact tray |
+| Default display | Full-width in conversation thread, collapsed to thumbnail in artifact tray |
 | Expand | Full-screen overlay available |
-| Export | SVG download from artefact tray |
+| Export | SVG download from artifact tray |
 | Mobile | Horizontally scrollable — never scaled to illegibility |
 | Accessibility | Descriptive alt text generated by the model and attached to the SVG |
-| Artefact | Mermaid source stored in turn record; added to artefact tray on render complete |
+| Artifact | Mermaid source stored in turn record; added to artifact tray on render complete |
 
 ![Mermaid diagram — rendered SVG flowchart alongside its raw Mermaid source](./samples/renderer-previews/01-mermaid.png)
 
@@ -1283,21 +1283,21 @@ Feedback request cards do **not** expose a Raw toggle while the card is pending 
 | Entity relationship | `erDiagram` | *"Show me the relationship between X and Y"* |
 | Process flow | `flowchart LR` | *"Walk me through the approval workflow"* |
 | Sequence diagram | `sequenceDiagram` | *"How do these services communicate?"* |
-| Hierarchy / tree | `graph TD` | *"Show me the organisational structure"* |
+| Hierarchy / tree | `graph TD` | *"Show me the organizational structure"* |
 | Timeline | `timeline` | *"Show the project milestones"* |
 
 ---
 
 #### Vega-Lite chart
 
-| Behaviour | Specification |
+| Behavior | Specification |
 |-----------|--------------|
 | Rendering | Interactive via vega-embed |
 | Responsive sizing | `width: "container"` — adapts to viewport or container |
-| Export | PNG or SVG download from artefact tray |
+| Export | PNG or SVG download from artifact tray |
 | Interactivity | Hover tooltips, click-to-filter where applicable |
 | Mobile | Responsive; minimum bar/point size maintained for touch targets. Hover tooltips activate on tap; click-to-filter activates on double-tap. Pinch-to-zoom is disabled — the chart scales with the viewport instead |
-| Artefact | Vega-Lite spec stored in turn record; added to artefact tray on render complete |
+| Artifact | Vega-Lite spec stored in turn record; added to artifact tray on render complete |
 
 ![Vega-Lite chart — rendered interactive bar chart alongside its raw Vega-Lite JSON spec](./samples/renderer-previews/02-vega-lite.png)
 
@@ -1307,13 +1307,13 @@ Feedback request cards do **not** expose a Raw toggle while the card is pending 
 
 Mathematical expressions are rendered using **KaTeX** — fast, lightweight, and browser-native.
 
-| Behaviour | Specification |
+| Behavior | Specification |
 |-----------|--------------|
-| Display block | Triggered by ` ```math ` fenced block or `$$...$$` delimiter — rendered full-width, centred |
+| Display block | Triggered by ` ```math ` fenced block or `$$...$$` delimiter — rendered full-width, centered |
 | Inline | Triggered by `$...$` within prose — renders inline without breaking text flow |
 | Library | KaTeX — subset of LaTeX math notation |
 | Copy | LaTeX source copy-to-clipboard button on display blocks |
-| Export | LaTeX source and rendered SVG downloadable from artefact tray |
+| Export | LaTeX source and rendered SVG downloadable from artifact tray |
 | Mobile | Display blocks horizontally scrollable at narrow viewports |
 | Fallback | If KaTeX fails to parse, the raw LaTeX source is shown in a code block with a parse-error notice |
 
@@ -1323,11 +1323,11 @@ Mathematical expressions are rendered using **KaTeX** — fast, lightweight, and
 
 #### JSON inspector
 
-| Behaviour | Specification |
+| Behavior | Specification |
 |-----------|--------------|
 | Default state | Collapsed to two levels |
 | Navigation | Expand/collapse nodes; copy individual values or subtrees |
-| Export | Full JSON download from artefact tray |
+| Export | Full JSON download from artifact tray |
 | Use cases | Tool result payloads, configuration inspection, structured record data |
 
 ![JSON inspector — rendered collapsible tree view alongside its raw JSON source](./samples/renderer-previews/04-json-inspector.png)
@@ -1336,13 +1336,13 @@ Mathematical expressions are rendered using **KaTeX** — fast, lightweight, and
 
 #### Data table
 
-| Behaviour | Specification |
+| Behavior | Specification |
 |-----------|--------------|
 | Sorting | Click column header to sort ascending/descending |
 | Filtering | Inline filter row per column |
 | Pagination | 25 rows per page; configurable |
 | Mobile | Horizontally scrollable; first column sticky |
-| Export | CSV download from artefact tray |
+| Export | CSV download from artifact tray |
 | Empty state | "No results" message with query context |
 
 ![Data table — rendered sortable filterable table with row numbers alongside its raw CSV source](./samples/renderer-previews/03-data-table.png)
@@ -1351,27 +1351,27 @@ Mathematical expressions are rendered using **KaTeX** — fast, lightweight, and
 
 #### Syntax-highlighted code
 
-| Behaviour | Specification |
+| Behavior | Specification |
 |-----------|--------------|
 | Highlighting | Prism.js — auto-detects language from fenced block tag |
 | Copy | Copy-to-clipboard button always visible |
 | Line numbers | Shown for blocks of more than five lines |
 | Languages | SQL, Python, YAML, TypeScript, JSON, Bash, and all Prism-supported languages |
 
-![Syntax-highlighted code — rendered TypeScript with token colouring and line numbers alongside its raw source](./samples/renderer-previews/11-code-block.png)
+![Syntax-highlighted code — rendered TypeScript with token coloring and line numbers alongside its raw source](./samples/renderer-previews/11-code-block.png)
 
 ---
 
 #### Attached content
 
-**Non-image documents** (PDF, Excel, Word) appear in the user message bubble as a labelled file card:
+**Non-image documents** (PDF, Excel, Word) appear in the user message bubble as a labeled file card:
 - Format icon
 - File name
 - Page count (PDF), sheet count (Excel), or section count (Word)
 
 Clicking the file card opens the document in an **inline document viewer** embedded directly in the conversation thread. The viewer renders the full document without leaving the conversation.
 
-| Format | Viewer behaviour |
+| Format | Viewer behavior |
 |--------|-----------------|
 | PDF | Paginated page-by-page render; page navigation controls; text selection and search within the PDF |
 | Excel | Sheet tabs across the top; each sheet rendered as a scrollable, read-only data table |
@@ -1384,7 +1384,7 @@ When the model references a specific section, it cites by page number (PDF), she
 
 ![PDF attachment — rendered inline document viewer alongside the raw attachment card](./samples/renderer-previews/07-pdf.png)
 
-**Images** (PNG, JPEG, WEBP) are **rendered inline** in the user message bubble at a constrained size (max 320px wide, max 240px tall, maintaining aspect ratio). Multiple images in one turn stack vertically. Clicking an image opens it in a full-screen lightbox overlay. The original file is downloadable from the lightbox and from the artefact tray.
+**Images** (PNG, JPEG, WEBP) are **rendered inline** in the user message bubble at a constrained size (max 320px wide, max 240px tall, maintaining aspect ratio). Multiple images in one turn stack vertically. Clicking an image opens it in a full-screen lightbox overlay. The original file is downloadable from the lightbox and from the artifact tray.
 
 ---
 
@@ -1392,7 +1392,7 @@ When the model references a specific section, it cites by page number (PDF), she
 
 The default renderer for all assistant output that does not match a higher-priority content type. Renders GitHub-Flavoured Markdown (GFM) — headings, bold, italic, inline code, blockquotes, links, ordered and unordered lists, and tables.
 
-| Behaviour | Specification |
+| Behavior | Specification |
 |-----------|--------------|
 | Standard | GFM — headings, emphasis, inline code, blockquotes, links, lists, tables |
 | Streaming | Character-by-character; renders incrementally as tokens arrive |
@@ -1403,17 +1403,17 @@ The default renderer for all assistant output that does not match a higher-prior
 
 ---
 
-### Cross-cutting behaviours
+### Cross-cutting behaviors
 
 #### Streaming
 
-| Content type | Streaming behaviour |
+| Content type | Streaming behavior |
 |-------------|-------------------|
 | Prose / markdown | Streams character-by-character; renders incrementally |
 | Non-prose blocks (Mermaid, Vega-Lite, JSON, tables, code) | Buffers internally; renders on `content_block_stop` to prevent hydration errors on partial content |
 | **Feedback request card** | **Blocks the stream entirely.** Subsequent content is withheld until the user responds. The stop-generation button is hidden while a card is pending |
 | Tool call disclosures | Appear as an in-progress card while the tool is running; update on result receipt |
-| Artefact chips | *"Added to artefacts ↗"* chip appears beneath each completed non-prose block |
+| Artifact chips | *"Added to artifacts ↗"* chip appears beneath each completed non-prose block |
 
 While the model is streaming, the input field is disabled and replaced by a **stop-generation button**. Stopping generation saves the partial response to the audit trail as a partial turn — it does not discard it. When stopped, a *"(generation stopped)"* label appears beneath the partial response.
 
@@ -1429,18 +1429,18 @@ The Continue button is shown for a maximum of 60 seconds after the truncated res
 
 ---
 
-#### Artefact tray
+#### Artifact tray
 
-The artefact tray is a persistent UI panel (collapsed by default, expandable from a tray handle at the bottom of the conversation) that collects downloadable outputs from the current conversation. Every non-prose rendered block — Mermaid diagrams, Vega-Lite charts, math expressions, JSON payloads, data tables, document canvas outputs, and custom renderer outputs — is automatically added to the tray when it finishes rendering.
+The artifact tray is a persistent UI panel (collapsed by default, expandable from a tray handle at the bottom of the conversation) that collects downloadable outputs from the current conversation. Every non-prose rendered block — Mermaid diagrams, Vega-Lite charts, math expressions, JSON payloads, data tables, document canvas outputs, and custom renderer outputs — is automatically added to the tray when it finishes rendering.
 
 | Element | Specification |
 |---------|--------------|
 | Trigger | Added automatically on render completion of any non-prose block |
 | Entry label | Content type name + block title (where extractable) or timestamp |
-| Download | Clicking an entry downloads the artefact. For custom renderers that implement `getExportBlob()`, the exported blob is used; otherwise the raw fenced block source is downloaded as plain text |
+| Download | Clicking an entry downloads the artifact. For custom renderers that implement `getExportBlob()`, the exported blob is used; otherwise the raw fenced block source is downloaded as plain text |
 | Scope | Tray contents are scoped to the current conversation. Navigating to a new conversation clears the tray |
-| Persistence | Artefact tray entries are stored with the turn record and restored when the conversation is reopened |
-| Empty state | Tray handle is hidden when there are no artefacts in the current conversation |
+| Persistence | Artifact tray entries are stored with the turn record and restored when the conversation is reopened |
+| Empty state | Tray handle is hidden when there are no artifacts in the current conversation |
 
 ---
 
@@ -1465,7 +1465,7 @@ The toggle is a **Rendered · Raw** pill control placed in the top-right corner 
 - Switching to Raw does not re-fetch or reprocess content — the raw source is the already-buffered fenced block content.
 - The toggle state is per-block and per-session — it is not persisted across page loads.
 - Switching a Vega-Lite block to Raw shows the JSON inspector rather than a plain code block, since the spec is structured data with navigable nodes.
-- When a block is in Raw view, the artefact tray entry for that block still downloads the rendered export (or raw source if no `getExportBlob()` is available) — the toggle does not affect the download target.
+- When a block is in Raw view, the artifact tray entry for that block still downloads the rendered export (or raw source if no `getExportBlob()` is available) — the toggle does not affect the download target.
 - Custom renderers that implement `getExportBlob()` are not called while the block is in Raw view.
 
 ---
@@ -1562,7 +1562,7 @@ The `feedback-request` renderer is a built-in entry in the registry. Its system 
 
 ```
 [Feedback request]
-Use a ```feedback-request block when you need explicit user confirmation or a structured choice before continuing. Provide a clear prompt, 1–4 labelled options, and set allowFreeText to true only when free-form input adds value over the available options. Do not use feedback-request for rhetorical or clarifying questions that do not block execution — use prose instead.
+Use a ```feedback-request block when you need explicit user confirmation or a structured choice before continuing. Provide a clear prompt, 1–4 labeled options, and set allowFreeText to true only when free-form input adds value over the available options. Do not use feedback-request for rhetorical or clarifying questions that do not block execution — use prose instead.
 ```
 
 > **Adding a new renderer requires writing one module and adding one config entry. No existing renderer code, no platform core, and no system prompt template needs to be touched.** The rendering surface scales by addition, not by modification — each new capability is a self-contained deployment that sits alongside everything already running.

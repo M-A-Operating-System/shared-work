@@ -29,7 +29,7 @@ GET https://knowledge-mcp.maoperatingsystem.com/.well-known/mcp-server
 }
 ```
 
-### Python SDK Initialisation
+### Python SDK Initialization
 
 ```python
 from mcp import ClientSession
@@ -182,10 +182,10 @@ Once connected via the settings above, Claude Code can call any tool directly in
 | `-32002` Resource not found | Do not retry without correcting the URI |
 | `-32602` Invalid params | Fix the URI or argument before retrying |
 | `-32603` Internal error | Retry with exponential backoff; alert on repeated failure |
-| HTTP `429` Rate limited | Honour `Retry-After`; implement client-side request queuing |
-| HTTP `401` Unauthorised | Refresh token via OAuth 2.1 refresh flow; retry once |
+| HTTP `429` Rate limited | Honor `Retry-After`; implement client-side request queuing |
+| HTTP `401` Unauthorized | Refresh token via OAuth 2.1 refresh flow; retry once |
 
-## Offline / Unavailable Behaviour
+## Offline / Unavailable Behavior
 
 Cache the last successful response per URI with a 5-minute TTL. On connection failure or `5xx`, serve the cached version and log a warning. On cache miss with server unavailable, surface a user-visible notice and continue operating — do not surface server unavailability as an agent failure.
 

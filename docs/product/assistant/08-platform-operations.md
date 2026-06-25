@@ -37,7 +37,7 @@ All conversation content is retained in full at write time. Nothing is reconstru
 | Rendered content blocks | Mermaid source, Vega-Lite specs, CSV, code — typed JSONB records |
 | Tool call log | Tool name, input parameters, response payload, latency, success/error per invocation |
 | Attached input files | Full binary stored in platform object storage |
-| Output artefacts | Full content stored in turn record |
+| Output artifacts | Full content stored in turn record |
 | Canvas version | If the turn produces or accepts a canvas revision, a `canvas_versions` row is written linked to this turn |
 | Model version | Exact provider model string (e.g. `provider-name:model-id:version`) and resolved tier (`fast` / `standard` / `powerful`) |
 | Token counts | Input, output, cache read, cache write — per turn and running session totals |
@@ -60,7 +60,7 @@ When a user stops generation mid-stream, the partial response is saved to the au
 | Archival | A scheduled platform function handles expiry and archival per tenant's configured retention period |
 | User-initiated deletion | Users may delete conversations subject to the tenant's retention minimum; physical deletion is deferred to retention expiry |
 | Turn-level deletion | Not permitted — conversations are append-only at the turn level. Editing creates a new branched thread. |
-| Object storage | Binary artefacts (attached documents, generated outputs) follow the same tenant-configured retention schedule |
+| Object storage | Binary artifacts (attached documents, generated outputs) follow the same tenant-configured retention schedule |
 
 ---
 
@@ -90,7 +90,7 @@ The `assistant` schema contains the following tables:
 | `assistant.tenants` | One row per registered host application; tenant config snapshot, API key reference |
 | `assistant.conversations` | One row per conversation thread; `tenant_id`, title, owner, timestamps, retention expiry, CSAT |
 | `assistant.turns` | One row per turn; `tenant_id`, conversation FK, author FK, model, token counts, status |
-| `assistant.artefacts` | One row per artefact; `tenant_id`, turn FK, type, content/storage path, auto-generated name |
+| `assistant.artifacts` | One row per artifact; `tenant_id`, turn FK, type, content/storage path, auto-generated name |
 | `assistant.bindings` | One row per `@`-binding chip in a turn; `tenant_id`, object type, Display ID, resolved context snapshot |
 | `assistant.tool_calls` | One row per MCP tool invocation; `tenant_id`, turn FK, server ID, tool name, input params, response, latency, status |
 | `assistant.improvement_signals` | One row per signal; `tenant_id`, turn FK, signal type, confidence score, lifecycle status, issue reference |
@@ -117,15 +117,15 @@ The `assistant` schema contains the following tables:
 
 ### Object storage conventions
 
-Binary artefacts are stored in platform object storage under the following path convention:
+Binary artifacts are stored in platform object storage under the following path convention:
 
 ```
-{tenant_id}/conversations/{conversation_id}/{turn_id}/{artefact_id}/{filename}
+{tenant_id}/conversations/{conversation_id}/{turn_id}/{artifact_id}/{filename}
 ```
 
 - Storage is private — access is mediated by signed URLs generated per-request with short expiry.
 - Files are not publicly accessible.
-- Storage paths are stored in `assistant.artefacts.storage_path`.
+- Storage paths are stored in `assistant.artifacts.storage_path`.
 
 ---
 
@@ -275,7 +275,7 @@ Host applications configure an improvement webhook endpoint via the Platform Adm
 
 ### Governing principle
 
-Metrics are captured from day one at both the platform level (across all tenants) and at the application level (per tenant). Platform-level targets reflect the health of the infrastructure and ecosystem. Application-level targets reflect the value each host application is delivering to its users. Baseline targets for new tenants are set at the end of month 1 based on observed behaviour.
+Metrics are captured from day one at both the platform level (across all tenants) and at the application level (per tenant). Platform-level targets reflect the health of the infrastructure and ecosystem. Application-level targets reflect the value each host application is delivering to its users. Baseline targets for new tenants are set at the end of month 1 based on observed behavior.
 
 ---
 
@@ -310,7 +310,7 @@ These metrics are tracked per tenant and reported to the Application Admin via t
 | **Improvement signal rate** | Improvement signals per 100 turns | Baseline month 1; reduction month-over-month |
 | **Cache hit rate (application)** | Cache hit rate for this tenant's sessions | ≥ 40% by month 2 |
 | **Document attachment rate** | Sessions with at least one document attachment | Baseline month 1 |
-| **Artefact download rate** | Sessions with at least one artefact download | ≥ 20% |
+| **Artifact download rate** | Sessions with at least one artifact download | ≥ 20% |
 | **Mobile session share** | Sessions on mobile/tablet viewport | Baseline month 1 |
 | **Shared conversation rate** | Conversations with at least one invitation sent | Baseline month 1 |
 | **Participant acceptance rate** | Invitations accepted ÷ total invitations sent | ≥ 70% |
@@ -346,8 +346,8 @@ Total improvement signals (all types) per 100 conversation turns, tracked by sig
 #### Document attachment rate
 Sessions where the user attached at least one document (PDF, Excel, Word, or image). Baseline metric — no target until month 1 data is available.
 
-#### Artefact download rate
-Sessions where the user downloaded at least one artefact from the artefact tray. Tracks whether users find rendered outputs useful enough to take away.
+#### Artifact download rate
+Sessions where the user downloaded at least one artifact from the artifact tray. Tracks whether users find rendered outputs useful enough to take away.
 
 #### Mobile session share
 Sessions where the viewport width is < 768px (mobile) or 768px–1023px (tablet) at any point during the session. Baseline metric to validate mobile-first investment.
@@ -364,7 +364,7 @@ Invitations accepted ÷ total invitations sent. A low rate may indicate users ar
 
 | Metric | Source | Owner |
 |--------|--------|-------|
-| WAU, queries per session, CSAT, attachment rate, artefact download, mobile share, shared rate, acceptance rate | `assistant` schema + session analytics | Platform Engineering |
+| WAU, queries per session, CSAT, attachment rate, artifact download, mobile share, shared rate, acceptance rate | `assistant` schema + session analytics | Platform Engineering |
 | Workflow invocation rate, binding click-through | `assistant.tool_calls` + binding click events | Platform Engineering |
 | MCP tool error rate | `assistant.tool_calls.status` | Platform Engineering |
 | Improvement signal rate | `assistant.improvement_signals` | Platform team + Application Admin |
@@ -404,7 +404,7 @@ Three ecosystem-level MCP services operate alongside the platform and host appli
 
 Two of these services have full product specifications in this repository:
 
-- **[MCP Knowledge](../knowledge/01-overview.md)** — the centralised knowledge and skills server
+- **[MCP Knowledge](../knowledge/01-overview.md)** — the centralized knowledge and skills server
 - **[MCP Internet Fetch & Search](../internet/01-overview.md)** — the controlled web search and page fetch server
 
 ---
@@ -413,7 +413,7 @@ Two of these services have full product specifications in this repository:
 
 #### Overview
 
-The **MCP Repository** is a centralised, discoverable catalogue of MCP servers available within the ecosystem. It serves as the primary discovery mechanism for host teams when they are configuring their tenant's MCP tool registry — providing a searchable directory of tools that have already been built, tested, and published, rather than requiring every host team to build their own MCP servers from scratch.
+The **MCP Repository** is a centralized, discoverable catalog of MCP servers available within the ecosystem. It serves as the primary discovery mechanism for host teams when they are configuring their tenant's MCP tool registry — providing a searchable directory of tools that have already been built, tested, and published, rather than requiring every host team to build their own MCP servers from scratch.
 
 The MCP Repository is a **config-time service**: host teams use it when setting up or updating their application config, not as a runtime tool invoked during user conversations. Its value is in accelerating the time between "we want to add this capability to our assistant" and "this capability is live for our users."
 
@@ -422,17 +422,17 @@ The MCP Repository is a **config-time service**: host teams use it when setting 
 The MCP Repository holds metadata records for each published MCP server, including:
 
 - **Server identity:** Name, publisher, version, and a plain-language description of what the server provides
-- **Capability catalogue:** The specific tools exposed by the server, with descriptions and example invocations
+- **Capability catalog:** The specific tools exposed by the server, with descriptions and example invocations
 - **Integration metadata:** The server's MCP endpoint URL, supported authentication types (`bearer`, `api-key`, `none`), and any pre-conditions for integration (e.g. required host-side configuration)
 - **Quality indicators:** Verification status, uptime history, average latency, and known compatibility notes with the AI Chat Platform
-- **Suggested descriptions:** Pre-written `description` field text optimised for injection into the AI Chat Platform's system prompt — host teams can use these as-is or customise them
+- **Suggested descriptions:** Pre-written `description` field text optimized for injection into the AI Chat Platform's system prompt — host teams can use these as-is or customize them
 
 #### How host teams use the MCP Repository
 
 When a host team wants to add a new capability to their assistant, the typical flow is:
 
 1. Search the MCP Repository for a server that provides the needed capability
-2. Review the server's capability catalogue and quality indicators
+2. Review the server's capability catalog and quality indicators
 3. Copy the server's endpoint URL, suggested `description`, and recommended `authType` into the `mcpServers` entry in the application config
 4. Submit the updated config via the Config Editor UI or Admin API — the platform validates endpoint reachability as part of config submission
 5. Monitor tool invocation quality via improvement signals in the first weeks of use
@@ -453,7 +453,7 @@ The MCP Repository and the per-tenant tool registry ([05-tools-and-memory.md](./
 
 | MCP Repository | Per-tenant registry |
 |---------------|---------------------|
-| Ecosystem-wide catalogue of all available servers | Tenant-specific list of servers active for that host application |
+| Ecosystem-wide catalog of all available servers | Tenant-specific list of servers active for that host application |
 | Read at config time by host teams | Resolved at session runtime by the platform |
 | Covers all publishers and server types | Covers only what the host application has chosen to enable |
 | Not invoked during user conversations | The source of truth for what tools a session can use |
@@ -464,13 +464,13 @@ The MCP Repository and the per-tenant tool registry ([05-tools-and-memory.md](./
 
 #### Overview
 
-**[MCP Knowledge](../knowledge/01-overview.md)** is a centralised MCP server that provides shared, reusable assets across the MCP ecosystem — skills, guidance documents, prompt templates, and other static artefacts that are useful across many different host applications and conversation types.
+**[MCP Knowledge](../knowledge/01-overview.md)** is a centralized MCP server that provides shared, reusable assets across the MCP ecosystem — skills, guidance documents, prompt templates, and other static artifacts that are useful across many different host applications and conversation types.
 
 Unlike the MCP Repository (which helps teams find and configure tools at setup time), MCP Knowledge is a **runtime service** — it can be registered as an MCP server in a tenant's tool registry and invoked during user conversations to retrieve resources on demand.
 
 #### What the MCP Knowledge provides
 
-The MCP Knowledge organises its content into three categories:
+The MCP Knowledge organizes its content into three categories:
 
 **Skills**
 Pre-built structured reasoning patterns that the assistant can invoke to approach complex tasks consistently. Skills are prompt fragments with defined input parameters and expected output structures. Examples include:
@@ -487,7 +487,7 @@ Static reference documents that apply across many host applications and are impr
 - Data privacy handling guidance for AI-assisted workflows
 - Model capability and limitation reference cards
 - Prompt engineering best practices for domain-specific applications
-- **Uncertainty handling guidance** — instructions for how the assistant should communicate the limits of its knowledge, signal when data may be outdated, and offer next steps (such as web search) when it cannot answer with confidence. This document is injected as a resource at session start by hosts that want consistent, domain-appropriate uncertainty behaviour beyond the platform's non-overridable baseline.
+- **Uncertainty handling guidance** — instructions for how the assistant should communicate the limits of its knowledge, signal when data may be outdated, and offer next steps (such as web search) when it cannot answer with confidence. This document is injected as a resource at session start by hosts that want consistent, domain-appropriate uncertainty behavior beyond the platform's non-overridable baseline.
 
 Guidance documents are versioned by the MCP Knowledge. When retrieved in a conversation, the document version is recorded in the tool call log.
 
@@ -510,7 +510,7 @@ Host applications that want their end users to benefit from MCP Knowledge conten
 }
 ```
 
-The MCP Knowledge endpoint and connection details are documented in the [MCP Knowledge specification](../knowledge/README.md). The suggested `description` field text above is optimised for AI Chat Platform system prompt injection.
+The MCP Knowledge endpoint and connection details are documented in the [MCP Knowledge specification](../knowledge/README.md). The suggested `description` field text above is optimized for AI Chat Platform system prompt injection.
 
 #### Content governance
 
@@ -527,7 +527,7 @@ Host applications and their users cannot modify MCP Knowledge content. Feedback 
 MCP Knowledge is independent of the AI Chat Platform — the platform does not own or operate it. The platform integrates with it cleanly:
 - Resources returned by the service are rendered using the platform's standard content rendering rules (prose, code blocks, data tables as appropriate)
 - Resource retrievals appear in the tool call disclosure card with the server name and tool name
-- Retrieved resources are added to the session artefact tray for download
+- Retrieved resources are added to the session artifact tray for download
 - Resource retrievals are included in the tenant's MCP tool error rate metric and improvement signal pipeline
 
 If the MCP Knowledge is unavailable, it behaves like any other unavailable opt-in MCP server — an error is shown in the tool call disclosure card, and the session continues without it.
@@ -547,7 +547,7 @@ Web access complements the platform's primary data access pattern (structured MC
 | Tool | Description |
 |------|-------------|
 | `search` | Executes a web search query and returns a ranked list of results: title, URL, snippet, source domain, and site classification metadata |
-| `fetch` | Retrieves and returns the content of a specific URL in raw, markdown, chunked, or summarised format |
+| `fetch` | Retrieves and returns the content of a specific URL in raw, markdown, chunked, or summarized format |
 | `fetch_authenticated` | Retrieves content from sites requiring authentication, using the caller's enterprise IdP or consumer OAuth credentials (v1+) |
 
 Results are returned as structured MCP tool output — they appear in a tool call disclosure card and are cited inline using the platform's standard source citation mechanism (superscript numerals linking to the disclosure card). The model does not present web results as its own knowledge.

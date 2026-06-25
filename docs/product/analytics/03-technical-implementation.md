@@ -8,14 +8,14 @@
 ---
 
 
-This chapter describes one reference implementation of the AI Analytics Platform. Stack choices are concrete but not prescriptive. The product specification is intentionally stack-agnostic. Any conformant implementation that satisfies the specified behaviours, governance guarantees, and interface contracts is valid. Technology substitutions at any layer require no changes to the product specification.
+This chapter describes one reference implementation of the AI Analytics Platform. Stack choices are concrete but not prescriptive. The product specification is intentionally stack-agnostic. Any conformant implementation that satisfies the specified behaviors, governance guarantees, and interface contracts is valid. Technology substitutions at any layer require no changes to the product specification.
 
-The product specification (component behaviours, interface contracts, governance requirements) is in [Chapter 2 -- Core Platform Capabilities](./02-core-capabilities.md). The design principles governing every decision are in [Platform Overview — Design Principles](./01-overview.md#design-principles).
+The product specification (component behaviors, interface contracts, governance requirements) is in [Chapter 2 -- Core Platform Capabilities](./02-core-capabilities.md). The design principles governing every decision are in [Platform Overview — Design Principles](./01-overview.md#design-principles).
 
 
 ## 3.1 Reference Architecture Summary
 
-This chapter presents **one reference implementation**. It is intended as a concrete starting point — a worked example of how the capabilities defined in Chapter 2 can be realised using a specific technology stack. It is not a prescriptive design. Teams should treat each layer-level technology choice as a recommendation, not a constraint. A conformant implementation may substitute any component provided it honours the interface contracts and governance guarantees specified in Chapter 2.
+This chapter presents **one reference implementation**. It is intended as a concrete starting point — a worked example of how the capabilities defined in Chapter 2 can be realized using a specific technology stack. It is not a prescriptive design. Teams should treat each layer-level technology choice as a recommendation, not a constraint. A conformant implementation may substitute any component provided it honors the interface contracts and governance guarantees specified in Chapter 2.
 
 The table below maps each Chapter 2 capability to its reference implementation name and the key technology it uses in this architecture. The components are listed in pipeline order.
 
@@ -105,7 +105,7 @@ flowchart TD
     PAS -->|"sealed compliance block"| Result
 ```
 
-The Semantic Metrics Repository (SMR) and the Semantic Data Repository (SDR) are two independent stores housed within the Data Context Store (DCS). The SDR is a pre-existing organisational component holding the foundational data definitions — data models, physical schemas, and data lineage. The SMR is a separate store holding the four analytical document types (`analytical_metric`, `analytical_dimension`, `analytical_operation`, `analytical_dataset`); both stores are built on the DCS's shared versioned storage, search index, and scoped access control, and both are reached through the DCS API. The `physical_mapping` fields in SMR metric definitions resolve against SDR schema metadata to locate the physical tables and columns behind each metric.
+The Semantic Metrics Repository (SMR) and the Semantic Data Repository (SDR) are two independent stores housed within the Data Context Store (DCS). The SDR is a pre-existing organizational component holding the foundational data definitions — data models, physical schemas, and data lineage. The SMR is a separate store holding the four analytical document types (`analytical_metric`, `analytical_dimension`, `analytical_operation`, `analytical_dataset`); both stores are built on the DCS's shared versioned storage, search index, and scoped access control, and both are reached through the DCS API. The `physical_mapping` fields in SMR metric definitions resolve against SDR schema metadata to locate the physical tables and columns behind each metric.
 
 
 ## 3.3 Layer-by-Layer Stack Decisions
@@ -123,7 +123,7 @@ The Semantic Metrics Repository (SMR) and the Semantic Data Repository (SDR) are
 | **Resources** | Knowledge artifacts only — guides, skills definitions, compliance reference | Static; no user data; embedded in AI consumer context before analytical tasks; no controls pipeline |
 | **Prompts** | Pre-built analytical and regulatory assistant templates | Inject available metrics and governance constraints at session start |
 
-FastMCP (`pip install fastmcp`) provides the `@mcp.tool()`, `@mcp.resource()`, and `@mcp.prompt()` decorators and handles MCP Streamable HTTP transport. Each analytical capability is a decorated Python function; the framework serialises schemas and routes calls automatically.
+FastMCP (`pip install fastmcp`) provides the `@mcp.tool()`, `@mcp.resource()`, and `@mcp.prompt()` decorators and handles MCP Streamable HTTP transport. Each analytical capability is a decorated Python function; the framework serializes schemas and routes calls automatically.
 
 The separation of tools and resources is intentional. All analytical execution goes through `run_analytics`, a single tool that delegates to the SMR for every operation definition. Resources expose static knowledge artifacts from the Knowledge Store; they contain no user data and require no governance evaluation. The SMR owns what operations exist, what parameters they require, and which presentation stages they invoke. The code owns only the execution engine.
 
@@ -216,14 +216,14 @@ async def validate_jwt(token: str) -> dict:
 
 #### Caller Identity Claims
 
-Every request carries a host-issued JWT in the `Authorization: Bearer <token>` header — the reference implementation's realisation of the authentication/identity token. Expired tokens are rejected immediately; tokens carrying no analytical role claim are denied (deny-by-default is an architectural property — there is no public-access fallback).
+Every request carries a host-issued JWT in the `Authorization: Bearer <token>` header — the reference implementation's realization of the authentication/identity token. Expired tokens are rejected immediately; tokens carrying no analytical role claim are denied (deny-by-default is an architectural property — there is no public-access fallback).
 
 **Required claims**
 
 | Claim | Type | Description |
 |-------|------|-------------|
-| `sub` | string | Caller's unique identifier within the organisation |
-| `org_id` | string | Must match the platform's registered organisation identifier |
+| `sub` | string | Caller's unique identifier within the organization |
+| `org_id` | string | Must match the platform's registered organization identifier |
 | `exp` | number | Token expiry timestamp |
 | Field named by `roleClaimField` | `string[]` | Analytical role array — consumed by the RAPL for metric, dimension, and row-level access |
 
@@ -327,7 +327,7 @@ Each SMR operation carries an `execution_profile` that tells the pipeline execut
 
 #### Resources
 
-Resources are used for **knowledge artifacts** — static reference material, skills definitions, and workflow guides that AI consumers embed in their context to understand how to use the platform effectively. Dynamic data lookups (metric definitions, lineage records, dimension catalogues) are handled by tools, not resources.
+Resources are used for **knowledge artifacts** — static reference material, skills definitions, and workflow guides that AI consumers embed in their context to understand how to use the platform effectively. Dynamic data lookups (metric definitions, lineage records, dimension catalogs) are handled by tools, not resources.
 
 ```python
 @mcp.resource("guide://analytics/platform-overview")
@@ -387,13 +387,13 @@ Knowledge artifacts are stored in a versioned content store (`knowledge_store`) 
 
 #### Prompts
 
-Prompts provide pre-built instruction templates that AI consumers can load to anchor their analytical behaviour before making tool calls.
+Prompts provide pre-built instruction templates that AI consumers can load to anchor their analytical behavior before making tool calls.
 
 ```python
 @mcp.prompt()
 async def analytical_assistant(jwt: str) -> str:
     """System prompt for an AI assistant using the Analytics Platform.
-    Injects the organisation's available metrics and governance constraints."""
+    Injects the organization's available metrics and governance constraints."""
     # 1. Validate JWT → claims
     # 2. Fetch slim metric summary from SMR (id + label + description only — prompt size matters)
     # 3. Return system prompt string — instructs the assistant to use tool results only, never estimate
@@ -433,7 +433,7 @@ Consumers branch on `display_spec.type` (`"chart"` → Vega-Lite rendering; `"ta
 
 #### Error Handling
 
-All tool call failures return a structured error envelope. The MCP framework serialises Python exceptions as tool error responses; the platform maps exception classes to stable error codes before they leave the service boundary.
+All tool call failures return a structured error envelope. The MCP framework serializes Python exceptions as tool error responses; the platform maps exception classes to stable error codes before they leave the service boundary.
 
 ```python
 class AnalyticsError(Exception):
@@ -482,13 +482,13 @@ Every error response carries a `result_id`, so every request — successful, blo
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
-| **Candidate retrieval** | Embedding similarity search over SMR operation/metric embeddings | RAG retrieval narrows the full catalogue to a handful of candidates before the model ranks them |
+| **Candidate retrieval** | Embedding similarity search over SMR operation/metric embeddings | RAG retrieval narrows the full catalog to a handful of candidates before the model ranks them |
 | **Intent ranking** | Anthropic Claude | Ranks candidate operations and binds parameters from the natural-language query |
 | **Confirmation** | Candidate cards when intent is ambiguous | The user selects or refines before any query executes |
 | **Compliance intent** | `compliance_purpose_score` produced within the same ranking call | Signal 2 of the SCL's two-signal compliance gate; an ambiguous purpose triggers a clarification card rather than a guess |
 | **Scope** | Natural-language requests only | Structured `operation_id` + `params` calls bypass the IRA entirely and declare compliance purpose explicitly |
 
-The Intent Resolution Agent (IRA) is the only AI step in the pre-computation pipeline. It receives a natural-language query and the caller's JWT from the MCP layer, retrieves candidate operations from the SMR catalogue using embedding similarity search, ranks them with a language model, binds parameters to the leading candidate, and derives a presentation preview. Within the same ranking call it scores whether the stated purpose of the query is compliance-driven — the `compliance_purpose_score` forwarded with the resolved intent and consumed by the SCL's two-signal compliance gate — and clarifies with the user through the confirmation card flow when the purpose is ambiguous. When the top candidate is confident and unambiguous, the resolved intent is forwarded directly to the RAPL; when it is ambiguous, ranked candidate cards are returned to the consumer for selection or conversational refinement. The IRA produces no output visible to the end user once intent is resolved, and makes no governance or execution decisions — those belong to the deterministic pipeline that follows.
+The Intent Resolution Agent (IRA) is the only AI step in the pre-computation pipeline. It receives a natural-language query and the caller's JWT from the MCP layer, retrieves candidate operations from the SMR catalog using embedding similarity search, ranks them with a language model, binds parameters to the leading candidate, and derives a presentation preview. Within the same ranking call it scores whether the stated purpose of the query is compliance-driven — the `compliance_purpose_score` forwarded with the resolved intent and consumed by the SCL's two-signal compliance gate — and clarifies with the user through the confirmation card flow when the purpose is ambiguous. When the top candidate is confident and unambiguous, the resolved intent is forwarded directly to the RAPL; when it is ambiguous, ranked candidate cards are returned to the consumer for selection or conversational refinement. The IRA produces no output visible to the end user once intent is resolved, and makes no governance or execution decisions — those belong to the deterministic pipeline that follows.
 
 ```python
 import anthropic
@@ -514,7 +514,7 @@ class IntentResolutionAgent:
 
     async def _retrieve_candidates(self, query: str, claims: dict) -> list[dict]:
         # Input:  query string + claims (for org scoping)
-        # Output: top-k approved operations from the SMR catalogue by embedding similarity
+        # Output: top-k approved operations from the SMR catalog by embedding similarity
         ...
 
     def _rank_and_bind(self, query: str, candidates: list[dict]) -> dict:
@@ -578,7 +578,7 @@ class SemanticValidationLayer:
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
-| **Provider** | Anthropic Claude | Reliable instruction-following for constrained summarisation tasks |
+| **Provider** | Anthropic Claude | Reliable instruction-following for constrained summarization tasks |
 | **Standard queries** | Claude Haiku | Sub-200ms narrative generation for simple metric summaries |
 | **Complex queries** | Claude Sonnet | Attribution decompositions and multi-portfolio results require richer prose |
 | **Prompt construction** | Result-only context | Metric labels + row values + units injected; no user query, no physical schema |
@@ -661,7 +661,7 @@ class ProvenanceArtifactService:
         # 1. Fetch the projection, controls decision, and execution records from the ALS
         # 2. Assemble the Provenance Artifact — intent, escalation signals, metric versions,
         #    logical field spec, physical execution detail, entitlement snapshot
-        # 3. Sign the canonical serialised artifact — ECDSA-P256-SHA256, signed_fields listed
+        # 3. Sign the canonical serialized artifact — ECDSA-P256-SHA256, signed_fields listed
         # 4. Write {result_id}_provenance.json to the ALS bucket — immutable sibling record
         # 5. Return the compliance block; the export gate stays locked until the write is confirmed
         ...
@@ -725,7 +725,7 @@ The core metric definition. One document per approved metric version. The `statu
 }
 ```
 
-`status` is one of `"proposed"` | `"in_review"` | `"approved"` | `"deprecated"` | `"retired"`. The DCS enforces a uniqueness constraint: at most one document per `(org_id, metric_id)` may carry `"status": "approved"` at any point in time. All prior versions are retained as `"deprecated"` for lineage reconstruction. `source` is `"platform"` for Financial Services Reference Model entries and `"custom"` for organisation-customised definitions.
+`status` is one of `"proposed"` | `"in_review"` | `"approved"` | `"deprecated"` | `"retired"`. The DCS enforces a uniqueness constraint: at most one document per `(org_id, metric_id)` may carry `"status": "approved"` at any point in time. All prior versions are retained as `"deprecated"` for lineage reconstruction. `source` is `"platform"` for Financial Services Reference Model entries and `"custom"` for organization-customized definitions.
 
 `weight_metric_id` is required when `aggregation` is `"value_weighted_average"` (or any other weighted aggregation variant) and must reference the `metric_id` of an approved `analytical_metric` in the SMR. The SVL resolves and validates this reference at query time. If the weight metric is missing or unapproved, the query is rejected. The field is absent for non-weighted aggregations (`"sum"`, `"last"`, `"count"`, `"min"`, `"max"`, `"mean"`). The LQP generator emits a `weight_metric_id` key on the `metric_scan` node so that the execution backend can fetch the weighting values alongside the primary metric.
 
@@ -733,7 +733,7 @@ The core metric definition. One document per approved metric version. The `statu
 
 #### SMR document type: `analytical_dimension`
 
-Dimension definitions are the third SMR document type. They define the valid slicing axes referenced in `supported_dimensions` and `required_dimensions` on metrics and operations. The SVL validates dimension IDs against this catalogue at resolution time.
+Dimension definitions are the third SMR document type. They define the valid slicing axes referenced in `supported_dimensions` and `required_dimensions` on metrics and operations. The SVL validates dimension IDs against this catalog at resolution time.
 
 ```json
 {
@@ -755,7 +755,7 @@ Dimension definitions are the third SMR document type. They define the valid sli
 
 #### SMR document type: `analytical_operation`
 
-The operation catalogue. One document per approved operation. The `execution_profile` field tells the pipeline executor which stages to invoke. The `supported_metrics` and `supported_dimensions` lists are enforced by the Semantic Validation Layer. A `run_analytics` call referencing an out-of-catalogue value is rejected before LQP generation.
+The operation catalog. One document per approved operation. The `execution_profile` field tells the pipeline executor which stages to invoke. The `supported_metrics` and `supported_dimensions` lists are enforced by the Semantic Validation Layer. A `run_analytics` call referencing an out-of-catalog value is rejected before LQP generation.
 
 ```json
 {
@@ -970,14 +970,14 @@ class LQPGenerator:
 |----------|--------|-----------|
 | **Implementation** | Custom middleware (Python) | Thin, stateless; computes the entitlement projection before the LQP is compiled |
 | **Role resolution** | JWT claim extraction + DES role definition lookup | Role claim field name is configurable |
-| **Policy store (DES)** | PostgreSQL `role_policies` schema — the reference realisation of the Data Entitlements Store | Dedicated schema and credentials, logically separate from platform data; written only by the Entitlements Manager — not writable via the platform Admin API |
+| **Policy store (DES)** | PostgreSQL `role_policies` schema — the reference realization of the Data Entitlements Store | Dedicated schema and credentials, logically separate from platform data; written only by the Entitlements Manager — not writable via the platform Admin API |
 | **Row scope** | `{{user.claim_name}}` template interpolation at projection time | Resolved from JWT claims; passed to the SVL, which injects the row scope filter nodes |
 | **Column masking** | Registered in the projection; applied post-assembly in the FQE result assembler | Post-assembly supports cross-backend result sets |
 | **Default policy** | Deny-by-default — fixed, not configurable | No access unless a matching role definition is found; an architectural property (P5), not a setting |
 
 #### Role policies schema
 
-Role policy documents are stored in the PostgreSQL `role_policies` schema — the reference realisation of the **Data Entitlements Store (DES)**. The schema carries its own credentials and is logically separate from platform data even when physically co-located; it is written only by the Entitlements Manager and is not writable through the platform Admin API. Organisations with an existing entitlement system substitute it behind the same role-definition read interface. Each document maps directly to the following JSON shape:
+Role policy documents are stored in the PostgreSQL `role_policies` schema — the reference realization of the **Data Entitlements Store (DES)**. The schema carries its own credentials and is logically separate from platform data even when physically co-located; it is written only by the Entitlements Manager and is not writable through the platform Admin API. Organizations with an existing entitlement system substitute it behind the same role-definition read interface. Each document maps directly to the following JSON shape:
 
 ```json
 {
@@ -1014,7 +1014,7 @@ Field reference:
 | Field | Type | Description |
 |-------|------|-------------|
 | `role_id` | string | Matches the role name in the JWT `analytics_roles` claim |
-| `org_id` | string | Organisation scope — one policy per org per role |
+| `org_id` | string | Organization scope — one policy per org per role |
 | `data_access_domains` | array | Data domains the role may access; requests outside them are **DENIED** (`DATA_NOT_ENTITLED`) |
 | `classification_ceiling` | string | Highest classification level the role may touch; metrics and fields above it are denied or excluded |
 | `allowed_metrics` | array \| null | Null = all metrics permitted; array = explicit allowlist |
@@ -1193,7 +1193,7 @@ class SemanticControlsLayer:
 | **Output** | A single **federated Trino SQL** statement | Starburst performs the cross-source join natively; no per-backend decomposition needed |
 | **Execution** | None | The PQP has no backend connectivity; it hands the federated SQL to the FQE (Starburst) |
 
-The Physical Query Planner receives the controls-approved LQP from the SCL and translates it into a single **federated Trino SQL** statement ready for Starburst to execute. For each `metric_scan` node it queries the SMR for the `physical_mapping` of the pinned metric definition version and binds it to a Starburst **catalog** reference (`catalog.schema.table`). It builds a Calcite relational tree from the LQP nodes — scans, joins, filters, time expansion, and sort — distributes the row scope filters, dimension filters, and column-mask directives into the statement, and emits Trino-dialect SQL. Because Starburst federates across catalogs natively, the PQP no longer decomposes the plan into per-backend sub-plans; the single statement references every catalog the query touches, and Starburst plans the cross-source join itself. This realises Chapter 2's PQP sub-plan/FQE execution contract inside Starburst — the per-source split happens in the engine rather than in application code. The PQP has no execution capability — it passes the federated SQL to the FQE.
+The Physical Query Planner receives the controls-approved LQP from the SCL and translates it into a single **federated Trino SQL** statement ready for Starburst to execute. For each `metric_scan` node it queries the SMR for the `physical_mapping` of the pinned metric definition version and binds it to a Starburst **catalog** reference (`catalog.schema.table`). It builds a Calcite relational tree from the LQP nodes — scans, joins, filters, time expansion, and sort — distributes the row scope filters, dimension filters, and column-mask directives into the statement, and emits Trino-dialect SQL. Because Starburst federates across catalogs natively, the PQP no longer decomposes the plan into per-backend sub-plans; the single statement references every catalog the query touches, and Starburst plans the cross-source join itself. This realizes Chapter 2's PQP sub-plan/FQE execution contract inside Starburst — the per-source split happens in the engine rather than in application code. The PQP has no execution capability — it passes the federated SQL to the FQE.
 
 #### PQP input — approved LQP
 
@@ -1286,7 +1286,7 @@ The PQP passes the federated Trino SQL to the FQE.
 | **Client** | Python Trino client | Submits the PQP's federated SQL to the Starburst coordinator and streams typed rows |
 | **Result handling** | Custom (Python) | Applies the LQP's column masks, caches by LQP signature, and writes the lineage record |
 
-The FQE is realised as **Starburst**, a Trino-based federation engine. It receives the federated Trino SQL produced by the PQP, submits it to the Starburst coordinator, and Starburst federates the query across its configured **catalog connectors** — pushing filters and aggregations down to each source (Snowflake, lakehouse, semantic layer, graph, REST) and performing any cross-source join itself. The FQE is the only component holding the Starburst connection. Once Starburst returns the result, the FQE applies the LQP's `column_masks`, caches the result by LQP signature, and writes the execution record to the Analytical Lineage Store. There are no per-backend adapters and no application-level fan-out — federation is Starburst's responsibility, and each source is reached as a Starburst catalog.
+The FQE is realized as **Starburst**, a Trino-based federation engine. It receives the federated Trino SQL produced by the PQP, submits it to the Starburst coordinator, and Starburst federates the query across its configured **catalog connectors** — pushing filters and aggregations down to each source (Snowflake, lakehouse, semantic layer, graph, REST) and performing any cross-source join itself. The FQE is the only component holding the Starburst connection. Once Starburst returns the result, the FQE applies the LQP's `column_masks`, caches the result by LQP signature, and writes the execution record to the Analytical Lineage Store. There are no per-backend adapters and no application-level fan-out — federation is Starburst's responsibility, and each source is reached as a Starburst catalog.
 
 #### FQE input — federated Trino SQL
 
@@ -1321,7 +1321,7 @@ After Starburst executes the federated query, the FQE returns a typed result env
 
 #### Data Source Registration
 
-Execution backends are registered through the Admin API by the Integration Engineer. The registration record is the logical input — type, endpoint, authentication mode, capabilities, and the logical data affinities the backend serves; the platform materialises it as a Starburst catalog properties file plus an entry in the `physical_mapping.source` → catalog map.
+Execution backends are registered through the Admin API by the Integration Engineer. The registration record is the logical input — type, endpoint, authentication mode, capabilities, and the logical data affinities the backend serves; the platform materializes it as a Starburst catalog properties file plus an entry in the `physical_mapping.source` → catalog map.
 
 ```json
 {
@@ -1351,7 +1351,7 @@ Execution backends are registered through the Admin API by the Integration Engin
 | Field | Required | Description |
 |-------|----------|-------------|
 | `type` | Yes | Source type — `sql_warehouse`, `opendata_api`, `graph_api`, `semantic_layer`, `olap_engine`, `custom` — selects the Starburst connector |
-| `authType` | Yes | `service-account` (platform-held credential), `api-key`, or `bearer` (forwards the caller's token to the backend) |
+| `authType` | Yes | `service-account` (platform-held credential), `api-key`, or `bearer` (forward the caller's token to the backend) |
 | `dataAffinity` | Yes | Logical data domains this backend serves — sub-plans whose metric `data_affinity` matches are routed here |
 | `capabilities` | Yes | Operations that may be routed to this backend: `aggregate`, `filter`, `join`, `window`, `timeseries`, `metric`, `traverse` |
 | `priority` | No | Selection order when multiple backends share a `dataAffinity` |
@@ -1365,11 +1365,11 @@ Each registered source is exposed to Starburst as a catalog. The reference deplo
 | Catalog type | Starburst connector | Sources |
 |---|---|---|
 | **SQL warehouse / lakehouse** | Snowflake · BigQuery · Databricks/Delta · Redshift · Iceberg · Hive | Primary performance and position data |
-| **Semantic layer** | dbt Semantic Layer (MetricFlow) · Cube.js (via JDBC/REST connector) | Pre-modelled governed metrics |
+| **Semantic layer** | dbt Semantic Layer (MetricFlow) · Cube.js (via JDBC/REST connector) | Pre-modeled governed metrics |
 | **Relational** | PostgreSQL · MySQL | Reference and governance data |
 | **Graph** | Neo4j · Amazon Neptune (via connector) | Relationship and counterparty data |
 | **REST / OpenData** | REST · OData v4 (via connector) | Reference data and third-party feeds |
-| **Custom** | Any Trino-compatible connector | Proprietary or specialised sources |
+| **Custom** | Any Trino-compatible connector | Proprietary or specialized sources |
 
 A catalog is registered with a standard Starburst catalog properties file — one per source — and becomes addressable as `catalog.schema.table` in the federated SQL the PQP emits:
 
@@ -1418,7 +1418,7 @@ class FederatedQueryEngine:
 |----------|--------|-----------|
 | **Chart spec** | Vega-Lite v5 JSON | Industry-standard chart grammar; wide ecosystem for web, server-side, and image rendering |
 | **Table spec** | Platform-defined `type: "table"` extension | Vega-Lite has no native table mark; same `data` + `columns` convention |
-| **Colour palette** | Platform theme configuration | Not part of the chart contract — deterministic within a deployment, brandable across deployments |
+| **Color palette** | Platform theme configuration | Not part of the chart contract — deterministic within a deployment, brandable across deployments |
 
 #### Data Visualization Language (DVL) input
 
@@ -1654,7 +1654,7 @@ Field reference:
 | Field | Type | Notes |
 |-------|------|-------|
 | `result_id` | string | Primary key; matches S3 object path |
-| `org_id` | string | Organisation scope |
+| `org_id` | string | Organization scope |
 | `user_sub` | string | JWT `sub` claim of the requesting user |
 | `regulatory_frameworks` | string \| null | Comma-separated framework tags from triggered metrics; null for non-compliance queries |
 | `estimated_scan_rows` | integer \| null | Tier-2 scan estimate recorded by the data-scale check |
@@ -1690,7 +1690,7 @@ class AnalyticalLineageStore:
         ...
 
     async def fetch(self, result_id: str, org_id: str) -> dict:
-        # Input:  result_id + org_id (organisation scope)
+        # Input:  result_id + org_id (organization scope)
         # Output: full lineage record from S3
         # PostgreSQL index used only to resolve the S3 key — full record always read from S3
         ...
@@ -1765,7 +1765,7 @@ class KnowledgeStore:
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
 | **Store** | Redis (cluster mode) | Sub-millisecond read; TTL-native; cluster mode for HA |
-| **Cache key** | SHA-256 of the canonical serialised LQP | The plan embeds `org_id`, the row-scope filter nodes, and `column_masks` — different effective entitlements produce different plans and therefore different keys, structurally |
+| **Cache key** | SHA-256 of the canonical serialized LQP | The plan embeds `org_id`, the row-scope filter nodes, and `column_masks` — different effective entitlements produce different plans and therefore different keys, structurally |
 | **TTL** | 5 minutes default; configurable per operation via `cache_ttl_seconds` on `analytical_operation` | Short TTL balances freshness against backend load |
 | **Compliance bypass** | Queries with `compliance_purpose: true` skip read and write | Provenance Artifact requires a fresh execution record |
 | **Cache-aside pattern** | FQE checks before execution; writes after assembly | Cache is never on the critical governance path |
@@ -1779,7 +1779,7 @@ class ResultCache:
 
     def _key(self, lqp: dict) -> str:
         # Input:  LQP — org_id, nodes (including the row-scope filter nodes), column_masks
-        # Output: Redis key string — SHA-256 of the canonical serialised LQP
+        # Output: Redis key string — SHA-256 of the canonical serialized LQP
         # Entitlement isolation is structural: the plan embeds row scope and column masks,
         # so different effective entitlements always produce different keys
         ...
@@ -1822,7 +1822,7 @@ The Admin API is a REST service authenticated with a platform service token (Bea
 | Validation | Description |
 |------------|-------------|
 | Backend reachability | Connectivity probe to the registered `endpoint`, confirmed within the configured timeout |
-| Data affinity consistency | Each `dataAffinity` value checked against the known logical domain registry — unrecognised labels generate a warning |
+| Data affinity consistency | Each `dataAffinity` value checked against the known logical domain registry — unrecognized labels generate a warning |
 | Role claim field | `roleClaimField` verified to be a non-empty string; a warning is surfaced if no token issued in the last 30 days contained that claim |
 | Metric resolution | Metrics whose `data_affinity` has no matching registered backend generate a resolution warning |
 
@@ -1862,7 +1862,7 @@ Alongside `controls_config`, a platform settings document configures analytical 
 }
 ```
 
-`analyticalDomain` selects the Financial Services Reference Model bundles imported at setup. `fiscalYearStartMonth` anchors the fiscal calendar for time-relative metric expressions such as `YTD` and `FY`. The `models` block selects the NSA inference tier — `"fast"` (Haiku) or `"standard"` (Sonnet); see §Narrative Synthesis Agent. Feature flags toggle presentation capabilities without affecting the controls pipeline: disabling `narrativeSynthesis` removes the narrative from responses but has no effect on lineage, entitlement enforcement, or computation. Metric approval, ownership, and versioning are architectural behaviours of the SMR governance workflow, not settings — there are no toggles for them.
+`analyticalDomain` selects the Financial Services Reference Model bundles imported at setup. `fiscalYearStartMonth` anchors the fiscal calendar for time-relative metric expressions such as `YTD` and `FY`. The `models` block selects the NSA inference tier — `"fast"` (Haiku) or `"standard"` (Sonnet); see §Narrative Synthesis Agent. Feature flags toggle presentation capabilities without affecting the controls pipeline: disabling `narrativeSynthesis` removes the narrative from responses but has no effect on lineage, entitlement enforcement, or computation. Metric approval, ownership, and versioning are architectural behaviors of the SMR governance workflow, not settings — there are no toggles for them.
 
 
 ### Service Startup and Dependency Wiring
@@ -1944,7 +1944,7 @@ All platform services run in a dedicated Kubernetes namespace (`analytics`). Sta
 | **Packaging** | Versioned JSON document bundles (one per domain) | Conforms directly to the SMR `analytical_metric` schema; idempotently importable via `POST /v1/admin/smr/seed`; selective per-domain activation |
 | **Distribution** | Bundled at installation; updatable from Semantic Registry Service | Air-gapped deployments supported |
 | **Activation** | `analyticalDomain` config triggers SMR import at initial platform setup | Bundle documents are written to the SMR in `proposed` state; Analytics Governance approves before metrics become resolvable |
-| **Customisation** | Full edit/override via Admin API after import | Customised definitions marked `source: "custom"` in the SMR document |
+| **Customization** | Full edit/override via Admin API after import | Customized definitions marked `source: "custom"` in the SMR document |
 
 The full reference model covers six primary domains, activated per domain via `analyticalDomain` / seed configuration:
 
@@ -2517,7 +2517,7 @@ Three optional ecosystem services extend the platform for financial services dep
 | **Regulatory Reference Service** | Runtime execution backend | Registered as a data source with `dataAffinity: ["regulatory"]` | Authoritative, always-current regulatory metric values and thresholds without internal maintenance |
 | **Benchmark Data Service** | Runtime execution backend | Registered as a data source with `dataAffinity: ["benchmarks"]` | Licensed benchmark data for comparison queries across equity, fixed income, multi-asset, factor, and custom blend indices |
 
-**Semantic Registry Service** — a curated, version-controlled library of pre-built metric definitions, dimension schemas, hierarchy definitions, measure group collections, formula documentation, and regulatory mappings, organised into domain packages. Administrators import packages through the Admin API rather than authoring definitions from scratch. Imported definitions enter the SMR as `proposed` and follow the normal approval workflow; modifications are tracked under `source: "custom"` and are never overwritten by package updates, which are notified and may be imported selectively as deltas. The Financial Services Reference Model bundled at installation is a snapshot of the relevant packages; the live service provides the most current definitions and packages beyond the core seed set.
+**Semantic Registry Service** — a curated, version-controlled library of pre-built metric definitions, dimension schemas, hierarchy definitions, measure group collections, formula documentation, and regulatory mappings, organized into domain packages. Administrators import packages through the Admin API rather than authoring definitions from scratch. Imported definitions enter the SMR as `proposed` and follow the normal approval workflow; modifications are tracked under `source: "custom"` and are never overwritten by package updates, which are notified and may be imported selectively as deltas. The Financial Services Reference Model bundled at installation is a snapshot of the relevant packages; the live service provides the most current definitions and packages beyond the core seed set.
 
 **Regulatory Reference Service** — a runtime execution backend serving the `regulatory` data affinity. Once registered, the FQE routes regulatory-domain sub-plans to it, ensuring threshold values (LCR, NSFR, leverage and capital ratios) are sourced from the authoritative service rather than host-maintained tables that may lag regulatory publication schedules. The service publishes update notifications when thresholds change. If it is unavailable, the FQE falls back to the next registered backend with `regulatory` affinity; with no fallback configured, regulatory sub-plans fail with a structured error — the platform never fabricates regulatory threshold values.
 

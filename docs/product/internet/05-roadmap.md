@@ -50,7 +50,7 @@ v1 completes the fetch output format set, extends classification coverage, and a
 
 **Fetch extensions**
 - Chunked output format with pagination support
-- Summarised output format (requires configured LLM backend)
+- Summarized output format (requires configured LLM backend)
 - Browser automation backend for JavaScript-rendered pages
 - PDF and document fetch and parsing
 

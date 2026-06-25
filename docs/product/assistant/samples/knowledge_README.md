@@ -16,7 +16,7 @@ Read these instructions before doing any work in this repository.
 
 ## What this repository is
 
-Everything in this repository is exposed over the Model Context Protocol and consumed in real time by authorised MCP clients. When a file is merged to `main`, the MCP server detects the change and notifies all connected clients immediately. There are no local copies — this is the single source of truth.
+Everything in this repository is exposed over the Model Context Protocol and consumed in real time by authorized MCP clients. When a file is merged to `main`, the MCP server detects the change and notifies all connected clients immediately. There are no local copies — this is the single source of truth.
 
 The server is **read-only at runtime**. It never writes files. All changes go through Git: feature branch → PR → merge.
 
@@ -193,7 +193,7 @@ skills:                               # omit if none
   - skill-name
 system_prompt_extends: base-agent     # optional — must reference an existing agent name
 ---
-System prompt body. Write the agent's persona, scope, and behavioural constraints here.
+System prompt body. Write the agent's persona, scope, and behavioral constraints here.
 ```
 
 - If `system_prompt_extends` is set, it must name an existing agent in this repository — the server prepends that agent's system prompt before this body

@@ -9,7 +9,7 @@
 
 ## Capability Model
 
-The server exposes five capability areas as MCP tools. Each is described below with its purpose, inputs, outputs, behaviour, and acceptance criteria.
+The server exposes five capability areas as MCP tools. Each is described below with its purpose, inputs, outputs, behavior, and acceptance criteria.
 
 ---
 
@@ -36,7 +36,7 @@ A ranked list of results, each containing:
 
 Each response also includes a **provenance block** recording: the query string, execution timestamp (UTC), backend identifier, result count before and after filtering, and a SHA-256 hash of the filtered result set. The provenance block is returned to the caller and independently written to the audit log.
 
-### Behaviour
+### Behavior
 The search backend is configurable at deployment time. The server abstracts the backend — callers issue a standard MCP tool call regardless of which backend is active. Results are filtered through the active entitlement policy before being returned; results for blocked or restricted domains are silently excluded from the response. Results whose site classification falls below configured safety thresholds are excluded or flagged according to deployment policy.
 
 ### Unhappy Paths
@@ -62,7 +62,7 @@ Accept a URL and return the page content in one of four caller-selected output f
 | Parameter | Type | Required | Description |
 |---|---|---|---|
 | url | string | Yes | The URL to fetch |
-| format | enum | No | Output format: raw, markdown, chunked, summarised. Default: markdown |
+| format | enum | No | Output format: raw, markdown, chunked, summarized. Default: markdown |
 | chunk_size | integer | No | Token or character limit per chunk when format is chunked |
 | start_chunk | integer | No | Chunk index to begin from, enabling pagination through large pages |
 
@@ -74,11 +74,11 @@ Accept a URL and return the page content in one of four caller-selected output f
 
 **Chunked** — The Markdown-converted content segmented into discrete chunks of a configurable size. Each chunk includes its index and the total chunk count. Enables agents to paginate through large pages without exceeding context window limits.
 
-**Summarised** — An LLM-generated summary of the page content. The server passes the Markdown-converted content to a configured language model and returns the summary. The model used is configurable at deployment time.
+**Summarized** — An LLM-generated summary of the page content. The server passes the Markdown-converted content to a configured language model and returns the summary. The model used is configurable at deployment time.
 
 All fetch formats return a **provenance block** alongside the content: the final URL (after redirects), fetch timestamp (UTC), raw content size in bytes, SHA-256 hash of the raw response body before format conversion, HTTP status code, and the original URL if a redirect occurred. The provenance block is returned to the caller and independently written to the audit log.
 
-### Behaviour
+### Behavior
 Before executing a fetch, the server checks the URL against the active entitlement policy. If the URL or its domain is on the deny list, the fetch is rejected and a policy response is returned. If the URL's site classification falls below the configured safety threshold, the fetch is rejected or the response is flagged according to deployment policy. Fetch is performed using the server's own HTTP client — no browser automation is required for static content. JavaScript-rendered pages require a configured browser automation backend.
 
 ### Unhappy Paths
@@ -86,14 +86,14 @@ Before executing a fetch, the server checks the URL against the active entitleme
 - URL blocked by site classification: returns a classification rejection response
 - Target server returns non-200 response: returns a structured error including the HTTP status code
 - Target server times out: returns a timeout error with the configured timeout value
-- Summarised format requested but no LLM backend configured: returns an error indicating the capability is not available in this deployment
+- Summarized format requested but no LLM backend configured: returns an error indicating the capability is not available in this deployment
 - Chunked format requested with start_chunk beyond available chunks: returns an error indicating the chunk index is out of range
 
 ### Acceptance Criteria
 - Given a valid permitted URL, when fetch is called with format markdown, then clean Markdown content is returned with boilerplate stripped
 - Given a valid permitted URL, when fetch is called with format raw, then the unprocessed HTTP response body is returned
 - Given a valid permitted URL, when fetch is called with format chunked, then content is returned in segments with index and total chunk count in each response
-- Given a valid permitted URL, when fetch is called with format summarised and an LLM backend is configured, then a summary of the page content is returned
+- Given a valid permitted URL, when fetch is called with format summarized and an LLM backend is configured, then a summary of the page content is returned
 - Given a URL on the deny list, when fetch is called, then a policy rejection response is returned and no content is fetched
 - Given a URL with a site classification safety flag below threshold, when fetch is called, then the fetch is rejected per deployment policy
 - Given a target server timeout, when fetch is called, then a structured timeout error is returned
@@ -116,7 +116,7 @@ Entitlement rules are defined by the Platform Administrator at deployment time t
 | URL pattern rules | Allow or deny rules applied at the URL path level using pattern matching |
 | Default posture | When no allow list is defined: open (block only deny-listed domains) or closed (block all except allow-listed domains) |
 
-### Behaviour
+### Behavior
 Entitlement checks run before any search result is returned or any fetch is executed. Blocked content is never retrieved or returned. The caller receives a structured policy response indicating the request was blocked; the reason (domain blocked, URL pattern blocked) is included in the response.
 
 Search results for blocked domains are excluded from the result list before the response is returned — the caller does not see them and is not informed of their existence unless inspection-mode logging is enabled for audit purposes.
@@ -143,7 +143,7 @@ Provide category and reputation metadata for URLs accessed through search and fe
 | Safety flags | Explicit flags for malware, phishing, spam, hate speech, and other threat categories |
 | Classification source | The provider or database that supplied the classification |
 
-### Behaviour
+### Behavior
 Classification is checked at two points: when search results are assembled, and before a fetch is executed. The deployment configuration defines threshold policies — which categories are blocked, which reputation score ranges are permitted, and which safety flags result in an automatic block.
 
 Classification metadata is returned alongside search results and fetch responses, enabling consuming agents and UIs to make their own downstream policy decisions in addition to the server's enforcement. This supports scenarios where the enterprise wants both server-side safety enforcement and agent-layer awareness of content classification.
@@ -170,12 +170,12 @@ Enable the server to retrieve content from websites that require an authenticate
 The server accepts an access token issued by the enterprise identity provider (Entra ID, Okta, or any OIDC-compliant IdP) passed in the tool call context. For downstream resources that require a different token audience, the server performs an OAuth 2.0 On-Behalf-Of (OBO) token exchange — trading the inbound user token for a token scoped to the target resource — and uses that exchanged token to execute the fetch.
 
 **Consumer OAuth Providers**
-The server supports OAuth 2.1 with PKCE for consumer providers (Google, GitHub, and others). The user authenticates via the standard OAuth authorisation code flow through their AI client. The resulting access token is stored in the user's session context and used by the server to execute fetches on behalf of the user for the duration of the session.
+The server supports OAuth 2.1 with PKCE for consumer providers (Google, GitHub, and others). The user authenticates via the standard OAuth authorization code flow through their AI client. The resulting access token is stored in the user's session context and used by the server to execute fetches on behalf of the user for the duration of the session.
 
 **Cookie/Session Forwarding**
-For sites where the user has an active browser session, the server accepts a serialised session state (cookies and localStorage) captured from the user's authenticated browser session. The server replays the session credentials when fetching the target URL. This mechanism is intended for local or single-user deployments where formal OAuth flows are not available for the target site.
+For sites where the user has an active browser session, the server accepts a serialized session state (cookies and localStorage) captured from the user's authenticated browser session. The server replays the session credentials when fetching the target URL. This mechanism is intended for local or single-user deployments where formal OAuth flows are not available for the target site.
 
-### Behaviour
+### Behavior
 Authenticated fetch applies the same entitlement and classification checks as standard fetch. Authentication does not bypass access controls — a user with a valid session cannot fetch content from a blocked domain or a URL that fails classification policy.
 
 Token handling follows the MCP Authorization Specification (2025-11-25). Tokens are validated on each request. Token passthrough to downstream services without validation is not permitted. The server maintains a consent registry mapping user identities to approved tool scopes.
@@ -190,7 +190,7 @@ Token handling follows the MCP Authorization Specification (2025-11-25). Tokens 
 
 ---
 
-## Cross-Cutting Behaviours
+## Cross-Cutting Behaviors
 
 ### Audit Logging
 All tool calls — search queries, fetch requests, classification decisions, entitlement rejections, and authentication events — are logged. Log entries include: timestamp, tool called, caller identity (where available), query or URL, entitlement outcome, classification outcome, and response status. Logs are written to a configurable destination (stdout, file, external log sink).

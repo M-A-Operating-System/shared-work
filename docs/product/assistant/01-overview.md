@@ -11,7 +11,7 @@
 
 ### Conversational AI for any application
 
-The **AI Chat Platform** enables any application to give its users a persistent, context-aware conversational interface — without building AI infrastructure. The experience is modelled on the best native AI desktop applications: rich rendered output, transparent tool usage, and a conversation that remembers where you left off. It is not a general-purpose assistant layer — each deployment is a **specialist** tuned to its host application's domain.
+The **AI Chat Platform** enables any application to give its users a persistent, context-aware conversational interface — without building AI infrastructure. The experience is modeled on the best native AI desktop applications: rich rendered output, transparent tool usage, and a conversation that remembers where you left off. It is not a general-purpose assistant layer — each deployment is a **specialist** tuned to its host application's domain.
 
 > **Governing intent:** Give any application team the ability to drop a production-grade AI assistant into their product within days — fully branded, scoped to their domain, connected to their data, and backed by a complete audit trail.
 
@@ -21,7 +21,7 @@ The **AI Chat Platform** enables any application to give its users a persistent,
 |-------|-----------|
 | A white-label assistant layer any application can embed as a web component | A standalone AI product with its own brand or identity |
 | A multi-tenant platform where each host application brings its own scope, tools, and branding | A shared assistant all host applications configure from a single pool |
-| A complete audit trail for every conversation turn and artefact | A transient chat tool with no persistent record |
+| A complete audit trail for every conversation turn and artifact | A transient chat tool with no persistent record |
 | A controlled, host-configured MCP integration surface | An open API that allows arbitrary tool connections without host approval |
 | A read-and-write assistant — queries, reasoning, and actions via host-registered MCP tools | A system that bypasses host application security models or acts without user confirmation |
 
@@ -46,7 +46,7 @@ The platform has no end-user-facing name. Every tenant names their own assistant
 - Full-text search across all user conversations within the tenant
 - Host-configured `@`-binding for application-defined object types
 - Host-configured Display ID pattern detection and auto-resolution
-- Document attachments (PDF, Excel, Word, images) stored as platform artefacts
+- Document attachments (PDF, Excel, Word, images) stored as platform artifacts
 - Model switching within the host-configured allowed model set; provider-agnostic architecture
 - Communication style and verbosity driven by host-provided user profile claims
 - Host-registered MCP servers with always-on and opt-in access tiers
@@ -55,13 +55,13 @@ The platform has no end-user-facing name. Every tenant names their own assistant
 - Write operations — actions via host MCP tools with explicit user confirmation before execution
 - Shared conversations — up to ten participants within the same tenant, equal-participant model
 - Personal memory (user-managed) and application context (Application Admin-managed)
-- Session artefact tray accumulating all input and output artefacts
+- Session artifact tray accumulating all input and output artifacts
 - Document canvas — iteratable working-document surface in the conversation panel; versioned, editable, model-revisable
 - Three-zone responsive layout (history panel, conversation area, conversation panel) embedded within host app UI
 - Rich content rendering: diagrams, chart specifications (SCL), structured data, syntax-highlighted code, formatted prose, mathematical notation
 - Continuous improvement signal capture and per-tenant improvement issue pipeline
-- Full audit trail per turn: raw prompt, resolved prompt, tool call log, output artefacts, token counts
-- Complementary MCP ecosystem services: MCP Repository (tool discovery), MCP Knowledge (shared skills and artefacts), and MCP Internet Fetch & Search (real-time web search)
+- Full audit trail per turn: raw prompt, resolved prompt, tool call log, output artifacts, token counts
+- Complementary MCP ecosystem services: MCP Repository (tool discovery), MCP Knowledge (shared skills and artifacts), and MCP Internet Fetch & Search (real-time web search)
 
 #### Out of scope
 
@@ -135,12 +135,12 @@ The platform has no end-user-facing name. Every tenant names their own assistant
 | Dependency | Role |
 |------------|------|
 | **AI provider** | Provider-agnostic abstraction exposing three model tiers: `fast`, `standard` (default), `powerful`. The platform maps tiers to the tenant's configured provider's current models. Multiple providers planned — see [ROADMAP.md](./ROADMAP.md). |
-| **Platform storage** | Relational database with row-level security for conversation records; object storage for binary artefacts. |
+| **Platform storage** | Relational database with row-level security for conversation records; object storage for binary artifacts. |
 | **Platform edge function** | JWT handling, AI provider API request construction, SSE stream passthrough, MCP call routing. Provider-agnostic interface. |
 | **Host authentication** | The host application issues JWTs for its users. The platform validates these tokens and trusts the embedded claims. The platform performs no re-authentication. |
 | **Host MCP server(s)** | The host's registered MCP endpoints providing data access and action capabilities. |
 | **MCP Repository** | Complementary ecosystem service — discoverable registry of available MCP tools. |
-| **MCP Knowledge** | Complementary ecosystem service — centralised skills, guidance documents, and reusable prompt artefacts. |
+| **MCP Knowledge** | Complementary ecosystem service — centralized skills, guidance documents, and reusable prompt artifacts. |
 | **MCP Internet Fetch & Search** | Complementary ecosystem service — real-time web search and page retrieval; registered by hosts as an opt-in or always-on MCP server. |
 
 ---
@@ -167,7 +167,7 @@ These archetypes exist in every deployment regardless of the host application's 
 
 The Application Admin role is the platform's equivalent of a product owner for the assistant within the tenant. They are not necessarily a technical user. Key responsibilities:
 
-- Managing application context (organisation-wide memory items that all users benefit from)
+- Managing application context (organization-wide memory items that all users benefit from)
 - Reviewing and approving application context items proposed by colleagues
 - Triaging improvement signals generated by end users within their tenant
 - Updating the application config via the Config Editor UI (non-technical admins) or Admin API (technical admins)
@@ -196,9 +196,9 @@ The assistant invokes the host's governance MCP server, retrieves domain health 
 
 The executive taps one of the domain binding chips in the response, which the host application has configured to navigate to the domain detail page. They follow up: *"Who owns the entities flagged in the Finance domain?"* — the assistant returns a table of owners with contact details.
 
-Both artefacts appear in the session artefact tray.
+Both artifacts appear in the session artifact tray.
 
-**Features exercised:** Mobile layout, Vega-Lite rendering, `@`-binding chip click-through to host app, artefact tray, always-on MCP server.
+**Features exercised:** Mobile layout, Vega-Lite rendering, `@`-binding chip click-through to host app, artifact tray, always-on MCP server.
 
 ---
 
@@ -278,9 +278,9 @@ A governance lead shares an active conversation with two colleagues to collabora
 
 Both colleagues receive in-platform notifications and accept — seeing the full conversation history from the beginning (with the acceptance disclaimer). Each participant now submits their own turns. Because each user's `@`-binding typeahead is scoped to their individual permissions, one participant sees a **[Restricted object]** chip for a binding they cannot access in the host application.
 
-At the end of the session, the lead downloads all artefacts from the tray as a zip archive.
+At the end of the session, the lead downloads all artifacts from the tray as a zip archive.
 
-**Features exercised:** Shared conversations, participant invitation, permission-scoped `@`-binding, message attribution, artefact download.
+**Features exercised:** Shared conversations, participant invitation, permission-scoped `@`-binding, message attribution, artifact download.
 
 ---
 
@@ -320,7 +320,7 @@ Every action the platform takes is visible. Tool calls are shown, not hidden. Th
 
 **Consequences:**
 - Every MCP tool invocation renders as a collapsible disclosure card in the conversation thread — tool name, input parameters, response status, result summary.
-- The assistant may not summarise tool call activity without providing access to the full disclosure.
+- The assistant may not summarize tool call activity without providing access to the full disclosure.
 - Every write operation proposed by the assistant displays a **confirmation step** showing the before/after state before any MCP write call is executed. The assistant never implies a write has occurred if it has not.
 
 ---
@@ -349,7 +349,7 @@ Plain text answers to structured data queries are a regression from most applica
 
 ### P4 — Audit completeness
 
-Every conversation turn is a self-contained, reproducible record: raw prompt, resolved prompt, attached files, model response, tool call log, output artefacts. A reviewer can reconstruct any turn without referring to an external system.
+Every conversation turn is a self-contained, reproducible record: raw prompt, resolved prompt, attached files, model response, tool call log, output artifacts. A reviewer can reconstruct any turn without referring to an external system.
 
 **Consequences:**
 - Storage policy ([08-platform-operations.md](./08-platform-operations.md)) retains all turn elements at write time — nothing is generated on demand.
@@ -377,8 +377,8 @@ The assistant is fully functional on mobile and tablet. Hosts embed the platform
 The `<ai-chat>` web component inherits the host application's visual language via branding tokens. The component introduces no new visual language of its own. End users should experience the assistant as a natural extension of the host application, not a foreign product embedded inside it.
 
 **Consequences:**
-- All colour, typography, border radius, and logo tokens are provided by the host application config (`branding` section).
-- Participant colour assignments in shared conversations use the host's primary colour as an anchor; the platform generates a compliant palette from it.
+- All color, typography, border radius, and logo tokens are provided by the host application config (`branding` section).
+- Participant color assignments in shared conversations use the host's primary color as an anchor; the platform generates a compliant palette from it.
 - Platform-default styles are used only as fallbacks when the host has not provided a token.
 
 ---
@@ -410,13 +410,13 @@ No change to the system prompt, tool registry, or guided workflow prompts is app
 
 ### P9 — Host sovereignty
 
-The host application has final authority over the assistant's configuration, scope, and behaviour within its tenant. The platform enforces safety and audit requirements as non-negotiable constraints, but within those constraints the host is in control.
+The host application has final authority over the assistant's configuration, scope, and behavior within its tenant. The platform enforces safety and audit requirements as non-negotiable constraints, but within those constraints the host is in control.
 
 **Consequences:**
 - The application config schema gives hosts control of system prompt, tools, bindings, workflows, branding, models, and feature flags.
 - Platform-managed instructions (safety clauses, tool transparency, audit logging) are injected alongside — never instead of — the host system prompt. They are not user-configurable or host-overridable.
 - Hosts may restrict capabilities (disable features, lock model selection, limit participant count) but may not exceed platform-level maximums.
-- New platform-level defaults that would change existing tenant behaviour require a config migration path and advance notice.
+- New platform-level defaults that would change existing tenant behavior require a config migration path and advance notice.
 
 ---
 
@@ -427,7 +427,7 @@ The host application has final authority over the assistant's configuration, sco
 | P1 (transparency) vs UX conciseness | Tool call disclosures add visual weight | Disclose via collapsible cards — present but not obtrusive |
 | P3 (rendered output) vs P5 (mobile) | Charts may not render well at narrow widths | Vega-Lite `width: "container"` + horizontal scroll for tables and diagrams |
 | P4 (audit completeness) vs storage cost | Full binary attachment storage is expensive | Retention is tenant-configurable; scheduled archival at expiry |
-| P6 (host design system) vs accessibility | Host colour tokens may not meet contrast requirements | Platform validates contrast ratios at config submission; warnings surfaced to host |
+| P6 (host design system) vs accessibility | Host color tokens may not meet contrast requirements | Platform validates contrast ratios at config submission; warnings surfaced to host |
 | P7 (progressive disclosure) vs P4 (audit completeness) | Collapsed content could obscure audit data | Collapse is a UI affordance only — all content is stored in full regardless of display state |
 | P8 (human-gated improvement) vs velocity | Approval pipeline slows iteration | Accepted tradeoff — trust and data integrity outweigh iteration speed on platforms where users act on assistant output |
 | P9 (host sovereignty) vs P1 (transparency) | Host may wish to hide tool calls from end users | Tool call disclosure is mandatory and non-configurable — hosts may not suppress MCP disclosures |
@@ -441,7 +441,7 @@ The host application has final authority over the assistant's configuration, sco
 | **D1** | Host applications configure everything via a JSON application config. The platform provides mechanisms; hosts provide content (system prompt, tools, bindings, workflows, branding). |
 | **D2** | The platform has no end-user-facing name. Each host application names its own assistant in its config. |
 | **D3** | The platform is multi-tenant. One deployment serves many host applications, each fully isolated by `tenant_id` with row-level security. |
-| **D4** | Conversations and artefacts are stored in the platform's own database. Host applications do not manage storage. |
+| **D4** | Conversations and artifacts are stored in the platform's own database. Host applications do not manage storage. |
 | **D5** | The web component is the only supported embedding model in v1. Direct iframe embedding is not supported. |
 | **D6** | The authentication bridge passes host-authenticated user identity to the component. The platform trusts the host's JWT; it does not re-authenticate users independently. |
 | **D7** | No MCP server is always-on by default. Host applications designate which of their registered servers should be always-on in their config. If no always-on server is registered, the platform operates in prompt-only mode. |

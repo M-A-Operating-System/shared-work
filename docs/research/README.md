@@ -6,7 +6,7 @@ The catalog covers AI products across experience, knowledge, agentic, integratio
 
 ## Pages
 
-- [Research Overview](inventory.md) — introduction to the catalog structure, domains and how the research is organised
+- [Research Overview](inventory.md) — introduction to the catalog structure, domains and how the research is organized
 - [Research Results Table](research-table.md) — full catalog of AI products with reference implementations, capabilities and tags
 - [Research Prompt](weekly-agentic-ai-research.md) — the prompt and instructions used by the weekly research agent
 
@@ -45,7 +45,7 @@ AI Assistant · LLM Gateway · AI Governance · AI Audit · AI Entitlement · AI
 
 The weekly research GitHub Action runs every Monday (or on demand). It uses a two-phase approach:
 
-1. **Phase 1 — Gather** (Claude Sonnet): searches the web for new products and implementations across the current domain rotation using Exa and/or Tavily, then summarises findings
+1. **Phase 1 — Gather** (Claude Sonnet): searches the web for new products and implementations across the current domain rotation using Exa and/or Tavily, then summarizes findings
 2. **Phase 2 — Update** (Claude Opus with extended thinking): applies the findings to the structured catalog, validating against the JSON schema before writing
 
 Results are committed directly to this folder. Only the files in this folder are ever touched by the automated process.
