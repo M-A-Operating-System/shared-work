@@ -1,0 +1,125 @@
+{
+  "date": "2026-06-29",
+  "sources": [
+    {
+      "title": "Google Cloud Knowledge Catalog — Introducing the Google Cloud Knowledge Catalog",
+      "url": "https://cloud.google.com/blog/products/data-analytics/introducing-the-google-cloud-knowledge-catalog",
+      "relevance": "Major new reference implementation for catalog and context domains; universal context engine for AI agents with aggregation, enrichment, and search pillars. GA April 2026."
+    },
+    {
+      "title": "Databricks Unity Catalog Business Semantics — GA and Open Source Announcement",
+      "url": "https://www.databricks.com/blog/redefining-semantics-data-layer-future-bi-and-ai",
+      "relevance": "Major development for semantic and definition domains; governed metric definitions at the data platform layer, open-sourced in Apache Spark. GA 2026."
+    },
+    {
+      "title": "What's new with Unity Catalog at Data + AI Summit 2026",
+      "url": "https://www.databricks.com/blog/whats-new-unity-catalog-data-ai-summit-2026",
+      "relevance": "Unity AI Gateway, Governance Hub, ABAC, Glossary & Domains for agentic AI governance. Impacts catalog, context, definition, and governance domains."
+    },
+    {
+      "title": "Atlan at Snowflake Summit 2026: Context Agents, Context Engineering Studio & MCP",
+      "url": "https://atlan.com/snowflake-summit-2026-announcements/",
+      "relevance": "New Context Agents, Context Engineering Studio, and MCP Server capabilities for catalog and definition domains. 17x MCP adoption growth."
+    },
+    {
+      "title": "OpenMetadata 1.8 — Enterprise-grade data context for AI",
+      "url": "https://blog.open-metadata.org/announcing-openmetadata-1-8-948eb14d41c7",
+      "relevance": "First enterprise-grade embedded MCP server for metadata; data contracts; SCIM provisioning. Impacts catalog, definition, and context domains."
+    },
+    {
+      "title": "Amazon Bedrock Managed Knowledge Base",
+      "url": "https://aws.amazon.com/blogs/aws/introducing-amazon-bedrock-managed-knowledge-base-for-faster-more-accurate-enterprise-ai-applications/",
+      "relevance": "New managed RAG infrastructure with agentic retriever, native connectors, smart parsing. Impacts retrieval and knowledge domains."
+    },
+    {
+      "title": "Microsoft Foundry IQ — Unlocking ubiquitous knowledge for agents (Azure AI Search)",
+      "url": "https://techcommunity.microsoft.com/blog/azure-ai-foundry-blog/foundry-iq-unlocking-ubiquitous-knowledge-for-agents/4470812",
+      "relevance": "Next-generation RAG centralized knowledge layer for enterprise agents. Impacts retrieval domain."
+    },
+    {
+      "title": "Agentic GraphRAG for Capital Markets — AWS for Industries",
+      "url": "https://aws.amazon.com/blogs/industries/agentic-graphrag-for-capital-markets/",
+      "relevance": "Reference architecture for knowledge graph RAG in capital markets. Impacts retrieval domain for regulated industries."
+    },
+    {
+      "title": "Microsoft GraphRAG — GitHub Repository",
+      "url": "https://github.com/microsoft/graphrag",
+      "relevance": "Structured hierarchical knowledge graph RAG system. 34k+ stars, actively maintained (last push June 2026). Key reference implementation for retrieval domain."
+    },
+    {
+      "title": "Neo4j GraphRAG Context Provider for Microsoft Agent Framework",
+      "url": "https://learn.microsoft.com/en-us/agent-framework/integrations/neo4j-graphrag",
+      "relevance": "Native Neo4j GraphRAG integration with Microsoft Agent Framework for vector, fulltext, and hybrid search with graph traversal."
+    },
+    {
+      "title": "Neo4j — Graph-Based Agentic AI for Loan Approval Compliance",
+      "url": "https://neo4j.com/blog/developer/architecting-graph-based-agentic-system-when-a-regulator-asks-why-was-this-loan-approved/",
+      "relevance": "Graph-based agentic AI for regulatory explainability in lending (LoanGuard AI). Regulated industry use case for knowledge graph retrieval."
+    },
+    {
+      "title": "Atlan MCP Server — From Metadata to Meaningful Action",
+      "url": "https://blog.atlan.com/announcements/atlan-mcp-ai-metadata/",
+      "relevance": "Atlan MCP Server delivering catalog metadata to AI agents (Claude, Copilot, etc.). Impacts catalog and context domains."
+    },
+    {
+      "title": "OpenMetadata MCP Server Introduction",
+      "url": "https://blog.open-metadata.org/introducing-the-model-context-protocol-mcp-in-openmetadata-e757385f4fb2",
+      "relevance": "OpenMetadata MCP server for AI metadata access. Impacts catalog domain."
+    },
+    {
+      "title": "Informatica IDMC Spring 2026 Release — Activate Enterprise Data with Trusted Context",
+      "url": "https://www.informatica.com/blogs/activate-enterprise-data-with-trusted-context-new-capabilities-in-idmcs-spring-2026-release.html",
+      "relevance": "Trusted context APIs for agentic AI in IDMC Spring 2026. Impacts context domain."
+    },
+    {
+      "title": "DataHub Cloud v1.1.0 Release Blog",
+      "url": "https://datahub.com/blog/introducing-datahub-cloud-v1-1-0/",
+      "relevance": "Native Microsoft Fabric connectors, multi-tool context plugins, quality monitoring. Impacts catalog and context domains."
+    },
+    {
+      "title": "SCAIR: Schema-Conditioned Agentic Iterative Reasoning for Enterprise Knowledge Graphs (ACL 2026)",
+      "url": "https://aclanthology.org/2026.acl-industry.76.pdf",
+      "relevance": "Industry-track ACL 2026 paper on agentic KG reasoning (Bosch/Stuttgart). Signals academic-industry convergence on knowledge graph retrieval."
+    },
+    {
+      "title": "Agentic GraphRAG: Navigating Unstructured Financial Data (ETH Zürich, arXiv 2026)",
+      "url": "https://arxiv.org/html/2605.18770",
+      "relevance": "Collaborative agentic GraphRAG for financial registry data analysis. Regulated industry retrieval domain."
+    },
+    {
+      "title": "Google Gemini Enterprise Agent Platform — Agentic RAG",
+      "url": "https://research.google/blog/unlocking-dependable-responses-with-gemini-enterprise-agent-platforms-agentic-rag/",
+      "relevance": "Google multi-agent RAG framework for complex enterprise queries. June 2026. Impacts retrieval domain."
+    },
+    {
+      "title": "Boomi Meta Hub",
+      "url": "https://boomi.com/platform/metahub/",
+      "relevance": "Business glossary and semantic-to-technical asset linking for agentic AI context. New entrant for definition domain."
+    },
+    {
+      "title": "AtScale — The Golden Age of the Semantic Layer",
+      "url": "https://www.atscale.com/blog/golden-age-of-the-semantic-layer/",
+      "relevance": "Semantic layer as connective tissue between enterprise data and LLMs. Impacts semantic domain."
+    },
+    {
+      "title": "Omni Analytics — Semantic Layer for AI and BI 2026",
+      "url": "https://omni.co/articles/best-semantic-layer-for-ai-and-bi-2026",
+      "relevance": "2026 guide on semantic layers for AI and BI. New reference implementation for semantic domain."
+    },
+    {
+      "title": "Daxe.ai — Enterprise AI for Regulated Industries",
+      "url": "https://daxe.ai/",
+      "relevance": "GraphRAG-powered enterprise AI for financial institutions with traceable, auditable retrieval. Regulated industry retrieval domain."
+    },
+    {
+      "title": "Galaxy — Ontology Management and Semantic Modeling Operating Model",
+      "url": "https://www.getgalaxy.io/articles/ontology-management-semantic-modeling-operating-model-enterprise-context",
+      "relevance": "Governed lifecycle for ontology management including versioning, review, and change control. Impacts definition domain."
+    },
+    {
+      "title": "Enterprise Semantic Layer Buyer's Guide 2026 — Strategy Mosaic",
+      "url": "https://www.strategy.com/software/enterprise-semantic-layer-buyers-guide",
+      "relevance": "2026 buyer's guide for enterprise semantic layer solutions. Market intelligence for semantic domain."
+    }
+  ]
+}

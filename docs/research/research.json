@@ -2851,1150 +2851,6 @@
       ]
     },
     {
-      "product_name": "analytics",
-      "display_name": "Analytics",
-      "domain": "knowledge",
-      "description": "Provides governed analytical access, query generation, KPI analysis and AI-enabled insights over enterprise data.",
-      "reference_implementations": [
-        {
-          "name": "ThoughtSpot",
-          "vendor": "ThoughtSpot",
-          "implementation_type": "commercial",
-          "deployment_models": [
-            "saas"
-          ],
-          "url": "https://www.thoughtspot.com",
-          "notes": "AI-enabled analytics and search-driven BI platform."
-        },
-        {
-          "name": "Power BI",
-          "vendor": "Microsoft",
-          "implementation_type": "commercial",
-          "deployment_models": [
-            "saas",
-            "managed_cloud"
-          ],
-          "url": "https://powerbi.microsoft.com",
-          "notes": "Business intelligence and analytics platform."
-        },
-        {
-          "name": "Tableau",
-          "vendor": "Salesforce",
-          "implementation_type": "commercial",
-          "deployment_models": [
-            "saas",
-            "managed_cloud"
-          ],
-          "url": "https://www.tableau.com",
-          "notes": "Analytics and visualization platform."
-        },
-        {
-          "name": "Sigma",
-          "vendor": "Sigma",
-          "implementation_type": "commercial",
-          "deployment_models": [
-            "saas"
-          ],
-          "url": "https://www.sigmacomputing.com",
-          "notes": "Cloud analytics and BI platform."
-        },
-        {
-          "name": "Cube",
-          "vendor": "Cube Dev",
-          "implementation_type": "open_source",
-          "deployment_models": [
-            "self_hosted",
-            "saas"
-          ],
-          "url": "https://cube.dev",
-          "notes": "Semantic layer and analytics API."
-        }
-      ],
-      "capabilities": [
-        {
-          "capability_name": "analytics_generation",
-          "display_name": "Analytics Generation",
-          "description": "Generates analytical results from user intent.",
-          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
-          "required": true
-        },
-        {
-          "capability_name": "governed_query",
-          "display_name": "Governed Query",
-          "description": "Runs queries through governed models or semantic layers.",
-          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
-          "required": true
-        },
-        {
-          "capability_name": "kpi_analysis",
-          "display_name": "KPI Analysis",
-          "description": "Analyzes KPIs and metric trends.",
-          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
-          "required": true
-        },
-        {
-          "capability_name": "drilldown",
-          "display_name": "Drilldown",
-          "description": "Drills into supporting data and dimensions.",
-          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
-          "required": true
-        },
-        {
-          "capability_name": "explanation_generation",
-          "display_name": "Explanation Generation",
-          "description": "Generates explanations of analytical results.",
-          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
-          "required": true
-        },
-        {
-          "capability_name": "decision_support",
-          "display_name": "Decision Support",
-          "description": "Supports business decisions using governed analytics.",
-          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
-          "required": true
-        }
-      ],
-      "tags": [
-        "analytics",
-        "bi",
-        "semantic",
-        "data"
-      ]
-    },
-    {
-      "product_name": "catalog",
-      "display_name": "Data Catalog",
-      "domain": "knowledge",
-      "description": "Discovers, documents, organizes and governs enterprise data assets, metadata, ownership, lineage, quality signals and usage context.",
-      "reference_implementations": [
-        {
-          "name": "Alation Data Catalog",
-          "vendor": "Alation",
-          "implementation_type": "commercial",
-          "deployment_models": [
-            "saas",
-            "managed_cloud"
-          ],
-          "url": "https://www.alation.com",
-          "notes": "Enterprise data catalog and governance platform."
-        },
-        {
-          "name": "Atlan",
-          "vendor": "Atlan",
-          "implementation_type": "commercial",
-          "deployment_models": [
-            "saas",
-            "managed_cloud"
-          ],
-          "url": "https://atlan.com",
-          "notes": "Active metadata and data catalog platform."
-        },
-        {
-          "name": "Collibra",
-          "vendor": "Collibra",
-          "implementation_type": "commercial",
-          "deployment_models": [
-            "saas",
-            "managed_cloud"
-          ],
-          "url": "https://www.collibra.com",
-          "notes": "Enterprise data catalog and governance platform."
-        },
-        {
-          "name": "DataHub",
-          "vendor": "DataHub",
-          "implementation_type": "open_source",
-          "deployment_models": [
-            "self_hosted",
-            "managed_cloud"
-          ],
-          "url": "https://datahub.com",
-          "notes": "Open source metadata and data catalog platform with MCP support."
-        },
-        {
-          "name": "Microsoft Purview",
-          "vendor": "Microsoft",
-          "implementation_type": "commercial",
-          "deployment_models": [
-            "saas",
-            "managed_cloud"
-          ],
-          "url": "https://www.microsoft.com/security/business/microsoft-purview",
-          "notes": "Data governance, catalog, lineage and compliance platform."
-        },
-        {
-          "name": "OpenMetadata",
-          "vendor": "OpenMetadata",
-          "implementation_type": "open_source",
-          "deployment_models": [
-            "self_hosted",
-            "managed_cloud"
-          ],
-          "url": "https://open-metadata.org",
-          "notes": "Open source metadata, catalog and data governance platform."
-        }
-      ],
-      "capabilities": [
-        {
-          "capability_name": "asset_discovery",
-          "display_name": "Asset Discovery",
-          "description": "Discovers enterprise data assets across systems.",
-          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
-          "required": true
-        },
-        {
-          "capability_name": "catalog_search",
-          "display_name": "Catalog Search",
-          "description": "Searches data assets, metadata and definitions.",
-          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
-          "required": true
-        },
-        {
-          "capability_name": "data_asset_catalog",
-          "display_name": "Data Asset Catalog",
-          "description": "Catalogs datasets, tables, files, reports, metrics and other data assets.",
-          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
-          "required": true
-        },
-        {
-          "capability_name": "data_certification",
-          "display_name": "Data Certification",
-          "description": "Marks data assets as certified, trusted or fit for use.",
-          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
-          "required": true
-        },
-        {
-          "capability_name": "data_lineage",
-          "display_name": "Data Lineage",
-          "description": "Captures lineage between sources, transformations and consumers.",
-          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
-          "required": true
-        },
-        {
-          "capability_name": "data_ownership",
-          "display_name": "Data Ownership",
-          "description": "Documents owners, stewards and accountable teams for data assets.",
-          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
-          "required": true
-        },
-        {
-          "capability_name": "data_usage_tracking",
-          "display_name": "Data Usage Tracking",
-          "description": "Tracks how data assets are used by users, systems and agents.",
-          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
-          "required": true
-        },
-        {
-          "capability_name": "metadata_management",
-          "display_name": "Metadata Management",
-          "description": "Manages technical and business metadata.",
-          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
-          "required": true
-        }
-      ],
-      "tags": [
-        "catalog",
-        "data",
-        "governance",
-        "knowledge",
-        "metadata"
-      ]
-    },
-    {
-      "product_name": "context",
-      "display_name": "Data Context",
-      "domain": "knowledge",
-      "description": "Provides structured business and technical context so AI systems understand enterprise data meaning, provenance, usage, ownership and constraints.",
-      "reference_implementations": [
-        {
-          "name": "M&A Operating System Data Design Authority",
-          "vendor": "M&A Operating System",
-          "implementation_type": "commercial",
-          "deployment_models": [
-            "saas",
-            "managed_cloud"
-          ],
-          "url": "https://www.maoperatingsystem.com/dda",
-          "notes": "Data Design Authority for managing data context and data model repositories."
-        },
-        {
-          "name": "DataHub MCP Server",
-          "vendor": "DataHub",
-          "implementation_type": "open_source",
-          "deployment_models": [
-            "self_hosted",
-            "managed_cloud"
-          ],
-          "url": "https://datahub.com/resources/datahub-mcp-server-overview/",
-          "notes": "MCP server exposing enterprise data context to agents."
-        },
-        {
-          "name": "OpenMetadata",
-          "vendor": "OpenMetadata",
-          "implementation_type": "open_source",
-          "deployment_models": [
-            "self_hosted"
-          ],
-          "url": "https://open-metadata.org",
-          "notes": "Metadata, governance and data context platform."
-        }
-      ],
-      "capabilities": [
-        {
-          "capability_name": "metadata_access",
-          "display_name": "Metadata Access",
-          "description": "Provides structured access to metadata for humans, assistants and agents.",
-          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
-          "required": true
-        },
-        {
-          "capability_name": "quality_signal_access",
-          "display_name": "Quality Signal Access",
-          "description": "Exposes data quality signals to users and agents.",
-          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
-          "required": true
-        },
-        {
-          "capability_name": "lineage_access",
-          "display_name": "Lineage Access",
-          "description": "Provides lineage context for data assets and transformations.",
-          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
-          "required": true
-        },
-        {
-          "capability_name": "trust_signal_access",
-          "display_name": "Trust Signal Access",
-          "description": "Exposes trust, certification or fitness-for-use signals.",
-          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
-          "required": true
-        },
-        {
-          "capability_name": "definition_resolution",
-          "display_name": "Definition Resolution",
-          "description": "Resolves data elements to business definitions and context.",
-          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
-          "required": true
-        },
-        {
-          "capability_name": "context_api",
-          "display_name": "Context API",
-          "description": "Provides API access to enterprise data context.",
-          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
-          "required": true
-        }
-      ],
-      "tags": [
-        "context",
-        "metadata",
-        "mcp",
-        "data",
-        "ai_ready"
-      ]
-    },
-    {
-      "product_name": "decisioning",
-      "display_name": "AI Decisioning",
-      "domain": "knowledge",
-      "description": "Defines, manages and visualizes enterprise decision logic as structured, deterministic decision trees and semantic decision definitions, enabling consistent, auditable, human-readable decision outcomes for business rules, policy and agentic workflows.",
-      "reference_implementations": [
-        {
-          "name": "Draw Decision Tree",
-          "vendor": "Draw Decision Tree",
-          "implementation_type": "commercial",
-          "deployment_models": [
-            "saas"
-          ],
-          "url": "https://www.drawdecisiontree.com",
-          "notes": "Visual decision tree authoring and management platform for building semantic decision definitions and deterministic decision outcomes."
-        }
-      ],
-      "capabilities": [
-        {
-          "capability_name": "semantic_decision_definition",
-          "display_name": "Semantic Decision Definition",
-          "description": "Defines decision logic using structured, human-readable semantic definitions that capture intent, conditions and outcomes.",
-          "regulated_relevance": "Supports explainable, auditable decision-making required in regulated environments.",
-          "required": true
-        },
-        {
-          "capability_name": "deterministic_decision_outcomes",
-          "display_name": "Deterministic Decision Outcomes",
-          "description": "Evaluates decision trees to produce consistent, repeatable outcomes given the same inputs, eliminating non-deterministic AI inference for governed decisions.",
-          "regulated_relevance": "Critical for regulated industries requiring consistent, defensible and reproducible decision outputs.",
-          "required": true
-        },
-        {
-          "capability_name": "decision_tree_visualization",
-          "display_name": "Decision Tree Visualization",
-          "description": "Renders decision trees as interactive visual diagrams for authoring, review, testing and communication to business stakeholders.",
-          "regulated_relevance": "Supports human review and sign-off of decision logic in regulated change processes.",
-          "required": true
-        },
-        {
-          "capability_name": "decision_versioning",
-          "display_name": "Decision Versioning",
-          "description": "Tracks versions of decision trees and definitions to support change management and audit.",
-          "regulated_relevance": "Required for regulated audit trails and change governance.",
-          "required": true
-        },
-        {
-          "capability_name": "decision_testing",
-          "display_name": "Decision Testing",
-          "description": "Tests decision trees against expected inputs and outcomes to validate logic before deployment.",
-          "regulated_relevance": "Supports pre-production validation of business rules and policies.",
-          "required": false
-        },
-        {
-          "capability_name": "decision_publishing",
-          "display_name": "Decision Publishing",
-          "description": "Publishes approved decision definitions for consumption by applications, agents and agentic workflows.",
-          "regulated_relevance": "Enables governed, controlled release of decision logic.",
-          "required": false
-        }
-      ],
-      "tags": [
-        "decisioning",
-        "knowledge",
-        "deterministic",
-        "agentic",
-        "regulated"
-      ]
-    },
-    {
-      "product_name": "definition",
-      "display_name": "Data Definition",
-      "domain": "knowledge",
-      "description": "Manages business definitions, data definitions, metric definitions, logical models, semantic meaning and data context for human and agentic consumers.",
-      "reference_implementations": [
-        {
-          "name": "M&A Operating System Data Design Authority",
-          "vendor": "M&A Operating System",
-          "implementation_type": "commercial",
-          "deployment_models": [
-            "saas",
-            "managed_cloud"
-          ],
-          "url": "https://www.maoperatingsystem.com/dda",
-          "notes": "Data Design Authority for data model management, data context and governed data definitions."
-        },
-        {
-          "name": "DataHub",
-          "vendor": "DataHub",
-          "implementation_type": "open_source",
-          "deployment_models": [
-            "self_hosted",
-            "managed_cloud"
-          ],
-          "url": "https://datahub.com",
-          "notes": "Metadata platform that exposes data context including lineage, ownership, business definitions, quality signals and usage patterns."
-        },
-        {
-          "name": "OpenMetadata",
-          "vendor": "OpenMetadata",
-          "implementation_type": "open_source",
-          "deployment_models": [
-            "self_hosted",
-            "managed_cloud"
-          ],
-          "url": "https://open-metadata.org",
-          "notes": "Open source metadata, catalog and data collaboration platform."
-        },
-        {
-          "name": "Collibra",
-          "vendor": "Collibra",
-          "implementation_type": "commercial",
-          "deployment_models": [
-            "saas",
-            "managed_cloud"
-          ],
-          "url": "https://www.collibra.com",
-          "notes": "Enterprise data governance and catalog platform."
-        },
-        {
-          "name": "Atlan",
-          "vendor": "Atlan",
-          "implementation_type": "commercial",
-          "deployment_models": [
-            "saas",
-            "managed_cloud"
-          ],
-          "url": "https://atlan.com",
-          "notes": "Active metadata and data catalog platform."
-        },
-        {
-          "name": "dbt Semantic Layer",
-          "vendor": "dbt Labs",
-          "implementation_type": "commercial",
-          "deployment_models": [
-            "saas",
-            "managed_cloud"
-          ],
-          "url": "https://www.getdbt.com/product/semantic-layer",
-          "notes": "Semantic metric and business definition layer."
-        }
-      ],
-      "capabilities": [
-        {
-          "capability_name": "business_glossary",
-          "display_name": "Business Glossary",
-          "description": "Defines business terms and meanings.",
-          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
-          "required": true
-        },
-        {
-          "capability_name": "data_dictionary",
-          "display_name": "Data Dictionary",
-          "description": "Documents fields, structures and data elements.",
-          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
-          "required": true
-        },
-        {
-          "capability_name": "metric_definition",
-          "display_name": "Metric Definition",
-          "description": "Defines KPIs, metrics, calculations and business rules.",
-          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
-          "required": true
-        },
-        {
-          "capability_name": "semantic_definition",
-          "display_name": "Semantic Definition",
-          "description": "Defines semantic meaning for metrics, dimensions, entities and relationships.",
-          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
-          "required": true
-        },
-        {
-          "capability_name": "entity_definition",
-          "display_name": "Entity Definition",
-          "description": "Defines enterprise business entities.",
-          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
-          "required": true
-        },
-        {
-          "capability_name": "relationship_definition",
-          "display_name": "Relationship Definition",
-          "description": "Defines relationships between entities or data concepts.",
-          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
-          "required": true
-        },
-        {
-          "capability_name": "ownership_metadata",
-          "display_name": "Ownership Metadata",
-          "description": "Documents owners, stewards and accountable teams.",
-          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
-          "required": true
-        },
-        {
-          "capability_name": "usage_context",
-          "display_name": "Usage Context",
-          "description": "Captures how data assets are used and interpreted.",
-          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
-          "required": true
-        },
-        {
-          "capability_name": "lineage_context",
-          "display_name": "Lineage Context",
-          "description": "Provides lineage context for data definitions and transformations.",
-          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
-          "required": true
-        }
-      ],
-      "tags": [
-        "definition",
-        "data_context",
-        "glossary",
-        "semantic",
-        "regulated"
-      ]
-    },
-    {
-      "product_name": "knowledge",
-      "display_name": "AI Knowledge Repository",
-      "domain": "knowledge",
-      "description": "Repository and management layer for reusable AI knowledge assets including resources, prompts, skills, agent definitions, instructions, templates, playbooks and enterprise context.",
-      "reference_implementations": [
-        {
-          "name": "TrustBolt AI Adoption and Governance Platform",
-          "vendor": "TrustBolt",
-          "implementation_type": "commercial",
-          "deployment_models": [
-            "saas",
-            "private_cloud",
-            "api"
-          ],
-          "url": "https://www.trustbolt.ai",
-          "notes": "Platform capabilities relevant to reusable AI knowledge, prompts, team assets and governed AI adoption."
-        },
-        {
-          "name": "GitHub",
-          "vendor": "GitHub",
-          "implementation_type": "commercial",
-          "deployment_models": [
-            "saas",
-            "managed_cloud"
-          ],
-          "url": "https://github.com",
-          "notes": "Repository platform often used to manage prompts, specifications, skills and agent definitions as code."
-        },
-        {
-          "name": "Confluence",
-          "vendor": "Atlassian",
-          "implementation_type": "commercial",
-          "deployment_models": [
-            "saas",
-            "managed_cloud"
-          ],
-          "url": "https://www.atlassian.com/software/confluence",
-          "notes": "Enterprise knowledge and documentation platform."
-        },
-        {
-          "name": "DataHub",
-          "vendor": "DataHub",
-          "implementation_type": "open_source",
-          "deployment_models": [
-            "self_hosted",
-            "managed_cloud"
-          ],
-          "url": "https://datahub.com",
-          "notes": "Metadata and data context platform with MCP server support."
-        },
-        {
-          "name": "OpenMetadata",
-          "vendor": "OpenMetadata",
-          "implementation_type": "open_source",
-          "deployment_models": [
-            "self_hosted",
-            "managed_cloud"
-          ],
-          "url": "https://open-metadata.org",
-          "notes": "Open source metadata and data catalog platform."
-        },
-        {
-          "name": "OpenAI GPT Knowledge",
-          "vendor": "OpenAI",
-          "implementation_type": "commercial",
-          "deployment_models": [
-            "saas"
-          ],
-          "url": "https://openai.com",
-          "notes": "Knowledge attachments for configured GPTs."
-        },
-        {
-          "name": "Claude Projects",
-          "vendor": "Anthropic",
-          "implementation_type": "commercial",
-          "deployment_models": [
-            "saas"
-          ],
-          "url": "https://claude.ai",
-          "notes": "Project knowledge and context organization."
-        },
-        {
-          "name": "Notion",
-          "vendor": "Notion",
-          "implementation_type": "commercial",
-          "deployment_models": [
-            "saas"
-          ],
-          "url": "https://www.notion.com",
-          "notes": "Workspace and knowledge repository often used for internal documentation and reusable knowledge assets."
-        },
-        {
-          "name": "SharePoint",
-          "vendor": "Microsoft",
-          "implementation_type": "commercial",
-          "deployment_models": [
-            "saas",
-            "managed_cloud"
-          ],
-          "url": "https://www.microsoft.com/microsoft-365/sharepoint/collaboration",
-          "notes": "Enterprise document and knowledge repository."
-        }
-      ],
-      "capabilities": [
-        {
-          "capability_name": "resource_repository",
-          "display_name": "Resource Repository",
-          "description": "Stores reusable documents, resources and contextual assets for assistants and agents.",
-          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
-          "required": true
-        },
-        {
-          "capability_name": "prompt_repository",
-          "display_name": "Prompt Repository",
-          "description": "Stores reusable prompts and prompt templates.",
-          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
-          "required": true
-        },
-        {
-          "capability_name": "skill_repository",
-          "display_name": "Skill Repository",
-          "description": "Stores reusable skills, actions or tool-use definitions.",
-          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
-          "required": true
-        },
-        {
-          "capability_name": "agent_repository",
-          "display_name": "Agent Repository",
-          "description": "Stores reusable agent and assistant definitions.",
-          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
-          "required": true
-        },
-        {
-          "capability_name": "instruction_repository",
-          "display_name": "Instruction Repository",
-          "description": "Stores reusable instruction sets and system guidance.",
-          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
-          "required": true
-        },
-        {
-          "capability_name": "template_repository",
-          "display_name": "Template Repository",
-          "description": "Stores reusable templates for assistants, agents, prompts or workflows.",
-          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
-          "required": true
-        },
-        {
-          "capability_name": "version_management",
-          "display_name": "Version Management",
-          "description": "Versions knowledge assets, prompts, skills, instructions and definitions.",
-          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
-          "required": true
-        },
-        {
-          "capability_name": "approval_workflow",
-          "display_name": "Approval Workflow",
-          "description": "Supports review and approval before publishing knowledge assets.",
-          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
-          "required": true
-        },
-        {
-          "capability_name": "knowledge_discovery",
-          "display_name": "Knowledge Discovery",
-          "description": "Allows users and agents to find reusable knowledge assets.",
-          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
-          "required": true
-        },
-        {
-          "capability_name": "knowledge_sharing",
-          "display_name": "Knowledge Sharing",
-          "description": "Allows approved sharing of knowledge assets across users, teams or domains.",
-          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
-          "required": true
-        },
-        {
-          "capability_name": "knowledge_entitlements",
-          "display_name": "Knowledge Entitlements",
-          "description": "Controls who can access, publish, edit or use knowledge assets.",
-          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
-          "required": true
-        },
-        {
-          "capability_name": "knowledge_search",
-          "display_name": "Knowledge Search",
-          "description": "Searches reusable knowledge assets.",
-          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
-          "required": true
-        },
-        {
-          "capability_name": "playbook_repository",
-          "display_name": "Playbook Repository",
-          "description": "Stores reusable operational playbooks for assistants, agents and teams.",
-          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
-          "required": true
-        },
-        {
-          "capability_name": "policy_repository",
-          "display_name": "Policy Repository",
-          "description": "Stores reusable policy documents and AI-use guidance.",
-          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
-          "required": true
-        }
-      ],
-      "tags": [
-        "knowledge",
-        "prompts",
-        "resources",
-        "skills",
-        "agentic"
-      ]
-    },
-    {
-      "product_name": "modeling",
-      "display_name": "Data Model Repository",
-      "domain": "knowledge",
-      "description": "Repository and management function for conceptual, logical, physical, canonical and subject-based data models.",
-      "reference_implementations": [
-        {
-          "name": "M&A Operating System Data Design Authority",
-          "vendor": "M&A Operating System",
-          "implementation_type": "commercial",
-          "deployment_models": [
-            "saas",
-            "managed_cloud"
-          ],
-          "url": "https://www.maoperatingsystem.com/dda",
-          "notes": "Data model management and data design authority."
-        },
-        {
-          "name": "erwin Data Modeler",
-          "vendor": "Quest",
-          "implementation_type": "commercial",
-          "deployment_models": [
-            "desktop",
-            "managed_cloud"
-          ],
-          "url": "https://www.quest.com/products/erwin-data-modeler/",
-          "notes": "Enterprise data modeling tool."
-        },
-        {
-          "name": "SAP PowerDesigner",
-          "vendor": "SAP",
-          "implementation_type": "commercial",
-          "deployment_models": [
-            "desktop",
-            "on_prem"
-          ],
-          "url": "https://www.sap.com",
-          "notes": "Enterprise modeling and architecture tool."
-        },
-        {
-          "name": "Hackolade",
-          "vendor": "Hackolade",
-          "implementation_type": "commercial",
-          "deployment_models": [
-            "desktop",
-            "managed_cloud"
-          ],
-          "url": "https://hackolade.com",
-          "notes": "Data modeling platform with support for modern data stores."
-        },
-        {
-          "name": "dbdiagram",
-          "vendor": "Holistics",
-          "implementation_type": "commercial",
-          "deployment_models": [
-            "saas"
-          ],
-          "url": "https://dbdiagram.io",
-          "notes": "Database diagram and DBML modeling tool."
-        }
-      ],
-      "capabilities": [
-        {
-          "capability_name": "logical_model_repository",
-          "display_name": "Logical Model Repository",
-          "description": "Stores and manages logical data models.",
-          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
-          "required": true
-        },
-        {
-          "capability_name": "subject_model_repository",
-          "display_name": "Subject Model Repository",
-          "description": "Stores subject-based data models.",
-          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
-          "required": true
-        },
-        {
-          "capability_name": "canonical_model_repository",
-          "display_name": "Canonical Model Repository",
-          "description": "Stores canonical data model definitions.",
-          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
-          "required": true
-        },
-        {
-          "capability_name": "physical_model_repository",
-          "display_name": "Physical Model Repository",
-          "description": "Stores physical schemas and database structures.",
-          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
-          "required": true
-        },
-        {
-          "capability_name": "data_contract_repository",
-          "display_name": "Data Contract Repository",
-          "description": "Stores data contracts between producers and consumers.",
-          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
-          "required": true
-        },
-        {
-          "capability_name": "schema_versioning",
-          "display_name": "Schema Versioning",
-          "description": "Versions schemas, models and contracts.",
-          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
-          "required": true
-        },
-        {
-          "capability_name": "model_discovery",
-          "display_name": "Model Discovery",
-          "description": "Allows users and agents to discover available models.",
-          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
-          "required": true
-        },
-        {
-          "capability_name": "model_governance",
-          "display_name": "Model Governance",
-          "description": "Controls approvals, lifecycle and stewardship of models.",
-          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
-          "required": true
-        }
-      ],
-      "tags": [
-        "data_model",
-        "modeling",
-        "dda",
-        "context"
-      ]
-    },
-    {
-      "product_name": "retrieval",
-      "display_name": "Knowledge Retrieval",
-      "domain": "knowledge",
-      "description": "Search and retrieval layer that allows assistants and agents to access approved enterprise knowledge and data context.",
-      "reference_implementations": [
-        {
-          "name": "Azure AI Search",
-          "vendor": "Microsoft",
-          "implementation_type": "cloud_service",
-          "deployment_models": [
-            "managed_cloud",
-            "api"
-          ],
-          "url": "https://azure.microsoft.com/products/ai-services/ai-search",
-          "notes": "Managed enterprise search service with vector and hybrid retrieval."
-        },
-        {
-          "name": "OpenSearch",
-          "vendor": "OpenSearch Project",
-          "implementation_type": "open_source",
-          "deployment_models": [
-            "self_hosted",
-            "managed_cloud"
-          ],
-          "url": "https://opensearch.org",
-          "notes": "Open source search and analytics engine."
-        },
-        {
-          "name": "Elasticsearch",
-          "vendor": "Elastic",
-          "implementation_type": "commercial",
-          "deployment_models": [
-            "saas",
-            "self_hosted",
-            "managed_cloud"
-          ],
-          "url": "https://www.elastic.co/elasticsearch",
-          "notes": "Search and vector search platform."
-        },
-        {
-          "name": "Weaviate",
-          "vendor": "Weaviate",
-          "implementation_type": "open_source",
-          "deployment_models": [
-            "saas",
-            "self_hosted"
-          ],
-          "url": "https://weaviate.io",
-          "notes": "Vector database and semantic search platform."
-        },
-        {
-          "name": "Qdrant",
-          "vendor": "Qdrant",
-          "implementation_type": "open_source",
-          "deployment_models": [
-            "saas",
-            "self_hosted"
-          ],
-          "url": "https://qdrant.tech",
-          "notes": "Vector database and similarity search engine."
-        },
-        {
-          "name": "Pinecone",
-          "vendor": "Pinecone",
-          "implementation_type": "commercial",
-          "deployment_models": [
-            "saas"
-          ],
-          "url": "https://www.pinecone.io",
-          "notes": "Managed vector database."
-        }
-      ],
-      "capabilities": [
-        {
-          "capability_name": "semantic_search",
-          "display_name": "Semantic Search",
-          "description": "Finds relevant content using meaning-based search.",
-          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
-          "required": true
-        },
-        {
-          "capability_name": "hybrid_search",
-          "display_name": "Hybrid Search",
-          "description": "Combines keyword and semantic search.",
-          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
-          "required": true
-        },
-        {
-          "capability_name": "metadata_filtering",
-          "display_name": "Metadata Filtering",
-          "description": "Filters retrieval results using metadata.",
-          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
-          "required": true
-        },
-        {
-          "capability_name": "permission_aware_retrieval",
-          "display_name": "Permission-Aware Retrieval",
-          "description": "Restricts retrieval to authorized content.",
-          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
-          "required": true
-        },
-        {
-          "capability_name": "lineage_aware_retrieval",
-          "display_name": "Lineage-Aware Retrieval",
-          "description": "Uses lineage context to improve retrieval quality.",
-          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
-          "required": true
-        },
-        {
-          "capability_name": "quality_signal_filtering",
-          "display_name": "Quality Signal Filtering",
-          "description": "Filters retrieval results based on quality and trust signals.",
-          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
-          "required": true
-        },
-        {
-          "capability_name": "citation_generation",
-          "display_name": "Citation Generation",
-          "description": "Returns source references with retrieved content.",
-          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
-          "required": true
-        },
-        {
-          "capability_name": "ranking",
-          "display_name": "Ranking",
-          "description": "Ranks retrieved content for relevance and trust.",
-          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
-          "required": true
-        }
-      ],
-      "tags": [
-        "retrieval",
-        "rag",
-        "search",
-        "vector",
-        "knowledge"
-      ]
-    },
-    {
-      "product_name": "semantic",
-      "display_name": "Semantic Analytics",
-      "domain": "knowledge",
-      "description": "Governed business-level semantic layer for metrics, dimensions, entities and analytical queries.",
-      "reference_implementations": [
-        {
-          "name": "dbt Semantic Layer",
-          "vendor": "dbt Labs",
-          "implementation_type": "commercial",
-          "deployment_models": [
-            "saas",
-            "managed_cloud"
-          ],
-          "url": "https://www.getdbt.com/product/semantic-layer",
-          "notes": "Semantic layer for metrics and governed analytics."
-        },
-        {
-          "name": "MetricFlow",
-          "vendor": "dbt Labs",
-          "implementation_type": "open_source",
-          "deployment_models": [
-            "self_hosted"
-          ],
-          "url": "https://github.com/dbt-labs/metricflow",
-          "notes": "Open source semantic layer and metric query engine."
-        },
-        {
-          "name": "Cube",
-          "vendor": "Cube Dev",
-          "implementation_type": "open_source",
-          "deployment_models": [
-            "saas",
-            "self_hosted"
-          ],
-          "url": "https://cube.dev",
-          "notes": "Semantic layer and analytics API platform."
-        },
-        {
-          "name": "Malloy",
-          "vendor": "Malloy",
-          "implementation_type": "open_source",
-          "deployment_models": [
-            "self_hosted"
-          ],
-          "url": "https://www.malloydata.dev",
-          "notes": "Semantic data modeling and query language."
-        },
-        {
-          "name": "Looker Semantic Model",
-          "vendor": "Google",
-          "implementation_type": "commercial",
-          "deployment_models": [
-            "saas",
-            "managed_cloud"
-          ],
-          "url": "https://cloud.google.com/looker",
-          "notes": "BI semantic modeling layer."
-        }
-      ],
-      "capabilities": [
-        {
-          "capability_name": "metric_layer",
-          "display_name": "Metric Layer",
-          "description": "Defines and serves governed metrics.",
-          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
-          "required": true
-        },
-        {
-          "capability_name": "dimension_modeling",
-          "display_name": "Dimension Modeling",
-          "description": "Defines reusable analytical dimensions.",
-          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
-          "required": true
-        },
-        {
-          "capability_name": "semantic_query",
-          "display_name": "Semantic Query",
-          "description": "Allows querying through business semantics rather than physical schema.",
-          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
-          "required": true
-        },
-        {
-          "capability_name": "governed_text_to_sql",
-          "display_name": "Governed Text-to-SQL",
-          "description": "Constrains natural-language analytics through governed semantic context.",
-          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
-          "required": true
-        },
-        {
-          "capability_name": "analytics_api",
-          "display_name": "Analytics API",
-          "description": "Provides API access to governed analytics.",
-          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
-          "required": true
-        },
-        {
-          "capability_name": "metric_management",
-          "display_name": "Metric Management",
-          "description": "Manages lifecycle, definitions and ownership of metrics.",
-          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
-          "required": true
-        }
-      ],
-      "tags": [
-        "semantic",
-        "analytics",
-        "metrics",
-        "governed"
-      ]
-    },
-    {
       "product_name": "costing",
       "display_name": "AI Cost Management",
       "domain": "operations",
@@ -4672,6 +3528,1429 @@
         "pipeline",
         "data",
         "operations"
+      ]
+    },
+    {
+      "product_name": "analytics",
+      "display_name": "Analytics",
+      "domain": "knowledge",
+      "description": "Provides governed analytical access, query generation, KPI analysis and AI-enabled insights over enterprise data.",
+      "reference_implementations": [
+        {
+          "name": "ThoughtSpot",
+          "vendor": "ThoughtSpot",
+          "implementation_type": "commercial",
+          "deployment_models": [
+            "saas"
+          ],
+          "url": "https://www.thoughtspot.com",
+          "notes": "AI-enabled analytics and search-driven BI platform."
+        },
+        {
+          "name": "Power BI",
+          "vendor": "Microsoft",
+          "implementation_type": "commercial",
+          "deployment_models": [
+            "saas",
+            "managed_cloud"
+          ],
+          "url": "https://powerbi.microsoft.com",
+          "notes": "Business intelligence and analytics platform."
+        },
+        {
+          "name": "Tableau",
+          "vendor": "Salesforce",
+          "implementation_type": "commercial",
+          "deployment_models": [
+            "saas",
+            "managed_cloud"
+          ],
+          "url": "https://www.tableau.com",
+          "notes": "Analytics and visualization platform."
+        },
+        {
+          "name": "Sigma",
+          "vendor": "Sigma",
+          "implementation_type": "commercial",
+          "deployment_models": [
+            "saas"
+          ],
+          "url": "https://www.sigmacomputing.com",
+          "notes": "Cloud analytics and BI platform."
+        },
+        {
+          "name": "Cube",
+          "vendor": "Cube Dev",
+          "implementation_type": "open_source",
+          "deployment_models": [
+            "self_hosted",
+            "saas"
+          ],
+          "url": "https://cube.dev",
+          "notes": "Semantic layer and analytics API."
+        }
+      ],
+      "capabilities": [
+        {
+          "capability_name": "analytics_generation",
+          "display_name": "Analytics Generation",
+          "description": "Generates analytical results from user intent.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "governed_query",
+          "display_name": "Governed Query",
+          "description": "Runs queries through governed models or semantic layers.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "kpi_analysis",
+          "display_name": "KPI Analysis",
+          "description": "Analyzes KPIs and metric trends.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "drilldown",
+          "display_name": "Drilldown",
+          "description": "Drills into supporting data and dimensions.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "explanation_generation",
+          "display_name": "Explanation Generation",
+          "description": "Generates explanations of analytical results.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "decision_support",
+          "display_name": "Decision Support",
+          "description": "Supports business decisions using governed analytics.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        }
+      ],
+      "tags": [
+        "analytics",
+        "bi",
+        "semantic",
+        "data"
+      ]
+    },
+    {
+      "product_name": "catalog",
+      "display_name": "Data Catalog",
+      "domain": "knowledge",
+      "description": "Discovers, documents, organizes and governs enterprise data assets, metadata, ownership, lineage, quality signals and usage context.",
+      "reference_implementations": [
+        {
+          "name": "Alation Data Catalog",
+          "vendor": "Alation",
+          "implementation_type": "commercial",
+          "deployment_models": [
+            "saas",
+            "managed_cloud"
+          ],
+          "url": "https://www.alation.com",
+          "notes": "Enterprise data catalog and governance platform."
+        },
+        {
+          "name": "Atlan",
+          "vendor": "Atlan",
+          "implementation_type": "commercial",
+          "deployment_models": [
+            "saas",
+            "managed_cloud"
+          ],
+          "url": "https://atlan.com",
+          "notes": "Active metadata and data catalog platform with Context Agents, Context Engineering Studio, and MCP server for AI-native catalog access."
+        },
+        {
+          "name": "Collibra",
+          "vendor": "Collibra",
+          "implementation_type": "commercial",
+          "deployment_models": [
+            "saas",
+            "managed_cloud"
+          ],
+          "url": "https://www.collibra.com",
+          "notes": "Enterprise data catalog and governance platform."
+        },
+        {
+          "name": "DataHub",
+          "vendor": "DataHub",
+          "implementation_type": "open_source",
+          "deployment_models": [
+            "self_hosted",
+            "managed_cloud"
+          ],
+          "url": "https://datahub.com",
+          "notes": "Open source metadata and data catalog platform with MCP support."
+        },
+        {
+          "name": "Microsoft Purview",
+          "vendor": "Microsoft",
+          "implementation_type": "commercial",
+          "deployment_models": [
+            "saas",
+            "managed_cloud"
+          ],
+          "url": "https://www.microsoft.com/security/business/microsoft-purview",
+          "notes": "Data governance, catalog, lineage and compliance platform."
+        },
+        {
+          "name": "OpenMetadata",
+          "vendor": "OpenMetadata",
+          "implementation_type": "open_source",
+          "deployment_models": [
+            "self_hosted",
+            "managed_cloud"
+          ],
+          "url": "https://open-metadata.org",
+          "notes": "Open source metadata, catalog and data governance platform with embedded MCP server (v1.8) and fine-grained RBAC for agent access."
+        },
+        {
+          "name": "Google Cloud Knowledge Catalog",
+          "vendor": "Google",
+          "implementation_type": "cloud_service",
+          "deployment_models": [
+            "managed_cloud",
+            "saas"
+          ],
+          "url": "https://cloud.google.com/dataplex",
+          "notes": "Universal context engine for AI agents; aggregates metadata across Google Cloud services and enterprise SaaS, with multimodal enrichment via Gemini, data products, and agentic search (GA April 2026)."
+        },
+        {
+          "name": "Atlan MCP Server",
+          "vendor": "Atlan",
+          "implementation_type": "mcp_server",
+          "deployment_models": [
+            "saas",
+            "managed_cloud"
+          ],
+          "url": "https://atlan.com/",
+          "notes": "MCP server delivering unified catalog context to Claude, Copilot, Cursor, Gemini, Glean and other AI consumers."
+        },
+        {
+          "name": "OpenMetadata MCP Server",
+          "vendor": "OpenMetadata",
+          "implementation_type": "mcp_server",
+          "deployment_models": [
+            "self_hosted",
+            "managed_cloud"
+          ],
+          "url": "https://open-metadata.org/",
+          "notes": "First enterprise-grade embedded MCP server for metadata; supports entity search, lineage traversal, glossary term creation and metadata updates with RBAC."
+        }
+      ],
+      "capabilities": [
+        {
+          "capability_name": "asset_discovery",
+          "display_name": "Asset Discovery",
+          "description": "Discovers enterprise data assets across systems.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "catalog_search",
+          "display_name": "Catalog Search",
+          "description": "Searches data assets, metadata and definitions.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "data_asset_catalog",
+          "display_name": "Data Asset Catalog",
+          "description": "Catalogs datasets, tables, files, reports, metrics and other data assets.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "data_certification",
+          "display_name": "Data Certification",
+          "description": "Marks data assets as certified, trusted or fit for use.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "data_lineage",
+          "display_name": "Data Lineage",
+          "description": "Captures lineage between sources, transformations and consumers.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "data_ownership",
+          "display_name": "Data Ownership",
+          "description": "Documents owners, stewards and accountable teams for data assets.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "data_usage_tracking",
+          "display_name": "Data Usage Tracking",
+          "description": "Tracks how data assets are used by users, systems and agents.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "metadata_management",
+          "display_name": "Metadata Management",
+          "description": "Manages technical and business metadata.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "ai_context_generation",
+          "display_name": "AI Context Generation",
+          "description": "Automatically generates business context for catalog assets including table descriptions, preferred joins, filters, metrics and ontologies using AI agents.",
+          "regulated_relevance": "Reduces manual stewardship burden in regulated environments where complete, accurate metadata is required for AI agent grounding and audit.",
+          "required": false
+        },
+        {
+          "capability_name": "context_lifecycle_management",
+          "display_name": "Context Lifecycle Management",
+          "description": "Manages business context through a software-style build, test, review, approve, deploy and learn lifecycle, treating business knowledge as a governed software artifact.",
+          "regulated_relevance": "Applies change-control disciplines to business context, supporting regulated-industry requirements for traceable, approved knowledge updates.",
+          "required": false
+        },
+        {
+          "capability_name": "mcp_metadata_server",
+          "display_name": "MCP Metadata Server",
+          "description": "Exposes catalog metadata to AI agents and tools via the Model Context Protocol, enabling entity search, lineage traversal, glossary management and metadata updates with governed RBAC.",
+          "regulated_relevance": "Provides a governed, auditable interface for agents to consume enterprise metadata, enforcing access controls consistent with regulated-industry data governance requirements.",
+          "required": false
+        },
+        {
+          "capability_name": "data_product_catalog",
+          "display_name": "Data Product Catalog",
+          "description": "Catalogs self-contained data products with declared intent, SLAs and governance constraints, enabling governed discovery and consumption by humans and agents.",
+          "regulated_relevance": "Formalizes data accountability and fitness-for-purpose constraints critical in regulated industries with strict data stewardship obligations.",
+          "required": false
+        },
+        {
+          "capability_name": "multimodal_metadata_extraction",
+          "display_name": "Multimodal Metadata Extraction",
+          "description": "Extracts entities, relationships and business metadata from unstructured and heterogeneous content including documents, images and files using AI models.",
+          "regulated_relevance": "Enables automated cataloging of unstructured content subject to retention, classification and data governance controls in regulated environments.",
+          "required": false
+        }
+      ],
+      "tags": [
+        "catalog",
+        "data",
+        "governance",
+        "knowledge",
+        "metadata",
+        "mcp"
+      ]
+    },
+    {
+      "product_name": "context",
+      "display_name": "Data Context",
+      "domain": "knowledge",
+      "description": "Provides structured business and technical context so AI systems understand enterprise data meaning, provenance, usage, ownership and constraints.",
+      "reference_implementations": [
+        {
+          "name": "M&A Operating System Data Design Authority",
+          "vendor": "M&A Operating System",
+          "implementation_type": "commercial",
+          "deployment_models": [
+            "saas",
+            "managed_cloud"
+          ],
+          "url": "https://www.maoperatingsystem.com/dda",
+          "notes": "Data Design Authority for managing data context and data model repositories."
+        },
+        {
+          "name": "DataHub MCP Server",
+          "vendor": "DataHub",
+          "implementation_type": "open_source",
+          "deployment_models": [
+            "self_hosted",
+            "managed_cloud"
+          ],
+          "url": "https://datahub.com/resources/datahub-mcp-server-overview/",
+          "notes": "MCP server exposing enterprise data context to agents."
+        },
+        {
+          "name": "OpenMetadata",
+          "vendor": "OpenMetadata",
+          "implementation_type": "open_source",
+          "deployment_models": [
+            "self_hosted"
+          ],
+          "url": "https://open-metadata.org",
+          "notes": "Metadata, governance and data context platform."
+        },
+        {
+          "name": "Google Cloud Knowledge Catalog",
+          "vendor": "Google",
+          "implementation_type": "cloud_service",
+          "deployment_models": [
+            "managed_cloud",
+            "saas"
+          ],
+          "url": "https://cloud.google.com/dataplex",
+          "notes": "Context federation engine aggregating metadata from Google Cloud services and enterprise SaaS platforms (SAP, Salesforce, ServiceNow, Workday, Palantir) into a unified context layer for AI agents (Preview)."
+        },
+        {
+          "name": "Informatica IDMC",
+          "vendor": "Informatica",
+          "implementation_type": "commercial",
+          "deployment_models": [
+            "saas",
+            "managed_cloud"
+          ],
+          "url": "https://www.informatica.com/",
+          "notes": "Intelligent Data Management Cloud; Spring 2026 release focused on agentic data activation with trusted context APIs ensuring agents have complete, consistent and correct enterprise data context."
+        }
+      ],
+      "capabilities": [
+        {
+          "capability_name": "metadata_access",
+          "display_name": "Metadata Access",
+          "description": "Provides structured access to metadata for humans, assistants and agents.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "quality_signal_access",
+          "display_name": "Quality Signal Access",
+          "description": "Exposes data quality signals to users and agents.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "lineage_access",
+          "display_name": "Lineage Access",
+          "description": "Provides lineage context for data assets and transformations.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "trust_signal_access",
+          "display_name": "Trust Signal Access",
+          "description": "Exposes trust, certification or fitness-for-use signals.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "definition_resolution",
+          "display_name": "Definition Resolution",
+          "description": "Resolves data elements to business definitions and context.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "context_api",
+          "display_name": "Context API",
+          "description": "Provides API access to enterprise data context.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "context_federation",
+          "display_name": "Context Federation",
+          "description": "Aggregates and resolves metadata context from heterogeneous enterprise systems — including ERP, CRM and SaaS platforms — into a unified context engine accessible by AI agents.",
+          "regulated_relevance": "Ensures agents in regulated industries operate on authoritative, cross-system context rather than siloed or stale metadata, reducing the risk of incorrect outputs from incomplete grounding.",
+          "required": false
+        },
+        {
+          "capability_name": "agent_context_governance",
+          "display_name": "Agent Context Governance",
+          "description": "Enforces runtime governance over what context AI agents can access, scoped by identity, role and request origin, using attribute-based access controls.",
+          "regulated_relevance": "Critical in regulated industries for ensuring agents cannot access sensitive or restricted context beyond their permitted scope, with audit trails for compliance review.",
+          "required": false
+        }
+      ],
+      "tags": [
+        "context",
+        "metadata",
+        "mcp",
+        "data",
+        "ai_ready",
+        "agentic"
+      ]
+    },
+    {
+      "product_name": "decisioning",
+      "display_name": "AI Decisioning",
+      "domain": "knowledge",
+      "description": "Defines, manages and visualizes enterprise decision logic as structured, deterministic decision trees and semantic decision definitions, enabling consistent, auditable, human-readable decision outcomes for business rules, policy and agentic workflows.",
+      "reference_implementations": [
+        {
+          "name": "Draw Decision Tree",
+          "vendor": "Draw Decision Tree",
+          "implementation_type": "commercial",
+          "deployment_models": [
+            "saas"
+          ],
+          "url": "https://www.drawdecisiontree.com",
+          "notes": "Visual decision tree authoring and management platform for building semantic decision definitions and deterministic decision outcomes."
+        }
+      ],
+      "capabilities": [
+        {
+          "capability_name": "semantic_decision_definition",
+          "display_name": "Semantic Decision Definition",
+          "description": "Defines decision logic using structured, human-readable semantic definitions that capture intent, conditions and outcomes.",
+          "regulated_relevance": "Supports explainable, auditable decision-making required in regulated environments.",
+          "required": true
+        },
+        {
+          "capability_name": "deterministic_decision_outcomes",
+          "display_name": "Deterministic Decision Outcomes",
+          "description": "Evaluates decision trees to produce consistent, repeatable outcomes given the same inputs, eliminating non-deterministic AI inference for governed decisions.",
+          "regulated_relevance": "Critical for regulated industries requiring consistent, defensible and reproducible decision outputs.",
+          "required": true
+        },
+        {
+          "capability_name": "decision_tree_visualization",
+          "display_name": "Decision Tree Visualization",
+          "description": "Renders decision trees as interactive visual diagrams for authoring, review, testing and communication to business stakeholders.",
+          "regulated_relevance": "Supports human review and sign-off of decision logic in regulated change processes.",
+          "required": true
+        },
+        {
+          "capability_name": "decision_versioning",
+          "display_name": "Decision Versioning",
+          "description": "Tracks versions of decision trees and definitions to support change management and audit.",
+          "regulated_relevance": "Required for regulated audit trails and change governance.",
+          "required": true
+        },
+        {
+          "capability_name": "decision_testing",
+          "display_name": "Decision Testing",
+          "description": "Tests decision trees against expected inputs and outcomes to validate logic before deployment.",
+          "regulated_relevance": "Supports pre-production validation of business rules and policies.",
+          "required": false
+        },
+        {
+          "capability_name": "decision_publishing",
+          "display_name": "Decision Publishing",
+          "description": "Publishes approved decision definitions for consumption by applications, agents and agentic workflows.",
+          "regulated_relevance": "Enables governed, controlled release of decision logic.",
+          "required": false
+        }
+      ],
+      "tags": [
+        "decisioning",
+        "knowledge",
+        "deterministic",
+        "agentic",
+        "regulated"
+      ]
+    },
+    {
+      "product_name": "definition",
+      "display_name": "Data Definition",
+      "domain": "knowledge",
+      "description": "Manages business definitions, data definitions, metric definitions, logical models, semantic meaning and data context for human and agentic consumers.",
+      "reference_implementations": [
+        {
+          "name": "M&A Operating System Data Design Authority",
+          "vendor": "M&A Operating System",
+          "implementation_type": "commercial",
+          "deployment_models": [
+            "saas",
+            "managed_cloud"
+          ],
+          "url": "https://www.maoperatingsystem.com/dda",
+          "notes": "Data Design Authority for data model management, data context and governed data definitions."
+        },
+        {
+          "name": "DataHub",
+          "vendor": "DataHub",
+          "implementation_type": "open_source",
+          "deployment_models": [
+            "self_hosted",
+            "managed_cloud"
+          ],
+          "url": "https://datahub.com",
+          "notes": "Metadata platform that exposes data context including lineage, ownership, business definitions, quality signals and usage patterns."
+        },
+        {
+          "name": "OpenMetadata",
+          "vendor": "OpenMetadata",
+          "implementation_type": "open_source",
+          "deployment_models": [
+            "self_hosted",
+            "managed_cloud"
+          ],
+          "url": "https://open-metadata.org",
+          "notes": "Open source metadata, catalog and data collaboration platform."
+        },
+        {
+          "name": "Collibra",
+          "vendor": "Collibra",
+          "implementation_type": "commercial",
+          "deployment_models": [
+            "saas",
+            "managed_cloud"
+          ],
+          "url": "https://www.collibra.com",
+          "notes": "Enterprise data governance and catalog platform."
+        },
+        {
+          "name": "Atlan",
+          "vendor": "Atlan",
+          "implementation_type": "commercial",
+          "deployment_models": [
+            "saas",
+            "managed_cloud"
+          ],
+          "url": "https://atlan.com",
+          "notes": "Active metadata and data catalog platform."
+        },
+        {
+          "name": "dbt Semantic Layer",
+          "vendor": "dbt Labs",
+          "implementation_type": "commercial",
+          "deployment_models": [
+            "saas",
+            "managed_cloud"
+          ],
+          "url": "https://www.getdbt.com/product/semantic-layer",
+          "notes": "Semantic metric and business definition layer."
+        },
+        {
+          "name": "Databricks Unity Catalog Business Semantics",
+          "vendor": "Databricks",
+          "implementation_type": "commercial",
+          "deployment_models": [
+            "saas",
+            "managed_cloud"
+          ],
+          "url": "https://www.databricks.com/product/unity-catalog",
+          "notes": "GA 2026. Governs metric definitions (Metric Views) at the data platform layer with lineage, access controls and semantic metadata; up to 10x query performance. Core implementation open-sourced in Apache Spark."
+        },
+        {
+          "name": "Boomi Meta Hub",
+          "vendor": "Boomi",
+          "implementation_type": "commercial",
+          "deployment_models": [
+            "saas",
+            "managed_cloud"
+          ],
+          "url": "https://boomi.com/platform/metahub/",
+          "notes": "Master data and business definition hub for enterprise integration and data management."
+        }
+      ],
+      "capabilities": [
+        {
+          "capability_name": "business_glossary",
+          "display_name": "Business Glossary",
+          "description": "Defines business terms and meanings.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "data_dictionary",
+          "display_name": "Data Dictionary",
+          "description": "Documents fields, structures and data elements.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "metric_definition",
+          "display_name": "Metric Definition",
+          "description": "Defines KPIs, metrics, calculations and business rules.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "semantic_definition",
+          "display_name": "Semantic Definition",
+          "description": "Defines semantic meaning for metrics, dimensions, entities and relationships.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "entity_definition",
+          "display_name": "Entity Definition",
+          "description": "Defines enterprise business entities.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "relationship_definition",
+          "display_name": "Relationship Definition",
+          "description": "Defines relationships between entities or data concepts.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "ownership_metadata",
+          "display_name": "Ownership Metadata",
+          "description": "Documents owners, stewards and accountable teams.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "usage_context",
+          "display_name": "Usage Context",
+          "description": "Captures how data assets are used and interpreted.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "lineage_context",
+          "display_name": "Lineage Context",
+          "description": "Provides lineage context for data definitions and transformations.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "governed_metric_definition",
+          "display_name": "Governed Metric Definition",
+          "description": "Defines and enforces metric definitions at the data platform layer with lineage, access controls, semantic metadata and performance optimisation, making KPIs reusable across dashboards, notebooks and AI agents.",
+          "regulated_relevance": "Ensures consistent, auditable KPI definitions governed by the same access controls and lineage as the underlying data — critical for regulated-industry reporting and model governance.",
+          "required": false
+        },
+        {
+          "capability_name": "ontology_management",
+          "display_name": "Ontology Management",
+          "description": "Manages the governed lifecycle of shared business ontologies including versioning, review, approval and change control.",
+          "regulated_relevance": "Provides a controlled framework for evolving shared business vocabularies in regulated environments where definitional changes must be traceable and approved.",
+          "required": false
+        }
+      ],
+      "tags": [
+        "definition",
+        "data_context",
+        "glossary",
+        "semantic",
+        "regulated"
+      ]
+    },
+    {
+      "product_name": "knowledge",
+      "display_name": "AI Knowledge Repository",
+      "domain": "knowledge",
+      "description": "Repository and management layer for reusable AI knowledge assets including resources, prompts, skills, agent definitions, instructions, templates, playbooks and enterprise context.",
+      "reference_implementations": [
+        {
+          "name": "TrustBolt AI Adoption and Governance Platform",
+          "vendor": "TrustBolt",
+          "implementation_type": "commercial",
+          "deployment_models": [
+            "saas",
+            "private_cloud",
+            "api"
+          ],
+          "url": "https://www.trustbolt.ai",
+          "notes": "Platform capabilities relevant to reusable AI knowledge, prompts, team assets and governed AI adoption."
+        },
+        {
+          "name": "GitHub",
+          "vendor": "GitHub",
+          "implementation_type": "commercial",
+          "deployment_models": [
+            "saas",
+            "managed_cloud"
+          ],
+          "url": "https://github.com",
+          "notes": "Repository platform often used to manage prompts, specifications, skills and agent definitions as code."
+        },
+        {
+          "name": "Confluence",
+          "vendor": "Atlassian",
+          "implementation_type": "commercial",
+          "deployment_models": [
+            "saas",
+            "managed_cloud"
+          ],
+          "url": "https://www.atlassian.com/software/confluence",
+          "notes": "Enterprise knowledge and documentation platform."
+        },
+        {
+          "name": "DataHub",
+          "vendor": "DataHub",
+          "implementation_type": "open_source",
+          "deployment_models": [
+            "self_hosted",
+            "managed_cloud"
+          ],
+          "url": "https://datahub.com",
+          "notes": "Metadata and data context platform with MCP server support."
+        },
+        {
+          "name": "OpenMetadata",
+          "vendor": "OpenMetadata",
+          "implementation_type": "open_source",
+          "deployment_models": [
+            "self_hosted",
+            "managed_cloud"
+          ],
+          "url": "https://open-metadata.org",
+          "notes": "Open source metadata and data catalog platform."
+        },
+        {
+          "name": "OpenAI GPT Knowledge",
+          "vendor": "OpenAI",
+          "implementation_type": "commercial",
+          "deployment_models": [
+            "saas"
+          ],
+          "url": "https://openai.com",
+          "notes": "Knowledge attachments for configured GPTs."
+        },
+        {
+          "name": "Claude Projects",
+          "vendor": "Anthropic",
+          "implementation_type": "commercial",
+          "deployment_models": [
+            "saas"
+          ],
+          "url": "https://claude.ai",
+          "notes": "Project knowledge and context organization."
+        },
+        {
+          "name": "Notion",
+          "vendor": "Notion",
+          "implementation_type": "commercial",
+          "deployment_models": [
+            "saas"
+          ],
+          "url": "https://www.notion.com",
+          "notes": "Workspace and knowledge repository often used for internal documentation and reusable knowledge assets."
+        },
+        {
+          "name": "SharePoint",
+          "vendor": "Microsoft",
+          "implementation_type": "commercial",
+          "deployment_models": [
+            "saas",
+            "managed_cloud"
+          ],
+          "url": "https://www.microsoft.com/microsoft-365/sharepoint/collaboration",
+          "notes": "Enterprise document and knowledge repository."
+        },
+        {
+          "name": "Amazon Bedrock Managed Knowledge Base",
+          "vendor": "AWS",
+          "implementation_type": "cloud_service",
+          "deployment_models": [
+            "managed_cloud",
+            "api"
+          ],
+          "url": "https://aws.amazon.com/bedrock/knowledge-bases/",
+          "notes": "Fully managed RAG pipeline with Agentic Retriever for multi-turn, multi-hop retrieval; native connectors to S3, SharePoint, Confluence, Google Drive, OneDrive and web; Smart Parsing for heterogeneous content; integrates with AgentCore Gateway for role-based permissions and observability."
+        }
+      ],
+      "capabilities": [
+        {
+          "capability_name": "resource_repository",
+          "display_name": "Resource Repository",
+          "description": "Stores reusable documents, resources and contextual assets for assistants and agents.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "prompt_repository",
+          "display_name": "Prompt Repository",
+          "description": "Stores reusable prompts and prompt templates.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "skill_repository",
+          "display_name": "Skill Repository",
+          "description": "Stores reusable skills, actions or tool-use definitions.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "agent_repository",
+          "display_name": "Agent Repository",
+          "description": "Stores reusable agent and assistant definitions.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "instruction_repository",
+          "display_name": "Instruction Repository",
+          "description": "Stores reusable instruction sets and system guidance.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "template_repository",
+          "display_name": "Template Repository",
+          "description": "Stores reusable templates for assistants, agents, prompts or workflows.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "version_management",
+          "display_name": "Version Management",
+          "description": "Versions knowledge assets, prompts, skills, instructions and definitions.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "approval_workflow",
+          "display_name": "Approval Workflow",
+          "description": "Supports review and approval before publishing knowledge assets.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "knowledge_discovery",
+          "display_name": "Knowledge Discovery",
+          "description": "Allows users and agents to find reusable knowledge assets.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "knowledge_sharing",
+          "display_name": "Knowledge Sharing",
+          "description": "Allows approved sharing of knowledge assets across users, teams or domains.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "knowledge_entitlements",
+          "display_name": "Knowledge Entitlements",
+          "description": "Controls who can access, publish, edit or use knowledge assets.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "knowledge_search",
+          "display_name": "Knowledge Search",
+          "description": "Searches reusable knowledge assets.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "playbook_repository",
+          "display_name": "Playbook Repository",
+          "description": "Stores reusable operational playbooks for assistants, agents and teams.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "policy_repository",
+          "display_name": "Policy Repository",
+          "description": "Stores reusable policy documents and AI-use guidance.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "managed_knowledge_infrastructure",
+          "display_name": "Managed Knowledge Infrastructure",
+          "description": "Provides fully managed, auto-scaling knowledge base infrastructure with native connectors to enterprise content sources, automated embedding and re-ranking, and permission-enforced agentic retrieval.",
+          "regulated_relevance": "Reduces operational burden of maintaining retrieval infrastructure in regulated environments while enforcing role-based access controls and providing observability for compliance audit.",
+          "required": false
+        }
+      ],
+      "tags": [
+        "knowledge",
+        "prompts",
+        "resources",
+        "skills",
+        "agentic"
+      ]
+    },
+    {
+      "product_name": "modeling",
+      "display_name": "Data Model Repository",
+      "domain": "knowledge",
+      "description": "Repository and management function for conceptual, logical, physical, canonical and subject-based data models.",
+      "reference_implementations": [
+        {
+          "name": "M&A Operating System Data Design Authority",
+          "vendor": "M&A Operating System",
+          "implementation_type": "commercial",
+          "deployment_models": [
+            "saas",
+            "managed_cloud"
+          ],
+          "url": "https://www.maoperatingsystem.com/dda",
+          "notes": "Data model management and data design authority."
+        },
+        {
+          "name": "erwin Data Modeler",
+          "vendor": "Quest",
+          "implementation_type": "commercial",
+          "deployment_models": [
+            "desktop",
+            "managed_cloud"
+          ],
+          "url": "https://www.quest.com/products/erwin-data-modeler/",
+          "notes": "Enterprise data modeling tool."
+        },
+        {
+          "name": "SAP PowerDesigner",
+          "vendor": "SAP",
+          "implementation_type": "commercial",
+          "deployment_models": [
+            "desktop",
+            "on_prem"
+          ],
+          "url": "https://www.sap.com",
+          "notes": "Enterprise modeling and architecture tool."
+        },
+        {
+          "name": "Hackolade",
+          "vendor": "Hackolade",
+          "implementation_type": "commercial",
+          "deployment_models": [
+            "desktop",
+            "managed_cloud"
+          ],
+          "url": "https://hackolade.com",
+          "notes": "Data modeling platform with support for modern data stores."
+        },
+        {
+          "name": "dbdiagram",
+          "vendor": "Holistics",
+          "implementation_type": "commercial",
+          "deployment_models": [
+            "saas"
+          ],
+          "url": "https://dbdiagram.io",
+          "notes": "Database diagram and DBML modeling tool."
+        }
+      ],
+      "capabilities": [
+        {
+          "capability_name": "logical_model_repository",
+          "display_name": "Logical Model Repository",
+          "description": "Stores and manages logical data models.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "subject_model_repository",
+          "display_name": "Subject Model Repository",
+          "description": "Stores subject-based data models.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "canonical_model_repository",
+          "display_name": "Canonical Model Repository",
+          "description": "Stores canonical data model definitions.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "physical_model_repository",
+          "display_name": "Physical Model Repository",
+          "description": "Stores physical schemas and database structures.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "data_contract_repository",
+          "display_name": "Data Contract Repository",
+          "description": "Stores data contracts between producers and consumers.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "schema_versioning",
+          "display_name": "Schema Versioning",
+          "description": "Versions schemas, models and contracts.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "model_discovery",
+          "display_name": "Model Discovery",
+          "description": "Allows users and agents to discover available models.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "model_governance",
+          "display_name": "Model Governance",
+          "description": "Controls approvals, lifecycle and stewardship of models.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        }
+      ],
+      "tags": [
+        "data_model",
+        "modeling",
+        "dda",
+        "context"
+      ]
+    },
+    {
+      "product_name": "retrieval",
+      "display_name": "Knowledge Retrieval",
+      "domain": "knowledge",
+      "description": "Search and retrieval layer that allows assistants and agents to access approved enterprise knowledge and data context.",
+      "reference_implementations": [
+        {
+          "name": "Azure AI Search",
+          "vendor": "Microsoft",
+          "implementation_type": "cloud_service",
+          "deployment_models": [
+            "managed_cloud",
+            "api"
+          ],
+          "url": "https://azure.microsoft.com/products/ai-services/ai-search",
+          "notes": "Managed enterprise search service with vector and hybrid retrieval."
+        },
+        {
+          "name": "OpenSearch",
+          "vendor": "OpenSearch Project",
+          "implementation_type": "open_source",
+          "deployment_models": [
+            "self_hosted",
+            "managed_cloud"
+          ],
+          "url": "https://opensearch.org",
+          "notes": "Open source search and analytics engine."
+        },
+        {
+          "name": "Elasticsearch",
+          "vendor": "Elastic",
+          "implementation_type": "commercial",
+          "deployment_models": [
+            "saas",
+            "self_hosted",
+            "managed_cloud"
+          ],
+          "url": "https://www.elastic.co/elasticsearch",
+          "notes": "Search and vector search platform."
+        },
+        {
+          "name": "Weaviate",
+          "vendor": "Weaviate",
+          "implementation_type": "open_source",
+          "deployment_models": [
+            "saas",
+            "self_hosted"
+          ],
+          "url": "https://weaviate.io",
+          "notes": "Vector database and semantic search platform."
+        },
+        {
+          "name": "Qdrant",
+          "vendor": "Qdrant",
+          "implementation_type": "open_source",
+          "deployment_models": [
+            "saas",
+            "self_hosted"
+          ],
+          "url": "https://qdrant.tech",
+          "notes": "Vector database and similarity search engine."
+        },
+        {
+          "name": "Pinecone",
+          "vendor": "Pinecone",
+          "implementation_type": "commercial",
+          "deployment_models": [
+            "saas"
+          ],
+          "url": "https://www.pinecone.io",
+          "notes": "Managed vector database."
+        },
+        {
+          "name": "Microsoft GraphRAG",
+          "vendor": "Microsoft",
+          "implementation_type": "open_source",
+          "deployment_models": [
+            "self_hosted",
+            "managed_cloud"
+          ],
+          "url": "https://github.com/microsoft/graphrag",
+          "notes": "Structured hierarchical RAG extracting community summaries from knowledge graphs; 34k+ GitHub stars; MIT licensed; production-ready as of June 2026."
+        },
+        {
+          "name": "Amazon Bedrock Managed Knowledge Base",
+          "vendor": "AWS",
+          "implementation_type": "cloud_service",
+          "deployment_models": [
+            "managed_cloud",
+            "api"
+          ],
+          "url": "https://aws.amazon.com/bedrock/knowledge-bases/",
+          "notes": "Fully managed agentic RAG pipeline with multi-turn, multi-hop Agentic Retriever; native connectors for S3, SharePoint, Confluence, Google Drive, OneDrive and web; Smart Parsing; integrates with AgentCore Gateway."
+        },
+        {
+          "name": "Neo4j GraphRAG",
+          "vendor": "Neo4j",
+          "implementation_type": "commercial",
+          "deployment_models": [
+            "saas",
+            "self_hosted",
+            "managed_cloud"
+          ],
+          "url": "https://neo4j.com/product/graphrag/",
+          "notes": "Native graph-based RAG with vector, fulltext and hybrid search combined with Cypher graph traversal; integrates with Microsoft Agent Framework."
+        },
+        {
+          "name": "Microsoft Foundry IQ",
+          "vendor": "Microsoft",
+          "implementation_type": "cloud_service",
+          "deployment_models": [
+            "managed_cloud",
+            "api"
+          ],
+          "url": "https://azure.microsoft.com/en-us/products/ai-search",
+          "notes": "Next-generation enterprise RAG (Azure AI Search, Nov 2025); centralized knowledge layer shared across multiple agent teams."
+        },
+        {
+          "name": "Daxe.ai",
+          "vendor": "Daxe",
+          "implementation_type": "commercial",
+          "deployment_models": [
+            "saas",
+            "managed_cloud"
+          ],
+          "url": "https://daxe.ai/",
+          "notes": "Enterprise AI for regulated industries (financial, legal, government) using GraphRAG with traceable, auditable retrieval."
+        }
+      ],
+      "capabilities": [
+        {
+          "capability_name": "semantic_search",
+          "display_name": "Semantic Search",
+          "description": "Finds relevant content using meaning-based search.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "hybrid_search",
+          "display_name": "Hybrid Search",
+          "description": "Combines keyword and semantic search.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "metadata_filtering",
+          "display_name": "Metadata Filtering",
+          "description": "Filters retrieval results using metadata.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "permission_aware_retrieval",
+          "display_name": "Permission-Aware Retrieval",
+          "description": "Restricts retrieval to authorized content.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "lineage_aware_retrieval",
+          "display_name": "Lineage-Aware Retrieval",
+          "description": "Uses lineage context to improve retrieval quality.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "quality_signal_filtering",
+          "display_name": "Quality Signal Filtering",
+          "description": "Filters retrieval results based on quality and trust signals.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "citation_generation",
+          "display_name": "Citation Generation",
+          "description": "Returns source references with retrieved content.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "ranking",
+          "display_name": "Ranking",
+          "description": "Ranks retrieved content for relevance and trust.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "knowledge_graph_retrieval",
+          "display_name": "Knowledge Graph Retrieval",
+          "description": "Traverses knowledge graphs to retrieve multi-hop relationships and hierarchical structures, addressing the limitations of flat vector search for complex entity relationships, compliance investigation and counterparty risk analysis.",
+          "regulated_relevance": "Particularly valuable in capital markets, lending and compliance contexts where multi-hop relationship traversal — counterparty networks, supply chains, regulatory hierarchies — is required for defensible, auditable outputs.",
+          "required": false
+        },
+        {
+          "capability_name": "agentic_retrieval",
+          "display_name": "Agentic Retrieval",
+          "description": "Executes multi-turn, multi-hop retrieval strategies where an agent iteratively decomposes complex queries, retrieves intermediate context and refines subsequent retrievals to answer questions that single-shot vector search cannot resolve.",
+          "regulated_relevance": "Enables agents in regulated industries to ground complex analytical or compliance queries in authoritative enterprise knowledge without relying on model memory, reducing hallucination risk for high-stakes outputs.",
+          "required": false
+        }
+      ],
+      "tags": [
+        "retrieval",
+        "rag",
+        "search",
+        "vector",
+        "knowledge",
+        "graph",
+        "agentic"
+      ]
+    },
+    {
+      "product_name": "semantic",
+      "display_name": "Semantic Analytics",
+      "domain": "knowledge",
+      "description": "Governed business-level semantic layer for metrics, dimensions, entities and analytical queries.",
+      "reference_implementations": [
+        {
+          "name": "dbt Semantic Layer",
+          "vendor": "dbt Labs",
+          "implementation_type": "commercial",
+          "deployment_models": [
+            "saas",
+            "managed_cloud"
+          ],
+          "url": "https://www.getdbt.com/product/semantic-layer",
+          "notes": "Semantic layer for metrics and governed analytics."
+        },
+        {
+          "name": "MetricFlow",
+          "vendor": "dbt Labs",
+          "implementation_type": "open_source",
+          "deployment_models": [
+            "self_hosted"
+          ],
+          "url": "https://github.com/dbt-labs/metricflow",
+          "notes": "Open source semantic layer and metric query engine."
+        },
+        {
+          "name": "Cube",
+          "vendor": "Cube Dev",
+          "implementation_type": "open_source",
+          "deployment_models": [
+            "saas",
+            "self_hosted"
+          ],
+          "url": "https://cube.dev",
+          "notes": "Semantic layer and analytics API platform."
+        },
+        {
+          "name": "Malloy",
+          "vendor": "Malloy",
+          "implementation_type": "open_source",
+          "deployment_models": [
+            "self_hosted"
+          ],
+          "url": "https://www.malloydata.dev",
+          "notes": "Semantic data modeling and query language."
+        },
+        {
+          "name": "Looker Semantic Model",
+          "vendor": "Google",
+          "implementation_type": "commercial",
+          "deployment_models": [
+            "saas",
+            "managed_cloud"
+          ],
+          "url": "https://cloud.google.com/looker",
+          "notes": "BI semantic modeling layer."
+        },
+        {
+          "name": "Databricks Unity Catalog Business Semantics",
+          "vendor": "Databricks",
+          "implementation_type": "commercial",
+          "deployment_models": [
+            "saas",
+            "managed_cloud"
+          ],
+          "url": "https://www.databricks.com/product/unity-catalog",
+          "notes": "Platform-layer semantic definitions (Metric Views) governed by Unity Catalog; core implementation open-sourced in Apache Spark; accessible via SQL and API; reusable by dashboards, notebooks and AI agents."
+        },
+        {
+          "name": "AtScale",
+          "vendor": "AtScale",
+          "implementation_type": "commercial",
+          "deployment_models": [
+            "saas",
+            "managed_cloud"
+          ],
+          "url": "https://www.atscale.com/",
+          "notes": "AI-driven semantic layer serving governed metric context to LLMs and AI agents; positioned as connective tissue between enterprise data and AI."
+        },
+        {
+          "name": "Omni Analytics",
+          "vendor": "Omni Analytics",
+          "implementation_type": "commercial",
+          "deployment_models": [
+            "saas"
+          ],
+          "url": "https://omni.co/",
+          "notes": "Semantic layer for both AI agents and BI tooling."
+        }
+      ],
+      "capabilities": [
+        {
+          "capability_name": "metric_layer",
+          "display_name": "Metric Layer",
+          "description": "Defines and serves governed metrics.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "dimension_modeling",
+          "display_name": "Dimension Modeling",
+          "description": "Defines reusable analytical dimensions.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "semantic_query",
+          "display_name": "Semantic Query",
+          "description": "Allows querying through business semantics rather than physical schema.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "governed_text_to_sql",
+          "display_name": "Governed Text-to-SQL",
+          "description": "Constrains natural-language analytics through governed semantic context.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "analytics_api",
+          "display_name": "Analytics API",
+          "description": "Provides API access to governed analytics.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "metric_management",
+          "display_name": "Metric Management",
+          "description": "Manages lifecycle, definitions and ownership of metrics.",
+          "regulated_relevance": "Supports controlled, governed, reusable enterprise AI adoption.",
+          "required": true
+        },
+        {
+          "capability_name": "open_semantic_standard",
+          "display_name": "Open Semantic Standard",
+          "description": "Provides open, portable semantic definitions not locked to a proprietary BI tool, enabling semantic governance at the data platform layer and reuse across any downstream consumer.",
+          "regulated_relevance": "Reduces vendor lock-in risk for regulated institutions and enables consistent metric definitions across regulatory reporting, internal analytics and AI agent consumption from a single governed source.",
+          "required": false
+        },
+        {
+          "capability_name": "agent_semantic_context",
+          "display_name": "Agent Semantic Context",
+          "description": "Serves governed metric definitions, dimension context and business semantics to AI agents at runtime, enabling agents to answer analytical questions using authoritative business definitions rather than inferred schema knowledge.",
+          "regulated_relevance": "Grounds agent-generated analysis in enterprise-approved metric definitions, reducing the risk of incorrect or inconsistent outputs in regulated-industry reporting and decision support scenarios.",
+          "required": false
+        }
+      ],
+      "tags": [
+        "semantic",
+        "analytics",
+        "metrics",
+        "governed",
+        "agentic"
       ]
     }
   ]
