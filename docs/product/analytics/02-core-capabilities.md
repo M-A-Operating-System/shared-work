@@ -44,17 +44,82 @@ The implementation must record who proposed, reviewed, approved, deprecated, and
 The governed path applies the same controls to conversational users, autonomous agents, and custom applications.
 
 ```mermaid
-flowchart LR
-    C["AI Consumers"] --> M["MCP Capability Layer"]
-    M -->|Natural language| I["Intent Resolution Agent"]
-    M -->|Structured request| R["Role-Aware Projection Layer"]
-    I --> R
-    R --> V["Semantic Validation Layer"]
-    V --> S["Semantic Controls Layer"]
-    S --> P["Physical Query Planner"]
-    P --> F["Federated Query Engine"]
-    F --> A["Presentation and Evidence"]
-    A --> M
+flowchart TD
+    subgraph Consumers["AI Consumers"]
+        direction LR
+        Chat["Conversational Assistant"]
+        Agents["Autonomous Agents and Data Mining"]
+        Apps["Custom Applications"]
+    end
+
+    subgraph Platform["Governed Analytics Platform"]
+        direction TB
+        MCP["MCP Capability Layer\nAuthentication, tools, and response contract"]
+        IRA["Intent Resolution Agent (IRA)\nCandidate retrieval, ranking, parameters, and purpose signal"]
+        RAPL["Role-Aware Projection Layer (RAPL)\nMetric, dimension, row, classification, and masking permissions"]
+        SVL["Semantic Validation Layer (SVL)\nApproved definition resolution and Logical Query Plan"]
+        SCL["Semantic Controls Layer (SCL)\nScale, complexity, classification, compliance, and concurrency"]
+        PQP["Physical Query Planner (PQP)\nApproved mappings and source sub-plans"]
+        FQE["Federated Query Engine (FQE)\nControlled execution and result assembly"]
+        DVL["Data Visualization Language (DVL)\nGoverned chart or table contract"]
+        NSA["Narrative Synthesis Agent (NSA)\nOptional result-grounded summary"]
+        ALS[("Analytical Lineage Store (ALS)\nCorrelated decisions, execution, and terminal outcomes")]
+        PAS["Provenance Artifact Service (PAS)\nSigned compliance-purpose evidence"]
+        Response(["Structured Response\nData, display, narrative, lineage, and compliance state"])
+    end
+
+    subgraph Context["Governed Context"]
+        direction LR
+        SMR[("Semantic Metrics Repository (SMR)\nApproved metrics, dimensions, operations, and datasets")]
+        SDR[("Semantic Data Repository (SDR)\nData meaning, quality, structure, and mappings")]
+        DES[("Data Entitlements Store (DES)\nAccess, row scope, masks, and classification ceilings")]
+        SMR -. "approved mapping references" .-> SDR
+    end
+
+    Model["External Language Model Service\nIntent ranking and narrative synthesis"]
+    Renderer["Optional Rendering Service\nDisplay specification to SVG or PNG"]
+
+    subgraph Sources["Registered Data Sources"]
+        direction LR
+        Relational[("Relational Analytical Store")]
+        DataAPI[("Approved Data Service")]
+        Specialized[("Relationship or Multidimensional Store")]
+    end
+
+    Consumers -->|"authenticated analytical request"| MCP
+    MCP -->|"natural-language request"| IRA
+    MCP -->|"structured request"| RAPL
+    IRA -->|"approved candidate retrieval"| SMR
+    IRA -->|"ranking and purpose classification"| Model
+    IRA -->|"resolved operation and parameters"| RAPL
+    RAPL -->|"policy lookup"| DES
+    RAPL -->|"entitlement projection"| SVL
+    RAPL -->|"entitlement evidence"| ALS
+    SVL -->|"definition resolution"| SMR
+    SVL -->|"Logical Query Plan"| SCL
+    SVL -->|"validation and plan evidence"| ALS
+    SCL -->|"approved plan and execution budget"| PQP
+    SCL -->|"controls evidence"| ALS
+    PQP -->|"mapping resolution"| SMR
+    PQP -->|"physical execution envelope"| FQE
+    FQE --> Sources
+    FQE -->|"execution evidence"| ALS
+    FQE -->|"typed result"| DVL
+    FQE -->|"typed result"| NSA
+    NSA -->|"bounded synthesis request"| Model
+    ALS -->|"compliance-triggered event set"| PAS
+    DVL -->|"display specification"| Response
+    NSA -->|"validated narrative or omission state"| Response
+    ALS -->|"lineage reference"| Response
+    PAS -->|"sealed artifact state"| Response
+    Response --> MCP
+    MCP --> Consumers
+    Consumers -. "optional render request" .-> Renderer
+    Renderer -. "SVG or PNG" .-> Consumers
+
+    style Platform fill:#dbeafe,stroke:#2563eb
+    style Context fill:#f8fafc,stroke:#64748b
+    style Sources fill:#f8fafc,stroke:#64748b
 ```
 
 The request follows nine steps:
