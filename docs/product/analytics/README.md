@@ -19,7 +19,7 @@ For governed and regulated workloads, the platform replaces ad-hoc LLM query gen
 
 | Chapter | Title | Contents |
 |---------|-------|---------|
-| [1. Overview](./01-overview.md) | Governed Large-Scale Analytics and Data Mining | Problem space, platform introduction, design principles, and end-to-end worked examples |
+| [1. Overview](./01-overview.md) | Governed AI Analytics | Executive explanation of the product, Text-to-SQL position, operating model, business scenarios, design principles, and adoption decision |
 | [2. Core Capabilities](./02-core-capabilities.md) | Core Platform Capabilities | Platform roles, deep-dive specifications: SMR, Intent Layer, RAPL, Governance, FQE, Data Visualization Language (DVL), Output Format, Analytical Lineage Store (ALS), MCP Layer |
 | [3. Technical Implementation](./03-technical-implementation.md) | Proposed Technical Implementation | Non-normative reference stack with rationale: Kubernetes-hosted services, Starburst/Trino federation, Vega-Lite rendering, object-based lineage storage, PostgreSQL indexing, and a hosted LLM |
 | [4. Success Metrics](./04-success-metrics.md) | Success Metrics | Platform and application-level metrics, controls health indicators, review cadence |
@@ -27,7 +27,9 @@ For governed and regulated workloads, the platform replaces ad-hoc LLM query gen
 | [6. Roadmap](./06-roadmap.md) | Platform Roadmap | Planned enhancements beyond the current release |
 | [7. Glossary](./07-glossary.md) | Glossary | Definitions for all named components, technical terms, abbreviations, and domain concepts used across this specification |
 
-Start with Chapter 1 (Overview) for executive and business context, then read Chapters 2–4 sequentially. Each chapter assumes the previous. The appendix may be read independently as a standalone reference for teams evaluating architectural options. The glossary may be consulted at any point.
+The overview is a standalone executive account of the proposed product. Sections 2-4 provide capability, implementation, and measurement detail. The Text-to-SQL appendix explains the architectural position in depth, and the glossary defines technical terms.
+
+The [editorial archive](./editorial/01-overview-before-executive-edit.md) preserves the earlier overview, including its technical examples and diagrams, for author reference. It is working material excluded from the publication; its original relative links refer to the analytics directory.
 
 ---
 
