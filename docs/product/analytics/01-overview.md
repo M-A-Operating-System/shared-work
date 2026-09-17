@@ -66,6 +66,34 @@ A generated query does not, by itself, establish which business definition was a
 
 The proposed platform makes those requirements part of the execution process. AI selects from approved analytical definitions; deterministic software constructs and executes the calculation. This reduces reliance on the model inferring business meaning from physical schemas on each request.
 
+### Two Approaches to AI-Enabled Analytics
+
+Both approaches serve the same AI consumers: conversational assistants, autonomous agents, and custom applications. The difference is how a request becomes an executable calculation. These simplified diagrams show the request path, not response flows or deployment boundaries.
+
+**Text-to-SQL Approach**
+
+```mermaid
+flowchart LR
+    C["AI Consumers"] --> L["LLM: Generate SQL"]
+    C -->|Generated SQL| I["API / Protocol Layer"]
+    I --> D["Database / Data Sources"]
+```
+
+The consumer asks the LLM to generate SQL and submits that SQL through the interface for execution. The LLM has no direct connection to the database in this illustration.
+
+**Governed Analytics Approach**
+
+```mermaid
+flowchart LR
+    C["AI Consumers"] --> L["LLM: Interpret Requests"]
+    C -->|Analytical Request| S["Approved Semantic Definitions"]
+    S --> G["Permissions and Controls"]
+    G --> E["Controlled Query Planning and Execution"]
+    E --> D["Database / Data Sources"]
+```
+
+The governed path resolves the request against approved definitions, applies permissions and controls, and constructs the executable query in software. Each stage contributes to the analytical record. AI assists interpretation; it does not define the calculation at execution time.
+
 The [Text-to-SQL appendix](./05-text-to-sql-antipattern.md) provides the detailed rationale for this position, including governance, reproducibility, security, and maintenance risks.
 
 Text-to-SQL remains useful alongside the platform for controlled exploration and discovering new analytical needs. A shared conversational interface can support both paths, provided users can distinguish exploratory output from governed results. Useful exploratory calculations can become candidates for review and registration. AI may help draft those definitions; accountable people approve them before governed use.
