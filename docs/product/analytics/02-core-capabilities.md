@@ -1,14 +1,21 @@
-# 2. Core Platform Capabilities
+# 2. Proposed Architecture and Capabilities
 
-**Product:** AI Analytics Platform  
-**Version:** 2.0  
-**Date:** 2026-06-16  
+**Technical White Paper:** Governed AI-Enabled Analytics and Data Mining
+
+**Status:** Proposed architecture for evaluation
+
+**Document Version:** 2.1 (draft)
+
+**Date:** 2026-09-17
+
 **Author:** Andrew Bush / M&A Operating System
 
 ---
 
 
-This chapter defines the target logical architecture for the AI Analytics Platform. It covers thirteen pipeline components in the order a query will encounter them, using a single portfolio manager query as a running example throughout. Each section describes what a component will do, its controls contract, and its position in the pipeline — with no references to specific technology products or vendor implementations.
+This section proposes the logical architecture for governed AI-enabled analytics and data mining. Thirteen pipeline components separate request interpretation, controlled calculation, presentation, and evidence recording. A portfolio manager query illustrates their responsibilities. The design aims to support accuracy through approved definitions, traceability through recorded decisions, and repeatability through controlled execution.
+
+Statements of required behavior describe the proposed architecture, not verified features of a released product. An implementation must demonstrate these behaviors through evaluation; component names identify responsibilities rather than prescribing separate deployed services.
 
 Platform roles — who will interact with each component and how — are defined before the component descriptions.
 
@@ -1379,4 +1386,4 @@ RAPL will read role definitions from the DES at query time, keyed on the role cl
 `vega2img` should not be required for consumers that can natively render DVL specifications. Agentic pipelines that produce static report output will be the primary use case.
 
 
-*AI Analytics Platform — Product Design & Technical Specification · Confidential*
+*Governed AI-Enabled Analytics and Data Mining - Technical White Paper - Draft*

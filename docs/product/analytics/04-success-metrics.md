@@ -1,16 +1,32 @@
-# 4. Success Metrics
+# 4. Evaluation Framework and Proposed Success Measures
 
-**Product:** AI Analytics Platform  
-**Version:** 2.0  
-**Date:** 2026-06-16  
+**Technical White Paper:** Governed AI-Enabled Analytics and Data Mining
+
+**Status:** Proposed architecture for evaluation
+
+**Document Version:** 2.1 (draft)
+
+**Date:** 2026-09-17
+
 **Author:** Andrew Bush / M&A Operating System
 
 ---
 
 
-Metrics are captured from day one at both the platform level and the application level. Governance health metrics are first-class success indicators. A platform that is highly used but poorly governed is not successful.
+Evaluation should test whether the proposed architecture improves accuracy, traceability, and repeatability for the intended analytical and data-mining workloads. The measures below are proposed acceptance criteria and operating targets, not measured outcomes or service commitments. Owners should establish baselines and approve workload-specific thresholds before drawing conclusions about adoption.
 
-Component definitions referenced in the metrics below (SMR, FQE, RAPL, SCL, NSA, ALS) are in [Chapter 2 — Core Platform Capabilities](./02-core-capabilities.md). [Analytical Lineage Store (ALS)](./02-core-capabilities.md#analytical-lineage-store-als) · [Semantic Controls Layer (SCL)](./02-core-capabilities.md#semantic-controls-layer-scl) · [Narrative Synthesis Agent (NSA)](./02-core-capabilities.md#narrative-synthesis-agent-nsa)
+## Evaluation of the Central Proposal
+
+| Requirement | Evaluation Method | Evidence Required |
+|---|---|---|
+| Accuracy | Compare calculated values and dataset selections with independently verified reference results. Include ambiguous requests, incorrect definitions, missing data, and boundary cases. | Record expected and actual results, approved tolerances, interpretation errors, and unresolved discrepancies. |
+| Traceability | Ask an authorized reviewer to reconstruct a sample of successful, rejected, and failed requests from their evidence records. | Demonstrate links to definition and policy versions, source snapshots or references, execution decisions, and returned results or failure states. |
+| Repeatability | Rerun approved requests against preserved data and versioned definitions, permissions, and settings. | Compare result values and dataset membership under a declared tolerance and ordering policy. Explain every difference. |
+| Governed Access | Exercise permitted and denied requests across roles, organizations, and dataset fields. | Show that execution and evidence access respect policy, including cache hits and bulk retrieval. |
+
+Compare the approach with the organization's existing analytical process and, where relevant, a controlled Text-to-SQL workflow using the same questions and source data. Record definition-authoring effort, review effort, latency, cost, and unsupported questions alongside correctness. A benefit is established by those measurements, not by the presence of an architectural component.
+
+Component definitions referenced in the measures below are in [Section 2, Proposed Architecture and Capabilities](./02-core-capabilities.md), including the [Analytical Lineage Store](./02-core-capabilities.md#analytical-lineage-store-als), [Semantic Controls Layer](./02-core-capabilities.md#semantic-controls-layer-scl), and [Narrative Synthesis Agent](./02-core-capabilities.md#narrative-synthesis-agent-nsa).
 
 
 ## 4.1 Platform-Level Metrics

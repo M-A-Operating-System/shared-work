@@ -1,14 +1,19 @@
-# 6. Proposed Roadmap
+# 6. Possible Extensions and Implementation Considerations
 
-**Product:** AI Analytics Platform  
-**Version:** 2.0  
-**Date:** 2026-06-16  
+**Technical White Paper:** Governed AI-Enabled Analytics and Data Mining
+
+**Status:** Proposed architecture for evaluation
+
+**Document Version:** 2.1 (draft)
+
+**Date:** 2026-09-17
+
 **Author:** Andrew Bush / M&A Operating System
 
 ---
 
 
-This document describes one proposed sequence of deliverables for the AI Analytics Platform. It is not the only valid sequence and is not a committed delivery plan. Phase boundaries should be revisited as implementation proceeds, customer feedback is gathered, and technical constraints become clearer. Decisions to resequence or regroup phases should be recorded here; they do not require changes to the product specification.
+This section explores how an implementation could extend the proposed architecture. The groups below illustrate dependencies and possible development increments; they do not establish a product release schedule, staffing plan, or delivery commitment. Their feasibility and priority depend on evidence from evaluation of the governed core.
 
 
 <table>
@@ -298,4 +303,4 @@ This document describes one proposed sequence of deliverables for the AI Analyti
 </table>
 
 
-*This is a proposed delivery sequence, not a committed plan. For the product specification, see [README.md](./README.md) and the numbered chapter documents. For the proposed reference implementation stack, see [03-technical-implementation.md](./03-technical-implementation.md).*
+*These extensions are candidates for evaluation. The [white paper](./README.md) states the architectural proposal, and [Section 3](./03-technical-implementation.md) illustrates a technology stack.*

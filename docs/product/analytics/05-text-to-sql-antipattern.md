@@ -1,14 +1,19 @@
 # 5. Appendix: Text-to-SQL and Semantic Analytics: Better Together
 
-**Product:** AI Analytics Platform  
-**Version:** 2.0  
-**Date:** 2026-06-16  
+**Technical White Paper:** Governed AI-Enabled Analytics and Data Mining
+
+**Status:** Proposed architecture for evaluation
+
+**Document Version:** 2.1 (draft)
+
+**Date:** 2026-09-17
+
 **Author:** Andrew Bush / M&A Operating System
 
 ---
 
 
-This appendix is a standalone reference for teams designing AI-powered analytics architectures. It can be read independently of the platform specification.
+This appendix supports the white paper's proposal for governed semantic execution. It examines why we believe Text-to-SQL alone is not a sustainable long-term foundation for AI-enabled analytics and data mining where accuracy, traceability, and repeatability are critical. It can also be read independently by teams evaluating architectural alternatives.
 
 The central argument here is not that Text-to-SQL should be avoided. It is that large-scale analytics in a regulated environment needs both tools running alongside each other. Text-to-SQL is the exploration layer: fast, flexible, genuinely useful for ad-hoc analysis, hypothesis testing, and metric discovery. The semantic analytics engine is the governed execution layer: deterministic, auditable, with versioned metric definitions and enforced entitlements. The two work best as a connected system, with outputs promoted from exploration into the governed registry when they need to become reliable.
 
@@ -229,7 +234,7 @@ The governed architecture separates the AI translation layer from the governed c
 
 The boundary is the governed semantic registry. Crossing from exploration into production — from informal query into governed metric — requires a formal definition, approval, and versioning process. Text-to-SQL is available on the exploration side of that boundary. It is not available on the governed execution side.
 
-For a complete specification of this architecture, see [Chapter 2, Core Platform Capabilities](./02-core-capabilities.md).
+For the proposed component responsibilities and controls, see [Section 2, Proposed Architecture and Capabilities](./02-core-capabilities.md).
 
 
 ## SQL Injection in MCP-Exposed Query Services

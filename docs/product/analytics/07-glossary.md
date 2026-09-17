@@ -1,8 +1,13 @@
 # 7. Glossary
 
-**Product:** AI Analytics Platform  
-**Version:** 2.0  
-**Date:** 2026-06-16  
+**Technical White Paper:** Governed AI-Enabled Analytics and Data Mining
+
+**Status:** Proposed architecture for evaluation
+
+**Document Version:** 2.1 (draft)
+
+**Date:** 2026-09-17
+
 **Author:** Andrew Bush / M&A Operating System
 
 ---
@@ -44,4 +49,4 @@ All named components, technical terms, abbreviations, and domain concepts used a
 | **Semantic Validation Layer** | SVL | Receives the entitlement projection from the **RAPL** together with the fully qualified analytical request — either the resolved output of the **IRA** or a direct structured call from an API consumer — and produces a validated, platform-agnostic **LQP**. Resolves every identifier against approved **SMR** metadata definitions, enforces entitlement projection from **RAPL**, and validates semantic compatibility. Entirely deterministic — no AI model runs inside it. |
 
 
-*AI Analytics Platform — Product Design & Technical Specification · Confidential*
+*Governed AI-Enabled Analytics and Data Mining - Technical White Paper - Draft*

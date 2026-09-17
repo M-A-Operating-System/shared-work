@@ -1,21 +1,27 @@
-# 1. Overview: Governed AI Analytics
+# 1. Executive Overview: Governed AI-Enabled Analytics and Data Mining
 
-**Product:** AI Analytics Platform  
-**Version:** 2.0  
-**Date:** 2026-06-16  
+**Technical White Paper:** Governed AI-Enabled Analytics and Data Mining
+
+**Status:** Proposed architecture for evaluation
+
+**Document Version:** 2.1 (draft)
+
+**Date:** 2026-09-17
+
 **Author:** Andrew Bush / M&A Operating System
 
 ## Introduction
 
 ### About This Document
 
-This overview is for executives deciding how to expand AI-enabled analytics while retaining control over business definitions, access, and evidence. It explains the proposed product, its operating requirements, and the decisions needed to adopt it. The remaining sections define capabilities, describe a reference technology stack, propose success measures, examine Text-to-SQL risks, and outline future development.
+This technical white paper proposes an alternative approach to AI-enabled analytics and data mining in highly regulated and governed environments, where accuracy, traceability, and repeatability are critical. It is written for executives, architects, analytics leaders, and governance teams evaluating how to extend AI access to enterprise data.
 
-This is a product definition supported by illustrative scenarios. It does not report results from a deployed platform. Performance, business benefits, and suitability for a particular regulatory obligation require validation in the adopting organization.
+The proposal combines AI interpretation with approved semantic definitions, controlled computation, and recorded evidence. The remaining sections explain the architecture, illustrate a technology stack, propose evaluation measures, examine Text-to-SQL risks, and discuss possible extensions. Examples are illustrative; this paper does not report deployment results or establish regulatory compliance.
 
 ## Table of Contents
 
-- [The Product and Its Purpose](#the-product-and-its-purpose)
+- [The Proposed Approach](#the-proposed-approach)
+- [Accuracy, Traceability, and Repeatability](#accuracy-traceability-and-repeatability)
 - [Why Text-to-SQL Is Not the Long-Term Foundation](#why-text-to-sql-is-not-the-long-term-foundation)
 - [How the Platform Works](#how-the-platform-works)
 - [What Users Can Do](#what-users-can-do)
@@ -24,23 +30,37 @@ This is a product definition supported by illustrative scenarios. It does not re
 - [Implementation, Success, and Development](#implementation-success-and-development)
 - [The Executive Decision](#the-executive-decision)
 
-## The Product and Its Purpose
+## The Proposed Approach
 
-> **The AI Analytics Platform gives people and AI applications access to approved calculations and datasets through a shared, governed service.**
+> **We propose a governed semantic execution layer that gives people and AI applications access to approved calculations and datasets.**
 
 Business users need answers expressed in business terms: portfolio performance, risk exposure, liquidity, or operating outcomes. Those answers depend on agreed definitions, reliable source data, and permission to use it. When teams reconstruct those decisions for each report or request, they repeat work and risk producing different answers to the same business question.
 
-The proposed platform makes approved analytical definitions reusable across conversations, applications, and automated analysis. A user asks a question through an existing interface. The platform identifies the approved calculation, checks access, executes it against registered sources, and returns the result with an explanation of how it was produced.
+The paper uses the name AI Analytics Platform for this proposed architecture. It makes approved analytical definitions reusable across conversations, applications, and automated analysis. A user asks a question through an existing interface. The platform identifies the approved calculation, checks access, executes it against registered sources, and returns the result with an explanation of how it was produced.
 
 The platform sits above existing warehouses, data services, and specialist analytical engines. It requires supported connections and accurate mappings to those sources. Organizations can retain their existing investments while making governed analytics available to more consumers.
 
-The product includes metric queries, drilldown, and bulk dataset retrieval. It supplies results, governed chart or table specifications, optional narrative summaries, and audit evidence. Consumer applications provide the user experience.
+The proposed scope includes metric queries, drilldown, and bulk dataset retrieval. Responses include results, governed chart or table specifications, optional narrative summaries, and audit evidence. Consumer applications provide the user experience.
+
+## Accuracy, Traceability, and Repeatability
+
+The proposal addresses three distinct requirements. Each needs its own evidence before adoption.
+
+| Requirement | Meaning and Proposed Basis |
+|---|---|
+| Accuracy | A result answers the intended question using the correct business definition and suitable source data. Approved formulas, request validation, and comparison with independently verified results support this requirement. Consistent execution alone does not establish correctness. |
+| Traceability | An authorized reviewer can follow a result back to the request, definition versions, permissions, source references, and execution decisions. The proposed lineage record preserves those links under an agreed retention policy. |
+| Repeatability | An authorized rerun using the same request, data snapshot, definitions, permissions, and calculation settings produces the same result within a declared numerical tolerance. Version and snapshot preservation make this test possible. |
+
+For data mining, these requirements apply to the extracted dataset as well as to calculated metrics: which records and fields were supplied, under which selection rules, and from which source state. Subsequent model training or analysis requires its own validation.
 
 ## Why Text-to-SQL Is Not the Long-Term Foundation
 
 > **We do not believe Text-to-SQL alone is a sustainable long-term foundation for AI-enabled analytics in a highly regulated organization.**
 
-Text-to-SQL uses a large language model (LLM) to turn a question into a database query. It can accelerate exploration, especially when an analyst can inspect the query and judge the answer. The difficulty increases when the output becomes a recurring business metric, an automated decision input, or a regulatory submission.
+Text-to-SQL uses a large language model (LLM) to turn a question into a database query. These implementations are easy to stand up and quick to demonstrate: a model receives database schemas, generates a query, and returns an answer through a conversational interface. This makes them an attractive starting point for AI-enabled analytics and exploration.
+
+The challenge is moving from a successful demonstration to recurring business metrics, data-mining workflows, automated decision inputs, and regulatory submissions. A convincing answer in a demonstration does not show that the calculation is correct, that a reviewer can trace it, or that an authorized rerun can repeat it. This paper proposes governed semantic execution as the alternative foundation for those workloads.
 
 A generated query does not, by itself, establish which business definition was approved, which version applied, or whether the result can be reproduced. Database permissions and query validation can restrict execution, but they do not decide what a regulated metric means. Organizations still need accountable owners, approved formulas, controlled changes, and evidence linking each result to those decisions.
 
@@ -115,11 +135,11 @@ The proposed roadmap extends the governed core with capabilities such as schedul
 
 | Supporting Section | What It Adds |
 |---|---|
-| [2. Core Capabilities](./02-core-capabilities.md) | Defines roles, component responsibilities, interfaces, and controls. |
-| [3. Reference Implementation](./03-technical-implementation.md) | Maps the capabilities to a proposed technology stack and illustrative implementation. |
-| [4. Success Metrics](./04-success-metrics.md) | Defines measures for operation, governance, adoption, and query quality. |
+| [2. Proposed Architecture and Capabilities](./02-core-capabilities.md) | Defines roles, component responsibilities, interfaces, and controls. |
+| [3. Illustrative Reference Implementation](./03-technical-implementation.md) | Maps the capabilities to a proposed technology stack and illustrative implementation. |
+| [4. Evaluation Framework](./04-success-metrics.md) | Defines tests for accuracy, traceability, and repeatability, together with proposed operating measures. |
 | [5. Text-to-SQL Appendix](./05-text-to-sql-antipattern.md) | Examines why Text-to-SQL alone is insufficient for sustained governed analytics. |
-| [6. Proposed Roadmap](./06-roadmap.md) | Describes possible development beyond the governed core. |
+| [6. Possible Extensions](./06-roadmap.md) | Describes candidate development beyond the governed core. |
 | [7. Glossary](./07-glossary.md) | Defines the named components and technical terms. |
 
 ## The Executive Decision

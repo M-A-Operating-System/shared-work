@@ -1,16 +1,21 @@
-# 3. Reference Implementation
+# 3. Illustrative Reference Implementation
 
-**Product:** AI Analytics Platform  
-**Version:** 2.0  
-**Date:** 2026-06-16  
+**Technical White Paper:** Governed AI-Enabled Analytics and Data Mining
+
+**Status:** Proposed architecture for evaluation
+
+**Document Version:** 2.1 (draft)
+
+**Date:** 2026-09-17
+
 **Author:** Andrew Bush / M&A Operating System
 
 ---
 
 
-This chapter describes one non-normative reference implementation of the AI Analytics Platform. Stack choices are concrete but not prescriptive, and code fragments are illustrative pseudocode rather than production-ready implementations. The product specification is intentionally stack-agnostic. Any conformant implementation that satisfies the specified behaviors, governance controls, and interface contracts is valid.
+This section illustrates how a technology stack could support the proposed architecture. The technology mappings and code fragments explain implementation responsibilities; they are not evidence of a completed or benchmarked system. Alternative stacks can support the same responsibilities. Integration feasibility, correctness, performance, and operating cost require validation against the intended workload.
 
-The product specification (component behaviors, interface contracts, governance requirements) is in [Chapter 2 -- Core Platform Capabilities](./02-core-capabilities.md). The design principles governing every decision are in [Platform Overview — Design Principles](./01-overview.md#design-principles).
+The proposed behaviors, interfaces, and governance requirements are in [Section 2](./02-core-capabilities.md). The [design principles](./01-overview.md#design-principles) define the intended constraints on this implementation.
 
 
 ## 3.1 Reference Architecture Summary

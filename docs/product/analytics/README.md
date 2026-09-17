@@ -1,71 +1,64 @@
-# AI Analytics Platform — Product Design & Technical Specification
+# Governed AI-Enabled Analytics and Data Mining
 
-**Product:** AI Analytics Platform  
-**Version:** 2.0  
-**Date:** 2026-06-16  
+**An Alternative to Text-to-SQL for Accuracy, Traceability, and Repeatability in Highly Regulated Environments**
+
+**Document Type:** Technical White Paper
+
+**Status:** Proposed architecture for evaluation
+
+**Document Version:** 2.1 (draft)
+
+**Date:** 2026-09-17
+
 **Author:** Andrew Bush / M&A Operating System
-
----
 
 ## Abstract
 
-The AI Analytics Platform is a **deterministic semantic computation engine** designed for AI-native enterprise analytics. It exposes governed, role-aware analytical capabilities to any MCP-compatible consumer (conversational AI assistants, autonomous agents, and custom applications) through a headless JSON API backed by a federated query planner, a governed Semantic Metrics Repository, and a complete analytical lineage store.
+Text-to-SQL implementations offer an accessible starting point for AI-enabled analytics: connect a language model to database schemas, generate queries from natural-language questions, and demonstrate useful answers quickly. That ease of demonstration does not establish that the answers use approved business definitions, can be traced to their source and calculation, or can be repeated reliably.
 
-For governed and regulated workloads, the platform replaces ad-hoc LLM query generation with a semantic execution layer where metrics are registered, requests are validated, entitlements are enforced before execution, and accepted requests produce a provenance record. Text-to-SQL remains available as a complementary exploration tool, as described in Chapter 5.
+This technical white paper proposes an alternative for highly regulated and governed environments. A governed semantic execution layer resolves requests against approved metrics and dataset contracts, enforces access and execution controls, computes results through deterministic software, and records the evidence needed to explain them. AI interprets questions and summarizes results; approved definitions govern calculation and data selection.
 
----
+The proposal centers on accuracy, traceability, and repeatability for both analytical results and data-mining extracts. It describes an architecture, illustrates a technology stack, and sets out how the approach should be evaluated. It does not claim that the design alone establishes correctness or regulatory compliance. Source quality, definition ownership, operational controls, and measured validation remain necessary.
 
-## Document Structure
+Text-to-SQL can continue to support controlled exploration and discovery. The proposed alternative provides the governed execution path when analytical outputs must become repeatable, reviewable business information.
 
-| Chapter | Title | Contents |
-|---------|-------|---------|
-| [1. Overview](./01-overview.md) | Governed AI Analytics | Executive explanation of the product, Text-to-SQL position, operating model, business scenarios, design principles, and adoption decision |
-| [2. Core Capabilities](./02-core-capabilities.md) | Core Platform Capabilities | Platform roles, deep-dive specifications: SMR, Intent Layer, RAPL, Governance, FQE, Data Visualization Language (DVL), Output Format, Analytical Lineage Store (ALS), MCP Layer |
-| [3. Technical Implementation](./03-technical-implementation.md) | Proposed Technical Implementation | Non-normative reference stack with rationale: Kubernetes-hosted services, Starburst/Trino federation, Vega-Lite rendering, object-based lineage storage, PostgreSQL indexing, and a hosted LLM |
-| [4. Success Metrics](./04-success-metrics.md) | Success Metrics | Platform and application-level metrics, controls health indicators, review cadence |
-| [5. Appendix](./05-text-to-sql-antipattern.md) | Text-to-SQL and Semantic Analytics: Better Together | Structural failure modes, SQL injection risks, and the complementary architecture where both tools coexist |
-| [6. Roadmap](./06-roadmap.md) | Platform Roadmap | Planned enhancements beyond the current release |
-| [7. Glossary](./07-glossary.md) | Glossary | Definitions for all named components, technical terms, abbreviations, and domain concepts used across this specification |
+## Table of Contents
 
-The overview is a standalone executive account of the proposed product. Sections 2-4 provide capability, implementation, and measurement detail. The Text-to-SQL appendix explains the architectural position in depth, and the glossary defines technical terms.
+| Section | Purpose |
+|---|---|
+| [1. Executive Overview](./01-overview.md) | Explains the complete proposal, its contrast with Text-to-SQL, business uses, operating responsibilities, and the decision to evaluate it. |
+| [2. Proposed Architecture and Capabilities](./02-core-capabilities.md) | Defines the proposed responsibilities, interfaces, and controls that support governed execution. |
+| [3. Illustrative Reference Implementation](./03-technical-implementation.md) | Maps capabilities to technology products and explains their roles through illustrative implementation detail. |
+| [4. Evaluation Framework and Proposed Success Measures](./04-success-metrics.md) | Defines how to test accuracy, traceability, repeatability, access controls, and operating outcomes. |
+| [5. Text-to-SQL Appendix](./05-text-to-sql-antipattern.md) | Examines the limitations of Text-to-SQL as a long-term foundation and its continuing role in exploration. |
+| [6. Possible Extensions and Implementation Considerations](./06-roadmap.md) | Discusses candidate extensions beyond the governed core. |
+| [7. Glossary](./07-glossary.md) | Defines the architecture's named components and technical terms. |
 
-The [editorial archive](./editorial/01-overview-before-executive-edit.md) preserves the earlier overview, including its technical examples and diagrams, for author reference. It is working material excluded from the publication; its original relative links refer to the analytics directory.
+## Scope and Reading Guide
 
----
+The executive overview provides a standalone account of the argument. Architects and engineering teams can use Sections 2 and 3 to examine the proposed design, while governance and delivery leaders can use Section 4 to define an evaluation.
 
-## Key Concepts
+The term AI Analytics Platform names the proposed architecture throughout the paper. Present-tense component descriptions and mandatory controls express intended design behavior, not verified functionality in a released product. Technology choices, examples, and targets are illustrative unless supported by stated evidence.
 
-| Term | Definition |
-|------|------------|
-| **[Semantic Metrics Repository (SMR)](./02-core-capabilities.md#semantic-metrics-repository-smr)** | The governing catalog of all resolvable analytical concepts for the organization — metrics, dimensions, hierarchies, measure groups, and domains. Nothing is queryable that is not registered. |
-| **[Logical Query Plan (LQP)](./02-core-capabilities.md#semantic-validation-layer-svl)** | Engine-agnostic DAG of analytical operations produced by the Semantic Validation Layer (SVL). No physical backend references. |
-| **[Federated Query Engine (FQE)](./02-core-capabilities.md#federated-query-engine-fqe)** | The only component with knowledge of physical backends. It executes the physical plan using a conforming federation strategy and assembles typed results. |
-| **[Role-Aware Projection Layer (RAPL)](./02-core-capabilities.md#role-aware-projection-layer-rapl)** | Semantic-tier entitlement enforcement. Applies metric and dimension access rules and contributes row predicates and column protections to the plan before execution. |
-| **[Semantic Controls Layer (SCL)](./02-core-capabilities.md#semantic-controls-layer-scl)** | Suite of performance impact thresholds, complexity limits, and compliance classification checks applied to every query before FQE release. |
-| **[Data Visualization Language (DVL)](./02-core-capabilities.md#data-visualization-language-dvl)** | Platform output format for display specifications. Two types in a consistent JSON envelope: `type: "chart"` (Vega-Lite v5) and `type: "table"`. |
-| **[Analytical Lineage Store (ALS)](./02-core-capabilities.md#analytical-lineage-store-als)** | Computation provenance — not data lineage. A queryable record of the metric definitions, aggregation rules, role projections, and backend execution that produced each analytical result. |
-| **Application Admin** | Privileged user responsible for SMR integrity, entitlement policies, and governance configuration. Equivalent to a Chief Data Officer within the platform context. Must exist before go-live. |
-| **vega2img** | Standalone MCP render service for static image output. Registered directly with consumers as a peer server. Not part of the Analytics Platform. |
+## Architectural Constraints
 
----
+The proposal depends on the following constraints. Each maps to the [design principles](./01-overview.md#design-principles) introduced in the overview.
 
-## Non-Negotiable Platform Decisions
+| ID | Proposed Constraint | Principle |
+|---|---|---|
+| A1 | The normal AI query interface exposes approved semantic concepts. Physical execution details require separate authorization. | P1 |
+| A2 | The governed execution path accepts validated requests against registered definitions rather than executable SQL generated by a language model. | P2, P10 |
+| A3 | Metrics and dataset contracts require registration and approval before governed use. | P3 |
+| A4 | Entitlements are resolved before planning and enforced in the execution path. | P5 |
+| A5 | Accepted analytical requests produce lineage evidence, including terminal failures. Compliance-classified requests additionally produce a signed Provenance Artifact. | P4 |
+| A6 | Registered rules select presentation formats. | P7 |
+| A7 | Logical plans are independent of the execution technology; the Physical Query Planner translates them for execution. | P10 |
+| A8 | All governed queries pass the required controls before execution. | P2 |
+| A9 | Tenant and entitlement isolation apply to execution, cached results, evidence, and storage. | P5 |
+| A10 | Narrative values are validated against computed results and permitted derivations. | P6 |
 
-These decisions are non-negotiable architectural constraints. Each maps to one or more [Design Principles](./01-overview.md#design-principles) defined in Chapter 1.
+## Publication and Working Material
 
-| ID | Decision | Principle |
-|----|---------|-----------|
-| **A1** | The normal AI query interface does not expose physical schemas. AI interaction is mediated through the SMR; tightly authorized operational and audit interfaces may expose physical execution details. | [P1](./01-overview.md#design-principles) |
-| **A2** | Raw query generation by LLMs is not a permitted execution path. All queries are expressed as validated MCP tool call parameters resolved against the SMR. | [P2](./01-overview.md#design-principles), [P10](./01-overview.md#design-principles) |
-| **A3** | Every metric must be registered in the SMR before it is resolvable. Unregistered metrics cannot be queried. | [P3](./01-overview.md#design-principles) |
-| **A4** | Entitlements are enforced at the semantic tier — before the LQP is compiled and before any execution backend is contacted. | [P5](./01-overview.md#design-principles) |
-| **A5** | Every accepted analytical request produces a lineage record linking intent → semantic plan → LQP → backend execution → result or terminal failure. Compliance-classified requests additionally produce a signed Provenance Artifact. | [P4](./01-overview.md#design-principles) |
-| **A6** | Chart selection is deterministic and governed by the Data Visualization Language (DVL) — not inferred by the LLM per query. | [P7](./01-overview.md#design-principles) |
-| **A7** | The LQP is platform-agnostic. Physical execution translation is the FQE's responsibility. | [P10](./01-overview.md#design-principles) |
-| **A8** | SCL controls are applied at the semantic tier. No query reaches a physical backend without passing controls checks. | [P2](./01-overview.md#design-principles) |
-| **A9** | Entitlement isolation is enforced at every layer: RAPL/SCL checks on every request, row-level security on the lineage index, and scoped access on all storage. | [P5](./01-overview.md#design-principles) |
-| **A10** | Narrative synthesis is anchored to governed metric values in the execution result. The LLM may not introduce metric values not present in the result. | [P6](./01-overview.md#design-principles) |
+The numbered Markdown sections are the current white-paper source. Existing PDF files may reflect earlier product-design drafts until regenerated from these sources.
 
----
-
-*AI Analytics Platform — Product Design & Technical Specification · Confidential*
+The [editorial archive](./editorial/01-overview-before-executive-edit.md) preserves the earlier overview, including technical examples and diagrams. It is working material excluded from the publication; its original relative links refer to the analytics directory. Historical design notes under `TODOS/` are also outside the white paper.
