@@ -1,40 +1,32 @@
-# 3. Reference Implementation
+# 3. Illustrative Reference Implementation
 
-**Product:** AI Analytics Platform  
-**Version:** 2.0  
-**Date:** 2026-06-16  
-**Author:** Andrew Bush / M&A Operating System
+This section illustrates how a technology stack could support the proposed architecture. The technology mappings and code fragments explain implementation responsibilities; they are not evidence of a completed or benchmarked system. Alternative stacks can support the same responsibilities. Integration feasibility, correctness, performance, and operating cost require validation against the intended workload.
 
----
-
-
-This chapter describes one reference implementation of the AI Analytics Platform. Stack choices are concrete but not prescriptive. The product specification is intentionally stack-agnostic. Any conformant implementation that satisfies the specified behaviors, governance guarantees, and interface contracts is valid. Technology substitutions at any layer require no changes to the product specification.
-
-The product specification (component behaviors, interface contracts, governance requirements) is in [Chapter 2 -- Core Platform Capabilities](./02-core-capabilities.md). The design principles governing every decision are in [Platform Overview — Design Principles](./01-overview.md#design-principles).
+The proposed behaviors, interfaces, and governance requirements are in [Section 2](./02-core-capabilities.md). The [design principles](./01-overview.md#design-principles) define the intended constraints on this implementation.
 
 
 ## 3.1 Reference Architecture Summary
 
-This chapter presents **one reference implementation**. It is intended as a concrete starting point — a worked example of how the capabilities defined in Chapter 2 can be realized using a specific technology stack. It is not a prescriptive design. Teams should treat each layer-level technology choice as a recommendation, not a constraint. A conformant implementation may substitute any component provided it honors the interface contracts and governance guarantees specified in Chapter 2.
+This section maps the capabilities defined in Section 2 to a proposed technology stack. Each mapping names the technology, the work it performs, and the application code needed to complete the capability. Teams may substitute technologies that satisfy the same interface contracts and governance requirements.
 
-The table below maps each Chapter 2 capability to its reference implementation name and the key technology it uses in this architecture. The components are listed in pipeline order.
+The table maps each capability to its technology stack and explains how that stack supports it. Python entries require custom application code. The Data Context Store is an existing platform service; this reference implementation does not prescribe its underlying storage product.
 
-| Capability (Ch02) | Abbr | Reference Implementation | Key Technology |
+| Capability (Section 2) | Abbreviation | Technology Stack | Implementation Description |
 |---|---|---|---|
-| MCP Capability Layer | MCP | `build_mcp_app()` + FastMCP router | Python 3.12 · FastMCP 2.x · Uvicorn · port 8000 · JWT via python-jose (RS256) |
-| Intent Resolution Agent | IRA | `IntentResolutionAgent` | Python · embedding similarity search over SMR · Anthropic Claude (intent ranking + compliance intent scoring) · confirmation cards |
-| Semantic Metrics Repository | SMR | `SemanticMetricsRepository` | DCS API — JSON documents: `analytical_metric`, `analytical_dimension`, `analytical_operation`, `analytical_dataset` |
-| Role-Aware Projection Layer | RAPL | `RoleAwareProjectionLayer` | Python · asyncpg · role definition lookup from the DES |
-| Data Entitlements Store | DES | PostgreSQL `role_policies` schema | Dedicated schema + credentials — logically separate even when co-located; written only by the Entitlements Manager, not via the platform Admin API |
-| Semantic Validation Layer | SVL | `SemanticValidationLayer` + `LQPGenerator` | Python · Pydantic v2 · JSON Schema validation |
-| Semantic Controls Layer | SCL | `SemanticControlsLayer` | Python · Redis (concurrency semaphore) · rules engine |
-| Physical Query Planner | PQP | `PhysicalQueryPlanner` | Apache Calcite · physical_mapping → catalog reference binding · LQP → federated Trino SQL |
-| Federated Query Engine | FQE | `FederatedQueryEngine` (Starburst client) | Starburst (Trino) · native federation across catalog connectors — Snowflake · lakehouse · dbt Semantic Layer · Neo4j · REST/OData |
-| Data Visualization Language | DVL | `DataVisualizationLanguage` | Python · priority-ordered chart contract evaluation · output: Vega-Lite v5 spec |
-| Narrative Synthesis Agent | NSA | `NarrativeSynthesisAgent` | Claude Haiku 4.5 (simple queries) · Claude Sonnet 4.6 (complex queries) |
-| Provenance Artifact Service | PAS | `ProvenanceArtifactService` | In-process Python module · ECDSA P-256 signing (key from Vault) · S3 sibling document `{result_id}_provenance.json` |
-| Analytical Lineage Store | ALS | `AnalyticalLineageStore` | AWS S3 (JSON records per query) · PostgreSQL `lineage_index` (scalar search) |
-| Result Cache | — | `ResultCache` | Redis · SHA-256 cache key · 5-min TTL · compliance queries bypass cache |
+| MCP Capability Layer | MCP | Python 3.12, FastMCP 2.x, Uvicorn, python-jose | FastMCP exposes tools, resources, and prompts, and Uvicorn serves the application over HTTP. Python middleware uses python-jose to validate identity tokens before routing requests to the analytical pipeline. |
+| Intent Resolution Agent | IRA | Python, Anthropic Claude, Data Context Store (existing service) | Python retrieves candidate operations from the semantic catalog. Claude ranks them, binds request parameters, and scores compliance intent. The application asks the user to confirm ambiguous requests. |
+| Semantic Metrics Repository | SMR | Python, Data Context Store (existing service) | The Data Context Store stores, versions, approves, and indexes metric, dimension, operation, and dataset definitions. Python accesses those definitions through the service API. |
+| Role-Aware Projection Layer | RAPL | Python, asyncpg, PostgreSQL | Python uses asyncpg to read entitlement policies from PostgreSQL. It combines the policies with verified identity claims to determine permitted metrics, dimensions, rows, and column protections. |
+| Data Entitlements Store | DES | PostgreSQL | PostgreSQL stores entitlement policies in a dedicated schema with separate credentials. The Entitlements Manager maintains the policies, and the RAPL reads them when evaluating requests. |
+| Semantic Validation Layer | SVL | Python, Pydantic v2 | Pydantic validates tool input models. Python checks operation parameters against registered JSON schemas, resolves semantic definitions, enforces the entitlement projection, and builds the logical query plan. |
+| Semantic Controls Layer | SCL | Python, Redis, Data Context Store (existing service) | Python evaluates the five controls checks using configured thresholds and profiling statistics. The Data Context Store stores the configuration, and Redis coordinates concurrent-query admission across application instances. |
+| Physical Query Planner | PQP | Python, Apache Calcite | Python binds approved logical concepts to physical catalog references. Apache Calcite supplies relational planning functions used to produce Trino SQL with the required filters and column protections. |
+| Federated Query Engine | FQE | Starburst (Trino), Python, Trino Python client | Starburst acts as the FQE. The Trino Python client submits SQL to its coordinator, and Starburst executes queries across configured source connectors. Python verifies the returned schema, caches results, and records execution details. |
+| Data Visualization Language | DVL | Python, Vega-Lite v5 | Python selects the registered chart contract and generates a Vega-Lite display specification. Tabular results use the platform's separate table format. |
+| Narrative Synthesis Agent | NSA | Python, Anthropic Claude Haiku 4.5, Anthropic Claude Sonnet 4.6 | Claude generates narratives from computed result values. Python selects Haiku for simple summaries or Sonnet for complex results, constructs the prompt, and validates the generated text. |
+| Provenance Artifact Service | PAS | Python, cryptography, HashiCorp Vault or Kubernetes Secrets, Amazon S3 | Python assembles the provenance artifact, and cryptography signs it with ECDSA P-256 and SHA-256. Vault or Kubernetes Secrets supplies the key. The lineage service stores the signed artifact in S3 under configured retention controls. |
+| Analytical Lineage Store | ALS | Python, Amazon S3, PostgreSQL | S3 stores lineage documents, and PostgreSQL indexes the fields used to find them. Python coordinates writes and retrieval, with retention controls and integrity checks protecting the records. |
+| Result Cache | - | Python, Redis | Redis stores assembled results under keys derived from the canonical logical query plan. Python applies the configured expiry and bypasses cache reads and writes for compliance-purpose queries. |
 
 The two embedded AI components are the **Intent Resolution Agent (IRA)** and the **Narrative Synthesis Agent (NSA)**. Every stage between them — RAPL, SVL, SCL, PQP, and FQE — is deterministic.
 
@@ -114,6 +106,8 @@ The Semantic Metrics Repository (SMR) and the Semantic Data Repository (SDR) are
 
 > **Specification:** [§MCP Capability Layer](./02-core-capabilities.md#mcp-capability-layer-mcp)
 
+FastMCP implements the MCP Capability Layer's tool, resource, and prompt interfaces. Uvicorn serves the Python application over HTTP. Application middleware validates identity and routes analytical requests to the controls pipeline.
+
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
 | **Runtime** | Python · FastMCP + Uvicorn | Lightweight ASGI service; minimal dependencies; deploys as a Kubernetes pod or serverless container |
@@ -161,7 +155,7 @@ class DrilldownInput(BaseModel):
 # ── Tools ─────────────────────────────────────────────────────────────────────
 
 @mcp.tool()
-async def run_analytics(input: RunAnalyticsInput, jwt: str) -> dict:
+async def run_analytics(input: RunAnalyticsInput) -> dict:
     """Execute an SMR-registered analytical operation.
     Call list_operations first to discover valid operation_id values and their required params.
     The presentation depth — raw dataset, display specification, or full analytical response — is
@@ -173,7 +167,7 @@ async def run_analytics(input: RunAnalyticsInput, jwt: str) -> dict:
     ...
 
 @mcp.tool()
-async def list_operations(input: ListOperationsInput, jwt: str) -> dict:
+async def list_operations(input: ListOperationsInput) -> dict:
     """List all SMR-registered operations available to the current user's role.
     Returns operation IDs, display names, required parameters, supported metrics,
     supported dimensions, and execution profiles."""
@@ -182,7 +176,7 @@ async def list_operations(input: ListOperationsInput, jwt: str) -> dict:
     ...
 
 @mcp.tool()
-async def drilldown(input: DrilldownInput, jwt: str) -> dict:
+async def drilldown(input: DrilldownInput) -> dict:
     """Navigate into a dimension hierarchy from a prior result.
     The parent result's analytical context (operation, filters, hierarchy position) is inherited;
     entitlements and controls are re-evaluated in full for the derived query."""
@@ -193,7 +187,7 @@ async def drilldown(input: DrilldownInput, jwt: str) -> dict:
 
 #### JWT Validation
 
-Library: `python-jose[cryptography]`. The JWKS endpoint is fetched once at startup and cached with a 1-hour TTL. Required claims: `sub`, `org_id`. Optional but consumed claims: `analytics_roles`, `managed_portfolios`.
+The `python-jose[cryptography]` library verifies JWT signatures and claims using keys from the configured JWKS endpoint. Application middleware manages the key cache and enforces the required identity and analytical-role claims listed below. The cache refreshes at startup, after its one-hour TTL expires, and when an unknown key identifier requires a refresh.
 
 ```python
 from jose import jwt, JWTError
@@ -216,7 +210,9 @@ async def validate_jwt(token: str) -> dict:
 
 #### Caller Identity Claims
 
-Every request carries a host-issued JWT in the `Authorization: Bearer <token>` header — the reference implementation's realization of the authentication/identity token. Expired tokens are rejected immediately; tokens carrying no analytical role claim are denied (deny-by-default is an architectural property — there is no public-access fallback).
+Every request carries a host-issued JWT in the `Authorization: Bearer <token>` header — the reference implementation uses it as the authentication and identity token. Authentication middleware validates the token and makes verified claims available through server-side request context; bearer tokens are never MCP tool arguments and are never exposed to the model, tool schema, lineage payload, or application logs. Expired tokens and tokens carrying no analytical role claim are denied immediately.
+
+Validation pins the permitted signature algorithm, verifies `iss`, `aud`, `exp`, and `nbf` when present, and rejects missing required claims. JWKS caching honors key identifiers and supports refresh on an unknown `kid` so planned and emergency rotations do not require a service restart. Downstream services receive audience-specific exchanged tokens or workload credentials rather than the original bearer token unless an explicit, reviewed delegation policy permits forwarding.
 
 **Required claims**
 
@@ -391,20 +387,20 @@ Prompts provide pre-built instruction templates that AI consumers can load to an
 
 ```python
 @mcp.prompt()
-async def analytical_assistant(jwt: str) -> str:
+async def analytical_assistant() -> str:
     """System prompt for an AI assistant using the Analytics Platform.
     Injects the organization's available metrics and governance constraints."""
-    # 1. Validate JWT → claims
+    # 1. Read verified claims from authenticated server-side request context
     # 2. Fetch slim metric summary from SMR (id + label + description only — prompt size matters)
     # 3. Return system prompt string — instructs the assistant to use tool results only, never estimate
     ...
 
 @mcp.prompt()
-async def regulatory_reporting_assistant(jwt: str) -> str:
+async def regulatory_reporting_assistant() -> str:
     """System prompt for a compliance-focused assistant operating on regulatory metrics.
     Adds regulatory framing and prohibits investment recommendations. The frameworks in
     force are derived from the regulatory attributes on the queried metric definitions."""
-    # 1. Validate JWT → claims
+    # 1. Read verified claims from authenticated server-side request context
     # 2. Fetch regulatory-domain metric summary from SMR
     # 3. Return system prompt — extends analytical_assistant rules with compliance constraints:
     #    no investment recommendations, cite result_id in every response, explain compliance errors
@@ -480,6 +476,8 @@ Every error response carries a `result_id`, so every request — successful, blo
 
 > **Specification:** [§Intent Resolution Agent](./02-core-capabilities.md#intent-resolution-agent-ira)
 
+Custom Python code implements the IRA's retrieval and confirmation flow. The DCS search index supplies candidate SMR operations, and Anthropic Claude ranks those candidates, binds request parameters, and scores compliance intent. The application uses the model response to return a resolved request or ask for confirmation.
+
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
 | **Candidate retrieval** | Embedding similarity search over SMR operation/metric embeddings | RAG retrieval narrows the full catalog to a handful of candidates before the model ranks them |
@@ -538,6 +536,8 @@ Structured API consumers that already know the `operation_id` skip the IRA entir
 
 > **Specification:** [§Semantic Validation Layer](./02-core-capabilities.md#semantic-validation-layer-svl)
 
+Pydantic validates the tool input models, and JSON Schema validation checks operation parameters against their registered definitions. Custom Python code performs SMR lookups, enforces the entitlement projection, and builds the LQP. Together, these checks implement the SVL.
+
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
 | **Parameter validation** | JSON Schema + Pydantic | Strict schema enforcement against MCP tool input models; structured error responses |
@@ -576,10 +576,12 @@ class SemanticValidationLayer:
 
 > **Specification:** [§Narrative Synthesis Agent](./02-core-capabilities.md#narrative-synthesis-agent-nsa)
 
+Anthropic Claude generates the NSA's narrative text. Custom Python code selects the model, builds the prompt from result values, and validates the returned narrative. Claude Haiku handles simple summaries, and Claude Sonnet handles the more complex cases listed below.
+
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
 | **Provider** | Anthropic Claude | Reliable instruction-following for constrained summarization tasks |
-| **Standard queries** | Claude Haiku | Sub-200ms narrative generation for simple metric summaries |
+| **Standard queries** | Claude Haiku | Generates simple metric summaries; latency requires measurement against the intended workload. |
 | **Complex queries** | Claude Sonnet | Attribution decompositions and multi-portfolio results require richer prose |
 | **Prompt construction** | Result-only context | Metric labels + row values + units injected; no user query, no physical schema |
 | **Post-generation validation** | Custom Python | Every numeric value in narrative matched against result set; reject and retry once on failure |
@@ -633,6 +635,8 @@ class NarrativeSynthesisAgent:
 
 > **Specification:** [§Provenance Artifact Service](./02-core-capabilities.md#provenance-artifact-service-pas)
 
+An in-process Python module implements the PAS. The `cryptography` library signs the assembled artifact with ECDSA P-256 and SHA-256. Vault or Kubernetes Secrets supplies the signing key, and the ALS stores the signed artifact in S3 under the configured retention controls.
+
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
 | **Deployment** | In-process module within the `analytics-mcp` service | Invoked only for compliance-purpose queries — low volume; shares the S3 lineage bucket the service already writes to; no extra deployable |
@@ -676,6 +680,8 @@ class ProvenanceArtifactService:
 ### Semantic Metrics Repository (SMR)
 
 > **Specification:** [§Semantic Metrics Repository](./02-core-capabilities.md#semantic-metrics-repository-smr)
+
+The DCS stores and versions SMR definitions, manages their approval workflow, and indexes them for discovery. The Python `SemanticMetricsRepository` class accesses these functions through the DCS API.
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
@@ -966,18 +972,20 @@ class LQPGenerator:
 
 > **Specification:** [§Role-Aware Projection Layer](./02-core-capabilities.md#role-aware-projection-layer-rapl)
 
+Custom Python middleware implements the RAPL. It uses asyncpg to read policies from the PostgreSQL DES, combines those policies with verified identity claims, and produces the entitlement projection for the SVL.
+
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
 | **Implementation** | Custom middleware (Python) | Thin, stateless; computes the entitlement projection before the LQP is compiled |
 | **Role resolution** | JWT claim extraction + DES role definition lookup | Role claim field name is configurable |
-| **Policy store (DES)** | PostgreSQL `role_policies` schema — the reference realization of the Data Entitlements Store | Dedicated schema and credentials, logically separate from platform data; written only by the Entitlements Manager — not writable via the platform Admin API |
-| **Row scope** | `{{user.claim_name}}` template interpolation at projection time | Resolved from JWT claims; passed to the SVL, which injects the row scope filter nodes |
-| **Column masking** | Registered in the projection; applied post-assembly in the FQE result assembler | Post-assembly supports cross-backend result sets |
+| **Policy store (DES)** | The PostgreSQL `role_policies` schema acts as the Data Entitlements Store in the reference implementation | Dedicated schema and credentials, logically separate from platform data; written only by the Entitlements Manager — not writable via the platform Admin API |
+| **Row scope** | Typed predicate binding in Python | Binds verified claim values to allowlisted logical fields for the SVL to include in the plan. |
+| **Column protection** | Exclusions and deterministic masks are compiled into the PQP and executed before protected values leave the governed query boundary | Prevents unmasked values from entering the application process, cache, telemetry, or lineage store |
 | **Default policy** | Deny-by-default — fixed, not configurable | No access unless a matching role definition is found; an architectural property (P5), not a setting |
 
 #### Role policies schema
 
-Role policy documents are stored in the PostgreSQL `role_policies` schema — the reference realization of the **Data Entitlements Store (DES)**. The schema carries its own credentials and is logically separate from platform data even when physically co-located; it is written only by the Entitlements Manager and is not writable through the platform Admin API. Organizations with an existing entitlement system substitute it behind the same role-definition read interface. Each document maps directly to the following JSON shape:
+In the reference implementation, the PostgreSQL `role_policies` schema acts as the **Data Entitlements Store (DES)**. The schema carries its own credentials and is logically separate from platform data even when physically co-located; it is written only by the Entitlements Manager and is not writable through the platform Admin API. Organizations with an existing entitlement system substitute it behind the same role-definition read interface. Each document maps directly to the following JSON shape:
 
 ```json
 {
@@ -990,7 +998,7 @@ Role policy documents are stored in the PostgreSQL `role_policies` schema — th
   "allowed_dimensions":     null,
   "denied_dimensions":      ["issuer"],
   "row_scope": {
-    "portfolio": "portfolio_id IN ({{user.managed_portfolios}})"
+    "portfolio": { "operator": "in", "field": "portfolio_id", "claim": "managed_portfolios" }
   },
   "column_masks": {
     "aum": {
@@ -1021,7 +1029,7 @@ Field reference:
 | `denied_metrics` | array | Metric IDs denied regardless of `allowed_metrics` (`METRIC_NOT_ENTITLED`) |
 | `allowed_dimensions` | array \| null | Null = all dimensions permitted; array = explicit allowlist |
 | `denied_dimensions` | array | Dimension IDs denied regardless of `allowed_dimensions` (`DIMENSION_NOT_ENTITLED`) |
-| `row_scope` | object | Key = dimension name; value = `{{user.claim}}` template string |
+| `row_scope` | object | Key = dimension name; value = a typed predicate referencing an allowlisted logical field and a required verified claim |
 | `column_masks` | object | Key = field name; value = mask rule with `action:` one of `null_replacement`, `redacted_label`, `excluded`, `hash_replacement` |
 
 ```python
@@ -1039,7 +1047,7 @@ class RoleAwareProjectionLayer:
         # 1. Extract analytics_roles from claims — roleClaimField is configurable
         # 2. Load a role policy for each role — raises AccessDeniedError if none found (deny-by-default — not configurable)
         # 3. Merge policies — row scope intersected; column masks unioned
-        # 4. Resolve row scope templates against the JWT claims into concrete conditions
+        # 4. Bind verified claim values to typed predicates; missing claims deny the request
         # 5. Return the projection — the SVL injects the row scope nodes and embeds the column masks
         ...
 
@@ -1061,10 +1069,10 @@ class RoleAwareProjectionLayer:
         # Output: list of resolved row scope conditions for the SVL to inject as filter nodes
         ...
 
-    def _interpolate(self, template: str, claims: dict) -> str:
-        # Input:  predicate template string — e.g. "portfolio_id IN ({{user.managed_portfolios}})"
-        # Output: resolved predicate string with {{user.claim_name}} tokens replaced by JWT claim values
-        # List claims are expanded to comma-separated quoted values; unknown tokens collapse to empty string
+    def _bind_predicate(self, predicate: dict, claims: dict) -> dict:
+        # Input: typed predicate referencing an allowlisted logical field and verified claim
+        # Output: typed bound predicate compiled later with query parameters — never SQL text
+        # Missing claims, unsupported operators, and unknown fields fail closed
         ...
 
     async def _load_policy(self, org_id: str, role: str) -> dict | None:
@@ -1077,6 +1085,8 @@ class RoleAwareProjectionLayer:
 ### Semantic Controls Layer
 
 > **Specification:** [§Semantic Controls Layer](./02-core-capabilities.md#semantic-controls-layer-scl)
+
+Custom Python rules implement the SCL's five controls checks. The DCS stores control thresholds, the SDR supplies profiling statistics for scan estimates, and Redis coordinates concurrent-query admission across application instances.
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
@@ -1186,6 +1196,8 @@ class SemanticControlsLayer:
 
 > **Specification:** [§Physical Query Planner](./02-core-capabilities.md#physical-query-planner-pqp)
 
+Apache Calcite provides the relational planning functions used by the PQP. Application code maps the approved LQP and pinned SMR definitions into a relational tree, binds catalog references, and requests Trino SQL for execution by Starburst.
+
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
 | **Implementation** | Apache Calcite (Python-hosted) | Builds a relational tree from the LQP and emits SQL; battle-tested, dialect-aware |
@@ -1193,7 +1205,9 @@ class SemanticControlsLayer:
 | **Output** | A single **federated Trino SQL** statement | Starburst performs the cross-source join natively; no per-backend decomposition needed |
 | **Execution** | None | The PQP has no backend connectivity; it hands the federated SQL to the FQE (Starburst) |
 
-The Physical Query Planner receives the controls-approved LQP from the SCL and translates it into a single **federated Trino SQL** statement ready for Starburst to execute. For each `metric_scan` node it queries the SMR for the `physical_mapping` of the pinned metric definition version and binds it to a Starburst **catalog** reference (`catalog.schema.table`). It builds a Calcite relational tree from the LQP nodes — scans, joins, filters, time expansion, and sort — distributes the row scope filters, dimension filters, and column-mask directives into the statement, and emits Trino-dialect SQL. Because Starburst federates across catalogs natively, the PQP no longer decomposes the plan into per-backend sub-plans; the single statement references every catalog the query touches, and Starburst plans the cross-source join itself. This realizes Chapter 2's PQP sub-plan/FQE execution contract inside Starburst — the per-source split happens in the engine rather than in application code. The PQP has no execution capability — it passes the federated SQL to the FQE.
+For each `metric_scan` node, the PQP reads the `physical_mapping` from the pinned SMR metric version and binds it to a Starburst catalog reference (`catalog.schema.table`). The relational tree includes scans, joins, filters, time expansion, and sorting. The PQP adds row-scope filters, dimension filters, and column-mask directives before emitting Trino SQL.
+
+In this reference implementation, Starburst divides the federated query into source-specific execution work and performs cross-source joins. The application submits a single SQL statement. This allocation places the source-specific planning described in Section 2 within Starburst. The PQP supplies SQL to the FQE and does not execute it.
 
 #### PQP input — approved LQP
 
@@ -1284,9 +1298,11 @@ The PQP passes the federated Trino SQL to the FQE.
 | **Engine** | Starburst (Trino) | A mature federation engine with an ANSI-SQL surface and native connectors; performs cross-source joins and predicate/aggregate push-down without bespoke code |
 | **Federation** | One federated Trino SQL statement over multiple catalogs | Starburst plans and executes the cross-source join — no application-level fan-out or per-backend adapters to maintain |
 | **Client** | Python Trino client | Submits the PQP's federated SQL to the Starburst coordinator and streams typed rows |
-| **Result handling** | Custom (Python) | Applies the LQP's column masks, caches by LQP signature, and writes the lineage record |
+| **Result handling** | Custom (Python) | Verifies the protected result schema, caches by LQP signature, and writes the lineage record |
 
-The FQE is realized as **Starburst**, a Trino-based federation engine. It receives the federated Trino SQL produced by the PQP, submits it to the Starburst coordinator, and Starburst federates the query across its configured **catalog connectors** — pushing filters and aggregations down to each source (Snowflake, lakehouse, semantic layer, graph, REST) and performing any cross-source join itself. The FQE is the only component holding the Starburst connection. Once Starburst returns the result, the FQE applies the LQP's `column_masks`, caches the result by LQP signature, and writes the execution record to the Analytical Lineage Store. There are no per-backend adapters and no application-level fan-out — federation is Starburst's responsibility, and each source is reached as a Starburst catalog.
+Starburst acts as the FQE in the reference implementation. The Python Trino client submits SQL from the PQP to the Starburst coordinator. Starburst plans and executes the query across configured catalog connectors. Custom Python code verifies the returned schema against the entitlement projection, caches the result, and writes the execution record.
+
+The PQP compiles row predicates, column exclusions, and supported deterministic masks into the physical query so protected raw values do not enter the application result assembler. Unsupported masks fail closed during planning rather than being deferred to post-execution processing.
 
 #### FQE input — federated Trino SQL
 
@@ -1399,13 +1415,13 @@ class FederatedQueryEngine:
         # 1. Cache read — return cached result if available; compliance queries always bypass
         # 2. Submit plan["federated_sql"] to the Starburst coordinator via the Trino client
         #    Starburst federates across catalogs, pushes down predicates, performs cross-source joins
-        # 3. Stream typed rows; apply the LQP's column_masks during assembly
+        # 3. Stream typed rows; verify the returned schema against the entitlement projection
         # 4. Cache write — store the assembled result with TTL
         # 5. Write execution record to ALS — engine, catalogs_used, executed_sql, latency, scan_rows
         ...
 
-    def _apply_column_masks(self, rows: list[dict], lqp: dict) -> list[dict]:
-        # Applies the LQP's column_masks (null_replacement, redacted_label, excluded, hash_replacement) post-execution
+    def _verify_protected_schema(self, schema: list[dict], lqp: dict) -> None:
+        # Fail closed if a denied or unmasked protected field is returned
         ...
 ```
 
@@ -1413,6 +1429,8 @@ class FederatedQueryEngine:
 ### Data Visualization Language (DVL)
 
 > **Specification:** [§Data Visualization Language (DVL)](./02-core-capabilities.md#data-visualization-language-dvl)
+
+Custom Python code selects the DVL chart contract and generates the display specification. Vega-Lite v5 supplies the chart grammar; the platform defines a separate table format. Chart selection remains the responsibility of the Python contract evaluator.
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
@@ -1518,6 +1536,8 @@ class DataVisualizationLanguage:
 
 ### Static Image Rendering (vega2img)
 
+The vega2img service uses vega-embed to display Vega-Lite charts in a Vite application. Playwright controls headless Chromium to capture the rendered output. A custom HTML template supplies the table layout for table screenshots.
+
 vega2img is a **standalone MCP render service**, not part of the Analytics Platform. Consumers that need static image output register it as a peer MCP server alongside the Analytics Platform.
 
 | Decision | Choice | Rationale |
@@ -1597,12 +1617,18 @@ if __name__ == "__main__":
 
 > **Specification:** [§Analytical Lineage Store (ALS)](./02-core-capabilities.md#analytical-lineage-store-als)
 
+S3-compatible object storage stores the ALS records, and PostgreSQL indexes the fields needed to find them. The Python `AnalyticalLineageStore` class coordinates writes and retrieval across both stores. Storage retention controls and the application integrity checks described below protect the records.
+
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
 | **Lineage records** | S3-compatible object store — one JSON document per query | Write-once; append-only; cheap at scale; no schema migration required; natural fit for immutable audit records |
 | **Object key** | `lineage/{org_id}/{yyyy}/{mm}/{dd}/{result_id}.json` | Date-partitioned; enables prefix-based listing by time window |
 | **Search index** | Thin PostgreSQL table (scalar fields only, no JSON blobs) | Used by the Lineage Query REST API (see roadmap) for filtered search; full record always fetched from the object store |
 | **Retention** | Object lifecycle policy — sample default 7 years (configurable) | Long-horizon regulatory retention; enforced at the storage layer, not application code. Periods are deployment choices — the design documents deliberately prescribe none |
+
+The lineage store is a high-sensitivity security boundary because records can contain identity, entitlement, query, and result information. Deployments must encrypt records in transit and at rest with tenant-scoped access controls and auditable key rotation. Result payloads are excluded by default; the record stores a digest, schema, row count, and bounded summary unless an approved retention policy explicitly requires full result preservation. Requests and SQL are redacted for secrets and unnecessary personal data before persistence.
+
+Claims of write-once retention require a storage-enforced WORM control such as object lock in compliance mode (or an equivalent control), versioning, retention policy, and legal-hold support. Application convention alone is not immutability. Each record is signed or content-addressed, and periodic reconciliation detects missing objects, orphaned index rows, and signature failures. Object creation and index updates use a durable outbox/reconciliation workflow because S3 and PostgreSQL do not share a transaction.
 
 #### Lineage document schema
 
@@ -1619,7 +1645,7 @@ Each completed query writes a single JSON document to the object store at `linea
   "resolved_metrics":   [{ "metric_id": "portfolio_return", "version": "2.1.0" }],
   "controls_decision":{ "approved": true, "estimated_scan_rows": 408517, "checks_passed": ["data_scale_check", "complexity_check", "classification_gate", "compliance_check", "concurrency_check"] },
   "execution":          { "engine": "starburst", "catalogs_used": ["snowflake", "risk"], "executed_sql": "...", "latency_ms": 1243 },
-  "result_summary":     { "row_count": 2, "schema": ["..."], "rows": ["..."] },
+  "result_summary":     { "row_count": 2, "schema": ["..."], "result_digest": "sha256:..." },
   "display_spec":       { "type": "chart", "contract": "BAR_MULTI_SERIES_COMPARISON", "..." },
   "error_code":         null,
   "regulatory_frameworks": ["<framework_id>"],
@@ -1732,6 +1758,8 @@ class AnalyticalLineageStore:
 
 > **Used by:** MCP Resource handlers
 
+S3-compatible object storage stores the Knowledge Store's versioned Markdown or MDX documents. Python resource handlers retrieve the active versions for MCP consumers, and the Admin API manages document updates.
+
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
 | **Storage** | S3-compatible object store (versioned Markdown or MDX files) | Human-readable; diffable; straightforward Admin API management |
@@ -1762,9 +1790,11 @@ class KnowledgeStore:
 
 ### Result Cache
 
+Redis acts as the Result Cache. The Python `ResultCache` class derives keys from canonical LQPs, applies the configured TTL, and bypasses cache reads and writes for compliance-purpose queries.
+
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
-| **Store** | Redis (cluster mode) | Sub-millisecond read; TTL-native; cluster mode for HA |
+| **Store** | Redis (cluster mode) | Provides shared cache storage and key expiry; read latency requires measurement in the deployed environment. |
 | **Cache key** | SHA-256 of the canonical serialized LQP | The plan embeds `org_id`, the row-scope filter nodes, and `column_masks` — different effective entitlements produce different plans and therefore different keys, structurally |
 | **TTL** | 5 minutes default; configurable per operation via `cache_ttl_seconds` on `analytical_operation` | Short TTL balances freshness against backend load |
 | **Compliance bypass** | Queries with `compliance_purpose: true` skip read and write | Provenance Artifact requires a fresh execution record |
@@ -1910,6 +1940,8 @@ Configuration is read from environment variables at startup. Required variables:
 
 ## 3.4 Infrastructure
 
+Kubernetes runs the Python application services. Starburst executes federated queries, PostgreSQL stores policies and indexes, Redis stores cached results and concurrency state, and S3-compatible storage stores lineage and knowledge documents. Vault or the selected cloud secrets service supplies credentials to these components.
+
 | Component | Choice | Rationale |
 |-----------|--------|-----------|
 | MCP service | Python · FastMCP + Uvicorn | Lightweight ASGI MCP surface; deploys as Kubernetes pod |
@@ -1933,7 +1965,7 @@ Configuration is read from environment variables at startup. Required variables:
 | Redis | Managed (ElastiCache / Upstash) | 6379 | — | — | — | — |
 | Object storage | S3-compatible | — | — | — | — | — |
 
-Health check endpoint: `GET /health` on each container port. Returns `200 OK` with `{"status": "ok", "catalogs": {...}}` when all registered Starburst catalogs and DCS connectivity are confirmed.
+Each service exposes a minimal unauthenticated liveness endpoint that returns only `{"status": "ok"}`. A separate authenticated readiness endpoint reports dependency state to authorized operators; it does not expose catalog names or infrastructure topology to ordinary consumers.
 
 All platform services run in a dedicated Kubernetes namespace (`analytics`). Starburst catalog credentials and API keys are injected via Kubernetes Secrets mounted as environment variables — never baked into container images.
 

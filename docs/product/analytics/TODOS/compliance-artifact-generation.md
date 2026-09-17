@@ -1,4 +1,6 @@
-# TODO: Compliance Artifact Generation
+# Resolved Design Note: Compliance Artifact Generation
+
+> **Status:** Resolved in version 2.0. The two-signal compliance design described below is implemented in Chapters 1–3. This file is retained as architectural decision history and is not an open publication TODO. References to the former SEG name are historical; the implemented component is the Semantic Controls Layer (SCL).
 
 **Status:** Implemented in Chapters 2, 3, 4, 5. Open questions resolved. Closed.  
 **Affects:** Chapters 2, 3, 4, 5 and SMR metric schema  

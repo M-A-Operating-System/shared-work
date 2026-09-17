@@ -1,14 +1,6 @@
 # 5. Appendix: Text-to-SQL and Semantic Analytics: Better Together
 
-**Product:** AI Analytics Platform  
-**Version:** 2.0  
-**Date:** 2026-06-16  
-**Author:** Andrew Bush / M&A Operating System
-
----
-
-
-This appendix is a standalone reference for teams designing AI-powered analytics architectures. It can be read independently of the platform specification.
+This appendix supports the white paper's proposal for governed semantic execution. It examines why we believe Text-to-SQL alone is not a sustainable long-term foundation for AI-enabled analytics and data mining where accuracy, traceability, and repeatability are critical. It can also be read independently by teams evaluating architectural alternatives.
 
 The central argument here is not that Text-to-SQL should be avoided. It is that large-scale analytics in a regulated environment needs both tools running alongside each other. Text-to-SQL is the exploration layer: fast, flexible, genuinely useful for ad-hoc analysis, hypothesis testing, and metric discovery. The semantic analytics engine is the governed execution layer: deterministic, auditable, with versioned metric definitions and enforced entitlements. The two work best as a connected system, with outputs promoted from exploration into the governed registry when they need to become reliable.
 
@@ -44,13 +36,13 @@ The failure mode is rarely a deliberate decision. A team uses Text-to-SQL becaus
 | Valuable input to metric design | Cannot replace the governed metric registry it feeds into |
 
 
-## Why Text-to-SQL Cannot Scale to Governed Analytics
+## Why Unrestricted Text-to-SQL Is a Poor Foundation for Governed Analytics
 
 ### Governance and Regulatory Risk
 
 #### No audit trail for regulatory review
 
-When a regulator asks "how was this number calculated?", the answer in a Text-to-SQL system is: "A language model generated some SQL and this number came back." There is no versioned metric definition, no formula record, no lineage chain from input to result, and no guarantee the same question produces the same answer tomorrow. That does not satisfy any regulatory audit requirement.
+When a regulator asks "how was this number calculated?", an unrestricted Text-to-SQL system may be able to show only the generated SQL and returned value. Without versioned definitions, formula records, lineage, and evidence controls, that response is unlikely to satisfy a regulated organization's audit requirements.
 
 #### No metric versioning or change management
 
@@ -99,7 +91,7 @@ A deterministic pipeline can be tested: given these inputs, produce exactly this
 
 ### Information Security
 
-These risks run deeper than configuration choices. They exist because the LLM is doing two jobs at once: taking user requests and generating executable SQL from them, with no deterministic layer in between. Guardrails, validators, and output filters reduce the surface area but cannot eliminate the underlying exposure. The only reliable fix is to separate the AI from the execution layer entirely. The [SQL Injection in MCP-Exposed Query Services](#sql-injection-in-mcp-exposed-query-services) section covers the specific attack vectors in detail, with confirmed CVEs and recommended mitigations.
+These risks run deeper than configuration choices when an LLM both interprets requests and generates executable SQL without an intervening governed plan. Allowlists, AST validation, parameter binding, read-only replicas, least-privilege database roles, sandboxing, and human approval can materially reduce risk, but they do not create versioned metric definitions or deterministic semantic resolution. Governed workloads therefore benefit from separating probabilistic intent interpretation from controlled execution. The [SQL Injection in MCP-Exposed Query Services](#sql-injection-in-mcp-exposed-query-services) section covers relevant attack vectors and mitigations.
 
 #### Schema Exposure and Reconnaissance
 
@@ -229,7 +221,7 @@ The governed architecture separates the AI translation layer from the governed c
 
 The boundary is the governed semantic registry. Crossing from exploration into production — from informal query into governed metric — requires a formal definition, approval, and versioning process. Text-to-SQL is available on the exploration side of that boundary. It is not available on the governed execution side.
 
-For a complete specification of this architecture, see [Chapter 2, Core Platform Capabilities](./02-core-capabilities.md).
+For the proposed component responsibilities and controls, see [Section 2, Proposed Architecture and Capabilities](./02-core-capabilities.md).
 
 
 ## SQL Injection in MCP-Exposed Query Services
