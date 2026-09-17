@@ -136,7 +136,7 @@ flowchart TD
 | 8. Presentation and evidence - DVL, NSA, ALS, and PAS | Create the governed display contract, optionally create and validate a narrative, complete the correlated lineage evidence, and seal a compliance artifact when the trigger is active. | Typed result, resolved intent, plan references, and accumulated evidence | Display specification, optional narrative, lineage reference, and optional sealed compliance artifact |
 | 9. Capability response - MCP Capability Layer | Assemble the governed response and return it to the requesting consumer. A consumer may send the display specification to the optional rendering service. | Result, presentation outputs, evidence references, warnings, and terminal status | Structured consumer response and, when separately requested, rendered SVG or PNG |
 
-The worked example uses one request throughout. Each subsection names the stage input in prose and shows the stage output as technology-neutral JSON. Identifiers and values are illustrative, not implementation defaults.
+The running example uses one request throughout. Each component shows both its input and output as technology-neutral JSON. Identifiers and values are illustrative, not implementation defaults.
 
 A result is repeatable only when the request, source snapshot, definition versions, effective permissions, configuration, and execution software are preserved. Deterministic planning does not compensate for changed data or definitions.
 
@@ -157,29 +157,55 @@ A result is repeatable only when the request, source snapshot, definition versio
 | Narrative Synthesis Agent (NSA) | Produces an optional result-grounded summary. |
 | Analytical Lineage Store (ALS) | Preserves correlated records of requests, decisions, execution, and terminal outcomes. |
 | Provenance Artifact Service (PAS) | Signs additional evidence for compliance-purpose results. |
+| Structured Response | Delivers data, presentation, evidence, warnings, and status through one governed contract. |
+| Semantic Data Repository (SDR) | Supplies governed data meaning, structure, quality, lineage, and mapping context. |
+| Data Entitlements Store (DES) | Supplies independently governed analytical access policies. |
+| External Language Model Service | Supports bounded intent ranking and narrative drafting without performing calculation. |
+| Registered Data Sources | Execute bounded source instructions and return typed data or explicit failures. |
+| Optional Rendering Service | Converts a self-contained display specification into SVG or PNG. |
 
 ## AI Consumers
+
+**Business definition.** AI consumers are the channels through which people and automated processes request and use governed analysis.
+
+**Why this role exists.** The architecture separates the user experience from analytical governance so that several interfaces can use the same approved definitions, permissions, controls, and evidence.
+
+**Input and output.** A consumer starts with a business question or a known approved operation and the caller's authenticated context. It outputs a governed analytical request and later renders the structured response without recalculating or reinterpreting its values.
 
 AI consumers include conversational assistants, autonomous agents, data-mining workflows, and custom applications. They provide the user experience; they do not own analytical definitions, permissions, query planning, or execution.
 
 A consumer may submit natural language or an approved operation identifier with typed parameters. It passes the caller's authenticated context, preserves the returned result identifier for follow-up actions, and distinguishes governed results from exploratory output produced outside this platform.
 
-### Worked Example
+### Input and Output Example
 
 The running example asks the platform to compare the caller's equity portfolios with their benchmarks for the current quarter:
 
 ```json
 {
-  "question": "Compare my equity portfolios with their benchmarks this quarter",
-  "response_profile": "full_analytical"
+  "input": {
+    "business_request": "Compare my equity portfolios with their benchmarks this quarter",
+    "requested_experience": "analysis with presentation and narrative"
+  },
+  "output": {
+    "question": "Compare my equity portfolios with their benchmarks this quarter",
+    "response_profile": "full_analytical"
+  }
 }
 ```
 
 The authentication and identity context travels through the trusted transport. It is not embedded in the analytical request body.
 
+The consumer request becomes the MCP Capability Layer input, beginning the governed pipeline.
+
 ## MCP Capability Layer (MCP)
 
 > **Governing principles:** [P1 - Semantic abstraction](./01-overview.md#design-principles), [P2 - Controls before execution](./01-overview.md#design-principles), and [P5 - Role-aware by default](./01-overview.md#design-principles)
+
+**Business definition.** The MCP Capability Layer is the governed front door to the analytical service.
+
+**Why it exists.** It gives every consumer one consistent contract and prevents conversational, automated, or custom interfaces from creating alternative paths around authentication and governance.
+
+**Input and output.** It receives an authenticated natural-language or structured request. It outputs a correlated request to the correct pipeline stage and, after processing, a structured response to the consumer.
 
 The MCP Capability Layer is the single governed analytical entry point. The transport authenticates the caller before tool routing and passes identity through trusted request context. Bearer tokens are not analytical tool arguments.
 
@@ -217,24 +243,38 @@ The consumer may select a candidate, refine the question, or cancel. Selection r
 
 The capability layer exposes only registered tools and approved operation metadata. Tool discovery is entitlement-aware. Request limits, session limits, and allowed response sizes are versioned platform controls. Changes to tool contracts follow the same review and compatibility process as other public interfaces.
 
-### Worked Example
+### Input and Output Example
 
 The MCP layer accepts the natural-language request and creates a correlation identifier before routing it to the IRA:
 
 ```json
 {
-  "request_id": "req-20260518-093241",
-  "tool": "run_analytics",
   "input": {
-    "question": "Compare my equity portfolios with their benchmarks this quarter",
-    "response_profile": "full_analytical"
+    "authenticated_context_ref": "caller-context",
+    "analytical_request_ref": "consumer-request"
+  },
+  "output": {
+    "request_id": "req-20260518-093241",
+    "tool": "run_analytics",
+    "arguments": {
+      "question": "Compare my equity portfolios with their benchmarks this quarter",
+      "response_profile": "full_analytical"
+    }
   }
 }
 ```
 
+For natural-language requests, the correlated request becomes the IRA input. A structured request proceeds directly to RAPL.
+
 ## Intent Resolution Agent (IRA)
 
 > **Governing principles:** [P1 - Semantic abstraction](./01-overview.md#design-principles) and [P10 - Deterministic computation, not generation](./01-overview.md#design-principles)
+
+**Business definition.** The IRA translates a user's business language into a registered analytical operation and its typed parameters.
+
+**Why it exists.** Users should not need to know catalog identifiers, but the platform must not let a language model invent calculations or executable queries. The IRA bridges that gap and asks for confirmation when meaning is uncertain.
+
+**Input and output.** It receives a natural-language request and the approved definitions discoverable by the caller. It outputs a resolved operation, parameters, confidence evidence, and purpose signal, or a clarification request.
 
 The IRA is the only AI step before computation. It retrieves candidate operations from the SMR, ranks them against the user's request, binds parameters, and returns either a resolved request or a confirmation choice. It does not receive credentials, execute queries, or generate executable SQL.
 
@@ -254,28 +294,43 @@ The IRA also estimates whether the stated purpose is compliance-related. Ambiguo
 
 Retrieval narrows the model's choice set; it does not approve a definition or establish that the chosen intent is correct. Evaluation must measure top-candidate accuracy, correct-candidate coverage, clarification quality, and false certainty across representative language and user roles.
 
-### Worked Example
+### Input and Output Example
 
 The IRA resolves the question to an approved comparison operation. The symbolic caller-dependent scope remains unresolved:
 
 ```json
 {
-  "request_id": "req-20260518-093241",
-  "operation_id": "compare_portfolio_to_benchmark",
-  "parameters": {
-    "portfolio_scope": "caller_authorized_portfolios",
-    "asset_class": "EQUITY",
-    "time_period": "current_quarter"
+  "input": {
+    "request_id": "req-20260518-093241",
+    "question": "Compare my equity portfolios with their benchmarks this quarter",
+    "discoverable_catalog_ref": "approved-operations-for-caller"
   },
-  "confidence": 0.93,
-  "compliance_purpose_score": 0.08,
-  "confirmation_required": false
+  "output": {
+    "request_id": "req-20260518-093241",
+    "operation_id": "compare_portfolio_to_benchmark",
+    "parameters": {
+      "portfolio_scope": "caller_authorized_portfolios",
+      "asset_class": "EQUITY",
+      "time_period": "current_quarter"
+    },
+    "confidence": 0.93,
+    "compliance_purpose_score": 0.08,
+    "confirmation_required": false
+  }
 }
 ```
+
+The IRA uses the SMR to limit interpretation to approved analytical choices. Its resolved operation then becomes part of the RAPL input.
 
 ## Semantic Metrics Repository (SMR)
 
 > **Governing principles:** [P1 - Semantic abstraction](./01-overview.md#design-principles), [P3 - Deterministic metric resolution](./01-overview.md#design-principles), and [P10 - Deterministic computation, not generation](./01-overview.md#design-principles)
+
+**Business definition.** The SMR is the organization's governed rulebook for analytical meaning: what a metric, dimension, operation, or dataset means and which approved version applies.
+
+**Why it exists.** Without a shared catalog, each report, application, or AI interaction can reconstruct the same business concept differently. The SMR makes approved definitions reusable and versioned.
+
+**Input and output.** Authors submit proposed definitions through governance. At runtime, the IRA, SVL, and PQP submit approved identifiers or discovery queries. The SMR outputs discoverable operation metadata, pinned semantic definitions, and approved mapping references.
 
 In a governed AI-enabled analytics situation, the Semantic Metrics Repository (SMR) provides a catalog of approved metrics, dimensions, operations, and dataset contracts. It is the authoritative source for concepts that the governed path can resolve.
 
@@ -316,28 +371,54 @@ A formula is human-readable and audit-visible, but registration does not prove c
 
 Metrics Modellers submit definitions through an authenticated workflow. Analytics Governance reviews and approves them. Consumers discover only approved operations available under their entitlements. Search indexes and embeddings may improve discovery; they do not change approval state or access rights.
 
-### Worked Example
+### Input and Output Example
 
 The resolved operation references two approved metrics without exposing their physical implementation:
 
 ```json
 {
-  "operation_id": "compare_portfolio_to_benchmark",
-  "version": "1.3.0",
-  "status": "approved",
-  "metrics": [
-    { "metric_id": "portfolio_return", "version": "2.1.0" },
-    { "metric_id": "benchmark_return", "version": "1.4.2" }
-  ],
-  "dimensions": ["portfolio"],
-  "required_parameters": ["portfolio_scope", "asset_class", "time_period"],
-  "execution_profile": "full_analytical"
+  "input": {
+    "lookup": "approved_operation_definition",
+    "operation_id": "compare_portfolio_to_benchmark"
+  },
+  "output": {
+    "operation_id": "compare_portfolio_to_benchmark",
+    "version": "1.3.0",
+    "status": "approved",
+    "metrics": [
+      {
+        "metric_id": "portfolio_return",
+        "version": "2.1.0"
+      },
+      {
+        "metric_id": "benchmark_return",
+        "version": "1.4.2"
+      }
+    ],
+    "dimensions": [
+      "portfolio"
+    ],
+    "required_parameters": [
+      "portfolio_scope",
+      "asset_class",
+      "time_period"
+    ],
+    "execution_profile": "full_analytical"
+  }
 }
 ```
+
+The approved operation definition and resolved request now move to RAPL, where the caller's permitted analytical scope is determined.
 
 ## Role-Aware Projection Layer (RAPL)
 
 > **Governing principle:** [P5 - Role-aware by default](./01-overview.md#design-principles)
+
+**Business definition.** RAPL converts organizational access policy into the exact analytical scope permitted for the current caller and request.
+
+**Why it exists.** Permission to reach a data service does not explain which business metrics, dimensions, populations, or fields a person may use. RAPL makes those business-level restrictions explicit before planning begins.
+
+**Input and output.** It receives the resolved request, authenticated identity context, and versioned DES policies. It outputs an entitlement projection containing approved concepts, row scope, masks, classification ceiling, and decision evidence.
 
 RAPL converts authenticated identity claims and policies from the Data Entitlements Store (DES) into an effective entitlement projection. It validates identity context, retrieves role definitions, merges them according to policy, resolves claim-based row scopes, and records the decision.
 
@@ -375,30 +456,55 @@ The merge must be independent of role order and must fail closed when a required
 
 Masking changes what downstream consumers can observe. The selected mode, protected field, policy version, and enforcement location therefore form part of the analytical evidence.
 
-### Worked Example
+### Input and Output Example
 
 RAPL resolves the symbolic portfolio scope from the authenticated caller's policy and claims:
 
 ```json
 {
-  "request_id": "req-20260518-093241",
-  "policy_version": "portfolio-access-7.2",
-  "approved_metrics": ["portfolio_return", "benchmark_return"],
-  "approved_dimensions": ["portfolio"],
-  "row_scope": {
-    "field": "portfolio_id",
-    "operator": "in",
-    "values": ["GLOB_EQ_OPP", "UK_CORE_INC", "ASIA_PAC_GRW", "EUR_BAL_INC"]
+  "input": {
+    "resolved_request_ref": "req-20260518-093241",
+    "authenticated_context_ref": "caller-context",
+    "entitlement_policy_ref": "current-policy-snapshot"
   },
-  "column_masks": [],
-  "classification_ceiling": "INTERNAL",
-  "decision": "approved"
+  "output": {
+    "request_id": "req-20260518-093241",
+    "policy_version": "portfolio-access-7.2",
+    "approved_metrics": [
+      "portfolio_return",
+      "benchmark_return"
+    ],
+    "approved_dimensions": [
+      "portfolio"
+    ],
+    "row_scope": {
+      "field": "portfolio_id",
+      "operator": "in",
+      "values": [
+        "GLOB_EQ_OPP",
+        "UK_CORE_INC",
+        "ASIA_PAC_GRW",
+        "EUR_BAL_INC"
+      ]
+    },
+    "column_masks": [],
+    "classification_ceiling": "INTERNAL",
+    "decision": "approved"
+  }
 }
 ```
+
+The entitlement projection becomes an SVL input alongside the resolved request and pinned SMR definitions.
 
 ## Semantic Validation Layer (SVL)
 
 > **Governing principles:** [P2 - Controls before execution](./01-overview.md#design-principles) and [P10 - Deterministic computation, not generation](./01-overview.md#design-principles)
+
+**Business definition.** The SVL is the semantic quality gate that turns an entitled business request into a precise, technology-neutral calculation plan.
+
+**Why it exists.** A recognized intent can still be incomplete, incompatible, unapproved, or inconsistent with the caller's permissions. The SVL stops those requests before physical planning or source access.
+
+**Input and output.** It receives the resolved request, entitlement projection, and pinned SMR definitions. It outputs a backend-independent Logical Query Plan or a structured rejection.
 
 The SVL validates a fully qualified request and compiles it into a platform-independent LQP. No AI model runs in this component.
 
@@ -417,32 +523,70 @@ Unknown, unapproved, incompatible, or unauthorized required concepts cause a str
 
 The LQP also carries definition versions, data-affinity hints, mask directives, compliance inputs, and a preliminary impact indicator. It contains no credentials, connection endpoints, physical table names, or executable SQL.
 
-### Worked Example
+### Input and Output Example
 
 The SVL converts the qualified request into a backend-independent plan:
 
 ```json
 {
-  "lqp_id": "lqp-20260518-093243",
-  "operation_id": "compare_portfolio_to_benchmark",
-  "metric_versions": {
-    "portfolio_return": "2.1.0",
-    "benchmark_return": "1.4.2"
+  "input": {
+    "resolved_request_ref": "req-20260518-093241",
+    "entitlement_projection_ref": "projection:req-20260518-093241",
+    "definition_set_ref": "approved-definition-versions"
   },
-  "steps": [
-    { "type": "metric_scan", "metrics": ["portfolio_return", "benchmark_return"] },
-    { "type": "filter", "field": "asset_class", "operator": "eq", "value": "EQUITY" },
-    { "type": "row_scope", "field": "portfolio_id", "operator": "in", "value_ref": "authorized_portfolios" },
-    { "type": "sort", "field": "portfolio_return", "direction": "descending" }
-  ],
-  "time_period": { "type": "relative", "value": "current_quarter" },
-  "column_masks": []
+  "output": {
+    "lqp_id": "lqp-20260518-093243",
+    "operation_id": "compare_portfolio_to_benchmark",
+    "metric_versions": {
+      "portfolio_return": "2.1.0",
+      "benchmark_return": "1.4.2"
+    },
+    "steps": [
+      {
+        "type": "metric_scan",
+        "metrics": [
+          "portfolio_return",
+          "benchmark_return"
+        ]
+      },
+      {
+        "type": "filter",
+        "field": "asset_class",
+        "operator": "eq",
+        "value": "EQUITY"
+      },
+      {
+        "type": "row_scope",
+        "field": "portfolio_id",
+        "operator": "in",
+        "value_ref": "authorized_portfolios"
+      },
+      {
+        "type": "sort",
+        "field": "portfolio_return",
+        "direction": "descending"
+      }
+    ],
+    "time_period": {
+      "type": "relative",
+      "value": "current_quarter"
+    },
+    "column_masks": []
+  }
 }
 ```
+
+The completed Logical Query Plan becomes the SCL input for the mandatory release decision.
 
 ## Semantic Controls Layer (SCL)
 
 > **Governing principles:** [P2 - Controls before execution](./01-overview.md#design-principles), [P8 - Explainability at every layer](./01-overview.md#design-principles), and [P9 - Administrator sovereignty within governance bounds](./01-overview.md#design-principles)
+
+**Business definition.** The SCL is the operational and governance release gate for an otherwise valid analytical plan.
+
+**Why it exists.** Entitlement and semantic validity do not address excessive scale, unsafe complexity, operating capacity, classification boundaries, or compliance-purpose handling. The SCL decides whether the plan may proceed under current policy and conditions.
+
+**Input and output.** It receives the Logical Query Plan, versioned control policy, profiling evidence, and operating state. It outputs an approved plan with an execution budget or a structured rejection, together with a recorded decision.
 
 The SCL is the mandatory release gate between logical validation and physical planning. It evaluates every LQP against versioned controls and records the decision before execution.
 
@@ -467,28 +611,63 @@ The data-scale estimate uses current SDR profiling statistics and the resolved r
 
 No interactive user, automated agent, administrator, cache path, or internal retry bypasses this release decision. A retried or modified request receives its own decision record.
 
-### Worked Example
+### Input and Output Example
 
 The SCL records each decision and assigns the execution budget:
 
 ```json
 {
-  "lqp_id": "lqp-20260518-093243",
-  "decision": "approved",
-  "checks": {
-    "data_scale": { "estimate": 412000, "limit": 50000000, "result": "pass" },
-    "complexity": { "score": 4, "limit": 50, "result": "pass" },
-    "classification": { "required": "INTERNAL", "ceiling": "INTERNAL", "result": "pass" },
-    "compliance": { "metric_signal": false, "purpose_signal": false, "result": "standard" },
-    "concurrency": { "active": 3, "limit": 20, "result": "pass" }
+  "input": {
+    "lqp_id": "lqp-20260518-093243",
+    "controls_policy_ref": "current-controls",
+    "operating_state_ref": "current-capacity"
   },
-  "timeout_seconds": 30
+  "output": {
+    "lqp_id": "lqp-20260518-093243",
+    "decision": "approved",
+    "checks": {
+      "data_scale": {
+        "estimate": 412000,
+        "limit": 50000000,
+        "result": "pass"
+      },
+      "complexity": {
+        "score": 4,
+        "limit": 50,
+        "result": "pass"
+      },
+      "classification": {
+        "required": "INTERNAL",
+        "ceiling": "INTERNAL",
+        "result": "pass"
+      },
+      "compliance": {
+        "metric_signal": false,
+        "purpose_signal": false,
+        "result": "standard"
+      },
+      "concurrency": {
+        "active": 3,
+        "limit": 20,
+        "result": "pass"
+      }
+    },
+    "timeout_seconds": 30
+  }
 }
 ```
+
+An approved controls decision releases the Logical Query Plan and execution budget to the PQP.
 
 ## Physical Query Planner (PQP)
 
 > **Governing principles:** [P1 - Semantic abstraction](./01-overview.md#design-principles) and [P10 - Deterministic computation, not generation](./01-overview.md#design-principles)
+
+**Business definition.** The PQP translates an approved business calculation into bounded instructions that registered data sources can execute.
+
+**Why it exists.** Business definitions should remain stable when physical schemas or source technologies change. The PQP contains that translation boundary and keeps physical details away from AI consumers and language models.
+
+**Input and output.** It receives the approved Logical Query Plan, execution budget, pinned mappings, and source capabilities. It outputs a physical execution envelope containing source sub-plans, protection directives, and integrity evidence.
 
 The PQP is the boundary between logical concepts and physical execution. It resolves the approved physical mapping associated with each pinned definition version, expands logical time expressions, groups work by source affinity, and compiles source-specific sub-plans.
 
@@ -509,31 +688,58 @@ A repeatable physical plan requires the same LQP, definition and mapping version
 
 An implementation may delegate federation to one execution service or create several source sub-plans with an explicit assembly contract. Both approaches implement the same logical responsibility; Section 3 proposes a specific choice.
 
-### Worked Example
+### Input and Output Example
 
 The PQP resolves the approved mappings and creates a technology-neutral execution envelope:
 
 ```json
 {
-  "plan_id": "plan-20260518-093244",
-  "lqp_id": "lqp-20260518-093243",
-  "mapping_versions": ["portfolio-mapping-4.6"],
-  "sub_plans": [
-    {
-      "source_id": "portfolio-performance-source",
-      "metrics": ["portfolio_return", "benchmark_return"],
-      "filters": ["asset_class", "authorized_portfolios", "resolved_date_range"]
-    }
-  ],
-  "resolved_date_range": { "from": "2026-04-01", "to": "2026-05-18" },
-  "column_masks": [],
-  "timeout_seconds": 30
+  "input": {
+    "lqp_id": "lqp-20260518-093243",
+    "controls_decision_ref": "controls:lqp-20260518-093243",
+    "mapping_set_ref": "approved-mappings"
+  },
+  "output": {
+    "plan_id": "plan-20260518-093244",
+    "lqp_id": "lqp-20260518-093243",
+    "mapping_versions": [
+      "portfolio-mapping-4.6"
+    ],
+    "sub_plans": [
+      {
+        "source_id": "portfolio-performance-source",
+        "metrics": [
+          "portfolio_return",
+          "benchmark_return"
+        ],
+        "filters": [
+          "asset_class",
+          "authorized_portfolios",
+          "resolved_date_range"
+        ]
+      }
+    ],
+    "resolved_date_range": {
+      "from": "2026-04-01",
+      "to": "2026-05-18"
+    },
+    "column_masks": [],
+    "timeout_seconds": 30
+  }
 }
 ```
+
+The physical execution envelope becomes the FQE input; no upstream component executes against a data source.
 
 ## Federated Query Engine (FQE)
 
 > **Governing principles:** [P1 - Semantic abstraction](./01-overview.md#design-principles), [P4 - Complete analytical lineage](./01-overview.md#design-principles), and [P10 - Deterministic computation, not generation](./01-overview.md#design-principles)
+
+**Business definition.** The FQE is the controlled execution boundary that runs approved source instructions and assembles their results.
+
+**Why it exists.** Source credentials, timeouts, federation, caching, masking, and failure handling require one accountable boundary. Concentrating them here prevents upstream components and AI consumers from gaining direct backend access.
+
+**Input and output.** It receives an approved physical execution envelope. It outputs a typed result or an explicit terminal outcome, plus execution evidence for the ALS.
 
 The FQE is the only logical component with access to registered backend connections. It validates source availability, executes approved sub-plans within the assigned timeout, joins compatible results on governed dimensions, enforces any remaining masks within its controlled boundary, and records execution outcomes.
 
@@ -558,28 +764,64 @@ Supported source categories may include relational analytical stores, governed s
 
 Result-size limits determine whether the engine returns inline data, paginates an approved dataset, streams within a controlled protocol, or rejects the request. These choices are part of the operation contract and response evidence.
 
-### Worked Example
+### Input and Output Example
 
 The FQE executes the approved plan and returns typed result rows:
 
 ```json
 {
-  "result_id": "res-20260518-093247",
-  "status": "complete",
-  "sources_used": ["portfolio-performance-source"],
-  "cache_status": "miss",
-  "rows": [
-    { "portfolio_id": "GLOB_EQ_OPP", "portfolio": "Global Equity Opportunities", "portfolio_return": 0.0421, "benchmark_return": 0.0385 },
-    { "portfolio_id": "ASIA_PAC_GRW", "portfolio": "Asia Pacific Growth", "portfolio_return": 0.0367, "benchmark_return": 0.0390 },
-    { "portfolio_id": "UK_CORE_INC", "portfolio": "UK Core Income", "portfolio_return": 0.0287, "benchmark_return": 0.0254 },
-    { "portfolio_id": "EUR_BAL_INC", "portfolio": "EUR Balanced Income", "portfolio_return": 0.0193, "benchmark_return": 0.0231 }
-  ]
+  "input": {
+    "plan_id": "plan-20260518-093244",
+    "controls_decision_ref": "controls:lqp-20260518-093243"
+  },
+  "output": {
+    "result_id": "res-20260518-093247",
+    "status": "complete",
+    "sources_used": [
+      "portfolio-performance-source"
+    ],
+    "cache_status": "miss",
+    "rows": [
+      {
+        "portfolio_id": "GLOB_EQ_OPP",
+        "portfolio": "Global Equity Opportunities",
+        "portfolio_return": 0.0421,
+        "benchmark_return": 0.0385
+      },
+      {
+        "portfolio_id": "ASIA_PAC_GRW",
+        "portfolio": "Asia Pacific Growth",
+        "portfolio_return": 0.0367,
+        "benchmark_return": 0.039
+      },
+      {
+        "portfolio_id": "UK_CORE_INC",
+        "portfolio": "UK Core Income",
+        "portfolio_return": 0.0287,
+        "benchmark_return": 0.0254
+      },
+      {
+        "portfolio_id": "EUR_BAL_INC",
+        "portfolio": "EUR Balanced Income",
+        "portfolio_return": 0.0193,
+        "benchmark_return": 0.0231
+      }
+    ]
+  }
 }
 ```
+
+The typed result now branches to presentation and evidence components. DVL determines how consumers should display it.
 
 ## Data Visualization Language (DVL)
 
 > **Governing principle:** [P7 - Deterministic visualization](./01-overview.md#design-principles)
+
+**Business definition.** The DVL turns a governed result into a consistent chart or table contract that consumers can render.
+
+**Why it exists.** Presentation choices can change interpretation. A governed display contract prevents each consumer or language model from independently choosing labels, units, ordering, thresholds, and chart form.
+
+**Input and output.** It receives the approved intent, typed result schema, values, and presentation metadata. It outputs a versioned display specification or the governed table fallback.
 
 The DVL produces a structured chart or table specification from the approved intent and result schema. A registry maps comparison, trend, distribution, threshold, attribution, relationship, and composition patterns to compatible presentation contracts. A governed table is the fallback.
 
@@ -605,28 +847,57 @@ Each registered contract declares compatible patterns, required field types, car
 
 Themes may change approved colors and typography without changing the analytical contract. Threshold colors, units, labels, ordering, and benchmark semantics come from governed metadata and must remain interpretable in accessible and monochrome presentations.
 
-### Worked Example
+### Input and Output Example
 
 The DVL selects the registered comparison contract from the intent and result shape:
 
 ```json
 {
-  "type": "chart",
-  "contract": "multi_series_comparison",
-  "contract_version": "2.0",
-  "mark": "bar",
-  "category": { "field": "portfolio", "label": "Portfolio" },
-  "measures": [
-    { "field": "portfolio_return", "label": "Portfolio Return", "format": "percentage" },
-    { "field": "benchmark_return", "label": "Benchmark Return", "format": "percentage" }
-  ],
-  "sort": { "field": "portfolio_return", "direction": "descending" }
+  "input": {
+    "result_id": "res-20260518-093247",
+    "intent_pattern": "comparison",
+    "presentation_metadata_ref": "approved-labels-and-units"
+  },
+  "output": {
+    "type": "chart",
+    "contract": "multi_series_comparison",
+    "contract_version": "2.0",
+    "mark": "bar",
+    "category": {
+      "field": "portfolio",
+      "label": "Portfolio"
+    },
+    "measures": [
+      {
+        "field": "portfolio_return",
+        "label": "Portfolio Return",
+        "format": "percentage"
+      },
+      {
+        "field": "benchmark_return",
+        "label": "Benchmark Return",
+        "format": "percentage"
+      }
+    ],
+    "sort": {
+      "field": "portfolio_return",
+      "direction": "descending"
+    }
+  }
 }
 ```
+
+In parallel with DVL, the NSA receives the bounded result content needed for an optional narrative.
 
 ## Narrative Synthesis Agent (NSA)
 
 > **Governing principles:** [P6 - Governed narrative](./01-overview.md#design-principles) and [P10 - Deterministic computation, not generation](./01-overview.md#design-principles)
+
+**Business definition.** The NSA provides an optional plain-language explanation of a completed result.
+
+**Why it exists.** A concise explanation makes analysis easier to consume, but narrative generation must remain separate from calculation and must not introduce unsupported values or conclusions.
+
+**Input and output.** It receives only approved result labels, values, units, dimensions, and permitted derivations. It outputs a validated narrative or an explicit omission state.
 
 The NSA optionally produces a concise plain-language summary after computation. Its input is limited to approved result labels, values, units, and dimensions. It does not calculate metrics or change the result.
 
@@ -640,28 +911,52 @@ The narrative contract separates a short lead statement, supporting detail, and 
 
 The lineage record captures the model, prompt-template version, validation outcome, retry count, and omission reason. Model selection may vary by result complexity, but changing models must not alter computed data or the DVL contract.
 
-### Worked Example
+### Input and Output Example
 
 The NSA summarizes only statements supported by the result rows:
 
 ```json
 {
-  "narrative": {
-    "lead": "Two of four equity portfolios outperformed their benchmarks this quarter.",
-    "detail": "Global Equity Opportunities returned 4.21% compared with 3.85% for its benchmark. UK Core Income returned 2.87% compared with 2.54%.",
-    "anchored_to": ["GLOB_EQ_OPP", "UK_CORE_INC", "ASIA_PAC_GRW", "EUR_BAL_INC"]
+  "input": {
+    "result_id": "res-20260518-093247",
+    "allowed_content": [
+      "approved labels",
+      "result values",
+      "units",
+      "permitted derived counts"
+    ]
   },
-  "validation": {
-    "numbers": "passed",
-    "units": "passed",
-    "dimension_labels": "passed"
+  "output": {
+    "narrative": {
+      "lead": "Two of four equity portfolios outperformed their benchmarks this quarter.",
+      "detail": "Global Equity Opportunities returned 4.21% compared with 3.85% for its benchmark. UK Core Income returned 2.87% compared with 2.54%.",
+      "anchored_to": [
+        "GLOB_EQ_OPP",
+        "UK_CORE_INC",
+        "ASIA_PAC_GRW",
+        "EUR_BAL_INC"
+      ]
+    },
+    "validation": {
+      "numbers": "passed",
+      "units": "passed",
+      "dimension_labels": "passed"
+    }
   }
 }
 ```
 
+The presentation outcome joins the decisions and execution events already written to the ALS throughout the request.
+
 ## Analytical Lineage Store (ALS)
 
 > **Governing principles:** [P4 - Complete analytical lineage](./01-overview.md#design-principles) and [P8 - Explainability at every layer](./01-overview.md#design-principles)
+
+**Business definition.** The ALS is the evidence ledger for how each governed request was interpreted, authorized, controlled, planned, executed, and presented.
+
+**Why it exists.** A result cannot be traced or assessed for repeatability if its definitions, permissions, decisions, source references, and terminal outcome are scattered or overwritten.
+
+**Input and output.** It receives correlated events from each stage. It outputs an authorized lineage chain, searchable references, integrity evidence, and the event set used by PAS and audit export.
 
 The ALS preserves correlated events for every accepted request, including entitlement decisions, controls decisions, execution, presentation, and terminal failure. Records use a common request identifier so an authorized reviewer can reconstruct the sequence without treating one final payload as the complete history.
 
@@ -692,30 +987,62 @@ Retention policy defines periods for request events, controls decisions, executi
 
 An audit export includes the selected event chain, referenced definition and policy versions, verification material, export scope, and exporter's identity. The platform signs the export package and records the export as a new auditable event.
 
-### Worked Example
+### Input and Output Example
 
 The ALS correlates stage records without storing the full result by default:
 
 ```json
 {
-  "request_id": "req-20260518-093241",
-  "result_id": "res-20260518-093247",
-  "events": [
-    { "type": "intent_resolved", "record_id": "evt-intent-001" },
-    { "type": "entitlement_projected", "record_id": "evt-access-001" },
-    { "type": "controls_approved", "record_id": "evt-controls-001" },
-    { "type": "plan_compiled", "record_id": "evt-plan-001" },
-    { "type": "execution_completed", "record_id": "evt-execution-001" },
-    { "type": "presentation_assembled", "record_id": "evt-presentation-001" }
-  ],
-  "result_digest": "digest:<illustrative-value>",
-  "retention_policy": "analytical-evidence-standard"
+  "input": {
+    "request_id": "req-20260518-093241",
+    "correlated_stage_events_ref": "events:req-20260518-093241"
+  },
+  "output": {
+    "request_id": "req-20260518-093241",
+    "result_id": "res-20260518-093247",
+    "events": [
+      {
+        "type": "intent_resolved",
+        "record_id": "evt-intent-001"
+      },
+      {
+        "type": "entitlement_projected",
+        "record_id": "evt-access-001"
+      },
+      {
+        "type": "controls_approved",
+        "record_id": "evt-controls-001"
+      },
+      {
+        "type": "plan_compiled",
+        "record_id": "evt-plan-001"
+      },
+      {
+        "type": "execution_completed",
+        "record_id": "evt-execution-001"
+      },
+      {
+        "type": "presentation_assembled",
+        "record_id": "evt-presentation-001"
+      }
+    ],
+    "result_digest": "digest:<illustrative-value>",
+    "retention_policy": "analytical-evidence-standard"
+  }
 }
 ```
+
+When both compliance signals are active, the correlated ALS event set becomes the PAS input.
 
 ## Provenance Artifact Service (PAS)
 
 > **Governing principles:** [P2 - Controls before execution](./01-overview.md#design-principles), [P4 - Complete analytical lineage](./01-overview.md#design-principles), and [P9 - Administrator sovereignty within governance bounds](./01-overview.md#design-principles)
+
+**Business definition.** PAS packages the evidence required for a compliance-purpose result into a sealed, independently verifiable artifact.
+
+**Why it exists.** Standard lineage supports operational review, while regulated uses may require a fixed schema, named framework references, a digital signature, and an export gate.
+
+**Input and output.** It receives the active compliance trigger and the correlated ALS event set. It outputs a sealed artifact with verification metadata and an explicit export state, or a failure state that keeps export blocked.
 
 PAS assembles additional evidence for a request whose two compliance signals are active. It reads the relevant ALS events, adds the metric, framework, intent, policy, plan, execution, and result references required by the approved artifact schema, and signs the canonical artifact bytes.
 
@@ -737,27 +1064,48 @@ A valid signature shows that the signed bytes have not changed since sealing. It
 
 If assembly or signing fails, the result remains non-exportable and the ALS records the terminal artifact state. Amendments create a new signed artifact that references the original; they do not replace sealed evidence.
 
-### Worked Example
+### Input and Output Example
 
 The portfolio comparison does not activate PAS because neither compliance signal is active. A compliance-purpose operation would return an artifact state such as:
 
 ```json
 {
-  "compliance_purpose": true,
-  "triggered_by_metrics": ["liquidity_coverage_ratio"],
-  "triggered_by_frameworks": ["approved-liquidity-framework"],
-  "artifact_id": "artifact-20260518-104512",
-  "artifact_schema_version": "1.0",
-  "signature": {
-    "key_id": "platform-signing-key-2026-01",
-    "algorithm": "approved-digital-signature",
-    "verification_status": "verified"
+  "input": {
+    "compliance_trigger": {
+      "metric_signal": true,
+      "purpose_signal": true
+    },
+    "lineage_event_set_ref": "lineage:compliance-request"
   },
-  "export_status": "permitted"
+  "output": {
+    "compliance_purpose": true,
+    "triggered_by_metrics": [
+      "liquidity_coverage_ratio"
+    ],
+    "triggered_by_frameworks": [
+      "approved-liquidity-framework"
+    ],
+    "artifact_id": "artifact-20260518-104512",
+    "artifact_schema_version": "1.0",
+    "signature": {
+      "key_id": "platform-signing-key-2026-01",
+      "algorithm": "approved-digital-signature",
+      "verification_status": "verified"
+    },
+    "export_status": "permitted"
+  }
 }
 ```
 
+The result, presentation outputs, lineage reference, and any compliance artifact now become the response-assembly input.
+
 ## MCP Response Format
+
+**Business definition.** The MCP response is the governed delivery contract between the analytical platform and its consumers.
+
+**Why it exists.** Consumers need one unambiguous way to distinguish data, presentation, narrative, evidence, warnings, compliance state, and terminal status without reconstructing analytical meaning.
+
+**Input and output.** Response assembly receives the typed result or terminal outcome plus presentation and evidence references. It outputs one structured envelope that the consumer can render, retain, or pass to an authorized follow-up action.
 
 The platform is headless. It returns a structured response that lets different consumers present the same governed result without reinterpreting its meaning.
 
@@ -780,30 +1128,40 @@ A DVL specification is a discriminated chart or table envelope. It contains appr
 
 Complete, incomplete, rejected, failed, and timed-out are distinct states. An incomplete response identifies missing sources or metrics and appears only when the operation contract permits partial semantics. A rejection means a governance or validation rule prevented execution. A failure or timeout means approved execution did not complete. Consumers must present these states explicitly and must not render an incomplete or failed response as a complete governed answer.
 
-### Worked Example
+### Input and Output Example
 
 The final response combines the computed result with its governed presentation and evidence references:
 
 ```json
 {
-  "request_id": "req-20260518-093241",
-  "result_id": "res-20260518-093247",
-  "status": "complete",
-  "data_ref": "result:res-20260518-093247",
-  "display_spec_ref": "display:res-20260518-093247",
-  "narrative_ref": "narrative:res-20260518-093247",
-  "lineage": {
-    "record_ref": "lineage:req-20260518-093241",
-    "available_to_caller": true
+  "input": {
+    "result_ref": "result:res-20260518-093247",
+    "display_ref": "display:res-20260518-093247",
+    "narrative_ref": "narrative:res-20260518-093247",
+    "lineage_ref": "lineage:req-20260518-093241"
   },
-  "compliance": {
-    "triggered": false,
-    "export_status": "permitted"
-  },
-  "warnings": [],
-  "errors": []
+  "output": {
+    "request_id": "req-20260518-093241",
+    "result_id": "res-20260518-093247",
+    "status": "complete",
+    "data_ref": "result:res-20260518-093247",
+    "display_spec_ref": "display:res-20260518-093247",
+    "narrative_ref": "narrative:res-20260518-093247",
+    "lineage": {
+      "record_ref": "lineage:req-20260518-093241",
+      "available_to_caller": true
+    },
+    "compliance": {
+      "triggered": false,
+      "export_status": "permitted"
+    },
+    "warnings": [],
+    "errors": []
+  }
 }
 ```
+
+The MCP Capability Layer returns this response to the consumer, completing the governed request flow.
 
 ## External Components
 
@@ -811,19 +1169,39 @@ External components remain outside the Analytics Engine boundary and retain thei
 
 ### Conversational AI - Chat Front End
 
-The chat front end submits requests, renders confirmation choices, presents structured responses, and retains result identifiers for drilldown. It does not resolve definitions, enforce entitlements, plan queries, or gain access to backend credentials and schemas.
+**Business definition and purpose.** The chat front end is a consumer experience for people who request analysis conversationally. It exists to manage dialogue and presentation without owning analytical meaning or controls.
+
+**Input and output.** It receives a user's question, confirmation choices, and structured platform responses. It outputs authenticated analytical requests, rendered answers, and governed follow-up actions such as drilldown. It does not resolve definitions, enforce entitlements, plan queries, or gain access to backend credentials and schemas.
 
 ### Semantic Data Repository (SDR)
 
-The SDR contains organizational data metadata such as models, critical data elements, quality rules, physical schemas, and data-lineage references. The proposal does not assume that every organization already has a suitable SDR. Readiness assessment establishes its coverage, ownership, freshness, and mapping quality.
+**Business definition and purpose.** The SDR is the governed description of the organization's data assets. It exists so analytical definitions can connect to understood data structures, quality expectations, and lineage rather than undocumented source fields.
+
+**Input and output.** It receives approved data models, critical data elements, quality rules, structural metadata, and data-lineage references. It outputs versioned context and mapping targets used by SMR definitions and physical planning. The proposal does not assume that every organization already has a suitable SDR; readiness assessment establishes its coverage, ownership, freshness, and mapping quality.
 
 ### Data Entitlements Store (DES)
 
-The DES stores independently governed policies for metrics, dimensions, row scopes, masks, and classification ceilings. Policies reference logical concepts rather than physical table and column names. RAPL reads versioned policies at request time or from an equivalently controlled snapshot.
+**Business definition and purpose.** The DES is the independent policy source for who may use which analytical concepts and data populations. It exists to keep access decisions separate from metric authorship and platform administration.
+
+**Input and output.** It receives approved policies for metrics, dimensions, row scopes, masks, and classification ceilings. It outputs versioned role and policy definitions to RAPL. Policies reference logical concepts rather than physical table and column names.
+
+### External Language Model Service
+
+**Business definition and purpose.** The external language model service provides bounded language interpretation and synthesis. It exists to support natural interaction while remaining outside calculation, authorization, controls, and source execution.
+
+**Input and output.** For IRA, it receives approved candidate descriptions and the user's question and returns ranking and parameter suggestions. For NSA, it receives bounded result content and returns a draft narrative. IRA and NSA validate those outputs before the flow continues.
+
+### Registered Data Sources
+
+**Business definition and purpose.** Registered data sources hold the governed business data on which approved analytics operate. They remain systems of record or analytical services rather than becoming part of the AI layer.
+
+**Input and output.** They receive bounded, authorized source instructions from the FQE and return typed data or explicit failures. They do not receive natural-language questions, model prompts, or consumer credentials.
 
 ### Optional Rendering Service
 
-An optional peer rendering service can convert a self-contained display specification into SVG or PNG for consumers that cannot render it directly. The service has no access to analytical definitions, source credentials, or execution backends. Section 3 identifies an illustrative product and implementation for this role.
+**Business definition and purpose.** The optional rendering service converts a governed display contract into a static visual for consumers that cannot render it directly. It exists as a presentation utility, not as part of analytical computation.
+
+**Input and output.** It receives a self-contained display specification and outputs SVG or PNG. It has no access to analytical definitions, source credentials, or execution backends. Section 3 identifies an illustrative product and implementation for this role.
 
 ## Design Decisions Requiring Evaluation
 
