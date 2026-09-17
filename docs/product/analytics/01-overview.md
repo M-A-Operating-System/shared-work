@@ -143,7 +143,6 @@ flowchart LR
         D3["Graph Data API"]
     end
     clients --> L
-    L --> data
     clients --> M
     M --> data
 ```
