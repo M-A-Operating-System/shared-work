@@ -66,33 +66,71 @@ A generated query does not, by itself, establish which business definition was a
 
 The proposed platform makes those requirements part of the execution process. AI selects from approved analytical definitions; deterministic software constructs and executes the calculation. This reduces reliance on the model inferring business meaning from physical schemas on each request.
 
-### Two Approaches to AI-Enabled Analytics
+### The Architecture in Practice
 
-Both approaches serve the same AI consumers: conversational assistants, autonomous agents, and custom applications. The difference is how a request becomes an executable calculation. These simplified diagrams show the request path, not response flows or deployment boundaries.
+In both approaches, AI clients and LLMs are present. The difference is what happens next. In Text-to-SQL, the AI generates queries directly against raw database schemas. In the AI-Enabled Analytics Platform, it submits structured requests to a governed semantic layer — and the platform handles all computation, governance, and execution.
 
 **Text-to-SQL Approach**
 
 ```mermaid
 flowchart LR
-    C["AI Consumers"] --> L["LLM: Generate SQL"]
-    C -->|Generated SQL| I["API / Protocol Layer"]
-    I --> D["Database / Data Sources"]
+    subgraph clients["AI Consumers"]
+        direction TB
+        C1["Conversational\nAssistant"]
+        C2["Autonomous Agent\n& Data Mining"]
+        C3["Custom\nApplication"]
+    end
+    L["LLM"]
+
+    subgraph I["Interface"]
+        direction TB
+        M["API / Protocol Layer\n(MCP)"]
+    end
+
+    subgraph data["Database / Data Sources"]
+        direction TB
+        D1["SQL Warehouse"]
+        D2["OpenData API"]
+        D3["Graph Data API"]
+    end
+    clients --> L
+    clients -->|Generated SQL| M
+    M --> data
 ```
 
-The consumer asks the LLM to generate SQL and submits that SQL through the interface for execution. The LLM has no direct connection to the database in this illustration.
-
-**Governed Analytics Approach**
+**AI-Enabled Analytics Platform**
 
 ```mermaid
 flowchart LR
-    C["AI Consumers"] --> L["LLM: Interpret Requests"]
-    C -->|Analytical Request| S["Approved Semantic Definitions"]
-    S --> G["Permissions and Controls"]
-    G --> E["Controlled Query Planning and Execution"]
-    E --> D["Database / Data Sources"]
+    subgraph clients["AI Consumers"]
+        direction TB
+        C1["Conversational\nAssistant"]
+        C2["Autonomous Agent\n& Data Mining"]
+        C3["Custom\nApplication"]
+    end
+    L["LLM"]
+    subgraph platform["Analytics Capability"]
+        direction TB
+        M["API / Protocol Layer\n(MCP)"]
+        P1["Intent & Metric Resolution\nApproved Semantic Layer"]
+        P2["Controls Pipeline\nEntitlement · Compliance"]
+        P3["Federated Query Engine"]
+        M --> P1
+        P1 --> P2
+        P2 --> P3
+    end
+    subgraph data["Database / Data Sources"]
+        direction TB
+        D1["SQL Warehouse"]
+        D2["OpenData API"]
+        D3["Graph Data API"]
+    end
+    clients -->|Analytics Request| platform
+    clients --> L
+    platform --> data
 ```
 
-The governed path resolves the request against approved definitions, applies permissions and controls, and constructs the executable query in software. Each stage contributes to the analytical record. AI assists interpretation; it does not define the calculation at execution time.
+In the platform approach, every request routes through the API layer, traverses the invariant controls sequence, and produces an audit record. No path to execution backends, physical schemas, or raw data exists outside that pipeline.
 
 The [Text-to-SQL appendix](./05-text-to-sql-antipattern.md) provides the detailed rationale for this position, including governance, reproducibility, security, and maintenance risks.
 
