@@ -52,7 +52,7 @@ Text-to-SQL remains useful alongside the platform for controlled exploration and
 
 ## How the Platform Works
 
-The Semantic Metrics Repository (SMR) is the catalog of approved metrics, dimensions, operations, and dataset contracts. Each definition states what the analysis means, how it is calculated, and which data it uses. Versioning preserves the definition associated with a historical result.
+In a governed AI-enabled analytics situation, the Semantic Metrics Repository (SMR) provides a catalog of approved metrics, dimensions, operations, and dataset contracts. Each definition states what the analysis means, how it is calculated, and which data it uses. Versioning preserves the definition associated with a historical result.
 
 A request follows a common sequence:
 
