@@ -17,11 +17,14 @@ Component definitions referenced in the metrics below (SMR, FQE, RAPL, SCL, NSA,
 
 | Metric | Definition | Target |
 |--------|-----------|--------|
-| **Platform uptime** | API availability (p99 end-to-end latency < 2s including FQE backend execution; error rate < 0.1%) | 99.9% |
+| **API availability** | Valid requests receiving a non-5xx terminal response ÷ valid requests, measured monthly; planned exclusions must be documented in the SLO policy | ≥ 99.9% |
+| **Interactive latency** | End-to-end latency for successful interactive metric queries, reported separately for cache hits and executions | p95 < 2s cached; workload-specific execution SLOs |
+| **Platform 5xx rate** | Valid requests ending in a platform-attributable 5xx response ÷ valid requests | < 0.1% |
 | **Governance block rate** | Queries blocked by governance checks ÷ total queries | Monitor — sustained > 15% warrants investigation; > 30% triggers mandatory configuration review (see §4.3) |
 | **FQE error rate** | Queries with FQE execution errors ÷ total executed queries | < 2% |
 | **Cache hit rate** | Queries served from the Result Cache ÷ total executed queries — derived from the `cache_hit` field in the Analytical Lineage Store (ALS) | ≥ 35% by month 2 |
-| **Lineage completeness** | Queries with complete lineage records ÷ total queries | **100%** — any deviation is a platform defect |
+| **Lineage durability** | Accepted requests with a durable terminal lineage record ÷ accepted requests | 100% invariant; fail closed or queue durably when the ALS is unavailable |
+| **Lineage reconciliation lag** | Time from a recoverable partial write to a reconciled object/index/signature state | p99 < 5 minutes; no unresolved item > 24 hours |
 | **SMR registry health** | Metrics with no owner OR not updated in 12 months ÷ total active metrics | < 5% |
 
 
@@ -65,6 +68,8 @@ Component definitions referenced in the metrics below (SMR, FQE, RAPL, SCL, NSA,
 | **Intent resolution accuracy** | Queries where user accepted resolved intent without modification (when `requiresIntentConfirmation: true` is configured). When intent confirmation is not enabled, use query reformulation rate as the proxy measure. | ≥ 85% |
 | **Query reformulation rate** | Queries where user rephrased within 2 turns after a resolution error | < 10% |
 | **Narrative validation failure rate** | Narrative synthesis attempts failing post-generation validation | < 2% |
+| **Intent confirmation rate** | Natural-language requests requiring user confirmation ÷ natural-language requests | Monitor by operation and domain; sustained increases trigger catalog review |
+| **Cost per successful query** | Compute, model, federation, and storage cost ÷ successful queries, segmented by workload class | Establish baseline in month 1 and approve budgets by workload class |
 
 
 ## 4.3 Metric Interpretation
@@ -78,7 +83,7 @@ Component definitions referenced in the metrics below (SMR, FQE, RAPL, SCL, NSA,
 | 15–30% | Likely misconfiguration — data scale limits, entitlements, or scope too restrictive |
 | > 30% | Configuration review mandatory — platform may be inaccessible to legitimate queries |
 
-**Lineage completeness** is measured as `completed_lineage ÷ total_queries`. Any value below 100% triggers an automated platform alert. Lineage gaps are platform defects, not acceptable operational variance.
+**Lineage durability** is measured over accepted requests: requests that pass transport authentication and receive a platform request identifier. Authentication attempts that fail before an identifier is issued are recorded in the security audit system rather than the ALS denominator. Every accepted request must reach a durable terminal state: completed, denied by controls, cancelled, timed out, or failed. If the ALS cannot accept a durable write, execution fails closed or the event is committed to a durable queue before processing continues. Reconciliation lag measures temporary divergence between the object, index, and signature state.
 
 **SMR approval backlog** counts metric definitions in `proposed` or `in_review` state for more than 7 calendar days. A non-zero count triggers a notification to Analytics Governance.
 
@@ -87,7 +92,7 @@ Component definitions referenced in the metrics below (SMR, FQE, RAPL, SCL, NSA,
 
 | Cadence | Activity | Owner |
 |---------|----------|-------|
-| **Daily** | Lineage completeness check; FQE error rate; classification gate spike detection | Platform Admin (automated) |
+| **Daily** | Lineage durability and reconciliation; FQE error rate; classification gate spike detection | Platform Admin (automated) |
 | **Weekly** | WAU; governance block rate; SMR approval backlog; backend error rate per backend | Platform Admin + Analytics Governance |
 | **Monthly** | Full metric review; query quality analysis; SMR health report; narrative validation rate | Platform Admin + Analytics Governance |
 | **Day 90** | WAU adoption assessment (50% target); drilldown adoption; export rate | Analytics Governance + Platform Admin |
@@ -105,7 +110,7 @@ Analytics Governance has access to a read-only dashboard showing:
 - Execution backend error rate per backend
 - Cache hit rate trend
 - Top 10 most-queried metrics
-- Lineage completeness (always 100% or an active alert)
+- Lineage durability and reconciliation lag (100% durable terminal records or an active incident)
 - SMR approval backlog count
 
 Platform-level infrastructure metrics are visible to the Platform Admin only.

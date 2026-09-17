@@ -1128,7 +1128,7 @@ Post-generation validation will confirm every verbatim numeric value cited in th
 
 > **Governing principles:** [P4 — Complete analytical lineage](./01-overview.md#design-principles) · [P8 — Explainability at every layer](./01-overview.md#design-principles)
 
-The Analytical Lineage Store (ALS) is responsible for providing a complete, immutable record of how every analytical result was produced. It receives three writes per query: an entitlement projection record written by the Role-Aware Projection Layer when the projection is computed, a controls decision record written by the Semantic Controls Layer before execution begins, and a full execution record written by the Federated Query Engine after execution completes. A request denied at any stage still leaves the records written up to that point — blocked queries are never absent from the audit trail. Each lineage record captures the original request, the SMR metric definition versions resolved, the entitlement projection in force, the controls decisions applied, the physical sub-plans executed, and the visualization contract and narrative status. Records are written once and never mutated; corrections are made via new amendment documents that reference the original record. The store supports regulatory audit export via a filtered query API, with digitally signed export packages available for compliance review. Retention periods are configurable per deployment, governed by the organization's regulatory retention obligations.
+The Analytical Lineage Store (ALS) provides a durable terminal record for every accepted analytical request. It records the entitlement projection, controls decision, and execution or terminal failure as correlated events under one request identifier. A denied, cancelled, timed-out, or failed request retains the events produced before termination. Records minimize sensitive content: full results and raw requests are excluded unless an approved policy requires them, with digests and bounded summaries used by default. Storage-enforced retention, versioning, digital signatures, tenant-scoped authorization, encryption, and reconciliation—not application convention alone—provide the immutability and integrity properties required by a deployment.
 
 ### Storage Design
 
@@ -1248,7 +1248,7 @@ The Provenance Artifact Service (PAS) is responsible for assembling and sealing 
 
 ### Purpose
 
-The Provenance Artifact will be a sealed, tamper-evident record that satisfies regulatory requirements for demonstrable audit trail on compliance-purpose queries. It will be distinct from the standard lineage record that every query produces. The lineage record will be the full computation trace. The Provenance Artifact will be the governed, signed output of that trace — structured for regulatory consumption, explicitly linked to the frameworks that triggered it, and sealed before the result is returned to the consumer.
+The Provenance Artifact will be a sealed, tamper-evident record designed to support audit-trail requirements for compliance-purpose queries. It is distinct from the standard lineage record and is structured for compliance review, explicitly linked to the frameworks that triggered it, and sealed before export is enabled. Whether it satisfies a particular legal or supervisory requirement must be validated for the deployment's jurisdiction, activity, retention rules, and approval process.
 
 ### Assembly and Sealing
 

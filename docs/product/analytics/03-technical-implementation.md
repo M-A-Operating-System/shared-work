@@ -8,7 +8,7 @@
 ---
 
 
-This chapter describes one reference implementation of the AI Analytics Platform. Stack choices are concrete but not prescriptive. The product specification is intentionally stack-agnostic. Any conformant implementation that satisfies the specified behaviors, governance guarantees, and interface contracts is valid. Technology substitutions at any layer require no changes to the product specification.
+This chapter describes one non-normative reference implementation of the AI Analytics Platform. Stack choices are concrete but not prescriptive, and code fragments are illustrative pseudocode rather than production-ready implementations. The product specification is intentionally stack-agnostic. Any conformant implementation that satisfies the specified behaviors, governance controls, and interface contracts is valid.
 
 The product specification (component behaviors, interface contracts, governance requirements) is in [Chapter 2 -- Core Platform Capabilities](./02-core-capabilities.md). The design principles governing every decision are in [Platform Overview — Design Principles](./01-overview.md#design-principles).
 
@@ -161,7 +161,7 @@ class DrilldownInput(BaseModel):
 # ── Tools ─────────────────────────────────────────────────────────────────────
 
 @mcp.tool()
-async def run_analytics(input: RunAnalyticsInput, jwt: str) -> dict:
+async def run_analytics(input: RunAnalyticsInput) -> dict:
     """Execute an SMR-registered analytical operation.
     Call list_operations first to discover valid operation_id values and their required params.
     The presentation depth — raw dataset, display specification, or full analytical response — is
@@ -173,7 +173,7 @@ async def run_analytics(input: RunAnalyticsInput, jwt: str) -> dict:
     ...
 
 @mcp.tool()
-async def list_operations(input: ListOperationsInput, jwt: str) -> dict:
+async def list_operations(input: ListOperationsInput) -> dict:
     """List all SMR-registered operations available to the current user's role.
     Returns operation IDs, display names, required parameters, supported metrics,
     supported dimensions, and execution profiles."""
@@ -182,7 +182,7 @@ async def list_operations(input: ListOperationsInput, jwt: str) -> dict:
     ...
 
 @mcp.tool()
-async def drilldown(input: DrilldownInput, jwt: str) -> dict:
+async def drilldown(input: DrilldownInput) -> dict:
     """Navigate into a dimension hierarchy from a prior result.
     The parent result's analytical context (operation, filters, hierarchy position) is inherited;
     entitlements and controls are re-evaluated in full for the derived query."""
@@ -216,7 +216,9 @@ async def validate_jwt(token: str) -> dict:
 
 #### Caller Identity Claims
 
-Every request carries a host-issued JWT in the `Authorization: Bearer <token>` header — the reference implementation's realization of the authentication/identity token. Expired tokens are rejected immediately; tokens carrying no analytical role claim are denied (deny-by-default is an architectural property — there is no public-access fallback).
+Every request carries a host-issued JWT in the `Authorization: Bearer <token>` header — the reference implementation's realization of the authentication/identity token. Authentication middleware validates the token and makes verified claims available through server-side request context; bearer tokens are never MCP tool arguments and are never exposed to the model, tool schema, lineage payload, or application logs. Expired tokens and tokens carrying no analytical role claim are denied immediately.
+
+Validation pins the permitted signature algorithm, verifies `iss`, `aud`, `exp`, and `nbf` when present, and rejects missing required claims. JWKS caching honors key identifiers and supports refresh on an unknown `kid` so planned and emergency rotations do not require a service restart. Downstream services receive audience-specific exchanged tokens or workload credentials rather than the original bearer token unless an explicit, reviewed delegation policy permits forwarding.
 
 **Required claims**
 
@@ -391,20 +393,20 @@ Prompts provide pre-built instruction templates that AI consumers can load to an
 
 ```python
 @mcp.prompt()
-async def analytical_assistant(jwt: str) -> str:
+async def analytical_assistant() -> str:
     """System prompt for an AI assistant using the Analytics Platform.
     Injects the organization's available metrics and governance constraints."""
-    # 1. Validate JWT → claims
+    # 1. Read verified claims from authenticated server-side request context
     # 2. Fetch slim metric summary from SMR (id + label + description only — prompt size matters)
     # 3. Return system prompt string — instructs the assistant to use tool results only, never estimate
     ...
 
 @mcp.prompt()
-async def regulatory_reporting_assistant(jwt: str) -> str:
+async def regulatory_reporting_assistant() -> str:
     """System prompt for a compliance-focused assistant operating on regulatory metrics.
     Adds regulatory framing and prohibits investment recommendations. The frameworks in
     force are derived from the regulatory attributes on the queried metric definitions."""
-    # 1. Validate JWT → claims
+    # 1. Read verified claims from authenticated server-side request context
     # 2. Fetch regulatory-domain metric summary from SMR
     # 3. Return system prompt — extends analytical_assistant rules with compliance constraints:
     #    no investment recommendations, cite result_id in every response, explain compliance errors
@@ -972,7 +974,7 @@ class LQPGenerator:
 | **Role resolution** | JWT claim extraction + DES role definition lookup | Role claim field name is configurable |
 | **Policy store (DES)** | PostgreSQL `role_policies` schema — the reference realization of the Data Entitlements Store | Dedicated schema and credentials, logically separate from platform data; written only by the Entitlements Manager — not writable via the platform Admin API |
 | **Row scope** | `{{user.claim_name}}` template interpolation at projection time | Resolved from JWT claims; passed to the SVL, which injects the row scope filter nodes |
-| **Column masking** | Registered in the projection; applied post-assembly in the FQE result assembler | Post-assembly supports cross-backend result sets |
+| **Column protection** | Exclusions and deterministic masks are compiled into the PQP and executed before protected values leave the governed query boundary | Prevents unmasked values from entering the application process, cache, telemetry, or lineage store |
 | **Default policy** | Deny-by-default — fixed, not configurable | No access unless a matching role definition is found; an architectural property (P5), not a setting |
 
 #### Role policies schema
@@ -990,7 +992,7 @@ Role policy documents are stored in the PostgreSQL `role_policies` schema — th
   "allowed_dimensions":     null,
   "denied_dimensions":      ["issuer"],
   "row_scope": {
-    "portfolio": "portfolio_id IN ({{user.managed_portfolios}})"
+    "portfolio": { "operator": "in", "field": "portfolio_id", "claim": "managed_portfolios" }
   },
   "column_masks": {
     "aum": {
@@ -1021,7 +1023,7 @@ Field reference:
 | `denied_metrics` | array | Metric IDs denied regardless of `allowed_metrics` (`METRIC_NOT_ENTITLED`) |
 | `allowed_dimensions` | array \| null | Null = all dimensions permitted; array = explicit allowlist |
 | `denied_dimensions` | array | Dimension IDs denied regardless of `allowed_dimensions` (`DIMENSION_NOT_ENTITLED`) |
-| `row_scope` | object | Key = dimension name; value = `{{user.claim}}` template string |
+| `row_scope` | object | Key = dimension name; value = a typed predicate referencing an allowlisted logical field and a required verified claim |
 | `column_masks` | object | Key = field name; value = mask rule with `action:` one of `null_replacement`, `redacted_label`, `excluded`, `hash_replacement` |
 
 ```python
@@ -1039,7 +1041,7 @@ class RoleAwareProjectionLayer:
         # 1. Extract analytics_roles from claims — roleClaimField is configurable
         # 2. Load a role policy for each role — raises AccessDeniedError if none found (deny-by-default — not configurable)
         # 3. Merge policies — row scope intersected; column masks unioned
-        # 4. Resolve row scope templates against the JWT claims into concrete conditions
+        # 4. Bind verified claim values to typed predicates; missing claims deny the request
         # 5. Return the projection — the SVL injects the row scope nodes and embeds the column masks
         ...
 
@@ -1061,10 +1063,10 @@ class RoleAwareProjectionLayer:
         # Output: list of resolved row scope conditions for the SVL to inject as filter nodes
         ...
 
-    def _interpolate(self, template: str, claims: dict) -> str:
-        # Input:  predicate template string — e.g. "portfolio_id IN ({{user.managed_portfolios}})"
-        # Output: resolved predicate string with {{user.claim_name}} tokens replaced by JWT claim values
-        # List claims are expanded to comma-separated quoted values; unknown tokens collapse to empty string
+    def _bind_predicate(self, predicate: dict, claims: dict) -> dict:
+        # Input: typed predicate referencing an allowlisted logical field and verified claim
+        # Output: typed bound predicate compiled later with query parameters — never SQL text
+        # Missing claims, unsupported operators, and unknown fields fail closed
         ...
 
     async def _load_policy(self, org_id: str, role: str) -> dict | None:
@@ -1284,9 +1286,9 @@ The PQP passes the federated Trino SQL to the FQE.
 | **Engine** | Starburst (Trino) | A mature federation engine with an ANSI-SQL surface and native connectors; performs cross-source joins and predicate/aggregate push-down without bespoke code |
 | **Federation** | One federated Trino SQL statement over multiple catalogs | Starburst plans and executes the cross-source join — no application-level fan-out or per-backend adapters to maintain |
 | **Client** | Python Trino client | Submits the PQP's federated SQL to the Starburst coordinator and streams typed rows |
-| **Result handling** | Custom (Python) | Applies the LQP's column masks, caches by LQP signature, and writes the lineage record |
+| **Result handling** | Custom (Python) | Verifies the protected result schema, caches by LQP signature, and writes the lineage record |
 
-The FQE is realized as **Starburst**, a Trino-based federation engine. It receives the federated Trino SQL produced by the PQP, submits it to the Starburst coordinator, and Starburst federates the query across its configured **catalog connectors** — pushing filters and aggregations down to each source (Snowflake, lakehouse, semantic layer, graph, REST) and performing any cross-source join itself. The FQE is the only component holding the Starburst connection. Once Starburst returns the result, the FQE applies the LQP's `column_masks`, caches the result by LQP signature, and writes the execution record to the Analytical Lineage Store. There are no per-backend adapters and no application-level fan-out — federation is Starburst's responsibility, and each source is reached as a Starburst catalog.
+The FQE is realized as **Starburst**, a Trino-based federation engine. It receives the federated Trino SQL produced by the PQP, submits it to the Starburst coordinator, and Starburst federates the query across configured **catalog connectors**. Row predicates, column exclusions, and supported deterministic masks are compiled by the PQP into this physical query so protected raw values do not enter the application result assembler. The assembler verifies that the returned schema conforms to the entitlement projection before caching the result and writing the execution record. Unsupported masks fail closed during planning; they are not deferred to post-execution processing.
 
 #### FQE input — federated Trino SQL
 
@@ -1399,13 +1401,13 @@ class FederatedQueryEngine:
         # 1. Cache read — return cached result if available; compliance queries always bypass
         # 2. Submit plan["federated_sql"] to the Starburst coordinator via the Trino client
         #    Starburst federates across catalogs, pushes down predicates, performs cross-source joins
-        # 3. Stream typed rows; apply the LQP's column_masks during assembly
+        # 3. Stream typed rows; verify the returned schema against the entitlement projection
         # 4. Cache write — store the assembled result with TTL
         # 5. Write execution record to ALS — engine, catalogs_used, executed_sql, latency, scan_rows
         ...
 
-    def _apply_column_masks(self, rows: list[dict], lqp: dict) -> list[dict]:
-        # Applies the LQP's column_masks (null_replacement, redacted_label, excluded, hash_replacement) post-execution
+    def _verify_protected_schema(self, schema: list[dict], lqp: dict) -> None:
+        # Fail closed if a denied or unmasked protected field is returned
         ...
 ```
 
@@ -1604,6 +1606,10 @@ if __name__ == "__main__":
 | **Search index** | Thin PostgreSQL table (scalar fields only, no JSON blobs) | Used by the Lineage Query REST API (see roadmap) for filtered search; full record always fetched from the object store |
 | **Retention** | Object lifecycle policy — sample default 7 years (configurable) | Long-horizon regulatory retention; enforced at the storage layer, not application code. Periods are deployment choices — the design documents deliberately prescribe none |
 
+The lineage store is a high-sensitivity security boundary because records can contain identity, entitlement, query, and result information. Deployments must encrypt records in transit and at rest with tenant-scoped access controls and auditable key rotation. Result payloads are excluded by default; the record stores a digest, schema, row count, and bounded summary unless an approved retention policy explicitly requires full result preservation. Requests and SQL are redacted for secrets and unnecessary personal data before persistence.
+
+Claims of write-once retention require a storage-enforced WORM control such as object lock in compliance mode (or an equivalent control), versioning, retention policy, and legal-hold support. Application convention alone is not immutability. Each record is signed or content-addressed, and periodic reconciliation detects missing objects, orphaned index rows, and signature failures. Object creation and index updates use a durable outbox/reconciliation workflow because S3 and PostgreSQL do not share a transaction.
+
 #### Lineage document schema
 
 Each completed query writes a single JSON document to the object store at `lineage/{org_id}/{yyyy}/{mm}/{dd}/{result_id}.json`:
@@ -1619,7 +1625,7 @@ Each completed query writes a single JSON document to the object store at `linea
   "resolved_metrics":   [{ "metric_id": "portfolio_return", "version": "2.1.0" }],
   "controls_decision":{ "approved": true, "estimated_scan_rows": 408517, "checks_passed": ["data_scale_check", "complexity_check", "classification_gate", "compliance_check", "concurrency_check"] },
   "execution":          { "engine": "starburst", "catalogs_used": ["snowflake", "risk"], "executed_sql": "...", "latency_ms": 1243 },
-  "result_summary":     { "row_count": 2, "schema": ["..."], "rows": ["..."] },
+  "result_summary":     { "row_count": 2, "schema": ["..."], "result_digest": "sha256:..." },
   "display_spec":       { "type": "chart", "contract": "BAR_MULTI_SERIES_COMPARISON", "..." },
   "error_code":         null,
   "regulatory_frameworks": ["<framework_id>"],
@@ -1933,7 +1939,7 @@ Configuration is read from environment variables at startup. Required variables:
 | Redis | Managed (ElastiCache / Upstash) | 6379 | — | — | — | — |
 | Object storage | S3-compatible | — | — | — | — | — |
 
-Health check endpoint: `GET /health` on each container port. Returns `200 OK` with `{"status": "ok", "catalogs": {...}}` when all registered Starburst catalogs and DCS connectivity are confirmed.
+Each service exposes a minimal unauthenticated liveness endpoint that returns only `{"status": "ok"}`. A separate authenticated readiness endpoint reports dependency state to authorized operators; it does not expose catalog names or infrastructure topology to ordinary consumers.
 
 All platform services run in a dedicated Kubernetes namespace (`analytics`). Starburst catalog credentials and API keys are injected via Kubernetes Secrets mounted as environment variables — never baked into container images.
 
