@@ -216,7 +216,7 @@ async def validate_jwt(token: str) -> dict:
 
 #### Caller Identity Claims
 
-Every request carries a host-issued JWT in the `Authorization: Bearer <token>` header — the reference implementation's realization of the authentication/identity token. Authentication middleware validates the token and makes verified claims available through server-side request context; bearer tokens are never MCP tool arguments and are never exposed to the model, tool schema, lineage payload, or application logs. Expired tokens and tokens carrying no analytical role claim are denied immediately.
+Every request carries a host-issued JWT in the `Authorization: Bearer <token>` header — the reference implementation uses it as the authentication and identity token. Authentication middleware validates the token and makes verified claims available through server-side request context; bearer tokens are never MCP tool arguments and are never exposed to the model, tool schema, lineage payload, or application logs. Expired tokens and tokens carrying no analytical role claim are denied immediately.
 
 Validation pins the permitted signature algorithm, verifies `iss`, `aud`, `exp`, and `nbf` when present, and rejects missing required claims. JWKS caching honors key identifiers and supports refresh on an unknown `kid` so planned and emergency rotations do not require a service restart. Downstream services receive audience-specific exchanged tokens or workload credentials rather than the original bearer token unless an explicit, reviewed delegation policy permits forwarding.
 
@@ -972,14 +972,14 @@ class LQPGenerator:
 |----------|--------|-----------|
 | **Implementation** | Custom middleware (Python) | Thin, stateless; computes the entitlement projection before the LQP is compiled |
 | **Role resolution** | JWT claim extraction + DES role definition lookup | Role claim field name is configurable |
-| **Policy store (DES)** | PostgreSQL `role_policies` schema — the reference realization of the Data Entitlements Store | Dedicated schema and credentials, logically separate from platform data; written only by the Entitlements Manager — not writable via the platform Admin API |
+| **Policy store (DES)** | The PostgreSQL `role_policies` schema acts as the Data Entitlements Store in the reference implementation | Dedicated schema and credentials, logically separate from platform data; written only by the Entitlements Manager — not writable via the platform Admin API |
 | **Row scope** | `{{user.claim_name}}` template interpolation at projection time | Resolved from JWT claims; passed to the SVL, which injects the row scope filter nodes |
 | **Column protection** | Exclusions and deterministic masks are compiled into the PQP and executed before protected values leave the governed query boundary | Prevents unmasked values from entering the application process, cache, telemetry, or lineage store |
 | **Default policy** | Deny-by-default — fixed, not configurable | No access unless a matching role definition is found; an architectural property (P5), not a setting |
 
 #### Role policies schema
 
-Role policy documents are stored in the PostgreSQL `role_policies` schema — the reference realization of the **Data Entitlements Store (DES)**. The schema carries its own credentials and is logically separate from platform data even when physically co-located; it is written only by the Entitlements Manager and is not writable through the platform Admin API. Organizations with an existing entitlement system substitute it behind the same role-definition read interface. Each document maps directly to the following JSON shape:
+In the reference implementation, the PostgreSQL `role_policies` schema acts as the **Data Entitlements Store (DES)**. The schema carries its own credentials and is logically separate from platform data even when physically co-located; it is written only by the Entitlements Manager and is not writable through the platform Admin API. Organizations with an existing entitlement system substitute it behind the same role-definition read interface. Each document maps directly to the following JSON shape:
 
 ```json
 {
@@ -1288,7 +1288,7 @@ The PQP passes the federated Trino SQL to the FQE.
 | **Client** | Python Trino client | Submits the PQP's federated SQL to the Starburst coordinator and streams typed rows |
 | **Result handling** | Custom (Python) | Verifies the protected result schema, caches by LQP signature, and writes the lineage record |
 
-The FQE is realized as **Starburst**, a Trino-based federation engine. It receives the federated Trino SQL produced by the PQP, submits it to the Starburst coordinator, and Starburst federates the query across configured **catalog connectors**. Row predicates, column exclusions, and supported deterministic masks are compiled by the PQP into this physical query so protected raw values do not enter the application result assembler. The assembler verifies that the returned schema conforms to the entitlement projection before caching the result and writing the execution record. Unsupported masks fail closed during planning; they are not deferred to post-execution processing.
+**Starburst acts as the Federated Query Engine (FQE)** in the reference implementation. It receives the federated Trino SQL produced by the Physical Query Planner (PQP), submits the SQL to the Starburst coordinator, and federates the query across configured catalog connectors. The PQP compiles row predicates, column exclusions, and supported deterministic masks into the physical query so protected raw values do not enter the application result assembler. The assembler verifies the returned schema against the entitlement projection before it caches the result and writes the execution record. Unsupported masks fail closed during planning rather than being deferred to post-execution processing.
 
 #### FQE input — federated Trino SQL
 
