@@ -1,18 +1,5 @@
 # 3. Illustrative Reference Implementation
 
-**Technical White Paper:** Governed AI-Enabled Analytics and Data Mining
-
-**Status:** Proposed architecture for evaluation
-
-**Document Version:** 2.1 (draft)
-
-**Date:** 2026-09-17
-
-**Author:** Andrew Bush / M&A Operating System
-
----
-
-
 This section illustrates how a technology stack could support the proposed architecture. The technology mappings and code fragments explain implementation responsibilities; they are not evidence of a completed or benchmarked system. Alternative stacks can support the same responsibilities. Integration feasibility, correctness, performance, and operating cost require validation against the intended workload.
 
 The proposed behaviors, interfaces, and governance requirements are in [Section 2](./02-core-capabilities.md). The [design principles](./01-overview.md#design-principles) define the intended constraints on this implementation.

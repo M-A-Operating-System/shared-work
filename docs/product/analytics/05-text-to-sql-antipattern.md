@@ -1,18 +1,5 @@
 # 5. Appendix: Text-to-SQL and Semantic Analytics: Better Together
 
-**Technical White Paper:** Governed AI-Enabled Analytics and Data Mining
-
-**Status:** Proposed architecture for evaluation
-
-**Document Version:** 2.1 (draft)
-
-**Date:** 2026-09-17
-
-**Author:** Andrew Bush / M&A Operating System
-
----
-
-
 This appendix supports the white paper's proposal for governed semantic execution. It examines why we believe Text-to-SQL alone is not a sustainable long-term foundation for AI-enabled analytics and data mining where accuracy, traceability, and repeatability are critical. It can also be read independently by teams evaluating architectural alternatives.
 
 The central argument here is not that Text-to-SQL should be avoided. It is that large-scale analytics in a regulated environment needs both tools running alongside each other. Text-to-SQL is the exploration layer: fast, flexible, genuinely useful for ad-hoc analysis, hypothesis testing, and metric discovery. The semantic analytics engine is the governed execution layer: deterministic, auditable, with versioned metric definitions and enforced entitlements. The two work best as a connected system, with outputs promoted from exploration into the governed registry when they need to become reliable.

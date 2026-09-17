@@ -1,18 +1,5 @@
 # 4. Evaluation Framework and Proposed Success Measures
 
-**Technical White Paper:** Governed AI-Enabled Analytics and Data Mining
-
-**Status:** Proposed architecture for evaluation
-
-**Document Version:** 2.1 (draft)
-
-**Date:** 2026-09-17
-
-**Author:** Andrew Bush / M&A Operating System
-
----
-
-
 Evaluation should test whether the proposed architecture improves accuracy, traceability, and repeatability for the intended analytical and data-mining workloads. The measures below are proposed acceptance criteria and operating targets, not measured outcomes or service commitments. Owners should establish baselines and approve workload-specific thresholds before drawing conclusions about adoption.
 
 ## Evaluation of the Central Proposal

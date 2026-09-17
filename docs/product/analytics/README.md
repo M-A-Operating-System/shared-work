@@ -61,4 +61,4 @@ The proposal depends on the following constraints. Each maps to the [design prin
 
 The numbered Markdown sections are the current white-paper source. Existing PDF files may reflect earlier product-design drafts until regenerated from these sources.
 
-The [editorial archive](./editorial/01-overview-before-executive-edit.md) preserves the earlier overview, including technical examples and diagrams. It is working material excluded from the publication; its original relative links refer to the analytics directory. Historical design notes under `TODOS/` are also outside the white paper.
+The editorial archive preserves the earlier [overview](./editorial/01-overview-before-executive-edit.md) and [architecture chapter](./editorial/02-core-capabilities-before-editorial-edit.md), including detailed examples and diagrams removed during publication editing. These files are working material excluded from the publication; their original relative links refer to the analytics directory. Historical design notes under `TODOS/` are also outside the white paper.

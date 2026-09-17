@@ -1,15 +1,5 @@
 # 1. Executive Overview: Governed AI-Enabled Analytics and Data Mining
 
-**Technical White Paper:** Governed AI-Enabled Analytics and Data Mining
-
-**Status:** Proposed architecture for evaluation
-
-**Document Version:** 2.1 (draft)
-
-**Date:** 2026-09-17
-
-**Author:** Andrew Bush / M&A Operating System
-
 ## Introduction
 
 ### About This Document

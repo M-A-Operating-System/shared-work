@@ -1,18 +1,5 @@
 # 7. Glossary
 
-**Technical White Paper:** Governed AI-Enabled Analytics and Data Mining
-
-**Status:** Proposed architecture for evaluation
-
-**Document Version:** 2.1 (draft)
-
-**Date:** 2026-09-17
-
-**Author:** Andrew Bush / M&A Operating System
-
----
-
-
 All named components, technical terms, abbreviations, and domain concepts used across the AI Analytics Platform documentation. Terms are sorted alphabetically. Cross-references to other glossary entries are shown in **bold**.
 
 | Term | Abbrev | Definition |

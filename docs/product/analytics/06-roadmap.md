@@ -1,18 +1,5 @@
 # 6. Possible Extensions and Implementation Considerations
 
-**Technical White Paper:** Governed AI-Enabled Analytics and Data Mining
-
-**Status:** Proposed architecture for evaluation
-
-**Document Version:** 2.1 (draft)
-
-**Date:** 2026-09-17
-
-**Author:** Andrew Bush / M&A Operating System
-
----
-
-
 This section explores how an implementation could extend the proposed architecture. The groups below illustrate dependencies and possible development increments; they do not establish a product release schedule, staffing plan, or delivery commitment. Their feasibility and priority depend on evidence from evaluation of the governed core.
 
 
