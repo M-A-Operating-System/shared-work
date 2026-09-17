@@ -17,24 +17,24 @@ The product specification (component behaviors, interface contracts, governance 
 
 This section maps the capabilities defined in Section 2 to a proposed technology stack. Each mapping names the technology, the work it performs, and the application code needed to complete the capability. Teams may substitute technologies that satisfy the same interface contracts and governance requirements.
 
-The table below maps each Chapter 2 capability to its reference implementation name and the key technology it uses in this architecture. The components are listed in pipeline order.
+The table maps each capability to its technology stack and explains how that stack supports it. Python entries require custom application code. The Data Context Store is an existing platform service; this reference implementation does not prescribe its underlying storage product.
 
-| Capability (Ch02) | Abbr | Reference Implementation | Key Technology |
+| Capability (Section 2) | Abbreviation | Technology Stack | Implementation Description |
 |---|---|---|---|
-| MCP Capability Layer | MCP | `build_mcp_app()` + FastMCP router | Python 3.12 · FastMCP 2.x · Uvicorn · port 8000 · JWT via python-jose (RS256) |
-| Intent Resolution Agent | IRA | `IntentResolutionAgent` | Python · embedding similarity search over SMR · Anthropic Claude (intent ranking + compliance intent scoring) · confirmation cards |
-| Semantic Metrics Repository | SMR | `SemanticMetricsRepository` | DCS API — JSON documents: `analytical_metric`, `analytical_dimension`, `analytical_operation`, `analytical_dataset` |
-| Role-Aware Projection Layer | RAPL | `RoleAwareProjectionLayer` | Python · asyncpg · role definition lookup from the DES |
-| Data Entitlements Store | DES | PostgreSQL `role_policies` schema | Dedicated schema + credentials — logically separate even when co-located; written only by the Entitlements Manager, not via the platform Admin API |
-| Semantic Validation Layer | SVL | `SemanticValidationLayer` + `LQPGenerator` | Python · Pydantic v2 · JSON Schema validation |
-| Semantic Controls Layer | SCL | `SemanticControlsLayer` | Python · Redis (concurrency semaphore) · rules engine |
-| Physical Query Planner | PQP | `PhysicalQueryPlanner` | Apache Calcite · physical_mapping → catalog reference binding · LQP → federated Trino SQL |
-| Federated Query Engine | FQE | `FederatedQueryEngine` (Starburst client) | Starburst (Trino) · native federation across catalog connectors — Snowflake · lakehouse · dbt Semantic Layer · Neo4j · REST/OData |
-| Data Visualization Language | DVL | `DataVisualizationLanguage` | Python · priority-ordered chart contract evaluation · output: Vega-Lite v5 spec |
-| Narrative Synthesis Agent | NSA | `NarrativeSynthesisAgent` | Claude Haiku 4.5 (simple queries) · Claude Sonnet 4.6 (complex queries) |
-| Provenance Artifact Service | PAS | `ProvenanceArtifactService` | In-process Python module · ECDSA P-256 signing (key from Vault) · S3 sibling document `{result_id}_provenance.json` |
-| Analytical Lineage Store | ALS | `AnalyticalLineageStore` | AWS S3 (JSON records per query) · PostgreSQL `lineage_index` (scalar search) |
-| Result Cache | — | `ResultCache` | Redis · SHA-256 cache key · 5-min TTL · compliance queries bypass cache |
+| MCP Capability Layer | MCP | Python 3.12, FastMCP 2.x, Uvicorn, python-jose | FastMCP exposes tools, resources, and prompts, and Uvicorn serves the application over HTTP. Python middleware uses python-jose to validate identity tokens before routing requests to the analytical pipeline. |
+| Intent Resolution Agent | IRA | Python, Anthropic Claude, Data Context Store (existing service) | Python retrieves candidate operations from the semantic catalog. Claude ranks them, binds request parameters, and scores compliance intent. The application asks the user to confirm ambiguous requests. |
+| Semantic Metrics Repository | SMR | Python, Data Context Store (existing service) | The Data Context Store stores, versions, approves, and indexes metric, dimension, operation, and dataset definitions. Python accesses those definitions through the service API. |
+| Role-Aware Projection Layer | RAPL | Python, asyncpg, PostgreSQL | Python uses asyncpg to read entitlement policies from PostgreSQL. It combines the policies with verified identity claims to determine permitted metrics, dimensions, rows, and column protections. |
+| Data Entitlements Store | DES | PostgreSQL | PostgreSQL stores entitlement policies in a dedicated schema with separate credentials. The Entitlements Manager maintains the policies, and the RAPL reads them when evaluating requests. |
+| Semantic Validation Layer | SVL | Python, Pydantic v2 | Pydantic validates tool input models. Python checks operation parameters against registered JSON schemas, resolves semantic definitions, enforces the entitlement projection, and builds the logical query plan. |
+| Semantic Controls Layer | SCL | Python, Redis, Data Context Store (existing service) | Python evaluates the five controls checks using configured thresholds and profiling statistics. The Data Context Store stores the configuration, and Redis coordinates concurrent-query admission across application instances. |
+| Physical Query Planner | PQP | Python, Apache Calcite | Python binds approved logical concepts to physical catalog references. Apache Calcite supplies relational planning functions used to produce Trino SQL with the required filters and column protections. |
+| Federated Query Engine | FQE | Starburst (Trino), Python, Trino Python client | Starburst acts as the FQE. The Trino Python client submits SQL to its coordinator, and Starburst executes queries across configured source connectors. Python verifies the returned schema, caches results, and records execution details. |
+| Data Visualization Language | DVL | Python, Vega-Lite v5 | Python selects the registered chart contract and generates a Vega-Lite display specification. Tabular results use the platform's separate table format. |
+| Narrative Synthesis Agent | NSA | Python, Anthropic Claude Haiku 4.5, Anthropic Claude Sonnet 4.6 | Claude generates narratives from computed result values. Python selects Haiku for simple summaries or Sonnet for complex results, constructs the prompt, and validates the generated text. |
+| Provenance Artifact Service | PAS | Python, cryptography, HashiCorp Vault or Kubernetes Secrets, Amazon S3 | Python assembles the provenance artifact, and cryptography signs it with ECDSA P-256 and SHA-256. Vault or Kubernetes Secrets supplies the key. The lineage service stores the signed artifact in S3 under configured retention controls. |
+| Analytical Lineage Store | ALS | Python, Amazon S3, PostgreSQL | S3 stores lineage documents, and PostgreSQL indexes the fields used to find them. Python coordinates writes and retrieval, with retention controls and integrity checks protecting the records. |
+| Result Cache | - | Python, Redis | Redis stores assembled results under keys derived from the canonical logical query plan. Python applies the configured expiry and bypasses cache reads and writes for compliance-purpose queries. |
 
 The two embedded AI components are the **Intent Resolution Agent (IRA)** and the **Narrative Synthesis Agent (NSA)**. Every stage between them — RAPL, SVL, SCL, PQP, and FQE — is deterministic.
 
