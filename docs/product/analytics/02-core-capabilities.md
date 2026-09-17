@@ -95,6 +95,19 @@ AI consumers include conversational assistants, autonomous agents, data-mining w
 
 A consumer may submit natural language or an approved operation identifier with typed parameters. It passes the caller's authenticated context, preserves the returned result identifier for follow-up actions, and distinguishes governed results from exploratory output produced outside this platform.
 
+### Worked Example
+
+The running example asks the platform to compare the caller's equity portfolios with their benchmarks for the current quarter:
+
+```json
+{
+  "question": "Compare my equity portfolios with their benchmarks this quarter",
+  "response_profile": "full_analytical"
+}
+```
+
+The authentication and identity context travels through the trusted transport. It is not embedded in the analytical request body.
+
 ## MCP Capability Layer (MCP)
 
 > **Governing principles:** [P1 - Semantic abstraction](./01-overview.md#design-principles), [P2 - Controls before execution](./01-overview.md#design-principles), and [P5 - Role-aware by default](./01-overview.md#design-principles)
@@ -135,6 +148,21 @@ The consumer may select a candidate, refine the question, or cancel. Selection r
 
 The capability layer exposes only registered tools and approved operation metadata. Tool discovery is entitlement-aware. Request limits, session limits, and allowed response sizes are versioned platform controls. Changes to tool contracts follow the same review and compatibility process as other public interfaces.
 
+### Worked Example
+
+The MCP layer accepts the natural-language request and creates a correlation identifier before routing it to the IRA:
+
+```json
+{
+  "request_id": "req-20260518-093241",
+  "tool": "run_analytics",
+  "input": {
+    "question": "Compare my equity portfolios with their benchmarks this quarter",
+    "response_profile": "full_analytical"
+  }
+}
+```
+
 ## Intent Resolution Agent (IRA)
 
 > **Governing principles:** [P1 - Semantic abstraction](./01-overview.md#design-principles) and [P10 - Deterministic computation, not generation](./01-overview.md#design-principles)
@@ -156,6 +184,25 @@ The IRA also estimates whether the stated purpose is compliance-related. Ambiguo
 | Output validation | Validate the selected operation identifier and typed parameters against the SMR contract. | Validation result and rejection reason when applicable. |
 
 Retrieval narrows the model's choice set; it does not approve a definition or establish that the chosen intent is correct. Evaluation must measure top-candidate accuracy, correct-candidate coverage, clarification quality, and false certainty across representative language and user roles.
+
+### Worked Example
+
+The IRA resolves the question to an approved comparison operation. The symbolic caller-dependent scope remains unresolved:
+
+```json
+{
+  "request_id": "req-20260518-093241",
+  "operation_id": "compare_portfolio_to_benchmark",
+  "parameters": {
+    "portfolio_scope": "caller_authorized_portfolios",
+    "asset_class": "EQUITY",
+    "time_period": "current_quarter"
+  },
+  "confidence": 0.93,
+  "compliance_purpose_score": 0.08,
+  "confirmation_required": false
+}
+```
 
 ## Semantic Metrics Repository (SMR)
 
@@ -200,6 +247,25 @@ A formula is human-readable and audit-visible, but registration does not prove c
 
 Metrics Modellers submit definitions through an authenticated workflow. Analytics Governance reviews and approves them. Consumers discover only approved operations available under their entitlements. Search indexes and embeddings may improve discovery; they do not change approval state or access rights.
 
+### Worked Example
+
+The resolved operation references two approved metrics without exposing their physical implementation:
+
+```json
+{
+  "operation_id": "compare_portfolio_to_benchmark",
+  "version": "1.3.0",
+  "status": "approved",
+  "metrics": [
+    { "metric_id": "portfolio_return", "version": "2.1.0" },
+    { "metric_id": "benchmark_return", "version": "1.4.2" }
+  ],
+  "dimensions": ["portfolio"],
+  "required_parameters": ["portfolio_scope", "asset_class", "time_period"],
+  "execution_profile": "full_analytical"
+}
+```
+
 ## Role-Aware Projection Layer (RAPL)
 
 > **Governing principle:** [P5 - Role-aware by default](./01-overview.md#design-principles)
@@ -240,6 +306,27 @@ The merge must be independent of role order and must fail closed when a required
 
 Masking changes what downstream consumers can observe. The selected mode, protected field, policy version, and enforcement location therefore form part of the analytical evidence.
 
+### Worked Example
+
+RAPL resolves the symbolic portfolio scope from the authenticated caller's policy and claims:
+
+```json
+{
+  "request_id": "req-20260518-093241",
+  "policy_version": "portfolio-access-7.2",
+  "approved_metrics": ["portfolio_return", "benchmark_return"],
+  "approved_dimensions": ["portfolio"],
+  "row_scope": {
+    "field": "portfolio_id",
+    "operator": "in",
+    "values": ["GLOB_EQ_OPP", "UK_CORE_INC", "ASIA_PAC_GRW", "EUR_BAL_INC"]
+  },
+  "column_masks": [],
+  "classification_ceiling": "INTERNAL",
+  "decision": "approved"
+}
+```
+
 ## Semantic Validation Layer (SVL)
 
 > **Governing principles:** [P2 - Controls before execution](./01-overview.md#design-principles) and [P10 - Deterministic computation, not generation](./01-overview.md#design-principles)
@@ -260,6 +347,29 @@ Unknown, unapproved, incompatible, or unauthorized required concepts cause a str
 | Plan generation | Logical scans, filters, calculations, joins, sorts, limits, and output shape. | A backend-independent LQP. |
 
 The LQP also carries definition versions, data-affinity hints, mask directives, compliance inputs, and a preliminary impact indicator. It contains no credentials, connection endpoints, physical table names, or executable SQL.
+
+### Worked Example
+
+The SVL converts the qualified request into a backend-independent plan:
+
+```json
+{
+  "lqp_id": "lqp-20260518-093243",
+  "operation_id": "compare_portfolio_to_benchmark",
+  "metric_versions": {
+    "portfolio_return": "2.1.0",
+    "benchmark_return": "1.4.2"
+  },
+  "steps": [
+    { "type": "metric_scan", "metrics": ["portfolio_return", "benchmark_return"] },
+    { "type": "filter", "field": "asset_class", "operator": "eq", "value": "EQUITY" },
+    { "type": "row_scope", "field": "portfolio_id", "operator": "in", "value_ref": "authorized_portfolios" },
+    { "type": "sort", "field": "portfolio_return", "direction": "descending" }
+  ],
+  "time_period": { "type": "relative", "value": "current_quarter" },
+  "column_masks": []
+}
+```
 
 ## Semantic Controls Layer (SCL)
 
@@ -288,6 +398,25 @@ The data-scale estimate uses current SDR profiling statistics and the resolved r
 
 No interactive user, automated agent, administrator, cache path, or internal retry bypasses this release decision. A retried or modified request receives its own decision record.
 
+### Worked Example
+
+The SCL records each decision and assigns the execution budget:
+
+```json
+{
+  "lqp_id": "lqp-20260518-093243",
+  "decision": "approved",
+  "checks": {
+    "data_scale": { "estimate": 412000, "limit": 50000000, "result": "pass" },
+    "complexity": { "score": 4, "limit": 50, "result": "pass" },
+    "classification": { "required": "INTERNAL", "ceiling": "INTERNAL", "result": "pass" },
+    "compliance": { "metric_signal": false, "purpose_signal": false, "result": "standard" },
+    "concurrency": { "active": 3, "limit": 20, "result": "pass" }
+  },
+  "timeout_seconds": 30
+}
+```
+
 ## Physical Query Planner (PQP)
 
 > **Governing principles:** [P1 - Semantic abstraction](./01-overview.md#design-principles) and [P10 - Deterministic computation, not generation](./01-overview.md#design-principles)
@@ -310,6 +439,28 @@ A repeatable physical plan requires the same LQP, definition and mapping version
 | Plan sealing | Hash the physical plan and record planner, dialect, mapping, and configuration versions. |
 
 For a federated SQL product, the output may be one controlled statement that delegates source planning to that product. For heterogeneous services, the output may contain several sub-plans and an explicit assembly contract. Both are implementations of the same logical responsibility.
+
+### Worked Example
+
+The PQP resolves the approved mappings and creates a technology-neutral execution envelope:
+
+```json
+{
+  "plan_id": "plan-20260518-093244",
+  "lqp_id": "lqp-20260518-093243",
+  "mapping_versions": ["portfolio-mapping-4.6"],
+  "sub_plans": [
+    {
+      "source_id": "portfolio-performance-source",
+      "metrics": ["portfolio_return", "benchmark_return"],
+      "filters": ["asset_class", "authorized_portfolios", "resolved_date_range"]
+    }
+  ],
+  "resolved_date_range": { "from": "2026-04-01", "to": "2026-05-18" },
+  "column_masks": [],
+  "timeout_seconds": 30
+}
+```
 
 ## Federated Query Engine (FQE)
 
@@ -337,6 +488,25 @@ The FQE records source identifiers, plan hashes, timing, row counts, cache statu
 Supported source categories may include SQL warehouses and lakehouses, governed semantic layers, approved REST or OpenData services, graph stores, and OLAP engines. Connector availability does not make a source usable automatically. Each connection requires approved mappings, credentials, classifications, timeout behavior, and failure semantics.
 
 Result-size limits determine whether the engine returns inline data, paginates an approved dataset, streams within a controlled protocol, or rejects the request. These choices are part of the operation contract and response evidence.
+
+### Worked Example
+
+The FQE executes the approved plan and returns typed result rows:
+
+```json
+{
+  "result_id": "res-20260518-093247",
+  "status": "complete",
+  "sources_used": ["portfolio-performance-source"],
+  "cache_status": "miss",
+  "rows": [
+    { "portfolio_id": "GLOB_EQ_OPP", "portfolio": "Global Equity Opportunities", "portfolio_return": 0.0421, "benchmark_return": 0.0385 },
+    { "portfolio_id": "ASIA_PAC_GRW", "portfolio": "Asia Pacific Growth", "portfolio_return": 0.0367, "benchmark_return": 0.0390 },
+    { "portfolio_id": "UK_CORE_INC", "portfolio": "UK Core Income", "portfolio_return": 0.0287, "benchmark_return": 0.0254 },
+    { "portfolio_id": "EUR_BAL_INC", "portfolio": "EUR Balanced Income", "portfolio_return": 0.0193, "benchmark_return": 0.0231 }
+  ]
+}
+```
 
 ## Data Visualization Language (DVL)
 
@@ -366,6 +536,25 @@ Each registered contract declares compatible patterns, required field types, car
 
 Themes may change approved colors and typography without changing the analytical contract. Threshold colors, units, labels, ordering, and benchmark semantics come from governed metadata and must remain interpretable in accessible and monochrome presentations.
 
+### Worked Example
+
+The DVL selects the registered comparison contract from the intent and result shape:
+
+```json
+{
+  "type": "chart",
+  "contract": "multi_series_comparison",
+  "contract_version": "2.0",
+  "mark": "bar",
+  "category": { "field": "portfolio", "label": "Portfolio" },
+  "measures": [
+    { "field": "portfolio_return", "label": "Portfolio Return", "format": "percentage" },
+    { "field": "benchmark_return", "label": "Benchmark Return", "format": "percentage" }
+  ],
+  "sort": { "field": "portfolio_return", "direction": "descending" }
+}
+```
+
 ## Narrative Synthesis Agent (NSA)
 
 > **Governing principles:** [P6 - Governed narrative](./01-overview.md#design-principles) and [P10 - Deterministic computation, not generation](./01-overview.md#design-principles)
@@ -381,6 +570,25 @@ Disabling the NSA has no effect on calculation, display specification, lineage, 
 The narrative contract separates a short lead statement, supporting detail, and the result identifiers to which each claim is anchored. Validation covers numbers, units, dimension labels, comparison direction, and permitted derived counts. It rejects invented causes, recommendations, forecasts, or significance claims unless the approved operation explicitly provides those outputs.
 
 The lineage record captures the model, prompt-template version, validation outcome, retry count, and omission reason. Model selection may vary by result complexity, but changing models must not alter computed data or the DVL contract.
+
+### Worked Example
+
+The NSA summarizes only statements supported by the result rows:
+
+```json
+{
+  "narrative": {
+    "lead": "Two of four equity portfolios outperformed their benchmarks this quarter.",
+    "detail": "Global Equity Opportunities returned 4.21% compared with 3.85% for its benchmark. UK Core Income returned 2.87% compared with 2.54%.",
+    "anchored_to": ["GLOB_EQ_OPP", "UK_CORE_INC", "ASIA_PAC_GRW", "EUR_BAL_INC"]
+  },
+  "validation": {
+    "numbers": "passed",
+    "units": "passed",
+    "dimension_labels": "passed"
+  }
+}
+```
 
 ## Analytical Lineage Store (ALS)
 
@@ -415,6 +623,27 @@ Retention policy defines periods for request events, controls decisions, executi
 
 An audit export includes the selected event chain, referenced definition and policy versions, verification material, export scope, and exporter's identity. The platform signs the export package and records the export as a new auditable event.
 
+### Worked Example
+
+The ALS correlates stage records without storing the full result by default:
+
+```json
+{
+  "request_id": "req-20260518-093241",
+  "result_id": "res-20260518-093247",
+  "events": [
+    { "type": "intent_resolved", "record_id": "evt-intent-001" },
+    { "type": "entitlement_projected", "record_id": "evt-access-001" },
+    { "type": "controls_approved", "record_id": "evt-controls-001" },
+    { "type": "plan_compiled", "record_id": "evt-plan-001" },
+    { "type": "execution_completed", "record_id": "evt-execution-001" },
+    { "type": "presentation_assembled", "record_id": "evt-presentation-001" }
+  ],
+  "result_digest": "sha256:<illustrative-digest>",
+  "retention_policy": "analytical-evidence-standard"
+}
+```
+
 ## Provenance Artifact Service (PAS)
 
 > **Governing principles:** [P2 - Controls before execution](./01-overview.md#design-principles), [P4 - Complete analytical lineage](./01-overview.md#design-principles), and [P9 - Administrator sovereignty within governance bounds](./01-overview.md#design-principles)
@@ -439,6 +668,26 @@ A valid signature shows that the signed bytes have not changed since sealing. It
 
 If assembly or signing fails, the result remains non-exportable and the ALS records the terminal artifact state. Amendments create a new signed artifact that references the original; they do not replace sealed evidence.
 
+### Worked Example
+
+The portfolio comparison does not activate PAS because neither compliance signal is active. A compliance-purpose operation would return an artifact state such as:
+
+```json
+{
+  "compliance_purpose": true,
+  "triggered_by_metrics": ["liquidity_coverage_ratio"],
+  "triggered_by_frameworks": ["approved-liquidity-framework"],
+  "artifact_id": "artifact-20260518-104512",
+  "artifact_schema_version": "1.0",
+  "signature": {
+    "key_id": "platform-signing-key-2026-01",
+    "algorithm": "approved-digital-signature",
+    "verification_status": "verified"
+  },
+  "export_status": "permitted"
+}
+```
+
 ## MCP Response Format
 
 The platform is headless. It returns a structured response that lets different consumers present the same governed result without reinterpreting its meaning.
@@ -461,6 +710,31 @@ A DVL specification is a discriminated chart or table envelope. It contains appr
 ### Response Status and Failure Semantics
 
 Complete, incomplete, rejected, failed, and timed-out are distinct states. An incomplete response identifies missing sources or metrics and appears only when the operation contract permits partial semantics. A rejection means a governance or validation rule prevented execution. A failure or timeout means approved execution did not complete. Consumers must present these states explicitly and must not render an incomplete or failed response as a complete governed answer.
+
+### Worked Example
+
+The final response combines the computed result with its governed presentation and evidence references:
+
+```json
+{
+  "request_id": "req-20260518-093241",
+  "result_id": "res-20260518-093247",
+  "status": "complete",
+  "data_ref": "result:res-20260518-093247",
+  "display_spec_ref": "display:res-20260518-093247",
+  "narrative_ref": "narrative:res-20260518-093247",
+  "lineage": {
+    "record_ref": "lineage:req-20260518-093241",
+    "available_to_caller": true
+  },
+  "compliance": {
+    "triggered": false,
+    "export_status": "permitted"
+  },
+  "warnings": [],
+  "errors": []
+}
+```
 
 ## External Components
 
