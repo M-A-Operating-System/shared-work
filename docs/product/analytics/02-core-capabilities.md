@@ -136,7 +136,7 @@ flowchart TD
 | 8. Presentation and evidence - DVL, NSA, ALS, and PAS | Create the governed display contract, optionally create and validate a narrative, complete the correlated lineage evidence, and seal a compliance artifact when the trigger is active. | Typed result, resolved intent, plan references, and accumulated evidence | Display specification, optional narrative, lineage reference, and optional sealed compliance artifact |
 | 9. Capability response - MCP Capability Layer | Assemble the governed response and return it to the requesting consumer. A consumer may send the display specification to the optional rendering service. | Result, presentation outputs, evidence references, warnings, and terminal status | Structured consumer response and, when separately requested, rendered SVG or PNG |
 
-The running example uses one request throughout. Each component shows both its input and output as technology-neutral JSON. Identifiers and values are illustrative, not implementation defaults.
+The running example uses one request throughout. Each component shows both its input and output as technology-neutral JSON. When one component emits a request, definition, projection, plan, result, or evidence reference, the receiving component repeats the same field name and value so the handoff is visible. Identifiers and values are illustrative, not implementation defaults.
 
 A result is repeatable only when the request, source snapshot, definition versions, effective permissions, configuration, and execution software are preserved. Deterministic planning does not compensate for changed data or definitions.
 
@@ -187,6 +187,7 @@ The running example asks the platform to compare the caller's equity portfolios 
     "requested_experience": "analysis with presentation and narrative"
   },
   "output": {
+    "analytical_request_id": "request-draft-001",
     "question": "Compare my equity portfolios with their benchmarks this quarter",
     "response_profile": "full_analytical"
   }
@@ -251,15 +252,16 @@ The MCP layer accepts the natural-language request and creates a correlation ide
 {
   "input": {
     "authenticated_context_ref": "caller-context",
-    "analytical_request_ref": "consumer-request"
+    "analytical_request_id": "request-draft-001",
+    "question": "Compare my equity portfolios with their benchmarks this quarter",
+    "response_profile": "full_analytical"
   },
   "output": {
     "request_id": "req-20260518-093241",
-    "tool": "run_analytics",
-    "arguments": {
-      "question": "Compare my equity portfolios with their benchmarks this quarter",
-      "response_profile": "full_analytical"
-    }
+    "route": "natural_language",
+    "analytical_request_id": "request-draft-001",
+    "question": "Compare my equity portfolios with their benchmarks this quarter",
+    "response_profile": "full_analytical"
   }
 }
 ```
@@ -303,9 +305,11 @@ The IRA resolves the question to an approved comparison operation. The symbolic 
   "input": {
     "request_id": "req-20260518-093241",
     "question": "Compare my equity portfolios with their benchmarks this quarter",
+    "response_profile": "full_analytical",
     "discoverable_catalog_ref": "approved-operations-for-caller"
   },
   "output": {
+    "resolved_request_id": "resolved-20260518-093242",
     "request_id": "req-20260518-093241",
     "operation_id": "compare_portfolio_to_benchmark",
     "parameters": {
@@ -315,7 +319,8 @@ The IRA resolves the question to an approved comparison operation. The symbolic 
     },
     "confidence": 0.93,
     "compliance_purpose_score": 0.08,
-    "confirmation_required": false
+    "confirmation_required": false,
+    "response_profile": "full_analytical"
   }
 }
 ```
@@ -378,10 +383,11 @@ The resolved operation references two approved metrics without exposing their ph
 ```json
 {
   "input": {
-    "lookup": "approved_operation_definition",
-    "operation_id": "compare_portfolio_to_benchmark"
+    "operation_id": "compare_portfolio_to_benchmark",
+    "required_state": "approved"
   },
   "output": {
+    "operation_definition_ref": "smr:operation:compare_portfolio_to_benchmark@1.3.0",
     "operation_id": "compare_portfolio_to_benchmark",
     "version": "1.3.0",
     "status": "approved",
@@ -463,11 +469,14 @@ RAPL resolves the symbolic portfolio scope from the authenticated caller's polic
 ```json
 {
   "input": {
-    "resolved_request_ref": "req-20260518-093241",
+    "resolved_request_id": "resolved-20260518-093242",
+    "request_id": "req-20260518-093241",
+    "operation_definition_ref": "smr:operation:compare_portfolio_to_benchmark@1.3.0",
     "authenticated_context_ref": "caller-context",
     "entitlement_policy_ref": "current-policy-snapshot"
   },
   "output": {
+    "entitlement_projection_ref": "projection:req-20260518-093241",
     "request_id": "req-20260518-093241",
     "policy_version": "portfolio-access-7.2",
     "approved_metrics": [
@@ -530,12 +539,13 @@ The SVL converts the qualified request into a backend-independent plan:
 ```json
 {
   "input": {
-    "resolved_request_ref": "req-20260518-093241",
-    "entitlement_projection_ref": "projection:req-20260518-093241",
-    "definition_set_ref": "approved-definition-versions"
+    "resolved_request_id": "resolved-20260518-093242",
+    "operation_definition_ref": "smr:operation:compare_portfolio_to_benchmark@1.3.0",
+    "entitlement_projection_ref": "projection:req-20260518-093241"
   },
   "output": {
     "lqp_id": "lqp-20260518-093243",
+    "request_id": "req-20260518-093241",
     "operation_id": "compare_portfolio_to_benchmark",
     "metric_versions": {
       "portfolio_return": "2.1.0",
@@ -559,7 +569,7 @@ The SVL converts the qualified request into a backend-independent plan:
         "type": "row_scope",
         "field": "portfolio_id",
         "operator": "in",
-        "value_ref": "authorized_portfolios"
+        "value_ref": "projection:req-20260518-093241"
       },
       {
         "type": "sort",
@@ -623,6 +633,7 @@ The SCL records each decision and assigns the execution budget:
     "operating_state_ref": "current-capacity"
   },
   "output": {
+    "controls_decision_ref": "controls:lqp-20260518-093243",
     "lqp_id": "lqp-20260518-093243",
     "decision": "approved",
     "checks": {
@@ -702,6 +713,7 @@ The PQP resolves the approved mappings and creates a technology-neutral executio
   "output": {
     "plan_id": "plan-20260518-093244",
     "lqp_id": "lqp-20260518-093243",
+    "controls_decision_ref": "controls:lqp-20260518-093243",
     "mapping_versions": [
       "portfolio-mapping-4.6"
     ],
@@ -776,6 +788,8 @@ The FQE executes the approved plan and returns typed result rows:
   },
   "output": {
     "result_id": "res-20260518-093247",
+    "request_id": "req-20260518-093241",
+    "plan_id": "plan-20260518-093244",
     "status": "complete",
     "sources_used": [
       "portfolio-performance-source"
@@ -859,6 +873,8 @@ The DVL selects the registered comparison contract from the intent and result sh
     "presentation_metadata_ref": "approved-labels-and-units"
   },
   "output": {
+    "display_spec_ref": "display:res-20260518-093247",
+    "result_id": "res-20260518-093247",
     "type": "chart",
     "contract": "multi_series_comparison",
     "contract_version": "2.0",
@@ -927,6 +943,8 @@ The NSA summarizes only statements supported by the result rows:
     ]
   },
   "output": {
+    "narrative_ref": "narrative:res-20260518-093247",
+    "result_id": "res-20260518-093247",
     "narrative": {
       "lead": "Two of four equity portfolios outperformed their benchmarks this quarter.",
       "detail": "Global Equity Opportunities returned 4.21% compared with 3.85% for its benchmark. UK Core Income returned 2.87% compared with 2.54%.",
@@ -995,9 +1013,13 @@ The ALS correlates stage records without storing the full result by default:
 {
   "input": {
     "request_id": "req-20260518-093241",
+    "result_id": "res-20260518-093247",
+    "display_spec_ref": "display:res-20260518-093247",
+    "narrative_ref": "narrative:res-20260518-093247",
     "correlated_stage_events_ref": "events:req-20260518-093241"
   },
   "output": {
+    "lineage_ref": "lineage:req-20260518-093241",
     "request_id": "req-20260518-093241",
     "result_id": "res-20260518-093247",
     "events": [
@@ -1066,33 +1088,25 @@ If assembly or signing fails, the result remains non-exportable and the ALS reco
 
 ### Input and Output Example
 
-The portfolio comparison does not activate PAS because neither compliance signal is active. A compliance-purpose operation would return an artifact state such as:
+The portfolio comparison reaches the compliance decision with both signals inactive. No artifact is assembled, and the explicit compliance state continues to response assembly:
 
 ```json
 {
   "input": {
+    "request_id": "req-20260518-093241",
+    "lineage_ref": "lineage:req-20260518-093241",
     "compliance_trigger": {
-      "metric_signal": true,
-      "purpose_signal": true
-    },
-    "lineage_event_set_ref": "lineage:compliance-request"
+      "metric_signal": false,
+      "purpose_signal": false
+    }
   },
   "output": {
-    "compliance_purpose": true,
-    "triggered_by_metrics": [
-      "liquidity_coverage_ratio"
-    ],
-    "triggered_by_frameworks": [
-      "approved-liquidity-framework"
-    ],
-    "artifact_id": "artifact-20260518-104512",
-    "artifact_schema_version": "1.0",
-    "signature": {
-      "key_id": "platform-signing-key-2026-01",
-      "algorithm": "approved-digital-signature",
-      "verification_status": "verified"
-    },
-    "export_status": "permitted"
+    "compliance_state_ref": "compliance:req-20260518-093241",
+    "request_id": "req-20260518-093241",
+    "artifact_required": false,
+    "artifact_id": null,
+    "export_status": "permitted",
+    "reason": "two_signal_trigger_not_active"
   }
 }
 ```
@@ -1135,10 +1149,12 @@ The final response combines the computed result with its governed presentation a
 ```json
 {
   "input": {
-    "result_ref": "result:res-20260518-093247",
-    "display_ref": "display:res-20260518-093247",
+    "request_id": "req-20260518-093241",
+    "result_id": "res-20260518-093247",
+    "display_spec_ref": "display:res-20260518-093247",
     "narrative_ref": "narrative:res-20260518-093247",
-    "lineage_ref": "lineage:req-20260518-093241"
+    "lineage_ref": "lineage:req-20260518-093241",
+    "compliance_state_ref": "compliance:req-20260518-093241"
   },
   "output": {
     "request_id": "req-20260518-093241",
@@ -1152,6 +1168,7 @@ The final response combines the computed result with its governed presentation a
       "available_to_caller": true
     },
     "compliance": {
+      "state_ref": "compliance:req-20260518-093241",
       "triggered": false,
       "export_status": "permitted"
     },
