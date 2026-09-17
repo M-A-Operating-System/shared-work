@@ -86,67 +86,55 @@ flowchart TD
         Specialized[("Relationship or Multidimensional Store")]
     end
 
-    Consumers -->|"authenticated analytical request"| MCP
-    MCP -->|"natural-language request"| IRA
-    MCP -->|"structured request"| RAPL
-    IRA -->|"approved candidate retrieval"| SMR
-    IRA -->|"ranking and purpose classification"| Model
-    IRA -->|"resolved operation and parameters"| RAPL
-    RAPL -->|"policy lookup"| DES
-    RAPL -->|"entitlement projection"| SVL
-    RAPL -->|"entitlement evidence"| ALS
-    SVL -->|"definition resolution"| SMR
-    SVL -->|"Logical Query Plan"| SCL
-    SVL -->|"validation and plan evidence"| ALS
-    SCL -->|"approved plan and execution budget"| PQP
-    SCL -->|"controls evidence"| ALS
-    PQP -->|"mapping resolution"| SMR
-    PQP -->|"physical execution envelope"| FQE
-    FQE --> Sources
-    FQE -->|"execution evidence"| ALS
-    FQE -->|"typed result"| DVL
-    FQE -->|"typed result"| NSA
-    NSA -->|"bounded synthesis request"| Model
-    ALS -->|"compliance-triggered event set"| PAS
-    DVL -->|"display specification"| Response
-    NSA -->|"validated narrative or omission state"| Response
-    ALS -->|"lineage reference"| Response
-    PAS -->|"sealed artifact state"| Response
-    Response --> MCP
-    MCP --> Consumers
-    Consumers -. "optional render request" .-> Renderer
-    Renderer -. "SVG or PNG" .-> Consumers
+    Consumers -->|"1. authenticated analytical request"| MCP
+    MCP -->|"2. natural-language request"| IRA
+    MCP -->|"3. structured request bypasses IRA"| RAPL
+    IRA -->|"2. approved candidate retrieval"| SMR
+    IRA -->|"2. ranking and purpose classification"| Model
+    IRA -->|"3. resolved operation and parameters"| RAPL
+    RAPL -->|"3. policy lookup"| DES
+    RAPL -->|"4. entitlement projection"| SVL
+    RAPL -->|"3. entitlement evidence"| ALS
+    SVL -->|"4. definition resolution"| SMR
+    SVL -->|"5. Logical Query Plan"| SCL
+    SVL -->|"4. validation and plan evidence"| ALS
+    SCL -->|"6. approved plan and execution budget"| PQP
+    SCL -->|"5. controls evidence"| ALS
+    PQP -->|"6. mapping resolution"| SMR
+    PQP -->|"7. physical execution envelope"| FQE
+    FQE -->|"7. controlled source execution"| Sources
+    FQE -->|"7. execution evidence"| ALS
+    FQE -->|"8. typed result"| DVL
+    FQE -->|"8. typed result"| NSA
+    NSA -->|"8. bounded synthesis request"| Model
+    ALS -->|"8. compliance-triggered event set"| PAS
+    DVL -->|"8. display specification"| Response
+    NSA -->|"8. validated narrative or omission state"| Response
+    ALS -->|"8. lineage reference"| Response
+    PAS -->|"8. sealed artifact state"| Response
+    Response -->|"9. response package"| MCP
+    MCP -->|"9. structured consumer response"| Consumers
+    Consumers -. "9. optional render request" .-> Renderer
+    Renderer -. "9. SVG or PNG" .-> Consumers
 
     style Platform fill:#dbeafe,stroke:#2563eb
     style Context fill:#f8fafc,stroke:#64748b
     style Sources fill:#f8fafc,stroke:#64748b
 ```
 
-The request follows nine steps:
+### Request Steps
 
-1. The MCP Capability Layer authenticates the request and selects the natural-language or structured route.
-2. The Intent Resolution Agent (IRA), when used, matches the question to approved operations and asks for clarification when confidence or purpose is ambiguous.
-3. The Role-Aware Projection Layer (RAPL) resolves the caller's effective permissions.
-4. The Semantic Validation Layer (SVL) validates the request against approved definitions and creates a Logical Query Plan (LQP).
-5. The Semantic Controls Layer (SCL) applies mandatory execution controls.
-6. The Physical Query Planner (PQP) translates the approved logical plan into source-specific sub-plans.
-7. The Federated Query Engine (FQE) executes those sub-plans and assembles the result.
-8. The DVL and NSA prepare presentation output, the ALS completes the correlated evidence, and PAS adds a signed artifact when required.
-9. The MCP Capability Layer returns a structured response.
-
-### Stage Inputs and Outputs
-
-| Stage | Input | Output |
-|---|---|---|
-| Capability entry | Authenticated consumer request | Correlated natural-language or structured analytical request |
-| Intent resolution | Natural-language request and discoverable approved definitions | Approved operation identifier, typed parameters, confidence, and purpose signal |
-| Entitlement projection | Resolved request and authenticated identity context | Effective metrics, dimensions, row scope, masks, and classification ceiling |
-| Semantic validation | Resolved request and entitlement projection | Backend-independent Logical Query Plan |
-| Controls | Logical plan, policy, and operating state | Approved or rejected controls decision and execution budget |
-| Physical planning | Approved logical plan and registered mappings | Source-neutral execution envelope containing one or more source sub-plans |
-| Federated execution | Approved execution envelope | Typed result or explicit terminal outcome |
-| Presentation and evidence | Result, plan references, and execution events | Display contract, optional narrative, lineage references, and optional compliance artifact |
-| Capability response | Result and presentation package | Structured response for the consumer |
+| Step | Description | Input | Output |
+|---|---|---|---|
+| 1. Capability entry - MCP Capability Layer | Authenticate the caller, create the request correlation context, and route a natural-language or structured request. | Authenticated consumer request | Correlated analytical request routed either to IRA or directly to RAPL |
+| 2. Intent resolution - IRA when required | Retrieve approved candidates from the SMR, rank them, bind typed parameters, classify stated purpose, and request clarification when the result is ambiguous. Structured requests skip this step. | Natural-language request and discoverable approved definitions | Approved operation identifier, typed parameters, confidence evidence, and purpose signal |
+| 3. Entitlement projection - RAPL | Resolve policies from the DES against the authenticated identity and record the effective access decision in the ALS. | Resolved operation and parameters plus authenticated identity context | Approved metrics and dimensions, row scope, masks, classification ceiling, and entitlement evidence |
+| 4. Semantic validation - SVL | Resolve approved definition versions from the SMR, validate semantic compatibility, apply the entitlement projection, and record validation evidence in the ALS. | Resolved request and entitlement projection | Backend-independent Logical Query Plan or structured rejection |
+| 5. Controls - SCL | Evaluate scale, complexity, classification, compliance, and concurrency; record the controls decision in the ALS; and assign an execution budget when approved. | Logical Query Plan, versioned controls, and operating state | Approved plan with execution budget or structured rejection |
+| 6. Physical planning - PQP | Resolve approved mappings through the SMR and SDR context and compile one or more bounded source sub-plans. | Approved Logical Query Plan, execution budget, and registered mappings | Physical execution envelope containing source sub-plans, protection directives, and integrity evidence |
+| 7. Federated execution - FQE | Execute the approved sub-plans against registered sources, assemble the result, enforce remaining protections, and record execution evidence in the ALS. | Approved physical execution envelope | Typed result or explicit incomplete, failed, or timed-out outcome |
+| 8. Presentation and evidence - DVL, NSA, ALS, and PAS | Create the governed display contract, optionally create and validate a narrative, complete the correlated lineage evidence, and seal a compliance artifact when the trigger is active. | Typed result, resolved intent, plan references, and accumulated evidence | Display specification, optional narrative, lineage reference, and optional sealed compliance artifact |
+| 9. Capability response - MCP Capability Layer | Assemble the governed response and return it to the requesting consumer. A consumer may send the display specification to the optional rendering service. | Result, presentation outputs, evidence references, warnings, and terminal status | Structured consumer response and, when separately requested, rendered SVG or PNG |
 
 The worked example uses one request throughout. Each subsection names the stage input in prose and shows the stage output as technology-neutral JSON. Identifiers and values are illustrative, not implementation defaults.
 
