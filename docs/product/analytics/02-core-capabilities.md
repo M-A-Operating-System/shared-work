@@ -2,7 +2,7 @@
 
 ## Purpose and Boundaries
 
-This section defines the proposed logical architecture for governed AI-enabled analytics and data mining. It explains each component's responsibility and the contracts between components. [Section 3](./03-technical-implementation.md) maps these responsibilities to an illustrative technology stack and provides detailed schemas, interfaces, and configuration examples.
+This section defines the proposed logical architecture for governed AI-enabled analytics and data mining. It explains each component's responsibility and the contracts between components. It is implementation-neutral: it names required behavior, inputs, outputs, and evidence without selecting products, programming languages, frameworks, storage services, or deployment patterns. [Section 3](./03-technical-implementation.md) maps these responsibilities to an illustrative technology stack.
 
 The design separates AI-assisted interpretation from governed computation. A language model may match a question to an approved operation and summarize a completed result. Registered definitions, deterministic software, and controlled data services perform the calculation. A structured caller may bypass natural-language interpretation, but it may not bypass entitlements, validation, controls, execution evidence, or other mandatory stages.
 
@@ -68,6 +68,22 @@ The request follows nine steps:
 7. The Federated Query Engine (FQE) executes those sub-plans and assembles the result.
 8. The DVL and NSA prepare presentation output, the ALS completes the correlated evidence, and PAS adds a signed artifact when required.
 9. The MCP Capability Layer returns a structured response.
+
+### Stage Inputs and Outputs
+
+| Stage | Input | Output |
+|---|---|---|
+| Capability entry | Authenticated consumer request | Correlated natural-language or structured analytical request |
+| Intent resolution | Natural-language request and discoverable approved definitions | Approved operation identifier, typed parameters, confidence, and purpose signal |
+| Entitlement projection | Resolved request and authenticated identity context | Effective metrics, dimensions, row scope, masks, and classification ceiling |
+| Semantic validation | Resolved request and entitlement projection | Backend-independent Logical Query Plan |
+| Controls | Logical plan, policy, and operating state | Approved or rejected controls decision and execution budget |
+| Physical planning | Approved logical plan and registered mappings | Source-neutral execution envelope containing one or more source sub-plans |
+| Federated execution | Approved execution envelope | Typed result or explicit terminal outcome |
+| Presentation and evidence | Result, plan references, and execution events | Display contract, optional narrative, lineage references, and optional compliance artifact |
+| Capability response | Result and presentation package | Structured response for the consumer |
+
+The worked example uses one request throughout. Each subsection names the stage input in prose and shows the stage output as technology-neutral JSON. Identifiers and values are illustrative, not implementation defaults.
 
 A result is repeatable only when the request, source snapshot, definition versions, effective permissions, configuration, and execution software are preserved. Deterministic planning does not compensate for changed data or definitions.
 
@@ -435,10 +451,10 @@ A repeatable physical plan requires the same LQP, definition and mapping version
 | Predicate binding | Bind typed dimension filters and RAPL row scopes using backend-safe parameters. |
 | Time resolution | Expand relative periods against the recorded evaluation timestamp and calendar. |
 | Source grouping | Group compatible work by data affinity and identify required cross-source assembly. |
-| Dialect compilation | Produce a bounded sub-plan in the registered dialect for each source group. |
-| Plan sealing | Hash the physical plan and record planner, dialect, mapping, and configuration versions. |
+| Source instruction compilation | Produce a bounded sub-plan in the registered instruction format for each source group. |
+| Plan sealing | Create an integrity digest and record planner, instruction-format, mapping, and configuration versions. |
 
-For a federated SQL product, the output may be one controlled statement that delegates source planning to that product. For heterogeneous services, the output may contain several sub-plans and an explicit assembly contract. Both are implementations of the same logical responsibility.
+An implementation may delegate federation to one execution service or create several source sub-plans with an explicit assembly contract. Both approaches implement the same logical responsibility; Section 3 proposes a specific choice.
 
 ### Worked Example
 
@@ -485,7 +501,7 @@ The FQE records source identifiers, plan hashes, timing, row counts, cache statu
 | Final protection | Apply any remaining masks and verify the returned schema before release. |
 | Evidence write | Record the outcome before returning the result or terminal failure. |
 
-Supported source categories may include SQL warehouses and lakehouses, governed semantic layers, approved REST or OpenData services, graph stores, and OLAP engines. Connector availability does not make a source usable automatically. Each connection requires approved mappings, credentials, classifications, timeout behavior, and failure semantics.
+Supported source categories may include relational analytical stores, governed semantic services, approved data APIs, relationship stores, and multidimensional analytical engines. Technical connectivity does not make a source usable automatically. Each connection requires approved mappings, credentials, classifications, timeout behavior, and failure semantics.
 
 Result-size limits determine whether the engine returns inline data, paginates an approved dataset, streams within a controlled protocol, or rejects the request. These choices are part of the operation contract and response evidence.
 
@@ -610,7 +626,7 @@ Retention varies by record class, jurisdiction, and business purpose. Definition
 | Intent resolved | Candidate set, selected operation, model evidence, confidence, and confirmation history. |
 | Entitlement projected | Policy versions, active roles, resolved row scopes, masks, ceiling, and decision. |
 | Controls evaluated | Each control input, limit, outcome, reason, and assigned timeout. |
-| Plan compiled | Logical and physical plan hashes plus definition, mapping, planner, and dialect versions. |
+| Plan compiled | Logical and physical plan digests plus definition, mapping, planner, and instruction-format versions. |
 | Execution completed | Sources, timings, row counts, cache status, failures, and result digest. |
 | Presentation assembled | DVL contract, narrative validation, artifact state, and response status. |
 | Request terminated | Rejection, cancellation, timeout, or failure stage and structured reason. |
@@ -639,7 +655,7 @@ The ALS correlates stage records without storing the full result by default:
     { "type": "execution_completed", "record_id": "evt-execution-001" },
     { "type": "presentation_assembled", "record_id": "evt-presentation-001" }
   ],
-  "result_digest": "sha256:<illustrative-digest>",
+  "result_digest": "digest:<illustrative-value>",
   "retention_policy": "analytical-evidence-standard"
 }
 ```
@@ -752,9 +768,9 @@ The SDR contains organizational data metadata such as models, critical data elem
 
 The DES stores independently governed policies for metrics, dimensions, row scopes, masks, and classification ceilings. Policies reference logical concepts rather than physical table and column names. RAPL reads versioned policies at request time or from an equivalently controlled snapshot.
 
-### vega2img
+### Optional Rendering Service
 
-vega2img is an optional peer rendering service for consumers that need static SVG or PNG output. It receives a self-contained display specification and has no access to analytical definitions, source credentials, or execution backends.
+An optional peer rendering service can convert a self-contained display specification into SVG or PNG for consumers that cannot render it directly. The service has no access to analytical definitions, source credentials, or execution backends. Section 3 identifies an illustrative product and implementation for this role.
 
 ## Design Decisions Requiring Evaluation
 
@@ -765,7 +781,7 @@ The proposal leaves several choices for implementation and governance teams to v
 - operation contracts that may return partial results;
 - evidence and freshness rules for caching;
 - source snapshot retention and reconstruction;
-- supported formula operations and backend dialects;
+- supported formula operations and source instruction formats;
 - confidence and compliance-purpose thresholds;
 - storage controls for evidence integrity and retention; and
 - artifact schemas and approval processes for each intended regulatory use.
