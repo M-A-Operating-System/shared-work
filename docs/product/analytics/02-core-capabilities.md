@@ -52,7 +52,7 @@ flowchart TD
         Apps["Custom Applications"]
     end
 
-    subgraph Platform["Governed Analytics Platform"]
+    subgraph Platform["AI Analytics Platform"]
         direction TB
         MCP["MCP Capability Layer\nAuthentication, tools, and response contract"]
         IRA["Intent Resolution Agent (IRA)\nCandidate retrieval, ranking, parameters, and purpose signal"]
@@ -148,7 +148,7 @@ The architecture is not a strictly linear sequence. Some components provide look
 | Structured Response | Assemble the governed delivery package. | Typed result; display; narrative; lineage; compliance state; warnings and errors | Response package to MCP Capability Layer |
 | Optional Rendering Service | Produce a static visual without joining analytical computation. | Self-contained display specification from a consumer | SVG or PNG to the consumer |
 
-The running example uses one request throughout. Each component shows both its input and output as technology-neutral JSON. When one component emits a request, definition, projection, plan, result, or evidence reference, the receiving component repeats the same field name and value so the handoff is visible. Identifiers and values are illustrative, not implementation defaults.
+The running example uses one request throughout. Each primary flow component shows both its input and output as technology-neutral JSON. When one component emits a request, definition, projection, plan, result, or evidence reference, the receiving component repeats the same field name and value so the handoff is visible. Identifiers and values are illustrative, not implementation defaults.
 
 A result is repeatable only when the request, source snapshot, definition versions, effective permissions, configuration, and execution software are preserved. Deterministic planning does not compensate for changed data or definitions.
 
@@ -176,8 +176,7 @@ The running example asks the platform to compare the caller's equity portfolios 
   },
   "output": {
     "analytical_request_id": "request-draft-001",
-    "question": "Compare my equity portfolios with their benchmarks this quarter",
-    "response_profile": "full_analytical"
+    "question": "Compare my equity portfolios with their benchmarks this quarter"
   }
 }
 ```
@@ -202,7 +201,7 @@ The MCP Capability Layer is the single governed analytical entry point. The tran
 
 | Tool | Purpose |
 |---|---|
-| run_analytics | Runs a natural-language request or an approved operation with typed parameters. |
+| run_analytics | Accepts either a natural-language question or an approved operation with typed parameters. Natural language is resolved by the IRA before governed execution begins. |
 | list_operations | Lists operations and parameters available to the caller. |
 | drilldown | Creates a governed follow-up request from a prior result and hierarchy selection. |
 
@@ -241,15 +240,13 @@ The MCP layer accepts the natural-language request and creates a correlation ide
   "input": {
     "authenticated_context_ref": "caller-context",
     "analytical_request_id": "request-draft-001",
-    "question": "Compare my equity portfolios with their benchmarks this quarter",
-    "response_profile": "full_analytical"
+    "question": "Compare my equity portfolios with their benchmarks this quarter"
   },
   "output": {
     "request_id": "req-20260518-093241",
     "route": "natural_language",
     "analytical_request_id": "request-draft-001",
-    "question": "Compare my equity portfolios with their benchmarks this quarter",
-    "response_profile": "full_analytical"
+    "question": "Compare my equity portfolios with their benchmarks this quarter"
   }
 }
 ```
@@ -293,7 +290,6 @@ The IRA resolves the question to an approved comparison operation. The symbolic 
   "input": {
     "request_id": "req-20260518-093241",
     "question": "Compare my equity portfolios with their benchmarks this quarter",
-    "response_profile": "full_analytical",
     "discoverable_catalog_ref": "approved-operations-for-caller"
   },
   "output": {
@@ -307,8 +303,7 @@ The IRA resolves the question to an approved comparison operation. The symbolic 
     },
     "confidence": 0.93,
     "compliance_purpose_score": 0.08,
-    "confirmation_required": false,
-    "response_profile": "full_analytical"
+    "confirmation_required": false
   }
 }
 ```

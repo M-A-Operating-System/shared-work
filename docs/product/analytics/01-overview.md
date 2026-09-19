@@ -13,6 +13,7 @@ The proposal combines AI interpretation with approved semantic definitions, cont
 - [The Proposed Approach](#the-proposed-approach)
 - [Accuracy, Traceability, and Repeatability](#accuracy-traceability-and-repeatability)
 - [Why Text-to-SQL Is Not the Long-Term Foundation](#why-text-to-sql-is-not-the-long-term-foundation)
+- [Proposed Architecture at a Glance](#proposed-architecture-at-a-glance)
 - [How the Platform Works](#how-the-platform-works)
 - [What Users Can Do](#what-users-can-do)
 - [What the Organization Must Provide](#what-the-organization-must-provide)
@@ -56,9 +57,9 @@ A generated query does not, by itself, establish which business definition was a
 
 The proposed platform makes those requirements part of the execution process. AI selects from approved analytical definitions; deterministic software constructs and executes the calculation. This reduces reliance on the model inferring business meaning from physical schemas on each request.
 
-### The Architecture in Practice
+## Proposed Architecture at a Glance
 
-In both approaches, AI clients and LLMs are present. The difference is what happens next. In Text-to-SQL, the AI generates queries directly against raw database schemas. In the AI-Enabled Analytics Platform, it submits structured requests to a governed semantic layer — and the platform handles all computation, governance, and execution.
+In both approaches, AI clients and LLMs are present. The difference is what happens next. In Text-to-SQL, the AI generates queries directly against raw database schemas. In the AI Analytics Platform, it submits structured requests to a governed semantic layer, and the platform handles all computation, governance, and execution.
 
 **Text-to-SQL Approach**
 
@@ -88,7 +89,7 @@ flowchart LR
     M --> data
 ```
 
-**AI-Enabled Analytics Platform**
+**AI Analytics Platform**
 
 ```mermaid
 flowchart LR
@@ -158,7 +159,7 @@ These scenarios use the same governed service. Their differences are the approve
 
 > **The platform depends on accountable ownership of definitions, permissions, and source data.**
 
-Data modelers describe the source data and its business meaning. Metrics modelers define calculations and dataset contracts. Analytics Governance approves definitions and oversees analytical quality. The Entitlements Manager maintains access policies, integration engineers connect sources, and platform administrators operate the service.
+Data Modellers describe the source data and its business meaning. Metrics Modellers define calculations and dataset contracts. Analytics Governance approves definitions and oversees analytical quality. The Entitlements Manager maintains access policies, Integration Engineers connect sources, and Platform Admins operate the service.
 
 This work determines what the platform can answer. An unregistered business concept requires a reviewed definition before it becomes available through the governed path. Catalog coverage therefore grows through a maintained approval process.
 

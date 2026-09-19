@@ -4,28 +4,36 @@ This section illustrates how a technology stack could support the proposed archi
 
 The proposed behaviors, interfaces, and governance requirements are in [Section 2](./02-core-capabilities.md). The [design principles](./01-overview.md#design-principles) define the intended constraints on this implementation.
 
+Readers making an architectural or investment decision can use Sections 3.1 and 3.2 as the implementation summary. Sections 3.3 and 3.4 provide companion detail for engineering evaluation, including illustrative code, schemas, configuration, infrastructure, and seed definitions.
+
 
 ## 3.1 Reference Architecture Summary
 
 This section maps the capabilities defined in Section 2 to a proposed technology stack. Each mapping names the technology, the work it performs, and the application code needed to complete the capability. Teams may substitute technologies that satisfy the same interface contracts and governance requirements.
 
-The table maps each capability to its technology stack and explains how that stack supports it. Python entries require custom application code. The Data Context Store is an existing platform service; this reference implementation does not prescribe its underlying storage product.
+The table follows the logical flow in Section 2. It accounts for platform components, external dependencies, consumer responsibilities, and optional services so that an omitted row cannot be mistaken for an omitted capability. Python entries require custom application code. The Data Context Store is an existing platform service; this reference implementation does not prescribe its underlying storage product.
 
 | Capability (Section 2) | Abbreviation | Technology Stack | Implementation Description |
 |---|---|---|---|
+| AI Consumers | - | Claude-based chat client, autonomous agent, or custom application | Consumer products provide the user experience, submit natural-language or structured analytical requests, and render the governed response. They do not calculate governed values or bypass platform controls. |
 | MCP Capability Layer | MCP | Python 3.12, FastMCP 2.x, Uvicorn, python-jose | FastMCP exposes tools, resources, and prompts, and Uvicorn serves the application over HTTP. Python middleware uses python-jose to validate identity tokens before routing requests to the analytical pipeline. |
 | Intent Resolution Agent | IRA | Python, Anthropic Claude, Data Context Store (existing service) | Python retrieves candidate operations from the semantic catalog. Claude ranks them, binds request parameters, and scores compliance intent. The application asks the user to confirm ambiguous requests. |
 | Semantic Metrics Repository | SMR | Python, Data Context Store (existing service) | The Data Context Store stores, versions, approves, and indexes metric, dimension, operation, and dataset definitions. Python accesses those definitions through the service API. |
-| Role-Aware Projection Layer | RAPL | Python, asyncpg, PostgreSQL | Python uses asyncpg to read entitlement policies from PostgreSQL. It combines the policies with verified identity claims to determine permitted metrics, dimensions, rows, and column protections. |
+| Semantic Data Repository | SDR | Data Context Store (existing service) | The existing Data Context Store supplies governed business and physical data metadata. SMR physical mappings reference SDR objects rather than embedding unmanaged source-schema knowledge in AI prompts. |
 | Data Entitlements Store | DES | PostgreSQL | PostgreSQL stores entitlement policies in a dedicated schema with separate credentials. The Entitlements Manager maintains the policies, and the RAPL reads them when evaluating requests. |
+| Role-Aware Projection Layer | RAPL | Python, asyncpg, PostgreSQL | Python uses asyncpg to read entitlement policies from PostgreSQL. It combines the policies with verified identity claims to determine permitted metrics, dimensions, rows, and column protections. |
 | Semantic Validation Layer | SVL | Python, Pydantic v2 | Pydantic validates tool input models. Python checks operation parameters against registered JSON schemas, resolves semantic definitions, enforces the entitlement projection, and builds the logical query plan. |
 | Semantic Controls Layer | SCL | Python, Redis, Data Context Store (existing service) | Python evaluates the five controls checks using configured thresholds and profiling statistics. The Data Context Store stores the configuration, and Redis coordinates concurrent-query admission across application instances. |
 | Physical Query Planner | PQP | Python, Apache Calcite | Python binds approved logical concepts to physical catalog references. Apache Calcite supplies relational planning functions used to produce Trino SQL with the required filters and column protections. |
 | Federated Query Engine | FQE | Starburst (Trino), Python, Trino Python client | Starburst acts as the FQE. The Trino Python client submits SQL to its coordinator, and Starburst executes queries across configured source connectors. Python verifies the returned schema, caches results, and records execution details. |
+| Registered Data Sources | - | Snowflake, BigQuery, Databricks, Redshift, dbt Semantic Layer, Cube, REST, OData, Neo4j, Amazon Neptune | Starburst connectors provide controlled access to registered warehouses, lakehouses, semantic layers, APIs, and graph stores. Source registration and approved mappings determine which data can participate in governed execution. |
 | Data Visualization Language | DVL | Python, Vega-Lite v5 | Python selects the registered chart contract and generates a Vega-Lite display specification. Tabular results use the platform's separate table format. |
+| External Language Model Service | - | Anthropic Claude API | The IRA and NSA call the model service through separate, governed adapters. The model interprets intent or drafts a narrative; it does not receive database credentials or generate the executable query. |
 | Narrative Synthesis Agent | NSA | Python, Anthropic Claude Haiku 4.5, Anthropic Claude Sonnet 4.6 | Claude generates narratives from computed result values. Python selects Haiku for simple summaries or Sonnet for complex results, constructs the prompt, and validates the generated text. |
-| Provenance Artifact Service | PAS | Python, cryptography, HashiCorp Vault or Kubernetes Secrets, Amazon S3 | Python assembles the provenance artifact, and cryptography signs it with ECDSA P-256 and SHA-256. Vault or Kubernetes Secrets supplies the key. The lineage service stores the signed artifact in S3 under configured retention controls. |
 | Analytical Lineage Store | ALS | Python, Amazon S3, PostgreSQL | S3 stores lineage documents, and PostgreSQL indexes the fields used to find them. Python coordinates writes and retrieval, with retention controls and integrity checks protecting the records. |
+| Provenance Artifact Service | PAS | Python, cryptography, HashiCorp Vault or Kubernetes Secrets, Amazon S3 | Python assembles the provenance artifact, and cryptography signs it with ECDSA P-256 and SHA-256. Vault or Kubernetes Secrets supplies the key. The lineage service stores the signed artifact in S3 under configured retention controls. |
+| Structured Response | - | Python, Pydantic v2, FastMCP 2.x | Pydantic assembles and validates the typed response containing data, presentation, narrative, lineage, compliance state, warnings, and errors. FastMCP returns that package without allowing the consumer to recalculate governed values. |
+| Optional Rendering Service | - | Python, FastMCP 2.x, vega-embed, Playwright, Chromium | A separate MCP service converts a self-contained Vega-Lite specification to SVG or PNG. It has no access to analytical sources and is not part of governed computation. |
 | Result Cache | - | Python, Redis | Redis stores assembled results under keys derived from the canonical logical query plan. Python applies the configured expiry and bypasses cache reads and writes for compliance-purpose queries. |
 
 The two embedded AI components are the **Intent Resolution Agent (IRA)** and the **Narrative Synthesis Agent (NSA)**. Every stage between them — RAPL, SVL, SCL, PQP, and FQE — is deterministic.
@@ -35,7 +43,9 @@ The two embedded AI components are the **Intent Resolution Agent (IRA)** and the
 
 ```mermaid
 flowchart TD
-    Consumer["Consumer\nAI Chat Platform (Claude) · autonomous agent · custom application"]
+    Consumer["AI Consumers\nchat platform / autonomous agent / custom application"]
+    IdP["Trusted Identity Provider"]
+    LLM["Anthropic Claude API\nexternal language model service"]
 
     subgraph analytics["AI Analytics Platform"]
         MCP["FastMCP / Uvicorn (MCP)\nPython 3.12 · MCP Streamable HTTP · port 8000\nJWT — python-jose · JWKS · RS256"]
@@ -72,16 +82,20 @@ flowchart TD
         GDA["Graph catalog\nNeo4j · Amazon Neptune"]
     end
 
-    Consumer -->|"POST /v1/mcp (JWT + MCP tool call)"| MCP
+    Consumer -->|"Analytics Request"| MCP
+    IdP -->|"signed identity token in trusted request context"| MCP
     Consumer -->|"render tool call (display_spec)"| vega2img
-    MCP -->|"natural language query + JWT"| IRA
-    MCP -->|"structured call (operation_id + params) — bypasses IRA"| RAPL
+    MCP -->|"natural-language analytical request"| IRA
+    MCP -->|"structured request: operation_id + params"| RAPL
     IRA -->|"RAG retrieval over operation/metric embeddings"| SMR
+    IRA <-->|"candidate definitions and resolved intent"| LLM
     IRA -->|"resolved operation_id + params"| RAPL
     RAPL -->|"role definition lookup"| ENT
     RAPL -->|"entitlement projection (row scope + column masks)"| SVL
+    RAPL -->|"entitlement decision evidence"| LS
     SVL -->|"metric + dimension ID resolution"| SMR
     SVL -->|"validated LQP"| SCL
+    SVL -->|"validation and plan evidence"| LS
     SCL -->|"controls decision record"| LS
     SCL -->|"approved LQP"| PQP
     PQP -->|"physical_mapping lookup"| SMR
@@ -91,16 +105,23 @@ flowchart TD
     FQE -->|"execution record"| LS
     FQE -->|"assembled result"| DVL
     FQE -->|"assembled result"| NSA
+    NSA <-->|"grounded result and draft narrative"| LLM
     DVL -->|"DVL display spec"| Result
     NSA -->|"governed narrative"| Result
-    LS -->|"lineage records (compliance queries only)"| PAS
+    DVL -->|"presentation evidence"| LS
+    NSA -->|"narrative evidence"| LS
+    LS -->|"correlated evidence set when compliance trigger is active"| PAS
     PAS -->|"sealed compliance block"| Result
+    Result -->|"Structured Response"| MCP
+    MCP -->|"Governed Response"| Consumer
 ```
 
 The Semantic Metrics Repository (SMR) and the Semantic Data Repository (SDR) are two independent stores housed within the Data Context Store (DCS). The SDR is a pre-existing organizational component holding the foundational data definitions — data models, physical schemas, and data lineage. The SMR is a separate store holding the four analytical document types (`analytical_metric`, `analytical_dimension`, `analytical_operation`, `analytical_dataset`); both stores are built on the DCS's shared versioned storage, search index, and scoped access control, and both are reached through the DCS API. The `physical_mapping` fields in SMR metric definitions resolve against SDR schema metadata to locate the physical tables and columns behind each metric.
 
 
 ## 3.3 Layer-by-Layer Stack Decisions
+
+The implementation subsections can be read in the same logical sequence as Section 2: [MCP](#mcp-capability-layer), [IRA](#intent-resolution-agent), [SMR](#semantic-metrics-repository-smr), [RAPL](#role-aware-projection-layer), [SVL request validation](#request-validation-svl), [SVL logical planning](#logical-query-plan-generation-svl), [SCL](#semantic-controls-layer), [PQP](#physical-query-planner-pqp), [FQE](#federated-query-engine-fqe), [DVL](#data-visualization-language-dvl), [NSA](#narrative-synthesis-agent), [ALS](#analytical-lineage-store), and [PAS](#provenance-artifact-service-pas). Supporting runtime services follow the primary flow. The subsection placement groups closely related implementation material, while these links preserve traceability to the component sequence.
 
 ### MCP Capability Layer
 
@@ -127,22 +148,29 @@ Three tools cover the entire analytical surface. The SMR owns every operation de
 
 ```python
 from fastmcp import FastMCP
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, model_validator
 
 mcp = FastMCP(
-    name="Analytics Platform",
+    name="AI Analytics Platform",
     instructions=(
         "Governed analytical execution engine. All operations are defined in the Semantic Metrics Repository. "
-        "Call list_operations to discover available operations and their required parameters before "
-        "calling run_analytics."
+        "Supply a natural-language question to run_analytics, or call list_operations to discover an "
+        "approved operation and its required parameters before making a structured call."
     ),
 )
 
 # ── Tool input models ─────────────────────────────────────────────────────────
 
 class RunAnalyticsInput(BaseModel):
-    operation_id: str   # SMR operation ID — discover via list_operations
-    params:       dict  # operation parameters; validated against SMR operation schema by SVL
+    question:     str | None = None  # natural language; resolved by the IRA
+    operation_id: str | None = None  # approved SMR operation ID for structured callers
+    params:       dict = Field(default_factory=dict)  # validated against the resolved operation schema
+
+    @model_validator(mode="after")
+    def require_one_request_form(self):
+        if bool(self.question) == bool(self.operation_id):
+            raise ValueError("Supply either question or operation_id, but not both")
+        return self
 
 class ListOperationsInput(BaseModel):
     domain: str | None = None  # optional filter by analytical domain
@@ -156,14 +184,16 @@ class DrilldownInput(BaseModel):
 
 @mcp.tool()
 async def run_analytics(input: RunAnalyticsInput) -> dict:
-    """Execute an SMR-registered analytical operation.
-    Call list_operations first to discover valid operation_id values and their required params.
+    """Resolve or execute an SMR-registered analytical operation.
+    Natural-language questions pass through the IRA. Structured callers may supply an approved
+    operation_id and typed parameters directly.
     The presentation depth — raw dataset, display specification, or full analytical response — is
     determined by the operation's execution_profile in the SMR, not by this tool; the full controls
     pipeline runs for every operation."""
     # 1. Validate JWT → claims
-    # 2. Resolve operation from SMR — rejects unknown/unapproved operation IDs
-    # 3. Delegate to pipeline_executor.run — returns result shaped by execution_profile
+    # 2. If question is present, invoke the IRA to resolve operation_id + params
+    # 3. Resolve the approved operation from SMR — rejects unknown/unapproved operation IDs
+    # 4. Delegate to pipeline_executor.run — returns result shaped by execution_profile
     ...
 
 @mcp.tool()
@@ -284,7 +314,7 @@ A consumer holding a `result_id` traverses hierarchies without re-specifying the
 {
   "tool": "drilldown",
   "input": {
-    "result_id":      "res-20260518-093247-wk4n",
+    "result_id":      "res-20260518-093247",
     "hierarchy":      "asset_class_hierarchy",
     "selected_value": "EQUITY"
   }
@@ -416,8 +446,8 @@ A successful call returns a JSON object containing the result data, the display 
 
 ```json
 {
-  "result_id":   "res-20260518-093247-wk4n",
-  "lineage_ref": "lineage/acme-wealth/2026/05/18/res-20260518-093247-wk4n.json",
+  "result_id":   "res-20260518-093247",
+  "lineage_ref": "lineage/acme-wealth/2026/05/18/res-20260518-093247.json",
   "data":        { "schema": [ "..." ], "rows": [ "..." ] },
   "display_spec": { "type": "chart", "...": "..." },
   "narrative":   { "lead": "...", "detail": "...", "anchoredTo": ["..."] },
@@ -532,7 +562,7 @@ class IntentResolutionAgent:
 Structured API consumers that already know the `operation_id` skip the IRA entirely: the MCP layer routes their call straight into the deterministic pipeline at the RAPL.
 
 
-### Semantic Validation Layer
+### Request Validation (SVL)
 
 > **Specification:** [§Semantic Validation Layer](./02-core-capabilities.md#semantic-validation-layer-svl)
 
@@ -558,7 +588,7 @@ class SemanticValidationLayer:
         # 1. Validate params against operation's required_params — fail fast before any SMR calls
         # 2. Resolve each metric ID from SMR — rejects unknown or non-approved metrics
         # 3. Enforce the RAPL projection — inject row scope filter nodes; embed column masks on the LQP
-        # 4. Delegate DAG construction to LQPGenerator (see §Semantic Validation Layer — LQP examples)
+    # 4. Delegate DAG construction to LQPGenerator (see Logical Query Plan Generation)
         # 5. Attach compliance_purpose_score from the resolved request — scored by the IRA for
         #    natural-language queries; explicit compliance_purpose param for structured calls
         # 6. Attach preliminary_impact_estimate (Σ performance_impact_weight) — Tier-1 coarse estimate
@@ -852,7 +882,7 @@ class SemanticMetricsRepository:
 ```
 
 
-### Semantic Validation Layer — LQP examples
+### Logical Query Plan Generation (SVL)
 
 The MCP tool call JSON (metric IDs, dimension IDs, time period, filters) is the analytical intent representation. The SVL validates these parameters, resolves metrics from the SMR, applies the RAPL entitlement projection, and constructs the LQP DAG.
 
@@ -862,7 +892,7 @@ The MCP tool call JSON (metric IDs, dimension IDs, time period, filters) is the 
 {
   "tool": "run_analytics",
   "input": {
-    "operation_id": "compare_portfolios",
+  "operation_id": "compare_portfolio_to_benchmark",
     "params": {
       "portfolio_ids": ["GLOB_EQ_OPP", "UK_CORE_INC"],
       "metrics":       ["portfolio_return", "tracking_error"],
@@ -878,7 +908,7 @@ The Semantic Validation Layer resolves metric IDs against the SMR, enforces the 
 
 ```json
 {
-  "lqp_id": "lqp-20260514-093241-xyz",
+  "lqp_id": "lqp-20260518-093243",
   "org_id": "acme-wealth",
   "nodes": [
     {
@@ -1215,7 +1245,7 @@ The PQP resolves each metric node's `physical_mapping` from the SMR (keyed on th
 
 ```json
 {
-  "lqp_id": "lqp-20260514-093241-xyz",
+  "lqp_id": "lqp-20260518-093243",
   "org_id": "acme-wealth",
   "nodes": [
     {
@@ -1277,7 +1307,7 @@ class PhysicalQueryPlanner:
 
 ```json
 {
-  "lqp_id":               "lqp-20260514-093241-xyz",
+  "lqp_id":               "lqp-20260518-093243",
   "engine":               "starburst",
   "catalogs_referenced":  ["snowflake", "risk"],
   "column_masks":         [],
@@ -1314,8 +1344,8 @@ After Starburst executes the federated query, the FQE returns a typed result env
 
 ```json
 {
-  "result_id":     "res-20260514-093247-a1b2c3",
-  "lqp_id":        "lqp-20260514-093241-xyz",
+    "result_id":     "res-20260518-093247",
+    "lqp_id":        "lqp-20260518-093243",
   "org_id":        "acme-wealth",
   "cache_hit":     false,
   "latency_ms":    1243,
@@ -1636,22 +1666,22 @@ Each completed query writes a single JSON document to the object store at `linea
 
 ```json
 {
-  "result_id":          "res-20260514-093247-a1b2c3",
+  "result_id":          "res-20260518-093247",
   "org_id":          "acme-wealth",
   "user_sub":           "auth0|user_xyz",
-  "lqp_id":             "lqp-20260514-093241-xyz",
+  "lqp_id":             "lqp-20260518-093243",
   "cache_hit":          false,
-  "request_payload":    { "tool": "run_analytics", "input": { "operation_id": "compare_portfolios", "params": {"..."} } },
+  "request_payload":    { "tool": "run_analytics", "input": { "operation_id": "compare_portfolio_to_benchmark", "params": { "portfolio_scope": "caller_authorized_portfolios", "asset_class": "EQUITY", "time_period": "current_quarter" } } },
   "resolved_metrics":   [{ "metric_id": "portfolio_return", "version": "2.1.0" }],
   "controls_decision":{ "approved": true, "estimated_scan_rows": 408517, "checks_passed": ["data_scale_check", "complexity_check", "classification_gate", "compliance_check", "concurrency_check"] },
   "execution":          { "engine": "starburst", "catalogs_used": ["snowflake", "risk"], "executed_sql": "...", "latency_ms": 1243 },
   "result_summary":     { "row_count": 2, "schema": ["..."], "result_digest": "sha256:..." },
-  "display_spec":       { "type": "chart", "contract": "BAR_MULTI_SERIES_COMPARISON", "..." },
+  "display_spec":       { "type": "chart", "contract": "BAR_MULTI_SERIES_COMPARISON", "additional_properties": "..." },
   "error_code":         null,
   "regulatory_frameworks": ["<framework_id>"],
-  "compliance_meta":    { "justification": "Quarterly review", "trace_id": "trace-20260514-093247-<framework_id>" },
-  "created_at":         "2026-05-14T09:32:47Z",
-  "expires_at":         "2033-05-14T09:32:47Z"
+  "compliance_meta":    { "justification": "Quarterly review", "trace_id": "trace-20260518-093247-<framework_id>" },
+  "created_at":         "2026-05-18T09:32:47Z",
+  "expires_at":         "2033-05-18T09:32:47Z"
 }
 ```
 
@@ -1663,7 +1693,7 @@ A lightweight PostgreSQL table (`analytics.lineage_index`) holds only the scalar
 
 ```json
 {
-  "result_id":                "res-20260514-093247-a1b2c3",
+  "result_id":                "res-20260518-093247",
   "org_id":                   "acme-wealth",
   "user_sub":                 "auth0|user_xyz",
   "regulatory_frameworks":    "<framework_id>",
@@ -2209,7 +2239,7 @@ One bundle covers all analytical dimensions. Every domain bundle's metrics and o
   {
     "type":                  "analytical_operation",
     "org_id":             "acme-wealth",
-    "operation_id":          "compare_portfolios",
+    "operation_id":          "compare_portfolio_to_benchmark",
     "version":               1,
     "status":                "approved",
     "source":                "platform",
