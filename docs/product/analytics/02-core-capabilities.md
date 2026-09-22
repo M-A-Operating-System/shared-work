@@ -1284,7 +1284,7 @@ The proposal leaves several choices for implementation and governance teams to v
 - storage controls for evidence integrity and retention; and
 - artifact schemas and approval processes for each intended regulatory use.
 
-These are evaluation questions, not hidden implementation details. Section 4 defines measures for testing the architecture before broader adoption.
+These are evaluation questions, not hidden implementation details. [Section 3.5](./03-technical-implementation.md#35-evaluation-plan-and-decision-gates) defines the plan for testing the architecture before broader adoption.
 
 ---
 

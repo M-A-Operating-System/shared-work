@@ -1,10 +1,10 @@
-# 3. Illustrative Reference Implementation
+# 3. Illustrative Reference Implementation and Evaluation Plan
 
 This section illustrates how a technology stack could support the proposed architecture. The technology mappings and code fragments explain implementation responsibilities; they are not evidence of a completed or benchmarked system. Alternative stacks can support the same responsibilities. Integration feasibility, correctness, performance, and operating cost require validation against the intended workload.
 
 The proposed behaviors, interfaces, and governance requirements are in [Section 2](./02-core-capabilities.md). The [design principles](./01-overview.md#design-principles) define the intended constraints on this implementation.
 
-Readers making an architectural or investment decision can use Sections 3.1 and 3.2 as the implementation summary. Sections 3.3 and 3.4 provide companion detail for engineering evaluation, including illustrative code, schemas, configuration, infrastructure, and seed definitions.
+Readers making an architectural or investment decision can use Sections 3.1 and 3.2 as the implementation summary. Sections 3.3 and 3.4 provide companion detail for engineering review, including illustrative code, schemas, configuration, infrastructure, and seed definitions. Section 3.5 defines the bounded evaluation, evidence requirements, and decision gates that determine whether the proposal should proceed.
 
 
 ## 3.1 Reference Architecture Summary
@@ -2584,3 +2584,131 @@ Three optional ecosystem services extend the platform for financial services dep
 **Regulatory Reference Service** — a runtime execution backend serving the `regulatory` data affinity. Once registered, the FQE routes regulatory-domain sub-plans to it, ensuring threshold values (LCR, NSFR, leverage and capital ratios) are sourced from the authoritative service rather than host-maintained tables that may lag regulatory publication schedules. The service publishes update notifications when thresholds change. If it is unavailable, the FQE falls back to the next registered backend with `regulatory` affinity; with no fallback configured, regulatory sub-plans fail with a structured error — the platform never fabricates regulatory threshold values.
 
 **Benchmark Data Service** — a runtime execution backend serving the `benchmarks` data affinity: equity, fixed income, multi-asset, and factor indices, plus administrator-configured custom benchmark blends (component identifiers and weights, registered via the service's Admin API). The service operates under data licensing agreements with index providers and enforces per-index licensing entitlement checks; blended benchmarks are subject to the same enforcement as their component indices.
+
+
+## 3.5 Evaluation Plan and Decision Gates
+
+The reference implementation should be evaluated as a bounded architectural proposition, not treated as a production platform merely because its components can be deployed. The evaluation determines whether governed semantic execution produces sufficiently accurate, traceable, repeatable, and access-controlled results for named workloads, and whether its additional governance effort is justified when compared with the organization's current analytical process and a controlled Text-to-SQL implementation.
+
+The evaluation does not establish regulatory compliance. It produces evidence that accountable business, governance, security, and technology owners can use to decide whether to stop, revise, proceed to a limited pilot, or consider broader adoption.
+
+### Evaluation Questions
+
+The evaluation must answer six questions:
+
+1. **Accuracy:** Does each result or dataset extract match an independently verified reference result within an approved tolerance?
+2. **Traceability:** Can an authorized reviewer reconstruct how a successful, rejected, failed, or timed-out request was interpreted, authorized, planned, executed, and presented?
+3. **Repeatability:** Can an authorized rerun reproduce the result or dataset membership when the relevant request, source snapshot, definitions, permissions, configuration, and software versions are preserved?
+4. **Governed access:** Do discovery, execution, caching, evidence retrieval, and export enforce the caller's current permissions without cross-role or cross-tenant leakage?
+5. **Operability:** Can the implementation meet approved workload expectations for latency, capacity, failure recovery, cost, and administrative effort?
+6. **Comparative value:** Does the approach improve governed analytical outcomes enough to justify the cost of authoring definitions, maintaining mappings and policies, and operating the evidence controls?
+
+### Scope and Entry Criteria
+
+Before testing begins, the evaluation sponsor and accountable owners approve a versioned evaluation charter containing:
+
+- the business domains, personas, operations, metrics, dataset contracts, and source systems in scope;
+- at least one metric comparison, one governed dataset-retrieval operation, and one compliance-triggering operation;
+- the approved metric formulas, expected dataset membership, numerical tolerances, ordering rules, and treatment of missing data;
+- a preserved or reproducibly addressable source-data snapshot for every repeatability test;
+- representative grants, denials, row scopes, masks, classification ceilings, and tenant boundaries;
+- the versions of semantic definitions, entitlement policies, controls, mappings, software, model adapters, and prompts under test;
+- the workload mix, concurrency range, result sizes, source-failure cases, and recovery scenarios;
+- the comparator design, including the existing analytical process and any controlled Text-to-SQL implementation;
+- named owners for reference results, access policy, security review, platform operation, evidence review, and the final decision; and
+- workload-specific operating thresholds or an explicit statement that the evaluation will establish a baseline before thresholds are approved.
+
+Testing does not begin until reference results and access expectations have been approved independently of the implementation team. A generated answer, an existing dashboard, or the output of another unverified query is not sufficient as a reference result.
+
+### Evaluation Corpus
+
+The evaluation corpus must cover the intended operating range rather than a collection of successful demonstrations.
+
+| Corpus Area | Required Coverage |
+|---|---|
+| Valid analytical requests | Natural-language variants and structured calls for every in-scope operation, including boundary values and permitted drilldowns. |
+| Ambiguous requests | Questions with competing operations, missing parameters, unclear time periods, and ambiguous compliance purpose. |
+| Invalid semantic requests | Unknown, retired, incompatible, or unapproved metrics, dimensions, operations, and datasets. |
+| Access tests | Permitted and denied metrics, dimensions, rows, fields, evidence records, exports, and catalog-discovery results across roles and tenants. |
+| Data-mining tests | Approved dataset selection, field projection, pagination, ordering, row scope, snapshot reference, membership digest, and export behavior. |
+| Control boundaries | Requests immediately below, at, and above scale, complexity, classification, concurrency, and timeout limits. |
+| Failure and recovery | Source unavailability, partial-source failure, stale statistics, cache hit and miss, model unavailability, ALS write failure, PAS signing failure, timeout, retry, and cancellation. |
+| Adversarial cases | Prompt injection, catalog poisoning, parameter manipulation, identifier guessing, cache-isolation attempts, lineage-access probing, and attempts to bypass the governed path. |
+
+The charter records the number of cases in each category and explains why the sample represents the intended workload. Results are reported by category and operation; an aggregate percentage must not hide a material failure in a regulated or high-risk scenario.
+
+### Evaluation Workstreams
+
+| Workstream | Method | Required Evidence | Accountable Owner |
+|---|---|---|---|
+| Semantic accuracy | Compare computed values, labels, units, dimensions, filters, and dataset membership with independently verified references. Review both natural-language resolution and structured execution. | Expected and actual results, approved tolerance, difference analysis, interpretation outcome, and reviewer sign-off. | Analytics Governance and metric or dataset owner. |
+| Entitlements and isolation | Execute positive and negative tests across roles, row scopes, masks, classifications, tenants, cache paths, evidence lookup, and export. | Policy versions, entitlement projections, test identities, returned schemas and rows, denial records, cache evidence, and security findings. | Entitlements Manager and Security. |
+| Controls and compliance | Exercise every SCL boundary and both states of the two-signal compliance trigger. Verify that no execution bypasses SCL and no triggered result is exportable before PAS sealing. | Control inputs, limits, decisions, terminal states, artifact verification, and export-gate evidence. | Analytics Governance and Compliance. |
+| Repeatability | Rerun the same requests against preserved source state and pinned definitions, policies, mappings, configuration, and software. | Run manifests, source snapshot references, result and dataset-membership digests, numerical comparisons, and explanation of every difference. | Evaluation Lead and Data Owner. |
+| Traceability | Give an independent reviewer only the authorized evidence entry point and require reconstruction of sampled complete, rejected, failed, and timed-out requests. | Reconstruction worksheet, retrieved event chain, missing evidence, elapsed review time, and reviewer conclusion. | Independent Audit or Assurance Reviewer. |
+| Resilience and recovery | Inject approved failures at each external dependency and persistence boundary. Verify fail-closed behavior, durable queuing where permitted, reconciliation, recovery, and explicit consumer status. | Failure timeline, alerts, terminal records, recovery record, reconciliation result, and unresolved data or evidence loss. | Platform Admin and Security. |
+| Performance and cost | Run the approved workload mix at the stated concurrency and result sizes. Separate cache hits, executions, source types, presentation profiles, and compliance paths. | Latency distribution, throughput, resource use, model calls, storage growth, unit cost, bottlenecks, and capacity assumptions. | Platform Admin and Finance or FinOps. |
+| Comparative evaluation | Run the same questions and source snapshot through the current process and controlled Text-to-SQL comparator. Do not grant the comparator broader data access or a different reference answer. | Correctness, unsupported questions, repeatability, traceability effort, latency, cost, authoring effort, review effort, and failure analysis for each approach. | Evaluation Lead and Analytics Governance. |
+
+### Mandatory Invariants
+
+The following are pass-or-fail architectural invariants rather than aspirational operating targets:
+
+| Invariant | Acceptance Condition |
+|---|---|
+| Reference-result correctness | No unresolved material discrepancy between a governed result and its approved reference result. Numerical tolerances and dataset comparison rules are approved before execution. |
+| Execution control | No request, retry, drilldown, cache path, or administrator action reaches a registered data source without the required entitlement, validation, and SCL decisions. |
+| Tenant and entitlement isolation | No unauthorized metric, dimension, row, field, cached result, catalog metadata, lineage record, or artifact is disclosed. |
+| Durable terminal evidence | Every accepted request has a durable terminal record for completion, rejection, cancellation, timeout, or failure. If evidence cannot be written or durably queued under approved policy, execution fails closed. |
+| Compliance export gate | A request with both compliance signals active cannot be exported until the required artifact is complete, sealed, and verifiable. |
+| Repeatability evidence | Every reported repeatability result identifies the request, snapshot or source reference, definition and policy versions, configuration, software version, and comparison outcome. |
+| Failure transparency | Missing sources, partial semantics, stale data, validation failure, timeout, and narrative omission are never presented as a complete governed answer. |
+
+A failure of an isolation or export-gate invariant stops affected testing immediately and triggers security review. Other invariant failures require documented remediation and a clean rerun of the affected corpus before an adoption decision.
+
+### Operating Measures and Baselines
+
+Availability, latency, throughput, cache effectiveness, backend error rate, cost per successful request, definition-authoring effort, approval time, catalog coverage, user adoption, drilldown use, and narrative use are operating measures. They are not universal proof of architectural correctness.
+
+The evaluation report must distinguish:
+
+| Measure Class | Treatment |
+|---|---|
+| Architectural invariant | Mandatory acceptance condition; not averaged against other results. |
+| Workload acceptance threshold | Approved in the evaluation charter for a named workload and environment. |
+| Baseline measure | Recorded during evaluation when no defensible target exists yet. |
+| Adoption hypothesis | Used to assess utility during a limited pilot; not used as evidence that calculations are correct. |
+
+Targets such as availability, percentile latency, cache-hit rate, or weekly adoption are approved only after the workload, denominator, observation period, exclusions, and business consequence are defined. A high cache-hit or adoption rate cannot compensate for a correctness, isolation, or lineage failure.
+
+### Evidence Pack
+
+The Evaluation Lead maintains a versioned evidence pack containing:
+
+- the approved charter and change history;
+- corpus definitions and expected outcomes;
+- reference-result construction and independent approval;
+- environment, software, model, prompt, definition, policy, mapping, and configuration versions;
+- source snapshot identifiers and freshness evidence;
+- raw test outcomes, structured differences, lineage references, artifact verification, and failure records;
+- performance, capacity, cost, and administrative-effort measurements;
+- comparator configuration and results;
+- defects, remediation, reruns, exceptions, and unresolved risks; and
+- signed conclusions from the accountable business, governance, security, and technology owners.
+
+Failed initial runs remain in the evidence pack. A successful rerun supplements rather than replaces the original result.
+
+### Decision Gates
+
+| Gate | Required Decision |
+|---|---|
+| Charter approval | Confirm that scope, owners, reference results, test corpus, invariants, comparator, and operating thresholds or baseline objectives are sufficient to begin. |
+| Readiness review | Confirm that the environment, source snapshots, definitions, policies, observability, evidence capture, and failure-injection controls are ready for formal testing. |
+| Midpoint review | Examine failures and corpus coverage. Continue unchanged, expand a weak area, pause for remediation, or stop if the proposition cannot be tested credibly. |
+| Exit review | Choose **proceed**, **revise and retest**, or **stop** using the complete evidence pack. No weighted score may offset a failed mandatory invariant. |
+
+**Proceed to a limited pilot** only when all mandatory invariants pass, reference-result discrepancies are resolved, workload thresholds are met or explicitly accepted, the comparator supports the claimed benefit, and accountable owners accept the documented residual risks.
+
+**Revise and retest** when the architecture remains credible but implementation defects, catalog gaps, policy errors, operating limits, or insufficient evidence prevent a decision. The review names the failed criteria, owner, remediation, and required rerun.
+
+**Stop** when the evaluation cannot establish trustworthy reference results, isolation, complete controls, usable evidence, or a defensible advantage for the intended workloads, or when the governance and operating burden is not justified by the measured benefit.

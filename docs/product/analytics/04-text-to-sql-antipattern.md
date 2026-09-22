@@ -1,4 +1,4 @@
-# 5. Appendix: Text-to-SQL and Semantic Analytics: Better Together
+# 4. Appendix: Text-to-SQL and Semantic Analytics: Better Together
 
 This appendix supports the white paper's proposal for governed semantic execution. It examines why we believe Text-to-SQL alone is not a sustainable long-term foundation for AI-enabled analytics and data mining where accuracy, traceability, and repeatability are critical. It can also be read independently by teams evaluating architectural alternatives.
 

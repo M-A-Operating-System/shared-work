@@ -1,4 +1,4 @@
-# 6. Glossary
+# 5. Glossary
 
 This glossary defines the principal components, contracts, roles, and technical terms used in the AI Analytics Platform white paper. Logical architecture terms follow Section 2. Product-specific terms are identified as elements of the illustrative reference implementation in Section 3. Terms are sorted alphabetically, and cross-references to other entries are shown in **bold**.
 

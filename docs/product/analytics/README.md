@@ -28,14 +28,13 @@ Text-to-SQL can continue to support controlled exploration and discovery. The pr
 |---|---|
 | [1. Executive Overview](./01-overview.md) | Explains the complete proposal, its contrast with Text-to-SQL, business uses, operating responsibilities, and the decision to evaluate it. |
 | [2. Proposed Architecture and Capabilities](./02-core-capabilities.md) | Defines the proposed responsibilities, interfaces, and controls that support governed execution. |
-| [3. Illustrative Reference Implementation](./03-technical-implementation.md) | Maps capabilities to technology products and explains their roles through illustrative implementation detail. |
-| [4. Evaluation Framework and Proposed Success Measures](./04-success-metrics.md) | Defines how to test accuracy, traceability, repeatability, access controls, and operating outcomes. |
-| [5. Text-to-SQL Appendix](./05-text-to-sql-antipattern.md) | Examines the limitations of Text-to-SQL as a long-term foundation and its continuing role in exploration. |
-| [6. Glossary](./06-glossary.md) | Defines the architecture's named components and technical terms. |
+| [3. Illustrative Reference Implementation and Evaluation Plan](./03-technical-implementation.md) | Maps capabilities to technology products, explains their illustrative implementation, and defines the evaluation evidence and decision gates. |
+| [4. Text-to-SQL Appendix](./04-text-to-sql-antipattern.md) | Examines the limitations of Text-to-SQL as a long-term foundation and its continuing role in exploration. |
+| [5. Glossary](./05-glossary.md) | Defines the architecture's named components and technical terms. |
 
 ## Scope and Reading Guide
 
-The executive overview provides a standalone account of the argument. Architects and engineering teams can use Sections 2 and 3 to examine the proposed design, while governance and delivery leaders can use Section 4 to define an evaluation.
+The executive overview provides a standalone account of the argument. Architects and engineering teams can use Sections 2 and 3 to examine the proposed design and illustrative implementation. Governance and delivery leaders can use [Section 3.5](./03-technical-implementation.md#35-evaluation-plan-and-decision-gates) to approve a bounded evaluation and its decision criteria.
 
 The term AI Analytics Platform names the proposed architecture throughout the paper. Present-tense component descriptions and mandatory controls express intended design behavior, not verified functionality in a released product. Technology choices, examples, and targets are illustrative unless supported by stated evidence.
 
