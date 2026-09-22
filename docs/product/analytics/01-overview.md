@@ -15,8 +15,8 @@ The proposal combines AI interpretation with approved semantic definitions, cont
 - [Why Text-to-SQL Is Not the Long-Term Foundation](#why-text-to-sql-is-not-the-long-term-foundation)
 - [Proposed Architecture at a Glance](#proposed-architecture-at-a-glance)
 - [How the Platform Works](#how-the-platform-works)
-- [What Users Can Do](#what-users-can-do)
-- [What the Organization Must Provide](#what-the-organization-must-provide)
+- [Examples by Persona](#examples-by-persona)
+- [Organizational Responsibilities](#organizational-responsibilities)
 - [Design Principles](#design-principles)
 - [Implementation, Success, and Development](#implementation-success-and-development)
 - [The Executive Decision](#the-executive-decision)
@@ -144,7 +144,7 @@ For a compliance-relevant metric requested for a compliance purpose, the design 
 
 Reproducibility depends on preserving the relevant data snapshot, definition versions, access policies, and calculation settings. A consistent formula cannot produce an identical historical result from changed source data.
 
-## What Users Can Do
+## Examples by Persona
 
 | User Need | Platform Response |
 |---|---|
@@ -155,7 +155,7 @@ Reproducibility depends on preserving the relevant data snapshot, definition ver
 
 These scenarios use the same governed service. Their differences are the approved operation, the caller's permissions, the requested output, and the evidence required.
 
-## What the Organization Must Provide
+## Organizational Responsibilities
 
 > **The platform depends on accountable ownership of definitions, permissions, and source data.**
 
