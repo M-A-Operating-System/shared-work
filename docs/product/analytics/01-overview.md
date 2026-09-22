@@ -16,7 +16,7 @@ The proposal combines AI interpretation with approved semantic definitions, cont
 - [Proposed Architecture at a Glance](#proposed-architecture-at-a-glance)
 - [How the Platform Works](#how-the-platform-works)
 - [Examples by Persona](#examples-by-persona)
-- [Organizational Responsibilities](#organizational-responsibilities)
+- [Supporting Roles and Activities](#supporting-roles-and-activities)
 - [Design Principles](#design-principles)
 - [Implementation, Success, and Development](#implementation-success-and-development)
 - [The Executive Decision](#the-executive-decision)
@@ -155,7 +155,7 @@ Reproducibility depends on preserving the relevant data snapshot, definition ver
 
 These scenarios use the same governed service. Their differences are the approved operation, the caller's permissions, the requested output, and the evidence required.
 
-## Organizational Responsibilities
+## Supporting Roles and Activities
 
 > **The platform depends on accountable ownership of definitions, permissions, and source data.**
 
