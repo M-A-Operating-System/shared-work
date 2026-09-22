@@ -1520,7 +1520,7 @@ The evaluator matches the `COMPARISON` intent pattern and two-metric schema to t
 }
 ```
 
-Full DVL examples including the `type: "table"` spec are in [MCP Response Format](./02-core-capabilities.md#mcp-response-format). Full chart contract definitions are in [Data Visualization Language (DVL)](./02-core-capabilities.md#data-visualization-language-dvl).
+Full DVL examples including the `type: "table"` spec are in [Structured Response](./02-core-capabilities.md#structured-response). Full chart contract definitions are in [Data Visualization Language (DVL)](./02-core-capabilities.md#data-visualization-language-dvl).
 
 ```python
 INTENT_CONTRACTS = {

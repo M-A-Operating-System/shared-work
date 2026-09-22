@@ -29,7 +29,7 @@ Production access must come from approved entitlement policy, not from an author
 
 | Activity | Accountable Role | Required Separation |
 |---|---|---|
-| Use approved analytics | Analytical End User or Power Analyst | Access remains limited by DES policy. |
+| Use approved analytics | Analytical End User or Power Analyst | Access remains limited by Data Entitlements Store (DES) policy. |
 | Author data metadata and mappings | Data Modeller | Production approval remains with the designated governance process. |
 | Author metrics and operations | Metrics Modeller | The author cannot make a definition available merely by submitting it. |
 | Approve analytical definitions | Analytics Governance | Approval is recorded against a versioned definition. |
@@ -54,7 +54,7 @@ flowchart TD
 
     subgraph Platform["AI Analytics Platform"]
         direction TB
-        MCP["MCP Capability Layer\nAuthentication, tools, and response contract"]
+        MCP["Model Context Protocol (MCP) Capability Layer\nAuthentication, tools, and response contract"]
         IRA["Intent Resolution Agent (IRA)\nCandidate retrieval, ranking, parameters, and purpose signal"]
         RAPL["Role-Aware Projection Layer (RAPL)\nMetric, dimension, row, classification, and masking permissions"]
         SVL["Semantic Validation Layer (SVL)\nApproved definition resolution and Logical Query Plan"]
@@ -89,29 +89,40 @@ flowchart TD
     Consumers -->|"authenticated analytical request"| MCP
     MCP -->|"natural-language request"| IRA
     MCP -->|"structured request bypasses IRA"| RAPL
+    MCP <-->|"catalog-discovery policy"| DES
+    MCP -->|"catalog discovery or structured operation lookup"| SMR
     IRA -->|"approved candidate retrieval"| SMR
-    IRA -->|"ranking and purpose classification"| Model
+    IRA <-->|"bounded ranking request and output"| Model
     IRA -->|"resolved operation and parameters"| RAPL
+    SMR -->|"approved operation definition"| RAPL
     RAPL -->|"policy lookup"| DES
     RAPL -->|"entitlement projection"| SVL
     RAPL -->|"entitlement evidence"| ALS
     SVL -->|"definition resolution"| SMR
     SVL -->|"Logical Query Plan"| SCL
     SVL -->|"validation and plan evidence"| ALS
+    SCL -->|"profiling evidence lookup"| SDR
     SCL -->|"approved plan and execution budget"| PQP
     SCL -->|"controls evidence"| ALS
+    SCL -->|"compliance decision"| Response
     PQP -->|"mapping resolution"| SMR
+    PQP -->|"data structure and source capabilities"| SDR
     PQP -->|"physical execution envelope"| FQE
+    PQP -->|"physical plan evidence"| ALS
     FQE -->|"controlled source execution"| Sources
     FQE -->|"execution evidence"| ALS
     FQE -->|"typed result"| DVL
     FQE -->|"typed result"| NSA
-    NSA -->|"bounded synthesis request"| Model
+    FQE -->|"typed result reference"| Response
+    NSA <-->|"bounded synthesis request and draft"| Model
     ALS -->|"compliance-triggered event set"| PAS
     DVL -->|"display specification"| Response
+    DVL -->|"presentation evidence"| ALS
     NSA -->|"validated narrative or omission state"| Response
+    NSA -->|"narrative evidence"| ALS
     ALS -->|"lineage reference"| Response
     PAS -->|"sealed artifact state"| Response
+    Response -->|"response and terminal evidence"| ALS
     Response -->|"response package"| MCP
     MCP -->|"structured consumer response"| Consumers
     Consumers -. "optional render request" .-> Renderer
@@ -129,26 +140,26 @@ The architecture is not a strictly linear sequence. Some components provide look
 | Component | Business Role | Receives | Provides |
 |---|---|---|---|
 | AI Consumers | Start governed analysis and present the answer. | Business question or approved operation; structured response | Authenticated analytical request; optional render request |
-| MCP Capability Layer | Govern the platform boundary and public contract. | Authenticated request; assembled response package | Correlated request to IRA or RAPL; structured response to consumer |
+| MCP Capability Layer | Govern the platform boundary and public contract. | Authenticated request; DES catalog-discovery policy; assembled response package | Entitlement-scoped catalog view; correlated natural-language request to IRA; structured request with approved SMR operation reference to RAPL; structured response to consumer |
 | Intent Resolution Agent (IRA) | Translate business language into an approved analytical request. | Natural-language request; approved candidates from SMR; bounded model output | Resolved operation and parameters; confidence and purpose evidence; clarification request when needed |
-| Semantic Metrics Repository (SMR) | Govern reusable analytical meaning and versions. | Authoring changes; discovery and definition lookups; mapping lookups | Approved operations, metrics, dimensions, datasets, and mapping references |
+| Semantic Metrics Repository (SMR) | Govern reusable analytical meaning and versions. | Authoring changes; discovery and definition lookups; mapping lookups | Approved operations, metrics, dimensions, datasets, presentation metadata, and mapping references |
 | Semantic Data Repository (SDR) | Govern data meaning, structure, quality, and mapping context. | Approved data metadata and lineage updates | Versioned data context and mapping targets referenced by SMR and PQP |
 | Data Entitlements Store (DES) | Govern business-level analytical access policy independently. | Approved role and access-policy changes | Versioned metric, dimension, row-scope, mask, and classification policies |
 | Role-Aware Projection Layer (RAPL) | Determine the caller's permitted analytical scope. | Resolved request; authenticated identity; DES policies | Entitlement projection to SVL; entitlement evidence to ALS |
 | Semantic Validation Layer (SVL) | Turn an entitled request into a valid logical calculation. | Resolved request; entitlement projection; approved SMR definitions | Logical Query Plan to SCL; validation and plan evidence to ALS; structured rejection |
-| Semantic Controls Layer (SCL) | Decide whether a valid plan may execute under current policy and conditions. | Logical Query Plan; versioned controls; profiling evidence; operating state | Approved plan and budget to PQP; controls evidence to ALS; structured rejection |
-| Physical Query Planner (PQP) | Translate logical calculations into bounded source instructions. | Approved Logical Query Plan; execution budget; SMR and SDR mapping context | Physical execution envelope to FQE; plan integrity evidence |
-| Federated Query Engine (FQE) | Execute approved source instructions and assemble controlled results. | Physical execution envelope; registered source connections | Typed result to DVL and NSA; execution evidence to ALS; explicit terminal outcome |
+| Semantic Controls Layer (SCL) | Decide whether a valid plan may execute under current policy and conditions. | Logical Query Plan; versioned controls; profiling evidence; operating state | Approved plan and budget to PQP; controls evidence to ALS; compliance decision to response assembly; structured rejection |
+| Physical Query Planner (PQP) | Translate logical calculations into bounded source instructions. | Approved Logical Query Plan; execution budget; SMR and SDR mapping context | Physical execution envelope to FQE; plan integrity evidence to ALS |
+| Federated Query Engine (FQE) | Execute approved source instructions and assemble controlled results. | Physical execution envelope; registered source connections | Typed result to DVL, NSA, and response assembly; execution evidence to ALS; explicit terminal outcome |
 | Registered Data Sources | Execute bounded operations over governed business data. | Authorized source instructions from FQE | Typed source data or explicit failure to FQE |
-| Data Visualization Language (DVL) | Define a consistent governed presentation. | Typed result; resolved intent; approved labels and units | Display specification to response assembly |
+| Data Visualization Language (DVL) | Define a consistent governed presentation. | Typed result; resolved intent; approved labels and units | Display specification to response assembly; presentation evidence to ALS |
 | Narrative Synthesis Agent (NSA) | Produce an optional result-grounded explanation. | Bounded result content; bounded model draft | Validated narrative or omission state to response assembly; narrative evidence to ALS |
 | External Language Model Service | Support bounded language ranking and drafting. | Candidate-ranking request from IRA; synthesis request from NSA | Ranking or draft text back to the requesting component |
 | Analytical Lineage Store (ALS) | Preserve the correlated evidence chain across the request. | Intent, entitlement, validation, controls, plan, execution, and presentation events | Lineage reference to response assembly; event set to PAS and audit export |
-| Provenance Artifact Service (PAS) | Seal additional evidence for compliance-purpose results. | Active compliance trigger; correlated ALS event set | Sealed artifact or failure state to response assembly; export state |
-| Structured Response | Assemble the governed delivery package. | Typed result; display; narrative; lineage; compliance state; warnings and errors | Response package to MCP Capability Layer |
+| Provenance Artifact Service (PAS) | Seal additional evidence for compliance-purpose results. | Active compliance trigger; correlated ALS event set | Sealed artifact-state reference or failure state to response assembly; export state |
+| Structured Response | Assemble the governed delivery package. | Typed result; display; narrative; lineage; compliance decision; optional artifact state; warnings and errors | Response package to MCP Capability Layer; response and terminal evidence to ALS |
 | Optional Rendering Service | Produce a static visual without joining analytical computation. | Self-contained display specification from a consumer | SVG or PNG to the consumer |
 
-The running example uses one request throughout. Each primary flow component shows both its input and output as technology-neutral JSON. When one component emits a request, definition, projection, plan, result, or evidence reference, the receiving component repeats the same field name and value so the handoff is visible. Identifiers and values are illustrative, not implementation defaults.
+The running example uses one request throughout. Each primary flow component shows both its input and output as technology-neutral JSON. When a downstream contract requires a request, definition, projection, plan, result, or evidence reference, it reuses the same field name and value so the handoff is visible. Identifiers and values are illustrative, not implementation defaults.
 
 A result is repeatable only when the request, source snapshot, definition versions, effective permissions, configuration, and execution software are preserved. Deterministic planning does not compensate for changed data or definitions.
 
@@ -171,8 +182,7 @@ The running example asks the platform to compare the caller's equity portfolios 
 ```json
 {
   "input": {
-    "business_request": "Compare my equity portfolios with their benchmarks this quarter",
-    "requested_experience": "analysis with presentation and narrative"
+    "business_request": "Compare my equity portfolios with their benchmarks this quarter"
   },
   "output": {
     "analytical_request_id": "request-draft-001",
@@ -195,7 +205,7 @@ The consumer request becomes the MCP Capability Layer input, beginning the gover
 
 **Input and output.** It receives an authenticated natural-language or structured request. It outputs a correlated request to the correct pipeline stage and, after processing, a structured response to the consumer.
 
-The MCP Capability Layer is the single governed analytical entry point. The transport authenticates the caller before tool routing and passes identity through trusted request context. Bearer tokens are not analytical tool arguments.
+The MCP Capability Layer is the single governed analytical entry point. The transport authenticates the caller before tool routing and passes identity through trusted request context. Bearer tokens are not analytical tool arguments. A structured request bypasses only language interpretation: the supplied operation identifier is resolved to an approved SMR definition before the request reaches RAPL.
 
 ### Tool Catalog
 
@@ -229,7 +239,7 @@ The consumer may select a candidate, refine the question, or cancel. Selection r
 
 ### Capability Governance
 
-The capability layer exposes only registered tools and approved operation metadata. Tool discovery is entitlement-aware. Request limits, session limits, and allowed response sizes are versioned platform controls. Changes to tool contracts follow the same review and compatibility process as other public interfaces.
+The capability layer exposes only registered tools and approved operation metadata. Tool and catalog discovery apply a bounded DES policy view before IRA candidate retrieval. This view limits which metadata the caller may discover; it does not authorize execution. RAPL independently evaluates the complete request and current entitlement policy before validation or planning. Request limits, session limits, and allowed response sizes are versioned platform controls. Changes to tool contracts follow the same review and compatibility process as other public interfaces.
 
 ### Input and Output Example
 
@@ -246,12 +256,13 @@ The MCP layer accepts the natural-language request and creates a correlation ide
     "request_id": "req-20260518-093241",
     "route": "natural_language",
     "analytical_request_id": "request-draft-001",
-    "question": "Compare my equity portfolios with their benchmarks this quarter"
+    "question": "Compare my equity portfolios with their benchmarks this quarter",
+    "discoverable_catalog_ref": "approved-operations-for-caller"
   }
 }
 ```
 
-For natural-language requests, the correlated request becomes the IRA input. A structured request proceeds directly to RAPL.
+For natural-language requests, the correlated request becomes the IRA input. A structured request bypasses IRA, resolves its operation identifier against the SMR, and then proceeds to RAPL with the approved operation reference.
 
 ## Intent Resolution Agent (IRA)
 
@@ -329,7 +340,7 @@ In a governed AI-enabled analytics situation, the Semantic Metrics Repository (S
 | Operation | Parameter contract, supported metrics and dimensions, execution profile, and confirmation requirements. |
 | Dataset | Approved fields, classifications, selection rules, mapping, refresh expectations, and pagination policy. |
 
-Only approved versions are resolvable for new governed requests. Historical versions remain available to authorized reviewers for lineage reconstruction.
+Only versions in the Approved state are normally resolvable for new governed requests. A Deprecated version may remain temporarily resolvable only when an explicit transition policy permits it. Historical versions remain available to authorized reviewers for lineage reconstruction.
 
 ### Definition Lifecycle and Versioning
 
@@ -392,6 +403,8 @@ The resolved operation references two approved metrics without exposing their ph
       "asset_class",
       "time_period"
     ],
+    "intent_pattern": "comparison",
+    "presentation_metadata_ref": "smr:presentation:portfolio-benchmark-comparison@2.0",
     "execution_profile": "full_analytical"
   }
 }
@@ -530,6 +543,10 @@ The SVL converts the qualified request into a backend-independent plan:
     "lqp_id": "lqp-20260518-093243",
     "request_id": "req-20260518-093241",
     "operation_id": "compare_portfolio_to_benchmark",
+    "execution_profile": "full_analytical",
+    "intent_pattern": "comparison",
+    "presentation_metadata_ref": "smr:presentation:portfolio-benchmark-comparison@2.0",
+    "entitlement_projection_ref": "projection:req-20260518-093241",
     "metric_versions": {
       "portfolio_return": "2.1.0",
       "benchmark_return": "1.4.2"
@@ -564,6 +581,10 @@ The SVL converts the qualified request into a backend-independent plan:
       "type": "relative",
       "value": "current_quarter"
     },
+    "compliance_inputs": {
+      "metric_signal": false,
+      "purpose_score": 0.08
+    },
     "column_masks": []
   }
 }
@@ -594,7 +615,7 @@ The SCL is the mandatory release gate between logical validation and physical pl
 
 Estimates are not exact measurements. The record identifies the source and freshness of the statistics used. Rejections return structured reasons and safe ways to narrow the request.
 
-The proposed compliance trigger requires both a compliance-relevant metric and a compliance purpose. For natural-language requests, the SCL evaluates the IRA score against a configured threshold; structured requests declare purpose explicitly. The SCL records both signals and invokes PAS when both are active. Whether this rule is sufficient for a jurisdiction or activity remains a deployment-specific compliance decision.
+The proposed compliance trigger requires both a compliance-relevant metric and a compliance purpose. For natural-language requests, the SCL evaluates the IRA score against a configured threshold; structured requests declare purpose explicitly. The SCL records both signals. When both are active, it marks the provenance artifact as required and blocks export until PAS seals the completed evidence set after execution. Whether this rule is sufficient for a jurisdiction or activity remains a deployment-specific compliance decision.
 
 ### Control Decision Contract
 
@@ -613,10 +634,12 @@ The SCL records each decision and assigns the execution budget:
   "input": {
     "lqp_id": "lqp-20260518-093243",
     "controls_policy_ref": "current-controls",
+    "profiling_evidence_ref": "sdr-profile:portfolio-performance-source@2026-05-18T09:30:00Z",
     "operating_state_ref": "current-capacity"
   },
   "output": {
     "controls_decision_ref": "controls:lqp-20260518-093243",
+    "compliance_decision_ref": "compliance-decision:req-20260518-093241",
     "lqp_id": "lqp-20260518-093243",
     "decision": "approved",
     "checks": {
@@ -691,15 +714,18 @@ The PQP resolves the approved mappings and creates a technology-neutral executio
   "input": {
     "lqp_id": "lqp-20260518-093243",
     "controls_decision_ref": "controls:lqp-20260518-093243",
-    "mapping_set_ref": "approved-mappings"
+    "mapping_set_ref": "approved-mappings",
+    "source_capabilities_ref": "registered-source-capabilities"
   },
   "output": {
     "plan_id": "plan-20260518-093244",
     "lqp_id": "lqp-20260518-093243",
     "controls_decision_ref": "controls:lqp-20260518-093243",
+    "entitlement_projection_ref": "projection:req-20260518-093241",
     "mapping_versions": [
       "portfolio-mapping-4.6"
     ],
+    "plan_digest": "digest:<illustrative-plan-value>",
     "sub_plans": [
       {
         "source_id": "portfolio-performance-source",
@@ -771,13 +797,34 @@ The FQE executes the approved plan and returns typed result rows:
   },
   "output": {
     "result_id": "res-20260518-093247",
+    "data_ref": "result:res-20260518-093247",
     "request_id": "req-20260518-093241",
     "plan_id": "plan-20260518-093244",
     "status": "complete",
+    "execution_profile": "full_analytical",
     "sources_used": [
       "portfolio-performance-source"
     ],
     "cache_status": "miss",
+    "schema": [
+      {
+        "field": "portfolio",
+        "type": "string",
+        "label": "Portfolio"
+      },
+      {
+        "field": "portfolio_return",
+        "type": "decimal",
+        "label": "Portfolio Return",
+        "unit": "ratio"
+      },
+      {
+        "field": "benchmark_return",
+        "type": "decimal",
+        "label": "Benchmark Return",
+        "unit": "ratio"
+      }
+    ],
     "rows": [
       {
         "portfolio_id": "GLOB_EQ_OPP",
@@ -808,7 +855,7 @@ The FQE executes the approved plan and returns typed result rows:
 }
 ```
 
-The typed result now branches to presentation and evidence components. DVL determines how consumers should display it.
+The typed result now branches to presentation, response assembly, and evidence recording. DVL determines how consumers should display it.
 
 ## Data Visualization Language (DVL)
 
@@ -852,8 +899,9 @@ The DVL selects the registered comparison contract from the intent and result sh
 {
   "input": {
     "result_id": "res-20260518-093247",
+    "data_ref": "result:res-20260518-093247",
     "intent_pattern": "comparison",
-    "presentation_metadata_ref": "approved-labels-and-units"
+    "presentation_metadata_ref": "smr:presentation:portfolio-benchmark-comparison@2.0"
   },
   "output": {
     "display_spec_ref": "display:res-20260518-093247",
@@ -918,6 +966,7 @@ The NSA summarizes only statements supported by the result rows:
 {
   "input": {
     "result_id": "res-20260518-093247",
+    "data_ref": "result:res-20260518-093247",
     "allowed_content": [
       "approved labels",
       "result values",
@@ -947,7 +996,7 @@ The NSA summarizes only statements supported by the result rows:
 }
 ```
 
-The presentation outcome joins the decisions and execution events already written to the ALS throughout the request.
+DVL and NSA write their presentation evidence to the ALS, where it joins the request, decision, plan, and execution events already recorded for the request.
 
 ## Analytical Lineage Store (ALS)
 
@@ -974,10 +1023,13 @@ Retention varies by record class, jurisdiction, and business purpose. Definition
 | Request accepted | Tenant, caller reference, tool, operation, parameters or bounded request representation, and timestamp. |
 | Intent resolved | Candidate set, selected operation, model evidence, confidence, and confirmation history. |
 | Entitlement projected | Policy versions, active roles, resolved row scopes, masks, ceiling, and decision. |
+| Semantic request validated | Pinned definitions, entitlement projection, compliance inputs, and logical plan digest. |
 | Controls evaluated | Each control input, limit, outcome, reason, and assigned timeout. |
 | Plan compiled | Logical and physical plan digests plus definition, mapping, planner, and instruction-format versions. |
 | Execution completed | Sources, timings, row counts, cache status, failures, and result digest. |
-| Presentation assembled | DVL contract, narrative validation, artifact state, and response status. |
+| Presentation prepared | DVL contract, narrative validation, and any omission reason. |
+| Provenance artifact sealed | Artifact identifier, schema version, verification metadata, and export state when PAS is required. |
+| Response assembled | Response status, included references, warnings, errors, and delivery outcome. |
 | Request terminated | Rejection, cancellation, timeout, or failure stage and structured reason. |
 
 ### Isolation, Retention, and Audit Export
@@ -996,16 +1048,25 @@ The ALS correlates stage records without storing the full result by default:
 {
   "input": {
     "request_id": "req-20260518-093241",
+    "resolved_request_id": "resolved-20260518-093242",
+    "entitlement_projection_ref": "projection:req-20260518-093241",
+    "lqp_id": "lqp-20260518-093243",
+    "controls_decision_ref": "controls:lqp-20260518-093243",
+    "compliance_decision_ref": "compliance-decision:req-20260518-093241",
+    "plan_id": "plan-20260518-093244",
     "result_id": "res-20260518-093247",
     "display_spec_ref": "display:res-20260518-093247",
-    "narrative_ref": "narrative:res-20260518-093247",
-    "correlated_stage_events_ref": "events:req-20260518-093241"
+    "narrative_ref": "narrative:res-20260518-093247"
   },
   "output": {
     "lineage_ref": "lineage:req-20260518-093241",
     "request_id": "req-20260518-093241",
     "result_id": "res-20260518-093247",
     "events": [
+      {
+        "type": "request_accepted",
+        "record_id": "evt-request-001"
+      },
       {
         "type": "intent_resolved",
         "record_id": "evt-intent-001"
@@ -1015,7 +1076,11 @@ The ALS correlates stage records without storing the full result by default:
         "record_id": "evt-access-001"
       },
       {
-        "type": "controls_approved",
+        "type": "semantic_validated",
+        "record_id": "evt-validation-001"
+      },
+      {
+        "type": "controls_evaluated",
         "record_id": "evt-controls-001"
       },
       {
@@ -1027,7 +1092,7 @@ The ALS correlates stage records without storing the full result by default:
         "record_id": "evt-execution-001"
       },
       {
-        "type": "presentation_assembled",
+        "type": "presentation_prepared",
         "record_id": "evt-presentation-001"
       }
     ],
@@ -1047,11 +1112,11 @@ When both compliance signals are active, the correlated ALS event set becomes th
 
 **Why it exists.** Standard lineage supports operational review, while regulated uses may require a fixed schema, named framework references, a digital signature, and an export gate.
 
-**Input and output.** It receives the active compliance trigger and the correlated ALS event set. It outputs a sealed artifact with verification metadata and an explicit export state, or a failure state that keeps export blocked.
+**Input and output.** It receives the active compliance trigger and the correlated ALS event set. It outputs an `artifact_state_ref` for a sealed artifact with verification metadata and an explicit export state, or a failure state that keeps export blocked.
 
 PAS assembles additional evidence for a request whose two compliance signals are active. It reads the relevant ALS events, adds the metric, framework, intent, policy, plan, execution, and result references required by the approved artifact schema, and signs the canonical artifact bytes.
 
-The platform enforces the export gate. A compliance-purpose result cannot be exported until PAS confirms that the artifact is complete and sealed. The response identifies the artifact, schema version, signing key, algorithm, and verification status.
+The platform enforces the export gate. A compliance-purpose result cannot be exported until PAS confirms that the artifact is complete and sealed. The response identifies the artifact, schema version, signing key identifier, algorithm, and verification status.
 
 A valid signature shows that the signed bytes have not changed since sealing. It does not prove that the calculation is correct or that the artifact satisfies a legal requirement. The organization validates the schema, retention, signing controls, and approval process for each intended framework.
 
@@ -1064,41 +1129,41 @@ A valid signature shows that the signed bytes have not changed since sealing. It
 | regulatory trace identifier | Correlates the artifact with the retained event chain. |
 | artifact schema version | Identifies the structure used by reviewers and verification software. |
 | definition, policy, plan, and result references | Binds the artifact to the governed computation. |
-| signing key, algorithm, and signature | Supports independent integrity verification. |
+| signing key identifier, algorithm, and signature | Supports independent integrity verification without exposing signing-key material. |
 | export status | Shows whether sealing completed and export is permitted. |
 
 If assembly or signing fails, the result remains non-exportable and the ALS records the terminal artifact state. Amendments create a new signed artifact that references the original; they do not replace sealed evidence.
 
-### Input and Output Example
+### Running Example: No PAS Invocation
 
-The portfolio comparison reaches the compliance decision with both signals inactive. No artifact is assembled, and the explicit compliance state continues to response assembly:
+The portfolio comparison reaches the compliance decision with both signals inactive. PAS is not invoked. The orchestration path records that routing outcome, and response assembly uses the SCL decision to produce the explicit standard compliance state:
 
 ```json
 {
   "input": {
     "request_id": "req-20260518-093241",
-    "lineage_ref": "lineage:req-20260518-093241",
+    "compliance_decision_ref": "compliance-decision:req-20260518-093241",
     "compliance_trigger": {
       "metric_signal": false,
       "purpose_signal": false
     }
   },
   "output": {
-    "compliance_state_ref": "compliance:req-20260518-093241",
     "request_id": "req-20260518-093241",
+    "pas_invoked": false,
     "artifact_required": false,
     "artifact_id": null,
-    "export_status": "permitted",
+    "compliance_route": "standard",
     "reason": "two_signal_trigger_not_active"
   }
 }
 ```
 
-The result, presentation outputs, lineage reference, and any compliance artifact now become the response-assembly input.
+The result, presentation outputs, lineage reference, compliance decision, and any sealed artifact state now become the response-assembly input.
 
-## MCP Response Format
+## Structured Response
 
-**Business definition.** The MCP response is the governed delivery contract between the analytical platform and its consumers.
+**Business definition.** The structured response is the governed delivery contract between the analytical platform and its consumers.
 
 **Why it exists.** Consumers need one unambiguous way to distinguish data, presentation, narrative, evidence, warnings, compliance state, and terminal status without reconstructing analytical meaning.
 
@@ -1134,10 +1199,12 @@ The final response combines the computed result with its governed presentation a
   "input": {
     "request_id": "req-20260518-093241",
     "result_id": "res-20260518-093247",
+    "data_ref": "result:res-20260518-093247",
     "display_spec_ref": "display:res-20260518-093247",
     "narrative_ref": "narrative:res-20260518-093247",
     "lineage_ref": "lineage:req-20260518-093241",
-    "compliance_state_ref": "compliance:req-20260518-093241"
+    "compliance_decision_ref": "compliance-decision:req-20260518-093241",
+    "artifact_state_ref": null
   },
   "output": {
     "request_id": "req-20260518-093241",
@@ -1165,7 +1232,7 @@ The MCP Capability Layer returns this response to the consumer, completing the g
 
 ## External Components
 
-External components remain outside the Analytics Engine boundary and retain their own ownership and controls.
+External components remain outside the AI Analytics Platform boundary and retain their own ownership and controls.
 
 ### Conversational AI - Chat Front End
 
