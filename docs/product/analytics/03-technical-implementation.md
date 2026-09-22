@@ -1653,7 +1653,7 @@ S3-compatible object storage stores the ALS records, and PostgreSQL indexes the 
 |----------|--------|-----------|
 | **Lineage records** | S3-compatible object store — one JSON document per query | Write-once; append-only; cheap at scale; no schema migration required; natural fit for immutable audit records |
 | **Object key** | `lineage/{org_id}/{yyyy}/{mm}/{dd}/{result_id}.json` | Date-partitioned; enables prefix-based listing by time window |
-| **Search index** | Thin PostgreSQL table (scalar fields only, no JSON blobs) | Used by the Lineage Query REST API (see roadmap) for filtered search; full record always fetched from the object store |
+| **Search index** | Thin PostgreSQL table (scalar fields only, no JSON blobs) | Used by the Lineage Query REST API for filtered search; full records are always fetched from the object store. |
 | **Retention** | Object lifecycle policy — sample default 7 years (configurable) | Long-horizon regulatory retention; enforced at the storage layer, not application code. Periods are deployment choices — the design documents deliberately prescribe none |
 
 The lineage store is a high-sensitivity security boundary because records can contain identity, entitlement, query, and result information. Deployments must encrypt records in transit and at rest with tenant-scoped access controls and auditable key rotation. Result payloads are excluded by default; the record stores a digest, schema, row count, and bounded summary unless an approved retention policy explicitly requires full result preservation. Requests and SQL are redacted for secrets and unnecessary personal data before persistence.
@@ -1689,7 +1689,7 @@ Records are written once and never mutated. Post-hoc compliance annotations are 
 
 #### Search index schema
 
-A lightweight PostgreSQL table (`analytics.lineage_index`) holds only the scalar fields required for the Lineage Query REST API (see roadmap). Full records are always retrieved from the S3 object store; this table is never the source of truth for record content. Each row corresponds to the following JSON shape:
+A lightweight PostgreSQL table (`analytics.lineage_index`) holds only the scalar fields required for the Lineage Query REST API. Full records are always retrieved from the S3 object store; this table is never the source of truth for record content. Each row corresponds to the following JSON shape:
 
 ```json
 {

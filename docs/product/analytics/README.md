@@ -31,8 +31,7 @@ Text-to-SQL can continue to support controlled exploration and discovery. The pr
 | [3. Illustrative Reference Implementation](./03-technical-implementation.md) | Maps capabilities to technology products and explains their roles through illustrative implementation detail. |
 | [4. Evaluation Framework and Proposed Success Measures](./04-success-metrics.md) | Defines how to test accuracy, traceability, repeatability, access controls, and operating outcomes. |
 | [5. Text-to-SQL Appendix](./05-text-to-sql-antipattern.md) | Examines the limitations of Text-to-SQL as a long-term foundation and its continuing role in exploration. |
-| [6. Possible Extensions and Implementation Considerations](./06-roadmap.md) | Discusses candidate extensions beyond the governed core. |
-| [7. Glossary](./07-glossary.md) | Defines the architecture's named components and technical terms. |
+| [6. Glossary](./06-glossary.md) | Defines the architecture's named components and technical terms. |
 
 ## Scope and Reading Guide
 

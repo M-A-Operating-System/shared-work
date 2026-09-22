@@ -188,7 +188,7 @@ The architecture separates required behavior from technology choices. The propos
 
 Success means that users obtain the analysis they need with approved definitions, appropriate access, and usable evidence. The organization should measure adoption, definition coverage, data freshness, response time, failures, cost, and the integrity of the audit record. Proposed targets require workload testing and a baseline; they are not demonstrated results.
 
-The proposed roadmap extends the governed core with capabilities such as scheduled monitoring, alerts, saved queries, and collaboration. These are development proposals rather than commitments about current availability or delivery dates.
+Possible future extensions include scheduled monitoring, alerts, saved queries, and collaboration. They are outside the proposed governed core and are not commitments about current availability or delivery dates.
 
 | Supporting Section | What It Adds |
 |---|---|
@@ -196,8 +196,7 @@ The proposed roadmap extends the governed core with capabilities such as schedul
 | [3. Illustrative Reference Implementation](./03-technical-implementation.md) | Maps the capabilities to a proposed technology stack and illustrative implementation. |
 | [4. Evaluation Framework](./04-success-metrics.md) | Defines tests for accuracy, traceability, and repeatability, together with proposed operating measures. |
 | [5. Text-to-SQL Appendix](./05-text-to-sql-antipattern.md) | Examines why Text-to-SQL alone is insufficient for sustained governed analytics. |
-| [6. Possible Extensions](./06-roadmap.md) | Describes candidate development beyond the governed core. |
-| [7. Glossary](./07-glossary.md) | Defines the named components and technical terms. |
+| [6. Glossary](./06-glossary.md) | Defines the named components and technical terms. |
 
 ## The Executive Decision
 
