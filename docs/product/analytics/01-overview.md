@@ -31,7 +31,7 @@ The paper uses the name AI Analytics Platform for this proposed architecture. It
 
 The platform sits above existing warehouses, data services, and specialist analytical engines. It requires supported connections and accurate mappings to those sources. Organizations can retain their existing investments while making governed analytics available to more consumers.
 
-The proposed scope includes metric queries, drilldown, and bulk dataset retrieval. Responses include results, governed chart or table specifications, optional narrative summaries, and audit evidence. Consumer applications provide the user experience.
+The proposed scope includes metric queries, drilldown, and governed bulk dataset retrieval for data-mining workflows. Responses include results, governed chart or table specifications, optional narrative summaries, and audit evidence. Consumer applications provide the user experience. The platform governs the dataset supplied to a data-mining workflow; it does not, by itself, validate downstream feature engineering, model training, or research conclusions. [Section 2 demonstrates this boundary with a governed data-mining example.](./02-core-capabilities.md#governed-data-mining-example)
 
 ## Accuracy, Traceability, and Repeatability
 

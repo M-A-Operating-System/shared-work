@@ -1230,6 +1230,133 @@ The final response combines the computed result with its governed presentation a
 
 The MCP Capability Layer returns this response to the consumer, completing the governed request flow.
 
+## Governed Data-Mining Example
+
+The portfolio-comparison example demonstrates governed metric calculation. Data mining uses the same platform controls but resolves an approved dataset contract rather than a metric formula. The output is a bounded, typed extract whose selection rules, permitted fields, source state, membership, pagination, and export decision are recorded.
+
+In this variation, an automated research application already knows the approved operation and submits a structured request. It bypasses IRA language interpretation, but it does not bypass SMR resolution, RAPL, SVL, SCL, PQP, FQE, or ALS. The approved operation uses the `data_retrieval` execution profile, so DVL and NSA are not invoked. PAS remains independent of the profile and would run only if the compliance trigger were active.
+
+### Component Handoffs
+
+| Component | Data-Mining Responsibility | Contract Handoff |
+|---|---|---|
+| AI consumer | Requests a known governed extract for downstream research. | `operation_id`, typed parameters, requested fields, and authenticated context to MCP. |
+| MCP and SMR | Resolve the approved operation and dataset contract. | Pinned operation and dataset-definition references to RAPL and SVL. |
+| RAPL and DES | Limit the extract to permitted datasets, fields, portfolios, classifications, and export rights. | Entitlement projection containing row scope, field projection, masks, and export policy. |
+| SVL | Validate the dataset contract, parameters, date range, field compatibility, and stable ordering. | Backend-independent LQP describing the governed dataset selection. |
+| SCL | Evaluate estimated row volume, complexity, classification, compliance purpose, concurrency, and timeout. | Approved execution budget and compliance decision, or structured rejection. |
+| PQP and FQE | Bind approved mappings, execute the bounded selection, apply protections, and paginate the result. | Typed dataset pages plus the extract manifest, source snapshot reference, and execution evidence. |
+| ALS | Correlate the contract, projection, plan, snapshot, page set, membership digest, export decision, and terminal outcome. | Authorized lineage reference for review and repeatability testing. |
+| Structured Response | Return the extract without adding a chart or AI narrative. | Data reference, schema, pagination, extract manifest, lineage, and export status. |
+
+### Technology-Neutral Contract Example
+
+The application requests daily fixed-income positions for its authorized portfolios during April 2026. The requested fields are a subset of the approved dataset contract:
+
+```json
+{
+  "input": {
+    "request_id": "req-20260518-101500",
+    "operation_id": "retrieve_position_history",
+    "operation_definition_ref": "smr:operation:retrieve_position_history@1.0.0",
+    "dataset_definition_ref": "smr:dataset:fixed_income_daily_positions@1.0.0",
+    "execution_profile": "data_retrieval",
+    "parameters": {
+      "portfolio_scope": "caller_authorized_portfolios",
+      "asset_class": "FIXED_INCOME",
+      "date_from": "2026-04-01",
+      "date_to": "2026-04-30",
+      "requested_fields": [
+        "portfolio_id",
+        "instrument_id",
+        "position_date",
+        "market_value",
+        "duration",
+        "currency"
+      ],
+      "page_size": 10000
+    },
+    "entitlement_projection": {
+      "entitlement_projection_ref": "projection:req-20260518-101500",
+      "authorized_portfolios": [
+        "GLOB_FI_CORE",
+        "US_CREDIT_OPP"
+      ],
+      "approved_fields": [
+        "portfolio_id",
+        "instrument_id",
+        "position_date",
+        "market_value",
+        "duration",
+        "currency"
+      ],
+      "classification_ceiling": "INTERNAL",
+      "export_policy_ref": "export-policy:research-internal@3.1"
+    }
+  },
+  "output": {
+    "request_id": "req-20260518-101500",
+    "result_id": "dataset-res-20260518-101512",
+    "status": "complete",
+    "data_ref": "dataset:dataset-res-20260518-101512",
+    "dataset_definition_ref": "smr:dataset:fixed_income_daily_positions@1.0.0",
+    "source_snapshot_ref": "snapshot:portfolio-source:2026-05-01T00:00:00Z",
+    "selection_digest": "digest:<illustrative-selection-value>",
+    "dataset_membership_digest": "digest:<illustrative-membership-value>",
+    "schema": [
+      {
+        "field": "portfolio_id",
+        "type": "string"
+      },
+      {
+        "field": "instrument_id",
+        "type": "string"
+      },
+      {
+        "field": "position_date",
+        "type": "date"
+      },
+      {
+        "field": "market_value",
+        "type": "decimal",
+        "unit": "reporting_currency"
+      },
+      {
+        "field": "duration",
+        "type": "decimal",
+        "unit": "years"
+      },
+      {
+        "field": "currency",
+        "type": "string"
+      }
+    ],
+    "ordering": [
+      "position_date",
+      "portfolio_id",
+      "instrument_id"
+    ],
+    "pagination": {
+      "page_size": 10000,
+      "total_rows": 24837,
+      "next_page_token": "page:dataset-res-20260518-101512:2"
+    },
+    "extract_manifest_ref": "manifest:dataset-res-20260518-101512",
+    "lineage_ref": "lineage:req-20260518-101500",
+    "export": {
+      "status": "permitted",
+      "policy_ref": "export-policy:research-internal@3.1"
+    },
+    "warnings": [],
+    "errors": []
+  }
+}
+```
+
+The extract manifest covers every page and records the dataset contract, logical selection, effective field and row projection, stable ordering, source snapshot, per-page digests, complete membership digest, and export decision. An authorized rerun can therefore distinguish a changed selection rule from changed dataset membership.
+
+The platform's accuracy claim for this workflow is limited to the governed extract: that the returned records and fields conform to the approved contract, permissions, source state, and selection rules. Feature engineering, statistical analysis, model training, model validation, and conclusions produced from the extract remain separate governed activities with their own evidence and approval requirements.
+
 ## External Components
 
 External components remain outside the AI Analytics Platform boundary and retain their own ownership and controls.

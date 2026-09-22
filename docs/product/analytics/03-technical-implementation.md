@@ -797,17 +797,18 @@ The operation catalog. One document per approved operation. The `execution_profi
 {
   "type":              "analytical_operation",
   "org_id":         "acme-wealth",
-  "operation_id":        "get_positions",
+  "operation_id":        "retrieve_position_history",
   "version":             1,
   "status":              "approved",
   "source":              "platform",
-  "display_name":        "Portfolio Positions",
-  "description":         "Fetch current or historical position data for a portfolio.",
+  "display_name":        "Position History Retrieval",
+  "description":         "Retrieve governed current or historical position records for authorized portfolios.",
   "execution_profile":   "data_retrieval",
-  "required_params":     ["portfolio_id"],
-  "optional_params":     ["as_of_date", "asset_class"],
+  "dataset_id":          "fixed_income_daily_positions",
+  "required_params":     ["portfolio_scope", "date_from", "date_to"],
+  "optional_params":     ["asset_class", "requested_fields", "page_size", "page_token"],
   "supported_metrics":   [],
-  "supported_dimensions": ["portfolio_id", "asset_class", "currency", "instrument_id", "as_of_date"]
+  "supported_dimensions": ["portfolio_id", "asset_class", "currency", "instrument_id", "position_date"]
 }
 ```
 
@@ -2437,15 +2438,16 @@ One bundle covers all analytical dimensions. Every domain bundle's metrics and o
   {
     "type":              "analytical_operation",
     "org_id":         "acme-wealth",
-    "operation_id":      "get_positions",
+    "operation_id":      "retrieve_position_history",
     "version":           1,
     "status":            "approved",
     "source":            "platform",
-    "display_name":      "Portfolio Positions",
-    "description":       "Fetch current or historical position data for a portfolio.",
+    "display_name":      "Position History Retrieval",
+    "description":       "Retrieve governed current or historical position records for authorized portfolios.",
     "execution_profile": "data_retrieval",
-    "required_params":   ["portfolio_id"],
-    "optional_params":   ["as_of_date", "asset_class"]
+    "dataset_id":        "fixed_income_daily_positions",
+    "required_params":   ["portfolio_scope", "date_from", "date_to"],
+    "optional_params":   ["asset_class", "requested_fields", "page_size", "page_token"]
   },
   {
     "type":                  "analytical_operation",
