@@ -28,13 +28,13 @@ Text-to-SQL can continue to support controlled exploration and discovery. The pr
 |---|---|
 | [1. Executive Overview](./01-overview.md) | Explains the complete proposal, its contrast with Text-to-SQL, business uses, operating responsibilities, and the decision to evaluate it. |
 | [2. Proposed Architecture and Capabilities](./02-core-capabilities.md) | Defines the proposed responsibilities, interfaces, and controls that support governed execution. |
-| [3. Illustrative Reference Implementation and Evaluation Plan](./03-technical-implementation.md) | Maps capabilities to technology products, explains their illustrative implementation, and defines the evaluation evidence and decision gates. |
-| [4. Glossary](./04-glossary.md) | Defines the architecture's named components and technical terms. |
+| [3. Glossary](./03-glossary.md) | Defines the architecture's named components and technical terms. |
 | [Appendix A. Text-to-SQL](./appendix-a-text-to-sql.md) | Defines the boundary between controlled exploration and governed execution. |
+| [Appendix B. Illustrative Reference Implementation and Evaluation Plan](./appendix-b-reference-implementation.md) | Maps the logical capabilities to one specific build design and defines the evidence and decision gates for evaluating it. |
 
 ## Scope and Reading Guide
 
-The executive overview provides a standalone account of the argument. Architects and engineering teams can use Sections 2 and 3 to examine the proposed design and illustrative implementation. Governance and delivery leaders can use [Section 3.5](./03-technical-implementation.md#35-evaluation-plan-and-decision-gates) to approve a bounded evaluation and its decision criteria.
+The executive overview provides a standalone account of the argument. Architects can use Section 2 to examine the implementation-neutral design. Engineering, governance, and delivery teams can use [Appendix B](./appendix-b-reference-implementation.md) to examine one specific implementation and approve a bounded evaluation with explicit decision criteria.
 
 The term AI Analytics Platform names the proposed architecture throughout the paper. Present-tense component descriptions and mandatory controls express intended design behavior, not verified functionality in a released product. Technology choices, examples, and targets are illustrative unless supported by stated evidence.
 

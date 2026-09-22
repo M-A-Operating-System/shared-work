@@ -2,7 +2,7 @@
 
 ## Purpose and Boundaries
 
-This section defines the proposed logical architecture for governed AI-enabled analytics and data mining. It explains each component's responsibility and the contracts between components. It is implementation-neutral: it names required behavior, inputs, outputs, and evidence without selecting products, programming languages, frameworks, storage services, or deployment patterns. [Section 3](./03-technical-implementation.md) maps these responsibilities to an illustrative technology stack.
+This section defines the proposed logical architecture for governed AI-enabled analytics and data mining. It explains each component's responsibility and the contracts between components. It is implementation-neutral: it names required behavior, inputs, outputs, and evidence without selecting products, programming languages, frameworks, storage services, or deployment patterns. [Appendix B](./appendix-b-reference-implementation.md) maps these responsibilities to one illustrative technology stack.
 
 The design separates AI-assisted interpretation from governed computation. A language model may match a question to an approved operation and summarize a completed result. Registered definitions, deterministic software, and controlled data services perform the calculation. A structured caller may bypass natural-language interpretation, but it may not bypass entitlements, validation, controls, execution evidence, or other mandatory stages.
 
@@ -703,7 +703,7 @@ A repeatable physical plan requires the same LQP, definition and mapping version
 | Source instruction compilation | Produce a bounded sub-plan in the registered instruction format for each source group. |
 | Plan sealing | Create an integrity digest and record planner, instruction-format, mapping, and configuration versions. |
 
-An implementation may delegate federation to one execution service or create several source sub-plans with an explicit assembly contract. Both approaches implement the same logical responsibility; Section 3 proposes a specific choice.
+An implementation may delegate federation to one execution service or create several source sub-plans with an explicit assembly contract. Both approaches implement the same logical responsibility; Appendix B proposes a specific choice.
 
 ### Input and Output Example
 
@@ -1395,7 +1395,7 @@ External components remain outside the AI Analytics Platform boundary and retain
 
 **Business definition and purpose.** The optional rendering service converts a governed display contract into a static visual for consumers that cannot render it directly. It exists as a presentation utility, not as part of analytical computation.
 
-**Input and output.** It receives a self-contained display specification and outputs SVG or PNG. It has no access to analytical definitions, source credentials, or execution backends. Section 3 identifies an illustrative product and implementation for this role.
+**Input and output.** It receives a self-contained display specification and outputs SVG or PNG. It has no access to analytical definitions, source credentials, or execution backends. Appendix B identifies an illustrative product and implementation for this role.
 
 ## Design Decisions Requiring Evaluation
 
@@ -1411,7 +1411,7 @@ The proposal leaves several choices for implementation and governance teams to v
 - storage controls for evidence integrity and retention; and
 - artifact schemas and approval processes for each intended regulatory use.
 
-These are evaluation questions, not hidden implementation details. [Section 3.5](./03-technical-implementation.md#35-evaluation-plan-and-decision-gates) defines the plan for testing the architecture before broader adoption.
+These are evaluation questions, not hidden implementation details. The [evaluation plan in Appendix B](./appendix-b-reference-implementation.md#evaluation-plan-and-decision-gates) defines how to test the architecture before broader adoption.
 
 ---
 

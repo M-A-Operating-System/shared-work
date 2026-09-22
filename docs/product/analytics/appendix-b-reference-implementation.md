@@ -1,13 +1,13 @@
-# 3. Illustrative Reference Implementation and Evaluation Plan
+# Appendix B. Illustrative Reference Implementation and Evaluation Plan
 
 This section illustrates how a technology stack could support the proposed architecture. The technology mappings and code fragments explain implementation responsibilities; they are not evidence of a completed or benchmarked system. Alternative stacks can support the same responsibilities. Integration feasibility, correctness, performance, and operating cost require validation against the intended workload.
 
 The proposed behaviors, interfaces, and governance requirements are in [Section 2](./02-core-capabilities.md). The [design principles](./01-overview.md#design-principles) define the intended constraints on this implementation.
 
-Readers making an architectural or investment decision can use Sections 3.1 and 3.2 as the implementation summary. Sections 3.3 and 3.4 provide companion detail for engineering review, including illustrative code, schemas, configuration, infrastructure, and seed definitions. Section 3.5 defines the bounded evaluation, evidence requirements, and decision gates that determine whether the proposal should proceed.
+Readers making an architectural or investment decision can use the Reference Build Summary and Architecture Overview as the implementation summary. The layer-by-layer and infrastructure sections provide companion detail for engineering review, including illustrative pseudocode, schemas, configuration, infrastructure, and seed definitions. The evaluation plan defines the evidence requirements and decision gates that determine whether the proposal should proceed.
 
 
-## 3.1 Reference Architecture Summary
+## Reference Build Summary
 
 This section maps the capabilities defined in Section 2 to a proposed technology stack. Each mapping names the technology, the work it performs, and the application code needed to complete the capability. Teams may substitute technologies that satisfy the same interface contracts and governance requirements.
 
@@ -24,9 +24,9 @@ The table follows the logical flow in Section 2. It accounts for platform compon
 | Role-Aware Projection Layer | RAPL | Python, asyncpg, PostgreSQL | Python uses asyncpg to read entitlement policies from PostgreSQL. It combines the policies with verified identity claims to determine permitted metrics, dimensions, rows, and column protections. |
 | Semantic Validation Layer | SVL | Python, Pydantic v2 | Pydantic validates tool input models. Python checks operation parameters against registered JSON schemas, resolves semantic definitions, enforces the entitlement projection, and builds the logical query plan. |
 | Semantic Controls Layer | SCL | Python, Redis, Data Context Store (existing service) | Python evaluates the five controls checks using configured thresholds and profiling statistics. The Data Context Store stores the configuration, and Redis coordinates concurrent-query admission across application instances. |
-| Physical Query Planner | PQP | Python, Apache Calcite | Python binds approved logical concepts to physical catalog references. Apache Calcite supplies relational planning functions used to produce Trino SQL with the required filters and column protections. |
+| Physical Query Planner | PQP | Python, Apache Calcite planner adapter | Python binds approved logical concepts to physical catalog references and calls a JVM-based Calcite adapter over a loopback interface. Calcite produces Trino SQL with the required filters and column protections. |
 | Federated Query Engine | FQE | Starburst (Trino), Python, Trino Python client | Starburst acts as the FQE. The Trino Python client submits SQL to its coordinator, and Starburst executes queries across configured source connectors. Python verifies the returned schema, caches results, and records execution details. |
-| Registered Data Sources | - | Snowflake, BigQuery, Databricks, Redshift, dbt Semantic Layer, Cube, REST, OData, Neo4j, Amazon Neptune | Starburst connectors provide controlled access to registered warehouses, lakehouses, semantic layers, APIs, and graph stores. Source registration and approved mappings determine which data can participate in governed execution. |
+| Registered Data Sources | - | Snowflake, BigQuery, Databricks, Redshift, dbt Semantic Layer, Cube, REST, OData, Neo4j, Amazon Neptune | Validated Starburst or Trino connectors provide access to supported sources; other systems require an approved adapter or custom connector. Source registration and approved mappings determine which data can participate in governed execution. |
 | Data Visualization Language | DVL | Python, Vega-Lite v5 | Python selects the registered chart contract and generates a Vega-Lite display specification. Tabular results use the platform's separate table format. |
 | External Language Model Service | - | Anthropic Claude API | The IRA and NSA call the model service through separate, governed adapters. The model interprets intent or drafts a narrative; it does not receive database credentials or generate the executable query. |
 | Narrative Synthesis Agent | NSA | Python, Anthropic Claude Haiku 4.5, Anthropic Claude Sonnet 4.6 | Claude generates narratives from computed result values. Python selects Haiku for simple summaries or Sonnet for complex results, constructs the prompt, and validates the generated text. |
@@ -34,12 +34,56 @@ The table follows the logical flow in Section 2. It accounts for platform compon
 | Provenance Artifact Service | PAS | Python, cryptography, HashiCorp Vault or Kubernetes Secrets, Amazon S3 | Python assembles the provenance artifact, and cryptography signs it with ECDSA P-256 and SHA-256. Vault or Kubernetes Secrets supplies the key. The lineage service stores the signed artifact in S3 under configured retention controls. |
 | Structured Response | - | Python, Pydantic v2, FastMCP 2.x | Pydantic assembles and validates the typed response containing data, presentation, narrative, lineage, compliance state, warnings, and errors. FastMCP returns that package without allowing the consumer to recalculate governed values. |
 | Optional Rendering Service | - | Python, FastMCP 2.x, vega-embed, Playwright, Chromium | A separate MCP service converts a self-contained Vega-Lite specification to SVG or PNG. It has no access to analytical sources and is not part of governed computation. |
-| Result Cache | - | Python, Redis | Redis stores assembled results under keys derived from the canonical logical query plan. Python applies the configured expiry and bypasses cache reads and writes for compliance-purpose queries. |
+| Result Cache | - | Python, Redis | Redis stores assembled results under keys derived from the complete effective execution context. Python reauthorizes every hit, applies the configured expiry, and bypasses cache reads and writes when the compliance trigger is active. |
 
 The two embedded AI components are the **Intent Resolution Agent (IRA)** and the **Narrative Synthesis Agent (NSA)**. Every stage between them — RAPL, SVL, SCL, PQP, and FQE — is deterministic.
 
+### Reference Build Profile
 
-## 3.2 Architecture Overview
+This appendix defines one bounded reference build, not a complete product implementation. Its purpose is to prove that the logical contracts in Section 2 can be assembled, secured, and evaluated using the named stack. Productization, multi-region operation, every Financial Services Reference Model domain, and every optional integration remain outside the minimum build.
+
+The reference build uses a **modular monolith** for the governed application pipeline. MCP, IRA adapters, RAPL, SVL, SCL, PQP client, DVL, NSA adapters, ALS coordination, PAS, and cache coordination run as modules in the `analytics-mcp` application. Apache Calcite runs in a JVM sidecar in the same Kubernetes pod because it is not a native Python library. Starburst, the DCS, PostgreSQL, Redis, object storage, the identity provider, and the external language-model service remain external dependencies. This deployment choice reduces distributed-system complexity while preserving component interfaces that could support later separation.
+
+| Build Area | Included in the Minimum Reference Build | Deferred or Optional |
+|---|---|---|
+| Governed operations | One metric comparison, one governed dataset retrieval, and one compliance-triggering metric operation. | The full six-domain reference catalog and broad operation coverage. |
+| Request paths | Structured operation calls and natural-language resolution with confirmation for ambiguity. | Additional channels, scheduled execution, alerts, and collaboration. |
+| Data sources | One primary analytical source and one second source sufficient to exercise federation. | Every connector listed in the broader capability matrix. |
+| Governance | Definition approval state, entitlements, validation, all SCL checks, lineage, terminal status, and compliance export gating. | Organization-specific approval user interfaces and enterprise workflow integration. |
+| Responses | Typed data, governed table or chart specification, optional validated narrative, and lineage reference. | Static image rendering, customized themes, and advanced interaction patterns. |
+| Operations | Repeatable deployment, configuration, health checks, structured logs, metrics, traces, failure injection, and evidence reconciliation. | Multi-region disaster recovery and production service-level commitments. |
+
+The build is complete enough for formal evaluation only when all three operations traverse the mandatory controls sequence, expected authorization failures are demonstrated, every accepted request has a durable terminal record, preserved inputs can be rerun, and the evaluation corpus can execute without manual changes to application code.
+
+### Candidate Bill of Materials
+
+The following products define the candidate stack for the reference build. Exact versions must be pinned in the build manifest and recorded in the evaluation evidence pack. A named product or major version in this paper is a design choice to validate, not a statement that the combination has already been integration-tested.
+
+| Product or Runtime | Reference-Build Role | Minimum Build | Validation Required |
+|---|---|---|---|
+| Python 3.12, FastMCP, Uvicorn, Pydantic | Governed application runtime, MCP transport, and typed contracts. | Yes | Confirm supported versions, transport behavior, cancellation, and authentication middleware integration. |
+| Apache Calcite on a JVM sidecar | Relational planning and Trino SQL generation. | Yes | Validate the loopback contract, Trino dialect output, startup dependency, timeout, and failure behavior. |
+| Starburst or compatible Trino distribution | Federated execution boundary. | Yes | Validate every selected connector and required push-down, masking, cancellation, and query-evidence capability. |
+| PostgreSQL | DES policies and ALS search index under separate schemas and credentials. | Yes | Validate migration, backup, recovery, isolation, and reconciliation with object storage. |
+| Redis | Result cache and distributed concurrency state. | Yes | Validate eviction, fail-closed concurrency behavior, key isolation, and recovery after interruption. |
+| S3-compatible object storage | Lineage, artifacts, and knowledge content. | Yes | Validate object lock or equivalent retention controls, versioning, signing, lifecycle, and legal hold where required. |
+| External language-model service | IRA ranking and optional NSA narrative generation. | IRA only | Pin model identifiers in deployment configuration and test ambiguity, unavailability, and output validation. |
+| Vega-Lite and optional rendering service | Governed presentation contract and optional image rendering. | Specification only | Validate consumer compatibility; image rendering is not required for the minimum build. |
+| Kubernetes and a managed secrets service | Deployment, workload identity, configuration, and secret delivery. | Yes | Validate pod security, network policy, autoscaling assumptions, key rotation, and workload identity. |
+
+### Build Increments and Acceptance Evidence
+
+| Increment | Deliverable | Acceptance Evidence |
+|---|---|---|
+| 1. Foundation | Deploy the application pod, Calcite sidecar, PostgreSQL, Redis, object storage, DCS client, identity validation, and Starburst connectivity. | Reproducible deployment, pinned manifest, dependency health, secret rotation test, and denied unauthenticated request. |
+| 2. Structured metric execution | Implement SMR resolution, RAPL, SVL, SCL, PQP, FQE, ALS, and the structured response for one metric comparison. | Approved reference result, negative entitlement tests, plan and execution evidence, and durable terminal states. |
+| 3. Governed data retrieval | Add the approved dataset contract, field and row projection, stable ordering, pagination, manifest, and export decision. | Expected membership digest, page continuity, denied-field tests, snapshot reference, and repeatable extract. |
+| 4. Natural language and presentation | Add IRA resolution and confirmation, DVL generation, and the optional validated NSA narrative. | Intent corpus results, ambiguity behavior, governed fallback presentation, and narrative omission on validation failure. |
+| 5. Compliance evidence | Add the two-signal trigger, PAS signing, verification, retention enforcement, and export gate. | Trigger truth-table results, non-exportability before sealing, signature verification, key-rotation evidence, and failure test. |
+| 6. Evaluation readiness | Add observability, failure injection, reconciliation, workload execution, and evidence-pack generation. | Entry-criteria review and successful execution of the corpus defined in the Evaluation Plan. |
+
+
+## Architecture Overview
 
 ```mermaid
 flowchart TD
@@ -53,12 +97,12 @@ flowchart TD
         RAPL["Python + asyncpg (RAPL)\nrole definition lookup from DES\nJWT claims → row scope injection · column masking"]
         SVL["Pydantic / Python (SVL)\nJSON Schema validation · SMR resolution\ncompliance signal evaluation · LQP generation"]
         SCL["Redis + Python rules (SCL)\ndata scale · complexity · classification · compliance · concurrency\nRedis concurrency semaphore"]
-        PQP["Apache Calcite (PQP)\nphysical_mapping resolution · catalog reference binding\nLQP → federated Trino SQL"]
+        PQP["Python PQP + Apache Calcite sidecar\nphysical_mapping resolution · catalog reference binding\nversioned plan contract → federated Trino SQL"]
         FQE["Starburst (FQE)\nTrino-based native federation across catalog connectors\npredicate push-down · parallel execution · result assembly"]
         DVL["Vega-Lite (DVL)\nPython · ontology evaluation · deterministic chart contract selection\noutput: Vega-Lite v5 spec"]
         NSA["Anthropic Claude (NSA)\nHaiku 4.5 — simple queries · Sonnet 4.6 — complex queries\nanchored strictly to result values"]
         PAS["ProvenanceArtifactService (PAS)\nin-process Python module — compliance queries only\nassembles + seals artifact — ECDSA P-256 (key from Vault)"]
-        Cache[("Redis (Result Cache)\nSHA-256 cache key · 5-min TTL\ncompliance queries bypass")]
+        Cache[("Redis (Result Cache)\neffective-context cache key · configurable TTL\ncompliance-triggered requests bypass")]
         LS[("AWS S3 + PostgreSQL (ALS)\nS3 — JSON record per query\nPostgreSQL lineage_index — scalar search")]
         Result(["MCP tool response\ndisplay_spec + data + narrative + result_id\n+ compliance block if Provenance Artifact active"])
     end
@@ -75,11 +119,11 @@ flowchart TD
         ENT[("PostgreSQL role_policies schema\ndedicated schema + credentials\nwritten only by the Entitlements Manager")]
     end
 
-    subgraph backends["Starburst Catalog Connectors"]
+    subgraph backends["Registered Execution Integrations"]
         SQL["Snowflake catalog\nSnowflake · BigQuery · Databricks · Redshift (warehouse / lakehouse)"]
-        SemLayer["Semantic-layer catalog\ndbt Semantic Layer (MetricFlow) · Cube.js"]
-        ODA["REST / OpenData catalog\nREST JSON · OData v4"]
-        GDA["Graph catalog\nNeo4j · Amazon Neptune"]
+        SemLayer["Validated semantic-layer adapter\ndbt Semantic Layer (MetricFlow) · Cube.js"]
+        ODA["Validated API adapter\nREST JSON · OData v4"]
+        GDA["Validated graph adapter\nNeo4j · Amazon Neptune"]
     end
 
     Consumer -->|"Analytics Request"| MCP
@@ -119,9 +163,11 @@ flowchart TD
 The Semantic Metrics Repository (SMR) and the Semantic Data Repository (SDR) are two independent stores housed within the Data Context Store (DCS). The SDR is a pre-existing organizational component holding the foundational data definitions — data models, physical schemas, and data lineage. The SMR is a separate store holding the four analytical document types (`analytical_metric`, `analytical_dimension`, `analytical_operation`, `analytical_dataset`); both stores are built on the DCS's shared versioned storage, search index, and scoped access control, and both are reached through the DCS API. The `physical_mapping` fields in SMR metric definitions resolve against SDR schema metadata to locate the physical tables and columns behind each metric.
 
 
-## 3.3 Layer-by-Layer Stack Decisions
+## Layer-by-Layer Stack Decisions
 
 The implementation subsections can be read in the same logical sequence as Section 2: [MCP](#mcp-capability-layer), [IRA](#intent-resolution-agent), [SMR](#semantic-metrics-repository-smr), [RAPL](#role-aware-projection-layer), [SVL request validation](#request-validation-svl), [SVL logical planning](#logical-query-plan-generation-svl), [SCL](#semantic-controls-layer), [PQP](#physical-query-planner-pqp), [FQE](#federated-query-engine-fqe), [DVL](#data-visualization-language-dvl), [NSA](#narrative-synthesis-agent), [ALS](#analytical-lineage-store), and [PAS](#provenance-artifact-service-pas). Supporting runtime services follow the primary flow. The subsection placement groups closely related implementation material, while these links preserve traceability to the component sequence.
+
+Unless a block is explicitly described as a complete configuration or contract example, Python blocks in this appendix are **illustrative pseudocode**. Ellipses identify behavior that the build must implement and test; the fragments are not intended to be copied into a deployable service as written. JSON examples are technology-neutral contract instances or illustrative configuration, not generated evidence from a running system.
 
 ### MCP Capability Layer
 
@@ -1227,11 +1273,12 @@ class SemanticControlsLayer:
 
 > **Specification:** [§Physical Query Planner](./02-core-capabilities.md#physical-query-planner-pqp)
 
-Apache Calcite provides the relational planning functions used by the PQP. Application code maps the approved LQP and pinned SMR definitions into a relational tree, binds catalog references, and requests Trino SQL for execution by Starburst.
+Apache Calcite provides the relational planning functions used by the PQP. Because Calcite is JVM-based and the governed application is Python, the reference build runs a small `calcite-planner` sidecar in the same Kubernetes pod as `analytics-mcp`. The Python PQP resolves approved mappings and sends a typed relational-plan request over a loopback-only HTTP interface. The adapter returns Trino SQL and a digest of the canonical planner input. It has no source credentials and cannot execute the query.
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
-| **Implementation** | Apache Calcite (Python-hosted) | Builds a relational tree from the LQP and emits SQL; battle-tested, dialect-aware |
+| **Implementation** | Python PQP client plus JVM-based Apache Calcite sidecar | Makes the cross-runtime boundary explicit while keeping the planner inside the reference build's deployment unit. |
+| **Planner interface** | Versioned JSON over loopback HTTP | Accepts only the approved relational operators and logical references defined by the PQP contract; inaccessible outside the pod. |
 | **Catalog binding** | SMR `physical_mapping` lookup → Starburst catalog name | The PQP resolves each node's `physical_mapping` from the SMR, keyed on the pinned metric version, then binds `source` → catalog |
 | **Output** | A single **federated Trino SQL** statement | Starburst performs the cross-source join natively; no per-backend decomposition needed |
 | **Execution** | None | The PQP has no backend connectivity; it hands the federated SQL to the FQE (Starburst) |
@@ -1290,17 +1337,17 @@ class PhysicalQueryPlanner:
 
         # 1. Resolve each metric_scan node's physical_mapping from the SMR (pinned metric version),
         #    then map physical_mapping.source → Starburst catalog
-        # 2. Build a Calcite relational tree from the LQP nodes (scan, join, filter, time_expand, sort)
-        # 3. Bind each scan to its catalog.schema.table reference; inject row scope + dimension filters
-        # 4. Emit one Trino-dialect SQL statement — Starburst performs the cross-catalog join
+        # 2. Build the versioned planner request from approved operators and bound catalog references
+        # 3. Call the loopback Calcite adapter with a deadline and verify its input digest
+        # 4. Receive one Trino-dialect SQL statement — Starburst performs the cross-catalog join
         ...
 
     def _catalog_for(self, physical_mapping: dict) -> str:
         # Maps physical_mapping.source → configured Starburst catalog name
         ...
 
-    def _emit_trino_sql(self, rel) -> str:
-        # Calcite RelNode tree → Trino-dialect SQL with catalog-qualified table references
+    def _emit_trino_sql(self, planner_request: dict) -> str:
+        # Versioned request → loopback Calcite adapter → Trino SQL
         ...
 ```
 
@@ -1405,17 +1452,19 @@ Execution backends are registered through the Admin API by the Integration Engin
 
 Multiple backends may share a `dataAffinity`; selection uses `priority`, `capabilities`, and availability. With `authType: "bearer"` the caller's token is forwarded and backend-layer enforcement becomes the source system's responsibility — the platform's row-scope injection still applies upstream.
 
-#### Starburst catalog connectors
+#### Starburst and Trino integration routes
+
+The following table is a candidate capability matrix, not a claim that every combination is available through an unmodified connector. Before a source is admitted to the reference build, the team must verify the selected Starburst or Trino distribution, connector edition, authentication method, data-type mapping, predicate and aggregation push-down, cancellation behavior, and licensing terms. Sources without a validated connector require an approved adapter or remain out of scope.
 
 Each registered source is exposed to Starburst as a catalog. The reference deployment configures at least the following connector types; any Trino-compatible connector may be added:
 
 | Catalog type | Starburst connector | Sources |
 |---|---|---|
 | **SQL warehouse / lakehouse** | Snowflake · BigQuery · Databricks/Delta · Redshift · Iceberg · Hive | Primary performance and position data |
-| **Semantic layer** | dbt Semantic Layer (MetricFlow) · Cube.js (via JDBC/REST connector) | Pre-modeled governed metrics |
+| **Semantic layer** | Approved JDBC, REST, or custom Trino adapter for dbt Semantic Layer or Cube | Pre-modeled governed metrics; not assumed to be a built-in connector. |
 | **Relational** | PostgreSQL · MySQL | Reference and governance data |
-| **Graph** | Neo4j · Amazon Neptune (via connector) | Relationship and counterparty data |
-| **REST / OpenData** | REST · OData v4 (via connector) | Reference data and third-party feeds |
+| **Graph** | Validated commercial or custom connector for Neo4j or Amazon Neptune | Relationship and counterparty data; admitted only after capability testing. |
+| **REST / OpenData** | Validated commercial or custom connector for REST or OData v4 | Reference data and third-party feeds; admitted only after schema, paging, and push-down testing. |
 | **Custom** | Any Trino-compatible connector | Proprietary or specialized sources |
 
 A catalog is registered with a standard Starburst catalog properties file — one per source — and becomes addressable as `catalog.schema.table` in the federated SQL the PQP emits:
@@ -1821,14 +1870,14 @@ class KnowledgeStore:
 
 ### Result Cache
 
-Redis acts as the Result Cache. The Python `ResultCache` class derives keys from canonical LQPs, applies the configured TTL, and bypasses cache reads and writes for compliance-purpose queries.
+Redis acts as the Result Cache. The Python `ResultCache` class derives keys from the complete effective execution context, applies the configured TTL, and bypasses cache reads and writes when the compliance trigger is active. A cache hit is usable only after current authorization has been evaluated and produces fresh lineage evidence.
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
 | **Store** | Redis (cluster mode) | Provides shared cache storage and key expiry; read latency requires measurement in the deployed environment. |
-| **Cache key** | SHA-256 of the canonical serialized LQP | The plan embeds `org_id`, the row-scope filter nodes, and `column_masks` — different effective entitlements produce different plans and therefore different keys, structurally |
+| **Cache key** | SHA-256 of the canonical effective execution context | Includes the LQP, tenant, entitlement projection, pinned definition and policy versions, relevant control and mapping versions, output contract, and source-freshness token. |
 | **TTL** | 5 minutes default; configurable per operation via `cache_ttl_seconds` on `analytical_operation` | Short TTL balances freshness against backend load |
-| **Compliance bypass** | Queries with `compliance_purpose: true` skip read and write | Provenance Artifact requires a fresh execution record |
+| **Compliance bypass** | Requests for which the SCL activates the two-signal compliance trigger skip read and write | The Provenance Artifact requires fresh execution evidence. |
 | **Cache-aside pattern** | FQE checks before execution; writes after assembly | Cache is never on the critical governance path |
 
 ```python
@@ -1838,22 +1887,21 @@ class ResultCache:
     def __init__(self, redis_client):
         self.redis = redis_client
 
-    def _key(self, lqp: dict) -> str:
-        # Input:  LQP — org_id, nodes (including the row-scope filter nodes), column_masks
-        # Output: Redis key string — SHA-256 of the canonical serialized LQP
-        # Entitlement isolation is structural: the plan embeds row scope and column masks,
-        # so different effective entitlements always produce different keys
+    def _key(self, execution_context: dict) -> str:
+        # Input: LQP + tenant + entitlement projection + pinned definition, policy,
+        # mapping, control, output-contract, and source-freshness versions
+        # Output: Redis key string — SHA-256 of the canonical serialized context
         ...
 
     async def get(self, lqp: dict, claims: dict) -> dict | None:
         # Input:  LQP + claims
         # Output: cached result dict, or None on miss
-        # Returns None immediately for compliance queries — they must always produce a fresh lineage record
+        # Reauthorize the request before reuse. Return None when the SCL compliance trigger is active.
         ...
 
     async def set(self, lqp: dict, claims: dict, result: dict, ttl: int = 300) -> None:
         # Input:  LQP + claims + assembled result + TTL seconds (default 5 min)
-        # No-op for compliance queries — result must not be cached
+        # No-op when the SCL compliance trigger is active.
         ...
 ```
 
@@ -1961,6 +2009,7 @@ Configuration is read from environment variables at startup. Required variables:
 | `DCS_API_KEY` | DCS service-to-service API key |
 | `S3_LINEAGE_BUCKET` | S3 bucket name for lineage records |
 | `STARBURST_DSN` | Starburst (Trino) coordinator connection — host, port, user, default catalog |
+| `CALCITE_PLANNER_URL` | Loopback URL for the Calcite planner sidecar; not routable outside the application pod. |
 | `ANTHROPIC_API_KEY` | Anthropic API key for the IRA (intent ranking) and NSA (narrative synthesis) |
 | `JWT_JWKS_URI` | JWKS endpoint for JWT public key retrieval |
 | `JWT_AUDIENCE` | Expected JWT audience claim |
@@ -1969,16 +2018,16 @@ Configuration is read from environment variables at startup. Required variables:
 | `PAS_SIGNING_KEY_ID` | Published key identifier included in artifact signature blocks (verification and rotation) |
 
 
-## 3.4 Infrastructure
+## Infrastructure
 
-Kubernetes runs the Python application services. Starburst executes federated queries, PostgreSQL stores policies and indexes, Redis stores cached results and concurrency state, and S3-compatible storage stores lineage and knowledge documents. Vault or the selected cloud secrets service supplies credentials to these components.
+Kubernetes runs the reference build as a small number of deployment units. The `analytics-mcp` pod contains the Python modular monolith and its Calcite planner sidecar. The separately deployed Admin API cannot execute analytical requests. Starburst executes federated queries, PostgreSQL stores policies and indexes, Redis stores cached results and concurrency state, and S3-compatible storage stores lineage and knowledge documents. Vault or the selected cloud secrets service supplies credentials to these components.
 
 | Component | Choice | Rationale |
 |-----------|--------|-----------|
-| MCP service | Python · FastMCP + Uvicorn | Lightweight ASGI MCP surface; deploys as Kubernetes pod |
-| Governance services | Kubernetes (cloud-agnostic) | IRA, RAPL, SVL, SCL, PQP, DVL, NSA as independently scalable pods |
+| Governed application | Python, FastMCP, and Uvicorn in `analytics-mcp` | MCP, IRA and NSA adapters, RAPL, SVL, SCL, PQP client, DVL, ALS coordination, PAS, and cache coordination run as modules in one application process. |
+| Planner adapter | Apache Calcite JVM sidecar in the `analytics-mcp` pod | Exposes the versioned planning contract only on loopback; has no source credentials and cannot execute queries. |
 | Federated Query Engine | Starburst (Trino) — Enterprise or Galaxy | Coordinator + workers; one catalog per registered source; performs all cross-source federation |
-| Primary database | PostgreSQL (Neon or RDS) | Lineage search index, scheduled queries, user preferences, saved queries; also hosts the DES `role_policies` schema under separate credentials |
+| Primary database | PostgreSQL (managed service) | Hosts the ALS search index and the DES `role_policies` schema under separate schemas, credentials, migration histories, and access paths. |
 | Data Context Store (DCS) | Pre-existing platform component | SMR metric definitions, controls config, SMR search — reuses SDR versioned storage and native search |
 | Knowledge Store | S3-compatible object store (versioned Markdown) | MCP resource content — guides, skills definitions, compliance reference |
 | Object storage | S3-compatible | Lineage records (one JSON document per query), result artifacts, large cached result sets |
@@ -1986,21 +2035,23 @@ Kubernetes runs the Python application services. Starburst executes federated qu
 
 ### Kubernetes Deployment Summary
 
-| Service | Container | Port | Min replicas | CPU request | Memory request | HPA trigger |
-|---------|-----------|------|-------------|-------------|----------------|-------------|
-| Analytics MCP | `analytics-mcp` | 8000 | 2 | 500m | 512Mi | CPU > 60% |
-| vega2img (optional) | `vega2img` | 8001 | 1 | 1000m | 1Gi | CPU > 70% |
-| Admin API | `analytics-admin` | 9000 | 1 | 250m | 256Mi | — |
-| Starburst (FQE) | Coordinator + workers (managed or self-hosted) | 8080 | — | — | — | — |
-| PostgreSQL | Managed (Neon / RDS) | 5432 | — | — | — | — |
-| Redis | Managed (ElastiCache / Upstash) | 6379 | — | — | — | — |
-| Object storage | S3-compatible | — | — | — | — | — |
+The following values are bootstrap assumptions for an evaluation environment, not production sizing recommendations or service-level commitments. The evaluation establishes measured resource baselines and scaling thresholds before a pilot decision.
+
+| Deployment Unit | Containers or Service | Network Surface | Evaluation Starting Point |
+|---|---|---|---|
+| Governed application pod | `analytics-mcp` plus `calcite-planner` sidecar | MCP on port 8000; planner available only on pod loopback | Two replicas to exercise shared concurrency and cache behavior; resource requests established by an initial load baseline. |
+| Admin API | `analytics-admin` | Authenticated administrative API on port 9000 | One replica; no route to analytical execution or DES writes. |
+| Optional rendering | `vega2img` | Separate MCP service on port 8001 | Excluded from the minimum build; add only for image-output evaluation. |
+| Federated Query Engine | Managed or self-hosted Starburst or compatible Trino distribution | Private coordinator endpoint | Sized for the selected two-source workload and configured with query cancellation and resource limits. |
+| Persistence | Managed PostgreSQL, Redis, and S3-compatible object storage | Private service endpoints | Separate credentials and network policies; backup, restore, retention, and reconciliation tested before formal evaluation. |
 
 Each service exposes a minimal unauthenticated liveness endpoint that returns only `{"status": "ok"}`. A separate authenticated readiness endpoint reports dependency state to authorized operators; it does not expose catalog names or infrastructure topology to ordinary consumers.
 
-All platform services run in a dedicated Kubernetes namespace (`analytics`). Starburst catalog credentials and API keys are injected via Kubernetes Secrets mounted as environment variables — never baked into container images.
+All platform services run in a dedicated Kubernetes namespace (`analytics`). Workload identity is preferred for cloud services. Credentials that cannot use workload identity are delivered through a managed secrets provider and mounted as files or short-lived runtime material; they are never baked into container images. The PAS signing key should be non-exportable through KMS or HSM for a high-assurance evaluation. A file-mounted key is permitted only as an explicitly documented reference-build simplification.
 
 ### Financial Services Reference Model
+
+The reference model below is extended sample content rather than minimum-build scope. Formal evaluation needs only the definitions required by the three operations in the Reference Build Profile. The remaining domain bundles demonstrate how the catalog can expand after the build proves the core contracts.
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
@@ -2588,7 +2639,7 @@ Three optional ecosystem services extend the platform for financial services dep
 **Benchmark Data Service** — a runtime execution backend serving the `benchmarks` data affinity: equity, fixed income, multi-asset, and factor indices, plus administrator-configured custom benchmark blends (component identifiers and weights, registered via the service's Admin API). The service operates under data licensing agreements with index providers and enforces per-index licensing entitlement checks; blended benchmarks are subject to the same enforcement as their component indices.
 
 
-## 3.5 Evaluation Plan and Decision Gates
+## Evaluation Plan and Decision Gates
 
 The reference implementation should be evaluated as a bounded architectural proposition, not treated as a production platform merely because its components can be deployed. The evaluation determines whether governed semantic execution produces sufficiently accurate, traceable, repeatable, and access-controlled results for named workloads, and whether its additional governance effort is justified when compared with the organization's current analytical process and a controlled Text-to-SQL implementation.
 

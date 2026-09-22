@@ -77,7 +77,7 @@ The exploratory output must not silently acquire governed status. Promotion occu
 
 ## Evaluation Implication
 
-The architectural proposition should be tested rather than accepted from diagrams alone. The [evaluation plan in Section 3.5](./03-technical-implementation.md#35-evaluation-plan-and-decision-gates) compares the governed approach with the organization's current process and a controlled Text-to-SQL implementation using the same questions, source state, permissions, and reference answers.
+The architectural proposition should be tested rather than accepted from diagrams alone. The [evaluation plan in Appendix B](./appendix-b-reference-implementation.md#evaluation-plan-and-decision-gates) compares the governed approach with the organization's current process and a controlled Text-to-SQL implementation using the same questions, source state, permissions, and reference answers.
 
 That comparison should measure correctness, unsupported-question handling, repeatability, traceability effort, latency, cost, authoring effort, and failure behavior. The objective is not to prove that one technique wins every category. It is to determine whether governed semantic execution provides sufficient control for the workloads that require it and whether Text-to-SQL remains useful within a clearly bounded exploratory role.
 

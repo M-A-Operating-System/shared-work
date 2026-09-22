@@ -193,9 +193,9 @@ Possible future extensions include scheduled monitoring, alerts, saved queries, 
 | Supporting Section | What It Adds |
 |---|---|
 | [2. Proposed Architecture and Capabilities](./02-core-capabilities.md) | Defines roles, component responsibilities, interfaces, and controls. |
-| [3. Illustrative Reference Implementation and Evaluation Plan](./03-technical-implementation.md) | Maps the capabilities to a proposed technology stack and defines the evaluation evidence and decision gates. |
-| [4. Glossary](./04-glossary.md) | Defines the named components and technical terms. |
+| [3. Glossary](./03-glossary.md) | Defines the named components and technical terms. |
 | [Appendix A. Text-to-SQL](./appendix-a-text-to-sql.md) | Defines the boundary between controlled exploration and governed execution. |
+| [Appendix B. Illustrative Reference Implementation and Evaluation Plan](./appendix-b-reference-implementation.md) | Applies the logical design to one proposed technology stack and defines how that implementation should be evaluated. |
 
 ## The Executive Decision
 
