@@ -123,7 +123,7 @@ flowchart LR
 
 In the platform approach, every request routes through the API layer, traverses the invariant controls sequence, and produces an audit record. No path to execution backends, physical schemas, or raw data exists outside that pipeline.
 
-The [Text-to-SQL appendix](./04-text-to-sql-antipattern.md) provides the detailed rationale for this position, including governance, reproducibility, security, and maintenance risks.
+The [Text-to-SQL appendix](./appendix-a-text-to-sql.md) explains the appropriate role of Text-to-SQL and the boundary between controlled exploration and governed execution.
 
 Text-to-SQL remains useful alongside the platform for controlled exploration and discovering new analytical needs. A shared conversational interface can support both paths, provided users can distinguish exploratory output from governed results. Useful exploratory calculations can become candidates for review and registration. AI may help draft those definitions; accountable people approve them before governed use.
 
@@ -194,8 +194,8 @@ Possible future extensions include scheduled monitoring, alerts, saved queries, 
 |---|---|
 | [2. Proposed Architecture and Capabilities](./02-core-capabilities.md) | Defines roles, component responsibilities, interfaces, and controls. |
 | [3. Illustrative Reference Implementation and Evaluation Plan](./03-technical-implementation.md) | Maps the capabilities to a proposed technology stack and defines the evaluation evidence and decision gates. |
-| [4. Text-to-SQL Appendix](./04-text-to-sql-antipattern.md) | Examines why Text-to-SQL alone is insufficient for sustained governed analytics. |
-| [5. Glossary](./05-glossary.md) | Defines the named components and technical terms. |
+| [4. Glossary](./04-glossary.md) | Defines the named components and technical terms. |
+| [Appendix A. Text-to-SQL](./appendix-a-text-to-sql.md) | Defines the boundary between controlled exploration and governed execution. |
 
 ## The Executive Decision
 

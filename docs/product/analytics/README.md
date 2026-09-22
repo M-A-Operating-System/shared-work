@@ -29,8 +29,8 @@ Text-to-SQL can continue to support controlled exploration and discovery. The pr
 | [1. Executive Overview](./01-overview.md) | Explains the complete proposal, its contrast with Text-to-SQL, business uses, operating responsibilities, and the decision to evaluate it. |
 | [2. Proposed Architecture and Capabilities](./02-core-capabilities.md) | Defines the proposed responsibilities, interfaces, and controls that support governed execution. |
 | [3. Illustrative Reference Implementation and Evaluation Plan](./03-technical-implementation.md) | Maps capabilities to technology products, explains their illustrative implementation, and defines the evaluation evidence and decision gates. |
-| [4. Text-to-SQL Appendix](./04-text-to-sql-antipattern.md) | Examines the limitations of Text-to-SQL as a long-term foundation and its continuing role in exploration. |
-| [5. Glossary](./05-glossary.md) | Defines the architecture's named components and technical terms. |
+| [4. Glossary](./04-glossary.md) | Defines the architecture's named components and technical terms. |
+| [Appendix A. Text-to-SQL](./appendix-a-text-to-sql.md) | Defines the boundary between controlled exploration and governed execution. |
 
 ## Scope and Reading Guide
 
