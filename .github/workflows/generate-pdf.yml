@@ -268,7 +268,6 @@ jobs:
         env:
           NOFRONT: ${{ inputs.nofront }}
         run: |
-          shopt -s nullglob
           NOFRONT_FLAG=""
           [ "$NOFRONT" = "true" ] && NOFRONT_FLAG="--nofront"
           python generate_pdf.py ${NOFRONT_FLAG:+"$NOFRONT_FLAG"}
@@ -279,7 +278,9 @@ jobs:
           git add docs/product/assistant/assistant_product_design.pdf
           git add docs/product/knowledge/knowledge_product_design.pdf
           git add docs/product/internet/internet_product_design.pdf
-          git add docs/data-models/*.pdf
+          while IFS= read -r -d '' pdf; do
+            git add -- "$pdf"
+          done < <(find docs/data-models -type f -name '*.pdf' -print0)
           git diff --cached --quiet || git commit -m "docs: regenerate all product PDFs [skip ci]"
 
       - name: Push
