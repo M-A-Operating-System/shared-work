@@ -6,11 +6,12 @@ on:
       - master
     paths:
       - 'docs/product/**'
+      - 'docs/data-models/**'
       - 'generate_pdf.py'
   workflow_dispatch:
     inputs:
       product:
-        description: 'Product to generate (analytics, assistant, knowledge). Leave blank to regenerate all products.'
+        description: 'Product to generate (analytics, assistant, knowledge, internet). Leave blank to regenerate all products.'
         required: false
         type: choice
         options:
@@ -19,6 +20,11 @@ on:
           - assistant
           - knowledge
           - internet
+        default: ''
+      document:
+        description: 'Single Markdown document to generate, relative to the repository root (docs/product/... or docs/data-models/).'
+        required: false
+        type: string
         default: ''
       pages:
         description: 'Space-separated chapter prefixes for a subset PDF, e.g. "02 04 08". Requires a product selection above. Leave blank for the full product.'
@@ -54,6 +60,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:
@@ -83,8 +90,6 @@ jobs:
             ~/.npm-global
             ~/.cache/puppeteer
           key: npm-mmdc-11.4.2-chrome-131.0.6778.204-${{ runner.os }}
-          restore-keys: |
-            npm-mmdc-11.4.2-chrome-${{ runner.os }}
 
       - name: Configure npm global prefix
         run: |
@@ -116,18 +121,27 @@ jobs:
           INPUT_PAGES: ${{ inputs.pages }}
           INPUT_PRODUCT: ${{ inputs.product }}
           INPUT_OUT: ${{ inputs.out }}
+          INPUT_DOCUMENT: ${{ inputs.document }}
         run: |
+          if [ -n "$INPUT_DOCUMENT" ] && { [ -n "$INPUT_PRODUCT" ] || [ -n "$INPUT_PAGES" ] || [ -n "$INPUT_OUT" ]; }; then
+            echo "Error: 'document' cannot be combined with product, pages, or out."
+            exit 1
+          fi
+          if [ -n "$INPUT_DOCUMENT" ]; then
+            case "$INPUT_DOCUMENT" in
+              docs/product/*.md|docs/data-models/*) ;;
+              *) echo "Error: 'document' must be a Markdown file under docs/product/ or docs/data-models/."; exit 1 ;;
+            esac
+          fi
           # pages requires a product
           if [ -n "$INPUT_PAGES" ] && [ -z "$INPUT_PRODUCT" ]; then
             echo "Error: 'pages' requires a product to be selected."
             exit 1
           fi
-          # out requires pages
           if [ -n "$INPUT_OUT" ] && [ -z "$INPUT_PAGES" ]; then
             echo "Error: 'out' is only valid when 'pages' is also specified."
             exit 1
           fi
-          # each page prefix must be exactly two digits
           if [ -n "$INPUT_PAGES" ]; then
             for prefix in $INPUT_PAGES; do
               if ! echo "$prefix" | grep -qE '^[0-9]{2}$'; then
@@ -136,6 +150,19 @@ jobs:
               fi
             done
           fi
+
+      # ── Single-document mode (product or data-model document) ───────────────
+      - name: Generate single document
+        if: github.event_name == 'workflow_dispatch' && inputs.document != ''
+        env:
+          INPUT_DOCUMENT: ${{ inputs.document }}
+          NOFRONT: ${{ inputs.nofront }}
+        run: |
+          NOFRONT_FLAG=""
+          [ "$NOFRONT" = "true" ] && NOFRONT_FLAG="--nofront"
+          python generate_pdf.py --page "$INPUT_DOCUMENT" ${NOFRONT_FLAG:+'--nofront'}
+          git add -- "${INPUT_DOCUMENT%.md}.pdf"
+          git diff --cached --quiet || git commit -m "docs: generate ${INPUT_DOCUMENT%.md}.pdf [skip ci]"
 
       # ── Pages-subset mode (product + pages specified) ────────────────────────
       - name: Generate pages-subset PDF
@@ -174,18 +201,85 @@ jobs:
           git diff --cached --quiet || git commit -m "docs($INPUT_PRODUCT): regenerate PDF [skip ci]"
 
       # ── All-products mode (push trigger, or dispatch with no product/pages) ───
+      - name: Generate changed documents
+        if: github.event_name == 'push'
+        env:
+          BEFORE: ${{ github.event.before }}
+          SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          declare -A products=()
+          data_models=()
+          generate_all=false
+
+          if [ "$BEFORE" = "0000000000000000000000000000000000000000" ]; then
+            changed_paths=$(git ls-tree -r --name-only "$SHA")
+          else
+            changed_paths=$(git diff --name-only "$BEFORE" "$SHA")
+          fi
+
+          while IFS= read -r path; do
+            case "$path" in
+              generate_pdf.py)
+                generate_all=true
+                ;;
+              docs/product/about.md)
+                generate_all=true
+                ;;
+              docs/product/analytics/*.md|docs/product/assistant/*.md|docs/product/knowledge/*.md|docs/product/internet/*.md)
+                product="${path#docs/product/}"
+                product="${product%%/*}"
+                products["$product"]=1
+                ;;
+              docs/data-models/*)
+                data_models+=("$path")
+                ;;
+            esac
+          done <<< "$changed_paths"
+
+          if [ "$generate_all" = true ]; then
+            for product in analytics assistant knowledge internet; do
+              python generate_pdf.py --product "$product"
+              git add -- "docs/product/$product/${product}_product_design.pdf"
+            done
+            while IFS= read -r -d '' path; do
+              python generate_pdf.py --page "$path"
+              git add -- "${path%.md}.pdf"
+            done < <(find docs/data-models -type f -name '*.md' -print0)
+          else
+            for product in "${!products[@]}"; do
+              python generate_pdf.py --product "$product"
+              git add -- "docs/product/$product/${product}_product_design.pdf"
+            done
+            for path in "${data_models[@]}"; do
+              if [ -f "$path" ]; then
+                python generate_pdf.py --page "$path"
+                git add -- "${path%.md}.pdf"
+              else
+                git rm -f --ignore-unmatch -- "${path%.md}.pdf"
+              fi
+            done
+          fi
+
+          git diff --cached --quiet || git commit -m "docs: regenerate changed PDFs [skip ci]"
+
       - name: Generate all PDFs
-        if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.product == '' && inputs.pages == '')
+        if: github.event_name == 'workflow_dispatch' && inputs.document == '' && inputs.product == '' && inputs.pages == ''
         env:
           NOFRONT: ${{ inputs.nofront }}
         run: |
+          shopt -s nullglob
           NOFRONT_FLAG=""
           [ "$NOFRONT" = "true" ] && NOFRONT_FLAG="--nofront"
           python generate_pdf.py ${NOFRONT_FLAG:+"$NOFRONT_FLAG"}
+          while IFS= read -r -d '' path; do
+            python generate_pdf.py --page "$path" ${NOFRONT_FLAG:+"$NOFRONT_FLAG"}
+          done < <(find docs/data-models -type f -name '*.md' -print0)
           git add docs/product/analytics/analytics_product_design.pdf
           git add docs/product/assistant/assistant_product_design.pdf
           git add docs/product/knowledge/knowledge_product_design.pdf
           git add docs/product/internet/internet_product_design.pdf
+          git add docs/data-models/*.pdf
           git diff --cached --quiet || git commit -m "docs: regenerate all product PDFs [skip ci]"
 
       - name: Push

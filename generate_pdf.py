@@ -18,6 +18,7 @@ Usage:
                                                         → merged PDF written to subset.pdf
 
     --product   Select a single product by name.  Omit to generate all products.
+    --page      Generate one Markdown document from docs/product/ or docs/data-models/.
     --pages     Space-separated two-digit chapter prefixes to include (requires --product).
                 Chapters are included in the order listed on the command line.
     --out       Output filename for --pages mode.  When omitted: a single chapter
@@ -59,7 +60,13 @@ from pathlib import Path
 # ---------- product registry ----------
 
 PRODUCTS_DIR = Path(__file__).parent / "docs" / "product"
+DATA_MODELS_DIR = Path(__file__).parent / "docs" / "data-models"
 _REPO_ROOT   = Path(__file__).parent
+
+DATA_MODEL_CONFIG = {
+    "meta": "Data Design Document",
+    "author": "Andrew Bush (www.maoperatingsystem.com/bio-andrew-bush)",
+}
 
 PRODUCTS = {
     "assistant": {
@@ -143,11 +150,11 @@ def _png_size(path: Path) -> tuple[int, int]:
     return w, h
 
 
-# Content area for US Letter after margins (22mm top, 26mm bottom, 24mm each side):
-#   width  = 215.9mm − 48mm  = 167.9mm  → use 160mm to leave breathing room
-#   height = 279.4mm − 48mm  = 231.4mm  → cap diagrams at 180mm so they sit with text
-_MAX_DIAGRAM_W_MM = 160.0
-_MAX_DIAGRAM_H_MM = 180.0
+# Content area for US Letter after margins (18mm top, 18mm bottom, 15mm each side):
+#   width  = 215.9mm − 30mm = 185.9mm  → use 178mm to leave breathing room
+#   height = 279.4mm − 36mm = 243.4mm  → cap diagrams at 190mm so they sit with text
+_MAX_DIAGRAM_W_MM = 178.0
+_MAX_DIAGRAM_H_MM = 190.0
 
 
 def _diagram_display_size(px_w: int, px_h: int) -> tuple[float, float]:
@@ -402,7 +409,7 @@ def build_html(files: list[Path], title: str, meta: str,
 CSS = """
 @page {
     size: letter;
-    margin: 22mm 24mm 26mm 24mm;
+    margin: 18mm 15mm;
     @bottom-right {
         content: counter(page);
         font-family: system-ui, sans-serif;
@@ -484,6 +491,7 @@ h2 {
     font-weight: 700;
     color: #1e3a6e;
     margin: 8mm 0 2mm;
+    page-break-before: always;
     bookmark-level: 2;
     bookmark-label: content();
 }
@@ -508,6 +516,7 @@ p { margin: 0 0 3mm; }
 /* Tables */
 table {
     width: 100%;
+    table-layout: fixed;
     border-collapse: collapse;
     margin: 4mm 0;
     font-size: 8.5pt;
@@ -524,6 +533,8 @@ td {
     padding: 3.5pt 7pt;
     border: 1px solid #e5e7eb;
     vertical-align: top;
+    overflow-wrap: anywhere;
+    word-break: break-word;
 }
 tr:nth-child(even) td { background-color: #f9fafb; }
 
@@ -706,9 +717,10 @@ def _resolve_page_path(file_path: Path) -> Path:
     if file_path.is_file() and not file_path.is_symlink():
         return file_path.resolve()
 
-    # Search all product directories for a file with this name
+    # Search all supported document directories for a file with this name
     candidates = sorted(
-        f for f in PRODUCTS_DIR.rglob(file_path.name)
+        f for root in (PRODUCTS_DIR, DATA_MODELS_DIR)
+        for f in root.rglob(file_path.name)
         if f.is_file() and not f.is_symlink()
     )
     if len(candidates) == 1:
@@ -720,9 +732,10 @@ def _resolve_page_path(file_path: Path) -> Path:
         for c in candidates:
             print(f"    {c.relative_to(_REPO_ROOT)}")
         sys.exit(1)
-    print(f"  [error] '{file_path.name}' not found in any product directory.")
+    print(f"  [error] '{file_path.name}' not found in a supported document directory.")
     print(f"          Provide the path relative to the repo root,")
     print(f"          e.g.: docs/product/analytics/07-text-to-sql-antipattern.md")
+    print(f"                 docs/data-models/cpg-manufacturing-data-design-document.md")
     sys.exit(1)
 
 
@@ -748,8 +761,15 @@ def generate_page(file_path: Path, nofront: bool = False) -> None:
             config = cfg
             break
 
+    try:
+        file_path.relative_to(DATA_MODELS_DIR.resolve())
+    except ValueError:
+        pass
+    else:
+        config = DATA_MODEL_CONFIG
+
     if config is None:
-        print(f"  [error] {file_path}: not inside a known product directory")
+        print(f"  [error] {file_path}: not inside a supported document directory")
         sys.exit(1)
 
     raw = file_path.read_text(encoding="utf-8")
@@ -791,7 +811,10 @@ def generate_pages(product_name: str, page_prefixes: list[str],
     files: list[Path] = []
     missing: list[str] = []
     for prefix in page_prefixes:
-        matches = sorted(docs_dir.glob(f"{prefix}-*.md"))
+        matches = sorted(
+            list(docs_dir.glob(f"{prefix}-*.md"))
+            + list(docs_dir.glob(f"{prefix}_*.md"))
+        )
         matches = [m for m in matches if "-ignore" not in m.stem and m.name not in EXCLUDE]
         if not matches:
             missing.append(prefix)
@@ -812,7 +835,14 @@ def generate_pages(product_name: str, page_prefixes: list[str],
         sys.exit(1)
 
     if out_name:
+        if (Path(out_name).is_absolute() or "/" in out_name or "\\" in out_name
+                or Path(out_name).suffix.lower() != ".pdf"):
+            print("  [error] --out must be a filename ending in .pdf")
+            sys.exit(1)
         output = docs_dir / out_name
+        if output.is_symlink():
+            print(f"  [error] output path is a symlink: {output.name}")
+            sys.exit(1)
     elif len(page_prefixes) == 1:
         output = files[0].with_suffix('.pdf')
     else:

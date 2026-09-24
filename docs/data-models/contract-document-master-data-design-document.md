@@ -2,6 +2,74 @@
 
 This document presents the business scope and logical data model for third-party IT, cloud and SaaS contracts. It moves from the business problem to the objects, domains and concepts needed to manage contract data, then provides the full data dictionary.
 
+## M&A Operating System — AI & Data Advisory Practice
+
+**M&A Operating System (MAOS) helps organizations turn data into measurable business outcomes.**
+
+Our **AI & Data Advisory Practice** works with senior business, data, analytics, and technology leaders to improve how their organizations use information to grow revenue, understand customers, make better decisions, reduce operating cost, manage risk, and enable analytics and AI.
+
+Most organizations do not lack data. They struggle to turn the data they already have into information the business can consistently trust and use. Customer information is fragmented, reports disagree, data is repeatedly copied and transformed, and business definitions vary across teams. Analytics and AI initiatives then inherit the same problems.
+
+We start with the business outcome and work backwards to the information, architecture, governance, operating model, and technology changes required to achieve it. That may mean improving customer identity to support segmentation and personalization, creating more reliable management information, simplifying complex data flows, or establishing the trusted business context required for AI.
+
+Our work typically includes:
+
+- Improving customer identity, segmentation, personalization, and revenue-growth capabilities
+- Solving complex data management and data content design issues for Legal Entity, Beneficial Owner, People, Securities, Product Definition and transactional data
+- Creating more consistent, timely, and trusted information for reporting, analytics, forecasting, and decision-making
+- Designing and maintaining business-aligned data models for operational, analytical, and AI needs
+- Resolving data quality, reliability, and performance issues caused by complex data flows, fragmented connectivity, duplication, and uncontrolled data propagation
+- Establishing trusted views of customers, legal entities, products, accounts, agreements, and other critical business subjects
+- Simplifying data architectures and reducing unnecessary movement, duplication, and technology complexity
+- Establishing practical data governance, ownership, and AI readiness aligned to business priorities
+
+Our goal is not simply to modernize data technology. It is to make information work better for the business.
+
+**The value of a data program should ultimately be measured by what the business can do better because of it.**
+
+### Find Out More
+
+To learn more about how M&A Operating System can help your organization turn data into measurable business outcomes, visit [maoperatingsystem.com](https://www.maoperatingsystem.com).
+
+For a direct conversation about your data, analytics, or AI priorities, contact [cdao-advisory@maoperatingsystem.com](mailto:cdao-advisory@maoperatingsystem.com).
+
+## About the M&A Operating System Practical Data Modelling Approach
+
+The **M&A Operating System Practical Data Modelling Approach** is our proprietary, business-led methodology for translating business outcomes and challenges into data requirements and approved logical data models.
+
+We engage business stakeholders and data-consuming groups to understand what they expect data services to make possible. Their needs are captured as plain-English business requirements, then translated through a controlled, traceable sequence of analysis and design activities. The methodology deliberately avoids overly technical terminology and modelling techniques, presenting the information in a business-readable, plain-English form. The resulting data modelling document follows the same sequence, allowing business stakeholders and data practitioners to understand, challenge, and approve the design.
+
+## The Five-Step Process
+
+### Step 1 — Gather and Approve Business Requirements
+
+We identify the outcomes stakeholders expect, the challenges they need to solve, and the business activities that data services must support. These are documented as plain-English requirements and approved as the scope and source of knowledge for the design.
+
+### Step 2 — Identify Actors, Objects, and Roles
+
+Using **Subject-Based Data Modelling**, we identify the actors, roles, and objects in the business lifecycle and map them to domains representing the immutable subjects of the data. Domains describe the enduring people, organizations, things, places, and other subjects the business needs to understand—not the specific reason they appear in a single process.
+
+Actors and objects are aligned to their underlying mastered subjects. Roles describe the capacity in which a subject participates in a relationship, process, or context. The same subject can perform several roles without being modelled repeatedly.
+
+### Step 3 — Identify Relationships
+
+We identify the relationships between actors and objects and express them as clear business verbs—such as owns, manages, supplies, purchases, or is party to. This makes their meaning understandable and reviewable by business and data stakeholders.
+
+### Step 4 — Identify Lifecycle Events
+
+We identify the events that actors, roles, and objects pass through as they live their natural lives and interact within business processes. These events include when an object is created, changed, activated, transferred, or retired; a subject assumes or ceases a role; or a relationship is established, modified, or ended. This determines what data must be captured at each stage.
+
+### Step 5 — Design Logical Data Models
+
+The approved requirements, subjects, roles, relationships, and lifecycle events form the logical data model, documented through four connected components:
+
+- **Data Domains** — governed groupings representing the immutable subjects of the data
+- **Data Concepts** — the unique logical elements that make up the data known and recorded about each subject
+- **Data Relationships** — the business connections between concepts, including the roles they perform
+- **Data Attributes** — the individual data elements that describe each concept or relationship
+
+Each component remains traceable to the requirement that established its need. The completed document provides the shared record business stakeholders and data practitioners use to review and approve the data requirements and model design.
+
 ## 1 Business Scope
 
 A buyer organisation acquires IT, cloud and SaaS services from third-party providers under written agreements, and must know at any date what each executed agreement obliges, permits, costs and protects, and be able to show the words in the signed original that say so.
@@ -60,7 +128,7 @@ The discovery package contains 41 sourced business requirements. The table below
 
 ## 2 Object Model
 
-The object model separates the commercial arrangement from the instruments and files that evidence it. Collections organize the arrangement. Documents represent independently identifiable instruments. Versions represent substantive states or editions of a Document. Files represent stored renditions of a Version.
+The object model separates the commercial arrangement from the instruments and files that evidence it. Collections organize the arrangement. Documents represent independently identifiable instruments. A Document Version is subordinate to exactly one Document and represents a substantive state or edition of that Document; it is not a separate legal instrument. Files represent stored renditions of a Version.
 
 | Object | Business meaning | Examples |
 |---|---|---|
@@ -84,8 +152,25 @@ flowchart LR
   T -->|evidenced by| CI[Citation]
   C -->|covers| S[Contracted Service]
   LE[Legal Entity] -->|participates in| C
-  LE -->|provides or consumes| S
+  LE -->|provides| S
+  LE -->|consumes| S
   P[Person] -->|signs| V
+```
+
+### Attribute consolidation and roll-up
+
+Business attributes may be recorded at Collection, Document or Document Version level. The value made available at a parent level is a logical consolidation and overlay of the applicable values held at that level and at the levels beneath it. A Collection can therefore present a consolidated view of its member Documents and their Versions, while a Document can present the applicable view across its Versions.
+
+Roll-up does not move, duplicate or overwrite the source facts. Every consolidated value must remain traceable to the Collection, Document or Version at which it was recorded. The consolidation, precedence, conflict-resolution and aggregation rules must be defined by document type because different instruments treat dates, parties, monetary terms, obligations and status differently. Where no valid rule exists, the model must preserve the distinct source values rather than manufacture a single answer.
+
+```mermaid
+flowchart LR
+  V[Document Version] -->|version of| D[Document]
+  D -->|member of| C[Collection]
+  V -.-> VC([Consolidate and overlay Version attributes])
+  VC -.->|document-type rules| D
+  D -.-> DC([Aggregate and consolidate Document attributes])
+  DC -.->|document-type rules| C
 ```
 
 ## 3 Domain Model
@@ -131,7 +216,7 @@ flowchart LR
 
 ## 4 Concept Model
 
-The Documents domain contains the concepts needed to describe documentary evidence, lifecycle, commercial terms, services, risk allocation, data protection and continuing obligations. Document Versions sit between Document and Document Files, while recursive Document composition supports Collections containing Documents and subordinate Collections.
+The Documents domain contains the concepts needed to describe documentary evidence, lifecycle, commercial terms, services, risk allocation, data protection and continuing obligations. Document Versions are subordinate to Documents and sit between Document and Document Files. Recursive Document composition supports Collections containing Documents and subordinate Collections. The LegalEntities domain adds supplier profile, corporate relationship, governance, risk, performance, financial, compliance, intelligence, strategy, action and QBR concepts derived from the supplier profile template. Contract-specific dates, values, renewal terms and service levels remain in the Documents domain and can be consolidated into supplier views without being duplicated. Portfolio annual spend, contract expiry and heatmap zone are logical views derived from the underlying contract, assessment and health data. Attributes recorded at Version, Document and Collection level participate in the governed logical roll-up described in the Object Model.
 
 ```mermaid
 flowchart TD
@@ -161,6 +246,18 @@ flowchart TD
   D --> OBL[Obligations]
   D --> CHG[Change Notice Rules]
   D --> DIS[Dispute Terms]
+  LE[Legal Entity] --> SP[Supplier Profile]
+  LE --> SS[Supplier Stakeholders]
+  LE --> SV[Supplier Services]
+  LE --> SR[Supplier Risk Assessments]
+  LE --> PF[Supplier Performance Assessments]
+  LE --> SF[Supplier Financial Assessments]
+  LE --> SC[Supplier Compliance Assessments]
+  LE --> SI[Supplier Intelligence]
+  LE --> ST[Supplier Strategic Assessments]
+  LE --> SA[Supplier Actions]
+  LE --> QBR[Supplier QBR Metrics]
+  LE --> CORP[Supplier Corporate Relationships]
 ```
 
 ### Concepts
@@ -191,225 +288,310 @@ flowchart TD
 | SBJ030 | DocumentObligations | Document | ONE_TO_MANY_OPTIONAL | A continuing commitment the document imposes: an obligation, a right or a prohibition binding one side. |
 | SBJ031 | DocumentChangeNoticeRules | Document | ONE_TO_MANY_OPTIONAL | The notice the provider must give, and the customer's right, for one kind of change to online terms or services. |
 | SBJ032 | DocumentDisputeTerms | Document | ONE_TO_ONE_OPTIONAL | Governing law and dispute resolution terms of the document. |
+| SBJ034 | LegalEntitySupplierProfile | LegalEntity | ONE_TO_ONE_OPTIONAL | The core supplier profile for a Legal Entity that acts as a supplier. |
+| SBJ035 | LegalEntitySupplierStakeholders | LegalEntity | ONE_TO_MANY_OPTIONAL | People assigned business, vendor-management, procurement, contract or executive-sponsor responsibilities for the supplier. |
+| SBJ036 | LegalEntitySupplierServices | LegalEntity | ONE_TO_MANY_OPTIONAL | Products, services, supported capabilities, integrations and data exchanges associated with the supplier. |
+| SBJ037 | LegalEntitySupplierRiskAssessments | LegalEntity | ONE_TO_MANY_OPTIONAL | Dated assessments of supplier criticality, inherent risk, residual risk and fourth-party dependency. |
+| SBJ038 | LegalEntitySupplierPerformanceAssessments | LegalEntity | ONE_TO_MANY_OPTIONAL | Dated supplier-level performance and health results consolidated from services and contracts. |
+| SBJ039 | LegalEntitySupplierFinancialAssessments | LegalEntity | ONE_TO_MANY_OPTIONAL | Dated observations of supplier financial condition and financial risk. |
+| SBJ040 | LegalEntitySupplierComplianceAssessments | LegalEntity | ONE_TO_MANY_OPTIONAL | Dated supplier-level security, resilience, insurance and privacy assurance results. |
+| SBJ041 | LegalEntitySupplierIntelligence | LegalEntity | ONE_TO_MANY_OPTIONAL | Dated market, corporate, leadership, industry and regulatory intelligence concerning the supplier. |
+| SBJ042 | LegalEntitySupplierStrategicAssessments | LegalEntity | ONE_TO_MANY_OPTIONAL | Dated assessments of strategic importance, switching complexity, innovation contribution and recommended treatment. |
+| SBJ043 | LegalEntitySupplierActions | LegalEntity | ONE_TO_MANY_OPTIONAL | Risks, issues, renewal actions and executive escalations requiring tracking for the supplier. |
+| SBJ044 | LegalEntitySupplierQBRMetrics | LegalEntity | ONE_TO_MANY_OPTIONAL | Supplier review metrics, targets, actual results, weights, scores, ownership and commentary for a review period. |
+| SBJ045 | LegalEntitySupplierCorporateRelationships | LegalEntity | ONE_TO_MANY_OPTIONAL | Corporate relationships between the supplier and other Legal Entities, including its parent company. |
 
 ## 5 Data Dictionary
 
 All attributes are listed once under their final owning concept or relationship.
 
-| Concept or relationship | Owner type | Attribute ID | Attribute | Data type | Lookup | Nature | Definition |
-|---|---|---|---|---|---|---|---|
-| Document | Concept | ATR207 | DocumentCollectionPurpose | LOOKUP | DocumentCollectionPurposes | observed | Purpose of a Collection, such as provider relationship, agreement, framework, order, statement of work or assurance pack. |
-| Document | Concept | ATR002 | DocumentDescription | LONGTEXT |  | observed | A short statement of what the document covers. |
-| Document | Concept | ATR007 | DocumentExpirationDate | DATE |  | observed | The date on which the document's initial or current stated term ends, if not perpetual. |
-| Document | Concept | ATR008 | DocumentIsPerpetual | BOOLEAN |  | observed | True when the document has no fixed end date (CUAD answer 'Perpetual'). |
-| Document | Concept | ATR009 | DocumentLanguage | LOOKUP | DLT000000082 | observed | The language of the executed text. |
-| Document | Concept | ATR010 | DocumentPageCount | INTEGER |  | observed | Number of pages in the executed original. |
-| Document | Concept | ATR206 | DocumentRepresentationType | LOOKUP | DocumentRepresentationTypes | observed | Whether the Document represents a governed Collection or one Individual instrument. |
-| Document | Concept | ATR016 | DocumentReviewDate | DATE |  | observed | The date the review status was reached. |
-| Document | Concept | ATR015 | DocumentReviewStatus | LOOKUP | LKP003 | observed | How far the whole document has been read and its terms abstracted and verified. |
-| Document | Concept | ATR012 | DocumentSourceUrl | URL |  | observed | For a document published online and incorporated by reference, the web address it is published at. |
-| Document | Concept | ATR001 | DocumentTitle | TEXT |  | observed | The title the document gives itself, e.g. 'Master Subscription Agreement'. |
-| Document | Concept | ATR003 | DocumentType | LOOKUP | LKP001 | observed | The form of the instrument, e.g. Order Form or Data Processing Agreement. |
-| DocumentAmendment | Relationship | ATR202 | DocumentAmendmentModificationType | LOOKUP | LKP042 | observed | The kind of textual change the amendment makes. |
-| DocumentAmendment | Relationship | ATR201 | DocumentAmendmentSequence | INTEGER |  | observed | Order in which the amendment applies to the amended document (1 for the first). |
-| DocumentAuditRights | Concept | ATR151 | DocumentAuditRightsAuditParty | LOOKUP | LKP037 | observed | Who may exercise the right. |
-| DocumentAuditRights | Concept | ATR156 | DocumentAuditRightsCertificationOnly | BOOLEAN |  | observed | True when the provider may satisfy the right with certifications or reports alone. |
-| DocumentAuditRights | Concept | ATR154 | DocumentAuditRightsCostAllocation | LOOKUP | LKP038 | observed | Who bears the cost. |
-| DocumentAuditRights | Concept | ATR152 | DocumentAuditRightsFrequency | LOOKUP | LKP050 | observed | How often the right may be exercised. |
-| DocumentAuditRights | Concept | ATR153 | DocumentAuditRightsNoticeDays | INTEGER |  | observed | Days of notice before an audit. |
-| DocumentAuditRights | Concept | ATR155 | DocumentAuditRightsOnsiteAccess | BOOLEAN |  | observed | True when on-site inspection is allowed. |
-| DocumentChangeNoticeRules | Concept | ATR174 | DocumentChangeNoticeRulesChangeType | LOOKUP | LKP039 | observed | The kind of change. |
-| DocumentChangeNoticeRules | Concept | ATR177 | DocumentChangeNoticeRulesCustomerRight | LOOKUP | LKP040 | observed | What the customer may do in response. |
-| DocumentChangeNoticeRules | Concept | ATR175 | DocumentChangeNoticeRulesNoticeDays | INTEGER |  | observed | Days of notice before the change binds. |
-| DocumentChangeNoticeRules | Concept | ATR176 | DocumentChangeNoticeRulesNoticeMethod | LOOKUP | LKP011 | observed | How notice of the change is given. |
-| DocumentCitations | Concept | ATR037 | DocumentCitationsBoundingRegion | TEXT |  | observed | Polygon on the page enclosing the quoted words. |
-| DocumentCitations | Concept | ATR036 | DocumentCitationsCharLength | INTEGER |  | observed | Length in characters of the quoted words. |
-| DocumentCitations | Concept | ATR035 | DocumentCitationsCharOffset | INTEGER |  | observed | Character offset of the quoted words in the document text. |
-| DocumentCitations | Concept | ATR031 | DocumentCitationsCitedAttributeCode | TEXT |  | observed | The DDA attribute code of the term value evidenced, e.g. DocumentLiabilityCapsFixedAmount. |
-| DocumentCitations | Concept | ATR032 | DocumentCitationsCitedRecordKey | TEXT |  | observed | Where the evidenced concept holds many records per document, the key of the record evidenced (e.g. the service or tier). |
-| DocumentCitations | Concept | ATR033 | DocumentCitationsClauseNumber | TEXT |  | observed | The number of the provision that states the value. |
-| DocumentCitations | Concept | ATR040 | DocumentCitationsConfidence | FLOAT |  | observed | Confidence from 0 to 1 reported by an automated extraction. |
-| DocumentCitations | Concept | ATR039 | DocumentCitationsExtractionMethod | LOOKUP | LKP007 | observed | How the value was taken from the original. |
-| DocumentCitations | Concept | ATR034 | DocumentCitationsPageNumber | INTEGER |  | observed | Page of the executed original on which the value is stated (1-indexed). |
-| DocumentCitations | Concept | ATR038 | DocumentCitationsQuotedText | LONGTEXT |  | observed | The words of the executed original that state the value. |
-| DocumentCitations | Concept | ATR041 | DocumentCitationsVerificationStatus | LOOKUP | LKP008 | observed | Whether a reviewer has confirmed the passage states the value. |
-| DocumentCitations | Concept | ATR042 | DocumentCitationsVerifiedBy | USER |  | observed | The reviewer who reached the verification status. |
-| DocumentCitations | Concept | ATR043 | DocumentCitationsVerifiedDate | DATE |  | observed | The date the reviewer reached the verification status. |
-| DocumentClauses | Concept | ATR030 | DocumentClausesActivityClass | LOOKUP | LKP006 | observed | Whether the provision calls for action in normal performance or only when something goes wrong. |
-| DocumentClauses | Concept | ATR026 | DocumentClausesClauseHeading | TEXT |  | observed | The heading of the provision as written. |
-| DocumentClauses | Concept | ATR025 | DocumentClausesClauseNumber | TEXT |  | observed | The number or reference the document gives the provision, e.g. '11.2' or 'Schedule 3, para 4'. |
-| DocumentClauses | Concept | ATR027 | DocumentClausesClauseText | LONGTEXT |  | observed | The full text of the provision as written in the executed original. |
-| DocumentClauses | Concept | ATR024 | DocumentClausesClauseType | LOOKUP | LKP005 | observed | The governed type of the provision. |
-| DocumentClauses | Concept | ATR029 | DocumentClausesPageEnd | INTEGER |  | observed | Page on which the provision ends. |
-| DocumentClauses | Concept | ATR028 | DocumentClausesPageStart | INTEGER |  | observed | Page of the executed original on which the provision begins. |
-| DocumentCommercialTerms | Concept | ATR071 | DocumentCommercialTermsAnnualValue | CURRENCY |  | observed | Annual value of the fees, as stated or annualised; the DORA register's annual expense. |
-| DocumentCommercialTerms | Concept | ATR073 | DocumentCommercialTermsBillingFrequency | LOOKUP | LKP050 | observed | How often fees are invoiced. |
-| DocumentCommercialTerms | Concept | ATR069 | DocumentCommercialTermsCurrency | LOOKUP | DLT000000072 | observed | Currency of the fees. |
-| DocumentCommercialTerms | Concept | ATR075 | DocumentCommercialTermsFeesNonCancellable | BOOLEAN |  | observed | True when fees are non-cancellable and non-refundable. |
-| DocumentCommercialTerms | Concept | ATR074 | DocumentCommercialTermsLateInterestPercent | FLOAT |  | observed | Interest rate charged on late payment, per month. |
-| DocumentCommercialTerms | Concept | ATR072 | DocumentCommercialTermsPaymentDays | INTEGER |  | observed | Days after invoice within which payment is due. |
-| DocumentCommercialTerms | Concept | ATR070 | DocumentCommercialTermsTotalValue | CURRENCY |  | observed | Total value the document commits over its stated term. |
-| DocumentComposition | Relationship | ATR216 | DocumentCompositionApplicabilityScope | LONGTEXT |  | observed | The services, entities or circumstances to which the membership applies. |
-| DocumentComposition | Relationship | ATR213 | DocumentCompositionIsConstitutive | BOOLEAN |  | observed | True when the member forms part of the governed arrangement rather than being retained only as supporting material. |
-| DocumentComposition | Relationship | ATR215 | DocumentCompositionIsPrimary | BOOLEAN |  | observed | True when the member is the primary governing Document or subordinate Collection. |
-| DocumentComposition | Relationship | ATR212 | DocumentCompositionMembershipRole | LOOKUP | DocumentCompositionMembershipRoles | observed | The member's function in the Collection. |
-| DocumentComposition | Relationship | ATR214 | DocumentCompositionSequence | INTEGER |  | observed | Display or processing order of the member within its immediate Collection. |
-| DocumentDataLocations | Concept | ATR137 | DocumentDataLocationsChangeNoticeDays | INTEGER |  | observed | Days of notice the provider must give before changing the location. |
-| DocumentDataLocations | Concept | ATR135 | DocumentDataLocationsCountry | LOOKUP | DLT000000071 | observed | The country. |
-| DocumentDataLocations | Concept | ATR134 | DocumentDataLocationsPurpose | LOOKUP | LKP032 | observed | What happens at the location. |
-| DocumentDataLocations | Concept | ATR136 | DocumentDataLocationsRegion | TEXT |  | observed | Region or data-centre area within the country, where stated. |
-| DocumentDataProtectionTerms | Concept | ATR143 | DocumentDataProtectionTermsAiTrainingUse | LOOKUP | LKP035 | observed | Whether the provider may use customer data to train AI models. |
-| DocumentDataProtectionTerms | Concept | ATR138 | DocumentDataProtectionTermsBreachNotificationHours | INTEGER |  | observed | Hours within which the provider must notify a personal-data or security breach. |
-| DocumentDataProtectionTerms | Concept | ATR139 | DocumentDataProtectionTermsEncryptionAtRestRequired | BOOLEAN |  | observed | True when data must be encrypted at rest. |
-| DocumentDataProtectionTerms | Concept | ATR140 | DocumentDataProtectionTermsEncryptionInTransitRequired | BOOLEAN |  | observed | True when data must be encrypted in transit. |
-| DocumentDataProtectionTerms | Concept | ATR141 | DocumentDataProtectionTermsMultiFactorAuthRequired | BOOLEAN |  | observed | True when multi-factor authentication is required for access to customer data. |
-| DocumentDataProtectionTerms | Concept | ATR142 | DocumentDataProtectionTermsTransferMechanism | LOOKUP | LKP033 | observed | Legal basis for international transfers of personal data. |
-| DocumentDataProtectionTerms | Concept | ATR144 | DocumentDataProtectionTermsUsageDataAggregation | LOOKUP | LKP035 | observed | Whether the provider may aggregate and use usage data. |
-| DocumentDisputeTerms | Concept | ATR182 | DocumentDisputeTermsArbitrationRules | TEXT |  | observed | Arbitration rules named, e.g. ICC, LCIA. |
-| DocumentDisputeTerms | Concept | ATR178 | DocumentDisputeTermsGoverningLawCountry | LOOKUP | DLT000000071 | observed | Country whose law governs the document. |
-| DocumentDisputeTerms | Concept | ATR179 | DocumentDisputeTermsGoverningLawRegion | TEXT |  | observed | State, province or legal system within the country, e.g. 'England and Wales', 'New York'. |
-| DocumentDisputeTerms | Concept | ATR181 | DocumentDisputeTermsMechanism | LOOKUP | LKP046 | observed | How disputes are resolved. |
-| DocumentDisputeTerms | Concept | ATR180 | DocumentDisputeTermsVenue | TEXT |  | observed | Courts or seat named for disputes. |
-| DocumentExitTerms | Concept | ATR061 | DocumentExitTermsAssistanceChargeBasis | LOOKUP | LKP016 | observed | How exit assistance is charged. |
-| DocumentExitTerms | Concept | ATR064 | DocumentExitTermsDataDeletionDays | INTEGER |  | observed | Days after termination by which the provider must delete customer data. |
-| DocumentExitTerms | Concept | ATR063 | DocumentExitTermsDataExportFormat | TEXT |  | observed | The format in which data is returned. |
-| DocumentExitTerms | Concept | ATR062 | DocumentExitTermsDataExportWindowDays | INTEGER |  | observed | Days after termination during which the customer may export its data. |
-| DocumentExitTerms | Concept | ATR065 | DocumentExitTermsDeletionCertified | BOOLEAN |  | observed | True when the provider must certify deletion. |
-| DocumentExitTerms | Concept | ATR066 | DocumentExitTermsExitPlanRequired | BOOLEAN |  | observed | True when the provider must maintain an exit plan. |
-| DocumentExitTerms | Concept | ATR068 | DocumentExitTermsInsolvencyDataReturn | BOOLEAN |  | observed | True when the customer keeps access to and recovery of its data on the provider's insolvency, resolution or discontinuation (DORA Art 30(2)(d)). |
-| DocumentExitTerms | Concept | ATR067 | DocumentExitTermsStressedExitCovered | BOOLEAN |  | observed | True when the exit provisions apply on the provider's failure or insolvency as well as on planned exit. |
-| DocumentExitTerms | Concept | ATR060 | DocumentExitTermsTransitionPeriodMonths | INTEGER |  | observed | Months the provider must continue the service after termination to allow migration. |
-| DocumentFiles | Concept | ATR022 | DocumentFilesCapturedDate | DATE |  | observed | For a web snapshot, the date the online document was captured as published; for other files, the date the file was produced. |
-| DocumentFiles | Concept | ATR020 | DocumentFilesFileHash | TEXT |  | observed | SHA-256 fingerprint of the file content. |
-| DocumentFiles | Concept | ATR018 | DocumentFilesFileName | TEXT |  | observed | The file name as stored. |
-| DocumentFiles | Concept | ATR017 | DocumentFilesFileRole | LOOKUP | LKP004 | observed | What the file is: executed original, certified copy, preservation copy, text rendition, web snapshot or signature evidence. |
-| DocumentFiles | Concept | ATR023 | DocumentFilesIsPdfA | BOOLEAN |  | observed | True when the file conforms to PDF/A for long-term preservation. |
-| DocumentFiles | Concept | ATR019 | DocumentFilesMediaType | TEXT |  | observed | IANA media type of the file, e.g. application/pdf. |
-| DocumentFiles | Concept | ATR021 | DocumentFilesStorageLocation | URL |  | observed | Where the file is held in the authoritative repository. |
-| DocumentIncorporation | Relationship | ATR204 | DocumentIncorporationIncorporationMode | LOOKUP | LKP041 | observed | How the document is incorporated. |
-| DocumentIncorporation | Relationship | ATR203 | DocumentIncorporationPrecedenceRank | INTEGER |  | observed | Rank of the incorporated document in the order of precedence of the incorporating agreement (1 prevails over 2). |
-| DocumentIndemnities | Concept | ATR128 | DocumentIndemnitiesCapTreatment | LOOKUP | LKP029 | observed | How the indemnity stands against the liability cap. |
-| DocumentIndemnities | Concept | ATR127 | DocumentIndemnitiesClaimType | LOOKUP | LKP030 | observed | The kind of claim covered. |
-| DocumentIndemnities | Concept | ATR130 | DocumentIndemnitiesExclusions | LONGTEXT |  | observed | Circumstances the indemnity does not cover. |
-| DocumentIndemnities | Concept | ATR126 | DocumentIndemnitiesIndemnifyingSide | LOOKUP | LKP009 | observed | The side giving the indemnity. |
-| DocumentIndemnities | Concept | ATR129 | DocumentIndemnitiesRemedies | LONGTEXT |  | observed | Remedies the indemnifier may elect, e.g. procure a licence, modify, or refund. |
-| DocumentInsuranceRequirements | Concept | ATR133 | DocumentInsuranceRequirementsCurrency | LOOKUP | DLT000000072 | observed | Currency of the minimum cover. |
-| DocumentInsuranceRequirements | Concept | ATR131 | DocumentInsuranceRequirementsInsuranceType | LOOKUP | LKP031 | observed | The type of insurance. |
-| DocumentInsuranceRequirements | Concept | ATR132 | DocumentInsuranceRequirementsMinimumAmount | CURRENCY |  | observed | Minimum cover required. |
-| DocumentLiabilityCaps | Concept | ATR122 | DocumentLiabilityCapsBasisPeriodMonths | INTEGER |  | observed | Months of fees the cap is measured over, e.g. 12. |
-| DocumentLiabilityCaps | Concept | ATR117 | DocumentLiabilityCapsCapType | LOOKUP | LKP025 | observed | How the cap is expressed. |
-| DocumentLiabilityCaps | Concept | ATR119 | DocumentLiabilityCapsCurrency | LOOKUP | DLT000000072 | observed | Currency of the fixed amount. |
-| DocumentLiabilityCaps | Concept | ATR121 | DocumentLiabilityCapsFeeBasis | LOOKUP | LKP027 | observed | Which fees a fee-based cap is measured against. |
-| DocumentLiabilityCaps | Concept | ATR120 | DocumentLiabilityCapsFeeMultiplier | FLOAT |  | observed | Multiple of fees, e.g. 1.25 for 125% of charges. |
-| DocumentLiabilityCaps | Concept | ATR118 | DocumentLiabilityCapsFixedAmount | CURRENCY |  | observed | The fixed amount of the cap, where it has one. |
-| DocumentLiabilityCaps | Concept | ATR116 | DocumentLiabilityCapsScope | LOOKUP | LKP026 | observed | Which liability the cap limits. |
-| DocumentLiabilityCaps | Concept | ATR115 | DocumentLiabilityCapsSide | LOOKUP | LKP009 | observed | The side whose liability is capped. |
-| DocumentLiabilityHeads | Concept | ATR123 | DocumentLiabilityHeadsHeadType | LOOKUP | LKP028 | observed | The head of loss. |
-| DocumentLiabilityHeads | Concept | ATR125 | DocumentLiabilityHeadsSide | LOOKUP | LKP009 | observed | The side whose liability the treatment applies to. |
-| DocumentLiabilityHeads | Concept | ATR124 | DocumentLiabilityHeadsTreatment | LOOKUP | LKP029 | observed | How the head stands against the cap. |
-| DocumentObligations | Concept | ATR173 | DocumentObligationsClauseNumber | TEXT |  | observed | The provision stating the commitment. |
-| DocumentObligations | Concept | ATR168 | DocumentObligationsDescription | LONGTEXT |  | observed | What must, may or must not be done. |
-| DocumentObligations | Concept | ATR172 | DocumentObligationsFirstDueDate | DATE |  | observed | The first date the commitment falls due. |
-| DocumentObligations | Concept | ATR170 | DocumentObligationsFrequency | LOOKUP | LKP050 | observed | How often a recurring commitment falls due. |
-| DocumentObligations | Concept | ATR169 | DocumentObligationsIsRecurring | BOOLEAN |  | observed | True when the commitment recurs. |
-| DocumentObligations | Concept | ATR165 | DocumentObligationsModality | LOOKUP | LKP045 | observed | Obligation, right or prohibition. |
-| DocumentObligations | Concept | ATR166 | DocumentObligationsObligatedSide | LOOKUP | LKP009 | observed | The side bound by the commitment. |
-| DocumentObligations | Concept | ATR167 | DocumentObligationsObligationType | LOOKUP | LKP044 | observed | The kind of commitment. |
-| DocumentObligations | Concept | ATR171 | DocumentObligationsTriggerEvent | TEXT |  | observed | The event that brings an event-driven commitment into play. |
-| DocumentPriceAdjustments | Concept | ATR108 | DocumentPriceAdjustmentsBasis | LOOKUP | LKP012 | observed | The mechanism. |
-| DocumentPriceAdjustments | Concept | ATR111 | DocumentPriceAdjustmentsCapPercent | FLOAT |  | observed | Maximum increase per adjustment, in percent. |
-| DocumentPriceAdjustments | Concept | ATR114 | DocumentPriceAdjustmentsFirstReviewDate | DATE |  | observed | Date of the first adjustment the mechanism allows. |
-| DocumentPriceAdjustments | Concept | ATR112 | DocumentPriceAdjustmentsFrequency | LOOKUP | LKP050 | observed | How often adjustments may be made. |
-| DocumentPriceAdjustments | Concept | ATR110 | DocumentPriceAdjustmentsIndexName | TEXT |  | observed | The index followed, e.g. 'UK CPI'. |
-| DocumentPriceAdjustments | Concept | ATR113 | DocumentPriceAdjustmentsNoticeDays | INTEGER |  | observed | Days of notice required before an adjustment takes effect. |
-| DocumentPriceAdjustments | Concept | ATR109 | DocumentPriceAdjustmentsTiming | LOOKUP | LKP013 | observed | When the mechanism applies. |
-| DocumentRenewalTerms | Concept | ATR044 | DocumentRenewalTermsInitialTermMonths | INTEGER |  | observed | Length of the initial term in months. |
-| DocumentRenewalTerms | Concept | ATR047 | DocumentRenewalTermsMaximumRenewals | INTEGER |  | observed | Maximum number of renewals; empty when unlimited. |
-| DocumentRenewalTerms | Concept | ATR048 | DocumentRenewalTermsNonRenewalNoticeDays | INTEGER |  | observed | Days before expiry by which notice of non-renewal must be given. |
-| DocumentRenewalTerms | Concept | ATR049 | DocumentRenewalTermsNoticeDayBasis | LOOKUP | LKP010 | observed | Whether the notice period counts calendar or business days. |
-| DocumentRenewalTerms | Concept | ATR052 | DocumentRenewalTermsNoticeDeadline | DATE |  | derived | The last date on which notice of non-renewal can be given: the expiry date less the notice period on its day basis. |
-| DocumentRenewalTerms | Concept | ATR050 | DocumentRenewalTermsNoticeMethod | LOOKUP | LKP011 | observed | How non-renewal notice must be given. |
-| DocumentRenewalTerms | Concept | ATR046 | DocumentRenewalTermsRenewalPeriodMonths | INTEGER |  | observed | Length of each renewal period in months. |
-| DocumentRenewalTerms | Concept | ATR051 | DocumentRenewalTermsRenewalPriceBasis | LOOKUP | LKP012 | observed | How prices are set for a renewal period. |
-| DocumentRenewalTerms | Concept | ATR045 | DocumentRenewalTermsRenewalType | LOOKUP | LKP014 | observed | How the document renews at the end of a term. |
-| DocumentResilienceTerms | Concept | ATR164 | DocumentResilienceTermsAuthorityCooperation | BOOLEAN |  | observed | True when the provider must cooperate fully with competent and resolution authorities. |
-| DocumentResilienceTerms | Concept | ATR157 | DocumentResilienceTermsBcpRequired | BOOLEAN |  | observed | True when the provider must maintain a business continuity plan. |
-| DocumentResilienceTerms | Concept | ATR158 | DocumentResilienceTermsBcpTestFrequency | LOOKUP | LKP050 | observed | How often the plan must be tested. |
-| DocumentResilienceTerms | Concept | ATR161 | DocumentResilienceTermsIncidentAssistanceChargeBasis | LOOKUP | LKP016 | observed | How incident assistance is charged. |
-| DocumentResilienceTerms | Concept | ATR162 | DocumentResilienceTermsPenetrationTestParticipation | BOOLEAN |  | observed | True when the provider must take part in the customer's threat-led penetration testing. |
-| DocumentResilienceTerms | Concept | ATR160 | DocumentResilienceTermsRecoveryPointHours | FLOAT |  | observed | Recovery point objective in hours. |
-| DocumentResilienceTerms | Concept | ATR159 | DocumentResilienceTermsRecoveryTimeHours | FLOAT |  | observed | Recovery time objective in hours. |
-| DocumentResilienceTerms | Concept | ATR163 | DocumentResilienceTermsSecurityTrainingParticipation | BOOLEAN |  | observed | True when the provider must take part in the customer's security awareness training. |
-| DocumentServiceCredits | Concept | ATR107 | DocumentServiceCreditsCreditApplication | LOOKUP | LKP024 | observed | How the credit is given. |
-| DocumentServiceCredits | Concept | ATR106 | DocumentServiceCreditsCreditPercent | FLOAT |  | observed | Credit as a percentage of the fee for the period. |
-| DocumentServiceCredits | Concept | ATR104 | DocumentServiceCreditsLowerBound | FLOAT |  | observed | Lowest achieved value in the tier (inclusive). |
-| DocumentServiceCredits | Concept | ATR105 | DocumentServiceCreditsUpperBound | FLOAT |  | observed | Highest achieved value in the tier (exclusive). |
-| DocumentServiceLevels | Concept | ATR102 | DocumentServiceLevelsChronicFailureThreshold | TEXT |  | observed | Number of failures in a number of periods that gives a right to terminate. |
-| DocumentServiceLevels | Concept | ATR099 | DocumentServiceLevelsClaimWindowDays | INTEGER |  | observed | Days after the failure within which a credit must be claimed. |
-| DocumentServiceLevels | Concept | ATR100 | DocumentServiceLevelsCreditCapPercent | FLOAT |  | observed | Maximum total credit as a percentage of the fee for the period. |
-| DocumentServiceLevels | Concept | ATR101 | DocumentServiceLevelsCreditsSoleRemedy | BOOLEAN |  | observed | True when credits are the customer's sole and exclusive remedy for the failure. |
-| DocumentServiceLevels | Concept | ATR103 | DocumentServiceLevelsEarnBackAvailable | BOOLEAN |  | observed | True when the provider may earn back credits by over-performance. |
-| DocumentServiceLevels | Concept | ATR098 | DocumentServiceLevelsExclusions | LONGTEXT |  | observed | Events excluded from measurement, e.g. scheduled maintenance. |
-| DocumentServiceLevels | Concept | ATR097 | DocumentServiceLevelsMeasurementBasis | LOOKUP | LKP023 | observed | How the metric is computed. |
-| DocumentServiceLevels | Concept | ATR096 | DocumentServiceLevelsMeasurementPeriod | LOOKUP | LKP050 | observed | The period over which performance is measured. |
-| DocumentServiceLevels | Concept | ATR091 | DocumentServiceLevelsMetricType | LOOKUP | LKP021 | observed | What the service level measures. |
-| DocumentServiceLevels | Concept | ATR092 | DocumentServiceLevelsObjectiveType | LOOKUP | LKP022 | observed | Quantitative objective or qualitative commitment. |
-| DocumentServiceLevels | Concept | ATR093 | DocumentServiceLevelsScope | TEXT |  | observed | What the commitment covers, e.g. 'region, multi-zone deployment'. |
-| DocumentServiceLevels | Concept | ATR095 | DocumentServiceLevelsTargetUnit | TEXT |  | observed | Unit of the target, e.g. percent, minutes, hours. |
-| DocumentServiceLevels | Concept | ATR094 | DocumentServiceLevelsTargetValue | FLOAT |  | observed | The committed target, e.g. 99.95. |
-| DocumentServices | Concept | ATR086 | DocumentServicesBillingFrequency | LOOKUP | LKP050 | observed | How often the service is invoiced. |
-| DocumentServices | Concept | ATR084 | DocumentServicesCurrency | LOOKUP | DLT000000072 | observed | Currency of the unit price. |
-| DocumentServices | Concept | ATR080 | DocumentServicesDeploymentModel | LOOKUP | LKP018 | observed | Cloud deployment model of the service. |
-| DocumentServices | Concept | ATR078 | DocumentServicesDescription | LONGTEXT |  | observed | What the service does, as described in the document. |
-| DocumentServices | Concept | ATR089 | DocumentServicesEndDate | DATE |  | observed | Date the service line ends. |
-| DocumentServices | Concept | ATR079 | DocumentServicesIctServiceType | LOOKUP | LKP017 | observed | Type of ICT service per the DORA register taxonomy. |
-| DocumentServices | Concept | ATR081 | DocumentServicesLicenceMetric | LOOKUP | LKP019 | observed | The unit the service is licensed or consumed against. |
-| DocumentServices | Concept | ATR087 | DocumentServicesOverageRate | CURRENCY |  | observed | Charge per unit of use beyond the contracted quantity. |
-| DocumentServices | Concept | ATR085 | DocumentServicesPricingModel | LOOKUP | LKP020 | observed | How charges for the service are calculated. |
-| DocumentServices | Concept | ATR077 | DocumentServicesProviderServiceCode | TEXT |  | observed | The provider's product or SKU code for the service. |
-| DocumentServices | Concept | ATR082 | DocumentServicesQuantity | FLOAT |  | observed | Quantity of the metric contracted. |
-| DocumentServices | Concept | ATR076 | DocumentServicesServiceName | TEXT |  | observed | The name of the service as the document states it. |
-| DocumentServices | Concept | ATR088 | DocumentServicesStartDate | DATE |  | observed | Date the service line starts. |
-| DocumentServices | Concept | ATR090 | DocumentServicesSupportsCriticalFunction | BOOLEAN |  | observed | True when the customer has assessed the service as supporting a critical or important function, which brings DORA Art 30(3) provisions into play. |
-| DocumentServices | Concept | ATR083 | DocumentServicesUnitPrice | CURRENCY |  | observed | Price per unit of the metric. |
-| DocumentSubcontractingTerms | Concept | ATR149 | DocumentSubcontractingTermsFlowDownRequired | BOOLEAN |  | observed | True when the provider must flow the document's obligations down to subcontractors. |
-| DocumentSubcontractingTerms | Concept | ATR146 | DocumentSubcontractingTermsNoticeDays | INTEGER |  | observed | Days of notice of a new or replacement subcontractor. |
-| DocumentSubcontractingTerms | Concept | ATR147 | DocumentSubcontractingTermsObjectionDays | INTEGER |  | observed | Days within which the customer may object. |
-| DocumentSubcontractingTerms | Concept | ATR145 | DocumentSubcontractingTermsPermission | LOOKUP | LKP036 | observed | Whether and on what consent subcontracting is allowed. |
-| DocumentSubcontractingTerms | Concept | ATR150 | DocumentSubcontractingTermsProviderRemainsResponsible | BOOLEAN |  | observed | True when the provider stays fully responsible for subcontracted services. |
-| DocumentSubcontractingTerms | Concept | ATR148 | DocumentSubcontractingTermsTerminationOnObjection | BOOLEAN |  | observed | True when the customer may terminate if a change goes ahead despite objection. |
-| DocumentSupersession | Relationship | ATR205 | DocumentSupersessionReason | LOOKUP | LKP043 | observed | Why the successor supersedes the predecessor. |
-| DocumentTerminationRights | Concept | ATR056 | DocumentTerminationRightsCureDays | INTEGER |  | observed | Period the other side has to remedy a breach before the right arises. |
-| DocumentTerminationRights | Concept | ATR057 | DocumentTerminationRightsDayBasis | LOOKUP | LKP010 | observed | Whether the notice and cure periods count calendar or business days. |
-| DocumentTerminationRights | Concept | ATR058 | DocumentTerminationRightsFeePayable | BOOLEAN |  | observed | True when exercising the right triggers a termination fee. |
-| DocumentTerminationRights | Concept | ATR055 | DocumentTerminationRightsNoticeDays | INTEGER |  | observed | Notice period for exercising the right. |
-| DocumentTerminationRights | Concept | ATR059 | DocumentTerminationRightsPrepaidFeesRefunded | BOOLEAN |  | observed | True when prepaid fees for the remaining term are refunded on exercise. |
-| DocumentTerminationRights | Concept | ATR053 | DocumentTerminationRightsSide | LOOKUP | LKP009 | observed | The side of the agreement that holds the right. |
-| DocumentTerminationRights | Concept | ATR054 | DocumentTerminationRightsTrigger | LOOKUP | LKP015 | observed | The ground on which the right arises. |
-| DocumentVersions | Concept | ATR006 | DocumentVersionsEffectiveDate | DATE |  | observed | The date from which the document states it takes effect. |
-| DocumentVersions | Concept | ATR005 | DocumentVersionsExecutionDate | DATE |  | derived | The date the last required signature was applied, making the document fully executed. Derived from the signing times on the signing relationship. |
-| DocumentVersions | Concept | ATR004 | DocumentVersionsExecutionStatus | LOOKUP | LKP002 | observed | How far the document has been executed. |
-| DocumentVersions | Concept | ATR210 | DocumentVersionsIsAuthoritative | BOOLEAN |  | observed | True when this is the Version approved for operational use. |
-| DocumentVersions | Concept | ATR211 | DocumentVersionsIsLegallyEffective | BOOLEAN |  | derived | Derived from execution, effective dates and supersession. |
-| DocumentVersions | Concept | ATR014 | DocumentVersionsPublicationDate | DATE |  | observed | The date the publisher states this version was published or last amended. |
-| DocumentVersions | Concept | ATR208 | DocumentVersionsSequence | INTEGER |  | observed | Order of the Version within the Document. |
-| DocumentVersions | Concept | ATR209 | DocumentVersionsState | LOOKUP | DocumentVersionStates | observed | Draft, redline, agreed form, executed, published, withdrawn or superseded. |
-| DocumentVersions | Concept | ATR013 | DocumentVersionsVersionLabel | TEXT |  | observed | The version or edition the publisher gives the document, e.g. 'November 2025' or 'v3.2'. |
-| LegalEntityDataProcessing | Relationship | ATR193 | LegalEntityDataProcessingDataSubjectCategories | LONGTEXT |  | observed | Categories of data subjects. |
-| LegalEntityDataProcessing | Relationship | ATR192 | LegalEntityDataProcessingPersonalDataTypes | LONGTEXT |  | observed | Types of personal data processed. |
-| LegalEntityDataProcessing | Relationship | ATR191 | LegalEntityDataProcessingPurposes | LONGTEXT |  | observed | Purposes of the processing. |
-| LegalEntityDataProcessing | Relationship | ATR194 | LegalEntityDataProcessingSccModule | LOOKUP | LKP034 | observed | Module of the standard contractual clauses used, where transfers occur. |
-| LegalEntityDataProcessing | Relationship | ATR190 | LegalEntityDataProcessingSubjectMatter | LONGTEXT |  | observed | Subject matter and nature of the processing. |
-| LegalEntityServiceProcurement | Relationship | ATR184 | LegalEntityServiceProcurementReferenceName | TEXT |  | observed | The name the document uses for the customer entity. |
-| LegalEntityServiceProvision | Relationship | ATR183 | LegalEntityServiceProvisionReferenceName | TEXT |  | observed | The name the document uses for the provider, e.g. 'Supplier' or 'AWS'. |
-| LegalEntitySubcontracting | Relationship | ATR188 | LegalEntitySubcontractingProcessesPersonalData | BOOLEAN |  | observed | True when the subcontractor processes personal data (a sub-processor). |
-| LegalEntitySubcontracting | Relationship | ATR185 | LegalEntitySubcontractingRank | INTEGER |  | observed | Place in the supply chain: 2 for a subcontractor of the direct provider, 3 for its subcontractor, and so on (the direct provider is rank 1). |
-| LegalEntitySubcontracting | Relationship | ATR186 | LegalEntitySubcontractingRecipientProvider | MASTERID |  | observed | Master ID of the legal entity to which this subcontractor provides the subcontracted service (the next link up the chain). |
-| LegalEntitySubcontracting | Relationship | ATR189 | LegalEntitySubcontractingServiceCountry | LOOKUP | DLT000000071 | observed | Country from which the subcontractor performs the services. |
-| LegalEntitySubcontracting | Relationship | ATR187 | LegalEntitySubcontractingServicesPerformed | LONGTEXT |  | observed | What the subcontractor performs. |
-| PersonDocumentSigning | Relationship | ATR199 | PersonDocumentSigningAssuranceLevel | LOOKUP | LKP048 | observed | Legal assurance level of an electronic signature. |
-| PersonDocumentSigning | Relationship | ATR196 | PersonDocumentSigningCapacity | TEXT |  | observed | The capacity or title in which the person signed, e.g. 'Chief Procurement Officer'. |
-| PersonDocumentSigning | Relationship | ATR197 | PersonDocumentSigningOnBehalfOf | MASTERID |  | observed | Master ID of the legal entity for which the person signed. |
-| PersonDocumentSigning | Relationship | ATR200 | PersonDocumentSigningPadesLevel | LOOKUP | LKP049 | observed | PAdES baseline level of the PDF signature. |
-| PersonDocumentSigning | Relationship | ATR198 | PersonDocumentSigningSignatureMethod | LOOKUP | LKP047 | observed | How the signature was applied. |
-| PersonDocumentSigning | Relationship | ATR195 | PersonDocumentSigningSignedDateTime | DATETIME |  | observed | When the signature was applied. |
+| Attribute ID | Concept or relationship | Owner type | Attribute | Data type | Lookup | Definition |
+|---|---|---|---|---|---|---|
+| ATR207 | Document | Concept | DocumentCollectionPurpose | LOOKUP | DocumentCollectionPurposes | Purpose of a Collection, such as provider relationship, agreement, framework, order, statement of work or assurance pack. |
+| ATR002 | Document | Concept | DocumentDescription | LONGTEXT |  | A short statement of what the document covers. |
+| ATR007 | Document | Concept | DocumentExpirationDate | DATE |  | The date on which the document's initial or current stated term ends, if not perpetual. |
+| ATR008 | Document | Concept | DocumentIsPerpetual | BOOLEAN |  | True when the document has no fixed end date (CUAD answer 'Perpetual'). |
+| ATR009 | Document | Concept | DocumentLanguage | LOOKUP | DLT000000082 | The language of the executed text. |
+| ATR010 | Document | Concept | DocumentPageCount | INTEGER |  | Number of pages in the executed original. |
+| ATR206 | Document | Concept | DocumentRepresentationType | LOOKUP | DocumentRepresentationTypes | Whether the Document represents a governed Collection or one Individual instrument. |
+| ATR016 | Document | Concept | DocumentReviewDate | DATE |  | The date the review status was reached. |
+| ATR015 | Document | Concept | DocumentReviewStatus | LOOKUP | LKP003 | How far the whole document has been read and its terms abstracted and verified. |
+| ATR012 | Document | Concept | DocumentSourceUrl | URL |  | For a document published online and incorporated by reference, the web address it is published at. |
+| ATR001 | Document | Concept | DocumentTitle | TEXT |  | The title the document gives itself, e.g. 'Master Subscription Agreement'. |
+| ATR003 | Document | Concept | DocumentType | LOOKUP | LKP001 | The form of the instrument, e.g. Order Form or Data Processing Agreement. |
+| ATR202 | DocumentAmendment | Relationship | DocumentAmendmentModificationType | LOOKUP | LKP042 | The kind of textual change the amendment makes. |
+| ATR201 | DocumentAmendment | Relationship | DocumentAmendmentSequence | INTEGER |  | Order in which the amendment applies to the amended document (1 for the first). |
+| ATR151 | DocumentAuditRights | Concept | DocumentAuditRightsAuditParty | LOOKUP | LKP037 | Who may exercise the right. |
+| ATR156 | DocumentAuditRights | Concept | DocumentAuditRightsCertificationOnly | BOOLEAN |  | True when the provider may satisfy the right with certifications or reports alone. |
+| ATR154 | DocumentAuditRights | Concept | DocumentAuditRightsCostAllocation | LOOKUP | LKP038 | Who bears the cost. |
+| ATR152 | DocumentAuditRights | Concept | DocumentAuditRightsFrequency | LOOKUP | LKP050 | How often the right may be exercised. |
+| ATR153 | DocumentAuditRights | Concept | DocumentAuditRightsNoticeDays | INTEGER |  | Days of notice before an audit. |
+| ATR155 | DocumentAuditRights | Concept | DocumentAuditRightsOnsiteAccess | BOOLEAN |  | True when on-site inspection is allowed. |
+| ATR174 | DocumentChangeNoticeRules | Concept | DocumentChangeNoticeRulesChangeType | LOOKUP | LKP039 | The kind of change. |
+| ATR177 | DocumentChangeNoticeRules | Concept | DocumentChangeNoticeRulesCustomerRight | LOOKUP | LKP040 | What the customer may do in response. |
+| ATR175 | DocumentChangeNoticeRules | Concept | DocumentChangeNoticeRulesNoticeDays | INTEGER |  | Days of notice before the change binds. |
+| ATR176 | DocumentChangeNoticeRules | Concept | DocumentChangeNoticeRulesNoticeMethod | LOOKUP | LKP011 | How notice of the change is given. |
+| ATR037 | DocumentCitations | Concept | DocumentCitationsBoundingRegion | TEXT |  | Polygon on the page enclosing the quoted words. |
+| ATR036 | DocumentCitations | Concept | DocumentCitationsCharLength | INTEGER |  | Length in characters of the quoted words. |
+| ATR035 | DocumentCitations | Concept | DocumentCitationsCharOffset | INTEGER |  | Character offset of the quoted words in the document text. |
+| ATR031 | DocumentCitations | Concept | DocumentCitationsCitedAttributeCode | TEXT |  | The DDA attribute code of the term value evidenced, e.g. DocumentLiabilityCapsFixedAmount. |
+| ATR032 | DocumentCitations | Concept | DocumentCitationsCitedRecordKey | TEXT |  | Where the evidenced concept holds many records per document, the key of the record evidenced (e.g. the service or tier). |
+| ATR033 | DocumentCitations | Concept | DocumentCitationsClauseNumber | TEXT |  | The number of the provision that states the value. |
+| ATR040 | DocumentCitations | Concept | DocumentCitationsConfidence | FLOAT |  | Confidence from 0 to 1 reported by an automated extraction. |
+| ATR039 | DocumentCitations | Concept | DocumentCitationsExtractionMethod | LOOKUP | LKP007 | How the value was taken from the original. |
+| ATR034 | DocumentCitations | Concept | DocumentCitationsPageNumber | INTEGER |  | Page of the executed original on which the value is stated (1-indexed). |
+| ATR038 | DocumentCitations | Concept | DocumentCitationsQuotedText | LONGTEXT |  | The words of the executed original that state the value. |
+| ATR041 | DocumentCitations | Concept | DocumentCitationsVerificationStatus | LOOKUP | LKP008 | Whether a reviewer has confirmed the passage states the value. |
+| ATR042 | DocumentCitations | Concept | DocumentCitationsVerifiedBy | USER |  | The reviewer who reached the verification status. |
+| ATR043 | DocumentCitations | Concept | DocumentCitationsVerifiedDate | DATE |  | The date the reviewer reached the verification status. |
+| ATR030 | DocumentClauses | Concept | DocumentClausesActivityClass | LOOKUP | LKP006 | Whether the provision calls for action in normal performance or only when something goes wrong. |
+| ATR026 | DocumentClauses | Concept | DocumentClausesClauseHeading | TEXT |  | The heading of the provision as written. |
+| ATR025 | DocumentClauses | Concept | DocumentClausesClauseNumber | TEXT |  | The number or reference the document gives the provision, e.g. '11.2' or 'Schedule 3, para 4'. |
+| ATR027 | DocumentClauses | Concept | DocumentClausesClauseText | LONGTEXT |  | The full text of the provision as written in the executed original. |
+| ATR024 | DocumentClauses | Concept | DocumentClausesClauseType | LOOKUP | LKP005 | The governed type of the provision. |
+| ATR029 | DocumentClauses | Concept | DocumentClausesPageEnd | INTEGER |  | Page on which the provision ends. |
+| ATR028 | DocumentClauses | Concept | DocumentClausesPageStart | INTEGER |  | Page of the executed original on which the provision begins. |
+| ATR071 | DocumentCommercialTerms | Concept | DocumentCommercialTermsAnnualValue | CURRENCY |  | Annual value of the fees, as stated or annualised; the DORA register's annual expense. |
+| ATR073 | DocumentCommercialTerms | Concept | DocumentCommercialTermsBillingFrequency | LOOKUP | LKP050 | How often fees are invoiced. |
+| ATR069 | DocumentCommercialTerms | Concept | DocumentCommercialTermsCurrency | LOOKUP | DLT000000072 | Currency of the fees. |
+| ATR075 | DocumentCommercialTerms | Concept | DocumentCommercialTermsFeesNonCancellable | BOOLEAN |  | True when fees are non-cancellable and non-refundable. |
+| ATR074 | DocumentCommercialTerms | Concept | DocumentCommercialTermsLateInterestPercent | FLOAT |  | Interest rate charged on late payment, per month. |
+| ATR072 | DocumentCommercialTerms | Concept | DocumentCommercialTermsPaymentDays | INTEGER |  | Days after invoice within which payment is due. |
+| ATR070 | DocumentCommercialTerms | Concept | DocumentCommercialTermsTotalValue | CURRENCY |  | Total value the document commits over its stated term. |
+| ATR216 | DocumentComposition | Relationship | DocumentCompositionApplicabilityScope | LONGTEXT |  | The services, entities or circumstances to which the membership applies. |
+| ATR213 | DocumentComposition | Relationship | DocumentCompositionIsConstitutive | BOOLEAN |  | True when the member forms part of the governed arrangement rather than being retained only as supporting material. |
+| ATR215 | DocumentComposition | Relationship | DocumentCompositionIsPrimary | BOOLEAN |  | True when the member is the primary governing Document or subordinate Collection. |
+| ATR212 | DocumentComposition | Relationship | DocumentCompositionMembershipRole | LOOKUP | DocumentCompositionMembershipRoles | The member's function in the Collection. |
+| ATR214 | DocumentComposition | Relationship | DocumentCompositionSequence | INTEGER |  | Display or processing order of the member within its immediate Collection. |
+| ATR137 | DocumentDataLocations | Concept | DocumentDataLocationsChangeNoticeDays | INTEGER |  | Days of notice the provider must give before changing the location. |
+| ATR135 | DocumentDataLocations | Concept | DocumentDataLocationsCountry | LOOKUP | DLT000000071 | The country. |
+| ATR134 | DocumentDataLocations | Concept | DocumentDataLocationsPurpose | LOOKUP | LKP032 | What happens at the location. |
+| ATR136 | DocumentDataLocations | Concept | DocumentDataLocationsRegion | TEXT |  | Region or data-centre area within the country, where stated. |
+| ATR143 | DocumentDataProtectionTerms | Concept | DocumentDataProtectionTermsAiTrainingUse | LOOKUP | LKP035 | Whether the provider may use customer data to train AI models. |
+| ATR138 | DocumentDataProtectionTerms | Concept | DocumentDataProtectionTermsBreachNotificationHours | INTEGER |  | Hours within which the provider must notify a personal-data or security breach. |
+| ATR139 | DocumentDataProtectionTerms | Concept | DocumentDataProtectionTermsEncryptionAtRestRequired | BOOLEAN |  | True when data must be encrypted at rest. |
+| ATR140 | DocumentDataProtectionTerms | Concept | DocumentDataProtectionTermsEncryptionInTransitRequired | BOOLEAN |  | True when data must be encrypted in transit. |
+| ATR141 | DocumentDataProtectionTerms | Concept | DocumentDataProtectionTermsMultiFactorAuthRequired | BOOLEAN |  | True when multi-factor authentication is required for access to customer data. |
+| ATR142 | DocumentDataProtectionTerms | Concept | DocumentDataProtectionTermsTransferMechanism | LOOKUP | LKP033 | Legal basis for international transfers of personal data. |
+| ATR144 | DocumentDataProtectionTerms | Concept | DocumentDataProtectionTermsUsageDataAggregation | LOOKUP | LKP035 | Whether the provider may aggregate and use usage data. |
+| ATR182 | DocumentDisputeTerms | Concept | DocumentDisputeTermsArbitrationRules | TEXT |  | Arbitration rules named, e.g. ICC, LCIA. |
+| ATR178 | DocumentDisputeTerms | Concept | DocumentDisputeTermsGoverningLawCountry | LOOKUP | DLT000000071 | Country whose law governs the document. |
+| ATR179 | DocumentDisputeTerms | Concept | DocumentDisputeTermsGoverningLawRegion | TEXT |  | State, province or legal system within the country, e.g. 'England and Wales', 'New York'. |
+| ATR181 | DocumentDisputeTerms | Concept | DocumentDisputeTermsMechanism | LOOKUP | LKP046 | How disputes are resolved. |
+| ATR180 | DocumentDisputeTerms | Concept | DocumentDisputeTermsVenue | TEXT |  | Courts or seat named for disputes. |
+| ATR061 | DocumentExitTerms | Concept | DocumentExitTermsAssistanceChargeBasis | LOOKUP | LKP016 | How exit assistance is charged. |
+| ATR064 | DocumentExitTerms | Concept | DocumentExitTermsDataDeletionDays | INTEGER |  | Days after termination by which the provider must delete customer data. |
+| ATR063 | DocumentExitTerms | Concept | DocumentExitTermsDataExportFormat | TEXT |  | The format in which data is returned. |
+| ATR062 | DocumentExitTerms | Concept | DocumentExitTermsDataExportWindowDays | INTEGER |  | Days after termination during which the customer may export its data. |
+| ATR065 | DocumentExitTerms | Concept | DocumentExitTermsDeletionCertified | BOOLEAN |  | True when the provider must certify deletion. |
+| ATR066 | DocumentExitTerms | Concept | DocumentExitTermsExitPlanRequired | BOOLEAN |  | True when the provider must maintain an exit plan. |
+| ATR068 | DocumentExitTerms | Concept | DocumentExitTermsInsolvencyDataReturn | BOOLEAN |  | True when the customer keeps access to and recovery of its data on the provider's insolvency, resolution or discontinuation (DORA Art 30(2)(d)). |
+| ATR067 | DocumentExitTerms | Concept | DocumentExitTermsStressedExitCovered | BOOLEAN |  | True when the exit provisions apply on the provider's failure or insolvency as well as on planned exit. |
+| ATR060 | DocumentExitTerms | Concept | DocumentExitTermsTransitionPeriodMonths | INTEGER |  | Months the provider must continue the service after termination to allow migration. |
+| ATR022 | DocumentFiles | Concept | DocumentFilesCapturedDate | DATE |  | For a web snapshot, the date the online document was captured as published; for other files, the date the file was produced. |
+| ATR020 | DocumentFiles | Concept | DocumentFilesFileHash | TEXT |  | SHA-256 fingerprint of the file content. |
+| ATR018 | DocumentFiles | Concept | DocumentFilesFileName | TEXT |  | The file name as stored. |
+| ATR017 | DocumentFiles | Concept | DocumentFilesFileRole | LOOKUP | LKP004 | What the file is: executed original, certified copy, preservation copy, text rendition, web snapshot or signature evidence. |
+| ATR023 | DocumentFiles | Concept | DocumentFilesIsPdfA | BOOLEAN |  | True when the file conforms to PDF/A for long-term preservation. |
+| ATR019 | DocumentFiles | Concept | DocumentFilesMediaType | TEXT |  | IANA media type of the file, e.g. application/pdf. |
+| ATR021 | DocumentFiles | Concept | DocumentFilesStorageLocation | URL |  | Where the file is held in the authoritative repository. |
+| ATR204 | DocumentIncorporation | Relationship | DocumentIncorporationIncorporationMode | LOOKUP | LKP041 | How the document is incorporated. |
+| ATR203 | DocumentIncorporation | Relationship | DocumentIncorporationPrecedenceRank | INTEGER |  | Rank of the incorporated document in the order of precedence of the incorporating agreement (1 prevails over 2). |
+| ATR128 | DocumentIndemnities | Concept | DocumentIndemnitiesCapTreatment | LOOKUP | LKP029 | How the indemnity stands against the liability cap. |
+| ATR127 | DocumentIndemnities | Concept | DocumentIndemnitiesClaimType | LOOKUP | LKP030 | The kind of claim covered. |
+| ATR130 | DocumentIndemnities | Concept | DocumentIndemnitiesExclusions | LONGTEXT |  | Circumstances the indemnity does not cover. |
+| ATR126 | DocumentIndemnities | Concept | DocumentIndemnitiesIndemnifyingSide | LOOKUP | LKP009 | The side giving the indemnity. |
+| ATR129 | DocumentIndemnities | Concept | DocumentIndemnitiesRemedies | LONGTEXT |  | Remedies the indemnifier may elect, e.g. procure a licence, modify, or refund. |
+| ATR133 | DocumentInsuranceRequirements | Concept | DocumentInsuranceRequirementsCurrency | LOOKUP | DLT000000072 | Currency of the minimum cover. |
+| ATR131 | DocumentInsuranceRequirements | Concept | DocumentInsuranceRequirementsInsuranceType | LOOKUP | LKP031 | The type of insurance. |
+| ATR132 | DocumentInsuranceRequirements | Concept | DocumentInsuranceRequirementsMinimumAmount | CURRENCY |  | Minimum cover required. |
+| ATR122 | DocumentLiabilityCaps | Concept | DocumentLiabilityCapsBasisPeriodMonths | INTEGER |  | Months of fees the cap is measured over, e.g. 12. |
+| ATR117 | DocumentLiabilityCaps | Concept | DocumentLiabilityCapsCapType | LOOKUP | LKP025 | How the cap is expressed. |
+| ATR119 | DocumentLiabilityCaps | Concept | DocumentLiabilityCapsCurrency | LOOKUP | DLT000000072 | Currency of the fixed amount. |
+| ATR121 | DocumentLiabilityCaps | Concept | DocumentLiabilityCapsFeeBasis | LOOKUP | LKP027 | Which fees a fee-based cap is measured against. |
+| ATR120 | DocumentLiabilityCaps | Concept | DocumentLiabilityCapsFeeMultiplier | FLOAT |  | Multiple of fees, e.g. 1.25 for 125% of charges. |
+| ATR118 | DocumentLiabilityCaps | Concept | DocumentLiabilityCapsFixedAmount | CURRENCY |  | The fixed amount of the cap, where it has one. |
+| ATR116 | DocumentLiabilityCaps | Concept | DocumentLiabilityCapsScope | LOOKUP | LKP026 | Which liability the cap limits. |
+| ATR115 | DocumentLiabilityCaps | Concept | DocumentLiabilityCapsSide | LOOKUP | LKP009 | The side whose liability is capped. |
+| ATR123 | DocumentLiabilityHeads | Concept | DocumentLiabilityHeadsHeadType | LOOKUP | LKP028 | The head of loss. |
+| ATR125 | DocumentLiabilityHeads | Concept | DocumentLiabilityHeadsSide | LOOKUP | LKP009 | The side whose liability the treatment applies to. |
+| ATR124 | DocumentLiabilityHeads | Concept | DocumentLiabilityHeadsTreatment | LOOKUP | LKP029 | How the head stands against the cap. |
+| ATR173 | DocumentObligations | Concept | DocumentObligationsClauseNumber | TEXT |  | The provision stating the commitment. |
+| ATR168 | DocumentObligations | Concept | DocumentObligationsDescription | LONGTEXT |  | What must, may or must not be done. |
+| ATR172 | DocumentObligations | Concept | DocumentObligationsFirstDueDate | DATE |  | The first date the commitment falls due. |
+| ATR170 | DocumentObligations | Concept | DocumentObligationsFrequency | LOOKUP | LKP050 | How often a recurring commitment falls due. |
+| ATR169 | DocumentObligations | Concept | DocumentObligationsIsRecurring | BOOLEAN |  | True when the commitment recurs. |
+| ATR165 | DocumentObligations | Concept | DocumentObligationsModality | LOOKUP | LKP045 | Obligation, right or prohibition. |
+| ATR166 | DocumentObligations | Concept | DocumentObligationsObligatedSide | LOOKUP | LKP009 | The side bound by the commitment. |
+| ATR167 | DocumentObligations | Concept | DocumentObligationsObligationType | LOOKUP | LKP044 | The kind of commitment. |
+| ATR171 | DocumentObligations | Concept | DocumentObligationsTriggerEvent | TEXT |  | The event that brings an event-driven commitment into play. |
+| ATR108 | DocumentPriceAdjustments | Concept | DocumentPriceAdjustmentsBasis | LOOKUP | LKP012 | The mechanism. |
+| ATR111 | DocumentPriceAdjustments | Concept | DocumentPriceAdjustmentsCapPercent | FLOAT |  | Maximum increase per adjustment, in percent. |
+| ATR114 | DocumentPriceAdjustments | Concept | DocumentPriceAdjustmentsFirstReviewDate | DATE |  | Date of the first adjustment the mechanism allows. |
+| ATR112 | DocumentPriceAdjustments | Concept | DocumentPriceAdjustmentsFrequency | LOOKUP | LKP050 | How often adjustments may be made. |
+| ATR110 | DocumentPriceAdjustments | Concept | DocumentPriceAdjustmentsIndexName | TEXT |  | The index followed, e.g. 'UK CPI'. |
+| ATR113 | DocumentPriceAdjustments | Concept | DocumentPriceAdjustmentsNoticeDays | INTEGER |  | Days of notice required before an adjustment takes effect. |
+| ATR109 | DocumentPriceAdjustments | Concept | DocumentPriceAdjustmentsTiming | LOOKUP | LKP013 | When the mechanism applies. |
+| ATR044 | DocumentRenewalTerms | Concept | DocumentRenewalTermsInitialTermMonths | INTEGER |  | Length of the initial term in months. |
+| ATR047 | DocumentRenewalTerms | Concept | DocumentRenewalTermsMaximumRenewals | INTEGER |  | Maximum number of renewals; empty when unlimited. |
+| ATR048 | DocumentRenewalTerms | Concept | DocumentRenewalTermsNonRenewalNoticeDays | INTEGER |  | Days before expiry by which notice of non-renewal must be given. |
+| ATR049 | DocumentRenewalTerms | Concept | DocumentRenewalTermsNoticeDayBasis | LOOKUP | LKP010 | Whether the notice period counts calendar or business days. |
+| ATR052 | DocumentRenewalTerms | Concept | DocumentRenewalTermsNoticeDeadline | DATE |  | The last date on which notice of non-renewal can be given: the expiry date less the notice period on its day basis. |
+| ATR050 | DocumentRenewalTerms | Concept | DocumentRenewalTermsNoticeMethod | LOOKUP | LKP011 | How non-renewal notice must be given. |
+| ATR046 | DocumentRenewalTerms | Concept | DocumentRenewalTermsRenewalPeriodMonths | INTEGER |  | Length of each renewal period in months. |
+| ATR051 | DocumentRenewalTerms | Concept | DocumentRenewalTermsRenewalPriceBasis | LOOKUP | LKP012 | How prices are set for a renewal period. |
+| ATR045 | DocumentRenewalTerms | Concept | DocumentRenewalTermsRenewalType | LOOKUP | LKP014 | How the document renews at the end of a term. |
+| ATR164 | DocumentResilienceTerms | Concept | DocumentResilienceTermsAuthorityCooperation | BOOLEAN |  | True when the provider must cooperate fully with competent and resolution authorities. |
+| ATR157 | DocumentResilienceTerms | Concept | DocumentResilienceTermsBcpRequired | BOOLEAN |  | True when the provider must maintain a business continuity plan. |
+| ATR158 | DocumentResilienceTerms | Concept | DocumentResilienceTermsBcpTestFrequency | LOOKUP | LKP050 | How often the plan must be tested. |
+| ATR161 | DocumentResilienceTerms | Concept | DocumentResilienceTermsIncidentAssistanceChargeBasis | LOOKUP | LKP016 | How incident assistance is charged. |
+| ATR162 | DocumentResilienceTerms | Concept | DocumentResilienceTermsPenetrationTestParticipation | BOOLEAN |  | True when the provider must take part in the customer's threat-led penetration testing. |
+| ATR160 | DocumentResilienceTerms | Concept | DocumentResilienceTermsRecoveryPointHours | FLOAT |  | Recovery point objective in hours. |
+| ATR159 | DocumentResilienceTerms | Concept | DocumentResilienceTermsRecoveryTimeHours | FLOAT |  | Recovery time objective in hours. |
+| ATR163 | DocumentResilienceTerms | Concept | DocumentResilienceTermsSecurityTrainingParticipation | BOOLEAN |  | True when the provider must take part in the customer's security awareness training. |
+| ATR107 | DocumentServiceCredits | Concept | DocumentServiceCreditsCreditApplication | LOOKUP | LKP024 | How the credit is given. |
+| ATR106 | DocumentServiceCredits | Concept | DocumentServiceCreditsCreditPercent | FLOAT |  | Credit as a percentage of the fee for the period. |
+| ATR104 | DocumentServiceCredits | Concept | DocumentServiceCreditsLowerBound | FLOAT |  | Lowest achieved value in the tier (inclusive). |
+| ATR105 | DocumentServiceCredits | Concept | DocumentServiceCreditsUpperBound | FLOAT |  | Highest achieved value in the tier (exclusive). |
+| ATR102 | DocumentServiceLevels | Concept | DocumentServiceLevelsChronicFailureThreshold | TEXT |  | Number of failures in a number of periods that gives a right to terminate. |
+| ATR099 | DocumentServiceLevels | Concept | DocumentServiceLevelsClaimWindowDays | INTEGER |  | Days after the failure within which a credit must be claimed. |
+| ATR100 | DocumentServiceLevels | Concept | DocumentServiceLevelsCreditCapPercent | FLOAT |  | Maximum total credit as a percentage of the fee for the period. |
+| ATR101 | DocumentServiceLevels | Concept | DocumentServiceLevelsCreditsSoleRemedy | BOOLEAN |  | True when credits are the customer's sole and exclusive remedy for the failure. |
+| ATR103 | DocumentServiceLevels | Concept | DocumentServiceLevelsEarnBackAvailable | BOOLEAN |  | True when the provider may earn back credits by over-performance. |
+| ATR098 | DocumentServiceLevels | Concept | DocumentServiceLevelsExclusions | LONGTEXT |  | Events excluded from measurement, e.g. scheduled maintenance. |
+| ATR097 | DocumentServiceLevels | Concept | DocumentServiceLevelsMeasurementBasis | LOOKUP | LKP023 | How the metric is computed. |
+| ATR096 | DocumentServiceLevels | Concept | DocumentServiceLevelsMeasurementPeriod | LOOKUP | LKP050 | The period over which performance is measured. |
+| ATR091 | DocumentServiceLevels | Concept | DocumentServiceLevelsMetricType | LOOKUP | LKP021 | What the service level measures. |
+| ATR092 | DocumentServiceLevels | Concept | DocumentServiceLevelsObjectiveType | LOOKUP | LKP022 | Quantitative objective or qualitative commitment. |
+| ATR093 | DocumentServiceLevels | Concept | DocumentServiceLevelsScope | TEXT |  | What the commitment covers, e.g. 'region, multi-zone deployment'. |
+| ATR095 | DocumentServiceLevels | Concept | DocumentServiceLevelsTargetUnit | TEXT |  | Unit of the target, e.g. percent, minutes, hours. |
+| ATR094 | DocumentServiceLevels | Concept | DocumentServiceLevelsTargetValue | FLOAT |  | The committed target, e.g. 99.95. |
+| ATR086 | DocumentServices | Concept | DocumentServicesBillingFrequency | LOOKUP | LKP050 | How often the service is invoiced. |
+| ATR084 | DocumentServices | Concept | DocumentServicesCurrency | LOOKUP | DLT000000072 | Currency of the unit price. |
+| ATR080 | DocumentServices | Concept | DocumentServicesDeploymentModel | LOOKUP | LKP018 | Cloud deployment model of the service. |
+| ATR078 | DocumentServices | Concept | DocumentServicesDescription | LONGTEXT |  | What the service does, as described in the document. |
+| ATR089 | DocumentServices | Concept | DocumentServicesEndDate | DATE |  | Date the service line ends. |
+| ATR079 | DocumentServices | Concept | DocumentServicesIctServiceType | LOOKUP | LKP017 | Type of ICT service per the DORA register taxonomy. |
+| ATR081 | DocumentServices | Concept | DocumentServicesLicenceMetric | LOOKUP | LKP019 | The unit the service is licensed or consumed against. |
+| ATR087 | DocumentServices | Concept | DocumentServicesOverageRate | CURRENCY |  | Charge per unit of use beyond the contracted quantity. |
+| ATR085 | DocumentServices | Concept | DocumentServicesPricingModel | LOOKUP | LKP020 | How charges for the service are calculated. |
+| ATR077 | DocumentServices | Concept | DocumentServicesProviderServiceCode | TEXT |  | The provider's product or SKU code for the service. |
+| ATR082 | DocumentServices | Concept | DocumentServicesQuantity | FLOAT |  | Quantity of the metric contracted. |
+| ATR076 | DocumentServices | Concept | DocumentServicesServiceName | TEXT |  | The name of the service as the document states it. |
+| ATR088 | DocumentServices | Concept | DocumentServicesStartDate | DATE |  | Date the service line starts. |
+| ATR090 | DocumentServices | Concept | DocumentServicesSupportsCriticalFunction | BOOLEAN |  | True when the customer has assessed the service as supporting a critical or important function, which brings DORA Art 30(3) provisions into play. |
+| ATR083 | DocumentServices | Concept | DocumentServicesUnitPrice | CURRENCY |  | Price per unit of the metric. |
+| ATR149 | DocumentSubcontractingTerms | Concept | DocumentSubcontractingTermsFlowDownRequired | BOOLEAN |  | True when the provider must flow the document's obligations down to subcontractors. |
+| ATR146 | DocumentSubcontractingTerms | Concept | DocumentSubcontractingTermsNoticeDays | INTEGER |  | Days of notice of a new or replacement subcontractor. |
+| ATR147 | DocumentSubcontractingTerms | Concept | DocumentSubcontractingTermsObjectionDays | INTEGER |  | Days within which the customer may object. |
+| ATR145 | DocumentSubcontractingTerms | Concept | DocumentSubcontractingTermsPermission | LOOKUP | LKP036 | Whether and on what consent subcontracting is allowed. |
+| ATR150 | DocumentSubcontractingTerms | Concept | DocumentSubcontractingTermsProviderRemainsResponsible | BOOLEAN |  | True when the provider stays fully responsible for subcontracted services. |
+| ATR148 | DocumentSubcontractingTerms | Concept | DocumentSubcontractingTermsTerminationOnObjection | BOOLEAN |  | True when the customer may terminate if a change goes ahead despite objection. |
+| ATR205 | DocumentSupersession | Relationship | DocumentSupersessionReason | LOOKUP | LKP043 | Why the successor supersedes the predecessor. |
+| ATR056 | DocumentTerminationRights | Concept | DocumentTerminationRightsCureDays | INTEGER |  | Period the other side has to remedy a breach before the right arises. |
+| ATR057 | DocumentTerminationRights | Concept | DocumentTerminationRightsDayBasis | LOOKUP | LKP010 | Whether the notice and cure periods count calendar or business days. |
+| ATR058 | DocumentTerminationRights | Concept | DocumentTerminationRightsFeePayable | BOOLEAN |  | True when exercising the right triggers a termination fee. |
+| ATR055 | DocumentTerminationRights | Concept | DocumentTerminationRightsNoticeDays | INTEGER |  | Notice period for exercising the right. |
+| ATR059 | DocumentTerminationRights | Concept | DocumentTerminationRightsPrepaidFeesRefunded | BOOLEAN |  | True when prepaid fees for the remaining term are refunded on exercise. |
+| ATR053 | DocumentTerminationRights | Concept | DocumentTerminationRightsSide | LOOKUP | LKP009 | The side of the agreement that holds the right. |
+| ATR054 | DocumentTerminationRights | Concept | DocumentTerminationRightsTrigger | LOOKUP | LKP015 | The ground on which the right arises. |
+| ATR006 | DocumentVersions | Concept | DocumentVersionsEffectiveDate | DATE |  | The date from which the document states it takes effect. |
+| ATR005 | DocumentVersions | Concept | DocumentVersionsExecutionDate | DATE |  | The date the last required signature was applied, making the document fully executed. Derived from the signing times on the signing relationship. |
+| ATR004 | DocumentVersions | Concept | DocumentVersionsExecutionStatus | LOOKUP | LKP002 | How far the document has been executed. |
+| ATR210 | DocumentVersions | Concept | DocumentVersionsIsAuthoritative | BOOLEAN |  | True when this is the Version approved for operational use. |
+| ATR211 | DocumentVersions | Concept | DocumentVersionsIsLegallyEffective | BOOLEAN |  | Derived from execution, effective dates and supersession. |
+| ATR014 | DocumentVersions | Concept | DocumentVersionsPublicationDate | DATE |  | The date the publisher states this version was published or last amended. |
+| ATR208 | DocumentVersions | Concept | DocumentVersionsSequence | INTEGER |  | Order of the Version within the Document. |
+| ATR209 | DocumentVersions | Concept | DocumentVersionsState | LOOKUP | DocumentVersionStates | Draft, redline, agreed form, executed, published, withdrawn or superseded. |
+| ATR013 | DocumentVersions | Concept | DocumentVersionsVersionLabel | TEXT |  | The version or edition the publisher gives the document, e.g. 'November 2025' or 'v3.2'. |
+| ATR193 | LegalEntityDataProcessing | Relationship | LegalEntityDataProcessingDataSubjectCategories | LONGTEXT |  | Categories of data subjects. |
+| ATR192 | LegalEntityDataProcessing | Relationship | LegalEntityDataProcessingPersonalDataTypes | LONGTEXT |  | Types of personal data processed. |
+| ATR191 | LegalEntityDataProcessing | Relationship | LegalEntityDataProcessingPurposes | LONGTEXT |  | Purposes of the processing. |
+| ATR194 | LegalEntityDataProcessing | Relationship | LegalEntityDataProcessingSccModule | LOOKUP | LKP034 | Module of the standard contractual clauses used, where transfers occur. |
+| ATR190 | LegalEntityDataProcessing | Relationship | LegalEntityDataProcessingSubjectMatter | LONGTEXT |  | Subject matter and nature of the processing. |
+| ATR184 | LegalEntityServiceProcurement | Relationship | LegalEntityServiceProcurementReferenceName | TEXT |  | The name the document uses for the customer entity. |
+| ATR183 | LegalEntityServiceProvision | Relationship | LegalEntityServiceProvisionReferenceName | TEXT |  | The name the document uses for the provider, e.g. 'Supplier' or 'AWS'. |
+| ATR188 | LegalEntitySubcontracting | Relationship | LegalEntitySubcontractingProcessesPersonalData | BOOLEAN |  | True when the subcontractor processes personal data (a sub-processor). |
+| ATR185 | LegalEntitySubcontracting | Relationship | LegalEntitySubcontractingRank | INTEGER |  | Place in the supply chain: 2 for a subcontractor of the direct provider, 3 for its subcontractor, and so on (the direct provider is rank 1). |
+| ATR186 | LegalEntitySubcontracting | Relationship | LegalEntitySubcontractingRecipientProvider | MASTERID |  | Master ID of the legal entity to which this subcontractor provides the subcontracted service (the next link up the chain). |
+| ATR189 | LegalEntitySubcontracting | Relationship | LegalEntitySubcontractingServiceCountry | LOOKUP | DLT000000071 | Country from which the subcontractor performs the services. |
+| ATR187 | LegalEntitySubcontracting | Relationship | LegalEntitySubcontractingServicesPerformed | LONGTEXT |  | What the subcontractor performs. |
+| ATR272 | LegalEntitySupplierActions | Concept | LegalEntitySupplierActionsActionType | LOOKUP | LegalEntitySupplierActionTypes | Whether the item is an open risk, open issue, renewal action or executive escalation. |
+| ATR273 | LegalEntitySupplierActions | Concept | LegalEntitySupplierActionsDescription | LONGTEXT |  | The action, issue, risk or escalation to be tracked. |
+| ATR276 | LegalEntitySupplierActions | Concept | LegalEntitySupplierActionsDueDate | DATE |  | The date by which the item should be resolved or completed. |
+| ATR275 | LegalEntitySupplierActions | Concept | LegalEntitySupplierActionsOwnerPersonReference | IDENTIFIER |  | Reference to the Person accountable for the item. |
+| ATR274 | LegalEntitySupplierActions | Concept | LegalEntitySupplierActionsStatus | LOOKUP | ActionStatuses | The current status of the tracked item. |
+| ATR254 | LegalEntitySupplierComplianceAssessments | Concept | LegalEntitySupplierComplianceAssessmentsAssessmentDate | DATE |  | The effective date of the supplier compliance assessment. |
+| ATR259 | LegalEntitySupplierComplianceAssessments | Concept | LegalEntitySupplierComplianceAssessmentsBCPDRTested | BOOLEAN |  | Whether the supplier's business-continuity or disaster-recovery arrangements have been tested. |
+| ATR258 | LegalEntitySupplierComplianceAssessments | Concept | LegalEntitySupplierComplianceAssessmentsCyberInsuranceStatus | LOOKUP | AssuranceStatuses | The supplier's cyber-insurance status. |
+| ATR257 | LegalEntitySupplierComplianceAssessments | Concept | LegalEntitySupplierComplianceAssessmentsISO27001Status | LOOKUP | AssuranceStatuses | The supplier's ISO 27001 certification status. |
+| ATR260 | LegalEntitySupplierComplianceAssessments | Concept | LegalEntitySupplierComplianceAssessmentsPrivacyReviewDate | DATE |  | The date of the supplier's latest privacy review. |
+| ATR255 | LegalEntitySupplierComplianceAssessments | Concept | LegalEntitySupplierComplianceAssessmentsSOC1Status | LOOKUP | AssuranceStatuses | The supplier's SOC 1 assurance status. |
+| ATR256 | LegalEntitySupplierComplianceAssessments | Concept | LegalEntitySupplierComplianceAssessmentsSOC2Status | LOOKUP | AssuranceStatuses | The supplier's SOC 2 assurance status. |
+| ATR289 | LegalEntitySupplierCorporateRelationships | Concept | LegalEntitySupplierCorporateRelationshipsEndDate | DATE |  | The date on which the corporate relationship ended, when applicable. |
+| ATR286 | LegalEntitySupplierCorporateRelationships | Concept | LegalEntitySupplierCorporateRelationshipsRelatedLegalEntityReference | IDENTIFIER |  | Reference to the related Legal Entity, such as the supplier's parent company. |
+| ATR287 | LegalEntitySupplierCorporateRelationships | Concept | LegalEntitySupplierCorporateRelationshipsRelationshipType | LOOKUP | LegalEntityCorporateRelationshipTypes | The corporate relationship type, such as parent, subsidiary or affiliate. |
+| ATR288 | LegalEntitySupplierCorporateRelationships | Concept | LegalEntitySupplierCorporateRelationshipsStartDate | DATE |  | The date from which the corporate relationship applies. |
+| ATR248 | LegalEntitySupplierFinancialAssessments | Concept | LegalEntitySupplierFinancialAssessmentsAnnualRevenue | DECIMAL |  | The supplier's reported annual revenue. |
+| ATR247 | LegalEntitySupplierFinancialAssessments | Concept | LegalEntitySupplierFinancialAssessmentsAssessmentDate | DATE |  | The effective date of the supplier financial assessment. |
+| ATR252 | LegalEntitySupplierFinancialAssessments | Concept | LegalEntitySupplierFinancialAssessmentsCreditRating | TEXT |  | The supplier's reported external or internal credit rating. |
+| ATR253 | LegalEntitySupplierFinancialAssessments | Concept | LegalEntitySupplierFinancialAssessmentsFinancialRiskRating | LOOKUP | LegalEntitySupplierRiskRatings | The assessed financial risk of the supplier. |
+| ATR251 | LegalEntitySupplierFinancialAssessments | Concept | LegalEntitySupplierFinancialAssessmentsProfitability | LOOKUP | LegalEntitySupplierProfitabilityStatuses | The assessed profitability of the supplier. |
+| ATR249 | LegalEntitySupplierFinancialAssessments | Concept | LegalEntitySupplierFinancialAssessmentsRevenueCurrency | LOOKUP | Currencies | The currency of reported annual revenue. |
+| ATR250 | LegalEntitySupplierFinancialAssessments | Concept | LegalEntitySupplierFinancialAssessmentsRevenueTrend | LOOKUP | LegalEntitySupplierRevenueTrends | The assessed direction of supplier revenue. |
+| ATR261 | LegalEntitySupplierIntelligence | Concept | LegalEntitySupplierIntelligenceAsOfDate | DATE |  | The date as of which the supplier intelligence applies. |
+| ATR265 | LegalEntitySupplierIntelligence | Concept | LegalEntitySupplierIntelligenceIndustryEvents | LONGTEXT |  | Industry events material to the supplier relationship. |
+| ATR262 | LegalEntitySupplierIntelligence | Concept | LegalEntitySupplierIntelligenceKeyCompetitors | LONGTEXT |  | Key competitors identified for the supplier. |
+| ATR264 | LegalEntitySupplierIntelligence | Concept | LegalEntitySupplierIntelligenceLeadershipChanges | LONGTEXT |  | Material supplier leadership changes. |
+| ATR263 | LegalEntitySupplierIntelligence | Concept | LegalEntitySupplierIntelligenceRecentAcquisitions | LONGTEXT |  | Recent acquisitions involving the supplier. |
+| ATR266 | LegalEntitySupplierIntelligence | Concept | LegalEntitySupplierIntelligenceRegulatoryImpacts | LONGTEXT |  | Regulatory changes or events that may affect the supplier relationship. |
+| ATR241 | LegalEntitySupplierPerformanceAssessments | Concept | LegalEntitySupplierPerformanceAssessmentsAssessmentDate | DATE |  | The effective date of the supplier performance assessment. |
+| ATR242 | LegalEntitySupplierPerformanceAssessments | Concept | LegalEntitySupplierPerformanceAssessmentsAvailabilityResult | DECIMAL |  | The consolidated availability result for the supplier and assessment period. |
+| ATR244 | LegalEntitySupplierPerformanceAssessments | Concept | LegalEntitySupplierPerformanceAssessmentsCustomerSatisfaction | DECIMAL |  | The customer-satisfaction result for the supplier and assessment period. |
+| ATR243 | LegalEntitySupplierPerformanceAssessments | Concept | LegalEntitySupplierPerformanceAssessmentsIncidentResponseResult | DECIMAL |  | The consolidated incident-response result for the supplier and assessment period. |
+| ATR246 | LegalEntitySupplierPerformanceAssessments | Concept | LegalEntitySupplierPerformanceAssessmentsOverallHealthScore | DECIMAL |  | The overall supplier health score for the assessment period. |
+| ATR245 | LegalEntitySupplierPerformanceAssessments | Concept | LegalEntitySupplierPerformanceAssessmentsQBRScore | DECIMAL |  | The consolidated QBR score for the supplier and assessment period. |
+| ATR225 | LegalEntitySupplierProfile | Concept | LegalEntitySupplierProfileAsOfDate | DATE |  | The date as of which the supplier profile information applies. |
+| ATR219 | LegalEntitySupplierProfile | Concept | LegalEntitySupplierProfileCategory | LOOKUP | LegalEntitySupplierCategories | The category used to segment and manage the supplier. |
+| ATR218 | LegalEntitySupplierProfile | Concept | LegalEntitySupplierProfileDisplayName | TEXT |  | The supplier name used in vendor-management reporting. |
+| ATR223 | LegalEntitySupplierProfile | Concept | LegalEntitySupplierProfileEmployeeCount | INTEGER |  | The supplier's reported employee count as of the profile date. |
+| ATR221 | LegalEntitySupplierProfile | Concept | LegalEntitySupplierProfileHeadquarters | TEXT |  | The supplier's reported headquarters location. |
+| ATR224 | LegalEntitySupplierProfile | Concept | LegalEntitySupplierProfileOwnershipType | LOOKUP | LegalEntitySupplierOwnershipTypes | Whether the supplier is public, private or another ownership type. |
+| ATR217 | LegalEntitySupplierProfile | Concept | LegalEntitySupplierProfileSupplierID | TEXT |  | The supplier identifier used by the vendor-management organization. |
+| ATR220 | LegalEntitySupplierProfile | Concept | LegalEntitySupplierProfileWebsite | URL |  | The supplier's primary website. |
+| ATR222 | LegalEntitySupplierProfile | Concept | LegalEntitySupplierProfileYearFounded | INTEGER |  | The year the supplier was founded. |
+| ATR280 | LegalEntitySupplierQBRMetrics | Concept | LegalEntitySupplierQBRMetricsActual | DECIMAL |  | The actual value for the performance indicator. |
+| ATR285 | LegalEntitySupplierQBRMetrics | Concept | LegalEntitySupplierQBRMetricsComments | LONGTEXT |  | Commentary supporting the performance result. |
+| ATR278 | LegalEntitySupplierQBRMetrics | Concept | LegalEntitySupplierQBRMetricsKPI | LOOKUP | LegalEntitySupplierQBRKPIs | The supplier-review performance indicator. |
+| ATR284 | LegalEntitySupplierQBRMetrics | Concept | LegalEntitySupplierQBRMetricsOwnerPersonReference | IDENTIFIER |  | Reference to the Person accountable for the performance indicator. |
+| ATR277 | LegalEntitySupplierQBRMetrics | Concept | LegalEntitySupplierQBRMetricsReviewDate | DATE |  | The date or period of the supplier review. |
+| ATR282 | LegalEntitySupplierQBRMetrics | Concept | LegalEntitySupplierQBRMetricsScore | DECIMAL |  | The normalized score for the performance indicator. |
+| ATR279 | LegalEntitySupplierQBRMetrics | Concept | LegalEntitySupplierQBRMetricsTarget | DECIMAL |  | The target value for the performance indicator. |
+| ATR283 | LegalEntitySupplierQBRMetrics | Concept | LegalEntitySupplierQBRMetricsWeightedScore | DECIMAL |  | The performance-indicator score adjusted by its assigned weight. |
+| ATR281 | LegalEntitySupplierQBRMetrics | Concept | LegalEntitySupplierQBRMetricsWeightPercent | DECIMAL |  | The percentage weight assigned to the performance indicator. |
+| ATR235 | LegalEntitySupplierRiskAssessments | Concept | LegalEntitySupplierRiskAssessmentsAssessmentDate | DATE |  | The effective date of the supplier risk assessment. |
+| ATR236 | LegalEntitySupplierRiskAssessments | Concept | LegalEntitySupplierRiskAssessmentsCriticalityTier | LOOKUP | LegalEntitySupplierCriticalityTiers | The supplier's criticality tier at the assessment date. |
+| ATR240 | LegalEntitySupplierRiskAssessments | Concept | LegalEntitySupplierRiskAssessmentsFourthPartyDependencies | LONGTEXT |  | Material fourth-party dependencies identified for the supplier. |
+| ATR238 | LegalEntitySupplierRiskAssessments | Concept | LegalEntitySupplierRiskAssessmentsInherentRiskRating | LOOKUP | LegalEntitySupplierRiskRatings | The supplier risk before controls or mitigation. |
+| ATR239 | LegalEntitySupplierRiskAssessments | Concept | LegalEntitySupplierRiskAssessmentsResidualRiskRating | LOOKUP | LegalEntitySupplierRiskRatings | The supplier risk remaining after controls and mitigation. |
+| ATR237 | LegalEntitySupplierRiskAssessments | Concept | LegalEntitySupplierRiskAssessmentsRiskTier | LOOKUP | LegalEntitySupplierRiskTiers | The supplier's overall risk tier at the assessment date. |
+| ATR232 | LegalEntitySupplierServices | Concept | LegalEntitySupplierServicesBusinessCapability | TEXT |  | The business capability supported by the product or service. |
+| ATR234 | LegalEntitySupplierServices | Concept | LegalEntitySupplierServicesDataShared | LONGTEXT |  | Data shared with or received from the supplier for the product or service. |
+| ATR233 | LegalEntitySupplierServices | Concept | LegalEntitySupplierServicesIntegration | LONGTEXT |  | A key integration involving the supplier product or service. |
+| ATR230 | LegalEntitySupplierServices | Concept | LegalEntitySupplierServicesPrimaryService | BOOLEAN |  | Whether this is the supplier's primary service for the organization. |
+| ATR231 | LegalEntitySupplierServices | Concept | LegalEntitySupplierServicesProductOrService | TEXT |  | A product or service provided by the supplier. |
+| ATR229 | LegalEntitySupplierStakeholders | Concept | LegalEntitySupplierStakeholdersEndDate | DATE |  | The date the responsibility ended, when applicable. |
+| ATR227 | LegalEntitySupplierStakeholders | Concept | LegalEntitySupplierStakeholdersPersonReference | IDENTIFIER |  | Reference to the Person assigned the supplier responsibility. |
+| ATR226 | LegalEntitySupplierStakeholders | Concept | LegalEntitySupplierStakeholdersRole | LOOKUP | LegalEntitySupplierStakeholderRoles | The person's role for the supplier, such as business owner, vendor manager, procurement owner, contract owner or executive sponsor. |
+| ATR228 | LegalEntitySupplierStakeholders | Concept | LegalEntitySupplierStakeholdersStartDate | DATE |  | The date the responsibility started. |
+| ATR267 | LegalEntitySupplierStrategicAssessments | Concept | LegalEntitySupplierStrategicAssessmentsAssessmentDate | DATE |  | The effective date of the strategic assessment. |
+| ATR270 | LegalEntitySupplierStrategicAssessments | Concept | LegalEntitySupplierStrategicAssessmentsInnovationContribution | LOOKUP | LegalEntitySupplierInnovationContributionLevels | The supplier's assessed contribution to innovation. |
+| ATR271 | LegalEntitySupplierStrategicAssessments | Concept | LegalEntitySupplierStrategicAssessmentsRecommendation | LONGTEXT |  | The current management recommendation for the supplier. |
+| ATR268 | LegalEntitySupplierStrategicAssessments | Concept | LegalEntitySupplierStrategicAssessmentsStrategicImportance | LOOKUP | LegalEntitySupplierStrategicImportanceLevels | The supplier's assessed strategic importance. |
+| ATR269 | LegalEntitySupplierStrategicAssessments | Concept | LegalEntitySupplierStrategicAssessmentsSwitchingComplexity | LOOKUP | LegalEntitySupplierSwitchingComplexityLevels | The assessed complexity of replacing the supplier. |
+| ATR199 | PersonDocumentSigning | Relationship | PersonDocumentSigningAssuranceLevel | LOOKUP | LKP048 | Legal assurance level of an electronic signature. |
+| ATR196 | PersonDocumentSigning | Relationship | PersonDocumentSigningCapacity | TEXT |  | The capacity or title in which the person signed, e.g. 'Chief Procurement Officer'. |
+| ATR197 | PersonDocumentSigning | Relationship | PersonDocumentSigningOnBehalfOf | MASTERID |  | Master ID of the legal entity for which the person signed. |
+| ATR200 | PersonDocumentSigning | Relationship | PersonDocumentSigningPadesLevel | LOOKUP | LKP049 | PAdES baseline level of the PDF signature. |
+| ATR198 | PersonDocumentSigning | Relationship | PersonDocumentSigningSignatureMethod | LOOKUP | LKP047 | How the signature was applied. |
+| ATR195 | PersonDocumentSigning | Relationship | PersonDocumentSigningSignedDateTime | DATETIME |  | When the signature was applied. |
