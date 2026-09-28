@@ -29,9 +29,10 @@ Usage:
                 outside the M&A Operating System brand context.
 
 Requirements:
-    pip install markdown weasyprint
+    pip install -r requirements.txt
 """
 
+import argparse
 import html as _html
 import base64 as _b64
 import json
@@ -64,7 +65,8 @@ DATA_MODELS_DIR = Path(__file__).parent / "docs" / "data-models"
 _REPO_ROOT   = Path(__file__).parent
 
 DATA_MODEL_CONFIG = {
-    "meta": "Data Design Document",
+    "category": "Data Design Document",
+    "meta": "",
     "author": "Andrew Bush (www.maoperatingsystem.com/bio-andrew-bush)",
 }
 
@@ -121,11 +123,15 @@ def get_ordered_files(docs_dir: Path) -> list[Path]:
 # ---------- markdown processing ----------
 
 def strip_md_links(text: str) -> str:
-    """Replace cross-doc .md links with their plain text — they don't resolve in PDF."""
-    # [label](./file.md#anchor) → label
-    text = re.sub(r"\[([^\]]+)\]\(\./[\w-]+\.md(?:#[\w-]*)?\)", r"\1", text)
-    # any remaining bare (./file.md#anchor) with no label → drop it
-    text = re.sub(r"\(\./[\w-]+\.md(?:#[\w-]*)?\)", "", text)
+    """Replace cross-doc .md links with their plain text — they don't resolve in PDF.
+
+    Covers ./file.md, file.md and ../other/file.md forms. Same-document (#anchor)
+    links are left intact; WeasyPrint resolves those into internal jumps.
+    """
+    # [label](../dir/file.md#anchor) → label
+    text = re.sub(r"\[([^\]]+)\]\((?:\./)?[\w./-]+\.md(?:#[\w-]*)?\)", r"\1", text)
+    # any remaining bare (../dir/file.md#anchor) with no label → drop it
+    text = re.sub(r"\((?:\./)?[\w./-]+\.md(?:#[\w-]*)?\)", "", text)
     return text
 
 
@@ -133,8 +139,8 @@ def strip_md_links(text: str) -> str:
 
 def _mmdc_available() -> bool:
     try:
-        subprocess.run(["mmdc", "--version"], capture_output=True, timeout=10)
-        return True
+        result = subprocess.run(["mmdc", "--version"], capture_output=True, timeout=10)
+        return result.returncode == 0
     except (FileNotFoundError, subprocess.SubprocessError):
         return False
 
@@ -184,7 +190,7 @@ def _render_mermaid(source: str) -> str | None:
     if _MMDC_PRESENT is None:
         _MMDC_PRESENT = _mmdc_available()
         if not _MMDC_PRESENT:
-            print("  [warn] mmdc not found — Mermaid diagrams will render as code blocks")
+            print("  [warn] mmdc not found or not working — Mermaid diagrams will render as code blocks")
     if not _MMDC_PRESENT:
         return None
 
@@ -199,7 +205,9 @@ def _render_mermaid(source: str) -> str | None:
         # Linux user-namespace privileges that Chromium's sandbox depends on.
         # This is safe here because the Mermaid source comes from files inside
         # the repository — it is not arbitrary untrusted web content.
-        cfg_path.write_text(json.dumps({"args": ["--no-sandbox", "--disable-setuid-sandbox"]}))
+        cfg_path.write_text(
+            json.dumps({"args": ["--no-sandbox", "--disable-setuid-sandbox"]}), encoding="utf-8"
+        )
 
         try:
             result = subprocess.run(
@@ -226,7 +234,11 @@ def _render_mermaid(source: str) -> str | None:
             print(f"  [warn] mmdc error: {result.stderr.decode('utf-8', errors='replace').strip()}")
             return None
 
-        px_w, px_h   = _png_size(out_path)
+        try:
+            px_w, px_h = _png_size(out_path)
+        except (OSError, struct.error) as e:
+            print(f"  [warn] could not read PNG dimensions ({e}); falling back to code block")
+            return None
         w_mm, h_mm   = _diagram_display_size(px_w, px_h)
         data         = _b64.b64encode(out_path.read_bytes()).decode()
 
@@ -248,7 +260,7 @@ def extract_mermaid_blocks(text: str) -> tuple[str, dict[str, str]]:
     def replace(match: re.Match) -> str:
         nonlocal counter
         source = match.group(1).strip()
-        key = f"MERMAID_BLOCK_{counter}_END"
+        key = f"MERMAIDBLOCK{counter}END"
         counter += 1
         rendered = _render_mermaid(source)
         if rendered:
@@ -341,7 +353,8 @@ def _inject_toc_under_heading(body: str, entries: list[tuple[int, str, str]]) ->
 
 def build_html(files: list[Path], title: str, meta: str,
                author: str = "", nofront: bool = False,
-               subs: dict[str, str] | None = None) -> str:
+               subs: dict[str, str] | None = None,
+               category: str = "Product Design") -> str:
     import markdown
 
     md = markdown.Markdown(
@@ -411,15 +424,15 @@ def build_html(files: list[Path], title: str, meta: str,
     if nofront:
         cover = ""
     else:
+        meta_line = f'\n    <p class="cover-meta">{safe_meta}</p>' if safe_meta else ""
         author_line = f'\n    <p class="cover-author">{safe_author}</p>' if safe_author else ""
         cover = f"""
 <div class="cover-page">
   <div class="cover-inner">
     <p class="cover-eyebrow">M&amp;A Operating System</p>
-    <p class="cover-category">Product Design</p>
+    <p class="cover-category">{_html.escape(category)}</p>
     <h1 class="cover-title">{safe_title}</h1>
-    <hr class="cover-rule">
-    <p class="cover-meta">{safe_meta}</p>{author_line}
+    <hr class="cover-rule">{meta_line}{author_line}
   </div>
 </div>"""
 
@@ -773,9 +786,9 @@ def _resolve_page_path(file_path: Path) -> Path:
             print(f"    {c.relative_to(_REPO_ROOT)}")
         sys.exit(1)
     print(f"  [error] '{file_path.name}' not found in a supported document directory.")
-    print(f"          Provide the path relative to the repo root,")
-    print(f"          e.g.: docs/product/analytics/07-text-to-sql-antipattern.md")
-    print(f"                 docs/data-models/cpg-manufacturing-data-design-document.md")
+    print("          Provide the path relative to the repo root,")
+    print("          e.g.: docs/product/analytics/07-text-to-sql-antipattern.md")
+    print("                 docs/data-models/cpg-manufacturing-data-design-document.md")
     sys.exit(1)
 
 
@@ -822,7 +835,8 @@ def generate_page(file_path: Path, nofront: bool = False) -> None:
     print("Building HTML…")
     html = build_html([file_path], page_title, config["meta"],
                       author=config.get("author", ""),
-                      nofront=nofront)
+                      nofront=nofront,
+                      category=config.get("category", "Product Design"))
 
     print("Rendering PDF…")
     from weasyprint import HTML, CSS as WeasyprintCSS
@@ -918,88 +932,55 @@ def generate_pages(product_name: str, page_prefixes: list[str],
 
 # ---------- main ----------
 
-def main():
+def _chapter_prefix(value: str) -> str:
+    """argparse type for --pages: exactly two digits."""
+    if not re.fullmatch(r"\d{2}", value):
+        raise argparse.ArgumentTypeError(f"page prefixes must be two digits (e.g. 02 04 08), got: {value}")
+    return value
+
+
+def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="Render product and data-model Markdown documents to PDF.",
+    )
+    parser.add_argument("--page", type=Path, metavar="FILE",
+                        help="Render one Markdown file from docs/product/ or docs/data-models/.")
+    parser.add_argument("--product", choices=list(PRODUCTS),
+                        help="Render a single product. Omit to render all products.")
+    parser.add_argument("--pages", nargs="+", type=_chapter_prefix, metavar="NN",
+                        help="Two-digit chapter prefixes to merge, in order (requires --product).")
+    parser.add_argument("--out", metavar="FILE.pdf",
+                        help="Output filename for --pages mode.")
+    parser.add_argument("--nofront", action="store_true", help="Omit the branded cover page.")
+    args = parser.parse_args(argv)
+
+    if args.page and (args.product or args.pages or args.out):
+        parser.error("--page cannot be combined with --product, --pages or --out")
+    if args.pages and not args.product:
+        parser.error("--pages requires --product")
+    if args.out and not args.pages:
+        parser.error("--out is only valid with --pages")
+    return args
+
+
+def main(argv: list[str] | None = None) -> None:
+    args = _parse_args(argv)
+
     try:
+        import markdown  # noqa: F401
         from weasyprint import HTML  # noqa: F401
     except ImportError:
-        print("weasyprint not installed. Run: pip install markdown weasyprint")
+        print("Render dependencies missing. Run: pip install -r requirements.txt")
         sys.exit(1)
 
-    args = sys.argv[1:]
-    nofront = "--nofront" in args
-    args = [a for a in args if a != "--nofront"]
-
-    # --page <file>
-    if args and args[0] == '--page':
-        if len(args) < 2:
-            print("Usage: python generate_pdf.py --page <path/to/file.md> [--nofront]")
-            sys.exit(1)
-        generate_page(Path(args[1]), nofront=nofront)
-        print("\nAll done.")
-        return
-
-    # Extract --product, --pages, --out from args
-    product_flag: str | None = None
-    pages_flag: list[str] = []
-    out_flag: str | None = None
-
-    i = 0
-    positional: list[str] = []
-    while i < len(args):
-        if args[i] == "--product":
-            if i + 1 >= len(args):
-                print("  [error] --product requires a value")
-                sys.exit(1)
-            product_flag = args[i + 1]
-            i += 2
-        elif args[i] == "--pages":
-            i += 1
-            while i < len(args) and not args[i].startswith("--"):
-                pages_flag.append(args[i])
-                i += 1
-        elif args[i] == "--out":
-            if i + 1 >= len(args):
-                print("  [error] --out requires a filename")
-                sys.exit(1)
-            out_flag = args[i + 1]
-            i += 2
-        else:
-            positional.append(args[i])
-            i += 1
-
-    if positional:
-        print(f"  [error] unexpected positional argument(s): {' '.join(positional)}")
-        print(f"          Use --product <name> to select a product.")
-        sys.exit(1)
-
-    # --pages mode: needs --product
-    if pages_flag:
-        if not product_flag:
-            print("  [error] --pages requires --product <name>")
-            sys.exit(1)
-        if product_flag not in PRODUCTS:
-            print(f"  [error] unknown product '{product_flag}'. Available: {', '.join(PRODUCTS)}")
-            sys.exit(1)
-        # validate prefix format (exactly two digits)
-        bad = [p for p in pages_flag if not re.fullmatch(r"\d{2}", p)]
-        if bad:
-            print(f"  [error] page prefixes must be two digits (e.g. 02 04 08), got: {', '.join(bad)}")
-            sys.exit(1)
-        generate_pages(product_flag, pages_flag, out_flag, nofront=nofront)
-        print("\nAll done.")
-        return
-
-    # Normal product generation
-    if product_flag:
-        if product_flag not in PRODUCTS:
-            print(f"Unknown product '{product_flag}'. Available: {', '.join(PRODUCTS)}")
-            sys.exit(1)
-        targets = {product_flag: PRODUCTS[product_flag]}
+    if args.page:
+        generate_page(args.page, nofront=args.nofront)
+    elif args.pages:
+        generate_pages(args.product, args.pages, args.out, nofront=args.nofront)
     else:
-        targets = PRODUCTS
-
-    for name, config in targets.items():
-        generate_product(name, config, nofront=nofront)
+        targets = {args.product: PRODUCTS[args.product]} if args.product else PRODUCTS
+        for name, config in targets.items():
+            generate_product(name, config, nofront=args.nofront)
 
     print("\nAll done.")
 
