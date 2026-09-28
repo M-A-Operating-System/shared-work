@@ -102,7 +102,7 @@ EXCLUDE = {"README.md"}
 # ---------- document ordering ----------
 
 def get_ordered_files(docs_dir: Path) -> list[Path]:
-    """Numbered docs in reading order, then ROADMAP.
+    """Numbered docs in reading order, then appendix-*.md by name, then ROADMAP.
 
     Files whose stem contains '-ignore' or '_ignore' are parked and excluded from the build.
     Supports both dash-separated (01-overview.md) and underscore-separated (01_overview.md) naming.
@@ -112,7 +112,11 @@ def get_ordered_files(docs_dir: Path) -> list[Path]:
          if f.name not in EXCLUDE and "-ignore" not in f.stem and "_ignore" not in f.stem],
         key=lambda f: int(f.stem[:2]),
     )
-    result = list(numbered)
+    appendices = sorted(
+        f for f in docs_dir.glob("appendix[_-]*.md")
+        if "-ignore" not in f.stem and "_ignore" not in f.stem
+    )
+    result = numbered + appendices
     for roadmap_name in ("ROADMAP.md", "roadmap.md"):
         roadmap = docs_dir / roadmap_name
         if roadmap.exists() and roadmap_name not in EXCLUDE:
@@ -158,9 +162,11 @@ def _png_size(path: Path) -> tuple[int, int]:
 
 # Content area for US Letter after margins (18mm top, 18mm bottom, 15mm each side):
 #   width  = 215.9mm − 30mm = 185.9mm  → use 178mm to leave breathing room
-#   height = 279.4mm − 36mm = 243.4mm  → cap diagrams at 190mm so they sit with text
+#   height = 279.4mm − 36mm = 243.4mm  → cap diagrams at 225mm, leaving room for
+#   a one- or two-line caption; tall, narrow diagrams would otherwise shrink
+#   until their labels are unreadable.
 _MAX_DIAGRAM_W_MM = 178.0
-_MAX_DIAGRAM_H_MM = 190.0
+_MAX_DIAGRAM_H_MM = 225.0
 
 
 def _diagram_display_size(px_w: int, px_h: int) -> tuple[float, float]:
@@ -348,7 +354,71 @@ def _inject_toc_under_heading(body: str, entries: list[tuple[int, str, str]]) ->
         return None
     toc_entries = [e for e in entries if e[2] != _TOC_HEADING_ID]
     nav = f'<nav class="toc-page toc-inline">\n{_toc_list_html(toc_entries)}\n</nav>'
-    return body[:heading.end()] + nav + body[heading.end():]
+    insert_at = heading.end()
+    # A hand-written list directly under the heading is stale: replace it
+    # rather than render two tables of contents. <ul> nests, so find the
+    # matching </ul> by depth rather than the first one.
+    replace_end = insert_at
+    gap = re.match(r"\s*", body[insert_at:])
+    list_start = insert_at + (gap.end() if gap else 0)
+    if body.startswith("<ul>", list_start):
+        depth, pos = 0, list_start
+        for tag in re.finditer(r"<(/?)ul\b[^>]*>", body[list_start:]):
+            depth += -1 if tag.group(1) else 1
+            if depth == 0:
+                pos = list_start + tag.end()
+                break
+        else:
+            raise RuntimeError("Table of Contents <ul> has no matching </ul>")
+        replace_end = pos
+    return body[:insert_at] + nav + body[replace_end:]
+
+
+_LONG_TOKEN = re.compile(r"[^\s<>&]{10,}")
+_CELL = re.compile(r"(<t[dh]\b[^>]*>)(.*?)(</t[dh]>)", re.DOTALL)
+
+
+def _break_long_tokens(text: str) -> str:
+    """Add <wbr> break points inside long unbroken tokens in HTML text.
+
+    Breaks go at CamelCase humps and after / _ - . so an identifier such as
+    DocumentCommercialTermsFeesNonCancellable wraps at word boundaries.
+    Only text between tags is changed; tags and attributes are left alone.
+    """
+    def split(match: re.Match[str]) -> str:
+        token = match.group(0)
+        token = re.sub(r"(?<=[a-z0-9])(?=[A-Z])", "<wbr>", token)
+        return re.sub(r"(?<=[/_.-])(?=\w)", "<wbr>", token)
+
+    parts = re.split(r"(<[^>]+>)", text)
+    return "".join(
+        part if part.startswith("<") else _LONG_TOKEN.sub(split, part) for part in parts
+    )
+
+
+# Tables with at least this many columns cannot fit portrait width at 8pt
+# without hyphenating nearly every word; they are placed on landscape pages.
+_WIDE_TABLE_COLUMNS = 9
+_TABLE = re.compile(r"<table\b[^>]*>.*?</table>", re.DOTALL)
+
+
+def _wrap_table_cells(body: str) -> str:
+    """Make auto-width tables fit the page.
+
+    Adds break points inside long tokens in every cell, and moves tables with
+    _WIDE_TABLE_COLUMNS or more columns onto landscape pages.
+    """
+    def fit(match: re.Match[str]) -> str:
+        table = _CELL.sub(
+            lambda m: m.group(1) + _break_long_tokens(m.group(2)) + m.group(3), match.group(0)
+        )
+        first_row = re.search(r"<tr\b[^>]*>(.*?)</tr>", table, re.DOTALL)
+        columns = len(re.findall(r"<t[dh]\b", first_row.group(1))) if first_row else 0
+        if columns >= _WIDE_TABLE_COLUMNS:
+            return f'<div class="wide-table">{table}</div>'
+        return table
+
+    return _TABLE.sub(fit, body)
 
 
 def build_html(files: list[Path], title: str, meta: str,
@@ -374,6 +444,7 @@ def build_html(files: list[Path], title: str, meta: str,
         raw, mermaid_map = extract_mermaid_blocks(raw)
         body = md.convert(raw)
         body = inject_mermaid(body, mermaid_map)
+        body = _wrap_table_cells(body)
 
         # Collect headings for the TOC before reset() clears toc_tokens.
         prefix = f"ch{i}-" if multi_chapter else ""
@@ -471,6 +542,10 @@ CSS = """
     margin: 0;
     @bottom-left { content: none; }
     @bottom-right { content: none; }
+}
+
+@page wide {
+    size: letter landscape;
 }
 
 /* Cover */
@@ -591,6 +666,9 @@ td {
     overflow-wrap: break-word;
 }
 tr:nth-child(even) td { background-color: #f9fafb; }
+/* Tables of 9+ columns: own landscape page(s), hyphenate only here. */
+.wide-table { page: wide; }
+.wide-table td { hyphens: auto; hyphenate-limit-chars: 8 4 4; }
 
 /* Code */
 code {
