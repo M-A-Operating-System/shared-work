@@ -1,8 +1,9 @@
 # CPG Food and Beverage — Product and Ingredient Data Model Design Document
 
+###About This Document
 This **Data Model Design Document** by **M&A Operating System** provides a single traceable review of one scoped area of a business: the business requirements that area works to, how those requirements translate into data requirements, and how those data requirements translate into a data model design. Every part of the design traces back to the requirement that made it necessary and to the source that evidences it, so that each statement can be followed in either direction. It is written in plain English for the business audience accountable for the area — the people best placed to say whether what it describes is true of their business, and who decide whether this design is recorded in a centralised Data Design Authority as the governed definition the organisation builds and reports on.
 
-## Version
+### Version
 
 |  |  |
 |---|---|
