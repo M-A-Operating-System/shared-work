@@ -4,9 +4,9 @@ Generates a PDF for each product in docs/product/, placing the output inside
 the respective product folder.
 
 Usage:
-    python generate_pdf.py [--product <name>] [--nofront] [--watermark]
-    python generate_pdf.py --page <path/to/file.md> [--nofront] [--watermark]
-    python generate_pdf.py --product <name> --pages <nn> [<nn> ...] [--out <file.pdf>] [--nofront] [--watermark]
+    python generate_pdf.py [--product <name>] [--nofront] [--watermark] [--watermark-text TEXT]
+    python generate_pdf.py --page <path/to/file.md> [--nofront] [--watermark] [--watermark-text TEXT]
+    python generate_pdf.py --product <name> --pages <nn> [<nn> ...] [--out <file.pdf>] [--nofront] [--watermark] [--watermark-text TEXT]
 
     python generate_pdf.py                              → generates all products
     python generate_pdf.py --product analytics          → generates only the analytics product
@@ -27,7 +27,8 @@ Usage:
                 produce <product>_pages_<nn…>.pdf in the product directory.
     --nofront   Omit the branded cover page. Useful for distributing content
                 outside the M&A Operating System brand context.
-    --watermark Add a diagonal DRAFT watermark to every page.
+    --watermark Add the configured watermark text to every page.
+    --watermark-text Set the watermark text (default: DRAFT; requires --watermark).
 
 Requirements:
     pip install -r requirements.txt
@@ -426,6 +427,7 @@ def build_html(files: list[Path], title: str, meta: str,
                author: str = "", nofront: bool = False,
                subs: dict[str, str] | None = None,
                watermark: bool = False,
+               watermark_text: str = "DRAFT",
                category: str = "Product Design") -> str:
     import markdown
 
@@ -509,7 +511,10 @@ def build_html(files: list[Path], title: str, meta: str,
   </div>
 </div>"""
 
-    watermark_html = '\n<div class="watermark">DRAFT</div>' if watermark else ""
+    watermark_html = (
+        f'\n<div class="watermark">{_html.escape(watermark_text.strip())}</div>'
+        if watermark else ""
+    )
 
     return f"""<!DOCTYPE html>
 <html lang="en">
@@ -810,7 +815,8 @@ tr          { page-break-inside: avoid; }
 # ---------- per-product generation ----------
 
 def generate_product(name: str, config: dict, nofront: bool = False,
-                     watermark: bool = False) -> None:
+                     watermark: bool = False,
+                     watermark_text: str = "DRAFT") -> None:
     docs_dir = PRODUCTS_DIR / name
     if not docs_dir.is_dir():
         print(f"  [skip] {name}: directory not found at {docs_dir}")
@@ -834,7 +840,8 @@ def generate_product(name: str, config: dict, nofront: bool = False,
                       author=config.get("author", ""),
                       nofront=nofront,
                       subs={"{{PRODUCT_NAME}}": name},
-                      watermark=watermark)
+                      watermark=watermark,
+                      watermark_text=watermark_text)
 
     print("Rendering PDF (this may take a moment)…")
     from weasyprint import HTML, CSS as WeasyprintCSS
@@ -891,7 +898,8 @@ def _resolve_page_path(file_path: Path) -> Path:
 
 
 def generate_page(file_path: Path, nofront: bool = False,
-                  watermark: bool = False) -> None:
+                  watermark: bool = False,
+                  watermark_text: str = "DRAFT") -> None:
     """Generate a PDF for a single .md file, placed next to it."""
     if file_path.is_symlink():
         print(f"  [error] symlinks are not supported: {file_path}")
@@ -936,6 +944,7 @@ def generate_page(file_path: Path, nofront: bool = False,
                       author=config.get("author", ""),
                       nofront=nofront,
                       watermark=watermark,
+                      watermark_text=watermark_text,
                       category=config.get("category", "Product Design"))
 
     print("Rendering PDF…")
@@ -954,7 +963,8 @@ def generate_page(file_path: Path, nofront: bool = False,
 
 def generate_pages(product_name: str, page_prefixes: list[str],
                    out_name: str | None, nofront: bool = False,
-                   watermark: bool = False) -> None:
+                   watermark: bool = False,
+                   watermark_text: str = "DRAFT") -> None:
     """Generate a merged PDF from a subset of chapters, in the order given."""
     if not page_prefixes:
         print("  [error] --pages requires at least one chapter prefix")
@@ -1014,7 +1024,8 @@ def generate_pages(product_name: str, page_prefixes: list[str],
                       author=config.get("author", ""),
                       nofront=nofront,
                       subs={"{{PRODUCT_NAME}}": product_name},
-                      watermark=watermark)
+                      watermark=watermark,
+                      watermark_text=watermark_text)
 
     print("Rendering PDF…")
     from weasyprint import HTML as WeasyprintHTML, CSS as WeasyprintCSS
@@ -1055,7 +1066,9 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
                         help="Output filename for --pages mode.")
     parser.add_argument("--nofront", action="store_true", help="Omit the branded cover page.")
     parser.add_argument("--watermark", action="store_true",
-                        help="Stamp a diagonal DRAFT watermark on every page.")
+                        help="Stamp the configured watermark text on every page.")
+    parser.add_argument("--watermark-text", default="DRAFT", metavar="TEXT",
+                        help="Watermark wording when --watermark is enabled (default: DRAFT).")
     args = parser.parse_args(argv)
 
     if args.page and (args.product or args.pages or args.out):
@@ -1064,6 +1077,8 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         parser.error("--pages requires --product")
     if args.out and not args.pages:
         parser.error("--out is only valid with --pages")
+    if args.watermark and not args.watermark_text.strip():
+        parser.error("--watermark-text cannot be empty when --watermark is enabled")
     return args
 
 
@@ -1078,15 +1093,18 @@ def main(argv: list[str] | None = None) -> None:
         sys.exit(1)
 
     if args.page:
-        generate_page(args.page, nofront=args.nofront, watermark=args.watermark)
+        generate_page(args.page, nofront=args.nofront, watermark=args.watermark,
+                      watermark_text=args.watermark_text)
     elif args.pages:
         generate_pages(args.product, args.pages, args.out,
-                       nofront=args.nofront, watermark=args.watermark)
+                       nofront=args.nofront, watermark=args.watermark,
+                       watermark_text=args.watermark_text)
     else:
         targets = {args.product: PRODUCTS[args.product]} if args.product else PRODUCTS
         for name, config in targets.items():
             generate_product(name, config, nofront=args.nofront,
-                             watermark=args.watermark)
+                             watermark=args.watermark,
+                             watermark_text=args.watermark_text)
 
     print("\nAll done.")
 
