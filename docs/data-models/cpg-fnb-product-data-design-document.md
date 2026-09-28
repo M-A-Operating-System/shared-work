@@ -1,6 +1,6 @@
 # CPG Food and Beverage — Product and Ingredient Data Model Design Document
 
-This **Data Model Design Document** by **M&A Operating System** provides a single traceable review of one scoped area of a business: the business requirements that area works to, how those requirements translate into data requirements, and how those data requirements translate into a data model design. Every part of the design traces back to the requirement that made it necessary and to the source that evidences it, so that each statement can be followed in either direction. It is written in plain English for the business audience accountable for the area — the people best placed to say whether what it describes is true of their business, and who decide whether this design is recorded in a centralised Data Design Authority as the governed definition the organisation builds and reports on.
+This **Data Model Design Document** by **M&A Operating System** provides a traceable review of one defined business area: the business requirements that govern it, how those requirements translate into data requirements, and how those data requirements translate into a data model design. Every part of the design traces back to the requirement that made it necessary and to the source that supports it, so that each statement can be followed in either direction. It is written in plain English for the business audience accountable for the area — the people best placed to confirm that the design reflects their business and to decide whether it should be recorded in the centralised Data Design Authority as the governed definition used for building and reporting.
 
 ## Version
 
@@ -11,7 +11,7 @@ This **Data Model Design Document** by **M&A Operating System** provides a singl
 | Package reference (the working files this document is produced from) | fnb-bdd |
 | Method version | 31.5 |
 
-**In brief.** This design covers what a food or beverage product is, what goes into it, what it must be, how long it lasts, who may supply its ingredients and what may be said about it on pack. The full summary, the questions it answers and the counts are in section 1.3. In this document, DDA means the Data Design Authority, the central register where the company's data model is kept.
+**In brief.** This design covers what a food or beverage product is, what it is made from, what it must be, how long it lasts, who may supply its ingredients and what may be printed on its pack. The full summary, the questions it answers and the counts are in section 1.3. In this document, DDA means the Data Design Authority, the central register where the company's data model is kept.
 
 ## Table of Contents
 
@@ -29,15 +29,15 @@ This **Data Model Design Document** by **M&A Operating System** provides a singl
 - [3 Business Requirements](#3-business-requirements)
 - [4 Data Requirements](#4-data-requirements)
 - [5 Data Model](#5-data-model)
-  - [5.1 Subject Domains](#51-subject-domains)
-  - [5.2 Canonical Roles](#52-canonical-roles)
-  - [5.3 Role–Verb–Role Relationships](#53-roleverbrole-relationships)
-  - [5.4 Concepts](#54-concepts)
-  - [5.5 Lookups and Values](#55-lookups-and-values)
-  - [5.6 Diagrams](#56-diagrams)
-    - [5.6.1 Domains Data Model](#561-domains-data-model)
-    - [5.6.2 Roles Data Model](#562-roles-data-model)
-    - [5.6.3 Concept Models by Domain](#563-concept-models-by-domain)
+  - [5.1 Diagrams](#51-diagrams)
+    - [5.1.1 Domains Data Model](#511-domains-data-model)
+    - [5.1.2 Roles Data Model](#512-roles-data-model)
+    - [5.1.3 Concept Models by Domain](#513-concept-models-by-domain)
+  - [5.2 Subject Domains](#52-subject-domains)
+  - [5.3 Canonical Roles](#53-canonical-roles)
+  - [5.4 Role–Verb–Role Relationships](#54-roleverbrole-relationships)
+  - [5.5 Concepts](#55-concepts)
+  - [5.6 Lookups and Values](#56-lookups-and-values)
 - [6 Outstanding Decisions](#6-outstanding-decisions)
 - [Appendix A — Sources](#appendix-a--sources)
 - [Appendix B — Data Modelling Principles](#appendix-b--data-modelling-principles)
@@ -119,7 +119,7 @@ Each component remains traceable to the requirement that established its need. T
 
 ### 1.3 Summary of Findings
 
-This design covers what a food or beverage product is, what goes into it, what it must be, how long it lasts, who may supply its ingredients and what may be said about it on pack. The formulation, meaning the list of what goes into a product and how much, is at its heart. The order ingredients are listed in, the allergens, the nutrition values and the claims on a pack all follow from the formulation, so a change to it shows which labels and claims it reaches. Where an ingredient is bought in already made, the design relies on what the supplier declares is inside it, and records who declared it and whether it was checked.
+This design covers what a food or beverage product is, what it is made from, what it must be, how long it lasts, who may supply its ingredients and what may be printed on its pack. Its formulation — the list of ingredients and packaging items used, and their quantities — is central to the design. Ingredient order, allergens, nutrition values and pack claims all follow from the formulation, so a change to it shows which labels and claims it affects. Where an ingredient is bought in already made, the design records what the supplier declares it contains, who made that declaration and whether it was checked.
 
 The design has three stated limits. It cannot say what is inside a bought-in ingredient beyond what the supplier declares. It finds every product that uses a recalled ingredient but not which batches, which belongs to the manufacturing model. It keeps a shelf life for each product and does not work one out from the shelf lives of its ingredients, because none of the sources describe a rule for doing so.
 
@@ -202,7 +202,7 @@ These are used as DDA already holds them.
 
 | ID | Question |
 |---|---|
-| SCQ001 | Which markets are the products sold in? The rules on what must appear on pack, the conditions for claims and the allergens to declare differ between markets. The design carries the allergens of the United States and the European Union, and a product declares those of the markets it is sold in. |
+| SCQ001 | In which markets are the products sold? Rules on pack information, claim conditions and allergens differ by market. The design includes the allergens required in the United States and the European Union; a product must declare the allergens required in each market where it is sold. |
 | SCQ002 | Are nutrition values worked out by testing the finished product, by calculating from its ingredients, or both? All three are allowed, and the design keeps how each value was arrived at. |
 
 ## 3 Business Requirements
@@ -274,15 +274,136 @@ What the business must keep, the questions it must be able to answer, and the mi
 
 **How to read this section.** A *domain* is an area of the business the design keeps information about. A *concept* is a group of related facts kept about something in a domain. A *role* is the part something plays, such as an organisation while it supplies goods. A *relationship* links two roles with a verb that reads naturally in both directions. A *list of values* is a fixed set of allowed answers. Names follow DDA's naming rules, so a concept called ProductAllergens is the group of facts about a product's allergens.
 
-### 5.1 Subject Domains
+### 5.1 Diagrams
+
+The diagrams come first, as a map of the model. The tables that follow give every area, role, relationship and concept in full: areas in 5.2, roles in 5.3, relationships in 5.4, concepts in 5.5 and lists of values in 5.6.
+
+#### 5.1.1 Domains Data Model
+
+One box for each area of the business. Each arrow is one relationship, labelled with the role at each end and the verb between them. An arrow that returns to its own box is a relationship between two things of the same kind. Areas DDA already holds are solid.
+
+```mermaid
+flowchart LR
+  DOM001("Product<br>PRODUCTS")
+  DOM003("Document<br>DOCUMENTS")
+  DOM002("Legal Entity<br>LEGAL ENTITIES")
+  DOM001 -->|"Made Product → is made from → Ingredient"| DOM001
+  DOM001 -->|"Variant → belongs to → Family"| DOM001
+  DOM001 -->|"Replaceable Ingredient → may be replaced by → Permitted Alternative"| DOM001
+  DOM001 -->|"Claiming Product → is compared with → Comparator"| DOM001
+  DOM001 -->|"Bought Material → may be sourced from → Authorised Supplier"| DOM002
+  DOM001 -->|"Certification Holder → holds a certification from → Certifying Body"| DOM002
+  DOM001 -->|"Labelled Product → is marketed by → Responsible Business"| DOM002
+  DOM003 -->|"Declaring Document → declares properties of → Declared Product"| DOM001
+  DOM003 -->|"Issued Document → is issued by → Issuing Organisation"| DOM002
+  classDef indda fill:#1f3a5f,stroke:#0d1f33,stroke-width:2px,color:#fff
+  classDef prop fill:#3d2b56,stroke:#241733,stroke-width:2px,color:#fff,stroke-dasharray:5 3
+  class DOM001,DOM002,DOM003 indda
+```
+
+#### 5.1.2 Roles Data Model
+
+One diagram of every role. Each box is an area of the business, and holds the roles that area plays. An arrow joins the two roles of a relationship, labelled with its verb, and runs between boxes wherever the two roles belong to different areas. The same product can play several roles at once, which is why its roles share a box.
+
+```mermaid
+flowchart LR
+  subgraph SGDOM001["Products"]
+    ROL001("Made Product")
+    ROL002("Ingredient")
+    ROL003("Variant")
+    ROL004("Family")
+    ROL005("Replaceable Ingredient")
+    ROL006("Permitted Alternative")
+    ROL007("Claiming Product")
+    ROL008("Comparator")
+    ROL009("Bought Material")
+    ROL011("Certification Holder")
+    ROL013("Labelled Product")
+    ROL015("Declared Product")
+  end
+  subgraph SGDOM003["Documents"]
+    ROL016("Declaring Document")
+    ROL017("Issued Document")
+  end
+  subgraph SGDOM002["Legal Entities"]
+    ROL010("Authorised Supplier")
+    ROL012("Certifying Body")
+    ROL014("Responsible Business")
+    ROL018("Issuing Organisation")
+  end
+  ROL001 -->|is made from| ROL002
+  ROL003 -->|belongs to| ROL004
+  ROL005 -->|may be replaced by| ROL006
+  ROL007 -->|is compared with| ROL008
+  ROL009 -->|may be sourced from| ROL010
+  ROL011 -->|holds a certification from| ROL012
+  ROL013 -->|is marketed by| ROL014
+  ROL016 -->|declares properties of| ROL015
+  ROL017 -->|is issued by| ROL018
+```
+
+#### 5.1.3 Concept Models by Domain
+
+One diagram per area: its main concept and the concepts beneath it, each arrow saying how many of the lower concept the upper one may have. Only the concepts this design uses are shown.
+
+**Products**
+
+```mermaid
+flowchart LR
+  SBJ001("Product<br>PRODUCTS")
+  SBJ002("Product Identifiers<br>PRODUCTS")
+  SBJ003("Product Formulation Versions<br>PRODUCTS")
+  SBJ004("Product Specifications<br>PRODUCTS")
+  SBJ005("Product Allergens<br>PRODUCTS")
+  SBJ006("Product Nutrition Values<br>PRODUCTS")
+  SBJ007("Product Label Items<br>PRODUCTS")
+  SBJ008("Product Claims<br>PRODUCTS")
+  SBJ009("Product Shelf Lives<br>PRODUCTS")
+  SBJ010("Product Origins<br>PRODUCTS")
+  SBJ011("Product Fraud Assessments<br>PRODUCTS")
+  SBJ012("Product Identity Changes<br>PRODUCTS")
+  SBJ001 -->|"may have many, or none"| SBJ002
+  SBJ001 -->|"may have many, or none"| SBJ003
+  SBJ001 -->|"may have many, or none"| SBJ004
+  SBJ001 -->|"may have many, or none"| SBJ005
+  SBJ001 -->|"may have many, or none"| SBJ006
+  SBJ001 -->|"may have many, or none"| SBJ007
+  SBJ001 -->|"may have many, or none"| SBJ008
+  SBJ001 -->|"may have many, or none"| SBJ009
+  SBJ001 -->|"may have many, or none"| SBJ010
+  SBJ001 -->|"may have many, or none"| SBJ011
+  SBJ001 -->|"may have many, or none"| SBJ012
+```
+
+**Documents**
+
+```mermaid
+flowchart LR
+  SBJ016("Document<br>DOCUMENTS")
+  SBJ017("Document Declarations<br>DOCUMENTS")
+  SBJ016 -->|"may have many, or none"| SBJ017
+```
+
+**Legal Entities**
+
+```mermaid
+flowchart LR
+  SBJ013("Legal Entity<br>LEGAL ENTITIES")
+  SBJ014("Legal Entity Identifiers<br>LEGAL ENTITIES")
+  SBJ015("Legal Entity Address<br>LEGAL ENTITIES")
+  SBJ013 -->|"may have many, or none"| SBJ014
+  SBJ013 -->|"may have one, or none"| SBJ015
+```
+
+### 5.2 Subject Domains
 
 | Domain | In DDA | Main concept | What it covers | Roles | Concepts |
 |---|---|---|---|---|---|
-| <a id="dom001"></a>DOM001<br>**Products** | [DMD000000032](https://datadesign.maoperatingsystem.com/models/domains/DMD000000032) | Product | Everything an organisation makes, buys or sells, including ingredients, packaging, sizes and packs. This design uses it for what each product is, what it is made from, what it must be, how long it lasts and what its pack says. The domain has no concepts in DDA yet, so this design adds them. | [12](#52-canonical-roles) | [12](#54-concepts) |
-| <a id="dom003"></a>DOM003<br>**Documents** | [DMD000000016](https://datadesign.maoperatingsystem.com/models/domains/DMD000000016) | Document | Documents that give evidence for business processes. This design uses it for supplier certificates of analysis, change notices, certification documents and specification sheets. | [2](#52-canonical-roles) | [2](#54-concepts) |
-| <a id="dom002"></a>DOM002<br>**Legal Entities** | [DMD000000012](https://datadesign.maoperatingsystem.com/models/domains/DMD000000012) | Legal Entity | Organisations of every kind. This design uses it for suppliers, certifying bodies, the business named on a pack and the organisations that issue supplier documents. | [4](#52-canonical-roles) | [3](#54-concepts) |
+| <a id="dom001"></a>DOM001<br>**Products** | [DMD000000032](https://datadesign.maoperatingsystem.com/models/domains/DMD000000032) | Product | Everything an organisation makes, buys or sells, including ingredients, packaging, sizes and packs. This design uses it for what each product is, what it is made from, what it must be, how long it lasts and what is printed on its pack. The domain has no concepts in DDA yet, so this design adds them. | [12](#53-canonical-roles) | [12](#55-concepts) |
+| <a id="dom003"></a>DOM003<br>**Documents** | [DMD000000016](https://datadesign.maoperatingsystem.com/models/domains/DMD000000016) | Document | Documents that give evidence for business processes. This design uses it for supplier certificates of analysis, change notices, certification documents and specification sheets. | [2](#53-canonical-roles) | [2](#55-concepts) |
+| <a id="dom002"></a>DOM002<br>**Legal Entities** | [DMD000000012](https://datadesign.maoperatingsystem.com/models/domains/DMD000000012) | Legal Entity | Organisations of every kind. This design uses it for suppliers, certifying bodies, the business named on a pack and the organisations that issue supplier documents. | [4](#53-canonical-roles) | [3](#55-concepts) |
 
-### 5.2 Canonical Roles
+### 5.3 Canonical Roles
 
 A role describes what something is while it is in a relationship. The same product can play several roles at once.
 
@@ -307,7 +428,7 @@ A role describes what something is while it is in a relationship. The same produ
 | Documents | <a id="rol017"></a>ROL017<br>**Issued Document** | A document is an Issued Document while it is issued by another party. It lets a statement be traced to whoever made it. It is not a Declaring Document, which is about what a document states about a product. | [REQ031](#req031) |
 | Legal Entities | <a id="rol018"></a>ROL018<br>**Issuing Organisation** | An organisation is an Issuing Organisation while it issues something to another party. It stands behind the statements in what it issues. It is not a Responsible Business, which answers for a finished pack and not for a document. | [REQ031](#req031) |
 
-### 5.3 Role–Verb–Role Relationships
+### 5.4 Role–Verb–Role Relationships
 
 Each relationship reads as two sentences, one in each direction. *How many* says how many on one side can link to the other. *Dates kept* says whether each link records when it starts and stops.
 
@@ -323,20 +444,20 @@ Each relationship reads as two sentences, one in each direction. *How many* says
 | <a id="rel008"></a>REL008 | A [declaring document](#rol016) declares properties of [declared products](#rol015).<br>A [declared product](#rol015) is declared by [declaring documents](#rol016). | Many to many | No | [DRQ012](#drq012) | New |
 | <a id="rel009"></a>REL009 | An [issued document](#rol017) is issued by an [issuing organisation](#rol018).<br>An [issuing organisation](#rol018) issues [issued documents](#rol017). | Many to one | No | [DRQ012](#drq012) | New |
 
-### 5.4 Concepts
+### 5.5 Concepts
 
 Every concept the design uses, whether DDA already has it or the design adds it. The code beneath each name is its DDA name.
 
 | Area | Concept | In DDA | What it is | Sits under | How many | Why it is needed |
 |---|---|---|---|---|---|---|
-| Products | <a id="sbj001"></a>SBJ001<br>**Product**<br>Product | New | There is one of these for each product the business sells, and for each ingredient or packaging item it buys to make one. Everything else about a product refers back to it: what it is made from, what it must be, how long it lasts and what its pack says are each kept in their own concept. It is not a batch, which is one production run of a product. | — | — | [DRQ001](#drq001) · [DRQ002](#drq002) · [DRQ005](#drq005) |
-| Products | <a id="sbj005"></a>SBJ005<br>**Product Allergens**<br>ProductAllergens | New | There is one of these for each allergen a product must declare in a market. The allergen is a value from the list for that market, so a product sold in two markets has an entry for each. You can rely on it to say which allergens are declared and whether each is known only because a supplier said so; for a product made from other products, the allergens they bring in are worked out from its formulation. It is not cross-contact in a factory, which is a manufacturing matter. | Product | Each product may have many, or none | [DRQ008](#drq008) |
-| Products | <a id="sbj008"></a>SBJ008<br>**Product Claims**<br>ProductClaims | New | There is one of these for each claim a pack makes in a market. You can rely on it for the wording, the condition the claim rests on, and whether the declared values still meet that condition. It is not the nutrition values a condition rests on, which are kept as nutrition values, and the product a claim compares with is named through the comparison relationship. | Product | Each product may have many, or none | [DRQ010](#drq010) |
-| Products | <a id="sbj003"></a>SBJ003<br>**Product Formulation Versions**<br>ProductFormulationVersions | New | There is one of these for each version of a product's formulation, with the date it applies from and the market it applies in. You can rely on it to say which version of what goes into a product is in force, so that every ingredient line belongs to exactly one version. It is not the ingredient lines themselves, which are the relationship between a product and what it is made from. | Product | Each product may have many, or none | [DRQ001](#drq001) · [DRQ006](#drq006) |
-| Products | <a id="sbj011"></a>SBJ011<br>**Product Fraud Assessments**<br>ProductFraudAssessments | New | There is one of these for each assessment of an ingredient's exposure to tampering or substitution. You can rely on it for how likely the ingredient is judged to be swapped for something cheaper, what that rested on, and what extra checks it calls for. It is not the checks made on a delivery, which are a manufacturing matter. | Product | Each product may have many, or none | [DRQ015](#drq015) |
-| Products | <a id="sbj002"></a>SBJ002<br>**Product Identifiers**<br>ProductIdentifiers | New | There is one of these for each identifier a product is known by, in each scheme, such as a trade item number or the organisation's own material number. You can rely on it to say which identifiers belong to which product and who issued each. It is not the name of the product, which belongs to the product itself, and it is not an identifier of an organisation, which belongs to the legal entity identifiers. | Product | Each product may have many, or none | [DRQ017](#drq017) |
+| Products | <a id="sbj001"></a>SBJ001<br>**Product**<br>Product | New | There is one of these for each product the business sells, and for each ingredient or packaging item it buys to make one. Everything else about a product refers back to it: what it is made from, what it must be, how long it lasts and what is printed on its pack are each kept in their own concept. It is not a batch, which is one production run of a product. | — | — | [DRQ001](#drq001) · [DRQ002](#drq002) · [DRQ005](#drq005) |
+| Products | <a id="sbj005"></a>SBJ005<br>**Product Allergens**<br>ProductAllergens | New | There is one of these for each allergen a product must declare in a market. The allergen is a value from the list for that market, so a product sold in two markets has an entry for each. It records which allergens are declared and whether each is known only because a supplier declared it; for a product made from other products, the allergens it brings in are worked out from its formulation. It does not cover cross-contact in a factory, which is a manufacturing matter. | Product | Each product may have many, or none | [DRQ008](#drq008) |
+| Products | <a id="sbj008"></a>SBJ008<br>**Product Claims**<br>ProductClaims | New | There is one of these for each claim printed on a pack in a market. It records the wording, the condition the claim rests on, and whether the declared values still meet that condition. The nutrition values a condition rests on are kept as nutrition values, and the product a claim compares with is named through the comparison relationship. | Product | Each product may have many, or none | [DRQ010](#drq010) |
+| Products | <a id="sbj003"></a>SBJ003<br>**Product Formulation Versions**<br>ProductFormulationVersions | New | There is one of these for each version of a product's formulation, with the date it applies from and the market it applies in. It records which formulation version is in force, so that every ingredient line belongs to exactly one version. The ingredient lines themselves are the relationship between a product and what it is made from. | Product | Each product may have many, or none | [DRQ001](#drq001) · [DRQ006](#drq006) |
+| Products | <a id="sbj011"></a>SBJ011<br>**Product Fraud Assessments**<br>ProductFraudAssessments | New | There is one of these for each assessment of an ingredient's exposure to tampering or substitution. It records the likelihood that the ingredient could be swapped for something cheaper, the evidence and factors used to reach the assessment, and the extra checks it calls for. It does not cover checks made on a delivery, which are a manufacturing matter. | Product | Each product may have many, or none | [DRQ015](#drq015) |
+| Products | <a id="sbj002"></a>SBJ002<br>**Product Identifiers**<br>ProductIdentifiers | New | There is one of these for each identifier a product is known by, in each scheme, such as a trade item number or the organisation's own material number. It records which identifiers belong to which product and who issued each. The product name belongs to the product itself, and an organisation identifier belongs to the legal entity identifiers. | Product | Each product may have many, or none | [DRQ017](#drq017) |
 | Products | <a id="sbj012"></a>SBJ012<br>**Product Identity Changes**<br>ProductIdentityChanges | New | There is one of these for each change made to a product that affects what it is. You can rely on it to say whether the change made a different product or only a new version of what goes in, and why. It is not the new version itself, which is a formulation version, and a different product is a product of its own. | Product | Each product may have many, or none | [DRQ006](#drq006) |
-| Products | <a id="sbj007"></a>SBJ007<br>**Product Label Items**<br>ProductLabelItems | New | There is one of these for each item a pack must print in a market, such as the name of the food or the storage instructions. You can rely on it for what the pack actually prints, which can differ from what the formulation says it should print, so a pack that is out of step can be seen. It is not the allergen or nutrition facts, which are kept in their own concepts. | Product | Each product may have many, or none | [DRQ007](#drq007) |
+| Products | <a id="sbj007"></a>SBJ007<br>**Product Label Items**<br>ProductLabelItems | New | There is one of these for each item a pack must print in a market, such as the name of the food or the storage instructions. It records what is printed on the pack, which can differ from what the formulation requires, so a pack that is out of step can be identified. Allergen and nutrition facts are kept in their own concepts. | Product | Each product may have many, or none | [DRQ007](#drq007) |
 | Products | <a id="sbj006"></a>SBJ006<br>**Product Nutrition Values**<br>ProductNutritionValues | New | There is one of these for each nutrient value shown on a pack, for each way it was arrived at. You can rely on it for the value, how it was arrived at and how far it may vary. It is not the ingredient lines a calculated value rests on, which are the product's formulation, and it is not the claims made from a value, which are kept as claims. | Product | Each product may have many, or none | [DRQ009](#drq009) |
 | Products | <a id="sbj010"></a>SBJ010<br>**Product Origins**<br>ProductOrigins | New | There is one of these for each country of origin declared for a product or ingredient. You can rely on it for which country is declared and what the statement rests on. It is not the wording printed on the pack, which is a label item, and it is not who supplies the ingredient, which comes from its authorised suppliers. | Product | Each product may have many, or none | [DRQ018](#drq018) |
 | Products | <a id="sbj009"></a>SBJ009<br>**Product Shelf Lives**<br>ProductShelfLives | New | There is one of these for each storage condition under which a product, ingredient or part-made good has a stated shelf life. You can rely on it for how long the item lasts under that storage and which date mark it carries. It is not the date on a particular batch, which is a manufacturing matter. | Product | Each product may have many, or none | [DRQ013](#drq013) |
@@ -347,7 +468,7 @@ Every concept the design uses, whether DDA already has it or the design adds it.
 | Legal Entities | <a id="sbj015"></a>SBJ015<br>**Legal Entity Address**<br>LegalEntityAddress | [DMC000000108](https://datadesign.maoperatingsystem.com/models/concepts/DMC000000108) | An organisation's address. This design uses it for the address of the responsible business, which the pack must show. | Legal Entity | Each legal entity may have one, or none | [DRQ007](#drq007) |
 | Legal Entities | <a id="sbj014"></a>SBJ014<br>**Legal Entity Identifiers**<br>LegalEntityIdentifiers | [DMC000000023](https://datadesign.maoperatingsystem.com/models/concepts/DMC000000023) | The identifiers an organisation is known by. This design uses it to identify suppliers and other organisations. | Legal Entity | Each legal entity may have many, or none | [DRQ017](#drq017) |
 
-### 5.5 Lookups and Values
+### 5.6 Lookups and Values
 
 Each list is a fixed set of allowed answers, so the same thing is always described the same way.
 
@@ -435,7 +556,7 @@ The items that a pre-packed food label must show, such as the name of the food, 
 | **Nutrition declaration**<br>NUTRITION | Energy and the main nutrients. |
 | **Batch number**<br>BATCH | Required in some markets only. |
 
-#### How a nutrition value was arrived at
+#### How nutrition values are derived
 
 How a declared nutrition value was arrived at: by testing the finished food, by calculating from its ingredients, or from accepted published data. Every value must say which way it used.
 
@@ -537,134 +658,13 @@ The units a quantity of food, ingredient or packaging is measured in, such as ki
 | **Each**<br>EA | A count of items. |
 | **Per cent**<br>PCT | A share of the whole, in per cent. |
 
-### 5.6 Diagrams
-
-Every diagram is drawn the same way: a rounded box names the thing on its first line and gives its area on the second, and an arrow carries the verb.
-
-#### 5.6.1 Domains Data Model
-
-One box for each area of the business. Each arrow is one relationship, labelled with the role at each end and the verb between them. An arrow that returns to its own box is a relationship between two things of the same kind. Areas DDA already holds are solid.
-
-```mermaid
-flowchart LR
-  DOM001("Product<br>PRODUCTS")
-  DOM003("Document<br>DOCUMENTS")
-  DOM002("Legal Entity<br>LEGAL ENTITIES")
-  DOM001 -->|"Made Product → is made from → Ingredient"| DOM001
-  DOM001 -->|"Variant → belongs to → Family"| DOM001
-  DOM001 -->|"Replaceable Ingredient → may be replaced by → Permitted Alternative"| DOM001
-  DOM001 -->|"Claiming Product → is compared with → Comparator"| DOM001
-  DOM001 -->|"Bought Material → may be sourced from → Authorised Supplier"| DOM002
-  DOM001 -->|"Certification Holder → holds a certification from → Certifying Body"| DOM002
-  DOM001 -->|"Labelled Product → is marketed by → Responsible Business"| DOM002
-  DOM003 -->|"Declaring Document → declares properties of → Declared Product"| DOM001
-  DOM003 -->|"Issued Document → is issued by → Issuing Organisation"| DOM002
-  classDef indda fill:#1f3a5f,stroke:#0d1f33,stroke-width:2px,color:#fff
-  classDef prop fill:#3d2b56,stroke:#241733,stroke-width:2px,color:#fff,stroke-dasharray:5 3
-  class DOM001,DOM002,DOM003 indda
-```
-
-#### 5.6.2 Roles Data Model
-
-One diagram of every role. Each box is an area of the business, and holds the roles that area plays. An arrow joins the two roles of a relationship, labelled with its verb, and runs between boxes wherever the two roles belong to different areas. The same product can play several roles at once, which is why its roles share a box.
-
-```mermaid
-flowchart LR
-  subgraph SGDOM001["Products"]
-    ROL001("Made Product")
-    ROL002("Ingredient")
-    ROL003("Variant")
-    ROL004("Family")
-    ROL005("Replaceable Ingredient")
-    ROL006("Permitted Alternative")
-    ROL007("Claiming Product")
-    ROL008("Comparator")
-    ROL009("Bought Material")
-    ROL011("Certification Holder")
-    ROL013("Labelled Product")
-    ROL015("Declared Product")
-  end
-  subgraph SGDOM003["Documents"]
-    ROL016("Declaring Document")
-    ROL017("Issued Document")
-  end
-  subgraph SGDOM002["Legal Entities"]
-    ROL010("Authorised Supplier")
-    ROL012("Certifying Body")
-    ROL014("Responsible Business")
-    ROL018("Issuing Organisation")
-  end
-  ROL001 -->|is made from| ROL002
-  ROL003 -->|belongs to| ROL004
-  ROL005 -->|may be replaced by| ROL006
-  ROL007 -->|is compared with| ROL008
-  ROL009 -->|may be sourced from| ROL010
-  ROL011 -->|holds a certification from| ROL012
-  ROL013 -->|is marketed by| ROL014
-  ROL016 -->|declares properties of| ROL015
-  ROL017 -->|is issued by| ROL018
-```
-
-#### 5.6.3 Concept Models by Domain
-
-One diagram per area: its main concept and the concepts beneath it, each arrow saying how many of the lower concept the upper one may have. Only the concepts this design uses are shown.
-
-**Products**
-
-```mermaid
-flowchart LR
-  SBJ001("Product<br>PRODUCTS")
-  SBJ002("Product Identifiers<br>PRODUCTS")
-  SBJ003("Product Formulation Versions<br>PRODUCTS")
-  SBJ004("Product Specifications<br>PRODUCTS")
-  SBJ005("Product Allergens<br>PRODUCTS")
-  SBJ006("Product Nutrition Values<br>PRODUCTS")
-  SBJ007("Product Label Items<br>PRODUCTS")
-  SBJ008("Product Claims<br>PRODUCTS")
-  SBJ009("Product Shelf Lives<br>PRODUCTS")
-  SBJ010("Product Origins<br>PRODUCTS")
-  SBJ011("Product Fraud Assessments<br>PRODUCTS")
-  SBJ012("Product Identity Changes<br>PRODUCTS")
-  SBJ001 -->|"may have many, or none"| SBJ002
-  SBJ001 -->|"may have many, or none"| SBJ003
-  SBJ001 -->|"may have many, or none"| SBJ004
-  SBJ001 -->|"may have many, or none"| SBJ005
-  SBJ001 -->|"may have many, or none"| SBJ006
-  SBJ001 -->|"may have many, or none"| SBJ007
-  SBJ001 -->|"may have many, or none"| SBJ008
-  SBJ001 -->|"may have many, or none"| SBJ009
-  SBJ001 -->|"may have many, or none"| SBJ010
-  SBJ001 -->|"may have many, or none"| SBJ011
-  SBJ001 -->|"may have many, or none"| SBJ012
-```
-
-**Documents**
-
-```mermaid
-flowchart LR
-  SBJ016("Document<br>DOCUMENTS")
-  SBJ017("Document Declarations<br>DOCUMENTS")
-  SBJ016 -->|"may have many, or none"| SBJ017
-```
-
-**Legal Entities**
-
-```mermaid
-flowchart LR
-  SBJ013("Legal Entity<br>LEGAL ENTITIES")
-  SBJ014("Legal Entity Identifiers<br>LEGAL ENTITIES")
-  SBJ015("Legal Entity Address<br>LEGAL ENTITIES")
-  SBJ013 -->|"may have many, or none"| SBJ014
-  SBJ013 -->|"may have one, or none"| SBJ015
-```
-
 ## 6 Outstanding Decisions
 
 Design choices that remain open.
 
 | ID | Decision | Options |
 |---|---|---|
-| DEC002 | When a supplier tells the organisation that what is inside its ingredient now differs from what was specified, should acting on that notice be part of this design? The design keeps the notice and what it says, and does not keep the action taken. | Keep the action in this design · Leave the action to supplier management |
+| DEC002 | Should the assessment and disposition of a supplier change notice be held in this design, or managed in the supplier-management model with a defined hand-off? The design keeps the notice and what it says, but not the action taken. | Keep the action in this design · Leave the action to supplier management |
 
 ## Appendix A — Sources
 
@@ -713,8 +713,8 @@ These are the design principles set by DDA in its standard [DMS000000169](https:
 | 3 | Understand what source data represents before integrating or distributing it. | Reconciliation is done once rather than by every consumer, and the line from source to business meaning stays visible. | The design starts from 29 published sources, listed in Appendix A with the reason each is included. It brings in no source data. A supplier's statements are kept with who made them and whether the organisation checked them. |
 | 4 | Establish enterprise identity for the principal business subjects independently of any analytical product. | Identity survives source replacement, and analytics, operations, and AI all draw on the same answer. | A product is identified by the identifiers it carries, such as a trade item number, an internal material number or a supplier's part number, each with its issuer and dates. Suppliers and documents use the identity DDA already has. Nothing depends on a report or a data product. |
 | 5 | Reports should consume governed business information, not become the place where enterprise information is defined. | Dashboards agree with one another, and the same definitions serve APIs, operations, and AI. | Does not apply. This design defines no reports. |
-| 6 | Author reusable business information once, and publish it through several purpose-built products. | New products are quicker to build because the core design work has already been completed and can be reused. | Applies in part. The product definition is written once so that other models can refer to it (section 5.1). No data product is designed here. |
-| 7 | Model, govern, and preserve relationships with the same care applied to the subjects they connect. | Cross-role questions, operational authorization, and AI context all become answerable rather than reconstructed. | There are nine relationships (section 5.3). Each has a verb that reads naturally in both directions, the role at each end, how many can link, and whether dates are kept. None is reduced to a field on either side. |
+| 6 | Author reusable business information once, and publish it through several purpose-built products. | New products are quicker to build because the core design work has already been completed and can be reused. | Applies in part. The product definition is written once so that other models can refer to it (section 5.2). No data product is designed here. |
+| 7 | Model, govern, and preserve relationships with the same care applied to the subjects they connect. | Cross-role questions, operational authorization, and AI context all become answerable rather than reconstructed. | There are nine relationships (section 5.4). Each has a verb that reads naturally in both directions, the role at each end, how many can link, and whether dates are kept. None is reduced to a field on either side. |
 | 8 | Approved business metadata should generate or validate the implementation and its documentation. | Less manual schema work, design and implementation that stay in step, and lineage that is produced rather than written. | The list of changes to make in DDA is generated from the model (101 steps in dependency order), and this document is produced from the same working files. One exception applies: DDA's Products definition disagrees with a requirement (see below). |
 | 9 | Use the language of the business consistently across definitions, governance, product contracts, and delivery. | Non-technical stakeholders can take part in design decisions, and ownership of a definition is unambiguous. | Definitions are written in the business's own words. Each concept shows a plain name beside its DDA name, and the requirements use the vocabulary of the field. |
 | 10 | Business information exists independently of the applications, projects, reports, and AI initiatives that use it. | Institutional knowledge outlives the systems and projects that produced it. | No concept, list of values or relationship refers to an application, a report or a project. |

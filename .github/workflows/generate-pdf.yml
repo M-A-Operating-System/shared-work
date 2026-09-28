@@ -41,6 +41,11 @@ on:
         required: false
         type: boolean
         default: false
+      watermark:
+        description: 'Stamp a diagonal DRAFT watermark on every page.'
+        required: false
+        type: boolean
+        default: false
 
 # Serialize all runs that commit PDFs back to master.
 # cancel-in-progress: false means concurrent runs queue rather than cancel —
@@ -157,10 +162,13 @@ jobs:
         env:
           INPUT_DOCUMENT: ${{ inputs.document }}
           NOFRONT: ${{ inputs.nofront }}
+          WATERMARK: ${{ inputs.watermark }}
         run: |
           NOFRONT_FLAG=""
           [ "$NOFRONT" = "true" ] && NOFRONT_FLAG="--nofront"
-          python generate_pdf.py --page "$INPUT_DOCUMENT" ${NOFRONT_FLAG:+'--nofront'}
+          WATERMARK_FLAG=""
+          [ "$WATERMARK" = "true" ] && WATERMARK_FLAG="--watermark"
+          python generate_pdf.py --page "$INPUT_DOCUMENT" ${NOFRONT_FLAG:+"$NOFRONT_FLAG"} ${WATERMARK_FLAG:+"$WATERMARK_FLAG"}
           git add -- "${INPUT_DOCUMENT%.md}.pdf"
           git diff --cached --quiet || git commit -m "docs: generate ${INPUT_DOCUMENT%.md}.pdf [skip ci]"
 
@@ -172,12 +180,15 @@ jobs:
           INPUT_PAGES: ${{ inputs.pages }}
           INPUT_OUT: ${{ inputs.out }}
           NOFRONT: ${{ inputs.nofront }}
+          WATERMARK: ${{ inputs.watermark }}
         run: |
           NOFRONT_FLAG=""
           [ "$NOFRONT" = "true" ] && NOFRONT_FLAG="--nofront"
+          WATERMARK_FLAG=""
+          [ "$WATERMARK" = "true" ] && WATERMARK_FLAG="--watermark"
           OUT_FLAG=""
           [ -n "$INPUT_OUT" ] && OUT_FLAG="--out $INPUT_OUT"
-          python generate_pdf.py --product "$INPUT_PRODUCT" --pages $INPUT_PAGES $OUT_FLAG ${NOFRONT_FLAG:+"$NOFRONT_FLAG"}
+          python generate_pdf.py --product "$INPUT_PRODUCT" --pages $INPUT_PAGES $OUT_FLAG ${NOFRONT_FLAG:+"$NOFRONT_FLAG"} ${WATERMARK_FLAG:+"$WATERMARK_FLAG"}
 
       - name: Commit pages-subset PDF
         if: github.event_name == 'workflow_dispatch' && inputs.pages != ''
@@ -193,10 +204,13 @@ jobs:
         env:
           INPUT_PRODUCT: ${{ inputs.product }}
           NOFRONT: ${{ inputs.nofront }}
+          WATERMARK: ${{ inputs.watermark }}
         run: |
           NOFRONT_FLAG=""
           [ "$NOFRONT" = "true" ] && NOFRONT_FLAG="--nofront"
-          python generate_pdf.py --product "$INPUT_PRODUCT" ${NOFRONT_FLAG:+"$NOFRONT_FLAG"}
+          WATERMARK_FLAG=""
+          [ "$WATERMARK" = "true" ] && WATERMARK_FLAG="--watermark"
+          python generate_pdf.py --product "$INPUT_PRODUCT" ${NOFRONT_FLAG:+"$NOFRONT_FLAG"} ${WATERMARK_FLAG:+"$WATERMARK_FLAG"}
           git add "docs/product/$INPUT_PRODUCT/${INPUT_PRODUCT}_product_design.pdf"
           git diff --cached --quiet || git commit -m "docs($INPUT_PRODUCT): regenerate PDF [skip ci]"
 
@@ -267,12 +281,15 @@ jobs:
         if: github.event_name == 'workflow_dispatch' && inputs.document == '' && inputs.product == '' && inputs.pages == ''
         env:
           NOFRONT: ${{ inputs.nofront }}
+          WATERMARK: ${{ inputs.watermark }}
         run: |
           NOFRONT_FLAG=""
           [ "$NOFRONT" = "true" ] && NOFRONT_FLAG="--nofront"
-          python generate_pdf.py ${NOFRONT_FLAG:+"$NOFRONT_FLAG"}
+          WATERMARK_FLAG=""
+          [ "$WATERMARK" = "true" ] && WATERMARK_FLAG="--watermark"
+          python generate_pdf.py ${NOFRONT_FLAG:+"$NOFRONT_FLAG"} ${WATERMARK_FLAG:+"$WATERMARK_FLAG"}
           while IFS= read -r -d '' path; do
-            python generate_pdf.py --page "$path" ${NOFRONT_FLAG:+"$NOFRONT_FLAG"}
+            python generate_pdf.py --page "$path" ${NOFRONT_FLAG:+"$NOFRONT_FLAG"} ${WATERMARK_FLAG:+"$WATERMARK_FLAG"}
           done < <(find docs/data-models -type f -name '*.md' -print0)
           git add docs/product/analytics/analytics_product_design.pdf
           git add docs/product/assistant/assistant_product_design.pdf

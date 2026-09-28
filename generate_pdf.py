@@ -4,9 +4,9 @@ Generates a PDF for each product in docs/product/, placing the output inside
 the respective product folder.
 
 Usage:
-    python generate_pdf.py [--product <name>] [--nofront]
-    python generate_pdf.py --page <path/to/file.md> [--nofront]
-    python generate_pdf.py --product <name> --pages <nn> [<nn> ...] [--out <file.pdf>] [--nofront]
+    python generate_pdf.py [--product <name>] [--nofront] [--watermark]
+    python generate_pdf.py --page <path/to/file.md> [--nofront] [--watermark]
+    python generate_pdf.py --product <name> --pages <nn> [<nn> ...] [--out <file.pdf>] [--nofront] [--watermark]
 
     python generate_pdf.py                              → generates all products
     python generate_pdf.py --product analytics          → generates only the analytics product
@@ -27,6 +27,7 @@ Usage:
                 produce <product>_pages_<nn…>.pdf in the product directory.
     --nofront   Omit the branded cover page. Useful for distributing content
                 outside the M&A Operating System brand context.
+    --watermark Add a diagonal DRAFT watermark to every page.
 
 Requirements:
     pip install markdown weasyprint
@@ -317,7 +318,8 @@ def _build_toc_html(entries: list[tuple[int, str, str]], standalone: bool) -> st
 
 def build_html(files: list[Path], title: str, meta: str,
                author: str = "", nofront: bool = False,
-               subs: dict[str, str] | None = None) -> str:
+               subs: dict[str, str] | None = None,
+               watermark: bool = False) -> str:
     import markdown
 
     md = markdown.Markdown(
@@ -394,10 +396,13 @@ def build_html(files: list[Path], title: str, meta: str,
   </div>
 </div>"""
 
+    watermark_html = '\n<div class="watermark">DRAFT</div>' if watermark else ""
+
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head><meta charset="utf-8"><title>{safe_title}</title></head>
 <body>
+{watermark_html}
 {cover}
 {toc_html}
 {"".join(sections)}
@@ -421,6 +426,19 @@ CSS = """
 @page cover-page {
     margin: 0;
     @bottom-right { content: none; }
+}
+
+.watermark {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-45deg);
+    font-size: 96pt;
+    font-weight: 700;
+    color: rgba(220, 38, 38, 0.18);
+    letter-spacing: 0.1em;
+    z-index: -1;
+    white-space: nowrap;
 }
 
 /* Cover */
@@ -660,7 +678,8 @@ tr          { page-break-inside: avoid; }
 
 # ---------- per-product generation ----------
 
-def generate_product(name: str, config: dict, nofront: bool = False) -> None:
+def generate_product(name: str, config: dict, nofront: bool = False,
+                     watermark: bool = False) -> None:
     docs_dir = PRODUCTS_DIR / name
     if not docs_dir.is_dir():
         print(f"  [skip] {name}: directory not found at {docs_dir}")
@@ -683,7 +702,8 @@ def generate_product(name: str, config: dict, nofront: bool = False) -> None:
     html = build_html(files, config["title"], config["meta"],
                       author=config.get("author", ""),
                       nofront=nofront,
-                      subs={"{{PRODUCT_NAME}}": name})
+                      subs={"{{PRODUCT_NAME}}": name},
+                      watermark=watermark)
 
     print("Rendering PDF (this may take a moment)…")
     from weasyprint import HTML, CSS as WeasyprintCSS
@@ -739,7 +759,8 @@ def _resolve_page_path(file_path: Path) -> Path:
     sys.exit(1)
 
 
-def generate_page(file_path: Path, nofront: bool = False) -> None:
+def generate_page(file_path: Path, nofront: bool = False,
+                  watermark: bool = False) -> None:
     """Generate a PDF for a single .md file, placed next to it."""
     if file_path.is_symlink():
         print(f"  [error] symlinks are not supported: {file_path}")
@@ -782,7 +803,8 @@ def generate_page(file_path: Path, nofront: bool = False) -> None:
     print("Building HTML…")
     html = build_html([file_path], page_title, config["meta"],
                       author=config.get("author", ""),
-                      nofront=nofront)
+                      nofront=nofront,
+                      watermark=watermark)
 
     print("Rendering PDF…")
     from weasyprint import HTML, CSS as WeasyprintCSS
@@ -799,7 +821,8 @@ def generate_page(file_path: Path, nofront: bool = False) -> None:
 # ---------- pages-subset generation ----------
 
 def generate_pages(product_name: str, page_prefixes: list[str],
-                   out_name: str | None, nofront: bool = False) -> None:
+                   out_name: str | None, nofront: bool = False,
+                   watermark: bool = False) -> None:
     """Generate a merged PDF from a subset of chapters, in the order given."""
     if not page_prefixes:
         print("  [error] --pages requires at least one chapter prefix")
@@ -858,7 +881,8 @@ def generate_pages(product_name: str, page_prefixes: list[str],
     html = build_html(files, config["title"], config["meta"],
                       author=config.get("author", ""),
                       nofront=nofront,
-                      subs={"{{PRODUCT_NAME}}": product_name})
+                      subs={"{{PRODUCT_NAME}}": product_name},
+                      watermark=watermark)
 
     print("Rendering PDF…")
     from weasyprint import HTML as WeasyprintHTML, CSS as WeasyprintCSS
@@ -887,14 +911,15 @@ def main():
 
     args = sys.argv[1:]
     nofront = "--nofront" in args
-    args = [a for a in args if a != "--nofront"]
+    watermark = "--watermark" in args
+    args = [a for a in args if a not in ("--nofront", "--watermark")]
 
     # --page <file>
     if args and args[0] == '--page':
         if len(args) < 2:
-            print("Usage: python generate_pdf.py --page <path/to/file.md> [--nofront]")
+            print("Usage: python generate_pdf.py --page <path/to/file.md> [--nofront] [--watermark]")
             sys.exit(1)
-        generate_page(Path(args[1]), nofront=nofront)
+        generate_page(Path(args[1]), nofront=nofront, watermark=watermark)
         print("\nAll done.")
         return
 
@@ -945,7 +970,8 @@ def main():
         if bad:
             print(f"  [error] page prefixes must be two digits (e.g. 02 04 08), got: {', '.join(bad)}")
             sys.exit(1)
-        generate_pages(product_flag, pages_flag, out_flag, nofront=nofront)
+        generate_pages(product_flag, pages_flag, out_flag,
+                       nofront=nofront, watermark=watermark)
         print("\nAll done.")
         return
 
@@ -959,7 +985,7 @@ def main():
         targets = PRODUCTS
 
     for name, config in targets.items():
-        generate_product(name, config, nofront=nofront)
+        generate_product(name, config, nofront=nofront, watermark=watermark)
 
     print("\nAll done.")
 
