@@ -29,9 +29,10 @@ Usage:
                 outside the M&A Operating System brand context.
 
 Requirements:
-    pip install markdown weasyprint
+    pip install -r requirements.txt
 """
 
+import argparse
 import html as _html
 import base64 as _b64
 import json
@@ -64,7 +65,8 @@ DATA_MODELS_DIR = Path(__file__).parent / "docs" / "data-models"
 _REPO_ROOT   = Path(__file__).parent
 
 DATA_MODEL_CONFIG = {
-    "meta": "Data Design Document",
+    "category": "Data Design Document",
+    "meta": "",
     "author": "Andrew Bush (www.maoperatingsystem.com/bio-andrew-bush)",
 }
 
@@ -100,7 +102,7 @@ EXCLUDE = {"README.md"}
 # ---------- document ordering ----------
 
 def get_ordered_files(docs_dir: Path) -> list[Path]:
-    """Numbered docs in reading order, then ROADMAP.
+    """Numbered docs in reading order, then appendix-*.md by name, then ROADMAP.
 
     Files whose stem contains '-ignore' or '_ignore' are parked and excluded from the build.
     Supports both dash-separated (01-overview.md) and underscore-separated (01_overview.md) naming.
@@ -110,7 +112,11 @@ def get_ordered_files(docs_dir: Path) -> list[Path]:
          if f.name not in EXCLUDE and "-ignore" not in f.stem and "_ignore" not in f.stem],
         key=lambda f: int(f.stem[:2]),
     )
-    result = list(numbered)
+    appendices = sorted(
+        f for f in docs_dir.glob("appendix[_-]*.md")
+        if "-ignore" not in f.stem and "_ignore" not in f.stem
+    )
+    result = numbered + appendices
     for roadmap_name in ("ROADMAP.md", "roadmap.md"):
         roadmap = docs_dir / roadmap_name
         if roadmap.exists() and roadmap_name not in EXCLUDE:
@@ -121,11 +127,15 @@ def get_ordered_files(docs_dir: Path) -> list[Path]:
 # ---------- markdown processing ----------
 
 def strip_md_links(text: str) -> str:
-    """Replace cross-doc .md links with their plain text — they don't resolve in PDF."""
-    # [label](./file.md#anchor) → label
-    text = re.sub(r"\[([^\]]+)\]\(\./[\w-]+\.md(?:#[\w-]*)?\)", r"\1", text)
-    # any remaining bare (./file.md#anchor) with no label → drop it
-    text = re.sub(r"\(\./[\w-]+\.md(?:#[\w-]*)?\)", "", text)
+    """Replace cross-doc .md links with their plain text — they don't resolve in PDF.
+
+    Covers ./file.md, file.md and ../other/file.md forms. Same-document (#anchor)
+    links are left intact; WeasyPrint resolves those into internal jumps.
+    """
+    # [label](../dir/file.md#anchor) → label
+    text = re.sub(r"\[([^\]]+)\]\((?:\./)?[\w./-]+\.md(?:#[\w-]*)?\)", r"\1", text)
+    # any remaining bare (../dir/file.md#anchor) with no label → drop it
+    text = re.sub(r"\((?:\./)?[\w./-]+\.md(?:#[\w-]*)?\)", "", text)
     return text
 
 
@@ -133,8 +143,8 @@ def strip_md_links(text: str) -> str:
 
 def _mmdc_available() -> bool:
     try:
-        subprocess.run(["mmdc", "--version"], capture_output=True, timeout=10)
-        return True
+        result = subprocess.run(["mmdc", "--version"], capture_output=True, timeout=10)
+        return result.returncode == 0
     except (FileNotFoundError, subprocess.SubprocessError):
         return False
 
@@ -152,9 +162,11 @@ def _png_size(path: Path) -> tuple[int, int]:
 
 # Content area for US Letter after margins (18mm top, 18mm bottom, 15mm each side):
 #   width  = 215.9mm − 30mm = 185.9mm  → use 178mm to leave breathing room
-#   height = 279.4mm − 36mm = 243.4mm  → cap diagrams at 190mm so they sit with text
+#   height = 279.4mm − 36mm = 243.4mm  → cap diagrams at 225mm, leaving room for
+#   a one- or two-line caption; tall, narrow diagrams would otherwise shrink
+#   until their labels are unreadable.
 _MAX_DIAGRAM_W_MM = 178.0
-_MAX_DIAGRAM_H_MM = 190.0
+_MAX_DIAGRAM_H_MM = 225.0
 
 
 def _diagram_display_size(px_w: int, px_h: int) -> tuple[float, float]:
@@ -184,7 +196,7 @@ def _render_mermaid(source: str) -> str | None:
     if _MMDC_PRESENT is None:
         _MMDC_PRESENT = _mmdc_available()
         if not _MMDC_PRESENT:
-            print("  [warn] mmdc not found — Mermaid diagrams will render as code blocks")
+            print("  [warn] mmdc not found or not working — Mermaid diagrams will render as code blocks")
     if not _MMDC_PRESENT:
         return None
 
@@ -199,7 +211,9 @@ def _render_mermaid(source: str) -> str | None:
         # Linux user-namespace privileges that Chromium's sandbox depends on.
         # This is safe here because the Mermaid source comes from files inside
         # the repository — it is not arbitrary untrusted web content.
-        cfg_path.write_text(json.dumps({"args": ["--no-sandbox", "--disable-setuid-sandbox"]}))
+        cfg_path.write_text(
+            json.dumps({"args": ["--no-sandbox", "--disable-setuid-sandbox"]}), encoding="utf-8"
+        )
 
         try:
             result = subprocess.run(
@@ -226,7 +240,11 @@ def _render_mermaid(source: str) -> str | None:
             print(f"  [warn] mmdc error: {result.stderr.decode('utf-8', errors='replace').strip()}")
             return None
 
-        px_w, px_h   = _png_size(out_path)
+        try:
+            px_w, px_h = _png_size(out_path)
+        except (OSError, struct.error) as e:
+            print(f"  [warn] could not read PNG dimensions ({e}); falling back to code block")
+            return None
         w_mm, h_mm   = _diagram_display_size(px_w, px_h)
         data         = _b64.b64encode(out_path.read_bytes()).decode()
 
@@ -248,7 +266,7 @@ def extract_mermaid_blocks(text: str) -> tuple[str, dict[str, str]]:
     def replace(match: re.Match) -> str:
         nonlocal counter
         source = match.group(1).strip()
-        key = f"MERMAID_BLOCK_{counter}_END"
+        key = f"MERMAIDBLOCK{counter}END"
         counter += 1
         rendered = _render_mermaid(source)
         if rendered:
@@ -292,6 +310,16 @@ def _flatten_toc_tokens(tokens: list, prefix: str, max_depth: int) -> list[tuple
     return result
 
 
+def _toc_list_html(entries: list[tuple[int, str, str]]) -> str:
+    """Render (level, text, anchor_id) triples as the TOC <ul>."""
+    items = [
+        f'  <li class="toc-h{level}">'
+        f'<a href="#{_html.escape(anchor)}">{_html.escape(text)}</a></li>'
+        for level, text, anchor in entries
+    ]
+    return '<ul class="toc-list">\n' + '\n'.join(items) + '\n</ul>'
+
+
 def _build_toc_html(entries: list[tuple[int, str, str]], standalone: bool) -> str:
     """Build a <nav class="toc-page"> element from (level, text, anchor_id) triples.
 
@@ -301,23 +329,102 @@ def _build_toc_html(entries: list[tuple[int, str, str]], standalone: bool) -> st
     if not entries:
         return ""
     cls = "toc-page toc-standalone" if standalone else "toc-page toc-inline"
-    items = [
-        f'  <li class="toc-h{level}">'
-        f'<a href="#{_html.escape(anchor)}">{_html.escape(text)}</a></li>'
-        for level, text, anchor in entries
-    ]
     return (
         f'<nav class="{cls}">\n'
         f'<h2 class="toc-heading">Contents</h2>\n'
-        f'<ul class="toc-list">\n'
-        + '\n'.join(items)
-        + '\n</ul>\n</nav>'
+        + _toc_list_html(entries)
+        + '\n</nav>'
     )
+
+
+_TOC_HEADING_ID = "table-of-contents"
+
+
+def _inject_toc_under_heading(body: str, entries: list[tuple[int, str, str]]) -> str | None:
+    """Fill a document's own "Table of Contents" heading with the generated list.
+
+    Returns the updated body, or None when the document has no such heading.
+    Placing the list under the author's heading avoids both an empty
+    "Table of Contents" page and a second, separate Contents page.
+    """
+    heading = re.search(
+        rf'<h([1-6])\b[^>]*\bid="{_TOC_HEADING_ID}"[^>]*>.*?</h\1>', body, flags=re.DOTALL
+    )
+    if heading is None:
+        return None
+    toc_entries = [e for e in entries if e[2] != _TOC_HEADING_ID]
+    nav = f'<nav class="toc-page toc-inline">\n{_toc_list_html(toc_entries)}\n</nav>'
+    insert_at = heading.end()
+    # A hand-written list directly under the heading is stale: replace it
+    # rather than render two tables of contents. <ul> nests, so find the
+    # matching </ul> by depth rather than the first one.
+    replace_end = insert_at
+    gap = re.match(r"\s*", body[insert_at:])
+    list_start = insert_at + (gap.end() if gap else 0)
+    if body.startswith("<ul>", list_start):
+        depth, pos = 0, list_start
+        for tag in re.finditer(r"<(/?)ul\b[^>]*>", body[list_start:]):
+            depth += -1 if tag.group(1) else 1
+            if depth == 0:
+                pos = list_start + tag.end()
+                break
+        else:
+            raise RuntimeError("Table of Contents <ul> has no matching </ul>")
+        replace_end = pos
+    return body[:insert_at] + nav + body[replace_end:]
+
+
+_LONG_TOKEN = re.compile(r"[^\s<>&]{10,}")
+_CELL = re.compile(r"(<t[dh]\b[^>]*>)(.*?)(</t[dh]>)", re.DOTALL)
+
+
+def _break_long_tokens(text: str) -> str:
+    """Add <wbr> break points inside long unbroken tokens in HTML text.
+
+    Breaks go at CamelCase humps and after / _ - . so an identifier such as
+    DocumentCommercialTermsFeesNonCancellable wraps at word boundaries.
+    Only text between tags is changed; tags and attributes are left alone.
+    """
+    def split(match: re.Match[str]) -> str:
+        token = match.group(0)
+        token = re.sub(r"(?<=[a-z0-9])(?=[A-Z])", "<wbr>", token)
+        return re.sub(r"(?<=[/_.-])(?=\w)", "<wbr>", token)
+
+    parts = re.split(r"(<[^>]+>)", text)
+    return "".join(
+        part if part.startswith("<") else _LONG_TOKEN.sub(split, part) for part in parts
+    )
+
+
+# Tables with at least this many columns cannot fit portrait width at 8pt
+# without hyphenating nearly every word; they are placed on landscape pages.
+_WIDE_TABLE_COLUMNS = 9
+_TABLE = re.compile(r"<table\b[^>]*>.*?</table>", re.DOTALL)
+
+
+def _wrap_table_cells(body: str) -> str:
+    """Make auto-width tables fit the page.
+
+    Adds break points inside long tokens in every cell, and moves tables with
+    _WIDE_TABLE_COLUMNS or more columns onto landscape pages.
+    """
+    def fit(match: re.Match[str]) -> str:
+        table = _CELL.sub(
+            lambda m: m.group(1) + _break_long_tokens(m.group(2)) + m.group(3), match.group(0)
+        )
+        first_row = re.search(r"<tr\b[^>]*>(.*?)</tr>", table, re.DOTALL)
+        columns = len(re.findall(r"<t[dh]\b", first_row.group(1))) if first_row else 0
+        if columns >= _WIDE_TABLE_COLUMNS:
+            return f'<div class="wide-table">{table}</div>'
+        return table
+
+    return _TABLE.sub(fit, body)
 
 
 def build_html(files: list[Path], title: str, meta: str,
                author: str = "", nofront: bool = False,
-               subs: dict[str, str] | None = None) -> str:
+               subs: dict[str, str] | None = None,
+               category: str = "Product Design") -> str:
     import markdown
 
     md = markdown.Markdown(
@@ -337,6 +444,7 @@ def build_html(files: list[Path], title: str, meta: str,
         raw, mermaid_map = extract_mermaid_blocks(raw)
         body = md.convert(raw)
         body = inject_mermaid(body, mermaid_map)
+        body = _wrap_table_cells(body)
 
         # Collect headings for the TOC before reset() clears toc_tokens.
         prefix = f"ch{i}-" if multi_chapter else ""
@@ -374,6 +482,11 @@ def build_html(files: list[Path], title: str, meta: str,
         sections.append(f'<section class="doc-section{extra_class}">{body}</section>')
 
     toc_html = _build_toc_html(all_toc_entries, standalone=multi_chapter)
+    if not multi_chapter and sections:
+        injected = _inject_toc_under_heading(sections[0], all_toc_entries)
+        if injected is not None:
+            sections[0] = injected
+            toc_html = ""
 
     safe_title  = _html.escape(title)
     safe_meta   = _html.escape(meta)
@@ -382,15 +495,15 @@ def build_html(files: list[Path], title: str, meta: str,
     if nofront:
         cover = ""
     else:
+        meta_line = f'\n    <p class="cover-meta">{safe_meta}</p>' if safe_meta else ""
         author_line = f'\n    <p class="cover-author">{safe_author}</p>' if safe_author else ""
         cover = f"""
 <div class="cover-page">
   <div class="cover-inner">
     <p class="cover-eyebrow">M&amp;A Operating System</p>
-    <p class="cover-category">Product Design</p>
+    <p class="cover-category">{_html.escape(category)}</p>
     <h1 class="cover-title">{safe_title}</h1>
-    <hr class="cover-rule">
-    <p class="cover-meta">{safe_meta}</p>{author_line}
+    <hr class="cover-rule">{meta_line}{author_line}
   </div>
 </div>"""
 
@@ -410,6 +523,13 @@ CSS = """
 @page {
     size: letter;
     margin: 18mm 15mm;
+    @bottom-left {
+        content: "© M&A Operating System 2026 – All rights reserved";
+        font-family: system-ui, sans-serif;
+        font-size: 7.5pt;
+        color: #9ca3af;
+        white-space: nowrap;
+    }
     @bottom-right {
         content: counter(page);
         font-family: system-ui, sans-serif;
@@ -420,7 +540,12 @@ CSS = """
 
 @page cover-page {
     margin: 0;
+    @bottom-left { content: none; }
     @bottom-right { content: none; }
+}
+
+@page wide {
+    size: letter landscape;
 }
 
 /* Cover */
@@ -515,11 +640,13 @@ p { margin: 0 0 3mm; }
 
 /* Tables */
 table {
+    /* auto layout sizes columns from their content; fixed layout without
+       <col> widths splits the width equally across all columns. */
     width: 100%;
-    table-layout: fixed;
+    table-layout: auto;
     border-collapse: collapse;
     margin: 4mm 0;
-    font-size: 8.5pt;
+    font-size: 8pt;
 }
 th {
     background-color: #eff6ff;
@@ -533,10 +660,15 @@ td {
     padding: 3.5pt 7pt;
     border: 1px solid #e5e7eb;
     vertical-align: top;
-    overflow-wrap: anywhere;
-    word-break: break-word;
+    /* break-word (not anywhere) so long tokens can still wrap without shrinking
+       each column's min-content width to one character, which splits short
+       words such as "Specification" mid-word under auto table layout. */
+    overflow-wrap: break-word;
 }
 tr:nth-child(even) td { background-color: #f9fafb; }
+/* Tables of 9+ columns: own landscape page(s), hyphenate only here. */
+.wide-table { page: wide; }
+.wide-table td { hyphens: auto; hyphenate-limit-chars: 8 4 4; }
 
 /* Code */
 code {
@@ -591,6 +723,9 @@ a { color: #1d4ed8; text-decoration: none; }
 
 /* Pagination hints */
 h1, h2, h3 { page-break-after: avoid; }
+/* Every H2 starts a new page, except one directly after an H1: the H1 is
+   already at the top of a page, and breaking again would strand it alone. */
+h1 + h2 { page-break-before: avoid; }
 tr          { page-break-inside: avoid; }
 
 /* Table of Contents */
@@ -613,18 +748,14 @@ tr          { page-break-inside: avoid; }
 .toc-h5 { margin-top: 0.25mm; font-size: 8pt;  color: #9ca3af; padding-left: 22mm; }
 .toc-h6 { margin-top: 0.25mm; font-size: 8pt;  color: #9ca3af; padding-left: 26mm; }
 .toc-list a {
-    display: flex;
+    /* Must stay a block box: WeasyPrint does not resolve target-counter() for
+       ::after content inside a flex container — every page number renders as 0. */
+    display: block;
     text-decoration: none;
     color: inherit;
-    align-items: baseline;
 }
 .toc-list a::after {
-    content: target-counter(attr(href url), page);
-    flex-shrink: 0;
-    margin-left: auto;
-    padding-left: 4mm;
-    min-width: 8mm;
-    text-align: right;
+    content: leader('.') target-counter(attr(href url), page);
     color: #6b7280;
     font-variant-numeric: tabular-nums;
     font-size: 8.5pt;
@@ -733,9 +864,9 @@ def _resolve_page_path(file_path: Path) -> Path:
             print(f"    {c.relative_to(_REPO_ROOT)}")
         sys.exit(1)
     print(f"  [error] '{file_path.name}' not found in a supported document directory.")
-    print(f"          Provide the path relative to the repo root,")
-    print(f"          e.g.: docs/product/analytics/07-text-to-sql-antipattern.md")
-    print(f"                 docs/data-models/cpg-manufacturing-data-design-document.md")
+    print("          Provide the path relative to the repo root,")
+    print("          e.g.: docs/product/analytics/07-text-to-sql-antipattern.md")
+    print("                 docs/data-models/cpg-manufacturing-data-design-document.md")
     sys.exit(1)
 
 
@@ -782,7 +913,8 @@ def generate_page(file_path: Path, nofront: bool = False) -> None:
     print("Building HTML…")
     html = build_html([file_path], page_title, config["meta"],
                       author=config.get("author", ""),
-                      nofront=nofront)
+                      nofront=nofront,
+                      category=config.get("category", "Product Design"))
 
     print("Rendering PDF…")
     from weasyprint import HTML, CSS as WeasyprintCSS
@@ -878,88 +1010,55 @@ def generate_pages(product_name: str, page_prefixes: list[str],
 
 # ---------- main ----------
 
-def main():
+def _chapter_prefix(value: str) -> str:
+    """argparse type for --pages: exactly two digits."""
+    if not re.fullmatch(r"\d{2}", value):
+        raise argparse.ArgumentTypeError(f"page prefixes must be two digits (e.g. 02 04 08), got: {value}")
+    return value
+
+
+def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="Render product and data-model Markdown documents to PDF.",
+    )
+    parser.add_argument("--page", type=Path, metavar="FILE",
+                        help="Render one Markdown file from docs/product/ or docs/data-models/.")
+    parser.add_argument("--product", choices=list(PRODUCTS),
+                        help="Render a single product. Omit to render all products.")
+    parser.add_argument("--pages", nargs="+", type=_chapter_prefix, metavar="NN",
+                        help="Two-digit chapter prefixes to merge, in order (requires --product).")
+    parser.add_argument("--out", metavar="FILE.pdf",
+                        help="Output filename for --pages mode.")
+    parser.add_argument("--nofront", action="store_true", help="Omit the branded cover page.")
+    args = parser.parse_args(argv)
+
+    if args.page and (args.product or args.pages or args.out):
+        parser.error("--page cannot be combined with --product, --pages or --out")
+    if args.pages and not args.product:
+        parser.error("--pages requires --product")
+    if args.out and not args.pages:
+        parser.error("--out is only valid with --pages")
+    return args
+
+
+def main(argv: list[str] | None = None) -> None:
+    args = _parse_args(argv)
+
     try:
+        import markdown  # noqa: F401
         from weasyprint import HTML  # noqa: F401
     except ImportError:
-        print("weasyprint not installed. Run: pip install markdown weasyprint")
+        print("Render dependencies missing. Run: pip install -r requirements.txt")
         sys.exit(1)
 
-    args = sys.argv[1:]
-    nofront = "--nofront" in args
-    args = [a for a in args if a != "--nofront"]
-
-    # --page <file>
-    if args and args[0] == '--page':
-        if len(args) < 2:
-            print("Usage: python generate_pdf.py --page <path/to/file.md> [--nofront]")
-            sys.exit(1)
-        generate_page(Path(args[1]), nofront=nofront)
-        print("\nAll done.")
-        return
-
-    # Extract --product, --pages, --out from args
-    product_flag: str | None = None
-    pages_flag: list[str] = []
-    out_flag: str | None = None
-
-    i = 0
-    positional: list[str] = []
-    while i < len(args):
-        if args[i] == "--product":
-            if i + 1 >= len(args):
-                print("  [error] --product requires a value")
-                sys.exit(1)
-            product_flag = args[i + 1]
-            i += 2
-        elif args[i] == "--pages":
-            i += 1
-            while i < len(args) and not args[i].startswith("--"):
-                pages_flag.append(args[i])
-                i += 1
-        elif args[i] == "--out":
-            if i + 1 >= len(args):
-                print("  [error] --out requires a filename")
-                sys.exit(1)
-            out_flag = args[i + 1]
-            i += 2
-        else:
-            positional.append(args[i])
-            i += 1
-
-    if positional:
-        print(f"  [error] unexpected positional argument(s): {' '.join(positional)}")
-        print(f"          Use --product <name> to select a product.")
-        sys.exit(1)
-
-    # --pages mode: needs --product
-    if pages_flag:
-        if not product_flag:
-            print("  [error] --pages requires --product <name>")
-            sys.exit(1)
-        if product_flag not in PRODUCTS:
-            print(f"  [error] unknown product '{product_flag}'. Available: {', '.join(PRODUCTS)}")
-            sys.exit(1)
-        # validate prefix format (exactly two digits)
-        bad = [p for p in pages_flag if not re.fullmatch(r"\d{2}", p)]
-        if bad:
-            print(f"  [error] page prefixes must be two digits (e.g. 02 04 08), got: {', '.join(bad)}")
-            sys.exit(1)
-        generate_pages(product_flag, pages_flag, out_flag, nofront=nofront)
-        print("\nAll done.")
-        return
-
-    # Normal product generation
-    if product_flag:
-        if product_flag not in PRODUCTS:
-            print(f"Unknown product '{product_flag}'. Available: {', '.join(PRODUCTS)}")
-            sys.exit(1)
-        targets = {product_flag: PRODUCTS[product_flag]}
+    if args.page:
+        generate_page(args.page, nofront=args.nofront)
+    elif args.pages:
+        generate_pages(args.product, args.pages, args.out, nofront=args.nofront)
     else:
-        targets = PRODUCTS
-
-    for name, config in targets.items():
-        generate_product(name, config, nofront=nofront)
+        targets = {args.product: PRODUCTS[args.product]} if args.product else PRODUCTS
+        for name, config in targets.items():
+            generate_product(name, config, nofront=args.nofront)
 
     print("\nAll done.")
 
