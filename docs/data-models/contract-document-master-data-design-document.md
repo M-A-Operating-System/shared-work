@@ -27,7 +27,7 @@ Our goal is not simply to modernize data technology. It is to make information w
 
 **The value of a data program should ultimately be measured by what the business can do better because of it.**
 
-### Find Out More
+## Find Out More
 
 To learn more about how M&A Operating System can help your organization turn data into measurable business outcomes, visit [maoperatingsystem.com](https://www.maoperatingsystem.com).
 
