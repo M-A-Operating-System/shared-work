@@ -292,6 +292,16 @@ def _flatten_toc_tokens(tokens: list, prefix: str, max_depth: int) -> list[tuple
     return result
 
 
+def _toc_list_html(entries: list[tuple[int, str, str]]) -> str:
+    """Render (level, text, anchor_id) triples as the TOC <ul>."""
+    items = [
+        f'  <li class="toc-h{level}">'
+        f'<a href="#{_html.escape(anchor)}">{_html.escape(text)}</a></li>'
+        for level, text, anchor in entries
+    ]
+    return '<ul class="toc-list">\n' + '\n'.join(items) + '\n</ul>'
+
+
 def _build_toc_html(entries: list[tuple[int, str, str]], standalone: bool) -> str:
     """Build a <nav class="toc-page"> element from (level, text, anchor_id) triples.
 
@@ -301,18 +311,32 @@ def _build_toc_html(entries: list[tuple[int, str, str]], standalone: bool) -> st
     if not entries:
         return ""
     cls = "toc-page toc-standalone" if standalone else "toc-page toc-inline"
-    items = [
-        f'  <li class="toc-h{level}">'
-        f'<a href="#{_html.escape(anchor)}">{_html.escape(text)}</a></li>'
-        for level, text, anchor in entries
-    ]
     return (
         f'<nav class="{cls}">\n'
         f'<h2 class="toc-heading">Contents</h2>\n'
-        f'<ul class="toc-list">\n'
-        + '\n'.join(items)
-        + '\n</ul>\n</nav>'
+        + _toc_list_html(entries)
+        + '\n</nav>'
     )
+
+
+_TOC_HEADING_ID = "table-of-contents"
+
+
+def _inject_toc_under_heading(body: str, entries: list[tuple[int, str, str]]) -> str | None:
+    """Fill a document's own "Table of Contents" heading with the generated list.
+
+    Returns the updated body, or None when the document has no such heading.
+    Placing the list under the author's heading avoids both an empty
+    "Table of Contents" page and a second, separate Contents page.
+    """
+    heading = re.search(
+        rf'<h([1-6])\b[^>]*\bid="{_TOC_HEADING_ID}"[^>]*>.*?</h\1>', body, flags=re.DOTALL
+    )
+    if heading is None:
+        return None
+    toc_entries = [e for e in entries if e[2] != _TOC_HEADING_ID]
+    nav = f'<nav class="toc-page toc-inline">\n{_toc_list_html(toc_entries)}\n</nav>'
+    return body[:heading.end()] + nav + body[heading.end():]
 
 
 def build_html(files: list[Path], title: str, meta: str,
@@ -374,6 +398,11 @@ def build_html(files: list[Path], title: str, meta: str,
         sections.append(f'<section class="doc-section{extra_class}">{body}</section>')
 
     toc_html = _build_toc_html(all_toc_entries, standalone=multi_chapter)
+    if not multi_chapter and sections:
+        injected = _inject_toc_under_heading(sections[0], all_toc_entries)
+        if injected is not None:
+            sections[0] = injected
+            toc_html = ""
 
     safe_title  = _html.escape(title)
     safe_meta   = _html.escape(meta)
@@ -410,6 +439,13 @@ CSS = """
 @page {
     size: letter;
     margin: 18mm 15mm;
+    @bottom-left {
+        content: "© M&A Operating System 2026 – All rights reserved";
+        font-family: system-ui, sans-serif;
+        font-size: 7.5pt;
+        color: #9ca3af;
+        white-space: nowrap;
+    }
     @bottom-right {
         content: counter(page);
         font-family: system-ui, sans-serif;
@@ -420,6 +456,7 @@ CSS = """
 
 @page cover-page {
     margin: 0;
+    @bottom-left { content: none; }
     @bottom-right { content: none; }
 }
 
@@ -515,11 +552,13 @@ p { margin: 0 0 3mm; }
 
 /* Tables */
 table {
+    /* auto layout sizes columns from their content; fixed layout without
+       <col> widths splits the width equally across all columns. */
     width: 100%;
-    table-layout: fixed;
+    table-layout: auto;
     border-collapse: collapse;
     margin: 4mm 0;
-    font-size: 8.5pt;
+    font-size: 8pt;
 }
 th {
     background-color: #eff6ff;
@@ -533,8 +572,10 @@ td {
     padding: 3.5pt 7pt;
     border: 1px solid #e5e7eb;
     vertical-align: top;
-    overflow-wrap: anywhere;
-    word-break: break-word;
+    /* break-word (not anywhere) so long tokens can still wrap without shrinking
+       each column's min-content width to one character, which splits short
+       words such as "Specification" mid-word under auto table layout. */
+    overflow-wrap: break-word;
 }
 tr:nth-child(even) td { background-color: #f9fafb; }
 
@@ -591,6 +632,9 @@ a { color: #1d4ed8; text-decoration: none; }
 
 /* Pagination hints */
 h1, h2, h3 { page-break-after: avoid; }
+/* Every H2 starts a new page, except one directly after an H1: the H1 is
+   already at the top of a page, and breaking again would strand it alone. */
+h1 + h2 { page-break-before: avoid; }
 tr          { page-break-inside: avoid; }
 
 /* Table of Contents */
@@ -613,18 +657,14 @@ tr          { page-break-inside: avoid; }
 .toc-h5 { margin-top: 0.25mm; font-size: 8pt;  color: #9ca3af; padding-left: 22mm; }
 .toc-h6 { margin-top: 0.25mm; font-size: 8pt;  color: #9ca3af; padding-left: 26mm; }
 .toc-list a {
-    display: flex;
+    /* Must stay a block box: WeasyPrint does not resolve target-counter() for
+       ::after content inside a flex container — every page number renders as 0. */
+    display: block;
     text-decoration: none;
     color: inherit;
-    align-items: baseline;
 }
 .toc-list a::after {
-    content: target-counter(attr(href url), page);
-    flex-shrink: 0;
-    margin-left: auto;
-    padding-left: 4mm;
-    min-width: 8mm;
-    text-align: right;
+    content: leader('.') target-counter(attr(href url), page);
     color: #6b7280;
     font-variant-numeric: tabular-nums;
     font-size: 8.5pt;
