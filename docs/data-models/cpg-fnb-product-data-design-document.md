@@ -16,31 +16,6 @@ This **Data Model Design Document** by **M&A Operating System** provides a singl
 
 ## Table of Contents
 
-- [1 Introduction](#1-introduction)
-  - [1.1 About M&A Operating System](#11-about-ma-operating-system)
-  - [1.2 About the MAOS Practical Data Modelling Approach](#12-about-the-maos-practical-data-modelling-approach)
-  - [1.3 Summary of Findings](#13-summary-of-findings)
-- [2 Scope](#2-scope)
-  - [2.1 The business](#21-the-business)
-  - [2.2 In scope](#22-in-scope)
-  - [2.3 Out of scope](#23-out-of-scope)
-  - [2.4 Shared with other models](#24-shared-with-other-models)
-  - [2.5 Assumptions](#25-assumptions)
-  - [2.6 Open questions](#26-open-questions)
-- [3 Business Requirements](#3-business-requirements)
-- [4 Data Requirements](#4-data-requirements)
-- [5 Data Model](#5-data-model)
-  - [5.1 Subject Domains](#51-subject-domains)
-  - [5.2 Canonical Roles](#52-canonical-roles)
-  - [5.3 Role–Verb–Role Relationships](#53-roleverbrole-relationships)
-  - [5.4 Concepts](#54-concepts)
-  - [5.5 Lookups and Values](#55-lookups-and-values)
-  - [5.6 Diagrams](#56-diagrams)
-- [6 Outstanding Decisions](#6-outstanding-decisions)
-- [Appendix A — Sources](#appendix-a--sources)
-- [Appendix B — Data Modelling Principles](#appendix-b--data-modelling-principles)
-  - [Where the principles and the requirements could not be reconciled](#where-the-principles-and-the-requirements-could-not-be-reconciled)
-
 ## 1 Introduction
 
 ### 1.1 About M&A Operating System
