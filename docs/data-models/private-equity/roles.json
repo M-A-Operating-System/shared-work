@@ -169,19 +169,19 @@
   },
   {
     "id": "ROL007",
-    "name": "Transfer",
-    "plural": "Transfers",
-    "definition": "A transaction is a Transfer while it is paid by one party and received by another. It says the event itself, which is not the same as the party that paid or received.",
+    "name": "Transaction",
+    "plural": "Transactions",
+    "definition": "A transaction is a Transaction in a relationship while it is the movement of money, holdings or ownership that the other subject took part in or was recorded against. It is the same role wherever a transaction meets another subject, which is how those subjects join up around it. It is the movement itself, not the parties to it.",
     "played_by_domain_ids": [
       "DOM003"
     ],
-    "distinct_need": "Names the event in which money or a holding moves; no other role says a transaction has parties.",
+    "distinct_need": "Names the event in which money or a holding moves; no other role says a movement has parties or an instrument.",
     "aliases": [
-      "Event"
+      "Event",
+      "Transfer"
     ],
     "established_by": [
       "REL005",
-      "REL006",
       "REL007"
     ],
     "stated_in": [
@@ -198,16 +198,19 @@
   },
   {
     "id": "ROL008",
-    "name": "Payer",
-    "plural": "Payers",
-    "definition": "A legal entity is a Payer while it pays into a transaction. It says the body gave money, and received the holding if there was one, which is not the same as being the Payee.",
+    "name": "Transaction Party",
+    "plural": "Transaction Parties",
+    "definition": "A legal entity is a Transaction Party while it takes part in a transaction as a payer, a payee, a buyer, a seller or an issuer. It says who the money or holdings moved from or to, which is not the same as owning an account the movement passed through.",
     "played_by_domain_ids": [
       "DOM001"
     ],
-    "distinct_need": "Names the party that pays in a transaction; no other role says which side of a transaction paid.",
+    "distinct_need": "Names the party that takes part in a transaction on either side; no other role says a body took part in a movement of money or holdings.",
     "aliases": [
-      "Contributor",
-      "Buyer"
+      "Payer",
+      "Payee",
+      "Buyer",
+      "Seller",
+      "Counterparty"
     ],
     "established_by": [
       "REL005"
@@ -227,7 +230,7 @@
     "id": "ROL009",
     "name": "Payee",
     "plural": "Payees",
-    "definition": "A legal entity is a Payee while it receives from a transaction. It says the body took money and gave up the holding if there was one, which is not the same as being the Payer.",
+    "definition": "A legal entity is a Payee while it receives from a transaction. It says the body took money and gave up the holding if there was one, which is not the same as the Payer.",
     "played_by_domain_ids": [
       "DOM001"
     ],
@@ -247,8 +250,8 @@
       "SRC001",
       "SRC002"
     ],
-    "status": "active",
-    "withdrawn_reason": null
+    "status": "withdrawn",
+    "withdrawn_reason": "Merged into Transaction Party (ROL008): the payer and the payee are one role, and whether the party paid or received is held on its record."
   },
   {
     "id": "ROL010",
@@ -271,6 +274,58 @@
     "evidence_source_ids": [
       "SRC003",
       "SRC015"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL011",
+    "name": "Valuation",
+    "plural": "Valuations",
+    "definition": "A valuation is a Valuation in a relationship while it is a judgement of the worth of something on a date, as seen from the thing that was valued. It says the figure is a view taken on a date and not a movement of money, so it is not a transaction. A new valuation does not replace an earlier one; each is kept for its own date.",
+    "played_by_domain_ids": [
+      "DOM003"
+    ],
+    "distinct_need": "Names the record of a judged worth on a date; no other role says a figure is a view and not a movement of money.",
+    "aliases": [
+      "Appraisal"
+    ],
+    "established_by": [
+      "REL008"
+    ],
+    "stated_in": [
+      "REQ009"
+    ],
+    "evidence_source_ids": [
+      "SRC005",
+      "SRC006",
+      "SRC007"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL012",
+    "name": "Valued Legal Entity",
+    "plural": "Valued Legal Entities",
+    "definition": "A legal entity is a Valued Legal Entity while a valuation judges its worth, such as a portfolio company's equity or a fund's net assets. It says the body is the thing valued, which is not the same as the party that holds it.",
+    "played_by_domain_ids": [
+      "DOM001"
+    ],
+    "distinct_need": "Names the legal entity a valuation is about; no other role says a body was valued.",
+    "aliases": [
+      "Valued Entity"
+    ],
+    "established_by": [
+      "REL008"
+    ],
+    "stated_in": [
+      "REQ009"
+    ],
+    "evidence_source_ids": [
+      "SRC005",
+      "SRC006",
+      "SRC007"
     ],
     "status": "active",
     "withdrawn_reason": null

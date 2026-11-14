@@ -112,8 +112,8 @@
       "SRC006",
       "SRC007"
     ],
-    "status": "active",
-    "withdrawn_reason": null
+    "status": "withdrawn",
+    "withdrawn_reason": "Merged into Valuation (SBJ009): one record for each valuation, with the measure of value named on it, instead of a record owned by the legal entity."
   },
   {
     "id": "SBJ005",
@@ -224,6 +224,34 @@
       "SRC002",
       "SRC003",
       "SRC015"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SBJ009",
+    "code": "Valuation",
+    "definition": "There is one of these for each valuation of a legal entity as at a date and on a named measure of value. In this structure it holds the net asset value of a fund and the equity value or enterprise value of a portfolio company or vehicle. If you need the value of a fund or a company at a reporting date, this is what you go by. A new valuation does not replace an earlier one, because each is kept for its own date. It is a view taken on a date and not a movement of money, so it is not a transaction. It is the value of the whole body and not the value of one fund's holding in it, which is the price per unit multiplied by the units held, and it is not the fair value of a single instrument, which is held with the instrument's price.",
+    "kind": "occurrence",
+    "mastery": "mastered",
+    "domain_id": "DOM003",
+    "is_anchor": false,
+    "parent_id": null,
+    "parent_cardinality": null,
+    "singled_out_by": "a governed valuation measure and the valuation date",
+    "independence": null,
+    "distinct_need": null,
+    "template_dda_id": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA: LegalEntityValuations DMC000000112 holds dated valuations of a legal entity only and is a child of the legal entity; Valuation is held in Transactions beside the transaction and linked to the legal entity valued by DMR000000039, so that the same concept can serve other things valued later. DMC000000112 is retired in its favour.",
+    "data_requirement_ids": [
+      "DRQ008"
+    ],
+    "evidence_source_ids": [
+      "SRC005",
+      "SRC006",
+      "SRC007"
     ],
     "status": "active",
     "withdrawn_reason": null

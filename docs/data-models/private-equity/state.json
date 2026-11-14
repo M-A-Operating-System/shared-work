@@ -172,6 +172,7 @@
         "SBJ008",
         "REL005",
         "SBJ001",
+        "ATR041",
         "ATR015",
         "ATR016"
       ],
@@ -190,9 +191,11 @@
         "SBJ008",
         "ATR021",
         "ATR022",
-        "REL006",
-        "ATR018",
-        "ATR019"
+        "REL005",
+        "SBJ001",
+        "ATR041",
+        "ATR015",
+        "ATR016"
       ],
       "result": "pass",
       "reason": ""
@@ -211,6 +214,7 @@
         "ATR011",
         "SBJ008",
         "REL005",
+        "ATR041",
         "ATR015",
         "ATR022"
       ],
@@ -303,6 +307,7 @@
         "SBJ008",
         "REL005",
         "SBJ001",
+        "ATR041",
         "ATR015",
         "ATR022",
         "REL007",
@@ -325,6 +330,7 @@
         "ATR021",
         "REL005",
         "SBJ001",
+        "ATR041",
         "ATR015"
       ],
       "result": "pass",
@@ -341,9 +347,10 @@
       "path": [
         "SBJ008",
         "ATR021",
-        "REL006",
+        "REL005",
         "SBJ001",
-        "ATR018"
+        "ATR041",
+        "ATR015"
       ],
       "result": "pass",
       "reason": ""
@@ -362,12 +369,11 @@
         "SBJ008",
         "ATR022",
         "REL005",
-        "ATR017",
-        "REL006",
-        "ATR020"
+        "ATR041",
+        "ATR017"
       ],
       "result": "pass",
-      "reason": "Worked out as units received less units given up across transactions to the date; no figure is stored."
+      "reason": "Worked out as units received less units given up across the transactions to the date, using the side on each party; no figure is stored."
     },
     {
       "id": "SCN021",
@@ -381,13 +387,12 @@
         "SBJ008",
         "ATR021",
         "REL005",
-        "REL006",
         "SBJ001",
-        "ATR017",
-        "ATR020"
+        "ATR041",
+        "ATR017"
       ],
       "result": "pass",
-      "reason": "The continuation vehicle is the paying party and fund F the receiving party in one transaction."
+      "reason": "The continuation vehicle is a party that paid and fund F a party that received, in one transaction."
     },
     {
       "id": "SCN022",
@@ -417,7 +422,8 @@
       "as_at": "as-at",
       "path": [
         "SBJ001",
-        "SBJ004",
+        "REL008",
+        "SBJ009",
         "ATR036",
         "ATR037",
         "ATR038"
@@ -441,6 +447,7 @@
         "REL007",
         "SBJ008",
         "REL005",
+        "ATR041",
         "ATR017"
       ],
       "result": "pass",
@@ -463,6 +470,25 @@
       "reason": "The relationship carries business start and end dates, so the earlier manager is still answerable."
     },
     {
+      "id": "SCN027",
+      "question": "What was portfolio company P's enterprise value as at a date?",
+      "data_requirement_ids": [
+        "DRQ008"
+      ],
+      "kind": "designed",
+      "as_at": "as-at",
+      "path": [
+        "SBJ001",
+        "REL008",
+        "SBJ009",
+        "ATR036",
+        "ATR037",
+        "ATR038"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
       "id": "SCN026",
       "question": "Is a company that invests in one fund and is a portfolio company of another held once?",
       "data_requirement_ids": [
@@ -483,21 +509,22 @@
   "document": {
     "edition": "lite",
     "requested_by": "Andrew Bush",
-    "rendered": "2026-10-28"
+    "rendered": "2026-11-14"
   },
   "minimality": [
     {
       "pass": 1,
       "counts": {
         "domains": 3,
-        "roles": 10,
+        "roles": 11,
         "relationships": 7,
         "concepts": 8,
-        "attributes": 40,
-        "lookups": 14
+        "attributes": 38,
+        "lookups": 15
       },
       "merged": [
-        "Capital call and distribution amounts by investor held as relationship data on two transaction relationships rather than a concept",
+        "Capital call and distribution amounts by investor held as relationship data on one transaction party relationship, with the side on each party, rather than a concept",
+        "Valuation held once, with the measure named on it, instead of a legal entity valuation concept owned by the legal entity",
         "Fund facts held on the management relationship rather than a fund concept",
         "Ownership held on one relationship for fund-to-vehicle, vehicle-to-vehicle and vehicle-to-company links"
       ],
@@ -517,11 +544,11 @@
       "pass": 2,
       "counts": {
         "domains": 3,
-        "roles": 10,
+        "roles": 11,
         "relationships": 7,
         "concepts": 8,
-        "attributes": 40,
-        "lookups": 14
+        "attributes": 38,
+        "lookups": 15
       },
       "merged": [],
       "withdrawn": [],
@@ -531,11 +558,11 @@
       "pass": 3,
       "counts": {
         "domains": 3,
-        "roles": 10,
+        "roles": 11,
         "relationships": 7,
         "concepts": 8,
-        "attributes": 40,
-        "lookups": 14
+        "attributes": 38,
+        "lookups": 15
       },
       "merged": [],
       "withdrawn": [],
@@ -671,15 +698,15 @@
     {
       "standard": "DMS000000169",
       "applies": true,
-      "how_satisfied": "Principles applied: each enduring subject is represented once and roles are derived from relationships (REL001 to REL007); relationships carry both verbs and both roles; observed and derived facts are separated (holdings, unfunded commitment, look-through ownership and fair value of a holding are worked out, never stored); dates are business dates; no audit fields appear.",
+      "how_satisfied": "Principles applied: each enduring subject is represented once and roles are derived from relationships (REL001 to REL005, REL007 and REL008); relationships carry both verbs and both roles; observed and derived facts are separated (holdings, unfunded commitment, look-through ownership and fair value of a holding are worked out, never stored); dates are business dates; no audit fields appear.",
       "artefact_ids": [
         "REL001",
         "REL002",
         "REL003",
         "REL004",
         "REL005",
-        "REL006",
-        "REL007"
+        "REL007",
+        "REL008"
       ],
       "exception_id": null,
       "read_hash": "feca57fe2bd77a2d",
@@ -726,21 +753,36 @@
       "decision": "",
       "by": "",
       "date": ""
+    },
+    {
+      "id": "DEC004",
+      "question": "This design holds the amount, purpose, units and side of each party on the transaction party relationship, because every party to one transaction pays or receives a different amount. The DDA description of that relationship (DMR000000037) says the date and amount belong to the transaction. Which is right, and what changes in DDA?",
+      "options": [
+        "Amounts stay per party on the relationship and the DDA description is corrected",
+        "Amounts move to a concept for each party's share of a transaction"
+      ],
+      "raised_at_pass": 1,
+      "status": "open",
+      "decision": "",
+      "by": "",
+      "date": ""
+    },
+    {
+      "id": "DEC005",
+      "question": "Valuation is held in the Transactions domain beside Transaction and is not a child of it, because a valuation is not a movement of money. Is a concept with no parent acceptable in a domain, or should Valuation hang under a new parent concept?",
+      "options": [
+        "Allow a concept with no parent beside the anchor",
+        "Create a parent concept for things recorded about a date in the domain"
+      ],
+      "raised_at_pass": 1,
+      "status": "open",
+      "decision": "",
+      "by": "",
+      "date": ""
     }
   ],
-  "editorial": {
-    "document_sha256": "2b2605bf9daf1f6bf9f60359c807b1e7597a79099ab808fe7a55ed2255c18c4e",
-    "reviewed_on": "2026-10-28",
-    "reviewer": "independent",
-    "findings_count": {
-      "factual": 6,
-      "clarity": 19,
-      "language": 9,
-      "structure": 6,
-      "substance": 6
-    }
-  },
+  "editorial": {},
   "converged": true,
   "gate_decision": "issue",
-  "summary": "The design represents a private equity sponsor's funds, vehicles, investors, portfolio companies and the ownership between them, from both the manager's side and the investor's side, using three shared domains that DDA already holds, Legal Entities, Instruments and Transactions, with one new concept, Transaction, as the anchor of the third. Fund, GP, LP, Investor and PortCo are roles that follow from seven relationships, so a company that invests in one fund and is held by another is held once. Commitments, stakes, capital calls, distributions, acquisitions and exits carry their own dates and amounts. Positions, unfunded commitments, look-through ownership and the fair value of a holding are worked out from them and never stored, while the price of an instrument and the value of a fund or company are recorded as at their dates. Three design questions remain open: how a reported ownership percentage is reconciled with units held, whether the start and end dates on the limited partner commitment are kept, and how the management company is linked to the sponsor's holding company."
+  "summary": "The design represents a private equity sponsor's funds, vehicles, investors, portfolio companies and the ownership between them, from both the manager's side and the investor's side, using three shared domains that DDA already holds, Legal Entities, Instruments and Transactions, with two new concepts in the third, Transaction as its anchor and Valuation beside it. Fund, GP, LP, Investor and PortCo are roles that follow from the relationships, so a company that invests in one fund and is held by another is held once. Commitments, stakes, capital calls, distributions, acquisitions and exits carry their own dates and amounts, and every party to a transaction is recorded once, with whether it paid or received. Positions, unfunded commitments, look-through ownership and the fair value of a holding are worked out from them and never stored, while the price of an instrument and the value of a fund or company, stated on a named measure such as net asset value, equity value or enterprise value, are recorded as at their dates. Five design questions remain open: how a reported ownership percentage is reconciled with units held, whether the start and end dates on the limited partner commitment are kept, how the management company is linked to the sponsor's holding company, where the amount of each party to a transaction is held, and where a valuation sits in the Transactions domain."
 }

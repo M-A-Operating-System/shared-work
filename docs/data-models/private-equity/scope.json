@@ -33,7 +33,7 @@
     },
     {
       "id": "SCI004",
-      "statement": "Portfolio companies and investments: acquisitions, follow-on investments and full or partial exits, the instruments held, cost, and fair value as at a date."
+      "statement": "Portfolio companies and investments: acquisitions, follow-on investments and full or partial exits, the instruments held, cost, the fair value of an instrument as at a date, and the value of a fund or portfolio company as at a date on a named measure."
     },
     {
       "id": "SCI005",
@@ -99,14 +99,19 @@
     },
     {
       "id": "SCA004",
-      "statement": "Fair value is a price per unit of an instrument as at a date, shared by every fund holding that instrument."
+      "statement": "Fair value is a price per unit of an instrument as at a date, shared by every fund holding that instrument. The value of a whole fund or company is a valuation as at a date on a named measure, and is never confused with a holding's fair value."
     },
     {
       "id": "SCA005",
       "statement": "The model aligns to the ILPA templates and to legal entity identifiers (LEI); no ontology such as FIBO is adopted."
     }
   ],
-  "questions_unanswered": [],
+  "questions_unanswered": [
+    {
+      "id": "SCQ001",
+      "note": "Which account each transaction is booked to is recorded in the Accounts model (relationship AccountTransactionBooking, DMR000000038) and is not yet part of this design. Should the booking link be shown here as the connection to the Accounts and Corporate Banking models?"
+    }
+  ],
   "candidate_dda_domains": [
     "DMD000000012",
     "DMD000000015",
@@ -134,6 +139,6 @@
   ],
   "confirmed": {
     "by": "Andrew Bush",
-    "date": "2026-10-28"
+    "date": "2026-11-14"
   }
 }

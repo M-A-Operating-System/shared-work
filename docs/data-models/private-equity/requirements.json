@@ -123,7 +123,7 @@
   {
     "id": "REQ009",
     "category": "Valuation",
-    "statement": "The business must record the fair value per unit of each instrument held, as at each reporting date, with its level in the fair value hierarchy, and the value of each fund and portfolio company as at a date.",
+    "statement": "The business must record the fair value per unit of each instrument held, as at each reporting date, with its level in the fair value hierarchy, and the value of each fund and portfolio company as at a date, stated on a named measure such as net asset value, equity value or enterprise value.",
     "owner": "Head of Portfolio Valuation",
     "subgroup_id": "SCG002",
     "satisfied_by": "model",

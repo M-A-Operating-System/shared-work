@@ -1,16 +1,16 @@
 {
-  "document_date": "2026-10-28",
-  "package_ref": "PE-STRUCT-20261028-01",
+  "document_date": "2026-11-14",
+  "package_ref": "PE-STRUCT-20261114-01",
   "summary_counts": {
     "business_requirements": 13,
     "data_requirements": 8,
     "domains": 3,
-    "roles": 10,
+    "roles": 11,
     "relationships": 7,
     "concepts": 8,
-    "attributes": 40,
-    "lookups": 14,
-    "test_cases": 26,
+    "attributes": 38,
+    "lookups": 15,
+    "test_cases": 27,
     "sources": 16
   },
   "case_index": {
@@ -95,7 +95,8 @@
     "REQ009": [
       "SCN022",
       "SCN023",
-      "SCN024"
+      "SCN024",
+      "SCN027"
     ]
   },
   "source_index": {
@@ -153,22 +154,21 @@
       "ROL007",
       "ROL010",
       "REL005",
-      "REL006",
       "REL007",
       "ATR001",
       "ATR003",
       "ATR005",
       "ATR015",
       "ATR017",
-      "ATR018",
-      "ATR020",
       "ATR022",
       "ATR036",
       "ATR037",
       "ATR038",
       "ATR040",
+      "ATR041",
       "LKP005",
-      "LKP008"
+      "LKP008",
+      "LKP015"
     ],
     "SRC009": [
       "REQ002",
@@ -209,28 +209,26 @@
       "ROL003",
       "ROL007",
       "ROL008",
-      "ROL009",
       "REL002",
       "REL005",
-      "REL006",
       "ATR006",
       "ATR011",
       "ATR012",
       "ATR013",
       "ATR015",
       "ATR016",
-      "ATR018",
-      "ATR019",
       "ATR021",
       "ATR022",
       "ATR023",
       "ATR024",
       "ATR025",
+      "ATR041",
       "LKP004",
       "LKP005",
       "LKP010",
       "LKP011",
-      "LKP013"
+      "LKP013",
+      "LKP015"
     ],
     "SRC016": [
       "REQ004",
@@ -250,7 +248,6 @@
       "REL007",
       "ATR012",
       "ATR017",
-      "ATR020",
       "ATR021",
       "LKP004",
       "LKP010"
@@ -260,19 +257,17 @@
       "SBJ008",
       "ROL007",
       "ROL008",
-      "ROL009",
       "REL005",
-      "REL006",
       "ATR015",
       "ATR016",
-      "ATR018",
-      "ATR019",
       "ATR021",
       "ATR022",
       "ATR023",
       "ATR024",
+      "ATR041",
       "LKP004",
-      "LKP005"
+      "LKP005",
+      "LKP015"
     ],
     "SRC010": [
       "REQ006",
@@ -307,8 +302,11 @@
     ],
     "SRC005": [
       "REQ009",
-      "SBJ004",
       "SBJ007",
+      "SBJ009",
+      "ROL011",
+      "ROL012",
+      "REL008",
       "ATR026",
       "ATR027",
       "ATR029",
@@ -323,19 +321,27 @@
     ],
     "SRC006": [
       "REQ009",
-      "SBJ004",
       "SBJ007",
+      "SBJ009",
+      "ROL011",
+      "ROL012",
+      "REL008",
       "ATR026",
       "ATR028",
       "ATR029",
       "ATR030",
+      "ATR036",
       "LKP006",
-      "LKP007"
+      "LKP007",
+      "LKP008"
     ],
     "SRC007": [
       "REQ009",
-      "SBJ004",
-      "SBJ007"
+      "SBJ007",
+      "SBJ009",
+      "ROL011",
+      "ROL012",
+      "REL008"
     ]
   },
   "views": {
@@ -356,16 +362,16 @@
       "mirror": "LegalEntityParallelVehicles"
     },
     "REL005": {
-      "forward": "TransactionPayers",
-      "mirror": "LegalEntityTransfers"
-    },
-    "REL006": {
-      "forward": "TransactionPayees",
-      "mirror": "LegalEntityTransfers"
+      "forward": "LegalEntityTransactions",
+      "mirror": "TransactionLegalEntityParties"
     },
     "REL007": {
       "forward": "TransactionTradedInstruments",
-      "mirror": "InstrumentTransfers"
+      "mirror": "InstrumentTransactions"
+    },
+    "REL008": {
+      "forward": "ValuationLegalEntity",
+      "mirror": "LegalEntityValuations"
     }
   }
 }

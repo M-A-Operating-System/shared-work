@@ -145,7 +145,8 @@
     "temporality": "as-at",
     "must_prevent": [
       "A call or distribution amount left blank",
-      "A purpose outside the agreed list"
+      "A purpose outside the agreed list",
+      "A party recorded without saying whether it paid or received"
     ],
     "prevent_resolution": [
       {
@@ -157,6 +158,11 @@
         "must_prevent_index": 1,
         "expressed_by": "lookup",
         "artefact_id": "LKP005"
+      },
+      {
+        "must_prevent_index": 2,
+        "expressed_by": "mandatory-attribute",
+        "artefact_id": "ATR041"
       }
     ],
     "status": "active",
@@ -250,17 +256,19 @@
     ],
     "must_record": [
       "The fair value per unit of an instrument as at a date, its price type and its fair value hierarchy level",
-      "The value of a fund or portfolio company as at a date, by type of valuation"
+      "The value of a fund or portfolio company as at a date, on a named measure of value"
     ],
     "must_answer": [
       "What was the fair value per unit of instrument I as at a date, and at which hierarchy level?",
       "What was fund F's net asset value as at a date?",
+      "What was portfolio company P's enterprise value as at a date?",
       "What is the fair value of fund F's holding in portfolio company P as at a date?"
     ],
     "temporality": "as-at",
     "must_prevent": [
       "A price with no date",
-      "A hierarchy level outside the three allowed"
+      "A hierarchy level outside the three allowed",
+      "A valuation with no measure, or a measure outside the agreed list"
     ],
     "prevent_resolution": [
       {
@@ -272,6 +280,11 @@
         "must_prevent_index": 1,
         "expressed_by": "lookup",
         "artefact_id": "LKP006"
+      },
+      {
+        "must_prevent_index": 2,
+        "expressed_by": "lookup",
+        "artefact_id": "LKP008"
       }
     ],
     "status": "active",

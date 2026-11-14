@@ -314,12 +314,12 @@
   },
   {
     "id": "LKP008",
-    "code": "LegalEntityValuationTypes",
-    "definition": "The list of ways a legal entity is valued, such as market value variants, net asset value and equity value. The head of portfolio valuation decides what goes on it.",
+    "code": "ValuationMeasures",
+    "definition": "The list of measures on which a legal entity is valued: net asset value, equity value and enterprise value. The head of portfolio valuation decides what goes on it.",
     "scope": "concept",
     "values": [
       {
-        "code": "NAV",
+        "code": "NET_ASSET_VALUE",
         "name": "Net Asset Value",
         "definition": "The value of a fund's assets less its liabilities."
       },
@@ -329,20 +329,21 @@
         "definition": "The value of the owners' interest in a company or vehicle."
       },
       {
-        "code": "FULLVALUE",
-        "name": "Full Value",
-        "definition": "Market value including all share types."
+        "code": "ENTERPRISE_VALUE",
+        "name": "Enterprise Value",
+        "definition": "The value of the whole business, being the owners' interest plus net debt."
       }
     ],
-    "dda_action": "extend",
-    "dda_id": "DLT000000063",
-    "reuse_search": "Searched DDA lookup types: DLT000000063 describes net asset value but holds only market-value variants; net asset value and equity value are added.",
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA lookup types: DLT000000063 holds market-value variants only; a list naming the measure of value is created for Valuation and DLT000000063 is left as it is.",
     "data_requirement_ids": [
       "DRQ008"
     ],
     "evidence_source_ids": [
       "SRC005",
-      "SRC003"
+      "SRC003",
+      "SRC006"
     ],
     "status": "active",
     "withdrawn_reason": null
@@ -2674,6 +2675,38 @@
     "evidence_source_ids": [
       "SRC010",
       "SRC009"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "LKP015",
+    "code": "LegalEntityTransactionPartySides",
+    "definition": "The list saying which side of a transaction a party was on: it paid or it received. The chief financial officer of the funds decides what goes on it.",
+    "scope": "concept",
+    "values": [
+      {
+        "code": "PAID",
+        "name": "Paid",
+        "definition": "The party gave money, and received the holding if there was one."
+      },
+      {
+        "code": "RECEIVED",
+        "name": "Received",
+        "definition": "The party took money, and gave up the holding if there was one."
+      }
+    ],
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA lookup types: none lists the side of a party to a transaction.",
+    "data_requirement_ids": [
+      "DRQ005",
+      "DRQ007"
+    ],
+    "evidence_source_ids": [
+      "SRC001",
+      "SRC002",
+      "SRC003"
     ],
     "status": "active",
     "withdrawn_reason": null

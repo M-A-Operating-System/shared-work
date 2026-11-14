@@ -1,14 +1,25 @@
 # Private Equity Data Model - Working Folder
 
-Working folder for the Private Equity data model.
+Working folder for the Private Equity data model. The design document is the **target state**: the intended final design, which leads the Data Design Authority (DDA) rather than following it.
 
 | File | Purpose |
 |---|---|
-| `private-equity-data-design-document.md` | Data Model Design Document (package PE-STRUCT-20261028-01, dated 2026-10-28) |
-| `*.json` | Package definition files (domains, roles, lookups, attributes, requirements, sources, validation and so on) |
+| `private-equity-data-design-document.md` | Data Model Design Document (package PE-STRUCT-20261114-01, dated 2026-11-14) |
+| `*.json` | Package definition files (domains, roles, relationships, concepts, attributes, lookups, requirements, sources, state and so on) |
+| `dda-changeset.json` | The changes DDA needs to reach this target state, including retirements to confirm before applying |
 
-## Status
+## Target state compared with DDA (2026-11-14)
 
-This is the baseline as generated on 2026-10-28. It does **not** yet include changes made directly in the Data Design Authority (DDA) from 4 to 14 November 2026, including accounts (beneficial owner, held at, Account Types hierarchy), transactions, valuations, the Corporate Banking model and the shared Account role. Bring the files up to date with DDA before relying on them.
+| Area | Target design | DDA today |
+|---|---|---|
+| Transaction parties | One role and one relationship (`LegalEntityTransactionParty`), with the side (paid or received), amount, purpose and units on each party | Relationship DMR000000037 exists, but its description says the amount belongs to the transaction (open decision DEC004) |
+| Valuations | One `Valuation` concept with a measure list (net asset value, equity value, enterprise value) linked by `ValuationLegalEntityValued` | `LegalEntityValuations` (DMC000000112) still exists and is to be retired; DMR000000039 exists |
+| Instrument traded | `TransactionInstrumentTraded` | Not yet created |
+| Account booking | Not in this design; open question SCQ001 | `AccountTransactionBooking` (DMR000000038) exists in DDA |
 
-The validation report (`validation.json`) records one blocking defect (RN03, change vocabulary in the document) and 22 advisory items, still open.
+Open design decisions are in section 10 of the document (DEC001 to DEC005).
+
+## Not yet refreshed
+
+- `validation.json` is the report from the 2026-10-28 baseline and has not been re-run. It records one blocking defect (RN03, change vocabulary), which appears to come from the standard MAOS introduction text and needs confirming, and 22 advisory items.
+- The generator scripts that produce these files are not in this folder.

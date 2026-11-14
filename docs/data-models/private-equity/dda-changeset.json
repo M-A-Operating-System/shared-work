@@ -1,6 +1,6 @@
 {
   "spec_version": "1.0",
-  "package_ref": "PE-STRUCT-20261028-01",
+  "package_ref": "PE-STRUCT-20261114-01",
   "apply_mode": "mcp",
   "preconditions": [],
   "notes": "No state transitions are exposed through the connector, so no precondition transitions are listed; confirm each before applying.",
@@ -642,12 +642,14 @@
     },
     {
       "seq": 42,
-      "op": "update",
+      "op": "create",
       "entity": "lookupTypes",
       "local_id": "LKP008",
-      "dda_id": "DLT000000063",
+      "dda_id": null,
       "fields": {
-        "lookup_type_description": "The list of ways a legal entity is valued, such as market value variants, net asset value and equity value. The head of portfolio valuation decides what goes on it."
+        "lookup_type_code": "ValuationMeasures",
+        "lookup_type_name": "ValuationMeasures",
+        "lookup_type_description": "The list of measures on which a legal entity is valued: net asset value, equity value and enterprise value. The head of portfolio valuation decides what goes on it."
       },
       "depends_on": []
     },
@@ -655,13 +657,13 @@
       "seq": 43,
       "op": "create",
       "entity": "lookups",
-      "local_id": "LKP008.NAV",
+      "local_id": "LKP008.NET_ASSET_VALUE",
       "dda_id": null,
       "fields": {
-        "lookup_code": "NAV",
+        "lookup_code": "NET_ASSET_VALUE",
         "lookup_name": "Net Asset Value",
         "lookup_description": "The value of a fund's assets less its liabilities.",
-        "lookup_type": "DLT000000063"
+        "lookup_type": "LKP008"
       },
       "depends_on": [
         42
@@ -677,7 +679,7 @@
         "lookup_code": "EQUITY_VALUE",
         "lookup_name": "Equity Value",
         "lookup_description": "The value of the owners' interest in a company or vehicle.",
-        "lookup_type": "DLT000000063"
+        "lookup_type": "LKP008"
       },
       "depends_on": [
         42
@@ -685,6 +687,22 @@
     },
     {
       "seq": 45,
+      "op": "create",
+      "entity": "lookups",
+      "local_id": "LKP008.ENTERPRISE_VALUE",
+      "dda_id": null,
+      "fields": {
+        "lookup_code": "ENTERPRISE_VALUE",
+        "lookup_name": "Enterprise Value",
+        "lookup_description": "The value of the whole business, being the owners' interest plus net debt.",
+        "lookup_type": "LKP008"
+      },
+      "depends_on": [
+        42
+      ]
+    },
+    {
+      "seq": 46,
       "op": "update",
       "entity": "lookupTypes",
       "local_id": "LKP009",
@@ -695,7 +713,7 @@
       "depends_on": []
     },
     {
-      "seq": 46,
+      "seq": 47,
       "op": "create",
       "entity": "lookups",
       "local_id": "LKP009.MANAGEMENT_COMPANY",
@@ -707,11 +725,11 @@
         "lookup_type": "DLT000000054"
       },
       "depends_on": [
-        45
+        46
       ]
     },
     {
-      "seq": 47,
+      "seq": 48,
       "op": "create",
       "entity": "lookups",
       "local_id": "LKP009.HOLDING_COMPANY",
@@ -723,11 +741,11 @@
         "lookup_type": "DLT000000054"
       },
       "depends_on": [
-        45
+        46
       ]
     },
     {
-      "seq": 48,
+      "seq": 49,
       "op": "create",
       "entity": "lookups",
       "local_id": "LKP009.SPV",
@@ -739,11 +757,11 @@
         "lookup_type": "DLT000000054"
       },
       "depends_on": [
-        45
+        46
       ]
     },
     {
-      "seq": 49,
+      "seq": 50,
       "op": "create",
       "entity": "lookups",
       "local_id": "LKP009.TAX_BLOCKER",
@@ -755,11 +773,11 @@
         "lookup_type": "DLT000000054"
       },
       "depends_on": [
-        45
+        46
       ]
     },
     {
-      "seq": 50,
+      "seq": 51,
       "op": "create",
       "entity": "lookups",
       "local_id": "LKP009.FUND_VEHICLE",
@@ -771,11 +789,11 @@
         "lookup_type": "DLT000000054"
       },
       "depends_on": [
-        45
+        46
       ]
     },
     {
-      "seq": 51,
+      "seq": 52,
       "op": "create",
       "entity": "lookups",
       "local_id": "LKP009.OPERATING_COMPANY",
@@ -787,11 +805,56 @@
         "lookup_type": "DLT000000054"
       },
       "depends_on": [
-        45
+        46
       ]
     },
     {
-      "seq": 52,
+      "seq": 53,
+      "op": "create",
+      "entity": "lookupTypes",
+      "local_id": "LKP015",
+      "dda_id": null,
+      "fields": {
+        "lookup_type_code": "LegalEntityTransactionPartySides",
+        "lookup_type_name": "LegalEntityTransactionPartySides",
+        "lookup_type_description": "The list saying which side of a transaction a party was on: it paid or it received. The chief financial officer of the funds decides what goes on it."
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 54,
+      "op": "create",
+      "entity": "lookups",
+      "local_id": "LKP015.PAID",
+      "dda_id": null,
+      "fields": {
+        "lookup_code": "PAID",
+        "lookup_name": "Paid",
+        "lookup_description": "The party gave money, and received the holding if there was one.",
+        "lookup_type": "LKP015"
+      },
+      "depends_on": [
+        53
+      ]
+    },
+    {
+      "seq": 55,
+      "op": "create",
+      "entity": "lookups",
+      "local_id": "LKP015.RECEIVED",
+      "dda_id": null,
+      "fields": {
+        "lookup_code": "RECEIVED",
+        "lookup_name": "Received",
+        "lookup_description": "The party took money, and gave up the holding if there was one.",
+        "lookup_type": "LKP015"
+      },
+      "depends_on": [
+        53
+      ]
+    },
+    {
+      "seq": 56,
       "op": "update",
       "entity": "concepts",
       "local_id": "SBJ003",
@@ -803,19 +866,7 @@
       "depends_on": []
     },
     {
-      "seq": 53,
-      "op": "update",
-      "entity": "concepts",
-      "local_id": "SBJ004",
-      "dda_id": "DMC000000112",
-      "fields": {
-        "concept_description": "There is one of these for each valuation of a legal entity as at a date and of a given type. In this structure it holds the net asset value of a fund and the equity value of a portfolio company or vehicle. If you need the value of a fund at a reporting date, this is what you go by. It is the value of the whole body and not the value of one fund's holding in it, which is the price per unit multiplied by the units held. It is not the fair value of a single instrument, which is held with the instrument's price.",
-        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
-      },
-      "depends_on": []
-    },
-    {
-      "seq": 54,
+      "seq": 57,
       "op": "update",
       "entity": "concepts",
       "local_id": "SBJ007",
@@ -827,7 +878,7 @@
       "depends_on": []
     },
     {
-      "seq": 55,
+      "seq": 58,
       "op": "create",
       "entity": "concepts",
       "local_id": "SBJ008",
@@ -842,7 +893,22 @@
       "depends_on": []
     },
     {
-      "seq": 56,
+      "seq": 59,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ009",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "Valuation",
+        "concept_name": "Valuation",
+        "concept_description": "There is one of these for each valuation of a legal entity as at a date and on a named measure of value. In this structure it holds the net asset value of a fund and the equity value or enterprise value of a portfolio company or vehicle. If you need the value of a fund or a company at a reporting date, this is what you go by. A new valuation does not replace an earlier one, because each is kept for its own date. It is a view taken on a date and not a movement of money, so it is not a transaction. It is the value of the whole body and not the value of one fund's holding in it, which is the price per unit multiplied by the units held, and it is not the fair value of a single instrument, which is held with the instrument's price.",
+        "concept_parent": "DMC000000100",
+        "concept_is_domain": "DMD000000022"
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 60,
       "op": "update",
       "entity": "relationships",
       "local_id": "REL001",
@@ -864,7 +930,7 @@
       "depends_on": []
     },
     {
-      "seq": 57,
+      "seq": 61,
       "op": "update",
       "entity": "relationships",
       "local_id": "REL002",
@@ -886,7 +952,7 @@
       "depends_on": []
     },
     {
-      "seq": 58,
+      "seq": 62,
       "op": "update",
       "entity": "relationships",
       "local_id": "REL003",
@@ -908,7 +974,7 @@
       "depends_on": []
     },
     {
-      "seq": 59,
+      "seq": 63,
       "op": "create",
       "entity": "relationships",
       "local_id": "REL004",
@@ -930,51 +996,29 @@
       "depends_on": []
     },
     {
-      "seq": 60,
-      "op": "create",
+      "seq": 64,
+      "op": "update",
       "entity": "relationships",
       "local_id": "REL005",
-      "dda_id": null,
+      "dda_id": "DMR000000037",
       "fields": {
-        "relationship_code": "TransactionLegalEntityPayers",
-        "relationship_description": "A transaction is paid for by one or more parties, each paying an amount for a stated purpose and, where an instrument is acquired, receiving a number of units. It covers each limited partner paying into a capital call and each fund paying for an acquisition. It does not cover those who receive.",
-        "relationship_forward_verb": "Is Paid By",
-        "relationship_inverse_verb": "Pays Into",
-        "relationship_source_role": "Transfer",
-        "relationship_target_role": "Payer",
-        "relationship_source_role_plural": "Transfers",
-        "relationship_target_role_plural": "Payers",
+        "relationship_code": "LegalEntityTransactionParty",
+        "relationship_description": "A legal entity takes part in a transaction as a party to it, whether it pays or receives: the limited partner paying into a capital call, the fund receiving it, the fund paying for an acquisition, or the seller receiving the price. A transaction has several parties and a legal entity takes part in many transactions. Each party's record says whether it paid or received, the amount for each stated purpose and, where an instrument changed hands, the number of units. The date and currency belong to the transaction. It does not say which account the money passed through.",
+        "relationship_forward_verb": "Is Party To",
+        "relationship_inverse_verb": "Has Party",
+        "relationship_source_role": "Transaction Party",
+        "relationship_target_role": "Transaction",
+        "relationship_source_role_plural": "Transaction Parties",
+        "relationship_target_role_plural": "Transactions",
         "relationship_cardinality": "MANY_TO_MANY",
         "relationship_dates": false,
-        "relationship_domain": "DMD000000022",
-        "relationship_destination_domain": "DMD000000012"
+        "relationship_domain": "DMD000000012",
+        "relationship_destination_domain": "DMD000000022"
       },
       "depends_on": []
     },
     {
-      "seq": 61,
-      "op": "create",
-      "entity": "relationships",
-      "local_id": "REL006",
-      "dda_id": null,
-      "fields": {
-        "relationship_code": "TransactionLegalEntityPayees",
-        "relationship_description": "A transaction is received by one or more parties, each receiving an amount for a stated purpose and, where an instrument is sold, giving up a number of units. It covers a fund receiving a call, each limited partner receiving a distribution and a seller receiving the price of an acquisition. It does not cover those who pay.",
-        "relationship_forward_verb": "Is Received By",
-        "relationship_inverse_verb": "Receives From",
-        "relationship_source_role": "Transfer",
-        "relationship_target_role": "Payee",
-        "relationship_source_role_plural": "Transfers",
-        "relationship_target_role_plural": "Payees",
-        "relationship_cardinality": "MANY_TO_MANY",
-        "relationship_dates": false,
-        "relationship_domain": "DMD000000022",
-        "relationship_destination_domain": "DMD000000012"
-      },
-      "depends_on": []
-    },
-    {
-      "seq": 62,
+      "seq": 65,
       "op": "create",
       "entity": "relationships",
       "local_id": "REL007",
@@ -984,9 +1028,9 @@
         "relationship_description": "A transaction concerns one instrument, and many transactions may concern the same instrument. It names what was bought or sold. A capital call or distribution concerns no instrument.",
         "relationship_forward_verb": "Transfers",
         "relationship_inverse_verb": "Is Transferred By",
-        "relationship_source_role": "Transfer",
+        "relationship_source_role": "Transaction",
         "relationship_target_role": "Traded Instrument",
-        "relationship_source_role_plural": "Transfers",
+        "relationship_source_role_plural": "Transactions",
         "relationship_target_role_plural": "Traded Instruments",
         "relationship_cardinality": "MANY_TO_ONE",
         "relationship_dates": false,
@@ -996,7 +1040,29 @@
       "depends_on": []
     },
     {
-      "seq": 63,
+      "seq": 66,
+      "op": "update",
+      "entity": "relationships",
+      "local_id": "REL008",
+      "dda_id": "DMR000000039",
+      "fields": {
+        "relationship_code": "ValuationLegalEntityValued",
+        "relationship_description": "A valuation judges the worth of one legal entity on a date and on a named measure, such as a fund's net assets or a portfolio company's equity or enterprise value. A legal entity is valued many times, once for each date and measure, and each valuation is about one legal entity. The date, amount, measure and currency belong to the valuation. It does not cover the value of an instrument, which is held with the instrument's price, and it is not a transaction, because nothing is paid or received.",
+        "relationship_forward_verb": "Values",
+        "relationship_inverse_verb": "Is Valued By",
+        "relationship_source_role": "Valuation",
+        "relationship_target_role": "Valued Legal Entity",
+        "relationship_source_role_plural": "Valuations",
+        "relationship_target_role_plural": "Valued Legal Entities",
+        "relationship_cardinality": "MANY_TO_ONE",
+        "relationship_dates": false,
+        "relationship_domain": "DMD000000022",
+        "relationship_destination_domain": "DMD000000012"
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 67,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR001",
@@ -1010,11 +1076,11 @@
         "attribute_relationship": "DMR000000001"
       },
       "depends_on": [
-        56
+        60
       ]
     },
     {
-      "seq": 64,
+      "seq": 68,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR002",
@@ -1029,11 +1095,11 @@
       },
       "depends_on": [
         1,
-        56
+        60
       ]
     },
     {
-      "seq": 65,
+      "seq": 69,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR003",
@@ -1047,11 +1113,11 @@
         "attribute_relationship": "DMR000000001"
       },
       "depends_on": [
-        56
+        60
       ]
     },
     {
-      "seq": 66,
+      "seq": 70,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR004",
@@ -1065,11 +1131,11 @@
         "attribute_relationship": "DMR000000001"
       },
       "depends_on": [
-        56
+        60
       ]
     },
     {
-      "seq": 67,
+      "seq": 71,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR005",
@@ -1083,11 +1149,11 @@
         "attribute_relationship": "DMR000000001"
       },
       "depends_on": [
-        56
+        60
       ]
     },
     {
-      "seq": 68,
+      "seq": 72,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR006",
@@ -1101,11 +1167,11 @@
         "attribute_relationship": "DMR000000001"
       },
       "depends_on": [
-        56
+        60
       ]
     },
     {
-      "seq": 69,
+      "seq": 73,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR007",
@@ -1119,11 +1185,11 @@
         "attribute_relationship": "DMR000000001"
       },
       "depends_on": [
-        56
+        60
       ]
     },
     {
-      "seq": 70,
+      "seq": 74,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR008",
@@ -1138,11 +1204,11 @@
       },
       "depends_on": [
         10,
-        58
+        62
       ]
     },
     {
-      "seq": 71,
+      "seq": 75,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR009",
@@ -1156,11 +1222,11 @@
         "attribute_relationship": "DMR000000002"
       },
       "depends_on": [
-        58
+        62
       ]
     },
     {
-      "seq": 72,
+      "seq": 76,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR010",
@@ -1174,11 +1240,11 @@
         "attribute_relationship": "DMR000000002"
       },
       "depends_on": [
-        58
+        62
       ]
     },
     {
-      "seq": 73,
+      "seq": 77,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR014",
@@ -1193,121 +1259,66 @@
       },
       "depends_on": [
         15,
-        59
-      ]
-    },
-    {
-      "seq": 74,
-      "op": "create",
-      "entity": "attributes",
-      "local_id": "ATR015",
-      "dda_id": null,
-      "fields": {
-        "attribute_code": "TransactionLegalEntityPayerAmount",
-        "attribute_fqn_name": "TransactionLegalEntityPayerAmount",
-        "attribute_description": "The money this party paid in the transaction for the stated purpose, in the transaction's currency. A party that pays for several purposes has one amount for each.",
-        "attribute_type": "CURRENCY",
-        "attribute_lookup_type": null,
-        "attribute_relationship": "REL005"
-      },
-      "depends_on": [
-        60
-      ]
-    },
-    {
-      "seq": 75,
-      "op": "create",
-      "entity": "attributes",
-      "local_id": "ATR016",
-      "dda_id": null,
-      "fields": {
-        "attribute_code": "TransactionLegalEntityPayerComponent",
-        "attribute_fqn_name": "TransactionLegalEntityPayerComponent",
-        "attribute_description": "The purpose for which this party paid, such as investment, management fee or fund expense, taken from the agreed list.",
-        "attribute_type": "LOOKUP",
-        "attribute_lookup_type": "LKP005",
-        "attribute_relationship": "REL005"
-      },
-      "depends_on": [
-        27,
-        60
-      ]
-    },
-    {
-      "seq": 76,
-      "op": "create",
-      "entity": "attributes",
-      "local_id": "ATR017",
-      "dda_id": null,
-      "fields": {
-        "attribute_code": "TransactionLegalEntityPayerQuantity",
-        "attribute_fqn_name": "TransactionLegalEntityPayerQuantity",
-        "attribute_description": "The number of units of the instrument this party received for its payment. It is blank for a capital call.",
-        "attribute_type": "FLOAT",
-        "attribute_lookup_type": null,
-        "attribute_relationship": "REL005"
-      },
-      "depends_on": [
-        60
-      ]
-    },
-    {
-      "seq": 77,
-      "op": "create",
-      "entity": "attributes",
-      "local_id": "ATR018",
-      "dda_id": null,
-      "fields": {
-        "attribute_code": "TransactionLegalEntityPayeeAmount",
-        "attribute_fqn_name": "TransactionLegalEntityPayeeAmount",
-        "attribute_description": "The money this party received in the transaction for the stated purpose, in the transaction's currency. A party that receives for several purposes has one amount for each.",
-        "attribute_type": "CURRENCY",
-        "attribute_lookup_type": null,
-        "attribute_relationship": "REL006"
-      },
-      "depends_on": [
-        61
+        63
       ]
     },
     {
       "seq": 78,
       "op": "create",
       "entity": "attributes",
-      "local_id": "ATR019",
+      "local_id": "ATR015",
       "dda_id": null,
       "fields": {
-        "attribute_code": "TransactionLegalEntityPayeeComponent",
-        "attribute_fqn_name": "TransactionLegalEntityPayeeComponent",
-        "attribute_description": "The purpose for which this party received, such as return of capital, realised gain or income, taken from the agreed list.",
-        "attribute_type": "LOOKUP",
-        "attribute_lookup_type": "LKP005",
-        "attribute_relationship": "REL006"
+        "attribute_code": "LegalEntityTransactionPartyAmount",
+        "attribute_fqn_name": "LegalEntityTransactionPartyAmount",
+        "attribute_description": "The money this party paid or received in the transaction for the stated purpose, in the transaction's currency. A party taking part for several purposes has one amount for each. The side says whether it was paid or received.",
+        "attribute_type": "CURRENCY",
+        "attribute_lookup_type": null,
+        "attribute_relationship": "DMR000000037"
       },
       "depends_on": [
-        27,
-        61
+        64
       ]
     },
     {
       "seq": 79,
       "op": "create",
       "entity": "attributes",
-      "local_id": "ATR020",
+      "local_id": "ATR016",
       "dda_id": null,
       "fields": {
-        "attribute_code": "TransactionLegalEntityPayeeQuantity",
-        "attribute_fqn_name": "TransactionLegalEntityPayeeQuantity",
-        "attribute_description": "The number of units of the instrument this party gave up for its receipt. It is blank for a distribution.",
-        "attribute_type": "FLOAT",
-        "attribute_lookup_type": null,
-        "attribute_relationship": "REL006"
+        "attribute_code": "LegalEntityTransactionPartyComponent",
+        "attribute_fqn_name": "LegalEntityTransactionPartyComponent",
+        "attribute_description": "The purpose for which this party paid or received, such as investment, management fee, fund expense, return of capital, realised gain or income, taken from the agreed list.",
+        "attribute_type": "LOOKUP",
+        "attribute_lookup_type": "LKP005",
+        "attribute_relationship": "DMR000000037"
       },
       "depends_on": [
-        61
+        27,
+        64
       ]
     },
     {
       "seq": 80,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR017",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "LegalEntityTransactionPartyQuantity",
+        "attribute_fqn_name": "LegalEntityTransactionPartyQuantity",
+        "attribute_description": "The number of units of the instrument this party received for its payment, or gave up for its receipt. It is blank for a capital call or a distribution.",
+        "attribute_type": "FLOAT",
+        "attribute_lookup_type": null,
+        "attribute_relationship": "DMR000000037"
+      },
+      "depends_on": [
+        64
+      ]
+    },
+    {
+      "seq": 81,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR021",
@@ -1322,11 +1333,11 @@
       },
       "depends_on": [
         19,
-        55
+        58
       ]
     },
     {
-      "seq": 81,
+      "seq": 82,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR022",
@@ -1340,11 +1351,11 @@
         "attribute_concept": "SBJ008"
       },
       "depends_on": [
-        55
+        58
       ]
     },
     {
-      "seq": 82,
+      "seq": 83,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR023",
@@ -1358,11 +1369,11 @@
         "attribute_concept": "SBJ008"
       },
       "depends_on": [
-        55
+        58
       ]
     },
     {
-      "seq": 83,
+      "seq": 84,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR024",
@@ -1376,11 +1387,11 @@
         "attribute_concept": "SBJ008"
       },
       "depends_on": [
-        55
+        58
       ]
     },
     {
-      "seq": 84,
+      "seq": 85,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR025",
@@ -1394,11 +1405,11 @@
         "attribute_concept": "SBJ008"
       },
       "depends_on": [
-        55
+        58
       ]
     },
     {
-      "seq": 85,
+      "seq": 86,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR026",
@@ -1412,11 +1423,11 @@
         "attribute_concept": "DMC000000128"
       },
       "depends_on": [
-        54
+        57
       ]
     },
     {
-      "seq": 86,
+      "seq": 87,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR027",
@@ -1430,11 +1441,11 @@
         "attribute_concept": "DMC000000128"
       },
       "depends_on": [
-        54
+        57
       ]
     },
     {
-      "seq": 87,
+      "seq": 88,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR028",
@@ -1449,11 +1460,11 @@
       },
       "depends_on": [
         35,
-        54
+        57
       ]
     },
     {
-      "seq": 88,
+      "seq": 89,
       "op": "update",
       "entity": "attributes",
       "local_id": "ATR029",
@@ -1468,8 +1479,160 @@
       },
       "depends_on": [
         39,
-        54
+        57
       ]
+    },
+    {
+      "seq": 90,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR036",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ValuationMeasure",
+        "attribute_fqn_name": "ValuationMeasure",
+        "attribute_description": "The measure on which the value was struck, such as net asset value, equity value or enterprise value, taken from the agreed list. Two values on different measures are never compared as like for like.",
+        "attribute_type": "LOOKUP",
+        "attribute_lookup_type": "LKP008",
+        "attribute_concept": "SBJ009"
+      },
+      "depends_on": [
+        42,
+        59
+      ]
+    },
+    {
+      "seq": 91,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR037",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ValuationDate",
+        "attribute_fqn_name": "ValuationDate",
+        "attribute_description": "The date as at which the valuation applies. A value has no meaning without the date it was struck, and later valuations do not replace earlier ones.",
+        "attribute_type": "DATE",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ009"
+      },
+      "depends_on": [
+        59
+      ]
+    },
+    {
+      "seq": 92,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR038",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ValuationAmount",
+        "attribute_fqn_name": "ValuationAmount",
+        "attribute_description": "The value placed on the legal entity on the valuation date and measure, in the valuation currency.",
+        "attribute_type": "FLOAT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ009"
+      },
+      "depends_on": [
+        59
+      ]
+    },
+    {
+      "seq": 93,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR039",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ValuationCurrency",
+        "attribute_fqn_name": "ValuationCurrency",
+        "attribute_description": "The currency in which the valuation is stated, so that values struck at different dates can be compared.",
+        "attribute_type": "LOOKUP",
+        "attribute_lookup_type": "DLT000000072",
+        "attribute_concept": "SBJ009"
+      },
+      "depends_on": [
+        59
+      ]
+    },
+    {
+      "seq": 94,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR041",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "LegalEntityTransactionPartySide",
+        "attribute_fqn_name": "LegalEntityTransactionPartySide",
+        "attribute_description": "Whether this party paid or received in the transaction, taken from the agreed list. It is what lets one relationship serve both sides of the movement.",
+        "attribute_type": "LOOKUP",
+        "attribute_lookup_type": "LKP015",
+        "attribute_relationship": "DMR000000037"
+      },
+      "depends_on": [
+        53,
+        64
+      ]
+    },
+    {
+      "seq": 95,
+      "op": "retire",
+      "entity": "concepts",
+      "local_id": "RETIRE.DMC000000112",
+      "dda_id": "DMC000000112",
+      "fields": {
+        "reason": "legal entity valuations merged into Valuation (SBJ009)",
+        "confirm_before_applying": true
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 96,
+      "op": "retire",
+      "entity": "attributes",
+      "local_id": "RETIRE.DMA000000698",
+      "dda_id": "DMA000000698",
+      "fields": {
+        "reason": "valuation type attribute replaced by ValuationMeasure",
+        "confirm_before_applying": true
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 97,
+      "op": "retire",
+      "entity": "attributes",
+      "local_id": "RETIRE.DMA000000697",
+      "dda_id": "DMA000000697",
+      "fields": {
+        "reason": "valuation date attribute replaced by ValuationDate",
+        "confirm_before_applying": true
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 98,
+      "op": "retire",
+      "entity": "attributes",
+      "local_id": "RETIRE.DMA000000699",
+      "dda_id": "DMA000000699",
+      "fields": {
+        "reason": "valuation amount attribute replaced by ValuationAmount",
+        "confirm_before_applying": true
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 99,
+      "op": "retire",
+      "entity": "attributes",
+      "local_id": "RETIRE.DMA000000696",
+      "dda_id": "DMA000000696",
+      "fields": {
+        "reason": "valuation currency attribute replaced by ValuationCurrency",
+        "confirm_before_applying": true
+      },
+      "depends_on": []
     }
   ]
 }
