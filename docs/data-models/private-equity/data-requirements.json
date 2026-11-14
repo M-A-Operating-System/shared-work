@@ -1,0 +1,280 @@
+[
+  {
+    "id": "DRQ001",
+    "business_requirement_ids": [
+      "REQ001",
+      "REQ002"
+    ],
+    "must_record": [
+      "The general partner or manager of each fund, with the period it manages",
+      "Each fund's vintage year, strategy, reporting currency, domicile, target size, final close date and investment period end"
+    ],
+    "must_answer": [
+      "Which general partner manages fund F as at a date?",
+      "Which funds does general partner G manage?",
+      "Which funds have a given vintage year and strategy?"
+    ],
+    "temporality": "as-at",
+    "must_prevent": [
+      "A fund having two managers at the same time",
+      "A fund strategy outside the agreed list"
+    ],
+    "prevent_resolution": [
+      {
+        "must_prevent_index": 0,
+        "expressed_by": "relationship-cardinality",
+        "artefact_id": "REL001"
+      },
+      {
+        "must_prevent_index": 1,
+        "expressed_by": "lookup",
+        "artefact_id": "LKP001"
+      }
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "DRQ002",
+    "business_requirement_ids": [
+      "REQ010",
+      "REQ011",
+      "REQ013"
+    ],
+    "must_record": [
+      "What each legal entity is for in the structure",
+      "Each legal entity's identifiers, including its legal entity identifier, with the period each is valid"
+    ],
+    "must_answer": [
+      "Which vehicles in the structure are tax blockers?",
+      "What is the legal entity identifier of entity E?"
+    ],
+    "temporality": "as-at",
+    "must_prevent": [
+      "A vehicle purpose outside the agreed list",
+      "An identifier of unknown kind"
+    ],
+    "prevent_resolution": [
+      {
+        "must_prevent_index": 0,
+        "expressed_by": "lookup",
+        "artefact_id": "LKP009"
+      },
+      {
+        "must_prevent_index": 1,
+        "expressed_by": "lookup",
+        "artefact_id": "LKP014"
+      }
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "DRQ003",
+    "business_requirement_ids": [
+      "REQ003"
+    ],
+    "must_record": [
+      "Which vehicles invest alongside each fund, the kind of each, and the period"
+    ],
+    "must_answer": [
+      "Which vehicles invest alongside fund F?"
+    ],
+    "temporality": "as-at",
+    "must_prevent": [
+      "A kind of side-by-side vehicle outside the agreed list"
+    ],
+    "prevent_resolution": [
+      {
+        "must_prevent_index": 0,
+        "expressed_by": "lookup",
+        "artefact_id": "LKP003"
+      }
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "DRQ004",
+    "business_requirement_ids": [
+      "REQ004",
+      "REQ012"
+    ],
+    "must_record": [
+      "Each investor's commitment to each fund: amount, type, status, start and end"
+    ],
+    "must_answer": [
+      "What is limited partner L's commitment to fund F as at a date?",
+      "Who are the limited partners in fund F?",
+      "What is the general partner's own commitment to fund F?"
+    ],
+    "temporality": "as-at",
+    "must_prevent": [
+      "A limited partner being limited to one fund or a fund to one limited partner",
+      "A commitment type outside the agreed list"
+    ],
+    "prevent_resolution": [
+      {
+        "must_prevent_index": 0,
+        "expressed_by": "relationship-cardinality",
+        "artefact_id": "REL002"
+      },
+      {
+        "must_prevent_index": 1,
+        "expressed_by": "lookup",
+        "artefact_id": "LKP010"
+      }
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "DRQ005",
+    "business_requirement_ids": [
+      "REQ005"
+    ],
+    "must_record": [
+      "Each capital call and distribution: type, date, currency",
+      "The amount each limited partner or other party paid or received, split by purpose"
+    ],
+    "must_answer": [
+      "How much did limited partner L pay in call C and for what purposes?",
+      "What was distributed to limited partner L in a year and of what kind?",
+      "What is limited partner L's unfunded commitment to fund F as at a date?"
+    ],
+    "temporality": "as-at",
+    "must_prevent": [
+      "A call or distribution amount left blank",
+      "A purpose outside the agreed list"
+    ],
+    "prevent_resolution": [
+      {
+        "must_prevent_index": 0,
+        "expressed_by": "mandatory-attribute",
+        "artefact_id": "ATR015"
+      },
+      {
+        "must_prevent_index": 1,
+        "expressed_by": "lookup",
+        "artefact_id": "LKP005"
+      }
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "DRQ006",
+    "business_requirement_ids": [
+      "REQ006",
+      "REQ007",
+      "REQ013"
+    ],
+    "must_record": [
+      "The stake each investor holds in each investee: economic share, voting share, control type, and the period"
+    ],
+    "must_answer": [
+      "What share of portfolio company P does each holder own as at a date?",
+      "Through which vehicles does fund F hold portfolio company P?",
+      "What does the whole sponsor hold in portfolio company P, looking through the chain?",
+      "Which funds hold the same portfolio company, and in what shares?"
+    ],
+    "temporality": "as-at",
+    "must_prevent": [
+      "A stake with no share recorded",
+      "A control type outside the agreed list",
+      "A vehicle or investor being limited to a single holder or stake"
+    ],
+    "prevent_resolution": [
+      {
+        "must_prevent_index": 0,
+        "expressed_by": "mandatory-attribute",
+        "artefact_id": "ATR009"
+      },
+      {
+        "must_prevent_index": 1,
+        "expressed_by": "lookup",
+        "artefact_id": "LKP002"
+      },
+      {
+        "must_prevent_index": 2,
+        "expressed_by": "relationship-cardinality",
+        "artefact_id": "REL003"
+      }
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "DRQ007",
+    "business_requirement_ids": [
+      "REQ008",
+      "REQ012",
+      "REQ007"
+    ],
+    "must_record": [
+      "Each acquisition, follow-on, partial exit, full exit and continuation transfer: type, date, currency",
+      "The instrument involved and its issuer",
+      "The amount and the number of units paid or received by each party"
+    ],
+    "must_answer": [
+      "What did fund F pay for portfolio company P and when?",
+      "Which funds took part in the follow-on investment and for how much each?",
+      "What were the proceeds of a partial exit, and who received them?",
+      "How many units of instrument I does fund F hold as at a date?",
+      "Which transfer moved portfolio company P from fund F to a continuation vehicle?"
+    ],
+    "temporality": "as-at",
+    "must_prevent": [
+      "A single transaction covering two different instruments",
+      "A transaction type outside the agreed list"
+    ],
+    "prevent_resolution": [
+      {
+        "must_prevent_index": 0,
+        "expressed_by": "relationship-cardinality",
+        "artefact_id": "REL007"
+      },
+      {
+        "must_prevent_index": 1,
+        "expressed_by": "lookup",
+        "artefact_id": "LKP004"
+      }
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "DRQ008",
+    "business_requirement_ids": [
+      "REQ009"
+    ],
+    "must_record": [
+      "The fair value per unit of an instrument as at a date, its price type and its fair value hierarchy level",
+      "The value of a fund or portfolio company as at a date, by type of valuation"
+    ],
+    "must_answer": [
+      "What was the fair value per unit of instrument I as at a date, and at which hierarchy level?",
+      "What was fund F's net asset value as at a date?",
+      "What is the fair value of fund F's holding in portfolio company P as at a date?"
+    ],
+    "temporality": "as-at",
+    "must_prevent": [
+      "A price with no date",
+      "A hierarchy level outside the three allowed"
+    ],
+    "prevent_resolution": [
+      {
+        "must_prevent_index": 0,
+        "expressed_by": "mandatory-attribute",
+        "artefact_id": "ATR026"
+      },
+      {
+        "must_prevent_index": 1,
+        "expressed_by": "lookup",
+        "artefact_id": "LKP006"
+      }
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  }
+]

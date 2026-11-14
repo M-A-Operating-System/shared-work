@@ -1,0 +1,212 @@
+[
+  {
+    "id": "REL001",
+    "code": "LegalEntityFundManagedBy",
+    "source_domain_id": "DOM001",
+    "destination_domain_id": "DOM001",
+    "forward_verb": "Is Managed By",
+    "inverse_verb": "Manages",
+    "source_role_id": "ROL001",
+    "target_role_id": "ROL002",
+    "cardinality": "MANY_TO_ONE",
+    "dates": true,
+    "is_symmetric": false,
+    "is_composition": false,
+    "quantified": false,
+    "name_override": null,
+    "dda_action": "extend",
+    "dda_id": "DMR000000001",
+    "reuse_search": "Searched DDA relationships: DMR000000001 already links a fund to its manager; its inverse verb is wrong and is corrected, and the fund's fixed facts are added.",
+    "data_requirement_ids": [
+      "DRQ001"
+    ],
+    "evidence_source_ids": [
+      "SRC012",
+      "SRC004",
+      "SRC008"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "definition": "A fund is managed by a general partner or manager for as long as the arrangement lasts, and a fund has one manager at a time, so the periods of its managers do not overlap. It holds the facts about the fund that belong to neither body alone: its vintage year, strategy, reporting currency, domicile, target size, final close date and the end of its investment period. If the manager of a fund is replaced, these facts are repeated on the new arrangement. It is not the fund's limited partners, who are linked by commitments."
+  },
+  {
+    "id": "REL002",
+    "code": "LegalEntityFundLPCommitment",
+    "source_domain_id": "DOM001",
+    "destination_domain_id": "DOM001",
+    "forward_verb": "Commits To",
+    "inverse_verb": "Receives Commitment From",
+    "source_role_id": "ROL003",
+    "target_role_id": "ROL001",
+    "cardinality": "MANY_TO_MANY",
+    "dates": true,
+    "is_symmetric": false,
+    "is_composition": false,
+    "quantified": false,
+    "name_override": "LegalEntityLPFundCommitments",
+    "dda_action": "extend",
+    "dda_id": "DMR000000004",
+    "reuse_search": "Searched DDA relationships: DMR000000004 already records an investor's commitment to a fund; the inverse verb and the cardinality are corrected.",
+    "data_requirement_ids": [
+      "DRQ004"
+    ],
+    "evidence_source_ids": [
+      "SRC001",
+      "SRC004",
+      "SRC016"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "definition": "A limited partner has committed capital to a fund for as long as the commitment runs. A limited partner may commit to several funds and a fund has many limited partners, and a second purchase of an existing interest is a further commitment of its own type. The amount, type and status belong to the commitment. It is not the money called or paid out, which is recorded as transactions."
+  },
+  {
+    "id": "REL003",
+    "code": "LegalEntityPEInvestor",
+    "source_domain_id": "DOM001",
+    "destination_domain_id": "DOM001",
+    "forward_verb": "Receives Investment From",
+    "inverse_verb": "Invests In",
+    "source_role_id": "ROL005",
+    "target_role_id": "ROL004",
+    "cardinality": "MANY_TO_MANY",
+    "dates": true,
+    "is_symmetric": false,
+    "is_composition": false,
+    "quantified": false,
+    "name_override": null,
+    "dda_action": "extend",
+    "dda_id": "DMR000000002",
+    "reuse_search": "Searched DDA relationships: DMR000000002 already links a portfolio company to its investor; the forward verb is corrected and the stake data is added.",
+    "data_requirement_ids": [
+      "DRQ006"
+    ],
+    "evidence_source_ids": [
+      "SRC010",
+      "SRC011",
+      "SRC012"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "definition": "A fund or vehicle holds a stake in a portfolio company or a holding vehicle for as long as it holds it. Several investors may hold one company and one investor may hold several. The economic share, voting share and control type belong to the stake. It is not what was paid for the stake, which is recorded as transactions."
+  },
+  {
+    "id": "REL004",
+    "code": "LegalEntityFundParallels",
+    "source_domain_id": "DOM001",
+    "destination_domain_id": "DOM001",
+    "forward_verb": "Invests Alongside",
+    "inverse_verb": "Invests Alongside",
+    "source_role_id": "ROL006",
+    "target_role_id": "ROL006",
+    "cardinality": "MANY_TO_MANY",
+    "dates": true,
+    "is_symmetric": true,
+    "is_composition": false,
+    "quantified": false,
+    "name_override": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA relationships (all four) and this model: none links two funds or vehicles that invest side by side.",
+    "data_requirement_ids": [
+      "DRQ003"
+    ],
+    "evidence_source_ids": [
+      "SRC013",
+      "SRC009"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "definition": "Two funds or vehicles invest side by side, for example a main fund and its parallel fund, an alternative investment vehicle or a co-investment vehicle, for as long as they do. The kind of vehicle belongs to the link. It is not an investor's commitment to a fund."
+  },
+  {
+    "id": "REL005",
+    "code": "TransactionLegalEntityPayers",
+    "source_domain_id": "DOM003",
+    "destination_domain_id": "DOM001",
+    "forward_verb": "Is Paid By",
+    "inverse_verb": "Pays Into",
+    "source_role_id": "ROL007",
+    "target_role_id": "ROL008",
+    "cardinality": "MANY_TO_MANY",
+    "dates": false,
+    "is_symmetric": false,
+    "is_composition": false,
+    "quantified": false,
+    "name_override": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA relationships and this model: none links a transaction to a paying party.",
+    "data_requirement_ids": [
+      "DRQ005",
+      "DRQ007"
+    ],
+    "evidence_source_ids": [
+      "SRC001",
+      "SRC002",
+      "SRC003"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "definition": "A transaction is paid for by one or more parties, each paying an amount for a stated purpose and, where an instrument is acquired, receiving a number of units. It covers each limited partner paying into a capital call and each fund paying for an acquisition. It does not cover those who receive."
+  },
+  {
+    "id": "REL006",
+    "code": "TransactionLegalEntityPayees",
+    "source_domain_id": "DOM003",
+    "destination_domain_id": "DOM001",
+    "forward_verb": "Is Received By",
+    "inverse_verb": "Receives From",
+    "source_role_id": "ROL007",
+    "target_role_id": "ROL009",
+    "cardinality": "MANY_TO_MANY",
+    "dates": false,
+    "is_symmetric": false,
+    "is_composition": false,
+    "quantified": false,
+    "name_override": "TransactionPayees",
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA relationships and this model: none links a transaction to a receiving party.",
+    "data_requirement_ids": [
+      "DRQ005",
+      "DRQ007"
+    ],
+    "evidence_source_ids": [
+      "SRC001",
+      "SRC002",
+      "SRC003"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "definition": "A transaction is received by one or more parties, each receiving an amount for a stated purpose and, where an instrument is sold, giving up a number of units. It covers a fund receiving a call, each limited partner receiving a distribution and a seller receiving the price of an acquisition. It does not cover those who pay."
+  },
+  {
+    "id": "REL007",
+    "code": "TransactionInstrumentTraded",
+    "source_domain_id": "DOM003",
+    "destination_domain_id": "DOM002",
+    "forward_verb": "Transfers",
+    "inverse_verb": "Is Transferred By",
+    "source_role_id": "ROL007",
+    "target_role_id": "ROL010",
+    "cardinality": "MANY_TO_ONE",
+    "dates": false,
+    "is_symmetric": false,
+    "is_composition": false,
+    "quantified": false,
+    "name_override": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA relationships and this model: none links a transaction to the instrument it concerns.",
+    "data_requirement_ids": [
+      "DRQ007"
+    ],
+    "evidence_source_ids": [
+      "SRC003",
+      "SRC015"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "definition": "A transaction concerns one instrument, and many transactions may concern the same instrument. It names what was bought or sold. A capital call or distribution concerns no instrument."
+  }
+]

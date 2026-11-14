@@ -1,0 +1,231 @@
+[
+  {
+    "id": "SBJ001",
+    "code": "LegalEntity",
+    "definition": "There is one of these for each company, partnership, fund or other body that can hold rights and owe duties in its own name. If you need to know who a fund, a general partner, an investor, a holding vehicle or a portfolio company is, this is what you go by. What a body is to another - manager, investor, portfolio company - is not stored here; it comes from the relationships between them.",
+    "kind": "subject",
+    "mastery": "mastered",
+    "domain_id": "DOM001",
+    "is_anchor": true,
+    "parent_id": null,
+    "parent_cardinality": null,
+    "singled_out_by": null,
+    "independence": null,
+    "distinct_need": null,
+    "template_dda_id": null,
+    "dda_action": "reuse",
+    "dda_id": "DMC000000106",
+    "reuse_search": "Searched DDA: LegalEntity DMC000000106 is the domain root and covers funds and companies.",
+    "data_requirement_ids": [
+      "DRQ001",
+      "DRQ002",
+      "DRQ004",
+      "DRQ005",
+      "DRQ006",
+      "DRQ007"
+    ],
+    "evidence_source_ids": [
+      "SRC012",
+      "SRC010",
+      "SRC004"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SBJ002",
+    "code": "LegalEntityIdentifiers",
+    "definition": "There is one of these for each identifier a legal entity is known by, such as its legal entity identifier, a registration number or a number used inside the firm. If you need to match a fund, vehicle or portfolio company to a regulatory filing or to published ownership data, this is what you go by. It does not say which identifier is preferred.",
+    "kind": "subject",
+    "mastery": "mastered",
+    "domain_id": "DOM001",
+    "is_anchor": false,
+    "parent_id": "SBJ001",
+    "parent_cardinality": "ONE_TO_MANY_OPTIONAL",
+    "singled_out_by": "a governed identifier type and business dates",
+    "independence": null,
+    "distinct_need": null,
+    "template_dda_id": null,
+    "dda_action": "reuse",
+    "dda_id": "DMC000000023",
+    "reuse_search": "Searched DDA: LegalEntityIdentifiers DMC000000023 holds identifier type, value and dates.",
+    "data_requirement_ids": [
+      "DRQ002"
+    ],
+    "evidence_source_ids": [
+      "SRC010",
+      "SRC009",
+      "SRC008"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SBJ003",
+    "code": "LegalEntityClassifications",
+    "definition": "There is one of these for each classification applied to a legal entity. In this structure it names what a vehicle is for: management company, holding company, special purpose vehicle, tax blocker, fund vehicle or operating company. If you need to know which vehicles in a structure are tax blockers, this is what you go by. It is not a statement of what a body is to another, which comes from relationships.",
+    "kind": "subject",
+    "mastery": "mastered",
+    "domain_id": "DOM001",
+    "is_anchor": false,
+    "parent_id": "SBJ001",
+    "parent_cardinality": "ONE_TO_MANY_OPTIONAL",
+    "singled_out_by": "a governed classification type",
+    "independence": null,
+    "distinct_need": null,
+    "template_dda_id": null,
+    "dda_action": "extend",
+    "dda_id": "DMC000000110",
+    "reuse_search": "Searched DDA: LegalEntityClassifications DMC000000110 holds classifications under a governed type; extended to allow several per legal entity and to carry the vehicle purposes.",
+    "data_requirement_ids": [
+      "DRQ002"
+    ],
+    "evidence_source_ids": [
+      "SRC012",
+      "SRC014"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SBJ004",
+    "code": "LegalEntityValuations",
+    "definition": "There is one of these for each valuation of a legal entity as at a date and of a given type. In this structure it holds the net asset value of a fund and the equity value of a portfolio company or vehicle. If you need the value of a fund at a reporting date, this is what you go by. It is the value of the whole body and not the value of one fund's holding in it, which is the price per unit multiplied by the units held. It is not the fair value of a single instrument, which is held with the instrument's price.",
+    "kind": "subject",
+    "mastery": "mastered",
+    "domain_id": "DOM001",
+    "is_anchor": false,
+    "parent_id": "SBJ001",
+    "parent_cardinality": "ONE_TO_MANY_OPTIONAL",
+    "singled_out_by": "a governed valuation type and the valuation date",
+    "independence": null,
+    "distinct_need": null,
+    "template_dda_id": null,
+    "dda_action": "extend",
+    "dda_id": "DMC000000112",
+    "reuse_search": "Searched DDA: LegalEntityValuations DMC000000112 holds dated valuations by type; extended to allow several per legal entity.",
+    "data_requirement_ids": [
+      "DRQ008"
+    ],
+    "evidence_source_ids": [
+      "SRC005",
+      "SRC006",
+      "SRC007"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SBJ005",
+    "code": "Instrument",
+    "definition": "There is one of these for each security or other tradable holding right that can be bought, held or sold, such as the ordinary shares of a portfolio company or a shareholder loan note. If you need to say what a fund bought or sold, this is what you go by. It is not the company that issued it, and not the number of units a fund holds, which is worked out from transactions.",
+    "kind": "subject",
+    "mastery": "mastered",
+    "domain_id": "DOM002",
+    "is_anchor": true,
+    "parent_id": null,
+    "parent_cardinality": null,
+    "singled_out_by": null,
+    "independence": null,
+    "distinct_need": null,
+    "template_dda_id": null,
+    "dda_action": "reuse",
+    "dda_id": "DMC000000121",
+    "reuse_search": "Searched DDA: Instrument DMC000000121 is the domain root and covers securities, loans and funds.",
+    "data_requirement_ids": [
+      "DRQ007",
+      "DRQ008"
+    ],
+    "evidence_source_ids": [
+      "SRC003",
+      "SRC015"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SBJ006",
+    "code": "InstrumentIssuer",
+    "definition": "There is one of these for each instrument, naming the legal entity that issued it. If you need to know which portfolio company or vehicle an instrument is a claim on, this is what you go by. It is not a stake held by a fund, which is recorded between the fund and the company.",
+    "kind": "subject",
+    "mastery": "mastered",
+    "domain_id": "DOM002",
+    "is_anchor": false,
+    "parent_id": "SBJ005",
+    "parent_cardinality": "ONE_TO_ONE_OPTIONAL",
+    "singled_out_by": null,
+    "independence": "It points at the issuing legal entity, which is what ties an instrument to a portfolio company, and it is governed with the issuer's identifiers rather than with the instrument's terms.",
+    "distinct_need": null,
+    "template_dda_id": null,
+    "dda_action": "reuse",
+    "dda_id": "DMC000000125",
+    "reuse_search": "Searched DDA: InstrumentIssuer DMC000000125 points an instrument at its issuer.",
+    "data_requirement_ids": [
+      "DRQ007"
+    ],
+    "evidence_source_ids": [
+      "SRC003",
+      "SRC010"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SBJ007",
+    "code": "InstrumentPrice",
+    "definition": "There is one of these for each price of an instrument as at a date and of a given price type. In this structure it holds the fair value per unit of a private holding, with its level in the fair value hierarchy. If you need to value any fund's holding of an instrument, multiply the units it holds by this. It is not the amount a fund paid, which is held on the transaction.",
+    "kind": "subject",
+    "mastery": "mastered",
+    "domain_id": "DOM002",
+    "is_anchor": false,
+    "parent_id": "SBJ005",
+    "parent_cardinality": "ONE_TO_MANY_OPTIONAL",
+    "singled_out_by": "a governed price type and the price date",
+    "independence": null,
+    "distinct_need": null,
+    "template_dda_id": null,
+    "dda_action": "extend",
+    "dda_id": "DMC000000128",
+    "reuse_search": "Searched DDA: InstrumentPrice DMC000000128 holds a price type and value only; extended to carry date, currency and hierarchy level and to allow several per instrument.",
+    "data_requirement_ids": [
+      "DRQ008"
+    ],
+    "evidence_source_ids": [
+      "SRC005",
+      "SRC006",
+      "SRC007"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SBJ008",
+    "code": "Transaction",
+    "definition": "There is one of these for each time money or a holding moved between parties in a single event, such as a capital call, a distribution, an acquisition, a follow-on investment, a partial or full exit, or a transfer to a continuation vehicle. If you need to know what happened on a date, what kind of event it was and who paid or received what, this is what you go by. It does not hold a fund's position, which is worked out from all of its transactions.",
+    "kind": "occurrence",
+    "mastery": "mastered",
+    "domain_id": "DOM003",
+    "is_anchor": true,
+    "parent_id": null,
+    "parent_cardinality": null,
+    "singled_out_by": null,
+    "independence": null,
+    "distinct_need": "Holds the type, date and currency of each event in which money or a holding moves; the Transactions domain has no root concept, so nothing in DDA holds it.",
+    "template_dda_id": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA: the Transactions domain DMD000000022 has no root concept and no concepts of its own (discover_entities, list_model concepts). Searched this model: no other subject records an event in which money moves.",
+    "data_requirement_ids": [
+      "DRQ005",
+      "DRQ007"
+    ],
+    "evidence_source_ids": [
+      "SRC001",
+      "SRC002",
+      "SRC003",
+      "SRC015"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  }
+]

@@ -1,0 +1,249 @@
+[
+  {
+    "id": "SRC001",
+    "title": "ILPA Capital Call and Distribution Template",
+    "organisation": "Institutional Limited Partners Association",
+    "url": "https://ilpa.org/resources-tools/resource-library/capital-call-distribution-template/",
+    "retrieved": "2026-10-28",
+    "scope_ids": [
+      "SCI002"
+    ],
+    "type": "standard",
+    "establishes": "A standard notice format that fund managers send investors for each capital call and distribution.",
+    "why_included": "Sets what a call or distribution must say to the investor.",
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SRC002",
+    "title": "ILPA Updates Capital Call and Distribution Template: Implications for GPs and LPs",
+    "organisation": "Katten Muchin Rosenman",
+    "url": "https://katten.com/ilpa-updates-capital-call-distribution-template-implications-for-gps-and-lps",
+    "retrieved": "2026-10-28",
+    "scope_ids": [
+      "SCI002"
+    ],
+    "type": "practitioner",
+    "establishes": "How the current template splits a call by purpose (investments, fees, expenses) and a distribution by component (return of capital, gains, income, recallable amounts).",
+    "why_included": "Gives the field-level content that the template page itself does not list.",
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SRC003",
+    "title": "ILPA Reporting and New Performance Template",
+    "organisation": "Citco",
+    "url": "https://www.citco.com/insights/ilpa-reporting-and-new-performance-template",
+    "retrieved": "2026-10-28",
+    "scope_ids": [
+      "SCI002",
+      "SCI004"
+    ],
+    "type": "practitioner",
+    "establishes": "The ILPA reporting and performance templates ask for fund cash flows, net asset value and investment-level cost and value.",
+    "why_included": "Supports the investor's view of what is held and what it is worth.",
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SRC004",
+    "title": "ILPA Principles 3.0",
+    "organisation": "Institutional Limited Partners Association",
+    "url": "https://ilpa.org/wp-content/uploads/2019/06/ILPA-Principles-3.0_2019.pdf",
+    "retrieved": "2026-10-28",
+    "scope_ids": [
+      "SCI001",
+      "SCI002",
+      "SCI005"
+    ],
+    "type": "standard",
+    "establishes": "Investor expectations for fund governance and transparency, including how commitments, follow-on investments by successor funds and cross-fund investments are disclosed.",
+    "why_included": "Supports cross-fund exposure and the general partner commitment.",
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SRC005",
+    "title": "IPEV Valuation Guidelines",
+    "organisation": "British Private Equity and Venture Capital Association",
+    "url": "https://www.bvca.co.uk/Policy/Key-Policy-Areas/Accounting/IPEV-Valuation-Guidelines",
+    "retrieved": "2026-10-28",
+    "scope_ids": [
+      "SCI004"
+    ],
+    "type": "standard",
+    "establishes": "Industry guidelines for fair value measurement of private capital investments at a reporting date. The page establishes the guidelines' existence and scope only.",
+    "why_included": "Supports valuation as at a date.",
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SRC006",
+    "title": "ASC 820 and private equity valuation",
+    "organisation": "Redwood Valuation",
+    "url": "https://www.redwoodvaluation.com/blog/asc-820-private-equity",
+    "retrieved": "2026-10-28",
+    "scope_ids": [
+      "SCI004"
+    ],
+    "type": "practitioner",
+    "establishes": "ASC 820 requires fair value to be classified in a three-level hierarchy according to the observability of its inputs.",
+    "why_included": "Supports recording the hierarchy level beside each fair value.",
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SRC007",
+    "title": "A First Look at the CFA Institute's Final 2020 GIPS Standards",
+    "organisation": "K&L Gates",
+    "url": "https://www.klgates.com/thought-leadership/A-First-Look-at-the-CFA-Institutes-Final-2020-GIPS-Standards-07-01-2019",
+    "retrieved": "2026-10-28",
+    "scope_ids": [
+      "SCI004"
+    ],
+    "type": "practitioner",
+    "establishes": "The 2020 GIPS standards apply to private market fund performance and rest on dated cash flows and valuations.",
+    "why_included": "Supports performance being derived from dated cash flows and valuations.",
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SRC008",
+    "title": "Guidelines on reporting obligations under Articles 3(3)(d) and 24(1), (2) and (4) of the AIFMD",
+    "organisation": "European Securities and Markets Authority",
+    "url": "https://www.esma.europa.eu/sites/default/files/library/2015/11/2014-869.pdf",
+    "retrieved": "2026-10-28",
+    "scope_ids": [
+      "SCI001",
+      "SCI003"
+    ],
+    "type": "regulatory",
+    "establishes": "Alternative investment fund managers report to their regulator on each fund they manage, including master-feeder structures, domicile and principal exposures.",
+    "why_included": "Supports recording fund domicile and feeder structures.",
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SRC009",
+    "title": "SEC Adopts Private Fund Risk Reporting (Form PF)",
+    "organisation": "Proskauer Rose",
+    "url": "https://www.proskauer.com/alert/sec-adopts-private-fund-risk-reporting",
+    "retrieved": "2026-10-28",
+    "scope_ids": [
+      "SCI001",
+      "SCI003"
+    ],
+    "type": "regulatory",
+    "establishes": "Private fund advisers report fund-level information to the SEC, including how funds are structured and invest through parallel and feeder funds.",
+    "why_included": "Supports recording parallel and feeder funds.",
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SRC010",
+    "title": "Level 2 data: who owns whom",
+    "organisation": "Global Legal Entity Identifier Foundation",
+    "url": "https://gleif.org/en/lei-data/access-and-use-lei-data/level-2-data-who-owns-whom/roc-policy-on-level-2-data",
+    "retrieved": "2026-10-28",
+    "scope_ids": [
+      "SCI003",
+      "SCI005"
+    ],
+    "type": "standard",
+    "establishes": "Level 2 data records the direct and ultimate accounting-consolidation parents of a legal entity identified by a legal entity identifier.",
+    "why_included": "Supports recording ownership between identified entities and tracing to the ultimate parent.",
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SRC011",
+    "title": "Relationship record common data file format",
+    "organisation": "Global Legal Entity Identifier Foundation",
+    "url": "https://www.gleif.org/about-lei/common-data-file-format/relationship-record-cdf-format",
+    "retrieved": "2026-10-28",
+    "scope_ids": [
+      "SCI003"
+    ],
+    "type": "standard",
+    "establishes": "A relationship between two identified entities is published with its start and end dates, a status and a relationship type.",
+    "why_included": "Supports dated ownership relationships carrying a type and a status.",
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SRC012",
+    "title": "Private equity fund structure",
+    "organisation": "Alter Domus",
+    "url": "https://alterdomus.com/insight/private-equity-fund-structure/",
+    "retrieved": "2026-10-28",
+    "scope_ids": [
+      "SCI001",
+      "SCI003"
+    ],
+    "type": "practitioner",
+    "establishes": "A fund is a partnership managed by a general partner through a management company, and holds portfolio companies through holding vehicles.",
+    "why_included": "Supports the shape of the sponsor and holding structure.",
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SRC013",
+    "title": "Parallel Fund Structures",
+    "organisation": "Aztec Group",
+    "url": "https://aztec.group/wp-content/uploads/2022/07/Parallel-Fund-Structures-Article-_FINAL-1.pdf",
+    "retrieved": "2026-10-28",
+    "scope_ids": [
+      "SCI001"
+    ],
+    "type": "practitioner",
+    "establishes": "Parallel funds invest side by side with a main fund on the same terms and in the same investments, and exist to meet the needs of particular investors.",
+    "why_included": "Supports recording vehicles that invest alongside a fund.",
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SRC014",
+    "title": "Subscription Credit Facilities: Understanding Shared Blockers",
+    "organisation": "Mayer Brown",
+    "url": "https://www.mayerbrown.com/ja/insights/publications/2024/07/subscription-credit-facilities-understanding-shared-blockers",
+    "retrieved": "2026-10-28",
+    "scope_ids": [
+      "SCI003"
+    ],
+    "type": "practitioner",
+    "establishes": "A blocker is a corporate vehicle through which several investors, or several funds, may hold an investment.",
+    "why_included": "Supports a holding vehicle shared by several investors.",
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SRC015",
+    "title": "Regulatory considerations for continuation funds",
+    "organisation": "ACA Group",
+    "url": "https://www.acaglobal.com/insights/regulatory-considerations-continuation-funds",
+    "retrieved": "2026-10-28",
+    "scope_ids": [
+      "SCI004"
+    ],
+    "type": "practitioner",
+    "establishes": "A continuation fund buys one or more assets from an existing fund of the same sponsor, and existing investors may sell or roll their interest.",
+    "why_included": "Supports recording a transfer of a holding between two funds of one sponsor.",
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SRC016",
+    "title": "GP commitment in funds and SPVs",
+    "organisation": "Allocations",
+    "url": "https://www.allocations.com/insights/gp-commitment-in-funds-and-spvs",
+    "retrieved": "2026-10-28",
+    "scope_ids": [
+      "SCI002"
+    ],
+    "type": "practitioner",
+    "establishes": "The general partner and its principals commit their own capital to the fund alongside outside investors.",
+    "why_included": "Supports recording the general partner's own commitment as a commitment like any other.",
+    "status": "active",
+    "withdrawn_reason": null
+  }
+]

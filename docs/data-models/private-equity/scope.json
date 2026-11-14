@@ -1,0 +1,139 @@
+{
+  "domain": "Private Equity Fund Investment Structure",
+  "business": "A sponsor, held through a holding company, runs several private equity funds. Each fund is a partnership managed by a general partner, funded by commitments from limited partners, and invests in portfolio companies, directly or through holding vehicles. The same portfolio company may be held by more than one fund. The model serves both the sponsor's view (funds, vehicles, investments, ownership) and the investor's view (commitments, calls, distributions, the value of what is held).",
+  "subgroups": [
+    {
+      "id": "SCG001",
+      "name": "Sponsor and fund family (GP view)",
+      "is_primary": true
+    },
+    {
+      "id": "SCG002",
+      "name": "Investors and commitments (LP view)",
+      "is_primary": false
+    },
+    {
+      "id": "SCG003",
+      "name": "Holding structure and ownership",
+      "is_primary": false
+    }
+  ],
+  "in_scope": [
+    {
+      "id": "SCI001",
+      "statement": "Sponsor and fund family: the holding company, management company, general partner, funds, and parallel, alternative-investment and co-investment vehicles."
+    },
+    {
+      "id": "SCI002",
+      "statement": "Investors and commitments: limited partners, the capital each commits to each fund, the calls made against it and the distributions paid from it."
+    },
+    {
+      "id": "SCI003",
+      "statement": "Holding structure: holding vehicles, tax blockers and special purpose vehicles, the ownership chain from fund to portfolio company, and control."
+    },
+    {
+      "id": "SCI004",
+      "statement": "Portfolio companies and investments: acquisitions, follow-on investments and full or partial exits, the instruments held, cost, and fair value as at a date."
+    },
+    {
+      "id": "SCI005",
+      "statement": "Cross-fund exposure and look-through: the shares in which several funds hold the same portfolio company, and ownership traced through the chain."
+    }
+  ],
+  "out_of_scope": [
+    {
+      "id": "SCO001",
+      "statement": "Fee and carried-interest waterfall calculation and fund accounting ledgers.",
+      "owned_by": "Fund accounting model"
+    },
+    {
+      "id": "SCO002",
+      "statement": "Deal pipeline and prospect tracking.",
+      "owned_by": "Deal sourcing model"
+    },
+    {
+      "id": "SCO003",
+      "statement": "Portfolio company operating KPIs and ESG metrics.",
+      "owned_by": "Portfolio monitoring model"
+    },
+    {
+      "id": "SCO004",
+      "statement": "Investor marketing, fundraising pipeline and investor contact management.",
+      "owned_by": "Investor relations model"
+    },
+    {
+      "id": "SCO005",
+      "statement": "Tax filings and the production of regulatory returns.",
+      "owned_by": "Regulatory reporting model"
+    }
+  ],
+  "shared_objects": [
+    {
+      "id": "SCS001",
+      "name": "Legal Entities",
+      "dda_id": "DMD000000012"
+    },
+    {
+      "id": "SCS002",
+      "name": "Instruments",
+      "dda_id": "DMD000000015"
+    },
+    {
+      "id": "SCS003",
+      "name": "Transactions",
+      "dda_id": "DMD000000022"
+    }
+  ],
+  "assumptions": [
+    {
+      "id": "SCA001",
+      "statement": "A portfolio company may be held by several funds, and a holding vehicle may be shared by several funds."
+    },
+    {
+      "id": "SCA002",
+      "statement": "Every limited partner in a fund, including an individual or a principal making the general partner commitment, invests through a legal entity, so the People domain is not used."
+    },
+    {
+      "id": "SCA003",
+      "statement": "Ownership is held per investor and investee for a period; the share looked through to the sponsor is worked out by following the chain."
+    },
+    {
+      "id": "SCA004",
+      "statement": "Fair value is a price per unit of an instrument as at a date, shared by every fund holding that instrument."
+    },
+    {
+      "id": "SCA005",
+      "statement": "The model aligns to the ILPA templates and to legal entity identifiers (LEI); no ontology such as FIBO is adopted."
+    }
+  ],
+  "questions_unanswered": [],
+  "candidate_dda_domains": [
+    "DMD000000012",
+    "DMD000000015",
+    "DMD000000022",
+    "DMD000000016",
+    "DMD000000020"
+  ],
+  "source_cap_per_function": 6,
+  "external_standards": [
+    "ILPA Reporting Template",
+    "ILPA Performance Template",
+    "ILPA Capital Call and Distribution Template",
+    "ILPA Principles 3.0",
+    "IPEV Valuation Guidelines",
+    "ASC 820",
+    "GIPS 2020",
+    "AIFMD Annex IV",
+    "SEC Form PF",
+    "GLEIF Level 2 (who owns whom)"
+  ],
+  "platform_capabilities": [
+    "Audit history and point-in-time reconstruction",
+    "Duplicate detection and entity resolution",
+    "Origin and lineage"
+  ],
+  "confirmed": {
+    "by": "Andrew Bush",
+    "date": "2026-10-28"
+  }
+}

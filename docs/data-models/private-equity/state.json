@@ -1,0 +1,746 @@
+{
+  "spec_version": "1.0",
+  "spec_uri": "dda://skills/domain-discovery",
+  "mechanics": "manual",
+  "pass": 3,
+  "next_action": {
+    "step": 10,
+    "reason": "Render the document and package."
+  },
+  "pass_limit": 6,
+  "stable_pass_count": 2,
+  "material_changes_last_pass": [],
+  "work_queue": [],
+  "escalated": [],
+  "scenarios": [
+    {
+      "id": "SCN001",
+      "question": "Which general partner manages fund F as at a date?",
+      "data_requirement_ids": [
+        "DRQ001"
+      ],
+      "kind": "designed",
+      "as_at": "as-at",
+      "path": [
+        "SBJ001",
+        "REL001",
+        "SBJ001"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN002",
+      "question": "Which funds does general partner G manage?",
+      "data_requirement_ids": [
+        "DRQ001"
+      ],
+      "kind": "designed",
+      "as_at": "current",
+      "path": [
+        "SBJ001",
+        "REL001",
+        "SBJ001"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN003",
+      "question": "Which funds have a given vintage year and strategy?",
+      "data_requirement_ids": [
+        "DRQ001"
+      ],
+      "kind": "designed",
+      "as_at": "current",
+      "path": [
+        "SBJ001",
+        "REL001",
+        "ATR001",
+        "ATR002"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN004",
+      "question": "Which vehicles in the structure are tax blockers?",
+      "data_requirement_ids": [
+        "DRQ002"
+      ],
+      "kind": "designed",
+      "as_at": "current",
+      "path": [
+        "SBJ001",
+        "SBJ003",
+        "ATR035"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN005",
+      "question": "What is the legal entity identifier of entity E?",
+      "data_requirement_ids": [
+        "DRQ002"
+      ],
+      "kind": "designed",
+      "as_at": "current",
+      "path": [
+        "SBJ001",
+        "SBJ002",
+        "ATR031",
+        "ATR032"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN006",
+      "question": "Which vehicles invest alongside fund F?",
+      "data_requirement_ids": [
+        "DRQ003"
+      ],
+      "kind": "designed",
+      "as_at": "as-at",
+      "path": [
+        "SBJ001",
+        "REL004",
+        "ATR014"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN007",
+      "question": "What is limited partner L's commitment to fund F as at a date?",
+      "data_requirement_ids": [
+        "DRQ004"
+      ],
+      "kind": "designed",
+      "as_at": "as-at",
+      "path": [
+        "SBJ001",
+        "REL002",
+        "ATR011"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN008",
+      "question": "Who are the limited partners in fund F?",
+      "data_requirement_ids": [
+        "DRQ004"
+      ],
+      "kind": "designed",
+      "as_at": "current",
+      "path": [
+        "SBJ001",
+        "REL002",
+        "SBJ001"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN009",
+      "question": "What is the general partner's own commitment to fund F?",
+      "data_requirement_ids": [
+        "DRQ004"
+      ],
+      "kind": "designed",
+      "as_at": "as-at",
+      "path": [
+        "SBJ001",
+        "REL002",
+        "ATR012",
+        "ATR011"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN010",
+      "question": "How much did limited partner L pay in call C and for what purposes?",
+      "data_requirement_ids": [
+        "DRQ005"
+      ],
+      "kind": "designed",
+      "as_at": "current",
+      "path": [
+        "SBJ008",
+        "REL005",
+        "SBJ001",
+        "ATR015",
+        "ATR016"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN011",
+      "question": "What was distributed to limited partner L in a year and of what kind?",
+      "data_requirement_ids": [
+        "DRQ005"
+      ],
+      "kind": "designed",
+      "as_at": "current",
+      "path": [
+        "SBJ008",
+        "ATR021",
+        "ATR022",
+        "REL006",
+        "ATR018",
+        "ATR019"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN012",
+      "question": "What is limited partner L's unfunded commitment to fund F as at a date?",
+      "data_requirement_ids": [
+        "DRQ005"
+      ],
+      "kind": "designed",
+      "as_at": "as-at",
+      "path": [
+        "SBJ001",
+        "REL002",
+        "ATR011",
+        "SBJ008",
+        "REL005",
+        "ATR015",
+        "ATR022"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN013",
+      "question": "What share of portfolio company P does each holder own as at a date?",
+      "data_requirement_ids": [
+        "DRQ006"
+      ],
+      "kind": "designed",
+      "as_at": "as-at",
+      "path": [
+        "SBJ001",
+        "REL003",
+        "ATR009",
+        "ATR010"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN014",
+      "question": "Through which vehicles does fund F hold portfolio company P?",
+      "data_requirement_ids": [
+        "DRQ006"
+      ],
+      "kind": "designed",
+      "as_at": "as-at",
+      "path": [
+        "SBJ001",
+        "REL003",
+        "SBJ001",
+        "REL003",
+        "SBJ001"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN015",
+      "question": "What does the whole sponsor hold in portfolio company P, looking through the chain?",
+      "data_requirement_ids": [
+        "DRQ006"
+      ],
+      "kind": "awkward",
+      "as_at": "as-at",
+      "path": [
+        "SBJ001",
+        "REL003",
+        "ATR009",
+        "SBJ001",
+        "REL003",
+        "ATR009",
+        "SBJ001",
+        "REL003",
+        "ATR009"
+      ],
+      "result": "pass",
+      "reason": "Worked out by multiplying the ownership percentage along each route and adding the routes; no figure is stored."
+    },
+    {
+      "id": "SCN016",
+      "question": "Which funds hold the same portfolio company, and in what shares?",
+      "data_requirement_ids": [
+        "DRQ006"
+      ],
+      "kind": "designed",
+      "as_at": "as-at",
+      "path": [
+        "SBJ001",
+        "REL003",
+        "ATR009",
+        "ATR008"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN017",
+      "question": "What did fund F pay for portfolio company P and when?",
+      "data_requirement_ids": [
+        "DRQ007"
+      ],
+      "kind": "designed",
+      "as_at": "current",
+      "path": [
+        "SBJ008",
+        "REL005",
+        "SBJ001",
+        "ATR015",
+        "ATR022",
+        "REL007",
+        "SBJ005",
+        "SBJ006"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN018",
+      "question": "Which funds took part in the follow-on investment and for how much each?",
+      "data_requirement_ids": [
+        "DRQ007"
+      ],
+      "kind": "awkward",
+      "as_at": "current",
+      "path": [
+        "SBJ008",
+        "ATR021",
+        "REL005",
+        "SBJ001",
+        "ATR015"
+      ],
+      "result": "pass",
+      "reason": "Two funds pay for one transaction, so there are two paying parties with their own amounts and units."
+    },
+    {
+      "id": "SCN019",
+      "question": "What were the proceeds of a partial exit, and who received them?",
+      "data_requirement_ids": [
+        "DRQ007"
+      ],
+      "kind": "designed",
+      "as_at": "current",
+      "path": [
+        "SBJ008",
+        "ATR021",
+        "REL006",
+        "SBJ001",
+        "ATR018"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN020",
+      "question": "How many units of instrument I does fund F hold as at a date?",
+      "data_requirement_ids": [
+        "DRQ007"
+      ],
+      "kind": "designed",
+      "as_at": "as-at",
+      "path": [
+        "SBJ005",
+        "REL007",
+        "SBJ008",
+        "ATR022",
+        "REL005",
+        "ATR017",
+        "REL006",
+        "ATR020"
+      ],
+      "result": "pass",
+      "reason": "Worked out as units received less units given up across transactions to the date; no figure is stored."
+    },
+    {
+      "id": "SCN021",
+      "question": "Which transfer moved portfolio company P from fund F to a continuation vehicle?",
+      "data_requirement_ids": [
+        "DRQ007"
+      ],
+      "kind": "awkward",
+      "as_at": "current",
+      "path": [
+        "SBJ008",
+        "ATR021",
+        "REL005",
+        "REL006",
+        "SBJ001",
+        "ATR017",
+        "ATR020"
+      ],
+      "result": "pass",
+      "reason": "The continuation vehicle is the paying party and fund F the receiving party in one transaction."
+    },
+    {
+      "id": "SCN022",
+      "question": "What was the fair value per unit of instrument I as at a date, and at which hierarchy level?",
+      "data_requirement_ids": [
+        "DRQ008"
+      ],
+      "kind": "designed",
+      "as_at": "as-at",
+      "path": [
+        "SBJ005",
+        "SBJ007",
+        "ATR026",
+        "ATR030",
+        "ATR028"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN023",
+      "question": "What was fund F's net asset value as at a date?",
+      "data_requirement_ids": [
+        "DRQ008"
+      ],
+      "kind": "designed",
+      "as_at": "as-at",
+      "path": [
+        "SBJ001",
+        "SBJ004",
+        "ATR036",
+        "ATR037",
+        "ATR038"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN024",
+      "question": "What is the fair value of fund F's holding in portfolio company P as at a date?",
+      "data_requirement_ids": [
+        "DRQ008"
+      ],
+      "kind": "awkward",
+      "as_at": "as-at",
+      "path": [
+        "SBJ005",
+        "SBJ007",
+        "ATR030",
+        "ATR026",
+        "REL007",
+        "SBJ008",
+        "REL005",
+        "ATR017"
+      ],
+      "result": "pass",
+      "reason": "Units held, worked out from transactions, multiplied by the price per unit as at the date."
+    },
+    {
+      "id": "SCN025",
+      "question": "Which general partner managed fund F before its manager was replaced?",
+      "data_requirement_ids": [
+        "DRQ001"
+      ],
+      "kind": "awkward",
+      "as_at": "as-at",
+      "path": [
+        "SBJ001",
+        "REL001",
+        "SBJ001"
+      ],
+      "result": "pass",
+      "reason": "The relationship carries business start and end dates, so the earlier manager is still answerable."
+    },
+    {
+      "id": "SCN026",
+      "question": "Is a company that invests in one fund and is a portfolio company of another held once?",
+      "data_requirement_ids": [
+        "DRQ006"
+      ],
+      "kind": "awkward",
+      "as_at": "current",
+      "path": [
+        "SBJ001",
+        "REL002",
+        "REL003",
+        "SBJ001"
+      ],
+      "result": "pass",
+      "reason": "One legal entity takes part in both relationships; the roles LP and PortCo are derived, not stored."
+    }
+  ],
+  "document": {
+    "edition": "lite",
+    "requested_by": "Andrew Bush",
+    "rendered": "2026-10-28"
+  },
+  "minimality": [
+    {
+      "pass": 1,
+      "counts": {
+        "domains": 3,
+        "roles": 10,
+        "relationships": 7,
+        "concepts": 8,
+        "attributes": 40,
+        "lookups": 14
+      },
+      "merged": [
+        "Capital call and distribution amounts by investor held as relationship data on two transaction relationships rather than a concept",
+        "Fund facts held on the management relationship rather than a fund concept",
+        "Ownership held on one relationship for fund-to-vehicle, vehicle-to-vehicle and vehicle-to-company links"
+      ],
+      "withdrawn": [],
+      "growth_justified_by": [
+        "DRQ001",
+        "DRQ002",
+        "DRQ003",
+        "DRQ004",
+        "DRQ005",
+        "DRQ006",
+        "DRQ007",
+        "DRQ008"
+      ]
+    },
+    {
+      "pass": 2,
+      "counts": {
+        "domains": 3,
+        "roles": 10,
+        "relationships": 7,
+        "concepts": 8,
+        "attributes": 40,
+        "lookups": 14
+      },
+      "merged": [],
+      "withdrawn": [],
+      "growth_justified_by": []
+    },
+    {
+      "pass": 3,
+      "counts": {
+        "domains": 3,
+        "roles": 10,
+        "relationships": 7,
+        "concepts": 8,
+        "attributes": 40,
+        "lookups": 14
+      },
+      "merged": [],
+      "withdrawn": [],
+      "growth_justified_by": []
+    }
+  ],
+  "standards_conformance": [
+    {
+      "standard": "DMS000000141",
+      "applies": true,
+      "how_satisfied": "Principles and governance statements: the data is held in shared domains (Legal Entities, Instruments, Transactions) and no department-owned domain is created. New concepts, relationships and lookups go through DDA's governed change process; critical attributes are flagged.",
+      "artefact_ids": [
+        "DOM001",
+        "DOM002",
+        "DOM003"
+      ],
+      "exception_id": null,
+      "read_hash": "1a2b4fe390f1da93",
+      "covers": [
+        "DMS000000142",
+        "DMS000000143",
+        "DMS000000144",
+        "DMS000000145",
+        "DMS000000146",
+        "DMS000000154",
+        "DMS000000153"
+      ]
+    },
+    {
+      "standard": "DMS000000147",
+      "applies": true,
+      "how_satisfied": "Every domain is a subject (legal entities, instruments, transactions). Funds, portfolio companies and investors are roles, not domains; holdings and valuations are held with the subjects they describe.",
+      "artefact_ids": [
+        "DOM001",
+        "DOM002",
+        "DOM003"
+      ],
+      "exception_id": null,
+      "read_hash": "2442af79e7adf66f",
+      "covers": []
+    },
+    {
+      "standard": "DMS000000148",
+      "applies": true,
+      "how_satisfied": "Data owners are named on each business requirement; stewardship of each lookup is stated in its definition.",
+      "artefact_ids": [
+        "REQ001",
+        "REQ002",
+        "REQ004"
+      ],
+      "exception_id": null,
+      "read_hash": "ebfcfb25e6287728",
+      "covers": []
+    },
+    {
+      "standard": "DMS000000149",
+      "applies": true,
+      "how_satisfied": "One model per domain: the structure extends existing records in Legal Entities, Instruments and Transactions rather than building a second model. Each concept names where it is mastered.",
+      "artefact_ids": [
+        "SBJ001",
+        "SBJ005",
+        "SBJ008"
+      ],
+      "exception_id": null,
+      "read_hash": "09b457f356d30ae5",
+      "covers": [
+        "DMS000000150"
+      ]
+    },
+    {
+      "standard": "DMS000000151",
+      "applies": true,
+      "how_satisfied": "Each domain keeps one primary identifier per record; external identifiers (legal entity identifier, registration numbers) are held as secondary identifiers in LegalEntityIdentifiers.",
+      "artefact_ids": [
+        "SBJ002",
+        "ATR031",
+        "ATR032"
+      ],
+      "exception_id": null,
+      "read_hash": "13c2c1462ade1318",
+      "covers": []
+    },
+    {
+      "standard": "DMS000000152",
+      "applies": true,
+      "how_satisfied": "Amounts, percentages, dates of valuation and identifiers that support regulatory and investor reporting are flagged critical.",
+      "artefact_ids": [
+        "ATR009",
+        "ATR011",
+        "ATR015",
+        "ATR018",
+        "ATR022",
+        "ATR026",
+        "ATR030"
+      ],
+      "exception_id": null,
+      "read_hash": "3beb8e00357c37a7",
+      "covers": [
+        "DMS000000167"
+      ]
+    },
+    {
+      "standard": "DMS000000156",
+      "applies": true,
+      "how_satisfied": "Definition standards: the design uses the platform's meanings of domain, model, concept and attribute.",
+      "artefact_ids": [
+        "DOM001"
+      ],
+      "exception_id": null,
+      "read_hash": "be3e27679175f4dc",
+      "covers": [
+        "DMS000000157",
+        "DMS000000158",
+        "DMS000000159",
+        "DMS000000160",
+        "DMS000000161",
+        "DMS000000162",
+        "DMS000000163",
+        "DMS000000164",
+        "DMS000000165",
+        "DMS000000166"
+      ]
+    },
+    {
+      "standard": "DMS000000168",
+      "applies": false,
+      "how_satisfied": "Lineage is held by the platform and is not modelled.",
+      "artefact_ids": [],
+      "exception_id": null,
+      "read_hash": "e0f1ec56bc770b12",
+      "covers": []
+    },
+    {
+      "standard": "DMS000000169",
+      "applies": true,
+      "how_satisfied": "Principles applied: each enduring subject is represented once and roles are derived from relationships (REL001 to REL007); relationships carry both verbs and both roles; observed and derived facts are separated (holdings, unfunded commitment, look-through ownership and fair value of a holding are worked out, never stored); dates are business dates; no audit fields appear.",
+      "artefact_ids": [
+        "REL001",
+        "REL002",
+        "REL003",
+        "REL004",
+        "REL005",
+        "REL006",
+        "REL007"
+      ],
+      "exception_id": null,
+      "read_hash": "feca57fe2bd77a2d",
+      "covers": []
+    }
+  ],
+  "exceptions": [],
+  "decisions": [
+    {
+      "id": "DEC001",
+      "question": "Should the reported ownership percentage on a stake be reconciled against units held and units issued, and who decides which prevails when they differ?",
+      "options": [
+        "The reported percentage prevails and a quality rule flags differences",
+        "Units held prevail and the percentage is derived"
+      ],
+      "raised_at_pass": 1,
+      "status": "open",
+      "decision": "",
+      "by": "",
+      "date": ""
+    },
+    {
+      "id": "DEC002",
+      "question": "Should the start and end dates held as separate attributes on the limited partner commitment relationship be retired, since every dated relationship already carries business start and end dates?",
+      "options": [
+        "Retire them",
+        "Keep them with a stated difference in meaning"
+      ],
+      "raised_at_pass": 1,
+      "status": "open",
+      "decision": "",
+      "by": "",
+      "date": ""
+    },
+    {
+      "id": "DEC003",
+      "question": "Should the management company be linked to the sponsor's holding company through the stake relationship, or through a dedicated relationship?",
+      "options": [
+        "The stake relationship",
+        "A dedicated relationship"
+      ],
+      "raised_at_pass": 1,
+      "status": "open",
+      "decision": "",
+      "by": "",
+      "date": ""
+    }
+  ],
+  "editorial": {
+    "document_sha256": "2b2605bf9daf1f6bf9f60359c807b1e7597a79099ab808fe7a55ed2255c18c4e",
+    "reviewed_on": "2026-10-28",
+    "reviewer": "independent",
+    "findings_count": {
+      "factual": 6,
+      "clarity": 19,
+      "language": 9,
+      "structure": 6,
+      "substance": 6
+    }
+  },
+  "converged": true,
+  "gate_decision": "issue",
+  "summary": "The design represents a private equity sponsor's funds, vehicles, investors, portfolio companies and the ownership between them, from both the manager's side and the investor's side, using three shared domains that DDA already holds, Legal Entities, Instruments and Transactions, with one new concept, Transaction, as the anchor of the third. Fund, GP, LP, Investor and PortCo are roles that follow from seven relationships, so a company that invests in one fund and is held by another is held once. Commitments, stakes, capital calls, distributions, acquisitions and exits carry their own dates and amounts. Positions, unfunded commitments, look-through ownership and the fair value of a holding are worked out from them and never stored, while the price of an instrument and the value of a fund or company are recorded as at their dates. Three design questions remain open: how a reported ownership percentage is reconciled with units held, whether the start and end dates on the limited partner commitment are kept, and how the management company is linked to the sponsor's holding company."
+}
