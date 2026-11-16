@@ -118,6 +118,8 @@ def render(pkg: Path, static: Path) -> tuple[str, int]:
     n_concept_re = sum(1 for s in subjects if s["dda_action"] == "reuse")
     n_rel_new = sum(1 for r in verbs if r["dda_action"] == "create")
     n_lk_new = sum(1 for l in lookups if l["dda_action"] == "create")
+    n_lk_ext = sum(1 for l in lookups if l["dda_action"] == "extend")
+    ext_vals = sum(len(l["values"]) for l in lookups if l["dda_action"] == "extend")
     n_dom_re = sum(1 for d in doms if d["dda_action"] == "reuse")
     n_dom_ext = sum(1 for d in doms if d["dda_action"] == "extend")
     n_dom_new = sum(1 for d in doms if d["dda_action"] == "create")
@@ -206,7 +208,7 @@ def render(pkg: Path, static: Path) -> tuple[str, int]:
         w(f"- {q if q.endswith('?') else q}")
     w("")
     w(f"This design creates {words(n_concept_new)} concepts, {words(len(roles))} roles, {words(n_rel_new)} relationships and {words(n_lk_new)} lists of values in DDA, "
-      f"extends {words(n_dom_ext)} existing domain (Locations) with the structure of a factory, and reuses {words(n_dom_re)} existing domains and {words(n_concept_re)} existing concepts. "
+      f"extends {words(n_dom_ext)} existing domain (Locations) with the structure of a factory, adds {words(ext_vals)} values to {words(n_lk_ext)} existing list, and reuses {words(n_dom_re)} existing domains and {words(n_concept_re)} existing concepts. "
       f"It proposes {words(n_dom_new)} new domains.")
     w("")
     w("|  | Count |")
@@ -460,6 +462,9 @@ def render(pkg: Path, static: Path) -> tuple[str, int]:
         w("")
         w(l["definition"])
         w("")
+        if l["dda_action"] == "extend":
+            w("DDA already holds this list, created without values. The values below are what this design contributes to it. CPG - Product Definition contributes the same values.")
+            w("")
         used: list[str] = []
         for a in sorted(attrs, key=lambda x: 0 if x["subject_id"] else 1):
             if a["lookup_id"] == l["id"]:

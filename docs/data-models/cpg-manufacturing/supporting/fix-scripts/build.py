@@ -55,7 +55,11 @@ for d in doms:
     elif d["dda_action"] == "extend":
         add("domains", d["id"], {"domain_description_addition": d["definition_update"]}, [], op="update", dda_id=d["dda_id"])
 for l in lookups:
-    add("lookupTypes", l["id"], {"lookup_type_code": l["code"], "lookup_type_description": l["definition"], "values": len(l["values"])}, [])
+    if l["dda_action"] == "extend":
+        add("lookupTypes", l["id"], {"lookups_to_add": [{"lookup_code": v["code"], "lookup_name": v["name"], "lookup_description": v["definition"]} for v in l["values"]]},
+            [], op="update", dda_id=l["dda_id"])
+    else:
+        add("lookupTypes", l["id"], {"lookup_type_code": l["code"], "lookup_type_description": l["definition"], "values": len(l["values"])}, [])
 
 # concepts: parents before children
 pending = [s for s in subjects if s["dda_action"] == "create"]

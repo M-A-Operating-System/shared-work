@@ -961,16 +961,16 @@
     },
     {
       "id": "DEC012",
-      "question": "The list of units of measure is proposed here as UniversalUnitOfMeasure and by CPG - Product Definition as UniversalUnitCodes. DDA holds neither. Which model creates the list, and under which name?",
+      "question": "The list of units of measure, UniversalUnitOfMeasureCodes, is used by this model and by CPG - Product Definition, with the same seven values. DDA does not yet hold it. Create it once in DDA ahead of both change packages, or let the first package applied create it and the second skip it.",
       "options": [
-        "CPG - Product Definition creates it as UniversalUnitCodes, and this model uses it",
-        "this model creates it as UniversalUnitOfMeasure"
+        "create it in DDA now",
+        "first change package applied creates it"
       ],
       "raised_at_pass": 2,
-      "status": "open",
-      "decision": "",
-      "by": "",
-      "date": ""
+      "status": "decided",
+      "decision": "Both CPG models use one list, UniversalUnitOfMeasureCodes, with the same seven values. It was created in DDA as lookup type DLT000000156 on 16 November 2026; each design contributes the values.",
+      "by": "Andrew Bush",
+      "date": "2026-11-16"
     }
   ],
   "converged": false,

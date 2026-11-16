@@ -377,8 +377,8 @@
   },
   {
     "id": "LKP009",
-    "code": "UniversalUnitOfMeasure",
-    "definition": "The unit a quantity is stated in, used wherever a quantity is recorded, so that kilograms are never mixed up with litres.",
+    "code": "UniversalUnitOfMeasureCodes",
+    "definition": "The unit a quantity is stated in, used wherever a quantity of food, an ingredient, packaging or product is recorded, so that kilograms are never mixed up with litres.",
     "scope": "universal",
     "values": [
       {
@@ -404,7 +404,12 @@
       {
         "code": "EA",
         "name": "Each",
-        "definition": "A count of units."
+        "definition": "A count of items."
+      },
+      {
+        "code": "PCT",
+        "name": "Per cent",
+        "definition": "A share of the whole, in per cent."
       },
       {
         "code": "CASE",
@@ -412,9 +417,9 @@
         "definition": "A count of cases."
       }
     ],
-    "dda_action": "create",
-    "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a list of values for UniversalUnitOfMeasure; none found. Searched this model's own lists for the same terms; no other list holds them.",
+    "dda_action": "extend",
+    "dda_id": "DLT000000156",
+    "reuse_search": "Searched DDA on 16 November 2026 for a list of units of measure among its 85 lookup types; none existed. The lookup type UniversalUnitOfMeasureCodes was created in DDA (DLT000000156) with no values, and is shared with the other CPG model, which uses the same list. This design contributes the values.",
     "data_requirement_ids": [
       "DRQ004"
     ],

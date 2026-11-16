@@ -124,14 +124,48 @@
     },
     {
       "seq": 10,
-      "op": "create",
+      "op": "update",
       "entity": "lookupTypes",
       "local_id": "LKP009",
-      "dda_id": null,
+      "dda_id": "DLT000000156",
       "fields": {
-        "lookup_type_code": "UniversalUnitOfMeasure",
-        "lookup_type_description": "The unit a quantity is stated in, used wherever a quantity is recorded, so that kilograms are never mixed up with litres.",
-        "values": 6
+        "lookups_to_add": [
+          {
+            "lookup_code": "KG",
+            "lookup_name": "Kilogram",
+            "lookup_description": "Mass in kilograms."
+          },
+          {
+            "lookup_code": "G",
+            "lookup_name": "Gram",
+            "lookup_description": "Mass in grams."
+          },
+          {
+            "lookup_code": "L",
+            "lookup_name": "Litre",
+            "lookup_description": "Volume in litres."
+          },
+          {
+            "lookup_code": "ML",
+            "lookup_name": "Millilitre",
+            "lookup_description": "Volume in millilitres."
+          },
+          {
+            "lookup_code": "EA",
+            "lookup_name": "Each",
+            "lookup_description": "A count of items."
+          },
+          {
+            "lookup_code": "PCT",
+            "lookup_name": "Per cent",
+            "lookup_description": "A share of the whole, in per cent."
+          },
+          {
+            "lookup_code": "CASE",
+            "lookup_name": "Case",
+            "lookup_description": "A count of cases."
+          }
+        ]
       },
       "depends_on": []
     },

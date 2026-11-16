@@ -843,6 +843,11 @@
       "dda_id": "DLT000000102",
       "code": "LegalEntityFundLPCommitmentTypes",
       "active": true
+    },
+    {
+      "dda_id": "DLT000000156",
+      "code": "UniversalUnitOfMeasureCodes",
+      "active": true
     }
   ],
   "state_transitions": [

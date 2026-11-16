@@ -5,10 +5,10 @@ Package for the **CPG Manufacturing and Supply Chain** data model (package refer
 | File | Purpose |
 |---|---|
 | `*.json` (15 files) | The package: scope, sources, requirements, data requirements, domains, subjects, roles, verbs, attributes, lookups, state, baseline, validation, derived and the DDA change package |
-| `cpg-manufacturing-data-design-document.md` and `.pdf` | The Data Design Document, lite edition, projected from the package (46 pages as PDF). Regenerate it, never edit it |
+| `cpg-manufacturing-data-design-document.md` | The Data Design Document, lite edition, projected from the package. Regenerate it, never edit it. The PDF is built from it by the repository's own workflow |
 | `supporting/first-pass-document/` | The document as first rendered (24 September 2026), in markdown and PDF. **Out of date**: kept only as the record of what the review examined |
 | `supporting/cpg-manufacturing-design-review.md` | The 22-finding review of the first-pass document that drove the corrections |
-| `supporting/fix-scripts/` | The scripts that applied the corrections, in order: `fix1`, `fix2`, `fix2b`, `fix3`, `fix4`/`fix5`, `build`. `defs.py` holds every definition. `common.py` points at the working copy used to run them. `render_mfg.py <package> <static-source.md> <out.md>` renders the document; `build_pdf.py` and `mmc.json` build the PDF from it |
+| `supporting/fix-scripts/` | The scripts that applied the corrections, in order: `fix1`, `fix2`, `fix2b`, `fix3`, `fix4`/`fix5`, `build`. `defs.py` holds every definition. `common.py` points at the working copy used to run them. `render_mfg.py <package> <static-source.md> <out.md>` renders the document |
 | `supporting/cpg-pass/`, `supporting/cpg-run/` | The first pass report and the research run that preceded the package |
 
 ## Status
@@ -30,7 +30,7 @@ Package for the **CPG Manufacturing and Supply Chain** data model (package refer
 | Roles and relationships | Roles 70 to 48 and relationships 38 to 31. All batch ends play one role, Traced Batch. Role definitions now stand alone and name no counterpart. Five view names are overridden because one role is played at several ends |
 | Attributes and lists | 120 to 93 attributes and 9 to 10 lists. Cost, product definition and typed text references are withdrawn; the unit of measure and the quantity the recipe called for move onto the link between a run and a batch; whether an alternative input was used is recorded on that link |
 | Definitions | Every concept, role, attribute and list is written in the three-part form of `references/definitions.md`, with the reuse search and the distinct need recorded |
-| Regeneration | Requirement REQ071 was used twice (a withdrawn one and the new traceability requirement); the new one is now REQ073. The six reused domains now carry a sentence on what this model uses each for. Two source descriptions no longer use the word *approval*. DEC012 records that the unit-of-measure list is proposed here and by CPG - Product Definition |
+| Regeneration | Requirement REQ071 was used twice (a withdrawn one and the new traceability requirement); the new one is now REQ073. The six reused domains now carry a sentence on what this model uses each for. Two source descriptions no longer use the word *approval*. The unit-of-measure list is now `UniversalUnitOfMeasureCodes`, created in DDA as lookup type DLT000000156 on 2026-11-16 and shared with CPG - Product Definition; this model extends it with seven values (DEC012 decided) |
 | State | The 32 test cases are re-walked against the new structure (30 pass, 2 accepted limits); the cost case is withdrawn with its scope. Exceptions and decisions are restated against the current DDA principles; conformance entries are written against the full standard text. A minimality sweep is recorded for both passes |
 
 ## Compared with the Private Equity folder (2026-11-16)
@@ -70,7 +70,7 @@ The review's decisions D1 to D6 were not answered. The corrections follow the di
 - **Retention.** The two-year retention in REQ052 is not confirmed from the rule's own text, which could not be retrieved (DEC011). The compliance date of 20 July 2028 is a proposal in the source, and the document states it as proposed.
 - **DDA could not be read.** The connection was down for this work, so the reuse searches are against the baseline read on 28 September 2026, which holds no concepts for Products or Locations. DEC009 (which model creates Product) and DEC010 (what Locations already holds) are to be settled before the change package is applied.
 - **Concept depth.** About 2 attributes per concept remains, and 15 event concepts remain, several with one attribute. The recall, complaint, correction and storage-breach concepts are the candidates for a further merge.
-- **Decisions DEC001, 004, 005, 007 and 008 to 012** are open. DEC012: this package proposes `UniversalUnitOfMeasure` and CPG - Product Definition proposes `UniversalUnitCodes`; DDA holds neither, and one model should create the list.
+- **Decisions DEC001, 004, 005, 007 and 008 to 011** are open.
+- **Baseline is out of date.** DDA is readable again and now holds 85 lookup types against the 67 in the baseline read on 28 September 2026, so the reuse searches, DEC009 and DEC010 should be re-run against it before the change package is applied. Only `DLT000000156` has been added to the baseline.
 - **Principles appendix.** The lite edition under validator v31.5 carries no principles table; the two departures (EXC002, EXC003) are stated in section 6.2. The principles table is in the full edition, which has no renderer yet.
-- **Print layout.** The roles diagram holds 48 roles and 31 relationships and is small on an A4 page; it reads when zoomed.
 - **The change package is unapplied** and carries no preconditions (DEC007).

@@ -140,7 +140,7 @@ The design has stated limits. The chain of what goes into what stops at anything
 - Was this batch ever stored outside its permitted conditions?
 - How many units are in a case of this product, and how many cases on a pallet?
 
-This design creates 43 concepts, 48 roles, 31 relationships and ten lists of values in DDA, extends one existing domain (Locations) with the structure of a factory, and reuses six existing domains and five existing concepts. It proposes two new domains.
+This design creates 43 concepts, 48 roles, 31 relationships and nine lists of values in DDA, extends one existing domain (Locations) with the structure of a factory, adds seven values to one existing list, and reuses six existing domains and five existing concepts. It proposes two new domains.
 
 |  | Count |
 |---|---|
@@ -801,13 +801,15 @@ Every concept the design uses, whether DDA already has it or the design adds it.
 
 Each list is a fixed set of allowed answers, so the same thing is always described the same way. Where a list is used by a relationship rather than a concept, the name beside it is that relationship's own group of facts.
 
-#### Universal Unit Of Measure
+#### Universal Unit Of Measure Codes
 
-The unit a quantity is stated in, used wherever a quantity is recorded, so that kilograms are never mixed up with litres.
+The unit a quantity is stated in, used wherever a quantity of food, an ingredient, packaging or product is recorded, so that kilograms are never mixed up with litres.
+
+DDA already holds this list, created without values. The values below are what this design contributes to it. CPG - Product Definition contributes the same values.
 
 | List | In DDA | Used for |
 |---|---|---|
-| <a id="lkp009"></a>LKP009 UniversalUnitOfMeasure | New | Event Batch Inputs |
+| <a id="lkp009"></a>LKP009 UniversalUnitOfMeasureCodes | [DLT000000156](https://datadesign.maoperatingsystem.com/models/lookup-types/DLT000000156) | Event Batch Inputs |
 
 | Value | Meaning |
 |---|---|
@@ -815,7 +817,8 @@ The unit a quantity is stated in, used wherever a quantity is recorded, so that 
 | **Gram**<br>G | Mass in grams. |
 | **Litre**<br>L | Volume in litres. |
 | **Millilitre**<br>ML | Volume in millilitres. |
-| **Each**<br>EA | A count of units. |
+| **Each**<br>EA | A count of items. |
+| **Per cent**<br>PCT | A share of the whole, in per cent. |
 | **Case**<br>CASE | A count of cases. |
 
 #### Event Dispositions Decision Type
@@ -978,7 +981,6 @@ Design choices that remain open.
 | DEC009 | Product is proposed both here and by CPG - Product Definition, because DDA's Products domain holds no concept. Which model creates it, and which refers to it? | CPG - Product Definition creates it · this model creates it |
 | DEC010 | DDA's Locations domain could not be read in full. Confirm it holds no concept for a place before the change package is applied. | confirmed none · reuse what is held |
 | DEC011 | Two years is the retention period given for traceability records. The rule's own text could not be read, so the period is unconfirmed. | keep two years · use the period in the rule |
-| DEC012 | The list of units of measure is proposed here as UniversalUnitOfMeasure and by CPG - Product Definition as UniversalUnitCodes. DDA holds neither. Which model creates the list, and under which name? | CPG - Product Definition creates it as UniversalUnitCodes, and this model uses it · this model creates it as UniversalUnitOfMeasure |
 
 ### 6.2 Where the design departs from DDA's principles
 
