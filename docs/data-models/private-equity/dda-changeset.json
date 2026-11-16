@@ -9,285 +9,6 @@
       "seq": 1,
       "op": "create",
       "entity": "lookupTypes",
-      "local_id": "LKP001",
-      "dda_id": null,
-      "fields": {
-        "lookup_type_code": "LegalEntityFundStrategyTypes",
-        "lookup_type_name": "LegalEntityFundStrategyTypes",
-        "lookup_type_description": "The list of investment strategies a fund can follow, as the sponsor's investors and regulators describe them. The chief financial officer of the funds decides what goes on it. It is not a classification of industries."
-      },
-      "depends_on": []
-    },
-    {
-      "seq": 2,
-      "op": "create",
-      "entity": "lookups",
-      "local_id": "LKP001.BUYOUT",
-      "dda_id": null,
-      "fields": {
-        "lookup_code": "BUYOUT",
-        "lookup_name": "Buyout",
-        "lookup_description": "Acquires control of established companies.",
-        "lookup_type": "LKP001"
-      },
-      "depends_on": [
-        1
-      ]
-    },
-    {
-      "seq": 3,
-      "op": "create",
-      "entity": "lookups",
-      "local_id": "LKP001.GROWTH",
-      "dda_id": null,
-      "fields": {
-        "lookup_code": "GROWTH",
-        "lookup_name": "Growth",
-        "lookup_description": "Takes minority or control stakes in growing companies.",
-        "lookup_type": "LKP001"
-      },
-      "depends_on": [
-        1
-      ]
-    },
-    {
-      "seq": 4,
-      "op": "create",
-      "entity": "lookups",
-      "local_id": "LKP001.VENTURE",
-      "dda_id": null,
-      "fields": {
-        "lookup_code": "VENTURE",
-        "lookup_name": "Venture",
-        "lookup_description": "Invests in early-stage companies.",
-        "lookup_type": "LKP001"
-      },
-      "depends_on": [
-        1
-      ]
-    },
-    {
-      "seq": 5,
-      "op": "create",
-      "entity": "lookups",
-      "local_id": "LKP001.CREDIT",
-      "dda_id": null,
-      "fields": {
-        "lookup_code": "CREDIT",
-        "lookup_name": "Private Credit",
-        "lookup_description": "Lends to companies.",
-        "lookup_type": "LKP001"
-      },
-      "depends_on": [
-        1
-      ]
-    },
-    {
-      "seq": 6,
-      "op": "create",
-      "entity": "lookups",
-      "local_id": "LKP001.INFRASTRUCTURE",
-      "dda_id": null,
-      "fields": {
-        "lookup_code": "INFRASTRUCTURE",
-        "lookup_name": "Infrastructure",
-        "lookup_description": "Invests in infrastructure assets.",
-        "lookup_type": "LKP001"
-      },
-      "depends_on": [
-        1
-      ]
-    },
-    {
-      "seq": 7,
-      "op": "create",
-      "entity": "lookups",
-      "local_id": "LKP001.REAL_ESTATE",
-      "dda_id": null,
-      "fields": {
-        "lookup_code": "REAL_ESTATE",
-        "lookup_name": "Real Estate",
-        "lookup_description": "Invests in property assets.",
-        "lookup_type": "LKP001"
-      },
-      "depends_on": [
-        1
-      ]
-    },
-    {
-      "seq": 8,
-      "op": "create",
-      "entity": "lookups",
-      "local_id": "LKP001.SECONDARIES",
-      "dda_id": null,
-      "fields": {
-        "lookup_code": "SECONDARIES",
-        "lookup_name": "Secondaries",
-        "lookup_description": "Buys existing interests in funds or assets.",
-        "lookup_type": "LKP001"
-      },
-      "depends_on": [
-        1
-      ]
-    },
-    {
-      "seq": 9,
-      "op": "create",
-      "entity": "lookups",
-      "local_id": "LKP001.FUND_OF_FUNDS",
-      "dda_id": null,
-      "fields": {
-        "lookup_code": "FUND_OF_FUNDS",
-        "lookup_name": "Fund of Funds",
-        "lookup_description": "Invests in other funds.",
-        "lookup_type": "LKP001"
-      },
-      "depends_on": [
-        1
-      ]
-    },
-    {
-      "seq": 10,
-      "op": "create",
-      "entity": "lookupTypes",
-      "local_id": "LKP002",
-      "dda_id": null,
-      "fields": {
-        "lookup_type_code": "LegalEntityPEInvestorControlTypes",
-        "lookup_type_name": "LegalEntityPEInvestorControlTypes",
-        "lookup_type_description": "The list of ways a holder relates to a company in which it has a stake: control, joint control, significant influence or a minority holding. The head of portfolio management decides what goes on it. It sits alongside the list LegalEntityRelationshipTypes and does not repeat it."
-      },
-      "depends_on": []
-    },
-    {
-      "seq": 11,
-      "op": "create",
-      "entity": "lookups",
-      "local_id": "LKP002.CONTROL",
-      "dda_id": null,
-      "fields": {
-        "lookup_code": "CONTROL",
-        "lookup_name": "Control",
-        "lookup_description": "The holder directs the company on its own.",
-        "lookup_type": "LKP002"
-      },
-      "depends_on": [
-        10
-      ]
-    },
-    {
-      "seq": 12,
-      "op": "create",
-      "entity": "lookups",
-      "local_id": "LKP002.JOINT_CONTROL",
-      "dda_id": null,
-      "fields": {
-        "lookup_code": "JOINT_CONTROL",
-        "lookup_name": "Joint Control",
-        "lookup_description": "The holder directs the company together with others.",
-        "lookup_type": "LKP002"
-      },
-      "depends_on": [
-        10
-      ]
-    },
-    {
-      "seq": 13,
-      "op": "create",
-      "entity": "lookups",
-      "local_id": "LKP002.SIGNIFICANT_INFLUENCE",
-      "dda_id": null,
-      "fields": {
-        "lookup_code": "SIGNIFICANT_INFLUENCE",
-        "lookup_name": "Significant Influence",
-        "lookup_description": "The holder influences the company without directing it.",
-        "lookup_type": "LKP002"
-      },
-      "depends_on": [
-        10
-      ]
-    },
-    {
-      "seq": 14,
-      "op": "create",
-      "entity": "lookups",
-      "local_id": "LKP002.MINORITY",
-      "dda_id": null,
-      "fields": {
-        "lookup_code": "MINORITY",
-        "lookup_name": "Minority",
-        "lookup_description": "A passive holding with no influence.",
-        "lookup_type": "LKP002"
-      },
-      "depends_on": [
-        10
-      ]
-    },
-    {
-      "seq": 15,
-      "op": "create",
-      "entity": "lookupTypes",
-      "local_id": "LKP003",
-      "dda_id": null,
-      "fields": {
-        "lookup_type_code": "LegalEntityFundParallelTypes",
-        "lookup_type_name": "LegalEntityFundParallelTypes",
-        "lookup_type_description": "The list of kinds of vehicle that invest alongside a fund: a parallel fund, an alternative investment vehicle and a co-investment vehicle. The general counsel decides what goes on it."
-      },
-      "depends_on": []
-    },
-    {
-      "seq": 16,
-      "op": "create",
-      "entity": "lookups",
-      "local_id": "LKP003.PARALLEL",
-      "dda_id": null,
-      "fields": {
-        "lookup_code": "PARALLEL",
-        "lookup_name": "Parallel Fund",
-        "lookup_description": "Invests side by side with the main fund on the same terms.",
-        "lookup_type": "LKP003"
-      },
-      "depends_on": [
-        15
-      ]
-    },
-    {
-      "seq": 17,
-      "op": "create",
-      "entity": "lookups",
-      "local_id": "LKP003.AIV",
-      "dda_id": null,
-      "fields": {
-        "lookup_code": "AIV",
-        "lookup_name": "Alternative Investment Vehicle",
-        "lookup_description": "Takes an investment the main fund cannot hold directly.",
-        "lookup_type": "LKP003"
-      },
-      "depends_on": [
-        15
-      ]
-    },
-    {
-      "seq": 18,
-      "op": "create",
-      "entity": "lookups",
-      "local_id": "LKP003.CO_INVEST",
-      "dda_id": null,
-      "fields": {
-        "lookup_code": "CO_INVEST",
-        "lookup_name": "Co-investment Vehicle",
-        "lookup_description": "Lets selected investors take a further share of one investment.",
-        "lookup_type": "LKP003"
-      },
-      "depends_on": [
-        15
-      ]
-    },
-    {
-      "seq": 19,
-      "op": "create",
-      "entity": "lookupTypes",
       "local_id": "LKP004",
       "dda_id": null,
       "fields": {
@@ -298,7 +19,7 @@
       "depends_on": []
     },
     {
-      "seq": 20,
+      "seq": 2,
       "op": "create",
       "entity": "lookups",
       "local_id": "LKP004.CAPITAL_CALL",
@@ -310,11 +31,11 @@
         "lookup_type": "LKP004"
       },
       "depends_on": [
-        19
+        1
       ]
     },
     {
-      "seq": 21,
+      "seq": 3,
       "op": "create",
       "entity": "lookups",
       "local_id": "LKP004.DISTRIBUTION",
@@ -326,11 +47,11 @@
         "lookup_type": "LKP004"
       },
       "depends_on": [
-        19
+        1
       ]
     },
     {
-      "seq": 22,
+      "seq": 4,
       "op": "create",
       "entity": "lookups",
       "local_id": "LKP004.ACQUISITION",
@@ -342,11 +63,11 @@
         "lookup_type": "LKP004"
       },
       "depends_on": [
-        19
+        1
       ]
     },
     {
-      "seq": 23,
+      "seq": 5,
       "op": "create",
       "entity": "lookups",
       "local_id": "LKP004.FOLLOW_ON",
@@ -358,11 +79,11 @@
         "lookup_type": "LKP004"
       },
       "depends_on": [
-        19
+        1
       ]
     },
     {
-      "seq": 24,
+      "seq": 6,
       "op": "create",
       "entity": "lookups",
       "local_id": "LKP004.PARTIAL_EXIT",
@@ -374,11 +95,11 @@
         "lookup_type": "LKP004"
       },
       "depends_on": [
-        19
+        1
       ]
     },
     {
-      "seq": 25,
+      "seq": 7,
       "op": "create",
       "entity": "lookups",
       "local_id": "LKP004.FULL_EXIT",
@@ -390,11 +111,11 @@
         "lookup_type": "LKP004"
       },
       "depends_on": [
-        19
+        1
       ]
     },
     {
-      "seq": 26,
+      "seq": 8,
       "op": "create",
       "entity": "lookups",
       "local_id": "LKP004.CONTINUATION_TRANSFER",
@@ -406,11 +127,11 @@
         "lookup_type": "LKP004"
       },
       "depends_on": [
-        19
+        1
       ]
     },
     {
-      "seq": 27,
+      "seq": 9,
       "op": "create",
       "entity": "lookupTypes",
       "local_id": "LKP005",
@@ -423,7 +144,7 @@
       "depends_on": []
     },
     {
-      "seq": 28,
+      "seq": 10,
       "op": "create",
       "entity": "lookups",
       "local_id": "LKP005.INVESTMENT",
@@ -435,11 +156,11 @@
         "lookup_type": "LKP005"
       },
       "depends_on": [
-        27
+        9
       ]
     },
     {
-      "seq": 29,
+      "seq": 11,
       "op": "create",
       "entity": "lookups",
       "local_id": "LKP005.MANAGEMENT_FEE",
@@ -451,11 +172,11 @@
         "lookup_type": "LKP005"
       },
       "depends_on": [
-        27
+        9
       ]
     },
     {
-      "seq": 30,
+      "seq": 12,
       "op": "create",
       "entity": "lookups",
       "local_id": "LKP005.FUND_EXPENSE",
@@ -467,11 +188,11 @@
         "lookup_type": "LKP005"
       },
       "depends_on": [
-        27
+        9
       ]
     },
     {
-      "seq": 31,
+      "seq": 13,
       "op": "create",
       "entity": "lookups",
       "local_id": "LKP005.RETURN_OF_CAPITAL",
@@ -483,11 +204,11 @@
         "lookup_type": "LKP005"
       },
       "depends_on": [
-        27
+        9
       ]
     },
     {
-      "seq": 32,
+      "seq": 14,
       "op": "create",
       "entity": "lookups",
       "local_id": "LKP005.REALISED_GAIN",
@@ -499,11 +220,11 @@
         "lookup_type": "LKP005"
       },
       "depends_on": [
-        27
+        9
       ]
     },
     {
-      "seq": 33,
+      "seq": 15,
       "op": "create",
       "entity": "lookups",
       "local_id": "LKP005.INCOME",
@@ -515,11 +236,11 @@
         "lookup_type": "LKP005"
       },
       "depends_on": [
-        27
+        9
       ]
     },
     {
-      "seq": 34,
+      "seq": 16,
       "op": "create",
       "entity": "lookups",
       "local_id": "LKP005.RECALLABLE",
@@ -531,11 +252,11 @@
         "lookup_type": "LKP005"
       },
       "depends_on": [
-        27
+        9
       ]
     },
     {
-      "seq": 35,
+      "seq": 17,
       "op": "create",
       "entity": "lookupTypes",
       "local_id": "LKP006",
@@ -548,7 +269,7 @@
       "depends_on": []
     },
     {
-      "seq": 36,
+      "seq": 18,
       "op": "create",
       "entity": "lookups",
       "local_id": "LKP006.L1",
@@ -560,11 +281,11 @@
         "lookup_type": "LKP006"
       },
       "depends_on": [
-        35
+        17
       ]
     },
     {
-      "seq": 37,
+      "seq": 19,
       "op": "create",
       "entity": "lookups",
       "local_id": "LKP006.L2",
@@ -576,11 +297,11 @@
         "lookup_type": "LKP006"
       },
       "depends_on": [
-        35
+        17
       ]
     },
     {
-      "seq": 38,
+      "seq": 20,
       "op": "create",
       "entity": "lookups",
       "local_id": "LKP006.L3",
@@ -592,11 +313,11 @@
         "lookup_type": "LKP006"
       },
       "depends_on": [
-        35
+        17
       ]
     },
     {
-      "seq": 39,
+      "seq": 21,
       "op": "create",
       "entity": "lookupTypes",
       "local_id": "LKP007",
@@ -609,7 +330,7 @@
       "depends_on": []
     },
     {
-      "seq": 40,
+      "seq": 22,
       "op": "create",
       "entity": "lookups",
       "local_id": "LKP007.CLOSING",
@@ -621,11 +342,11 @@
         "lookup_type": "LKP007"
       },
       "depends_on": [
-        39
+        21
       ]
     },
     {
-      "seq": 41,
+      "seq": 23,
       "op": "create",
       "entity": "lookups",
       "local_id": "LKP007.FAIR_VALUE",
@@ -637,11 +358,11 @@
         "lookup_type": "LKP007"
       },
       "depends_on": [
-        39
+        21
       ]
     },
     {
-      "seq": 42,
+      "seq": 24,
       "op": "create",
       "entity": "lookupTypes",
       "local_id": "LKP008",
@@ -654,7 +375,7 @@
       "depends_on": []
     },
     {
-      "seq": 43,
+      "seq": 25,
       "op": "create",
       "entity": "lookups",
       "local_id": "LKP008.NET_ASSET_VALUE",
@@ -666,11 +387,11 @@
         "lookup_type": "LKP008"
       },
       "depends_on": [
-        42
+        24
       ]
     },
     {
-      "seq": 44,
+      "seq": 26,
       "op": "create",
       "entity": "lookups",
       "local_id": "LKP008.EQUITY_VALUE",
@@ -682,11 +403,11 @@
         "lookup_type": "LKP008"
       },
       "depends_on": [
-        42
+        24
       ]
     },
     {
-      "seq": 45,
+      "seq": 27,
       "op": "create",
       "entity": "lookups",
       "local_id": "LKP008.ENTERPRISE_VALUE",
@@ -698,11 +419,11 @@
         "lookup_type": "LKP008"
       },
       "depends_on": [
-        42
+        24
       ]
     },
     {
-      "seq": 46,
+      "seq": 28,
       "op": "update",
       "entity": "lookupTypes",
       "local_id": "LKP009",
@@ -713,7 +434,7 @@
       "depends_on": []
     },
     {
-      "seq": 47,
+      "seq": 29,
       "op": "create",
       "entity": "lookups",
       "local_id": "LKP009.MANAGEMENT_COMPANY",
@@ -725,11 +446,11 @@
         "lookup_type": "DLT000000054"
       },
       "depends_on": [
-        46
+        28
       ]
     },
     {
-      "seq": 48,
+      "seq": 30,
       "op": "create",
       "entity": "lookups",
       "local_id": "LKP009.HOLDING_COMPANY",
@@ -741,11 +462,11 @@
         "lookup_type": "DLT000000054"
       },
       "depends_on": [
-        46
+        28
       ]
     },
     {
-      "seq": 49,
+      "seq": 31,
       "op": "create",
       "entity": "lookups",
       "local_id": "LKP009.SPV",
@@ -757,11 +478,11 @@
         "lookup_type": "DLT000000054"
       },
       "depends_on": [
-        46
+        28
       ]
     },
     {
-      "seq": 50,
+      "seq": 32,
       "op": "create",
       "entity": "lookups",
       "local_id": "LKP009.TAX_BLOCKER",
@@ -773,11 +494,11 @@
         "lookup_type": "DLT000000054"
       },
       "depends_on": [
-        46
+        28
       ]
     },
     {
-      "seq": 51,
+      "seq": 33,
       "op": "create",
       "entity": "lookups",
       "local_id": "LKP009.FUND_VEHICLE",
@@ -789,11 +510,11 @@
         "lookup_type": "DLT000000054"
       },
       "depends_on": [
-        46
+        28
       ]
     },
     {
-      "seq": 52,
+      "seq": 34,
       "op": "create",
       "entity": "lookups",
       "local_id": "LKP009.OPERATING_COMPANY",
@@ -805,56 +526,11 @@
         "lookup_type": "DLT000000054"
       },
       "depends_on": [
-        46
+        28
       ]
     },
     {
-      "seq": 53,
-      "op": "create",
-      "entity": "lookupTypes",
-      "local_id": "LKP015",
-      "dda_id": null,
-      "fields": {
-        "lookup_type_code": "LegalEntityTransactionPartySides",
-        "lookup_type_name": "LegalEntityTransactionPartySides",
-        "lookup_type_description": "The list saying which side of a transaction a party was on: it paid or it received. The chief financial officer of the funds decides what goes on it."
-      },
-      "depends_on": []
-    },
-    {
-      "seq": 54,
-      "op": "create",
-      "entity": "lookups",
-      "local_id": "LKP015.PAID",
-      "dda_id": null,
-      "fields": {
-        "lookup_code": "PAID",
-        "lookup_name": "Paid",
-        "lookup_description": "The party gave money, and received the holding if there was one.",
-        "lookup_type": "LKP015"
-      },
-      "depends_on": [
-        53
-      ]
-    },
-    {
-      "seq": 55,
-      "op": "create",
-      "entity": "lookups",
-      "local_id": "LKP015.RECEIVED",
-      "dda_id": null,
-      "fields": {
-        "lookup_code": "RECEIVED",
-        "lookup_name": "Received",
-        "lookup_description": "The party took money, and gave up the holding if there was one.",
-        "lookup_type": "LKP015"
-      },
-      "depends_on": [
-        53
-      ]
-    },
-    {
-      "seq": 56,
+      "seq": 35,
       "op": "update",
       "entity": "concepts",
       "local_id": "SBJ003",
@@ -866,7 +542,7 @@
       "depends_on": []
     },
     {
-      "seq": 57,
+      "seq": 36,
       "op": "update",
       "entity": "concepts",
       "local_id": "SBJ007",
@@ -878,44 +554,38 @@
       "depends_on": []
     },
     {
-      "seq": 58,
-      "op": "create",
-      "entity": "concepts",
-      "local_id": "SBJ008",
-      "dda_id": null,
-      "fields": {
-        "concept_code": "Transaction",
-        "concept_name": "Transaction",
-        "concept_description": "There is one of these for each time money or a holding moved between parties in a single event, such as a capital call, a distribution, an acquisition, a follow-on investment, a partial or full exit, or a transfer to a continuation vehicle. If you need to know what happened on a date, what kind of event it was and who paid or received what, this is what you go by. It does not hold a fund's position, which is worked out from all of its transactions.",
-        "concept_parent": "DMC000000100",
-        "concept_is_domain": "DMD000000022"
-      },
-      "depends_on": []
-    },
-    {
-      "seq": 59,
-      "op": "create",
+      "seq": 37,
+      "op": "update",
       "entity": "concepts",
       "local_id": "SBJ009",
-      "dda_id": null,
+      "dda_id": "DMC000000030",
       "fields": {
-        "concept_code": "Valuation",
-        "concept_name": "Valuation",
         "concept_description": "There is one of these for each valuation of a legal entity as at a date and on a named measure of value. In this structure it holds the net asset value of a fund and the equity value or enterprise value of a portfolio company or vehicle. If you need the value of a fund or a company at a reporting date, this is what you go by. A new valuation does not replace an earlier one, because each is kept for its own date. It is a view taken on a date and not a movement of money, so it is not a transaction. It is the value of the whole body and not the value of one fund's holding in it, which is the price per unit multiplied by the units held, and it is not the fair value of a single instrument, which is held with the instrument's price.",
-        "concept_parent": "DMC000000100",
-        "concept_is_domain": "DMD000000022"
+        "concept_parent_rel": null
       },
       "depends_on": []
     },
     {
-      "seq": 60,
+      "seq": 38,
+      "op": "update",
+      "entity": "concepts",
+      "local_id": "SBJ010",
+      "dda_id": "DMC000000032",
+      "fields": {
+        "concept_description": "There is one of these for each movement of money or of a holding within a transaction, for one party and one purpose. If you need to know who paid or received what, in which currency, for which instrument and how many units, and when it settled, this is what you go by. A capital call has one leg for each investor. It is not the transaction itself, which holds what the event was and when it took place.",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 39,
       "op": "update",
       "entity": "relationships",
       "local_id": "REL001",
       "dda_id": "DMR000000001",
       "fields": {
         "relationship_code": "LegalEntityFundManagedBy",
-        "relationship_description": "A fund is managed by a general partner or manager for as long as the arrangement lasts, and a fund has one manager at a time, so the periods of its managers do not overlap. It holds the facts about the fund that belong to neither body alone: its vintage year, strategy, reporting currency, domicile, target size, final close date and the end of its investment period. If the manager of a fund is replaced, these facts are repeated on the new arrangement. It is not the fund's limited partners, who are linked by commitments.",
+        "relationship_description": "A fund is managed by a general partner or manager for as long as the arrangement lasts, and a fund has one manager at a time, so the periods of its managers do not overlap. It holds nothing about the fund itself: the facts of the fund, such as its vintage year, strategy, currency and domicile, stay with the fund when its manager is replaced. It is not the fund's limited partners, who are linked by commitments.",
         "relationship_forward_verb": "Is Managed By",
         "relationship_inverse_verb": "Manages",
         "relationship_source_role": "Fund",
@@ -930,7 +600,7 @@
       "depends_on": []
     },
     {
-      "seq": 61,
+      "seq": 40,
       "op": "update",
       "entity": "relationships",
       "local_id": "REL002",
@@ -952,7 +622,7 @@
       "depends_on": []
     },
     {
-      "seq": 62,
+      "seq": 41,
       "op": "update",
       "entity": "relationships",
       "local_id": "REL003",
@@ -974,7 +644,7 @@
       "depends_on": []
     },
     {
-      "seq": 63,
+      "seq": 42,
       "op": "create",
       "entity": "relationships",
       "local_id": "REL004",
@@ -996,14 +666,14 @@
       "depends_on": []
     },
     {
-      "seq": 64,
+      "seq": 43,
       "op": "update",
       "entity": "relationships",
       "local_id": "REL005",
       "dda_id": "DMR000000037",
       "fields": {
         "relationship_code": "LegalEntityTransactionParty",
-        "relationship_description": "A legal entity takes part in a transaction as a party to it, whether it pays or receives: the limited partner paying into a capital call, the fund receiving it, the fund paying for an acquisition, or the seller receiving the price. A transaction has several parties and a legal entity takes part in many transactions. Each party's record says whether it paid or received, the amount for each stated purpose and, where an instrument changed hands, the number of units. The date and currency belong to the transaction. It does not say which account the money passed through.",
+        "relationship_description": "A legal entity takes part in a transaction as a party to it, whether it pays or receives: the limited partner paying into a capital call, the fund receiving it, the fund paying for an acquisition, or the seller receiving the price. A transaction has several parties and a legal entity takes part in many transactions. The amount, purpose, direction and units for each party are held on the legs of the transaction. The date belongs to the transaction.",
         "relationship_forward_verb": "Is Party To",
         "relationship_inverse_verb": "Has Party",
         "relationship_source_role": "Transaction Party",
@@ -1018,7 +688,7 @@
       "depends_on": []
     },
     {
-      "seq": 65,
+      "seq": 44,
       "op": "create",
       "entity": "relationships",
       "local_id": "REL007",
@@ -1040,7 +710,7 @@
       "depends_on": []
     },
     {
-      "seq": 66,
+      "seq": 45,
       "op": "update",
       "entity": "relationships",
       "local_id": "REL008",
@@ -1062,7 +732,7 @@
       "depends_on": []
     },
     {
-      "seq": 67,
+      "seq": 46,
       "op": "update",
       "entity": "relationships",
       "local_id": "REL009",
@@ -1084,134 +754,7 @@
       "depends_on": []
     },
     {
-      "seq": 68,
-      "op": "create",
-      "entity": "attributes",
-      "local_id": "ATR001",
-      "dda_id": null,
-      "fields": {
-        "attribute_code": "LegalEntityFundManagedByVintageYear",
-        "attribute_fqn_name": "LegalEntityFundManagedByVintageYear",
-        "attribute_description": "The year in which the fund first took in investors' money. It is the year investors compare funds by, and it does not change after the first close.",
-        "attribute_type": "INTEGER",
-        "attribute_lookup_type": null,
-        "attribute_relationship": "DMR000000001"
-      },
-      "depends_on": [
-        60
-      ]
-    },
-    {
-      "seq": 69,
-      "op": "create",
-      "entity": "attributes",
-      "local_id": "ATR002",
-      "dda_id": null,
-      "fields": {
-        "attribute_code": "LegalEntityFundManagedByStrategyType",
-        "attribute_fqn_name": "LegalEntityFundManagedByStrategyType",
-        "attribute_description": "The investment strategy the fund follows, taken from the agreed list. It says what kind of investing the fund does, not which industries it targets.",
-        "attribute_type": "LOOKUP",
-        "attribute_lookup_type": "LKP001",
-        "attribute_relationship": "DMR000000001"
-      },
-      "depends_on": [
-        1,
-        60
-      ]
-    },
-    {
-      "seq": 70,
-      "op": "create",
-      "entity": "attributes",
-      "local_id": "ATR003",
-      "dda_id": null,
-      "fields": {
-        "attribute_code": "LegalEntityFundManagedByCurrency",
-        "attribute_fqn_name": "LegalEntityFundManagedByCurrency",
-        "attribute_description": "The currency in which the fund keeps its books and reports to investors.",
-        "attribute_type": "LOOKUP",
-        "attribute_lookup_type": "DLT000000072",
-        "attribute_relationship": "DMR000000001"
-      },
-      "depends_on": [
-        60
-      ]
-    },
-    {
-      "seq": 71,
-      "op": "create",
-      "entity": "attributes",
-      "local_id": "ATR004",
-      "dda_id": null,
-      "fields": {
-        "attribute_code": "LegalEntityFundManagedByDomicile",
-        "attribute_fqn_name": "LegalEntityFundManagedByDomicile",
-        "attribute_description": "The country in which the fund is established. Regulators ask for it, and it is not the country of the manager.",
-        "attribute_type": "LOOKUP",
-        "attribute_lookup_type": "DLT000000071",
-        "attribute_relationship": "DMR000000001"
-      },
-      "depends_on": [
-        60
-      ]
-    },
-    {
-      "seq": 72,
-      "op": "create",
-      "entity": "attributes",
-      "local_id": "ATR005",
-      "dda_id": null,
-      "fields": {
-        "attribute_code": "LegalEntityFundManagedByTargetSize",
-        "attribute_fqn_name": "LegalEntityFundManagedByTargetSize",
-        "attribute_description": "The amount of commitments the manager set out to raise for the fund, in the fund's reporting currency. It is not the commitments actually received.",
-        "attribute_type": "CURRENCY",
-        "attribute_lookup_type": null,
-        "attribute_relationship": "DMR000000001"
-      },
-      "depends_on": [
-        60
-      ]
-    },
-    {
-      "seq": 73,
-      "op": "create",
-      "entity": "attributes",
-      "local_id": "ATR006",
-      "dda_id": null,
-      "fields": {
-        "attribute_code": "LegalEntityFundManagedByFinalCloseDate",
-        "attribute_fqn_name": "LegalEntityFundManagedByFinalCloseDate",
-        "attribute_description": "The date on which the fund stopped accepting new investors. Investors who joined at earlier closes are measured from their own commitment dates.",
-        "attribute_type": "DATE",
-        "attribute_lookup_type": null,
-        "attribute_relationship": "DMR000000001"
-      },
-      "depends_on": [
-        60
-      ]
-    },
-    {
-      "seq": 74,
-      "op": "create",
-      "entity": "attributes",
-      "local_id": "ATR007",
-      "dda_id": null,
-      "fields": {
-        "attribute_code": "LegalEntityFundManagedByInvestmentPeriodEndDate",
-        "attribute_fqn_name": "LegalEntityFundManagedByInvestmentPeriodEndDate",
-        "attribute_description": "The date on which the fund stops making new investments under its terms. Follow-on investments may continue after it.",
-        "attribute_type": "DATE",
-        "attribute_lookup_type": null,
-        "attribute_relationship": "DMR000000001"
-      },
-      "depends_on": [
-        60
-      ]
-    },
-    {
-      "seq": 75,
+      "seq": 47,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR008",
@@ -1221,16 +764,15 @@
         "attribute_fqn_name": "LegalEntityPEInvestorControlType",
         "attribute_description": "How the holder relates to the company it has a stake in: control, joint control, significant influence or minority, taken from the agreed list.",
         "attribute_type": "LOOKUP",
-        "attribute_lookup_type": "LKP002",
+        "attribute_lookup_type": "DLT000000110",
         "attribute_relationship": "DMR000000002"
       },
       "depends_on": [
-        10,
-        62
+        41
       ]
     },
     {
-      "seq": 76,
+      "seq": 48,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR009",
@@ -1244,11 +786,11 @@
         "attribute_relationship": "DMR000000002"
       },
       "depends_on": [
-        62
+        41
       ]
     },
     {
-      "seq": 77,
+      "seq": 49,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR010",
@@ -1262,11 +804,11 @@
         "attribute_relationship": "DMR000000002"
       },
       "depends_on": [
-        62
+        41
       ]
     },
     {
-      "seq": 78,
+      "seq": 50,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR014",
@@ -1276,71 +818,34 @@
         "attribute_fqn_name": "LegalEntityFundParallelsType",
         "attribute_description": "The kind of the side vehicle in the link: a parallel fund, an alternative investment vehicle or a co-investment vehicle. Where the link joins two funds of equal standing, it is a parallel fund.",
         "attribute_type": "LOOKUP",
-        "attribute_lookup_type": "LKP003",
+        "attribute_lookup_type": "DLT000000111",
         "attribute_relationship": "REL004"
       },
       "depends_on": [
-        15,
-        63
+        42
       ]
     },
     {
-      "seq": 79,
-      "op": "create",
-      "entity": "attributes",
-      "local_id": "ATR015",
-      "dda_id": null,
-      "fields": {
-        "attribute_code": "LegalEntityTransactionPartyAmount",
-        "attribute_fqn_name": "LegalEntityTransactionPartyAmount",
-        "attribute_description": "The money this party paid or received in the transaction for the stated purpose, in the transaction's currency. A party taking part for several purposes has one amount for each. The side says whether it was paid or received.",
-        "attribute_type": "CURRENCY",
-        "attribute_lookup_type": null,
-        "attribute_relationship": "DMR000000037"
-      },
-      "depends_on": [
-        64
-      ]
-    },
-    {
-      "seq": 80,
+      "seq": 51,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR016",
       "dda_id": null,
       "fields": {
-        "attribute_code": "LegalEntityTransactionPartyComponent",
-        "attribute_fqn_name": "LegalEntityTransactionPartyComponent",
-        "attribute_description": "The purpose for which this party paid or received, such as investment, management fee, fund expense, return of capital, realised gain or income, taken from the agreed list.",
+        "attribute_code": "TransactionLegComponent",
+        "attribute_fqn_name": "TransactionLegComponent",
+        "attribute_description": "The purpose for which the money moves, such as investment, management fee, fund expense, return of capital, realised gain or income, taken from the agreed list. It is what lets one party take part for several purposes.",
         "attribute_type": "LOOKUP",
         "attribute_lookup_type": "LKP005",
-        "attribute_relationship": "DMR000000037"
+        "attribute_concept": "DMC000000032"
       },
       "depends_on": [
-        27,
-        64
+        9,
+        38
       ]
     },
     {
-      "seq": 81,
-      "op": "create",
-      "entity": "attributes",
-      "local_id": "ATR017",
-      "dda_id": null,
-      "fields": {
-        "attribute_code": "LegalEntityTransactionPartyQuantity",
-        "attribute_fqn_name": "LegalEntityTransactionPartyQuantity",
-        "attribute_description": "The number of units of the instrument this party received for its payment, or gave up for its receipt. It is blank for a capital call or a distribution.",
-        "attribute_type": "FLOAT",
-        "attribute_lookup_type": null,
-        "attribute_relationship": "DMR000000037"
-      },
-      "depends_on": [
-        64
-      ]
-    },
-    {
-      "seq": 82,
+      "seq": 52,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR021",
@@ -1351,87 +856,14 @@
         "attribute_description": "What kind of event this was, such as a capital call, a distribution or an acquisition, taken from the agreed list.",
         "attribute_type": "LOOKUP",
         "attribute_lookup_type": "LKP004",
-        "attribute_concept": "SBJ008"
+        "attribute_concept": "DMC000000031"
       },
       "depends_on": [
-        19,
-        58
+        1
       ]
     },
     {
-      "seq": 83,
-      "op": "create",
-      "entity": "attributes",
-      "local_id": "ATR022",
-      "dda_id": null,
-      "fields": {
-        "attribute_code": "TransactionDate",
-        "attribute_fqn_name": "TransactionDate",
-        "attribute_description": "The date on which the event took effect. Questions about what a fund held on a date use this date.",
-        "attribute_type": "DATE",
-        "attribute_lookup_type": null,
-        "attribute_concept": "SBJ008"
-      },
-      "depends_on": [
-        58
-      ]
-    },
-    {
-      "seq": 84,
-      "op": "create",
-      "entity": "attributes",
-      "local_id": "ATR023",
-      "dda_id": null,
-      "fields": {
-        "attribute_code": "TransactionSettlementDate",
-        "attribute_fqn_name": "TransactionSettlementDate",
-        "attribute_description": "The date on which the money actually moved, where it differs from the date the event took effect.",
-        "attribute_type": "DATE",
-        "attribute_lookup_type": null,
-        "attribute_concept": "SBJ008"
-      },
-      "depends_on": [
-        58
-      ]
-    },
-    {
-      "seq": 85,
-      "op": "create",
-      "entity": "attributes",
-      "local_id": "ATR024",
-      "dda_id": null,
-      "fields": {
-        "attribute_code": "TransactionCurrency",
-        "attribute_fqn_name": "TransactionCurrency",
-        "attribute_description": "The currency in which every amount on the transaction is stated, so that amounts paid and received by different parties can be added together.",
-        "attribute_type": "LOOKUP",
-        "attribute_lookup_type": "DLT000000072",
-        "attribute_concept": "SBJ008"
-      },
-      "depends_on": [
-        58
-      ]
-    },
-    {
-      "seq": 86,
-      "op": "create",
-      "entity": "attributes",
-      "local_id": "ATR025",
-      "dda_id": null,
-      "fields": {
-        "attribute_code": "TransactionStatus",
-        "attribute_fqn_name": "TransactionStatus",
-        "attribute_description": "Whether the transaction is active, still being drafted or no longer in force.",
-        "attribute_type": "LOOKUP",
-        "attribute_lookup_type": "DLT000000067",
-        "attribute_concept": "SBJ008"
-      },
-      "depends_on": [
-        58
-      ]
-    },
-    {
-      "seq": 87,
+      "seq": 53,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR026",
@@ -1445,11 +877,11 @@
         "attribute_concept": "DMC000000128"
       },
       "depends_on": [
-        57
+        36
       ]
     },
     {
-      "seq": 88,
+      "seq": 54,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR027",
@@ -1463,11 +895,11 @@
         "attribute_concept": "DMC000000128"
       },
       "depends_on": [
-        57
+        36
       ]
     },
     {
-      "seq": 89,
+      "seq": 55,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR028",
@@ -1481,12 +913,12 @@
         "attribute_concept": "DMC000000128"
       },
       "depends_on": [
-        35,
-        57
+        17,
+        36
       ]
     },
     {
-      "seq": 90,
+      "seq": 56,
       "op": "update",
       "entity": "attributes",
       "local_id": "ATR029",
@@ -1500,12 +932,12 @@
         "attribute_concept": "DMC000000128"
       },
       "depends_on": [
-        39,
-        57
+        21,
+        36
       ]
     },
     {
-      "seq": 91,
+      "seq": 57,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR036",
@@ -1516,88 +948,15 @@
         "attribute_description": "The measure on which the value was struck, such as net asset value, equity value or enterprise value, taken from the agreed list. Two values on different measures are never compared as like for like.",
         "attribute_type": "LOOKUP",
         "attribute_lookup_type": "LKP008",
-        "attribute_concept": "SBJ009"
+        "attribute_concept": "DMC000000030"
       },
       "depends_on": [
-        42,
-        59
+        24,
+        37
       ]
     },
     {
-      "seq": 92,
-      "op": "create",
-      "entity": "attributes",
-      "local_id": "ATR037",
-      "dda_id": null,
-      "fields": {
-        "attribute_code": "ValuationDate",
-        "attribute_fqn_name": "ValuationDate",
-        "attribute_description": "The date as at which the valuation applies. A value has no meaning without the date it was struck, and later valuations do not replace earlier ones.",
-        "attribute_type": "DATE",
-        "attribute_lookup_type": null,
-        "attribute_concept": "SBJ009"
-      },
-      "depends_on": [
-        59
-      ]
-    },
-    {
-      "seq": 93,
-      "op": "create",
-      "entity": "attributes",
-      "local_id": "ATR038",
-      "dda_id": null,
-      "fields": {
-        "attribute_code": "ValuationAmount",
-        "attribute_fqn_name": "ValuationAmount",
-        "attribute_description": "The value placed on the legal entity on the valuation date and measure, in the valuation currency.",
-        "attribute_type": "FLOAT",
-        "attribute_lookup_type": null,
-        "attribute_concept": "SBJ009"
-      },
-      "depends_on": [
-        59
-      ]
-    },
-    {
-      "seq": 94,
-      "op": "create",
-      "entity": "attributes",
-      "local_id": "ATR039",
-      "dda_id": null,
-      "fields": {
-        "attribute_code": "ValuationCurrency",
-        "attribute_fqn_name": "ValuationCurrency",
-        "attribute_description": "The currency in which the valuation is stated, so that values struck at different dates can be compared.",
-        "attribute_type": "LOOKUP",
-        "attribute_lookup_type": "DLT000000072",
-        "attribute_concept": "SBJ009"
-      },
-      "depends_on": [
-        59
-      ]
-    },
-    {
-      "seq": 95,
-      "op": "create",
-      "entity": "attributes",
-      "local_id": "ATR041",
-      "dda_id": null,
-      "fields": {
-        "attribute_code": "LegalEntityTransactionPartySide",
-        "attribute_fqn_name": "LegalEntityTransactionPartySide",
-        "attribute_description": "Whether this party paid or received in the transaction, taken from the agreed list. It is what lets one relationship serve both sides of the movement.",
-        "attribute_type": "LOOKUP",
-        "attribute_lookup_type": "LKP015",
-        "attribute_relationship": "DMR000000037"
-      },
-      "depends_on": [
-        53,
-        64
-      ]
-    },
-    {
-      "seq": 96,
+      "seq": 58,
       "op": "retire",
       "entity": "concepts",
       "local_id": "RETIRE.DMC000000112",
@@ -1609,7 +968,7 @@
       "depends_on": []
     },
     {
-      "seq": 97,
+      "seq": 59,
       "op": "retire",
       "entity": "roles",
       "local_id": "RETIRE.DMO000000019",
@@ -1621,7 +980,7 @@
       "depends_on": []
     },
     {
-      "seq": 98,
+      "seq": 60,
       "op": "retire",
       "entity": "attributes",
       "local_id": "RETIRE.DMA000000698",
@@ -1633,7 +992,7 @@
       "depends_on": []
     },
     {
-      "seq": 99,
+      "seq": 61,
       "op": "retire",
       "entity": "attributes",
       "local_id": "RETIRE.DMA000000697",
@@ -1645,7 +1004,7 @@
       "depends_on": []
     },
     {
-      "seq": 100,
+      "seq": 62,
       "op": "retire",
       "entity": "attributes",
       "local_id": "RETIRE.DMA000000699",
@@ -1657,7 +1016,7 @@
       "depends_on": []
     },
     {
-      "seq": 101,
+      "seq": 63,
       "op": "retire",
       "entity": "attributes",
       "local_id": "RETIRE.DMA000000696",

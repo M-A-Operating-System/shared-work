@@ -518,7 +518,7 @@
         "domains": 3,
         "roles": 10,
         "relationships": 8,
-        "concepts": 8,
+        "concepts": 9,
         "attributes": 38,
         "lookups": 15
       },
@@ -546,7 +546,7 @@
         "domains": 3,
         "roles": 10,
         "relationships": 8,
-        "concepts": 8,
+        "concepts": 9,
         "attributes": 38,
         "lookups": 15
       },
@@ -560,7 +560,7 @@
         "domains": 3,
         "roles": 10,
         "relationships": 8,
-        "concepts": 8,
+        "concepts": 9,
         "attributes": 38,
         "lookups": 15
       },
@@ -763,10 +763,10 @@
         "Amounts move to a concept for each party's share of a transaction"
       ],
       "raised_at_pass": 1,
-      "status": "open",
-      "decision": "",
-      "by": "",
-      "date": ""
+      "status": "decided",
+      "decision": "Amounts, purpose, direction and units are held on the transaction legs, as DDA already holds them; the DDA description of the transaction party relationship stands.",
+      "by": "Andrew Bush",
+      "date": "2026-11-16"
     },
     {
       "id": "DEC005",

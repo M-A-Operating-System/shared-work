@@ -46,9 +46,9 @@
         "definition": "Invests in other funds."
       }
     ],
-    "dda_action": "create",
-    "dda_id": null,
-    "reuse_search": "Searched DDA lookup types (72): none lists fund strategies. Instrument and industry lists describe other things.",
+    "dda_action": "reuse",
+    "dda_id": "DLT000000109",
+    "reuse_search": "Searched DDA lookup types: DLT000000109 already holds this list.",
     "data_requirement_ids": [
       "DRQ001"
     ],
@@ -86,9 +86,9 @@
         "definition": "A passive holding with no influence."
       }
     ],
-    "dda_action": "create",
-    "dda_id": null,
-    "reuse_search": "Searched DDA lookup types: LegalEntityRelationshipTypes DLT000000061 holds Parent and Minority but states it is superseded by relationship records.",
+    "dda_action": "reuse",
+    "dda_id": "DLT000000110",
+    "reuse_search": "Searched DDA lookup types: DLT000000110 already holds this list.",
     "data_requirement_ids": [
       "DRQ006"
     ],
@@ -121,9 +121,9 @@
         "definition": "Lets selected investors take a further share of one investment."
       }
     ],
-    "dda_action": "create",
-    "dda_id": null,
-    "reuse_search": "Searched DDA lookup types: none lists side-by-side vehicle kinds.",
+    "dda_action": "reuse",
+    "dda_id": "DLT000000111",
+    "reuse_search": "Searched DDA lookup types: DLT000000111 already holds this list.",
     "data_requirement_ids": [
       "DRQ003"
     ],
@@ -2681,24 +2681,24 @@
   },
   {
     "id": "LKP015",
-    "code": "LegalEntityTransactionPartySides",
-    "definition": "The list saying which side of a transaction a party was on: it paid or it received. The chief financial officer of the funds decides what goes on it.",
+    "code": "TransactionLegDirectionTypes",
+    "definition": "The list saying which way a leg moves, into the account or out of it. The chief financial officer of the funds decides what goes on it.",
     "scope": "concept",
     "values": [
       {
-        "code": "PAID",
-        "name": "Paid",
-        "definition": "The party gave money, and received the holding if there was one."
+        "code": "In",
+        "name": "In",
+        "definition": "The leg moves money or a holding into the account."
       },
       {
-        "code": "RECEIVED",
-        "name": "Received",
-        "definition": "The party took money, and gave up the holding if there was one."
+        "code": "Out",
+        "name": "Out",
+        "definition": "The leg moves money or a holding out of the account."
       }
     ],
-    "dda_action": "create",
-    "dda_id": null,
-    "reuse_search": "Searched DDA lookup types: none lists the side of a party to a transaction.",
+    "dda_action": "reuse",
+    "dda_id": "DLT000000117",
+    "reuse_search": "Searched DDA lookup types: DLT000000117 already lists the direction of a leg (In, Out).",
     "data_requirement_ids": [
       "DRQ005",
       "DRQ007"

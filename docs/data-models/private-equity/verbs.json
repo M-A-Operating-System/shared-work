@@ -27,7 +27,7 @@
     ],
     "status": "active",
     "withdrawn_reason": null,
-    "definition": "A fund is managed by a general partner or manager for as long as the arrangement lasts, and a fund has one manager at a time, so the periods of its managers do not overlap. It holds the facts about the fund that belong to neither body alone: its vintage year, strategy, reporting currency, domicile, target size, final close date and the end of its investment period. If the manager of a fund is replaced, these facts are repeated on the new arrangement. It is not the fund's limited partners, who are linked by commitments.",
+    "definition": "A fund is managed by a general partner or manager for as long as the arrangement lasts, and a fund has one manager at a time, so the periods of its managers do not overlap. It holds nothing about the fund itself: the facts of the fund, such as its vintage year, strategy, currency and domicile, stay with the fund when its manager is replaced. It is not the fund's limited partners, who are linked by commitments.",
     "mirror_override": null
   },
   {
@@ -151,7 +151,7 @@
     ],
     "status": "active",
     "withdrawn_reason": null,
-    "definition": "A legal entity takes part in a transaction as a party to it, whether it pays or receives: the limited partner paying into a capital call, the fund receiving it, the fund paying for an acquisition, or the seller receiving the price. A transaction has several parties and a legal entity takes part in many transactions. Each party's record says whether it paid or received, the amount for each stated purpose and, where an instrument changed hands, the number of units. The date and currency belong to the transaction. It does not say which account the money passed through.",
+    "definition": "A legal entity takes part in a transaction as a party to it, whether it pays or receives: the limited partner paying into a capital call, the fund receiving it, the fund paying for an acquisition, or the seller receiving the price. A transaction has several parties and a legal entity takes part in many transactions. The amount, purpose, direction and units for each party are held on the legs of the transaction. The date belongs to the transaction.",
     "mirror_override": "TransactionLegalEntityParties"
   },
   {
