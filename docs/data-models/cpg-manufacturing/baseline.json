@@ -1,5 +1,5 @@
 {
-  "retrieved": "2026-09-28T13:50:00Z",
+  "retrieved": "2026-11-16T12:30:00Z",
   "apply_mode": "web-ui",
   "prefixes": [
     "DMA",
@@ -59,7 +59,7 @@
       "code": "LegalEntities",
       "prefix": "LEG",
       "name": "Legal Entities (incl. Relationships, Companies, Funds, Charities, Governments, Agencies etc.)",
-      "definition": "The LegalEntities (aka Party, Entities, Business Entities, Company) Domain defines the different entities that are involved in business transactions, services, or other processes in any capacity including trades/transactions, banking, ownership, governance, regulatory, advisory or otherwise, including:\n- Legal entities in general\n- Internal corporate structural entities that relate to internal, ownership and control, including primary executive roles for businesses - ie Branches, Subsidiaries and Affiliates\n- Functional entities such as governments and government entities, oversight bodies and rul issuing agencies, non-governmental organizations, international organizations,\n- not-for-profits organizations charities etc.\n- Other legal structures such as partnerships, private limited companies, sole proprietorships, and trusts etc.\n\nOptionally this domain can include data relating to people as records as they play a similar role to an entity in business transactions. In Relationship Management situations it may also be convenient to establish \"\"People\"\" as a separate domain. "
+      "definition": "Legal Entities — organisations, funds, and counterparties relevant to M&A and investment activity, including their financial statements, registrations, and compliance status."
     },
     {
       "dda_id": "DMD000000015",
@@ -97,13 +97,6 @@
       "definition": "The Documents Domain contains records that provide documentary evidence or support for business processes including Legal, Transactional, Regulatory, Identification and Commercial.  Centrally managing Document data is useful when multiple business processes refer to the same document and the correct data/information maintained within the Document needs to be represented in a machine readable form that can be leveraged as structured data within a business process.\n"
     },
     {
-      "dda_id": "DMD000000024",
-      "code": "Governance",
-      "prefix": "GOV",
-      "name": "Governance",
-      "definition": "The Governance Domain is a suite of data elements associated with ensuring correct and complete data Governance"
-    },
-    {
       "dda_id": "DMD000000030",
       "code": "Metrics",
       "prefix": "KPI",
@@ -137,6 +130,13 @@
       "prefix": "LOC",
       "name": "Locations",
       "definition": "The Locations Domain (aka Place, Site, Venue, Facility, Point of Interest) defines all physical points on earth that an organization needs to identify, reference, or track for any purpose, including places at which the organization operates, conducts business, stores inventory, serves customers, or delivers services; places visited by customers, employees, or counterparties in the course of business activity; points of interest relevant to the organization's market, territory, or operational context; and any other named or identifiable physical location that requires a governed master record. Every location record represents a specific, identifiable point on earth defined by its geospatial coordinates and physical address, and may optionally carry a named place designation, a site classification, and operational attributes such as trading hours, capacity, and service capabilities. A location may be organized hierarchically for reporting and operational purposes — grouping individual points into sites, sites into markets, and markets into regions — and this hierarchy is a self-referential relationship within this domain where a Location record points up to its immediate parent grouping."
+    },
+    {
+      "dda_id": "DMD000000038",
+      "code": "Accounts",
+      "prefix": "ACC",
+      "name": "Accounts",
+      "definition": "An account is an accounting ledger. It holds a balance of something as the result of transactions, and that balance usually has a value in financial terms. This domain describes the ledgers themselves: what each one is, who owns it, which institution holds it, and whether it is open or closed. It does not store the balance. A balance is worked out from the transactions recorded against the account whenever it is asked for, so it always agrees with the transaction record. A customer or client organisation in a sales or relationship system is not an account in this sense and belongs with Legal Entities. A user's login is not an account here either."
     }
   ],
   "standards": [
@@ -524,7 +524,7 @@
     },
     {
       "dda_id": "DLT000000037",
-      "code": "UniversalRatingAgencies",
+      "code": "UniversalRatingAgencyTypes",
       "active": true
     },
     {
@@ -649,7 +649,7 @@
     },
     {
       "dda_id": "DLT000000062",
-      "code": "LegalEntityRoleType",
+      "code": "LegalEntityRoleTypes",
       "active": true
     },
     {
@@ -659,9 +659,8 @@
     },
     {
       "dda_id": "DLT000000064",
-      "code": "MasterCrossRefTypes",
-      "active": true,
-      "description": "MasterCrossRefTypes provides information on the type of identifier being managed. Examples include tickers, SEDOLS, ISINS etc"
+      "code": "LegalEntityIdentifierTypes",
+      "active": true
     },
     {
       "dda_id": "DLT000000065",
@@ -696,8 +695,7 @@
     {
       "dda_id": "DLT000000071",
       "code": "UniversalCountryCodes",
-      "active": true,
-      "description": "We use the ISO3166 3-Letter country codes as our Golden Copy recomendation. The purpose of ISO 3166 is to define internationally recognized codes of letters and/or numbers that we can use when we refer to countries and their subdivisions. However, it does not define the names of countries � this information comes from United Nations sources (Terminology Bulletin Country Names and the Country and Region Codes for Statistical Use maintained by the United Nations Statistics Divisions)."
+      "active": true
     },
     {
       "dda_id": "DLT000000072",
@@ -771,7 +769,7 @@
     },
     {
       "dda_id": "DLT000000086",
-      "code": "PersonAlternativeNameType",
+      "code": "PersonAlternateNameTypes",
       "active": true
     },
     {
@@ -831,7 +829,7 @@
     },
     {
       "dda_id": "DLT000000099",
-      "code": "PersonRoles",
+      "code": "PersonRoleTypes",
       "active": true
     },
     {
@@ -841,7 +839,97 @@
     },
     {
       "dda_id": "DLT000000102",
-      "code": "LegalEntityFundLPCommitmentTypes",
+      "code": "UniversalFundCommitmentTypes",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000103",
+      "code": "LegalEntityBrandColorRoles",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000104",
+      "code": "LegalEntityFinancialsTypes",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000106",
+      "code": "LegalEntityIncomeStatementLineItemTypes",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000107",
+      "code": "LegalEntityBalanceSheetLineItemTypes",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000108",
+      "code": "LegalEntityCashFlowLineItemTypes",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000109",
+      "code": "LegalEntityFundStrategyTypes",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000110",
+      "code": "UniversalInvestmentControlTypes",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000111",
+      "code": "PrivateEquityFundParallelTypes",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000112",
+      "code": "PrivateEquityDirectInvestmentRouteTypes",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000113",
+      "code": "ValuationBasisTypes",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000114",
+      "code": "ValuationMethodTypes",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000115",
+      "code": "ValuationHierarchyLevels",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000116",
+      "code": "LegalEntityBoardAdvisoryTypes",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000117",
+      "code": "TransactionLegDirectionTypes",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000118",
+      "code": "TransactionLegKindTypes",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000119",
+      "code": "AccountFinancialTypes",
+      "active": false
+    },
+    {
+      "dda_id": "DLT000000144",
+      "code": "LegalEntityFundsPrivateEquityFeeBasisTypes",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000145",
+      "code": "LegalEntityFundsPrivateEquityWaterfallTypes",
       "active": true
     },
     {
@@ -1206,5 +1294,6 @@
       "records": "tool surface",
       "finding": "The guide names the tools list_state_transitions, list_workflow_instances and get_workflow_definitions. The server exposes list_model with the entity keys stateTransitions, workflowInstances and workflowDefinitions instead."
     }
-  ]
+  ],
+  "read_note": "Standards (28), domains (13) and lookup types (86) read on 2026-11-16. Standard texts are unchanged from the 28 September 2026 read, so the content hashes are kept. DDA holds concepts only in Accounts, Documents, Instruments, LegalEntities, Master, Metrics, People and Transactions."
 }

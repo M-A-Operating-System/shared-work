@@ -41,7 +41,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named EventBatchInputsUnitOfMeasure, or holding the same fact on EventBatchInputs; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventBatchInputsUnitOfMeasure, or holding the same fact on EventBatchInputs; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ004"
     ],
@@ -143,7 +143,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named InstanceBatchCompositionQuantity, or holding the same fact on InstanceBatchComposition; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named InstanceBatchCompositionQuantity, or holding the same fact on InstanceBatchComposition; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ016"
     ],
@@ -195,7 +195,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named ProductContractManufactureScope, or holding the same fact on ProductContractManufacture; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named ProductContractManufactureScope, or holding the same fact on ProductContractManufacture; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ033"
     ],
@@ -221,7 +221,7 @@
     "classification": "INTERNAL",
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named LocationInstallationsInstalledBy, or holding the same fact on LocationInstallations; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named LocationInstallationsInstalledBy, or holding the same fact on LocationInstallations; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ020"
     ],
@@ -247,7 +247,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named EventPerformersCapacity, or holding the same fact on EventPerformers; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventPerformersCapacity, or holding the same fact on EventPerformers; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ023",
       "DRQ027",
@@ -275,7 +275,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named EventBatchInputsQuantityUsed, or holding the same fact on EventBatchInputs; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventBatchInputsQuantityUsed, or holding the same fact on EventBatchInputs; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ004"
     ],
@@ -301,7 +301,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named EventBatchOutputsQuantityProduced, or holding the same fact on EventBatchOutputs; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventBatchOutputsQuantityProduced, or holding the same fact on EventBatchOutputs; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ004",
       "DRQ030"
@@ -328,7 +328,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named EventStoppageMachinesFailureMode, or holding the same fact on EventStoppageMachines; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventStoppageMachinesFailureMode, or holding the same fact on EventStoppageMachines; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ021",
       "DRQ022"
@@ -355,7 +355,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named DocumentBatchDeclarationsVerified, or holding the same fact on DocumentBatchDeclarations; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named DocumentBatchDeclarationsVerified, or holding the same fact on DocumentBatchDeclarations; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ007"
     ],
@@ -381,7 +381,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named EventStorageExposuresDuration, or holding the same fact on EventStorageExposures; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventStorageExposuresDuration, or holding the same fact on EventStorageExposures; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ034"
     ],
@@ -431,7 +431,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named ProductKind, or holding the same fact on Product; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named ProductKind, or holding the same fact on Product; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ013"
     ],
@@ -457,7 +457,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named ProductIsPurchased, or holding the same fact on Product; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named ProductIsPurchased, or holding the same fact on Product; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ008"
     ],
@@ -737,7 +737,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named ProductBatchesLotCode, or holding the same fact on ProductBatches; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named ProductBatchesLotCode, or holding the same fact on ProductBatches; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ030"
     ],
@@ -763,7 +763,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named ProductBatchesMadeOn, or holding the same fact on ProductBatches; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named ProductBatchesMadeOn, or holding the same fact on ProductBatches; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ030",
       "DRQ012"
@@ -817,7 +817,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named ProductBatchesQuantityMade, or holding the same fact on ProductBatches; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named ProductBatchesQuantityMade, or holding the same fact on ProductBatches; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ012"
     ],
@@ -843,7 +843,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named ProductSubBatchesQuantity, or holding the same fact on ProductSubBatches; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named ProductSubBatchesQuantity, or holding the same fact on ProductSubBatches; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ012"
     ],
@@ -1212,7 +1212,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named InstanceBuiltOn, or holding the same fact on Instance; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named InstanceBuiltOn, or holding the same fact on Instance; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ016"
     ],
@@ -1238,7 +1238,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named InstanceIdentifiersValue, or holding the same fact on InstanceIdentifiers; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named InstanceIdentifiersValue, or holding the same fact on InstanceIdentifiers; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ016"
     ],
@@ -1264,7 +1264,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named InstanceConditionsMeasure, or holding the same fact on InstanceConditions; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named InstanceConditionsMeasure, or holding the same fact on InstanceConditions; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ021"
     ],
@@ -1290,7 +1290,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named InstanceConditionsValue, or holding the same fact on InstanceConditions; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named InstanceConditionsValue, or holding the same fact on InstanceConditions; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ021"
     ],
@@ -1316,7 +1316,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named InstanceFailureModesEffect, or holding the same fact on InstanceFailureModes; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named InstanceFailureModesEffect, or holding the same fact on InstanceFailureModes; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ021"
     ],
@@ -1342,7 +1342,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named InstanceCriticalityScore, or holding the same fact on Instance; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named InstanceCriticalityScore, or holding the same fact on Instance; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ021"
     ],
@@ -1368,7 +1368,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named LocationLevel, or holding the same fact on Location; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named LocationLevel, or holding the same fact on Location; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ020"
     ],
@@ -1446,7 +1446,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named LocationSequencingRulesReason, or holding the same fact on LocationSequencingRules; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named LocationSequencingRulesReason, or holding the same fact on LocationSequencingRules; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ019"
     ],
@@ -1472,7 +1472,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named LocationSequencingRulesRequiresClean, or holding the same fact on LocationSequencingRules; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named LocationSequencingRulesRequiresClean, or holding the same fact on LocationSequencingRules; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ019"
     ],
@@ -1524,7 +1524,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named ProcessSegmentName, or holding the same fact on ProcessSegment; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named ProcessSegmentName, or holding the same fact on ProcessSegment; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ017"
     ],
@@ -1550,7 +1550,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named ProcessSegmentRequirementsKind, or holding the same fact on ProcessSegmentRequirements; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named ProcessSegmentRequirementsKind, or holding the same fact on ProcessSegmentRequirements; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ017"
     ],
@@ -1576,7 +1576,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named ProcessParametersLowerLimit, or holding the same fact on ProcessParameters; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named ProcessParametersLowerLimit, or holding the same fact on ProcessParameters; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ017"
     ],
@@ -1602,7 +1602,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named ProcessParametersUpperLimit, or holding the same fact on ProcessParameters; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named ProcessParametersUpperLimit, or holding the same fact on ProcessParameters; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ017"
     ],
@@ -1628,7 +1628,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named ProcessParameterValuesValue, or holding the same fact on ProcessParameterValues; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named ProcessParameterValuesValue, or holding the same fact on ProcessParameterValues; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ017",
       "DRQ018"
@@ -1655,7 +1655,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named ProcessRecipeLevelsLevel, or holding the same fact on ProcessRecipeLevels; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named ProcessRecipeLevelsLevel, or holding the same fact on ProcessRecipeLevels; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ018"
     ],
@@ -1681,7 +1681,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named ProcessRecipeLevelsIssuedOn, or holding the same fact on ProcessRecipeLevels; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named ProcessRecipeLevelsIssuedOn, or holding the same fact on ProcessRecipeLevels; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ018"
     ],
@@ -1707,7 +1707,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named ProcessSamplingPlansFrequency, or holding the same fact on ProcessSamplingPlans; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named ProcessSamplingPlansFrequency, or holding the same fact on ProcessSamplingPlans; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ025"
     ],
@@ -1733,7 +1733,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named ProcessRoutingsName, or holding the same fact on ProcessRoutings; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named ProcessRoutingsName, or holding the same fact on ProcessRoutings; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ017"
     ],
@@ -1759,7 +1759,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named LocationName, or holding the same fact on Location; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named LocationName, or holding the same fact on Location; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ020",
       "DRQ024"
@@ -1786,7 +1786,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named LocationIdentifiersValue, or holding the same fact on LocationIdentifiers; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named LocationIdentifiersValue, or holding the same fact on LocationIdentifiers; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ035"
     ],
@@ -1812,7 +1812,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named LocationIdentifiersIssuer, or holding the same fact on LocationIdentifiers; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named LocationIdentifiersIssuer, or holding the same fact on LocationIdentifiers; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ035"
     ],
@@ -1838,7 +1838,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named LocationStorageConditionsLowerLimit, or holding the same fact on LocationStorageConditions; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named LocationStorageConditionsLowerLimit, or holding the same fact on LocationStorageConditions; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ034"
     ],
@@ -1864,7 +1864,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named LocationStorageConditionsUpperLimit, or holding the same fact on LocationStorageConditions; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named LocationStorageConditionsUpperLimit, or holding the same fact on LocationStorageConditions; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ034"
     ],
@@ -1890,7 +1890,7 @@
     "classification": "INTERNAL_PII",
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named PersonQualificationRecordsAwardedOn, or holding the same fact on PersonQualificationRecords; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named PersonQualificationRecordsAwardedOn, or holding the same fact on PersonQualificationRecords; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ023"
     ],
@@ -1916,7 +1916,7 @@
     "classification": "INTERNAL_PII",
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named PersonQualificationRecordsExpiresOn, or holding the same fact on PersonQualificationRecords; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named PersonQualificationRecordsExpiresOn, or holding the same fact on PersonQualificationRecords; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ023"
     ],
@@ -1942,7 +1942,7 @@
     "classification": "INTERNAL_PII",
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named PersonShiftAssignmentsStartedAt, or holding the same fact on PersonShiftAssignments; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named PersonShiftAssignmentsStartedAt, or holding the same fact on PersonShiftAssignments; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ023"
     ],
@@ -1968,7 +1968,7 @@
     "classification": "INTERNAL_PII",
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named PersonSigningsMeaning, or holding the same fact on PersonSignings; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named PersonSigningsMeaning, or holding the same fact on PersonSignings; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ032"
     ],
@@ -1994,7 +1994,7 @@
     "classification": "INTERNAL_PII",
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named PersonSigningsSignedAt, or holding the same fact on PersonSignings; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named PersonSigningsSignedAt, or holding the same fact on PersonSignings; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ032"
     ],
@@ -2020,7 +2020,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named PersonSigningsIsSecondCheck, or holding the same fact on PersonSignings; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named PersonSigningsIsSecondCheck, or holding the same fact on PersonSignings; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ032"
     ],
@@ -2046,7 +2046,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named LegalEntityAssessmentsScope, or holding the same fact on LegalEntityAssessments; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named LegalEntityAssessmentsScope, or holding the same fact on LegalEntityAssessments; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ006"
     ],
@@ -2072,7 +2072,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named LegalEntityAssessmentsValidUntil, or holding the same fact on LegalEntityAssessments; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named LegalEntityAssessmentsValidUntil, or holding the same fact on LegalEntityAssessments; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ006"
     ],
@@ -2098,7 +2098,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named LegalEntitySupplierRequestsResponse, or holding the same fact on LegalEntitySupplierRequests; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named LegalEntitySupplierRequestsResponse, or holding the same fact on LegalEntitySupplierRequests; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ028"
     ],
@@ -2124,7 +2124,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named DocumentDeclarationsProperty, or holding the same fact on DocumentDeclarations; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named DocumentDeclarationsProperty, or holding the same fact on DocumentDeclarations; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ007"
     ],
@@ -2150,7 +2150,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named DocumentDeclarationsValue, or holding the same fact on DocumentDeclarations; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named DocumentDeclarationsValue, or holding the same fact on DocumentDeclarations; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ007"
     ],
@@ -2162,9 +2162,9 @@
   },
   {
     "id": "ATR085",
-    "subject_id": "SBJ046",
+    "subject_id": "SBJ068",
     "relationship_id": null,
-    "code": "TransactionKind",
+    "code": "TransactionGoodsMovementKind",
     "definition": "What kind of movement of goods it is: a purchase, a receipt, an issue to production, a transfer between places or a despatch.",
     "datatype": "LOOKUP",
     "lookup_id": "LKP008",
@@ -2176,7 +2176,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named TransactionKind, or holding the same fact on Transaction; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named TransactionKind, or holding the same fact on Transaction; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ024",
       "DRQ033"
@@ -2189,9 +2189,9 @@
   },
   {
     "id": "ATR086",
-    "subject_id": "SBJ046",
+    "subject_id": "SBJ068",
     "relationship_id": null,
-    "code": "TransactionOccurredAt",
+    "code": "TransactionGoodsMovementOccurredAt",
     "definition": "The time the goods moved. For a movement that takes time, it is the time they left or arrived, as the kind of movement says.",
     "datatype": "DATETIME",
     "lookup_id": null,
@@ -2203,7 +2203,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named TransactionOccurredAt, or holding the same fact on Transaction; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named TransactionOccurredAt, or holding the same fact on Transaction; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ024"
     ],
@@ -2215,9 +2215,9 @@
   },
   {
     "id": "ATR087",
-    "subject_id": "SBJ046",
+    "subject_id": "SBJ068",
     "relationship_id": null,
-    "code": "TransactionTitlePassesOnReceipt",
+    "code": "TransactionGoodsMovementTitlePassesOnReceipt",
     "definition": "Whether the goods become the organisation's when they are received, rather than when they are paid for or when they leave the supplier. It decides who owns goods that are in transit.",
     "datatype": "BOOLEAN",
     "lookup_id": null,
@@ -2229,7 +2229,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named TransactionTitlePassesOnReceipt, or holding the same fact on Transaction; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named TransactionTitlePassesOnReceipt, or holding the same fact on Transaction; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ033"
     ],
@@ -2243,7 +2243,7 @@
     "id": "ATR088",
     "subject_id": "SBJ047",
     "relationship_id": null,
-    "code": "TransactionLinesQuantity",
+    "code": "TransactionGoodsMovementLinesQuantity",
     "definition": "How much of the item moved on the line, in the item's unit of measure.",
     "datatype": "FLOAT",
     "lookup_id": null,
@@ -2255,7 +2255,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named TransactionLinesQuantity, or holding the same fact on TransactionLines; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named TransactionLinesQuantity, or holding the same fact on TransactionLines; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ024"
     ],
@@ -2281,7 +2281,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named TransactionInventoryPositionsCondition, or holding the same fact on TransactionInventoryPositions; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named TransactionInventoryPositionsCondition, or holding the same fact on TransactionInventoryPositions; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ013"
     ],
@@ -2307,7 +2307,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named TransactionInventoryPositionsQuantity, or holding the same fact on TransactionInventoryPositions; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named TransactionInventoryPositionsQuantity, or holding the same fact on TransactionInventoryPositions; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ013"
     ],
@@ -2333,7 +2333,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named TransactionInventoryPositionsCountedAt, or holding the same fact on TransactionInventoryPositions; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named TransactionInventoryPositionsCountedAt, or holding the same fact on TransactionInventoryPositions; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ013"
     ],
@@ -2359,7 +2359,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named EventOccurredAt, or holding the same fact on Event; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventOccurredAt, or holding the same fact on Event; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ023"
     ],
@@ -2385,7 +2385,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named EventProductionRunsStartedAt, or holding the same fact on EventProductionRuns; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventProductionRunsStartedAt, or holding the same fact on EventProductionRuns; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ023"
     ],
@@ -2411,7 +2411,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named EventProductionRunsEndedAt, or holding the same fact on EventProductionRuns; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventProductionRunsEndedAt, or holding the same fact on EventProductionRuns; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ023"
     ],
@@ -2440,7 +2440,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named EventProductionRunsYieldVariance, or holding the same fact on EventProductionRuns; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventProductionRunsYieldVariance, or holding the same fact on EventProductionRuns; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ004"
     ],
@@ -2466,7 +2466,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named EventBatchSplitsReason, or holding the same fact on EventBatchSplits; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventBatchSplitsReason, or holding the same fact on EventBatchSplits; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ012"
     ],
@@ -2492,7 +2492,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named EventChangeoversDuration, or holding the same fact on EventChangeovers; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventChangeoversDuration, or holding the same fact on EventChangeovers; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ019"
     ],
@@ -2518,7 +2518,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named EventChangeoversIncludedClean, or holding the same fact on EventChangeovers; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventChangeoversIncludedClean, or holding the same fact on EventChangeovers; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ019"
     ],
@@ -2544,7 +2544,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named EventStoppagesReason, or holding the same fact on EventStoppages; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventStoppagesReason, or holding the same fact on EventStoppages; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ022"
     ],
@@ -2570,7 +2570,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named EventStoppagesStartedAt, or holding the same fact on EventStoppages; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventStoppagesStartedAt, or holding the same fact on EventStoppages; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ022"
     ],
@@ -2596,7 +2596,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named EventStoppagesEndedAt, or holding the same fact on EventStoppages; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventStoppagesEndedAt, or holding the same fact on EventStoppages; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ022"
     ],
@@ -2648,7 +2648,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named EventTestsMethod, or holding the same fact on EventTests; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventTestsMethod, or holding the same fact on EventTests; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ025"
     ],
@@ -2674,7 +2674,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named EventTestsResult, or holding the same fact on EventTests; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventTestsResult, or holding the same fact on EventTests; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ025"
     ],
@@ -2700,7 +2700,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named EventTestsConformed, or holding the same fact on EventTests; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventTestsConformed, or holding the same fact on EventTests; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ025"
     ],
@@ -2726,7 +2726,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named EventFindingsClassification, or holding the same fact on EventFindings; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventFindingsClassification, or holding the same fact on EventFindings; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ026"
     ],
@@ -2752,7 +2752,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named EventFindingsContainedAt, or holding the same fact on EventFindings; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventFindingsContainedAt, or holding the same fact on EventFindings; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ026"
     ],
@@ -2830,7 +2830,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named EventDispositionsDecision, or holding the same fact on EventDispositions; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventDispositionsDecision, or holding the same fact on EventDispositions; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ027"
     ],
@@ -2856,7 +2856,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named EventDispositionsJustification, or holding the same fact on EventDispositions; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventDispositionsJustification, or holding the same fact on EventDispositions; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ027"
     ],
@@ -2882,7 +2882,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named EventCorrectiveActionsRootCause, or holding the same fact on EventCorrectiveActions; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventCorrectiveActionsRootCause, or holding the same fact on EventCorrectiveActions; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ028"
     ],
@@ -2908,7 +2908,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named EventCorrectiveActionsEffectivenessVerifiedAt, or holding the same fact on EventCorrectiveActions; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventCorrectiveActionsEffectivenessVerifiedAt, or holding the same fact on EventCorrectiveActions; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ028"
     ],
@@ -2934,7 +2934,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named EventCorrectiveActionsClosedAt, or holding the same fact on EventCorrectiveActions; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventCorrectiveActionsClosedAt, or holding the same fact on EventCorrectiveActions; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ028"
     ],
@@ -2960,7 +2960,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named EventReleasesBasis, or holding the same fact on EventReleases; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventReleasesBasis, or holding the same fact on EventReleases; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ029"
     ],
@@ -2986,7 +2986,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named EventReleasesReleasedAt, or holding the same fact on EventReleases; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventReleasesReleasedAt, or holding the same fact on EventReleases; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ029"
     ],
@@ -3012,7 +3012,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named EventRecallsScope, or holding the same fact on EventRecalls; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventRecallsScope, or holding the same fact on EventRecalls; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ030"
     ],
@@ -3038,7 +3038,7 @@
     "classification": "CUSTOMER",
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named EventComplaintsReport, or holding the same fact on EventComplaints; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventComplaintsReport, or holding the same fact on EventComplaints; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ031"
     ],
@@ -3064,7 +3064,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named EventCorrectionsReason, or holding the same fact on EventCorrections; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventCorrectionsReason, or holding the same fact on EventCorrections; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ032"
     ],
@@ -3090,7 +3090,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named EventStorageBreachesStartedAt, or holding the same fact on EventStorageBreaches; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventStorageBreachesStartedAt, or holding the same fact on EventStorageBreaches; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ034"
     ],
@@ -3116,7 +3116,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named EventBatchInputsQuantitySpecified, or holding the same fact on EventBatchInputs; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventBatchInputsQuantitySpecified, or holding the same fact on EventBatchInputs; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ004"
     ],
@@ -3142,7 +3142,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named EventBatchInputsIsAlternative, or holding the same fact on EventBatchInputs; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventBatchInputsIsAlternative, or holding the same fact on EventBatchInputs; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ005"
     ],
@@ -3168,7 +3168,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named ProductPackLevelsLevel, or holding the same fact on ProductPackLevels; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named ProductPackLevelsLevel, or holding the same fact on ProductPackLevels; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ037"
     ],
@@ -3194,7 +3194,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named ProductPackLevelsIdentifier, or holding the same fact on ProductPackLevels; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named ProductPackLevelsIdentifier, or holding the same fact on ProductPackLevels; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ037"
     ],
@@ -3221,7 +3221,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named ProductPackLevelsUnitsPerLevel, or holding the same fact on ProductPackLevels; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named ProductPackLevelsUnitsPerLevel, or holding the same fact on ProductPackLevels; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ037"
     ],
@@ -3247,7 +3247,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named EventMaintenanceWorkDescription, or holding the same fact on EventMaintenanceWork; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventMaintenanceWorkDescription, or holding the same fact on EventMaintenanceWork; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ021",
       "DRQ022"
@@ -3274,7 +3274,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named InstanceKind, or holding the same fact on Instance; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named InstanceKind, or holding the same fact on Instance; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ016",
       "DRQ020"
@@ -3301,7 +3301,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named EventTestsSpecificationVersion, or holding the same fact on EventTests; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventTestsSpecificationVersion, or holding the same fact on EventTests; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ025"
     ],
@@ -3327,7 +3327,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named EventFindingsKind, or holding the same fact on EventFindings; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventFindingsKind, or holding the same fact on EventFindings; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ026"
     ],
@@ -3353,7 +3353,7 @@
     "classification": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for an attribute named InstanceFailureModesName, or holding the same fact on InstanceFailureModes; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named InstanceFailureModesName, or holding the same fact on InstanceFailureModes; none found. Searched this model's own attributes for the same fact; none holds it.",
     "data_requirement_ids": [
       "DRQ021"
     ],

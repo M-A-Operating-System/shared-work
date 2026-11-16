@@ -1,8 +1,8 @@
 {
-  "defect_count": 7,
+  "defect_count": 10,
   "blocking": 2,
   "material": 0,
-  "advisory": 5,
+  "advisory": 8,
   "defects": [
     {
       "check": "RN03",
@@ -41,6 +41,24 @@
       "severity": "advisory",
       "routes_to": "5\u20138",
       "artefact_ids": [
+        "ROL038"
+      ],
+      "detail": "role definition uses 'entity'; keep it only where the field uses the word itself"
+    },
+    {
+      "check": "DF04a",
+      "severity": "advisory",
+      "routes_to": "5\u20138",
+      "artefact_ids": [
+        "ROL042"
+      ],
+      "detail": "role definition uses 'entity'; keep it only where the field uses the word itself"
+    },
+    {
+      "check": "DF04a",
+      "severity": "advisory",
+      "routes_to": "5\u20138",
+      "artefact_ids": [
         "SBJ043"
       ],
       "detail": "concept definition uses 'entity'; keep it only where the field uses the word itself"
@@ -52,6 +70,16 @@
       "artefact_ids": [
         "REL030",
         "REL029"
+      ],
+      "detail": "data requirements sit wholly inside a sibling's \u2014 a merge candidate"
+    },
+    {
+      "check": "MIN02",
+      "severity": "advisory",
+      "routes_to": "8",
+      "artefact_ids": [
+        "SBJ046",
+        "SBJ043"
       ],
       "detail": "data requirements sit wholly inside a sibling's \u2014 a merge candidate"
     },

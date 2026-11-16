@@ -51,7 +51,7 @@
       "mirror": "LocationSiteOperators"
     },
     "REL020": {
-      "forward": "PersonEmployers",
+      "forward": "PersonEmployerOrganizations",
       "mirror": "LegalEntityEmployees"
     },
     "REL021": {
@@ -59,16 +59,16 @@
       "mirror": "ProcessSegmentQualifiedPeople"
     },
     "REL022": {
-      "forward": "TransactionTradingParties",
-      "mirror": "LegalEntityRecordedExchanges"
+      "forward": "LegalEntityTransactions",
+      "mirror": "TransactionLegalEntityParties"
     },
     "REL023": {
       "forward": "TransactionTradedProducts",
-      "mirror": "ProductRecordedExchanges"
+      "mirror": "ProductTransactions"
     },
     "REL024": {
       "forward": "TransactionDespatchingPlaces",
-      "mirror": "LocationRecordedExchanges"
+      "mirror": "LocationTransactions"
     },
     "REL025": {
       "forward": "TransactionReceivingPlaces",
@@ -132,7 +132,7 @@
     "data_requirements": 28,
     "roles": 48,
     "verbs": 31,
-    "subjects": 48,
+    "subjects": 49,
     "attributes": 93,
     "lookups": 10,
     "sources": 38
@@ -553,7 +553,8 @@
       "SBJ043",
       "SBJ046",
       "SBJ047",
-      "SBJ048"
+      "SBJ048",
+      "SBJ068"
     ],
     "SRC040": [
       "ATR085",
@@ -563,7 +564,8 @@
       "REQ042",
       "ROL041",
       "SBJ046",
-      "SBJ048"
+      "SBJ048",
+      "SBJ068"
     ],
     "SRC041": [
       "REQ073"

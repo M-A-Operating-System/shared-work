@@ -33,7 +33,7 @@
     ],
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a list of values for ProductKindType; none found. Searched this model's own lists for the same terms; no other list holds them.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a list of values for ProductKindType; none found. Searched this model's own lists for the same terms; no other list holds them.",
     "data_requirement_ids": [
       "DRQ008",
       "DRQ013"
@@ -150,7 +150,7 @@
     ],
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a list of values for ProcessRecipeLevelsType; none found. Searched this model's own lists for the same terms; no other list holds them.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a list of values for ProcessRecipeLevelsType; none found. Searched this model's own lists for the same terms; no other list holds them.",
     "data_requirement_ids": [
       "DRQ018"
     ],
@@ -205,7 +205,7 @@
     ],
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a list of values for LocationLevelType; none found. Searched this model's own lists for the same terms; no other list holds them.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a list of values for LocationLevelType; none found. Searched this model's own lists for the same terms; no other list holds them.",
     "data_requirement_ids": [
       "DRQ020"
     ],
@@ -274,7 +274,7 @@
     ],
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a list of values for EventStoppagesReasonType; none found. Searched this model's own lists for the same terms; no other list holds them.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a list of values for EventStoppagesReasonType; none found. Searched this model's own lists for the same terms; no other list holds them.",
     "data_requirement_ids": [
       "DRQ022"
     ],
@@ -319,7 +319,7 @@
     ],
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a list of values for EventDispositionsDecisionType; none found. Searched this model's own lists for the same terms; no other list holds them.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a list of values for EventDispositionsDecisionType; none found. Searched this model's own lists for the same terms; no other list holds them.",
     "data_requirement_ids": [
       "DRQ027"
     ],
@@ -363,7 +363,7 @@
     ],
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a list of values for TransactionKindType; none found. Searched this model's own lists for the same terms; no other list holds them.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a list of values for TransactionKindType; none found. Searched this model's own lists for the same terms; no other list holds them.",
     "data_requirement_ids": [
       "DRQ024",
       "DRQ033"
@@ -448,7 +448,7 @@
     ],
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a list of values for EventFindingsKindType; none found. Searched this model's own lists for the same terms; no other list holds them.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a list of values for EventFindingsKindType; none found. Searched this model's own lists for the same terms; no other list holds them.",
     "data_requirement_ids": [
       "DRQ026"
     ],
@@ -492,7 +492,7 @@
     ],
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a list of values for ProductPackLevelsLevelType; none found. Searched this model's own lists for the same terms; no other list holds them.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a list of values for ProductPackLevelsLevelType; none found. Searched this model's own lists for the same terms; no other list holds them.",
     "data_requirement_ids": [
       "DRQ037"
     ],
@@ -522,7 +522,7 @@
     ],
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a list of values for InstanceKindType; none found. Searched this model's own lists for the same terms; no other list holds them.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a list of values for InstanceKindType; none found. Searched this model's own lists for the same terms; no other list holds them.",
     "data_requirement_ids": [
       "DRQ016",
       "DRQ020"

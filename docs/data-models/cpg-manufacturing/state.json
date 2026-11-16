@@ -856,7 +856,7 @@
     },
     {
       "id": "DEC004",
-      "question": "Instances takes the prefix UNT because INS is held by Instruments.",
+      "question": "Instances takes the prefix UNT because INS is held by Instruments. DDA as read on 16 November 2026 holds no domain with UNT, and none with PRC, the prefix proposed for Processes.",
       "options": [
         "confirm UNT",
         "reassign"
@@ -922,7 +922,7 @@
     },
     {
       "id": "DEC009",
-      "question": "Product is proposed both here and by CPG - Product Definition, because DDA's Products domain holds no concept. Which model creates it, and which refers to it?",
+      "question": "Product is proposed both here and by CPG - Product Definition, because DDA's Products domain still holds no concept (read on 16 November 2026). Which model creates it, and which refers to it?",
       "options": [
         "CPG - Product Definition creates it",
         "this model creates it"
@@ -941,10 +941,10 @@
         "reuse what is held"
       ],
       "raised_at_pass": 2,
-      "status": "open",
-      "decision": "",
-      "by": "",
-      "date": ""
+      "status": "decided",
+      "decision": "confirmed none",
+      "by": "DDA read on 16 November 2026: the Locations domain holds no concept, so Location is created and the domain is extended.",
+      "date": "2026-11-16"
     },
     {
       "id": "DEC011",
@@ -971,6 +971,19 @@
       "decision": "Both CPG models use one list, UniversalUnitOfMeasureCodes, with the same seven values. It was created in DDA as lookup type DLT000000156 on 16 November 2026; each design contributes the values.",
       "by": "Andrew Bush",
       "date": "2026-11-16"
+    },
+    {
+      "id": "DEC013",
+      "question": "DDA's Transaction is a movement of money or of a holding between two parties, with legs that balance, and says balances are never stored on it. Goods movements sit beneath it as the more specific kind it anticipates, and stock positions sit beneath it as counts. Keep both beneath Transaction, or propose a separate home for goods.",
+      "options": [
+        "keep beneath Transaction",
+        "separate home for goods"
+      ],
+      "raised_at_pass": 2,
+      "status": "open",
+      "decision": "",
+      "by": "",
+      "date": ""
     }
   ],
   "converged": false,

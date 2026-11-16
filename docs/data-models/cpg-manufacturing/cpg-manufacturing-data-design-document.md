@@ -140,7 +140,7 @@ The design has stated limits. The chain of what goes into what stops at anything
 - Was this batch ever stored outside its permitted conditions?
 - How many units are in a case of this product, and how many cases on a pallet?
 
-This design creates 43 concepts, 48 roles, 31 relationships and nine lists of values in DDA, extends one existing domain (Locations) with the structure of a factory, adds seven values to one existing list, and reuses six existing domains and five existing concepts. It proposes two new domains.
+This design creates 43 concepts, 48 roles, 29 relationships and nine lists of values in DDA, extends one existing domain (Locations) with the structure of a factory, adds seven values to one existing list, and reuses six existing domains and six existing concepts. It proposes two new domains.
 
 |  | Count |
 |---|---|
@@ -149,7 +149,7 @@ This design creates 43 concepts, 48 roles, 31 relationships and nine lists of va
 | Areas of the business covered (domains) | 9 (7 already in DDA, 2 proposed) |
 | Roles, meaning the part something plays in a relationship | 48 |
 | Relationships between roles | 31 |
-| Concepts, meaning groups of related facts | 48 |
+| Concepts, meaning groups of related facts | 49 |
 | Lists of allowed values | 10 |
 | Business test cases | 30 pass · 2 with a limit accepted |
 | Sources | 38 |
@@ -360,12 +360,12 @@ flowchart LR
   DOM010 -->|"Contained Place → is within → Containing Place"| DOM010
   DOM010 -->|"Registered Place → is registered with → Registering Authority"| DOM002
   DOM002 -->|"Site Operator → operates → Operated Site"| DOM010
-  DOM001 -->|"Employee → works for → Employer"| DOM002
+  DOM001 -->|"Organization Employee → Employed By → Organization Employer"| DOM002
   DOM001 -->|"Qualified Person → is qualified for → Qualified Work"| DOM009
-  DOM005 -->|"Recorded Exchange → is transacted with → Trading Party"| DOM002
-  DOM005 -->|"Recorded Exchange → concerns → Traded Product"| DOM006
-  DOM005 -->|"Recorded Exchange → ships from → Despatching Place"| DOM010
-  DOM005 -->|"Recorded Exchange → is delivered to → Receiving Place"| DOM010
+  DOM002 -->|"Transaction Party → Is Party To → Transaction"| DOM005
+  DOM005 -->|"Transaction → concerns → Traded Product"| DOM006
+  DOM005 -->|"Transaction → ships from → Despatching Place"| DOM010
+  DOM005 -->|"Transaction → is delivered to → Receiving Place"| DOM010
   DOM004 -->|"Production Run → ran at → Production Place"| DOM010
   DOM004 -->|"Production Run → ran under → Issued Instructions"| DOM009
   DOM004 -->|"Performed Work → was performed by → Performer"| DOM001
@@ -392,7 +392,7 @@ One diagram of every role. Each box is an area of the business, and holds the ro
 ```mermaid
 flowchart LR
   subgraph SGDOM001["People"]
-    ROL037("Employee")
+    ROL037("Organization Employee")
     ROL039("Qualified Person")
     ROL050("Performer")
   end
@@ -400,8 +400,8 @@ flowchart LR
     ROL011("Outside Manufacturer")
     ROL033("Site Operator")
     ROL036("Registering Authority")
-    ROL038("Employer")
-    ROL042("Trading Party")
+    ROL038("Organization Employer")
+    ROL042("Transaction Party")
     ROL066("Responsible Supplier")
   end
   subgraph SGDOM003["Documents"]
@@ -420,7 +420,7 @@ flowchart LR
     ROL069("Storage Breach")
   end
   subgraph SGDOM005["Transactions"]
-    ROL041("Recorded Exchange")
+    ROL041("Transaction")
   end
   subgraph SGDOM006["Products"]
     ROL010("Contracted Product")
@@ -469,9 +469,9 @@ flowchart LR
   ROL031 -->|is within| ROL032
   ROL035 -->|is registered with| ROL036
   ROL033 -->|operates| ROL034
-  ROL037 -->|works for| ROL038
+  ROL037 -->|Employed By| ROL038
   ROL039 -->|is qualified for| ROL040
-  ROL041 -->|is transacted with| ROL042
+  ROL042 -->|Is Party To| ROL041
   ROL041 -->|concerns| ROL043
   ROL041 -->|ships from| ROL044
   ROL041 -->|is delivered to| ROL045
@@ -571,10 +571,12 @@ flowchart LR
 ```mermaid
 flowchart LR
   SBJ046("Transaction<br>TRANSACTIONS")
-  SBJ047("Transaction Lines<br>TRANSACTIONS")
+  SBJ047("Transaction Goods Movement Lines<br>TRANSACTIONS")
   SBJ048("Transaction Inventory Positions<br>TRANSACTIONS")
-  SBJ046 -->|"has one or many"| SBJ047
+  SBJ068("Transaction Goods Movement<br>TRANSACTIONS")
+  SBJ068 -->|"has one or many"| SBJ047
   SBJ046 -->|"may have many, or none"| SBJ048
+  SBJ046 -->|"may have one, or none"| SBJ068
 ```
 
 **Products**
@@ -643,7 +645,7 @@ flowchart LR
 | <a id="dom002"></a>DOM002<br>**Legal Entities** | [DMD000000012](https://datadesign.maoperatingsystem.com/models/domains/DMD000000012) | Legal Entity | Holds the companies the organisation deals with, such as suppliers, outside manufacturers, operators of sites and regulators, with their identifiers and addresses, the assessments made of suppliers and outside manufacturers, and the requests made of suppliers. | [6](#53-canonical-roles) | [5](#55-concepts) |
 | <a id="dom003"></a>DOM003<br>**Documents** | [DMD000000016](https://datadesign.maoperatingsystem.com/models/domains/DMD000000016) | Document | Holds the documents that state facts about a batch, such as a supplier's certificate of analysis, with what each one declares and whether the organisation checked it. | [1](#53-canonical-roles) | [2](#55-concepts) |
 | <a id="dom004"></a>DOM004<br>**Events** | [DMD000000020](https://datadesign.maoperatingsystem.com/models/domains/DMD000000020) | Event | Holds what happens in making and moving product: production runs, splits of batches, changeovers, stoppages, maintenance, tests, findings, decisions, corrective actions, releases, recalls, complaints, corrections and storage breaches. | [10](#53-canonical-roles) | [15](#55-concepts) |
-| <a id="dom005"></a>DOM005<br>**Transactions** | [DMD000000022](https://datadesign.maoperatingsystem.com/models/domains/DMD000000022) | Transaction | Holds the exchanges of goods the organisation records, with their lines and the stock position each one leaves. | [1](#53-canonical-roles) | [3](#55-concepts) |
+| <a id="dom005"></a>DOM005<br>**Transactions** | [DMD000000022](https://datadesign.maoperatingsystem.com/models/domains/DMD000000022) | Transaction | Holds the exchanges of goods the organisation records, with their lines and the stock position each one leaves. | [1](#53-canonical-roles) | [4](#55-concepts) |
 | <a id="dom006"></a>DOM006<br>**Products** | [DMD000000032](https://datadesign.maoperatingsystem.com/models/domains/DMD000000032) | Product | Holds each batch of a product, the batches split from or combined into it, and the levels a product is packed in: unit, case and pallet. What a product is made from and what it must be are held by CPG - Product Definition. | [5](#53-canonical-roles) | [4](#55-concepts) |
 | <a id="dom007"></a>DOM007<br>**Instances** | New | Instance | Instances are individually identified physical things — a serial-numbered pack, a machine, a vessel, a tool — each made to a product definition and traceable as itself for its whole life. Includes what is fitted into each and what condition it is in. Excludes the product definition it is made to, which is a Product, and the batch it belongs to where it is not individually identified, which is a concept of Products. | [5](#53-canonical-roles) | [4](#55-concepts) |
 | <a id="dom009"></a>DOM009<br>**Processes** | New | Process Segment | Processes are the defined steps of work by which products are made — mixing, pasteurising, filling, labelling — the order they run in, the settings they run at, and the recipes that state them at each level of specificity from formulation to the instructions issued for one batch. Includes what each step requires of machines, people and materials. Excludes what a product is made from, which is Products, and the record of a step actually being performed, which is an Event. | [8](#53-canonical-roles) | [7](#55-concepts) |
@@ -655,15 +657,15 @@ A role describes what something is while it is in a relationship. The same thing
 
 | Area | Role | What it means | Requirements |
 |---|---|---|---|
-| People | <a id="rol037"></a>ROL037<br>**Employee** | A person is an Employee while it works for a company. It says that the person is employed by a company. That is not the same as being a Performer, which says a person who did a piece of work, whoever employs them. | [REQ041](#req041) |
+| People | <a id="rol037"></a>ROL037<br>**Organization Employee** | A person is an Organization Employee while they work for an organization under a contract of employment. It says the person is on the organization's payroll and is paid to do a job for it. It is not the same as an Organization Board or Advisory Member, who holds an oversight or advisory seat without being employed; one person may be both, and one person may work for several organizations. A person who leaves the job stops being an employee, and the employment stays on record with its dates. | [REQ041](#req041) |
 | People | <a id="rol050"></a>ROL050<br>**Performer** | A person is a Performer while it carries out recorded work. It says that the person did a piece of work, in a stated capacity. That is not the same as being a Qualified Person, which says a person entitled to do the work, whether or not they did it. | [REQ041](#req041) · [REQ047](#req047) · [REQ050](#req050) |
 | People | <a id="rol039"></a>ROL039<br>**Qualified Person** | A person is a Qualified Person while it holds a qualification for a kind of work. It says that the person may carry out that work. That is not the same as being a Performer, which says a person who actually did a piece of work. | [REQ064](#req064) · [REQ041](#req041) |
-| Legal Entities | <a id="rol038"></a>ROL038<br>**Employer** | A company is an Employer while it employs people. It says that the company has people working for it. That is not the same as being a Site Operator, which says a company that runs a place, whether or not it employs the people in it. | [REQ041](#req041) |
+| Legal Entities | <a id="rol038"></a>ROL038<br>**Organization Employer** | A legal entity is an Organization Employer while people work for it under contracts of employment. It says the organization has staff on its payroll. It is not the same as an Organization With A Board or Advisory Body, which has people who oversee or advise it without being employed; one body may be both. A body that employs no one stops being an employer, and its earlier employment stays on record. | [REQ041](#req041) |
 | Legal Entities | <a id="rol011"></a>ROL011<br>**Outside Manufacturer** | A company is an Outside Manufacturer while it makes or packs a product for the organisation. It says that the company holds a contract to make or pack goods for the organisation. That is not the same as being a Site Operator, which says that the company runs a place, whatever it makes there. | [REQ060](#req060) · [REQ062](#req062) |
 | Legal Entities | <a id="rol036"></a>ROL036<br>**Registering Authority** | A company is a Registering Authority while it keeps a register of places. It says that the body holds the register a place appears on. That is not the same as being a Site Operator, which says a company that runs a place. | [REQ067](#req067) |
 | Legal Entities | <a id="rol066"></a>ROL066<br>**Responsible Supplier** | A company is a Responsible Supplier while it is the supplier a problem is raised with. It says that the supplier is answerable for a problem. That is not the same as being a Trading Party, which says a company goods were bought from or sold to. | [REQ059](#req059) |
 | Legal Entities | <a id="rol033"></a>ROL033<br>**Site Operator** | A company is a Site Operator while it runs a place. It says that the company is responsible for running a place. That is not the same as being a Registering Authority, which says an authority that records a place without running it. | [REQ060](#req060) · [REQ062](#req062) |
-| Legal Entities | <a id="rol042"></a>ROL042<br>**Trading Party** | A company is a Trading Party while it is on the other side of a movement of goods. It says that the company sold to, bought from or received goods from the organisation. That is not the same as being an Outside Manufacturer, which says a company that makes goods for the organisation under contract. | [REQ061](#req061) |
+| Legal Entities | <a id="rol042"></a>ROL042<br>**Transaction Party** | A legal entity is a Transaction Party while it takes part in a transaction as a payer, a payee, a buyer, a seller or an issuer. It says who the money or holdings moved from or to. It is not the same as an Account Beneficial Owner, who owns an account, because a party to a transaction may use an account it does not own. One legal entity may be a party to many transactions. | [REQ061](#req061) |
 | Documents | <a id="rol067"></a>ROL067<br>**Declaring Document** | A document is a Declaring Document while it states properties of a batch. It says that the document makes a claim about a batch. That is not the same as being a Traced Batch, which says the batch the claim is about. | [REQ009](#req009) · [REQ010](#req010) |
 | Events | <a id="rol059"></a>ROL059<br>**Complaint** | A recorded event is a Complaint while it reports a problem raised by a customer. It says that a customer raised a problem with goods. That is not the same as being a Finding, which says a problem found by the organisation itself. | [REQ054](#req054) |
 | Events | <a id="rol064"></a>ROL064<br>**Corrected Record** | A recorded event is a Corrected Record while it has been corrected by a later entry. It says that the record stands corrected and is kept as it was. That is not the same as being a Correction, which says the entry that corrects it. | [REQ056](#req056) |
@@ -675,7 +677,7 @@ A role describes what something is while it is in a relationship. The same thing
 | Events | <a id="rol055"></a>ROL055<br>**Stoppage** | A recorded event is a Stoppage while it halts a machine. It says that production stopped, for a reason. That is not the same as being a Production Run, which says the making of a batch. | [REQ037](#req037) · [REQ038](#req038) |
 | Events | <a id="rol069"></a>ROL069<br>**Storage Breach** | A recorded event is a Storage Breach while it records stock held outside its conditions. It says that stock was exposed to conditions it should not have been. That is not the same as being a Finding, which says a problem found by checking, not by exposure. | [REQ066](#req066) |
 | Events | <a id="rol062"></a>ROL062<br>**Trigger** | A recorded event is a Trigger while it prompts another event. It says that something else was done because of it. That is not the same as being a Response, which says the event that answered it. | [REQ049](#req049) |
-| Transactions | <a id="rol041"></a>ROL041<br>**Recorded Exchange** | An exchange is a Recorded Exchange while it records goods moving between places and companies. It says that goods moved, and when. That is not the same as being a Production Run, which says goods made, not moved. | [REQ042](#req042) · [REQ061](#req061) |
+| Transactions | <a id="rol041"></a>ROL041<br>**Transaction** | A transaction is a Transaction in a relationship while it is the movement of money, holdings or ownership that the other subject took part in, was booked to, or was recorded against. It is the same role wherever a transaction meets another subject, which is how those subjects join up around it. It is the movement itself, not the parties to it or the accounts it touches. | [REQ042](#req042) · [REQ061](#req061) |
 | Products | <a id="rol010"></a>ROL010<br>**Contracted Product** | A product is a Contracted Product while it is made for the organisation by another company. It says that the organisation relies on an outside company to make or pack it. That is not the same as being a Routed Product, which says that the organisation has a method of its own for making it. | [REQ060](#req060) |
 | Products | <a id="rol027"></a>ROL027<br>**Defining Product** | A product is a Defining Product while it is the product that individually identified units are made to. It says that units are made to it. That is not the same as being a Traded Product, which says goods bought or sold, not the units made to it. | [REQ023](#req023) |
 | Products | <a id="rol012"></a>ROL012<br>**Routed Product** | A product is a Routed Product while it is made by a method the organisation has defined. It says that the organisation has a defined way of making it. That is not the same as being a Contracted Product, which says that an outside company makes it. | [REQ025](#req025) |
@@ -710,9 +712,10 @@ Each relationship reads as two sentences, one in each direction. *How many* says
 
 | ID | How it reads | How many | Dates kept | Why it is needed | In DDA |
 |---|---|---|---|---|---|
-| <a id="rel020"></a>REL020<br>Person Employments | An [employee](#rol037) works for [employers](#rol038).<br>An [employer](#rol038) employs [employees](#rol037). | Many to many | Yes | [DRQ023](#drq023) | New |
+| <a id="rel020"></a>REL020<br>Legal Entity Employment | An [organization employee](#rol037) Employed By [organization employers](#rol038).<br>An [organization employer](#rol038) Employs [organization employees](#rol037). | Many to many | Yes | [DRQ023](#drq023) | [DMR000000005](https://datadesign.maoperatingsystem.com/models/relationships/DMR000000005) |
 | <a id="rel021"></a>REL021<br>Person Work Qualifications | A [qualified person](#rol039) is qualified for [qualified works](#rol040).<br>A [qualified work](#rol040) may be performed by [qualified people](#rol039). | Many to many | Yes | [DRQ023](#drq023) | New |
 | <a id="rel019"></a>REL019<br>Legal Entity Site Operations | A [site operator](#rol033) operates [operated sites](#rol034).<br>An [operated site](#rol034) is operated by [site operators](#rol033). | Many to many | Yes | [DRQ033](#drq033) | New |
+| <a id="rel022"></a>REL022<br>Legal Entity Transaction Party | A [transaction party](#rol042) Is Party To [transactions](#rol041).<br>A [transaction](#rol041) Has Party [transaction parties](#rol042). | Many to many | No | [DRQ033](#drq033) | [DMR000000037](https://datadesign.maoperatingsystem.com/models/relationships/DMR000000037) |
 | <a id="rel037"></a>REL037<br>Document Batch Declarations | A [declaring document](#rol067) declares properties of [traced batches](#rol071).<br>A [traced batch](#rol071) is declared by [declaring documents](#rol067). | Many to many | No | [DRQ007](#drq007) | New |
 | <a id="rel026"></a>REL026<br>Event Run Places | A [production run](#rol046) ran at a [production place](#rol047).<br>A [production place](#rol047) ran [production runs](#rol046). | Many to one | No | [DRQ020](#drq020) · [DRQ023](#drq023) | New |
 | <a id="rel027"></a>REL027<br>Event Run Recipes | A [production run](#rol046) ran under an [issued instructions](#rol048).<br>An [issued instructions](#rol048) governed [production runs](#rol046). | Many to one | No | [DRQ018](#drq018) | New |
@@ -726,10 +729,9 @@ Each relationship reads as two sentences, one in each direction. *How many* says
 | <a id="rel034"></a>REL034<br>Event Action Triggers | A [response](#rol061) responds to [triggers](#rol062).<br>A [trigger](#rol062) prompted [responses](#rol061). | Many to many | No | [DRQ028](#drq028) | New |
 | <a id="rel035"></a>REL035<br>Event Correction Targets | A [correction](#rol063) corrects a [corrected record](#rol064).<br>A [corrected record](#rol064) is corrected by [corrections](#rol063). | Many to one | No | [DRQ032](#drq032) | New |
 | <a id="rel038"></a>REL038<br>Event Storage Exposures | A [storage breach](#rol069) exposed [traced batches](#rol071).<br>A [traced batch](#rol071) was exposed in [storage breaches](#rol069). | Many to many | No | [DRQ034](#drq034) | New |
-| <a id="rel022"></a>REL022<br>Transaction Parties | A [recorded exchange](#rol041) is transacted with [trading parties](#rol042).<br>A [trading party](#rol042) transacts [recorded exchanges](#rol041). | Many to many | No | [DRQ033](#drq033) | New |
-| <a id="rel023"></a>REL023<br>Transaction Subjects | A [recorded exchange](#rol041) concerns [traded products](#rol043).<br>A [traded product](#rol043) is traded in [recorded exchanges](#rol041). | Many to many | No | [DRQ024](#drq024) | New |
-| <a id="rel024"></a>REL024<br>Transaction Origins | A [recorded exchange](#rol041) ships from a [despatching place](#rol044).<br>A [despatching place](#rol044) despatches [recorded exchanges](#rol041). | Many to one | No | [DRQ024](#drq024) | New |
-| <a id="rel025"></a>REL025<br>Transaction Destinations | A [recorded exchange](#rol041) is delivered to a [receiving place](#rol045).<br>A [receiving place](#rol045) receives [recorded exchanges](#rol041). | Many to one | No | [DRQ024](#drq024) | New |
+| <a id="rel023"></a>REL023<br>Transaction Subjects | A [transaction](#rol041) concerns [traded products](#rol043).<br>A [traded product](#rol043) is traded in [transactions](#rol041). | Many to many | No | [DRQ024](#drq024) | New |
+| <a id="rel024"></a>REL024<br>Transaction Origins | A [transaction](#rol041) ships from a [despatching place](#rol044).<br>A [despatching place](#rol044) despatches [transactions](#rol041). | Many to one | No | [DRQ024](#drq024) | New |
+| <a id="rel025"></a>REL025<br>Transaction Destinations | A [transaction](#rol041) is delivered to a [receiving place](#rol045).<br>A [receiving place](#rol045) receives [transactions](#rol041). | Many to one | No | [DRQ024](#drq024) | New |
 | <a id="rel005"></a>REL005<br>Product Contract Manufacture | A [contracted product](#rol010) is manufactured by [outside manufacturers](#rol011).<br>An [outside manufacturer](#rol011) manufactures [contracted products](#rol010). | Many to many | Yes | [DRQ033](#drq033) | New |
 | <a id="rel006"></a>REL006<br>Product Routings | A [routed product](#rol012) is made by a [making method](#rol013).<br>A [making method](#rol013) makes [routed products](#rol012). | Many to one | Yes | [DRQ017](#drq017) | New |
 | <a id="rel013"></a>REL013<br>Instance Definitions | An [individual unit](#rol026) is a unit of a [defining product](#rol027).<br>A [defining product](#rol027) is made as [individual units](#rol026). | Many to one | No | [DRQ016](#drq016) | New |
@@ -774,9 +776,10 @@ Every concept the design uses, whether DDA already has it or the design adds it.
 | Events | <a id="sbj064"></a>SBJ064<br>**Event Complaints**<br>EventComplaints | New | There is one of these for each complaint received about a product, with the report as it was given. If you need to know what a customer reported and which batch it was about, this is what you go by. The investigation that follows is recorded as findings and corrective actions. | Event | For each event: many, or none | [DRQ031](#drq031) |
 | Events | <a id="sbj065"></a>SBJ065<br>**Event Corrections**<br>EventCorrections | New | There is one of these for each correction made to an earlier record, saying why. If you need to know that a record was altered and why, this is what you go by. The earlier record is kept as it was and is never overwritten. | Event | For each event: many, or none | [DRQ032](#drq032) |
 | Events | <a id="sbj066"></a>SBJ066<br>**Event Storage Breaches**<br>EventStorageBreaches | New | There is one of these for each time stock was held outside the conditions its place must keep, with when it began. If you need to know whether a batch was ever stored out of condition, this is what you go by. The conditions themselves are held with the place. | Event | For each event: many, or none | [DRQ034](#drq034) |
-| Transactions | <a id="sbj046"></a>SBJ046<br>**Transaction**<br>Transaction | New | There is one of these for each time goods are received, issued, moved, bought or despatched, with the time it happened. If you need to know where goods went and when, this is what you go by. How much of an item is held at a point in time is held as stock positions. | — | — | [DRQ024](#drq024) · [DRQ033](#drq033) |
-| Transactions | <a id="sbj047"></a>SBJ047<br>**Transaction Lines**<br>TransactionLines | New | There is one of these for each item and quantity on a movement of goods. If you need to know how much of what moved, this is what you go by. The parties and places of the movement are held on the movement itself. | Transaction | For each transaction: one or many | [DRQ024](#drq024) |
+| Transactions | <a id="sbj046"></a>SBJ046<br>**Transaction**<br>Transaction | [DMC000000031](https://datadesign.maoperatingsystem.com/models/concepts/DMC000000031) | There is one of these for each movement of money or of a holding between two parties on a date. If you need to know what moved, between whom and when, this is what you go by. A holding's balance is worked out from these and is not kept here; the more specific kinds, such as movements of goods, are held beneath it. | — | — | [DRQ024](#drq024) |
+| Transactions | <a id="sbj047"></a>SBJ047<br>**Transaction Goods Movement Lines**<br>TransactionGoodsMovementLines | New | There is one of these for each item and quantity on a movement of goods. If you need to know how much of what moved, this is what you go by. The parties and places of the movement are held on the movement itself. | Transaction Goods Movement | For each transaction goods movement: one or many | [DRQ024](#drq024) |
 | Transactions | <a id="sbj048"></a>SBJ048<br>**Transaction Inventory Positions**<br>TransactionInventoryPositions | New | There is one of these for each count of an item held at a place, in a stated condition, at a time. If you need to know how much is available, on hold or rejected right now, this is what you go by. A decision to hold material is recorded as a disposition. | Transaction | For each transaction: many, or none | [DRQ013](#drq013) |
+| Transactions | <a id="sbj068"></a>SBJ068<br>**Transaction Goods Movement**<br>TransactionGoodsMovement | New | There is one of these for each time goods are received, issued, moved, bought or despatched, with the time it happened. If you need to know where goods went and when, this is what you go by. How much of an item is held at a point in time is held as stock positions. It is a movement of goods; a movement of money or of a holding is the transaction it sits beneath. | Transaction | For each transaction: one, or none | [DRQ024](#drq024) · [DRQ033](#drq033) |
 | Products | <a id="sbj012"></a>SBJ012<br>**Product**<br>Product | New | There is one of these for each product the organisation makes, buys or sells that is a physical thing, such as a raw material, a pack component, an intermediate or a finished product. If you need to know which product a batch is of, and whether it is bought in or made, this is what you go by. What the product is made from, what it must be and what its pack says are held by CPG - Product Definition. | — | — | [DRQ008](#drq008) · [DRQ013](#drq013) |
 | Products | <a id="sbj016"></a>SBJ016<br>**Product Batches**<br>ProductBatches | New | There is one of these for each batch of a product that was made, packed or received, known by the lot code given when it was first packed or transformed. If you need to know when it was made, how much there was and what to call it at every later movement, this is what you go by. What went into it and where it went are held on the links between production runs and batches. | Product | For each product: many, or none | [DRQ012](#drq012) · [DRQ030](#drq030) |
 | Products | <a id="sbj017"></a>SBJ017<br>**Product Sub Batches**<br>ProductSubBatches | New | There is one of these for each part a batch is divided into, with the quantity of that part. If you need to know which batch a quantity came from, this is what you go by. A batch combined from others is shown by the links between production runs and batches, not here. | Product Batches | For each product batches: many, or none | [DRQ012](#drq012) |
@@ -955,7 +958,7 @@ What kind of movement of goods a transaction records. It lets a reader tell good
 
 | List | In DDA | Used for |
 |---|---|---|
-| <a id="lkp008"></a>LKP008 TransactionKindType | New | Transaction |
+| <a id="lkp008"></a>LKP008 TransactionKindType | New | Transaction Goods Movement |
 
 | Value | Meaning |
 |---|---|
@@ -974,13 +977,13 @@ Design choices that remain open.
 | ID | Decision | Options |
 |---|---|---|
 | DEC001 | Hold a batch beneath Product, with traced links pointing at it (EXC002), or give batches a domain of their own. | beneath Product · own domain |
-| DEC004 | Instances takes the prefix UNT because INS is held by Instruments. | confirm UNT · reassign |
+| DEC004 | Instances takes the prefix UNT because INS is held by Instruments. DDA as read on 16 November 2026 holds no domain with UNT, and none with PRC, the prefix proposed for Processes. | confirm UNT · reassign |
 | DEC005 | Is finished output identified individually, or only by batch? (SCQ001) | individually · batch only · both |
 | DEC007 | State transitions could not be read from DDA, so the change package carries no preconditions. | retry before applying · apply without preconditions |
 | DEC008 | The Events and Transactions domain definitions in DDA are written for financial services. Broaden them to cover making and moving goods. | broaden · leave as is |
-| DEC009 | Product is proposed both here and by CPG - Product Definition, because DDA's Products domain holds no concept. Which model creates it, and which refers to it? | CPG - Product Definition creates it · this model creates it |
-| DEC010 | DDA's Locations domain could not be read in full. Confirm it holds no concept for a place before the change package is applied. | confirmed none · reuse what is held |
+| DEC009 | Product is proposed both here and by CPG - Product Definition, because DDA's Products domain still holds no concept (read on 16 November 2026). Which model creates it, and which refers to it? | CPG - Product Definition creates it · this model creates it |
 | DEC011 | Two years is the retention period given for traceability records. The rule's own text could not be read, so the period is unconfirmed. | keep two years · use the period in the rule |
+| DEC013 | DDA's Transaction is a movement of money or of a holding between two parties, with legs that balance, and says balances are never stored on it. Goods movements sit beneath it as the more specific kind it anticipates, and stock positions sit beneath it as counts. Keep both beneath Transaction, or propose a separate home for goods. | keep beneath Transaction · separate home for goods |
 
 ### 6.2 Where the design departs from DDA's principles
 
@@ -1056,8 +1059,8 @@ Each case is a question the business must be able to ask, with the path through 
 | SCN020 | Which machine was in this place on the day this batch was made? | Designed | as-at | [REQ033](#req033) · [REQ034](#req034) | Location Installations → Instance → Location → Location Hierarchies → Location Installations Installed By | Pass | — |
 | SCN021 | Which machines cause the most unplanned stoppage, and how do they fail? | Designed | as-at | [REQ035](#req035) · [REQ036](#req036) · [REQ039](#req039) | Event Stoppage Machines Failure Mode → Instance Conditions → Instance Failure Modes → Event Stoppage Machines → Instance Conditions Measure → Instance Conditions Value → Instance Criticality Score | Pass | — |
 | SCN022 | How long did this line stop, why, and what did maintenance do about it? | Designed | as-at | [REQ037](#req037) · [REQ038](#req038) | Event Stoppage Machines Failure Mode → Event Stoppages → Event Maintenance Work → Event Stoppage Machines → Event Action Triggers → Event Stoppages Reason → Event Stoppages Started At | Pass | — |
-| SCN023 | Who carried out each step of this batch, and were they qualified on that day? | Designed | as-at | [REQ040](#req040) · [REQ041](#req041) · [REQ064](#req064) | Person Employments → Person → Person Qualification Records → Person Work Qualifications → Event Run Places → Event Performers Capacity | Pass | — |
-| SCN024 | Where has this batch been, and where is it now? | Designed | as-at | [REQ042](#req042) · [REQ065](#req065) | Transaction Kind → Location → Transaction → Location Hierarchies → Transaction Subjects → Location Name | Pass | — |
+| SCN023 | Who carried out each step of this batch, and were they qualified on that day? | Designed | as-at | [REQ040](#req040) · [REQ041](#req041) · [REQ064](#req064) | Legal Entity Employment → Person → Person Qualification Records → Person Work Qualifications → Event Run Places → Event Performers Capacity | Pass | — |
+| SCN024 | Where has this batch been, and where is it now? | Designed | as-at | [REQ042](#req042) · [REQ065](#req065) | Transaction Goods Movement Kind → Location → Transaction → Location Hierarchies → Transaction Subjects → Location Name | Pass | — |
 | SCN025 | Did this batch meet the specification in force when it was made, and by what test? | Designed | as-at | [REQ044](#req044) · [REQ045](#req045) | Process Sampling Plans → Event Tests → Event Tests Method → Event Tests Result → Event Tests Specification Version → Event Tests Conformed | Pass | — |
 | SCN026 | What went wrong on this batch — a procedure not followed, the product out of specification, or both? | Designed | current | [REQ046](#req046) · [REQ048](#req048) | Event Findings → Event Finding Batches → Event Findings Kind → Event Findings Classification → Event Findings Contained At | Pass | — |
 | SCN027 | What was decided about this failed material, why, and by whom? | Designed | current | [REQ047](#req047) | Event Dispositions → Event Performers → Event Finding Batches → Event Performers Capacity → Event Dispositions Decision | Pass | — |
@@ -1066,11 +1069,11 @@ Each case is a question the business must be able to ask, with the path through 
 | SCN030 | Every batch this ingredient batch went into, and everywhere those went — within twenty-four hours | Designed | current | [REQ051](#req051) · [REQ052](#req052) · [REQ053](#req053) · [REQ073](#req073) | Product Batches → Event Recalls → Event Batch Inputs → Event Batch Outputs → Event Batch Outputs Quantity Produced → Product Batches Lot Code | Pass | — |
 | SCN031 | Which complaints concern this batch, and what else was made from the same inputs? | Designed | current | [REQ054](#req054) | Event Complaints → Event Complaint Batches → Event Complaints Report | Pass | — |
 | SCN032 | Who signed this record, what did it mean, and has anything been corrected since? | Designed | as-at | [REQ055](#req055) · [REQ056](#req056) · [REQ057](#req057) | Person Signings Meaning → Person Signings → Event Corrections → Event Correction Targets → Person Signings Signed At → Person Signings Is Second Check | Pass | — |
-| SCN033 | Which of our finished batches were made by an outside manufacturer, to which specification, and when did they become ours? | Designed | as-at | [REQ060](#req060) · [REQ061](#req061) · [REQ062](#req062) | Product Contract Manufacture → Legal Entity → Transaction → Legal Entity Site Operations → Transaction Parties → Product Contract Manufacture Scope | Pass | — |
+| SCN033 | Which of our finished batches were made by an outside manufacturer, to which specification, and when did they become ours? | Designed | as-at | [REQ060](#req060) · [REQ061](#req061) · [REQ062](#req062) | Product Contract Manufacture → Legal Entity → Transaction → Legal Entity Site Operations → Legal Entity Transaction Party → Product Contract Manufacture Scope | Pass | — |
 | SCN034 | Was this batch ever stored outside its permitted conditions? | Designed | as-at | [REQ066](#req066) | Event Storage Exposures Duration → Location Storage Conditions → Event Storage Breaches → Event Storage Exposures → Location Storage Conditions Lower Limit → Location Storage Conditions Upper Limit | Pass | — |
 | SCN035 | Which place or machine is this, whatever identifier the supplier or regulator used? | Designed | current | [REQ067](#req067) · [REQ069](#req069) | Location Identifiers → Location Identifiers Value → Location Identifiers Issuer → Location Registrations → Instance Identifiers → Instance Identifiers Value | Pass | — |
 | SCN037 | What is inside the chocolate coating we buy in finished? | Awkward | as-at | [REQ010](#req010) · [REQ063](#req063) | Product Is Purchased → Document Declarations → Document Declarations Property → Document Declarations Value | Limit accepted | The chain of what goes into what stops at anything bought in. Only what the supplier has declared is known here, and that is recorded with who declared it and whether it was checked. |
 | SCN038 | A supplier recalls a sugar batch used inside a coating they sold us. Which of our batches are affected? | Awkward | as-at | [REQ010](#req010) · [REQ051](#req051) · [REQ052](#req052) · [REQ053](#req053) · [REQ063](#req063) · [REQ073](#req073) | Event Batch Outputs Quantity Produced → Product Batches → Event Recalls → Event Batch Inputs → Event Batch Outputs → Product Batches Lot Code | Limit accepted | Our record reaches the coating batch we received. Whether that batch contains the recalled sugar is in the supplier's records, so the twenty-four-hour answer depends on them. |
-| SCN040 | Two products are recorded as running at the same moment on a line and on a unit inside it. Which was it? | Awkward | as-at | [REQ040](#req040) · [REQ041](#req041) · [REQ064](#req064) | Person Employments → Person → Person Qualification Records → Person Work Qualifications → Event Run Places → Event Performers Capacity | Pass | Both runs are held with their places and times, and the place hierarchy says one is inside the other. Whether they may overlap is a value-level rule, authored against the model in DDA. |
-| SCN041 | An operator ran a step the day after their qualification expired. | Awkward | as-at | [REQ040](#req040) · [REQ041](#req041) · [REQ064](#req064) | Person Employments → Person → Person Qualification Records → Person Work Qualifications → Event Run Places → Event Performers Capacity | Pass | Recorded as it happened. The qualification's dates show it had expired, so the run is answerable rather than blocked after the event. |
+| SCN040 | Two products are recorded as running at the same moment on a line and on a unit inside it. Which was it? | Awkward | as-at | [REQ040](#req040) · [REQ041](#req041) · [REQ064](#req064) | Legal Entity Employment → Person → Person Qualification Records → Person Work Qualifications → Event Run Places → Event Performers Capacity | Pass | Both runs are held with their places and times, and the place hierarchy says one is inside the other. Whether they may overlap is a value-level rule, authored against the model in DDA. |
+| SCN041 | An operator ran a step the day after their qualification expired. | Awkward | as-at | [REQ040](#req040) · [REQ041](#req041) · [REQ064](#req064) | Legal Entity Employment → Person → Person Qualification Records → Person Work Qualifications → Event Run Places → Event Performers Capacity | Pass | Recorded as it happened. The qualification's dates show it had expired, so the run is answerable rather than blocked after the event. |
 | SCN042 | How many units are in a case of this product, and how many cases on a pallet? | Designed | current | [REQ072](#req072) | Product → Product Pack Levels → Product Pack Levels Level → Product Pack Levels Identifier → Product Pack Levels Units Per Level | Pass | — |

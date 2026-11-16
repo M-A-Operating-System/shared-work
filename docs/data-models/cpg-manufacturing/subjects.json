@@ -37,7 +37,7 @@
     "template_dda_id": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a concept named PersonQualificationRecords, or one holding the same facts under another name, in People and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named PersonQualificationRecords, or one holding the same facts under another name, in People and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
     "data_requirement_ids": [
       "DRQ023"
     ],
@@ -63,7 +63,7 @@
     "template_dda_id": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a concept named PersonShiftAssignments, or one holding the same facts under another name, in People and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named PersonShiftAssignments, or one holding the same facts under another name, in People and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
     "data_requirement_ids": [
       "DRQ023"
     ],
@@ -88,7 +88,7 @@
     "template_dda_id": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a concept named PersonSignings, or one holding the same facts under another name, in People and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named PersonSignings, or one holding the same facts under another name, in People and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
     "data_requirement_ids": [
       "DRQ032"
     ],
@@ -187,7 +187,7 @@
     "template_dda_id": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a concept named LegalEntityAssessments, or one holding the same facts under another name, in LegalEntities and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named LegalEntityAssessments, or one holding the same facts under another name, in LegalEntities and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
     "data_requirement_ids": [
       "DRQ006"
     ],
@@ -213,7 +213,7 @@
     "template_dda_id": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a concept named LegalEntitySupplierRequests, or one holding the same facts under another name, in LegalEntities and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named LegalEntitySupplierRequests, or one holding the same facts under another name, in LegalEntities and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
     "data_requirement_ids": [
       "DRQ028"
     ],
@@ -263,7 +263,7 @@
     "template_dda_id": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a concept named DocumentDeclarations, or one holding the same facts under another name, in Documents and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named DocumentDeclarations, or one holding the same facts under another name, in Documents and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
     "data_requirement_ids": [
       "DRQ007",
       "DRQ008"
@@ -290,7 +290,7 @@
     "template_dda_id": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a concept named Product, or one holding the same facts under another name, in Products and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named Product in DDA's Products domain; the domain holds no concepts. Searched this model's own concepts for the same need; none holds it.",
     "data_requirement_ids": [
       "DRQ008",
       "DRQ013"
@@ -390,7 +390,7 @@
     "template_dda_id": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a concept named ProductBatches, or one holding the same facts under another name, in Products and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named ProductBatches, or one holding the same facts under another name, in Products and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
     "data_requirement_ids": [
       "DRQ012",
       "DRQ030"
@@ -417,7 +417,7 @@
     "template_dda_id": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a concept named ProductSubBatches, or one holding the same facts under another name, in Products and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named ProductSubBatches, or one holding the same facts under another name, in Products and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
     "data_requirement_ids": [
       "DRQ012"
     ],
@@ -627,7 +627,7 @@
     "template_dda_id": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a concept named Instance, or one holding the same facts under another name, in Instances and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named Instance, or one holding the same facts under another name, in Instances and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
     "data_requirement_ids": [
       "DRQ016",
       "DRQ020",
@@ -655,7 +655,7 @@
     "template_dda_id": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a concept named InstanceIdentifiers, or one holding the same facts under another name, in Instances and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named InstanceIdentifiers, or one holding the same facts under another name, in Instances and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
     "data_requirement_ids": [
       "DRQ016"
     ],
@@ -680,7 +680,7 @@
     "template_dda_id": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a concept named InstanceConditions, or one holding the same facts under another name, in Instances and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named InstanceConditions, or one holding the same facts under another name, in Instances and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
     "data_requirement_ids": [
       "DRQ021"
     ],
@@ -705,7 +705,7 @@
     "template_dda_id": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a concept named InstanceFailureModes, or one holding the same facts under another name, in Instances and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named InstanceFailureModes, or one holding the same facts under another name, in Instances and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
     "data_requirement_ids": [
       "DRQ021"
     ],
@@ -827,7 +827,7 @@
     "template_dda_id": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a concept named LocationSequencingRules, or one holding the same facts under another name, in Locations and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named LocationSequencingRules, or one holding the same facts under another name, in Locations and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
     "data_requirement_ids": [
       "DRQ019"
     ],
@@ -877,7 +877,7 @@
     "template_dda_id": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a concept named ProcessSegment, or one holding the same facts under another name, in Processes and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named ProcessSegment, or one holding the same facts under another name, in Processes and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
     "data_requirement_ids": [
       "DRQ017"
     ],
@@ -903,7 +903,7 @@
     "template_dda_id": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a concept named ProcessSegmentRequirements, or one holding the same facts under another name, in Processes and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named ProcessSegmentRequirements, or one holding the same facts under another name, in Processes and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
     "data_requirement_ids": [
       "DRQ017"
     ],
@@ -929,7 +929,7 @@
     "template_dda_id": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a concept named ProcessParameters, or one holding the same facts under another name, in Processes and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named ProcessParameters, or one holding the same facts under another name, in Processes and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
     "data_requirement_ids": [
       "DRQ017"
     ],
@@ -955,7 +955,7 @@
     "template_dda_id": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a concept named ProcessSamplingPlans, or one holding the same facts under another name, in Processes and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named ProcessSamplingPlans, or one holding the same facts under another name, in Processes and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
     "data_requirement_ids": [
       "DRQ025"
     ],
@@ -980,7 +980,7 @@
     "template_dda_id": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a concept named ProcessRoutings, or one holding the same facts under another name, in Processes and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named ProcessRoutings, or one holding the same facts under another name, in Processes and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
     "data_requirement_ids": [
       "DRQ017"
     ],
@@ -1006,7 +1006,7 @@
     "template_dda_id": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a concept named ProcessRecipeLevels, or one holding the same facts under another name, in Processes and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named ProcessRecipeLevels, or one holding the same facts under another name, in Processes and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
     "data_requirement_ids": [
       "DRQ018"
     ],
@@ -1032,7 +1032,7 @@
     "template_dda_id": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a concept named ProcessParameterValues, or one holding the same facts under another name, in Processes and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named ProcessParameterValues, or one holding the same facts under another name, in Processes and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
     "data_requirement_ids": [
       "DRQ017",
       "DRQ018"
@@ -1059,7 +1059,7 @@
     "template_dda_id": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a concept named Location or Place in DDA's Locations domain; the baseline holds no concepts for that domain, so the domain's concepts are to be read again before the change package is applied. Searched this model's own concepts: the places in the plant that were held separately are merged here.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named Location or Place in DDA's Locations domain; the domain holds no concepts. Searched this model's own concepts: the places in the plant that were held separately are merged here.",
     "data_requirement_ids": [
       "DRQ020",
       "DRQ024"
@@ -1086,7 +1086,7 @@
     "template_dda_id": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a concept named LocationIdentifiers, or one holding the same facts under another name, in Locations and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named LocationIdentifiers, or one holding the same facts under another name, in Locations and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
     "data_requirement_ids": [
       "DRQ035"
     ],
@@ -1111,7 +1111,7 @@
     "template_dda_id": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a concept named LocationStorageConditions, or one holding the same facts under another name, in Locations and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named LocationStorageConditions, or one holding the same facts under another name, in Locations and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
     "data_requirement_ids": [
       "DRQ034"
     ],
@@ -1125,7 +1125,7 @@
   {
     "id": "SBJ046",
     "code": "Transaction",
-    "definition": "There is one of these for each time goods are received, issued, moved, bought or despatched, with the time it happened. If you need to know where goods went and when, this is what you go by. How much of an item is held at a point in time is held as stock positions.",
+    "definition": "There is one of these for each movement of money or of a holding between two parties on a date. If you need to know what moved, between whom and when, this is what you go by. A holding's balance is worked out from these and is not kept here; the more specific kinds, such as movements of goods, are held beneath it.",
     "kind": "occurrence",
     "mastery": "ingested",
     "domain_id": "DOM005",
@@ -1134,36 +1134,34 @@
     "parent_cardinality": null,
     "singled_out_by": null,
     "template_dda_id": null,
-    "dda_action": "create",
-    "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a concept named Transaction, or one holding the same facts under another name, in Transactions and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "dda_action": "reuse",
+    "dda_id": "DMC000000031",
+    "reuse_search": "Searched DDA as read on 16 November 2026: Transaction is held by DDA and is reused as it stands.",
     "data_requirement_ids": [
-      "DRQ024",
-      "DRQ033"
+      "DRQ024"
     ],
     "evidence_source_ids": [
       "SRC040",
       "SRC039"
     ],
     "status": "active",
-    "withdrawn_reason": null,
-    "distinct_need": "Holds each movement of goods; stock held is a separate count."
+    "withdrawn_reason": null
   },
   {
     "id": "SBJ047",
-    "code": "TransactionLines",
+    "code": "TransactionGoodsMovementLines",
     "definition": "There is one of these for each item and quantity on a movement of goods. If you need to know how much of what moved, this is what you go by. The parties and places of the movement are held on the movement itself.",
     "kind": "occurrence",
     "mastery": "ingested",
     "domain_id": "DOM005",
     "is_anchor": false,
-    "parent_id": "SBJ046",
+    "parent_id": "SBJ068",
     "parent_cardinality": "ONE_TO_MANY_MANDATORY",
     "singled_out_by": "dates",
     "template_dda_id": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a concept named TransactionLines, or one holding the same facts under another name, in Transactions and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named TransactionLines, or one holding the same facts under another name, in Transactions and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
     "data_requirement_ids": [
       "DRQ024"
     ],
@@ -1188,7 +1186,7 @@
     "template_dda_id": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a concept named TransactionInventoryPositions, or one holding the same facts under another name, in Transactions and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named TransactionInventoryPositions, or one holding the same facts under another name, in Transactions and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
     "data_requirement_ids": [
       "DRQ013"
     ],
@@ -1214,7 +1212,7 @@
     "template_dda_id": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a concept named Event, or one holding the same facts under another name, in Events and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named Event in DDA's Events domain; the domain holds no concepts. Searched this model's own concepts for the same need; none holds it.",
     "data_requirement_ids": [
       "DRQ023"
     ],
@@ -1263,7 +1261,7 @@
     "template_dda_id": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a concept named EventProductionRuns, or one holding the same facts under another name, in Events and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named EventProductionRuns, or one holding the same facts under another name, in Events and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
     "data_requirement_ids": [
       "DRQ004",
       "DRQ023"
@@ -1316,7 +1314,7 @@
     "template_dda_id": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a concept named EventBatchSplits, or one holding the same facts under another name, in Events and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named EventBatchSplits, or one holding the same facts under another name, in Events and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
     "data_requirement_ids": [
       "DRQ012"
     ],
@@ -1342,7 +1340,7 @@
     "template_dda_id": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a concept named EventChangeovers, or one holding the same facts under another name, in Events and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named EventChangeovers, or one holding the same facts under another name, in Events and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
     "data_requirement_ids": [
       "DRQ019"
     ],
@@ -1368,7 +1366,7 @@
     "template_dda_id": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a concept named EventStoppages, or one holding the same facts under another name, in Events and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named EventStoppages, or one holding the same facts under another name, in Events and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
     "data_requirement_ids": [
       "DRQ022"
     ],
@@ -1394,7 +1392,7 @@
     "template_dda_id": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a concept named EventMaintenanceWork, or one holding the same facts under another name, in Events and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named EventMaintenanceWork, or one holding the same facts under another name, in Events and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
     "data_requirement_ids": [
       "DRQ021",
       "DRQ022"
@@ -1421,7 +1419,7 @@
     "template_dda_id": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a concept named EventTests, or one holding the same facts under another name, in Events and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named EventTests, or one holding the same facts under another name, in Events and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
     "data_requirement_ids": [
       "DRQ025"
     ],
@@ -1447,7 +1445,7 @@
     "template_dda_id": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a concept named EventFindings, or one holding the same facts under another name, in Events and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named EventFindings, or one holding the same facts under another name, in Events and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
     "data_requirement_ids": [
       "DRQ026"
     ],
@@ -1498,7 +1496,7 @@
     "template_dda_id": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a concept named EventDispositions, or one holding the same facts under another name, in Events and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named EventDispositions, or one holding the same facts under another name, in Events and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
     "data_requirement_ids": [
       "DRQ027"
     ],
@@ -1523,7 +1521,7 @@
     "template_dda_id": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a concept named EventCorrectiveActions, or one holding the same facts under another name, in Events and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named EventCorrectiveActions, or one holding the same facts under another name, in Events and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
     "data_requirement_ids": [
       "DRQ028"
     ],
@@ -1549,7 +1547,7 @@
     "template_dda_id": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a concept named EventReleases, or one holding the same facts under another name, in Events and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named EventReleases, or one holding the same facts under another name, in Events and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
     "data_requirement_ids": [
       "DRQ029"
     ],
@@ -1575,7 +1573,7 @@
     "template_dda_id": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a concept named EventRecalls, or one holding the same facts under another name, in Events and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named EventRecalls, or one holding the same facts under another name, in Events and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
     "data_requirement_ids": [
       "DRQ030"
     ],
@@ -1601,7 +1599,7 @@
     "template_dda_id": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a concept named EventComplaints, or one holding the same facts under another name, in Events and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named EventComplaints, or one holding the same facts under another name, in Events and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
     "data_requirement_ids": [
       "DRQ031"
     ],
@@ -1626,7 +1624,7 @@
     "template_dda_id": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a concept named EventCorrections, or one holding the same facts under another name, in Events and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named EventCorrections, or one holding the same facts under another name, in Events and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
     "data_requirement_ids": [
       "DRQ032"
     ],
@@ -1651,7 +1649,7 @@
     "template_dda_id": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a concept named EventStorageBreaches, or one holding the same facts under another name, in Events and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named EventStorageBreaches, or one holding the same facts under another name, in Events and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
     "data_requirement_ids": [
       "DRQ034"
     ],
@@ -1678,7 +1676,7 @@
     "template_dda_id": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a concept named ProductPackLevels, or one holding the same facts under another name, in Products and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named ProductPackLevels, or one holding the same facts under another name, in Products and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
     "data_requirement_ids": [
       "DRQ037"
     ],
@@ -1688,5 +1686,33 @@
     ],
     "status": "active",
     "withdrawn_reason": null
+  },
+  {
+    "id": "SBJ068",
+    "code": "TransactionGoodsMovement",
+    "definition": "There is one of these for each time goods are received, issued, moved, bought or despatched, with the time it happened. If you need to know where goods went and when, this is what you go by. How much of an item is held at a point in time is held as stock positions. It is a movement of goods; a movement of money or of a holding is the transaction it sits beneath.",
+    "kind": "occurrence",
+    "mastery": "ingested",
+    "domain_id": "DOM005",
+    "is_anchor": false,
+    "parent_id": "SBJ046",
+    "parent_cardinality": "ONE_TO_ONE_OPTIONAL",
+    "singled_out_by": null,
+    "template_dda_id": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept holding movements of goods. Transaction (DMC000000031) and TransactionLeg (DMC000000032) hold movements of money and holdings between two parties, with legs that balance, so goods movements are created beneath Transaction as the more specific kind its definition anticipates. Searched this model's own concepts for the same need; none holds it.",
+    "data_requirement_ids": [
+      "DRQ024",
+      "DRQ033"
+    ],
+    "evidence_source_ids": [
+      "SRC040",
+      "SRC039"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "distinct_need": "Holds each movement of goods; DDA's transaction holds movements of money and holdings, and stock held is a separate count.",
+    "independence": "The movement lines, the places goods moved from and to, the products moved and the parties to the movement all refer to it, and DDA's transaction is for money and holdings, so these facts cannot sit on it."
   }
 ]

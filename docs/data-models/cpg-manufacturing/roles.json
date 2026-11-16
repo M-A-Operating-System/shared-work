@@ -773,9 +773,9 @@
   },
   {
     "id": "ROL037",
-    "name": "Employee",
-    "plural": "Employees",
-    "definition": "A person is an Employee while it works for a company. It says that the person is employed by a company. That is not the same as being a Performer, which says a person who did a piece of work, whoever employs them.",
+    "name": "Organization Employee",
+    "plural": "Organization Employees",
+    "definition": "A person is an Organization Employee while they work for an organization under a contract of employment. It says the person is on the organization's payroll and is paid to do a job for it. It is not the same as an Organization Board or Advisory Member, who holds an oversight or advisory seat without being employed; one person may be both, and one person may work for several organizations. A person who leaves the job stops being an employee, and the employment stays on record with its dates.",
     "played_by_domain_ids": [
       "DOM001"
     ],
@@ -791,13 +791,15 @@
     ],
     "status": "active",
     "withdrawn_reason": null,
-    "distinct_need": "Names the capacity in which that the person is employed by a company; no other role in this model says it."
+    "distinct_need": "Reuses the wording DDA already holds for this role on its relationship; the role is not created again.",
+    "dda_id": "DMO000000001",
+    "dda_code": "OrgEmployee"
   },
   {
     "id": "ROL038",
-    "name": "Employer",
-    "plural": "Employers",
-    "definition": "A company is an Employer while it employs people. It says that the company has people working for it. That is not the same as being a Site Operator, which says a company that runs a place, whether or not it employs the people in it.",
+    "name": "Organization Employer",
+    "plural": "Organization Employers",
+    "definition": "A legal entity is an Organization Employer while people work for it under contracts of employment. It says the organization has staff on its payroll. It is not the same as an Organization With A Board or Advisory Body, which has people who oversee or advise it without being employed; one body may be both. A body that employs no one stops being an employer, and its earlier employment stays on record.",
     "played_by_domain_ids": [
       "DOM002"
     ],
@@ -813,7 +815,9 @@
     ],
     "status": "active",
     "withdrawn_reason": null,
-    "distinct_need": "Names the capacity in which that the company has people working for it; no other role in this model says it."
+    "distinct_need": "Reuses the wording DDA already holds for this role on its relationship; the role is not created again.",
+    "dda_id": "DMO000000002",
+    "dda_code": "OrgEmployer"
   },
   {
     "id": "ROL039",
@@ -863,9 +867,9 @@
   },
   {
     "id": "ROL041",
-    "name": "Recorded Exchange",
-    "plural": "Recorded Exchanges",
-    "definition": "An exchange is a Recorded Exchange while it records goods moving between places and companies. It says that goods moved, and when. That is not the same as being a Production Run, which says goods made, not moved.",
+    "name": "Transaction",
+    "plural": "Transactions",
+    "definition": "A transaction is a Transaction in a relationship while it is the movement of money, holdings or ownership that the other subject took part in, was booked to, or was recorded against. It is the same role wherever a transaction meets another subject, which is how those subjects join up around it. It is the movement itself, not the parties to it or the accounts it touches.",
     "played_by_domain_ids": [
       "DOM005"
     ],
@@ -885,13 +889,15 @@
     ],
     "status": "active",
     "withdrawn_reason": null,
-    "distinct_need": "Names the capacity in which that goods moved, and when; no other role in this model says it."
+    "distinct_need": "Reuses the wording DDA already holds for this role on its relationship; the role is not created again.",
+    "dda_id": "DMO000000016",
+    "dda_code": "Transaction"
   },
   {
     "id": "ROL042",
-    "name": "Trading Party",
-    "plural": "Trading Parties",
-    "definition": "A company is a Trading Party while it is on the other side of a movement of goods. It says that the company sold to, bought from or received goods from the organisation. That is not the same as being an Outside Manufacturer, which says a company that makes goods for the organisation under contract.",
+    "name": "Transaction Party",
+    "plural": "Transaction Parties",
+    "definition": "A legal entity is a Transaction Party while it takes part in a transaction as a payer, a payee, a buyer, a seller or an issuer. It says who the money or holdings moved from or to. It is not the same as an Account Beneficial Owner, who owns an account, because a party to a transaction may use an account it does not own. One legal entity may be a party to many transactions.",
     "played_by_domain_ids": [
       "DOM002"
     ],
@@ -907,7 +913,9 @@
     ],
     "status": "active",
     "withdrawn_reason": null,
-    "distinct_need": "Names the capacity in which that the company sold to, bought from or received goods from the organisation; no other role in this model says it."
+    "distinct_need": "Reuses the wording DDA already holds for this role on its relationship; the role is not created again.",
+    "dda_id": "DMO000000017",
+    "dda_code": "TransactionParty"
   },
   {
     "id": "ROL043",
