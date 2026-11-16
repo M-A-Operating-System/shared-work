@@ -2,65 +2,22 @@
   "spec_version": "1.0",
   "spec_uri": "dda://skills/domain-discovery",
   "mechanics": "manual",
-  "pass": 1,
+  "pass": 2,
   "next_action": {
     "step": 9,
-    "reason": "validate and route the first pass"
+    "reason": "validate the second pass"
   },
   "pass_limit": 6,
   "stable_pass_count": 0,
   "material_changes_last_pass": [
-    "first pass — every artefact is new"
+    "Product definition moved to CPG - Product Definition: 11 concepts, 5 relationships, 31 attributes and 2 lists of values withdrawn",
+    "Plant structure merged into Locations; the Equipment domain withdrawn",
+    "Cost withdrawn; pack levels added; batch roles merged into one Traced Batch role",
+    "Findings merged into one concept; production-order and material-consumption concepts merged away"
   ],
   "work_queue": [],
   "escalated": [],
   "scenarios": [
-    {
-      "id": "SCN001",
-      "question": "What goes into this product, and how much of each input ends up in one finished unit?",
-      "data_requirement_ids": [
-        "DRQ001"
-      ],
-      "kind": "designed",
-      "as_at": "as-at",
-      "path": [
-        "REL001",
-        "SBJ012",
-        "SBJ015",
-        "ATR001",
-        "ATR002"
-      ],
-      "result": "pass",
-      "reason": ""
-    },
-    {
-      "id": "SCN002",
-      "question": "Which finished products contain this ingredient, by any route?",
-      "data_requirement_ids": [
-        "DRQ002"
-      ],
-      "kind": "designed",
-      "as_at": "current",
-      "path": [
-        "REL001"
-      ],
-      "result": "pass",
-      "reason": ""
-    },
-    {
-      "id": "SCN003",
-      "question": "Which products use this intermediate, and are any using a variant of it that should be its own product?",
-      "data_requirement_ids": [
-        "DRQ003"
-      ],
-      "kind": "designed",
-      "as_at": "current",
-      "path": [
-        "REL001"
-      ],
-      "result": "pass",
-      "reason": ""
-    },
     {
       "id": "SCN004",
       "question": "How much more or less of each input did this batch use than the recipe specified?",
@@ -70,12 +27,12 @@
       "kind": "designed",
       "as_at": "as-at",
       "path": [
-        "ATR001",
+        "ATR121",
         "SBJ051",
-        "SBJ052",
         "REL029",
         "ATR011",
-        "ATR012"
+        "ATR012",
+        "ATR095"
       ],
       "result": "pass",
       "reason": ""
@@ -89,30 +46,27 @@
       "kind": "designed",
       "as_at": "as-at",
       "path": [
-        "ATR003",
-        "SBJ022",
-        "SBJ052",
-        "ATR005",
-        "ATR042"
+        "SBJ051",
+        "REL029",
+        "ATR122",
+        "ATR011"
       ],
       "result": "pass",
       "reason": ""
     },
     {
       "id": "SCN006",
-      "question": "Was this supplier approved for this material on the day it was received?",
+      "question": "Did this supplier hold a valid assessment on the day a delivery was received?",
       "data_requirement_ids": [
         "DRQ006"
       ],
       "kind": "designed",
       "as_at": "as-at",
       "path": [
-        "REL003",
         "SBJ005",
-        "SBJ007",
-        "REL017",
-        "ATR007",
-        "ATR080"
+        "SBJ008",
+        "ATR080",
+        "ATR081"
       ],
       "result": "pass",
       "reason": ""
@@ -144,59 +98,10 @@
       "kind": "designed",
       "as_at": "current",
       "path": [
-        "SBJ011",
+        "SBJ012",
         "ATR018",
-        "ATR036"
-      ],
-      "result": "pass",
-      "reason": ""
-    },
-    {
-      "id": "SCN009",
-      "question": "What allergens, hazards and certifications does this product carry, and from which inputs?",
-      "data_requirement_ids": [
-        "DRQ009"
-      ],
-      "kind": "designed",
-      "as_at": "as-at",
-      "path": [
-        "REL004",
-        "SBJ018",
-        "SBJ020",
-        "ATR034",
-        "ATR035"
-      ],
-      "result": "pass",
-      "reason": ""
-    },
-    {
-      "id": "SCN010",
-      "question": "What must be disclosed for this household product, and what is withheld?",
-      "data_requirement_ids": [
-        "DRQ010"
-      ],
-      "kind": "designed",
-      "as_at": "current",
-      "path": [
-        "SBJ019",
-        "ATR037",
-        "ATR038"
-      ],
-      "result": "pass",
-      "reason": ""
-    },
-    {
-      "id": "SCN011",
-      "question": "What is the latest date this finished batch can be used, given what went into it?",
-      "data_requirement_ids": [
-        "DRQ011"
-      ],
-      "kind": "designed",
-      "as_at": "current",
-      "path": [
-        "SBJ021",
-        "ATR031",
-        "ATR041"
+        "SBJ011",
+        "ATR083"
       ],
       "result": "pass",
       "reason": ""
@@ -237,41 +142,6 @@
       "reason": ""
     },
     {
-      "id": "SCN014",
-      "question": "Which pack sizes of this product exist, and did this change create a new product or a new version?",
-      "data_requirement_ids": [
-        "DRQ014"
-      ],
-      "kind": "designed",
-      "as_at": "as-at",
-      "path": [
-        "REL002",
-        "SBJ013",
-        "SBJ023",
-        "ATR019",
-        "ATR043"
-      ],
-      "result": "pass",
-      "reason": ""
-    },
-    {
-      "id": "SCN015",
-      "question": "What recipe was this batch made to, and what was it meant to contain at the time?",
-      "data_requirement_ids": [
-        "DRQ015"
-      ],
-      "kind": "designed",
-      "as_at": "as-at",
-      "path": [
-        "ATR004",
-        "SBJ015",
-        "ATR026",
-        "ATR027"
-      ],
-      "result": "pass",
-      "reason": ""
-    },
-    {
       "id": "SCN016",
       "question": "What exactly is inside this individual unit, and which batch did each part come from?",
       "data_requirement_ids": [
@@ -299,12 +169,13 @@
       "kind": "designed",
       "as_at": "current",
       "path": [
-        "SBJ033",
         "SBJ036",
+        "SBJ037",
         "REL006",
         "REL007",
-        "ATR056",
-        "ATR060"
+        "ATR060",
+        "ATR061",
+        "ATR062"
       ],
       "result": "pass",
       "reason": ""
@@ -357,9 +228,8 @@
       "path": [
         "REL011",
         "SBJ026",
-        "SBJ031",
-        "REL010",
-        "REL012",
+        "SBJ043",
+        "REL016",
         "ATR009"
       ],
       "result": "pass",
@@ -379,7 +249,8 @@
         "SBJ029",
         "REL031",
         "ATR050",
-        "ATR051"
+        "ATR051",
+        "ATR053"
       ],
       "result": "pass",
       "reason": ""
@@ -397,6 +268,7 @@
         "SBJ055",
         "SBJ056",
         "REL031",
+        "REL034",
         "ATR099",
         "ATR100"
       ],
@@ -450,11 +322,12 @@
       "kind": "designed",
       "as_at": "as-at",
       "path": [
-        "ATR023",
-        "SBJ014",
         "SBJ039",
-        "ATR024",
-        "ATR025"
+        "SBJ057",
+        "ATR103",
+        "ATR104",
+        "ATR128",
+        "ATR105"
       ],
       "result": "pass",
       "reason": ""
@@ -469,8 +342,8 @@
       "as_at": "current",
       "path": [
         "SBJ058",
-        "SBJ059",
         "REL032",
+        "ATR129",
         "ATR106",
         "ATR107"
       ],
@@ -625,34 +498,19 @@
     },
     {
       "id": "SCN035",
-      "question": "Which place or product is this, whatever identifier the supplier or regulator used?",
+      "question": "Which place or machine is this, whatever identifier the supplier or regulator used?",
       "data_requirement_ids": [
         "DRQ035"
       ],
       "kind": "designed",
       "as_at": "current",
       "path": [
-        "SBJ006",
-        "SBJ013",
+        "SBJ044",
+        "ATR070",
+        "ATR071",
         "REL018",
-        "ATR019",
-        "ATR020"
-      ],
-      "result": "pass",
-      "reason": ""
-    },
-    {
-      "id": "SCN036",
-      "question": "What did this batch cost against its standard, and why?",
-      "data_requirement_ids": [
-        "DRQ036"
-      ],
-      "kind": "designed",
-      "as_at": "as-at",
-      "path": [
-        "ATR044",
-        "SBJ024",
-        "ATR045"
+        "SBJ027",
+        "ATR049"
       ],
       "result": "pass",
       "reason": ""
@@ -666,9 +524,10 @@
       "kind": "awkward",
       "as_at": "as-at",
       "path": [
-        "ATR036",
+        "ATR018",
         "SBJ011",
-        "ATR018"
+        "ATR083",
+        "ATR084"
       ],
       "result": "accepted-limit",
       "reason": "The chain of what goes into what stops at anything bought in. Only what the supplier has declared is known here, and that is recorded with who declared it and whether it was checked."
@@ -692,22 +551,6 @@
       ],
       "result": "accepted-limit",
       "reason": "Our record reaches the coating batch we received. Whether that batch contains the recalled sugar is in the supplier's records, so the twenty-four-hour answer depends on them."
-    },
-    {
-      "id": "SCN039",
-      "question": "What did poor quality cost across the plant last year?",
-      "data_requirement_ids": [
-        "DRQ036"
-      ],
-      "kind": "awkward",
-      "as_at": "as-at",
-      "path": [
-        "ATR044",
-        "SBJ024",
-        "ATR045"
-      ],
-      "result": "fail",
-      "reason": "Scrap, rework, stoppages and complaints are each held, but nothing brings them together as one measure, and adding them up is a different question."
     },
     {
       "id": "SCN040",
@@ -746,25 +589,43 @@
       ],
       "result": "pass",
       "reason": "Recorded as it happened. The qualification's dates show it had expired, so the run is answerable rather than blocked after the event."
+    },
+    {
+      "id": "SCN042",
+      "question": "How many units are in a case of this product, and how many cases on a pallet?",
+      "data_requirement_ids": [
+        "DRQ037"
+      ],
+      "kind": "designed",
+      "as_at": "current",
+      "path": [
+        "SBJ012",
+        "SBJ067",
+        "ATR123",
+        "ATR124",
+        "ATR125"
+      ],
+      "result": "pass",
+      "reason": ""
     }
   ],
   "standards_conformance": [
     {
       "standard": "DMS000000141",
       "applies": true,
-      "how_satisfied": "Every domain in the model is an enterprise subject referenced by more than one operating model; section 5.1 records which.",
+      "how_satisfied": "Every domain is a subject shared across the business: People, Legal Entities, Documents, Events, Transactions, Products and Locations are reused as DDA holds them, and the two proposed, Instances and Processes, are named for what they are and not for a department.",
       "artefact_ids": [],
       "exception_id": null,
-      "read_hash": "f9e35439d28d4563",
+      "read_hash": "534058049e904721b3d287990805b89c10cf07eb6343f71dc2d22981c20fe531",
       "covers": []
     },
     {
       "standard": "DMS000000142",
       "applies": true,
-      "how_satisfied": "Each requirement names an accountable owner, and each finding names who it belongs to.",
+      "how_satisfied": "Each requirement names an accountable role, and what could not be checked is raised as an open decision rather than worked around.",
       "artefact_ids": [],
       "exception_id": null,
-      "read_hash": "63d270dd377b337d",
+      "read_hash": "c6eaeae60dd0baa363dfb2e5b805878cab57705b2d0d83f3c03aaf1ef17da1fb",
       "covers": []
     },
     {
@@ -773,7 +634,7 @@
       "how_satisfied": "Policy ownership. Nothing in this model changes who owns the policy.",
       "artefact_ids": [],
       "exception_id": null,
-      "read_hash": "35e1036d709968b3",
+      "read_hash": "eac0b8da26e3051f068b7434a8b8a29372eba9b193817d1ee75947f7b2525dc3",
       "covers": []
     },
     {
@@ -782,79 +643,88 @@
       "how_satisfied": "Policy precedence. No conflict with a more specific policy arises in this model.",
       "artefact_ids": [],
       "exception_id": null,
-      "read_hash": "a82cb74ed045c5a1",
+      "read_hash": "8d17da8d9ab484fa2d18b52a77e141546d51177f5ca509746925cb7542ec8a19",
       "covers": []
     },
     {
       "standard": "DMS000000145",
       "applies": false,
-      "how_satisfied": "Policy scope. The model does not decide which data the policy applies to.",
+      "how_satisfied": "Policy scope. This model does not decide which data the policy applies to.",
       "artefact_ids": [],
       "exception_id": null,
-      "read_hash": "a0b2dba74cf42c99",
+      "read_hash": "7895ab06b93287f187f7a24775fac248a7c67f01dea6cfbac47e4c2124c87559",
       "covers": []
     },
     {
       "standard": "DMS000000146",
       "applies": true,
-      "how_satisfied": "Five domains are proposed to the Committee, each with its ten domain tests and the domains considered instead.",
+      "how_satisfied": "Two domains are proposed, Instances and Processes. Each is set out with its ten domain tests and the domains considered instead, so that the body that decides domains has what it needs.",
       "artefact_ids": [],
       "exception_id": null,
-      "read_hash": "ddfb76e415173d09",
+      "read_hash": "c34244772aa3433329d0de49e6da450889be7b7e8d9c4048277a2ba1f0a46b0e",
       "covers": []
     },
     {
       "standard": "DMS000000147",
       "applies": true,
-      "how_satisfied": "Every domain is named for the subject its records are about. Eight activity- and role-shaped candidates were rejected and are recorded with the test each failed.",
+      "how_satisfied": "Every domain is named for a subject. Candidates shaped like an activity or a role — Quality, Maintenance, Production, Inventory, Suppliers, Equipment and Batches — were tested and are recorded with the test each failed and where their subjects sit.",
       "artefact_ids": [],
       "exception_id": null,
-      "read_hash": "97a1de355e4ccb24",
+      "read_hash": "efc3c383f91f685d0f987e58681342639082810e8e535e9487750912a95edc4e",
       "covers": []
     },
     {
       "standard": "DMS000000148",
-      "applies": true,
-      "how_satisfied": "Each domain proposal names the obligations that would give it its own steward.",
+      "applies": false,
+      "how_satisfied": "Stewardship and custodian roles are assigned outside a model design.",
       "artefact_ids": [],
       "exception_id": null,
-      "read_hash": "600c848a5f0b5f8a",
+      "read_hash": "0d52947b52fa0c9e7a270745e87c85f62cfcd0d6593eb923e138e751e96ac430",
       "covers": []
     },
     {
       "standard": "DMS000000149",
       "applies": true,
-      "how_satisfied": "Each subject sits in one domain only, and each domain has exactly one anchor concept.",
+      "how_satisfied": "Each concept sits in one domain and each domain has one anchor concept. Products holds no concept in DDA, so its anchor, Product, is proposed here as well as by CPG - Product Definition.",
       "artefact_ids": [],
       "exception_id": null,
-      "read_hash": "5119d08b16a8db2e",
+      "read_hash": "b0cd368cc549ebf2ac721a8a56e549bcd35e9376ab35661742c11a4ca64ffeb3",
       "covers": []
     },
     {
       "standard": "DMS000000150",
       "applies": false,
-      "how_satisfied": "Authoritative repositories are named per domain by the Committee, not by a model design.",
+      "how_satisfied": "Authoritative repositories are named per domain outside a model design.",
       "artefact_ids": [],
       "exception_id": null,
-      "read_hash": "6e66cbefadd4fbad",
+      "read_hash": "264a51aa8b0e4db1d2b2238f42c063f6dac004797102673d2d4fef04821e6865",
+      "covers": []
+    },
+    {
+      "standard": "DMS000000168",
+      "applies": true,
+      "how_satisfied": "Lineage is held by the platform and is not modelled. Which batches went into which, and where they went, is traceability in the business sense and is held as links between production runs and batches.",
+      "artefact_ids": [],
+      "exception_id": null,
+      "read_hash": "ce58a031ecb15695c2712890139e04b33ab004ba86ec237fe14a57e3e36af92d",
       "covers": []
     },
     {
       "standard": "DMS000000151",
       "applies": true,
-      "how_satisfied": "Each proposed domain records the identifier scheme by which its records are uniquely known, under test DT7.",
+      "how_satisfied": "Locations, Instances and Legal Entities each carry an identifiers concept with the issuer and dates, and each batch is known by its lot code.",
       "artefact_ids": [],
       "exception_id": null,
-      "read_hash": "bad228de4bd6b699",
+      "read_hash": "9ba0c063c441df0647ba763fe424c9ed1fcdda1373ca11f8d5c114b728a7cbc7",
       "covers": []
     },
     {
       "standard": "DMS000000152",
       "applies": true,
-      "how_satisfied": "Attributes supporting regulatory, safety or financial obligations are marked critical.",
+      "how_satisfied": "Attributes that carry a duty to keep records or protect people — lot codes, quantities used and made, who signed and when, qualifications and their expiry, how long a supplier assessment is valid — are marked critical.",
       "artefact_ids": [],
       "exception_id": null,
-      "read_hash": "9fe5f44e4b6f5a8e",
+      "read_hash": "a5761a371b10ecd52b56c32d8715dad5c5df94fdf4f437e3d0dd23946ad42919",
       "covers": []
     },
     {
@@ -863,43 +733,50 @@
       "how_satisfied": "Issue management is a programme, not a model artefact.",
       "artefact_ids": [],
       "exception_id": null,
-      "read_hash": "f582cf1ba2758239",
+      "read_hash": "fec8c75bcfa384ede87cf175dabc85663df3e6ec8042e5bce6c5ea05b3bd769e",
       "covers": []
     },
     {
       "standard": "DMS000000154",
-      "applies": true,
-      "how_satisfied": "The package carries its method version, and changes to it are governed by the method rather than by this engagement.",
+      "applies": false,
+      "how_satisfied": "Change control of the policy itself is outside a model design.",
       "artefact_ids": [],
       "exception_id": null,
-      "read_hash": "b1e3bbf408164a32",
-      "covers": []
-    },
-    {
-      "standard": "DMS000000168",
-      "applies": true,
-      "how_satisfied": "Lineage is held by the platform and is not modelled; batch-to-batch lineage in the business sense is held as relationships between runs and batches.",
-      "artefact_ids": [],
-      "exception_id": null,
-      "read_hash": "830921eaedb33308",
+      "read_hash": "7cb5a498edde29480f3c1d7643573ccf00e8a20a6799908cfa0326cf834564a7",
       "covers": []
     },
     {
       "standard": "DMS000000169",
       "applies": true,
-      "how_satisfied": "The design states how it meets each of the fourteen principles: subjects modelled once with roles derived from relationships (1, 7); business meaning approved before structure (2, 9, 14); sources understood before integration (3); enterprise identity established per domain (4); the model published rather than defined in reports (5, 6, 10); the model generating implementation through the change package (8); sensitivity, criticality and retention declared on attributes (13). Principles 11 and 12 concern data products and are met at product design rather than here.",
+      "how_satisfied": "Each of the fourteen principles is addressed in turn. Four do not apply, because this model defines no reports, data products or publication. Two are not fully met and are set out as exceptions, each with its consequence and what would resolve it.",
       "artefact_ids": [],
-      "exception_id": null,
-      "read_hash": "a24042d3b115c5e6",
-      "covers": []
+      "exception_id": "EXC002, EXC003",
+      "read_hash": "fc56357c5a3643fe44ef9b66237f61d9b593e0b92d3be833780f7782d02c5d11",
+      "covers": [],
+      "by_principle": {
+        "1": "A product is defined once, as the Product concept. What a product is to another party, such as an ingredient, a variant or a bought-in material, is a role that comes from a relationship, not a field on the product. Suppliers, certifying bodies and the business named on a pack are Legal Entities playing roles in the same way. One exception applies: some changes make a different product under an external identity rule (see below).",
+        "2": "The requirements in section 3 and the data requirements in section 4 set out the business meaning first, in business words, each with a source. The requirements draw on published sources alone (assumption SCA004). No tool, pipeline or physical structure is chosen.",
+        "3": "The design starts from {sources} published sources, listed in Appendix A with the reason each is included. It brings in no source data. A supplier's statements are kept with who made them and whether the organisation checked them.",
+        "4": "A product is identified by the identifiers it carries, such as a trade item number, an internal material number or a supplier's part number, each with its issuer and dates. Suppliers and documents use the identity DDA already has. Nothing depends on a report or a data product.",
+        "5": "Does not apply. This design defines no reports.",
+        "6": "Applies in part. The product definition is written once so that other models can refer to it (section 5.2). No data product is designed here.",
+        "7": "There are nine relationships (section 5.4). Each has a verb that reads naturally in both directions, the role at each end, how many can link, and whether dates are kept. None is reduced to a field on either side.",
+        "8": "The list of changes to make in DDA is generated from the model ({operations} steps in dependency order), and this document is produced from the same working files. One exception applies: DDA's Products definition disagrees with a requirement (see below).",
+        "9": "Definitions are written in the business's own words. Each concept shows a plain name beside its DDA name, and the requirements use the vocabulary of the field.",
+        "10": "No concept, list of values or relationship refers to an application, a report or a project.",
+        "11": "Does not apply. This design defines no data products.",
+        "12": "Does not apply. This design defines no publication of information.",
+        "13": "Sensitivity is set on {classified} of the facts the design keeps, where it applies, and {critical} are marked critical because they support a legal or safety duty. Retention and provenance are looked after by the platform and are not modelled here. Stewardship and retention are not defined, which is an exception (see below).",
+        "14": "The model uses the things the business itself talks about, products, ingredients, suppliers and certificates, and the arrangements between them, as the requirements describe them."
+      }
     },
     {
       "standard": "DMS000000156",
       "applies": true,
-      "how_satisfied": "The glossary standards define domain, model, concept, attribute, producer, consumer, custodian, operational data store, master data management, warehouse, lake and critical data element. The model uses each term as defined.",
+      "how_satisfied": "The glossary standards define domain, model, concept, attribute, producer, consumer, custodian, operational data store, master data management, warehouse, lake and critical data element. The design uses each term as defined.",
       "artefact_ids": [],
       "exception_id": null,
-      "read_hash": "356d87ed405b2c3e",
+      "read_hash": "29ee3de96a1d3913b816658b70ce7f32f5bf72de99b6e27a27fc981703c00d97",
       "covers": [
         "DMS000000157",
         "DMS000000158",
@@ -918,23 +795,26 @@
   "exceptions": [
     {
       "id": "EXC001",
-      "standard": "M04",
+      "standard": "DMS000000169",
+      "principle": 1,
+      "kind": "conflict",
       "artefact_ids": [
         "SBJ012"
       ],
-      "justification": "Product anchors physical things and also the family groupings that variants belong to, which are not physical.",
-      "consequence": "A reader querying products by kind must exclude families, or count groupings as goods.",
-      "owner": "Technical lead",
-      "route_back": "A separate grouping domain if families acquire obligations of their own.",
-      "approved": {
-        "by": "",
-        "date": ""
-      }
+      "justification": "The family grouping that once sat in Product is held by CPG - Product Definition, so Product here anchors only physical goods.",
+      "consequence": "None for this model.",
+      "owner": "Data Design Authority owner",
+      "route_back": "None needed.",
+      "status": "withdrawn",
+      "withdrawn_reason": "No longer applies: Product in this model holds no family grouping."
     },
     {
       "id": "EXC002",
-      "standard": "M15",
+      "standard": "DMS000000169",
+      "principle": 1,
+      "kind": "conflict",
       "artefact_ids": [
+        "SBJ016",
         "REL015",
         "REL029",
         "REL030",
@@ -943,49 +823,30 @@
         "REL037",
         "REL038"
       ],
-      "justification": "These relationships point at a product batch, which sits beneath the Product anchor rather than being the anchor itself. Traceability is between batches, not between product definitions.",
-      "consequence": "A relationship's destination must be read as a concept within the destination domain rather than its anchor.",
-      "owner": "Quality manager",
-      "route_back": "A declared sub-anchor destination in the method, or Batches admitted as a domain.",
-      "approved": {
-        "by": "",
-        "date": ""
-      }
+      "justification": "Tracing food forward and back is between batches, and a batch is a thing in its own right with its own life. DDA's Products domain has no place for it other than beneath the Product anchor, so every traced link points at a concept inside the domain and not at the anchor itself.",
+      "consequence": "A reader following a traced link must read its destination as the batch within Products, not as a product. A batch cannot be shared with another domain without going through Product.",
+      "owner": "Data Design Authority owner",
+      "route_back": "A domain of its own for batches, if batches acquire identity and obligations that products do not share. It fails the domain tests today because a batch has no existence apart from the product it is a batch of."
+    },
+    {
+      "id": "EXC003",
+      "standard": "DMS000000169",
+      "principle": 13,
+      "kind": "not_met",
+      "artefact_ids": [],
+      "justification": "Principle 13 asks for stewardship, retention and provenance to be set as part of the design. This design names no steward for any concept and sets a retention period only for the lot-code records the United States food traceability rule covers.",
+      "consequence": "Nobody is named as accountable for a definition, and nothing says how long the other dated records are kept.",
+      "owner": "Data Design Authority owner",
+      "route_back": "Naming a steward for each domain and setting a retention period for each kind of dated record."
     }
   ],
   "decisions": [
     {
       "id": "DEC001",
-      "question": "Approve EXC001 and EXC002, or route them back.",
+      "question": "Hold a batch beneath Product, with traced links pointing at it (EXC002), or give batches a domain of their own.",
       "options": [
-        "approve",
-        "route back"
-      ],
-      "raised_at_pass": 1,
-      "status": "open",
-      "decision": "",
-      "by": "",
-      "date": ""
-    },
-    {
-      "id": "DEC002",
-      "question": "Certification of the requirement set cannot pass in research-only mode. Publish as a reference model, or appoint a business owner.",
-      "options": [
-        "publish as reference model",
-        "appoint an owner"
-      ],
-      "raised_at_pass": 1,
-      "status": "open",
-      "decision": "",
-      "by": "",
-      "date": ""
-    },
-    {
-      "id": "DEC003",
-      "question": "Five domains and two anchor concepts in existing domains need the Data Governance Committee.",
-      "options": [
-        "approve",
-        "decline"
+        "beneath Product",
+        "own domain"
       ],
       "raised_at_pass": 1,
       "status": "open",
@@ -1022,20 +883,20 @@
     },
     {
       "id": "DEC006",
-      "question": "The total cost of poor quality is asked for and no artefact answers it. Bring it into scope, or state it as out of scope.",
+      "question": "The total cost of poor quality is asked for and no artefact holds it. Costs are out of scope for this model.",
       "options": [
         "in scope",
         "out of scope"
       ],
       "raised_at_pass": 1,
-      "status": "open",
-      "decision": "",
-      "by": "",
+      "status": "decided",
+      "decision": "out of scope",
+      "by": "Stated direction for the model",
       "date": ""
     },
     {
       "id": "DEC007",
-      "question": "State transitions could not be read: list_model(stateTransitions) returned \"An internal error occurred\". The change package therefore carries no preconditions.",
+      "question": "State transitions could not be read from DDA, so the change package carries no preconditions.",
       "options": [
         "retry before applying",
         "apply without preconditions"
@@ -1048,9 +909,9 @@
     },
     {
       "id": "DEC008",
-      "question": "The Events and Transactions domain definitions in DDA are written for financial services. Propose broadening them.",
+      "question": "The Events and Transactions domain definitions in DDA are written for financial services. Broaden them to cover making and moving goods.",
       "options": [
-        "propose update",
+        "broaden",
         "leave as is"
       ],
       "raised_at_pass": 1,
@@ -1058,20 +919,211 @@
       "decision": "",
       "by": "",
       "date": ""
-    }
-  ],
-  "certification": {
-    "baseline_pass": null,
-    "baseline_by": "",
-    "baseline_date": "",
-    "delta_requirement_ids": [],
-    "delta_certified": {
+    },
+    {
+      "id": "DEC009",
+      "question": "Product is proposed both here and by CPG - Product Definition, because DDA's Products domain holds no concept. Which model creates it, and which refers to it?",
+      "options": [
+        "CPG - Product Definition creates it",
+        "this model creates it"
+      ],
+      "raised_at_pass": 2,
+      "status": "open",
+      "decision": "",
+      "by": "",
+      "date": ""
+    },
+    {
+      "id": "DEC010",
+      "question": "DDA's Locations domain could not be read in full. Confirm it holds no concept for a place before the change package is applied.",
+      "options": [
+        "confirmed none",
+        "reuse what is held"
+      ],
+      "raised_at_pass": 2,
+      "status": "open",
+      "decision": "",
+      "by": "",
+      "date": ""
+    },
+    {
+      "id": "DEC011",
+      "question": "Two years is the retention period given for traceability records. The rule's own text could not be read, so the period is unconfirmed.",
+      "options": [
+        "keep two years",
+        "use the period in the rule"
+      ],
+      "raised_at_pass": 2,
+      "status": "open",
+      "decision": "",
       "by": "",
       "date": ""
     }
-  },
-  "approvals": [],
+  ],
   "converged": false,
   "gate_decision": null,
-  "summary": "The model covers the making of consumer packaged goods across five subgroups, in the organisation's own factories and at outside manufacturers. It reuses five DDA domains and proposes five more, and the chain of what goes into what stops at anything bought in, where the supplier's declaration takes over."
+  "summary": "The model covers how a food and beverage manufacturer receives materials, makes, packs, tests and releases product, in its own factories and through outside manufacturers, and how any batch is traced back to what went into it and forward to where it went. It reuses seven DDA domains, extends Locations to hold each factory down to the shop floor, and proposes two new domains, Instances and Processes. What a product is, and what it is made from, is held by CPG - Product Definition and is not repeated here.",
+  "document": {
+    "edition": "lite",
+    "requested_by": "Andrew Bush",
+    "rendered": ""
+  },
+  "minimality": [
+    {
+      "pass": 1,
+      "counts": {
+        "domains": 10,
+        "roles": 70,
+        "relationships": 38,
+        "concepts": 66,
+        "attributes": 120,
+        "lookups": 9
+      },
+      "merged": [],
+      "withdrawn": [],
+      "growth_justified_by": [
+        "DRQ004",
+        "DRQ005",
+        "DRQ006",
+        "DRQ007",
+        "DRQ008",
+        "DRQ012",
+        "DRQ013",
+        "DRQ016",
+        "DRQ017",
+        "DRQ018",
+        "DRQ019",
+        "DRQ020",
+        "DRQ021",
+        "DRQ022",
+        "DRQ023",
+        "DRQ024",
+        "DRQ025",
+        "DRQ026",
+        "DRQ027",
+        "DRQ028",
+        "DRQ029",
+        "DRQ030",
+        "DRQ031",
+        "DRQ032",
+        "DRQ033",
+        "DRQ034",
+        "DRQ035"
+      ]
+    },
+    {
+      "pass": 2,
+      "counts": {
+        "domains": 9,
+        "roles": 48,
+        "relationships": 31,
+        "concepts": 48,
+        "attributes": 93,
+        "lookups": 10
+      },
+      "merged": [
+        "SBJ031 into SBJ043",
+        "SBJ032 into SBJ044",
+        "SBJ052 into SBJ051",
+        "SBJ059 into SBJ058",
+        "SBJ030 into SBJ026",
+        "REL010 into REL016",
+        "ROL051, ROL052, ROL053, ROL054, ROL058, ROL060, ROL068, ROL070, ROL030 into ROL071",
+        "ROL065 into ROL057"
+      ],
+      "withdrawn": [
+        "ATR001",
+        "ATR003",
+        "ATR004",
+        "ATR005",
+        "ATR007",
+        "ATR016",
+        "ATR019",
+        "ATR020",
+        "ATR021",
+        "ATR022",
+        "ATR023",
+        "ATR024",
+        "ATR025",
+        "ATR026",
+        "ATR027",
+        "ATR028",
+        "ATR031",
+        "ATR034",
+        "ATR035",
+        "ATR036",
+        "ATR037",
+        "ATR038",
+        "ATR039",
+        "ATR040",
+        "ATR041",
+        "ATR042",
+        "ATR043",
+        "ATR044",
+        "ATR045",
+        "ATR046",
+        "ATR047",
+        "ATR055",
+        "ATR056",
+        "ATR059",
+        "ATR102",
+        "ATR108",
+        "ATR109",
+        "LKP002",
+        "LKP003",
+        "REL001",
+        "REL002",
+        "REL003",
+        "REL004",
+        "REL010",
+        "REL012",
+        "REL017",
+        "ROL001",
+        "ROL002",
+        "ROL003",
+        "ROL004",
+        "ROL005",
+        "ROL006",
+        "ROL007",
+        "ROL008",
+        "ROL009",
+        "ROL020",
+        "ROL021",
+        "ROL024",
+        "ROL025",
+        "ROL030",
+        "ROL051",
+        "ROL052",
+        "ROL053",
+        "ROL054",
+        "ROL058",
+        "ROL060",
+        "ROL065",
+        "ROL068",
+        "ROL070",
+        "SBJ013",
+        "SBJ014",
+        "SBJ015",
+        "SBJ018",
+        "SBJ019",
+        "SBJ020",
+        "SBJ021",
+        "SBJ022",
+        "SBJ023",
+        "SBJ024",
+        "SBJ025",
+        "SBJ030",
+        "SBJ031",
+        "SBJ032",
+        "SBJ033",
+        "SBJ035",
+        "SBJ050",
+        "SBJ052",
+        "SBJ059"
+      ],
+      "growth_justified_by": [
+        "DRQ037"
+      ]
+    }
+  ]
 }

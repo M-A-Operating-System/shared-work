@@ -1,41 +1,17 @@
 {
-  "domain": "CPG Manufacturing Operations",
-  "business": "A manufacturer of consumer packaged goods. It buys materials, makes and tests product, and releases it for despatch, through its own factories and through outside manufacturers.",
+  "domain": "CPG Manufacturing and Supply Chain",
+  "business": "A manufacturer of food and beverage products. It receives materials, makes, packs and tests product, and releases it for despatch, through its own factories and through outside manufacturers.",
   "subgroups": [
     {
       "id": "SCG001",
       "name": "Food and beverage",
-      "is_primary": false
-    },
-    {
-      "id": "SCG002",
-      "name": "Household and cleaning products",
-      "is_primary": false
-    },
-    {
-      "id": "SCG003",
-      "name": "Personal care and cosmetics",
-      "is_primary": false
-    },
-    {
-      "id": "SCG004",
-      "name": "Pet care",
-      "is_primary": false
-    },
-    {
-      "id": "SCG005",
-      "name": "Beauty",
-      "is_primary": false
+      "is_primary": true
     }
   ],
   "in_scope": [
     {
       "id": "SCI001",
-      "statement": "Buying materials, and deciding which suppliers may supply them"
-    },
-    {
-      "id": "SCI002",
-      "statement": "Defining products — what they are made from and what they must be"
+      "statement": "Receiving materials from suppliers, and assessing the suppliers"
     },
     {
       "id": "SCI003",
@@ -43,7 +19,7 @@
     },
     {
       "id": "SCI004",
-      "statement": "The layout of each factory and the machines in it"
+      "statement": "The places in each factory down to the shop floor, and the machines in them"
     },
     {
       "id": "SCI005",
@@ -64,6 +40,14 @@
     {
       "id": "SCI009",
       "statement": "Product made or packed by outside manufacturers"
+    },
+    {
+      "id": "SCI010",
+      "statement": "Packing, and the levels a product is packed in for handling — unit, case and pallet"
+    },
+    {
+      "id": "SCI011",
+      "statement": "The sites that suppliers and outside manufacturers make and ship from"
     }
   ],
   "out_of_scope": [
@@ -96,6 +80,21 @@
       "id": "SCO006",
       "statement": "Research and development before a product is formally defined",
       "owned_by": "Not modelled"
+    },
+    {
+      "id": "SCO007",
+      "statement": "Defining products — what they are made from, what they must be, how long they last and what their packs say",
+      "owned_by": "The CPG - Product Definition model"
+    },
+    {
+      "id": "SCO008",
+      "statement": "The total cost of poor quality, and any other cost worked out by adding up what happened",
+      "owned_by": "The finance model"
+    },
+    {
+      "id": "SCO009",
+      "statement": "Household and cleaning products, personal care and cosmetics, pet care and beauty",
+      "owned_by": "A later extension of this model"
     }
   ],
   "shared_objects": [
@@ -123,6 +122,16 @@
       "id": "SCS005",
       "name": "Transactions",
       "dda_id": "DMD000000022"
+    },
+    {
+      "id": "SCS006",
+      "name": "Products",
+      "dda_id": "DMD000000032"
+    },
+    {
+      "id": "SCS007",
+      "name": "Locations",
+      "dda_id": "DMD000000034"
     }
   ],
   "assumptions": [
@@ -140,7 +149,19 @@
     },
     {
       "id": "SCA004",
-      "statement": "This is research-only work. No business owner has reviewed the requirements."
+      "statement": "The product definition — what a product is made from, what it must be, how long it lasts and what its pack says — is held by CPG - Product Definition. This model refers to a product and does not define it again."
+    },
+    {
+      "id": "SCA005",
+      "statement": "A manufacturing bill of materials is read as the formulation held in CPG - Product Definition. This model holds how a batch compares with it: what was used, and in what quantity."
+    },
+    {
+      "id": "SCA006",
+      "statement": "Food traceability duties differ by market. The United States, the United Kingdom and the European Union are the sample markets, and other markets come in as further requirements, not as a different design."
+    },
+    {
+      "id": "SCA007",
+      "statement": "Costs are not held. What each stoppage, failure, rework and complaint was is recorded; adding them up is a calculation outside this model."
     }
   ],
   "questions_unanswered": [
@@ -153,11 +174,6 @@
       "id": "SCQ002",
       "question_no": 11,
       "note": "What proportion of output is made by outside manufacturers? Where it is most of it, the organisation holds little production record of its own."
-    },
-    {
-      "id": "SCQ003",
-      "question_no": 13,
-      "note": "State transitions could not be read from the platform, so the change package carries no preconditions."
     }
   ],
   "candidate_dda_domains": [
@@ -165,10 +181,10 @@
     "DMD000000012",
     "DMD000000016",
     "DMD000000020",
-    "DMD000000022"
+    "DMD000000022",
+    "DMD000000032",
+    "DMD000000034"
   ],
-  "mode": "research-only",
-  "certifier": "none — research-only",
   "source_cap_per_function": 6,
   "external_standards": [
     "ISA-95 / IEC 62264",

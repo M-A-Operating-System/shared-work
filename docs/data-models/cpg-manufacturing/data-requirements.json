@@ -18,7 +18,7 @@
       "A product that contains itself, however many steps away",
       "A recipe read from lines belonging to two different versions"
     ],
-    "status": "active",
+    "status": "withdrawn",
     "prevent_resolution": [
       {
         "must_prevent_index": 0,
@@ -31,7 +31,7 @@
         "artefact_id": "SBJ015"
       }
     ],
-    "withdrawn_reason": null
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
   },
   {
     "id": "DRQ002",
@@ -47,9 +47,9 @@
     ],
     "temporality": "current",
     "must_prevent": [],
-    "status": "active",
+    "status": "withdrawn",
     "prevent_resolution": [],
-    "withdrawn_reason": null
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
   },
   {
     "id": "DRQ003",
@@ -66,7 +66,7 @@
     "must_prevent": [
       "Adjusting what goes into an input from inside the product that uses it"
     ],
-    "status": "active",
+    "status": "withdrawn",
     "prevent_resolution": [
       {
         "must_prevent_index": 0,
@@ -74,7 +74,7 @@
         "artefact_id": "REL001"
       }
     ],
-    "withdrawn_reason": null
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
   },
   {
     "id": "DRQ004",
@@ -83,7 +83,7 @@
       "REQ022"
     ],
     "must_record": [
-      "The quantity the recipe specified for each input",
+      "The quantity the recipe called for, as it stood when the batch was made",
       "The quantity each batch actually used"
     ],
     "must_answer": [
@@ -101,22 +101,21 @@
       "REQ007"
     ],
     "must_record": [
-      "Which input actually filled each place in the recipe on each batch",
-      "Approved alternatives and the conditions for using them"
+      "Which input actually filled each place in the recipe on each batch, and whether it was the specified input or an alternative"
     ],
     "must_answer": [
       "Which batches used an alternative input, and for which ingredient?"
     ],
     "temporality": "as-at",
     "must_prevent": [
-      "An alternative used without approval"
+      "A batch that used an alternative input with nothing recording that it did"
     ],
     "status": "active",
     "prevent_resolution": [
       {
         "must_prevent_index": 0,
         "expressed_by": "mandatory-attribute",
-        "artefact_id": "ATR042"
+        "artefact_id": "ATR122"
       }
     ],
     "withdrawn_reason": null
@@ -124,26 +123,24 @@
   {
     "id": "DRQ006",
     "business_requirement_ids": [
-      "REQ008",
       "REQ058"
     ],
     "must_record": [
-      "Each supplier's approval for each material, with the dates it held",
-      "Each assessment of a supplier, its scope and how long it is valid"
+      "Each assessment of a supplier or outside manufacturer, its scope and how long it is valid"
     ],
     "must_answer": [
-      "Was this supplier approved for this material on the day it was received?"
+      "Did this supplier hold a valid assessment on the day a delivery was received?"
     ],
     "temporality": "as-at",
     "must_prevent": [
-      "An approval treated as current after it lapsed"
+      "An assessment treated as current after it lapsed"
     ],
     "status": "active",
     "prevent_resolution": [
       {
         "must_prevent_index": 0,
-        "expressed_by": "dates",
-        "artefact_id": "REL003"
+        "expressed_by": "mandatory-attribute",
+        "artefact_id": "ATR081"
       }
     ],
     "withdrawn_reason": null
@@ -208,7 +205,7 @@
     "must_prevent": [
       "A product declared free of something one of its inputs contains"
     ],
-    "status": "active",
+    "status": "withdrawn",
     "prevent_resolution": [
       {
         "must_prevent_index": 0,
@@ -216,7 +213,7 @@
         "artefact_id": "REL001"
       }
     ],
-    "withdrawn_reason": null
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
   },
   {
     "id": "DRQ010",
@@ -231,9 +228,9 @@
     ],
     "temporality": "current",
     "must_prevent": [],
-    "status": "active",
+    "status": "withdrawn",
     "prevent_resolution": [],
-    "withdrawn_reason": null
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
   },
   {
     "id": "DRQ011",
@@ -248,9 +245,9 @@
     ],
     "temporality": "current",
     "must_prevent": [],
-    "status": "active",
+    "status": "withdrawn",
     "prevent_resolution": [],
-    "withdrawn_reason": null
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
   },
   {
     "id": "DRQ012",
@@ -271,8 +268,8 @@
     "prevent_resolution": [
       {
         "must_prevent_index": 0,
-        "expressed_by": "relationship-cardinality",
-        "artefact_id": "REL001"
+        "expressed_by": "parent-cardinality",
+        "artefact_id": "SBJ017"
       }
     ],
     "withdrawn_reason": null
@@ -298,8 +295,8 @@
     "prevent_resolution": [
       {
         "must_prevent_index": 0,
-        "expressed_by": "parent-cardinality",
-        "artefact_id": "SBJ048"
+        "expressed_by": "mandatory-attribute",
+        "artefact_id": "ATR089"
       }
     ],
     "withdrawn_reason": null
@@ -319,9 +316,9 @@
     ],
     "temporality": "as-at",
     "must_prevent": [],
-    "status": "active",
+    "status": "withdrawn",
     "prevent_resolution": [],
-    "withdrawn_reason": null
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
   },
   {
     "id": "DRQ015",
@@ -337,9 +334,9 @@
     ],
     "temporality": "as-at",
     "must_prevent": [],
-    "status": "active",
+    "status": "withdrawn",
     "prevent_resolution": [],
-    "withdrawn_reason": null
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
   },
   {
     "id": "DRQ016",
@@ -355,14 +352,14 @@
     ],
     "temporality": "as-at",
     "must_prevent": [
-      "A unit recorded with a part its definition does not call for"
+      "A batch built into a unit with no quantity recorded"
     ],
     "status": "active",
     "prevent_resolution": [
       {
         "must_prevent_index": 0,
-        "expressed_by": "relationship-cardinality",
-        "artefact_id": "REL015"
+        "expressed_by": "mandatory-attribute",
+        "artefact_id": "ATR006"
       }
     ],
     "withdrawn_reason": null
@@ -554,7 +551,7 @@
       "REQ045"
     ],
     "must_record": [
-      "Each version of a specification, and each test with its method, sample, sampling plan and result"
+      "Each test with its method, sample, sampling plan and result, and the version of the specification it was judged against"
     ],
     "must_answer": [
       "Did this batch meet the specification in force when it was made, and by what test?"
@@ -585,8 +582,8 @@
     "prevent_resolution": [
       {
         "must_prevent_index": 0,
-        "expressed_by": "platform",
-        "artefact_id": null
+        "expressed_by": "mandatory-attribute",
+        "artefact_id": "ATR129"
       }
     ],
     "withdrawn_reason": null
@@ -597,14 +594,14 @@
       "REQ047"
     ],
     "must_record": [
-      "Each hold, the decision taken, the reason, and who approved it"
+      "Each hold, the decision taken, the reason, and who decided it"
     ],
     "must_answer": [
       "What was decided about this failed material, why, and by whom?"
     ],
     "temporality": "current",
     "must_prevent": [
-      "A decision with no named approver"
+      "A decision with no named decider"
     ],
     "status": "active",
     "prevent_resolution": [
@@ -672,7 +669,8 @@
     "business_requirement_ids": [
       "REQ051",
       "REQ052",
-      "REQ053"
+      "REQ053",
+      "REQ071"
     ],
     "must_record": [
       "The lot code given at first packing or transformation, carried at every later movement, kept for two years"
@@ -719,7 +717,7 @@
       "REQ057"
     ],
     "must_record": [
-      "Each signature — who, what, when, and what it meant — each second check, and each correction as a new entry"
+      "Each signing — who, what, when, and what it meant — each second check, and each correction as a new entry"
     ],
     "must_answer": [
       "Who signed this record, what did it mean, and has anything been corrected since?"
@@ -781,10 +779,10 @@
       "REQ069"
     ],
     "must_record": [
-      "The identifiers each place and each product carries, and who issued each"
+      "The identifiers each place and each machine carries, and who issued each"
     ],
     "must_answer": [
-      "Which place or product is this, whatever identifier the supplier or regulator used?"
+      "Which place or machine is this, whatever identifier the supplier or regulator used?"
     ],
     "temporality": "current",
     "must_prevent": [],
@@ -805,8 +803,34 @@
     ],
     "temporality": "as-at",
     "must_prevent": [],
-    "status": "active",
+    "status": "withdrawn",
     "prevent_resolution": [],
+    "withdrawn_reason": "Cost is not held in this model (REQ070 is withdrawn)."
+  },
+  {
+    "id": "DRQ037",
+    "business_requirement_ids": [
+      "REQ072"
+    ],
+    "must_record": [
+      "Each level a product is packed in, such as unit, case and pallet",
+      "How many of the next level down each level holds"
+    ],
+    "must_answer": [
+      "How many units are in a case of this product, and how many cases on a pallet?"
+    ],
+    "temporality": "current",
+    "must_prevent": [
+      "A level that holds nothing, or holds itself"
+    ],
+    "status": "active",
+    "prevent_resolution": [
+      {
+        "must_prevent_index": 0,
+        "expressed_by": "mandatory-attribute",
+        "artefact_id": "ATR125"
+      }
+    ],
     "withdrawn_reason": null
   }
 ]

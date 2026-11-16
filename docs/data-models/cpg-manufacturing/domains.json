@@ -18,8 +18,7 @@
         "SBJ002",
         "SBJ003",
         "SBJ004"
-      ],
-      "committee_decision": null
+      ]
     },
     {
       "id": "DOM002",
@@ -40,8 +39,7 @@
         "SBJ007",
         "SBJ008",
         "SBJ009"
-      ],
-      "committee_decision": null
+      ]
     },
     {
       "id": "DOM003",
@@ -59,8 +57,7 @@
       "subject_ids": [
         "SBJ010",
         "SBJ011"
-      ],
-      "committee_decision": null
+      ]
     },
     {
       "id": "DOM004",
@@ -77,16 +74,13 @@
       "reuse_considered": [],
       "subject_ids": [
         "SBJ049",
-        "SBJ050",
         "SBJ051",
-        "SBJ052",
         "SBJ053",
         "SBJ054",
         "SBJ055",
         "SBJ056",
         "SBJ057",
         "SBJ058",
-        "SBJ059",
         "SBJ060",
         "SBJ061",
         "SBJ062",
@@ -94,8 +88,7 @@
         "SBJ064",
         "SBJ065",
         "SBJ066"
-      ],
-      "committee_decision": null
+      ]
     },
     {
       "id": "DOM005",
@@ -114,126 +107,27 @@
         "SBJ046",
         "SBJ047",
         "SBJ048"
-      ],
-      "committee_decision": null
+      ]
     },
     {
       "id": "DOM006",
-      "dda_id": null,
-      "dda_action": "create",
+      "dda_id": "DMD000000032",
+      "dda_action": "reuse",
       "code": "Products",
       "prefix": "PRD",
-      "definition": "Products are the things an organisation buys, makes or sells, at every level of processing and packing — ingredients, packaging components, part-made goods, finished packs and cases — together with what each is defined to be and what it is made from. Includes the batches in which they are made or received. Excludes the individual serial-numbered units made to a product definition, which are Instances, and the financial instruments an organisation issues or trades, which are Instruments.",
+      "definition": null,
       "definition_update": null,
       "anchor_subject_id": "SBJ012",
-      "shared": false,
-      "admission_gate": {
-        "independent": "A product definition exists whether or not this organisation makes anything; a supplier's finished product is this organisation's ingredient.",
-        "survives": "It survives discontinuation as the record of what was sold, what it contained and who it was sold to.",
-        "named": "Technical, quality, procurement and supply chain roles name products every day without being led."
-      },
-      "domain_tests": {
-        "DT1": {
-          "answer": "Products are things the business deals in. Making, testing and releasing are activities that act on them and are held as occurrences in Events.",
-          "evidence_ids": [
-            "SRC005",
-            "SRC008"
-          ]
-        },
-        "DT2": {
-          "answer": "A product can be described without naming a second party — what it is made from, what it must be, how long it lasts. Supplier and customer are roles of the parties to it, not of it.",
-          "evidence_ids": [
-            "SRC031",
-            "SRC020"
-          ]
-        },
-        "DT3": {
-          "answer": "A product is not a Legal Entity, a Person, a Document, a Transaction or an Event. Nothing in the current register has products as members.",
-          "evidence_ids": [
-            "SRC005"
-          ]
-        },
-        "DT4": {
-          "answer": "A product definition exists independently of this organisation: it is bought and sold between organisations, and a supplier's finished product is this organisation's input.",
-          "evidence_ids": [
-            "SRC023",
-            "SRC024"
-          ]
-        },
-        "DT5": {
-          "answer": "After discontinuation the definition, its batches and their lineage remain producible, and are required to be for two years after the record is made.",
-          "evidence_ids": [
-            "SRC011",
-            "SRC009"
-          ]
-        },
-        "DT6": {
-          "answer": "Technical, quality and procurement roles name products, ingredients and packs unprompted.",
-          "evidence_ids": [
-            "SRC020",
-            "SRC029"
-          ]
-        },
-        "DT7": {
-          "answer": "Products carry their own identifier scheme — the trade item number, allocated by the organisation under GS1 rules, with internal material numbers as secondary keys.",
-          "evidence_ids": [
-            "SRC030",
-            "SRC031"
-          ]
-        },
-        "DT8": {
-          "answer": "Products carry obligations no existing domain carries: declared formulation, ingredient disclosure, hazard declaration, shelf life and lot-level traceability, each with its own regulator and steward.",
-          "evidence_ids": [
-            "SRC034",
-            "SRC025",
-            "SRC009"
-          ]
-        },
-        "DT9": {
-          "answer": "Commercial, trade and marketing models all reference the same product records; a product is referenced far beyond manufacturing.",
-          "evidence_ids": [
-            "SRC008",
-            "SRC030"
-          ]
-        },
-        "DT10": {
-          "answer": "No current domain's definition covers a thing that is bought, made and sold. Instruments covers financial instruments, which products are not.",
-          "evidence_ids": [
-            "SRC005"
-          ]
-        }
-      },
-      "reuse_considered": [
-        {
-          "dda_id": null,
-          "why_not": "Instruments covers financial instruments — what an organisation issues or trades — not physical goods it makes."
-        },
-        {
-          "dda_id": "DMD000000022",
-          "why_not": "Transactions covers exchanges of goods, not the goods themselves; a product exists between transactions."
-        },
-        {
-          "dda_id": "DMD000000016",
-          "why_not": "Documents covers documentary evidence about things, not the things."
-        }
-      ],
+      "shared": true,
+      "admission_gate": null,
+      "domain_tests": null,
+      "reuse_considered": [],
       "subject_ids": [
         "SBJ012",
-        "SBJ013",
-        "SBJ014",
-        "SBJ015",
         "SBJ016",
         "SBJ017",
-        "SBJ018",
-        "SBJ019",
-        "SBJ020",
-        "SBJ021",
-        "SBJ022",
-        "SBJ023",
-        "SBJ024",
-        "SBJ025"
-      ],
-      "committee_decision": null
+        "SBJ067"
+      ]
     },
     {
       "id": "DOM007",
@@ -332,112 +226,9 @@
         "SBJ026",
         "SBJ027",
         "SBJ028",
-        "SBJ029",
-        "SBJ030"
+        "SBJ029"
       ],
-      "committee_decision": null
-    },
-    {
-      "id": "DOM008",
-      "dda_id": null,
-      "dda_action": "create",
-      "code": "Equipment",
-      "prefix": "EQP",
-      "definition": "Equipment covers the places in a plant where work is performed — site, area, work centre, work unit and equipment module — what each is able to do, and the rules that constrain what may run there. Includes the plant structure as ISA-95 defines it. Excludes the machines that stand in those places, which are Instances, and the geographic places goods are held at, which are Locations.",
-      "definition_update": null,
-      "anchor_subject_id": "SBJ031",
-      "shared": false,
-      "admission_gate": {
-        "independent": "A production line exists independently of the machine standing in it and of the organisation operating it; lines are bought, sold and relocated with a site.",
-        "survives": "It survives the replacement of every machine in it, and a past batch is still answerable against the place it ran at.",
-        "named": "Plant managers and production planners name lines, cells and units every day."
-      },
-      "domain_tests": {
-        "DT1": {
-          "answer": "A place in a plant is a thing, not an activity. Running and changing over are occurrences held in Events.",
-          "evidence_ids": [
-            "SRC001",
-            "SRC004"
-          ]
-        },
-        "DT2": {
-          "answer": "A line can be described without naming a second party — what it can do, how fast, what it sits within.",
-          "evidence_ids": [
-            "SRC001"
-          ]
-        },
-        "DT3": {
-          "answer": "A place in a plant is not a Location: a location is a geographic place goods are held at, a work centre is a position in a production structure. One site holds many work centres.",
-          "evidence_ids": [
-            "SRC001"
-          ]
-        },
-        "DT4": {
-          "answer": "ISA-95 defines the equipment hierarchy as a role-based structure that exists independently of the machines filling it.",
-          "evidence_ids": [
-            "SRC001",
-            "SRC004"
-          ]
-        },
-        "DT5": {
-          "answer": "After decommissioning, what ran at the place and what stood in it remain answerable.",
-          "evidence_ids": [
-            "SRC016",
-            "SRC001"
-          ]
-        },
-        "DT6": {
-          "answer": "Plant managers name lines, cells and filling stations unprompted.",
-          "evidence_ids": [
-            "SRC018",
-            "SRC016"
-          ]
-        },
-        "DT7": {
-          "answer": "Places in a plant carry their own identifier scheme, used by the control and execution systems.",
-          "evidence_ids": [
-            "SRC001"
-          ]
-        },
-        "DT8": {
-          "answer": "A place carries obligations no other domain carries: qualification to run a product, sequencing constraints, capacity and changeover.",
-          "evidence_ids": [
-            "SRC034",
-            "SRC017"
-          ]
-        },
-        "DT9": {
-          "answer": "Production, maintenance, planning and quality all reference the same plant structure.",
-          "evidence_ids": [
-            "SRC016",
-            "SRC004"
-          ]
-        },
-        "DT10": {
-          "answer": "No current domain covers the structure of a plant.",
-          "evidence_ids": [
-            "SRC001"
-          ]
-        }
-      },
-      "reuse_considered": [
-        {
-          "dda_id": null,
-          "why_not": "Instruments is financial and unrelated."
-        },
-        {
-          "dda_id": null,
-          "why_not": "Locations was considered and rejected on DT3: a site is a geographic place; a work centre is a position within a production structure, and the two have different obligations."
-        }
-      ],
-      "subject_ids": [
-        "SBJ031",
-        "SBJ032",
-        "SBJ033",
-        "SBJ034",
-        "SBJ035"
-      ],
-      "committee_decision": null
+      "reuse_search": ""
     },
     {
       "id": "DOM009",
@@ -445,7 +236,7 @@
       "dda_action": "create",
       "code": "Processes",
       "prefix": "PRC",
-      "definition": "Processes are the defined steps of work by which products are made — mixing, pasteurising, filling, labelling — the order they run in, the settings they run at, and the recipes that state them at each level of specificity from formulation to the instructions issued for one batch. Includes what each step requires of equipment, people and materials. Excludes what a product is made from, which is Products, and the record of a step actually being performed, which is an Event.",
+      "definition": "Processes are the defined steps of work by which products are made — mixing, pasteurising, filling, labelling — the order they run in, the settings they run at, and the recipes that state them at each level of specificity from formulation to the instructions issued for one batch. Includes what each step requires of machines, people and materials. Excludes what a product is made from, which is Products, and the record of a step actually being performed, which is an Event.",
       "definition_update": null,
       "anchor_subject_id": "SBJ036",
       "shared": false,
@@ -503,7 +294,7 @@
           ]
         },
         "DT8": {
-          "answer": "A recipe carries obligations no other domain carries: approval, version control, parameter limits and the instructions issued for one batch.",
+          "answer": "A recipe carries obligations no other domain carries: authorisation, version control, parameter limits and the instructions issued for one batch.",
           "evidence_ids": [
             "SRC003",
             "SRC033"
@@ -542,107 +333,32 @@
         "SBJ041",
         "SBJ042"
       ],
-      "committee_decision": null
+      "reuse_search": ""
     },
     {
       "id": "DOM010",
-      "dda_id": null,
-      "dda_action": "create",
+      "dda_id": "DMD000000034",
+      "dda_action": "extend",
       "code": "Locations",
       "prefix": "LOC",
-      "definition": "Locations are identifiable geographic places at which things are held or handled — a site, a plant, a warehouse, a storage position within one — the conditions each must keep, and the identifiers each is known by. Includes places operated by other organisations where goods are received from or delivered to. Excludes the production structure within a site, which is Equipment.",
-      "definition_update": null,
+      "definition": "The Locations domain holds all physical points on earth that an organisation needs to identify, as DDA defines it. For this model it also holds the structure of each factory down to the shop floor: the site, its areas, production lines, rooms and storage positions, each place inside the one above it, with the conditions each place must keep and the identifiers each is known by. Machines standing in these places are held with Instances.",
+      "definition_update": "The Locations domain also holds the structure of each factory down to the shop floor: the site, its areas, production lines, rooms and storage positions, each place inside the one above it, with the conditions each place must keep and the identifiers each is known by. Machines that stand in these places are held with Instances.",
       "anchor_subject_id": "SBJ043",
-      "shared": false,
-      "admission_gate": {
-        "independent": "A site or warehouse exists independently of this organisation; suppliers', customers' and regulators' places are all locations and each is identified by its own authority.",
-        "survives": "It survives closure as the place that past movements and past production refer to.",
-        "named": "Supply chain, quality and regulatory roles name sites, plants and warehouses every day."
-      },
-      "domain_tests": {
-        "DT1": {
-          "answer": "A place is a thing, not an activity. Storing and moving are occurrences held in Events and Transactions.",
-          "evidence_ids": [
-            "SRC039",
-            "SRC040"
-          ]
-        },
-        "DT2": {
-          "answer": "A site can be described without naming a second party — where it is, what conditions it keeps.",
-          "evidence_ids": [
-            "SRC020",
-            "SRC039"
-          ]
-        },
-        "DT3": {
-          "answer": "A place is not a Legal Entity: one organisation operates many places, and a place may change operator.",
-          "evidence_ids": [
-            "SRC011"
-          ]
-        },
-        "DT4": {
-          "answer": "Places are identified by outside authorities — a global location number, a regulator's facility registration — independently of this organisation.",
-          "evidence_ids": [
-            "SRC011"
-          ]
-        },
-        "DT5": {
-          "answer": "After a site closes, the movements and production that refer to it remain answerable, and lot codes carry their source place for two years.",
-          "evidence_ids": [
-            "SRC011",
-            "SRC009"
-          ]
-        },
-        "DT6": {
-          "answer": "Supply chain and quality roles name sites and warehouses unprompted.",
-          "evidence_ids": [
-            "SRC039",
-            "SRC029"
-          ]
-        },
-        "DT7": {
-          "answer": "Places carry their own identifier scheme — global location number, facility registration number, internal site code.",
-          "evidence_ids": [
-            "SRC011"
-          ]
-        },
-        "DT8": {
-          "answer": "A place carries obligations no other domain carries: storage conditions, site certification, and identification as a lot code source.",
-          "evidence_ids": [
-            "SRC020",
-            "SRC011"
-          ]
-        },
-        "DT9": {
-          "answer": "Manufacturing, distribution, commercial and regulatory processes all reference the same places.",
-          "evidence_ids": [
-            "SRC011",
-            "SRC040"
-          ]
-        },
-        "DT10": {
-          "answer": "No current domain covers a geographic place.",
-          "evidence_ids": [
-            "SRC011"
-          ]
-        }
-      },
+      "shared": true,
+      "admission_gate": null,
+      "domain_tests": null,
       "reuse_considered": [
         {
-          "dda_id": "DMD000000012",
-          "why_not": "LegalEntities was considered and rejected on DT3: an organisation is not a place, and one organisation operates many."
-        },
-        {
-          "dda_id": null,
-          "why_not": "Equipment was considered and rejected: the plant structure within a site is a different subject with different obligations."
+          "dda_id": "DMD000000034",
+          "why_not": "Reused as the home of every place. Extended so that the places inside a factory, below the site, are held in the same hierarchy as the site itself."
         }
       ],
       "subject_ids": [
+        "SBJ034",
         "SBJ043",
         "SBJ044",
         "SBJ045"
-      ],
-      "committee_decision": null
+      ]
     }
   ],
   "rejected_candidates": [
@@ -661,7 +377,7 @@
       "failed_tests": [
         "DT1"
       ],
-      "reason": "Maintenance is an activity. The machine is an Instance, the place is an Equipment position, and the work is an occurrence.",
+      "reason": "Maintenance is an activity. The machine is an Instance, the place is a Location, and the work is an occurrence.",
       "placed_in_domain_id": "DOM007",
       "prompted_by_subject_ids": [],
       "rejected_by": "agent"
@@ -671,7 +387,7 @@
       "failed_tests": [
         "DT1"
       ],
-      "reason": "Production is an activity. What is made is a Product, where it is made is an Equipment position, and the making is an occurrence.",
+      "reason": "Production is an activity. What is made is a Product, where it is made is a Location, and the making is an occurrence.",
       "placed_in_domain_id": "DOM004",
       "prompted_by_subject_ids": [],
       "rejected_by": "agent"
@@ -691,7 +407,7 @@
       "failed_tests": [
         "DT2"
       ],
-      "reason": "A supplier is what an organisation is to a buyer. It is a role, established by the relationship that approves it to supply a material.",
+      "reason": "A supplier is what an organisation is to a buyer. It is a role, established by the relationship that allows it to supply a material.",
       "placed_in_domain_id": "DOM002",
       "prompted_by_subject_ids": [],
       "rejected_by": "agent"
@@ -724,6 +440,19 @@
       "reason": "A recipe is a method stated at a level of specificity, held in Processes with the steps it arranges.",
       "placed_in_domain_id": "DOM009",
       "prompted_by_subject_ids": [],
+      "rejected_by": "agent"
+    },
+    {
+      "name": "Equipment",
+      "failed_tests": [
+        "DT2",
+        "DT3"
+      ],
+      "reason": "A place in the plant is a Location, one level of the same hierarchy as the site, and a machine is an Instance. Neither needs a domain of its own.",
+      "placed_in_domain_id": "DOM010",
+      "prompted_by_subject_ids": [
+        "SBJ031"
+      ],
       "rejected_by": "agent"
     }
   ]

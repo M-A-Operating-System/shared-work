@@ -1,42 +1,55 @@
 {
-  "defect_count": 4,
-  "blocking": 3,
-  "material": 1,
-  "advisory": 0,
+  "defect_count": 5,
+  "blocking": 0,
+  "material": 0,
+  "advisory": 5,
   "defects": [
     {
-      "check": "RN03",
-      "severity": "blocking",
-      "routes_to": "9",
-      "artefact_ids": [],
-      "detail": "change vocabulary 'changed' appears in the document"
+      "check": "DF04a",
+      "severity": "advisory",
+      "routes_to": "5\u20138",
+      "artefact_ids": [
+        "DOM007"
+      ],
+      "detail": "domain definition uses 'Instances'; keep it only where the field uses the word itself"
     },
     {
-      "check": "X01",
-      "severity": "blocking",
-      "routes_to": "\u2014",
+      "check": "DF04a",
+      "severity": "advisory",
+      "routes_to": "5\u20138",
       "artefact_ids": [
-        "EXC001"
+        "DOM010"
       ],
-      "detail": "exception is unapproved"
+      "detail": "domain definition uses 'Instances'; keep it only where the field uses the word itself"
     },
     {
-      "check": "X01",
-      "severity": "blocking",
-      "routes_to": "\u2014",
+      "check": "DF04a",
+      "severity": "advisory",
+      "routes_to": "5\u20138",
       "artefact_ids": [
-        "EXC002"
+        "SBJ043"
       ],
-      "detail": "exception is unapproved"
+      "detail": "concept definition uses 'entity'; keep it only where the field uses the word itself"
     },
     {
-      "check": "Q02",
-      "severity": "material",
-      "routes_to": "4",
+      "check": "MIN02",
+      "severity": "advisory",
+      "routes_to": "8",
       "artefact_ids": [
-        "SCN039"
+        "REL030",
+        "REL029"
       ],
-      "detail": "test case result is 'fail'"
+      "detail": "data requirements sit wholly inside a sibling's \u2014 a merge candidate"
+    },
+    {
+      "check": "MIN02",
+      "severity": "advisory",
+      "routes_to": "8",
+      "artefact_ids": [
+        "SBJ055",
+        "SBJ056"
+      ],
+      "detail": "data requirements sit wholly inside a sibling's \u2014 a merge candidate"
     }
   ]
 }

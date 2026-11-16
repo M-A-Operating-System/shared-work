@@ -1,51 +1,142 @@
 {
-  "retrieved": "2026-09-22T12:00:00Z",
+  "retrieved": "2026-09-28T13:50:00Z",
   "apply_mode": "web-ui",
   "prefixes": [
     "DMA",
-    "DMC",
-    "DMD",
-    "DMR",
-    "DMS",
     "DMT",
     "DCT",
-    "DLT"
+    "DMC",
+    "CMG",
+    "CPT",
+    "CRF",
+    "CON",
+    "DMP",
+    "DMS",
+    "DMD",
+    "GPM",
+    "GPR",
+    "GRP",
+    "DMI",
+    "DML",
+    "DLT",
+    "DNG",
+    "DNA",
+    "DNC",
+    "DNR",
+    "OPV",
+    "ORG",
+    "PLG",
+    "PER",
+    "DQR",
+    "DQT",
+    "DSF",
+    "DST",
+    "DSA",
+    "DSV",
+    "DMR",
+    "STR",
+    "SAR",
+    "SCP",
+    "SCT",
+    "QUE",
+    "RES",
+    "SCR",
+    "SUB",
+    "WFL",
+    "WFI",
+    "WFT"
   ],
   "domains": [
     {
-      "dda_id": "DMD000000001",
-      "code": "People",
-      "prefix": "",
-      "name": "People",
-      "definition": "People (incl Family Units). The People Domain contains information about individuals."
+      "dda_id": "DMD000000008",
+      "code": "Master",
+      "prefix": "XXX",
+      "name": "Master (Used for All Domains)",
+      "definition": "The Master Domain forms the top-level master data management information for all mastered data. "
     },
     {
       "dda_id": "DMD000000012",
       "code": "LegalEntities",
-      "prefix": "",
-      "name": "LegalEntities",
-      "definition": "Legal Entities (incl. Relationships, Companies, Funds, Charities, Governments, Agencies etc.). The LegalEntities Domain defines the different entities involved in business transactions, services or other processes in any capacity."
+      "prefix": "LEG",
+      "name": "Legal Entities (incl. Relationships, Companies, Funds, Charities, Governments, Agencies etc.)",
+      "definition": "The LegalEntities (aka Party, Entities, Business Entities, Company) Domain defines the different entities that are involved in business transactions, services, or other processes in any capacity including trades/transactions, banking, ownership, governance, regulatory, advisory or otherwise, including:\n- Legal entities in general\n- Internal corporate structural entities that relate to internal, ownership and control, including primary executive roles for businesses - ie Branches, Subsidiaries and Affiliates\n- Functional entities such as governments and government entities, oversight bodies and rul issuing agencies, non-governmental organizations, international organizations,\n- not-for-profits organizations charities etc.\n- Other legal structures such as partnerships, private limited companies, sole proprietorships, and trusts etc.\n\nOptionally this domain can include data relating to people as records as they play a similar role to an entity in business transactions. In Relationship Management situations it may also be convenient to establish \"\"People\"\" as a separate domain. "
     },
     {
-      "dda_id": "DMD000000016",
-      "code": "Documents",
-      "prefix": "",
-      "name": "Documents",
-      "definition": "Documents (including Contracts, Agreements, Amendments, etc). The Documents Domain contains records that provide documentary evidence or support for business processes including Legal, Transactional, Regulatory, Identification and Commercial."
+      "dda_id": "DMD000000015",
+      "code": "Instruments",
+      "prefix": "INS",
+      "name": "Instruments (incl. Securities, Tradable Assets etc.) ",
+      "definition": "The Instruments (aka Securities, Investable Assets) Domain contains records describing tradable asset such as an Equity, Debt/Credit, Warrant, Right, Option, Index, Fund, Spot Rate, a Point on an interest rate curve, Loan or FX/Currencies etc.  Often issued by a Government or Company Entity. An instrument can be listed on an exchange or privately traded between two or more entities."
+    },
+    {
+      "dda_id": "DMD000000001",
+      "code": "People",
+      "prefix": "PER",
+      "name": "People (incl Family Units)",
+      "definition": "The People Domain contains information about individuals.  Depending on the nature of the business model it may be beneficial to manage People as a subset of Legal Entities, however for the purpose of modeling people data we cover them separately here."
     },
     {
       "dda_id": "DMD000000020",
       "code": "Events",
-      "prefix": "",
-      "name": "Events",
-      "definition": "Events describe meaningful events in the lifecycle of various data assets including Mergers, Births, Deaths, Stock-Splits etc."
+      "prefix": "EVT",
+      "name": "Events (incl. Corporate Actions, Life Events etc)",
+      "definition": "Events describe meaningful events in the lifecycle of various data assets including Mergers, Births, Deaths, Stock-Splits etc. The exact list of potential events depends on the Domain in question\n"
     },
     {
       "dda_id": "DMD000000022",
       "code": "Transactions",
-      "prefix": "",
-      "name": "Transactions",
-      "definition": "Transactions are records of an individual trade/transaction which represents a transfer of ownership or investment usually in return for capital."
+      "prefix": "TRX",
+      "name": "Transactions (incl. Trades, Investments, Transfers etc)",
+      "definition": "Transactions are records of an individual trade/transaction which represents a transfer of ownership or investment usually in return for capital (cash) in a specific security or entity or asset. Generally, transactions result in the change of a position or balance within a record keeping account"
+    },
+    {
+      "dda_id": "DMD000000016",
+      "code": "Documents",
+      "prefix": "DOC",
+      "name": "Documents (including Contracts, Agreements, Amendments, etc)",
+      "definition": "The Documents Domain contains records that provide documentary evidence or support for business processes including Legal, Transactional, Regulatory, Identification and Commercial.  Centrally managing Document data is useful when multiple business processes refer to the same document and the correct data/information maintained within the Document needs to be represented in a machine readable form that can be leveraged as structured data within a business process.\n"
+    },
+    {
+      "dda_id": "DMD000000024",
+      "code": "Governance",
+      "prefix": "GOV",
+      "name": "Governance",
+      "definition": "The Governance Domain is a suite of data elements associated with ensuring correct and complete data Governance"
+    },
+    {
+      "dda_id": "DMD000000030",
+      "code": "Metrics",
+      "prefix": "KPI",
+      "name": "Metrics",
+      "definition": "The Metrics Domain extends a regular subject-based data warehouse to also enable the storage of key performance indicators (KPIs) and metrics on a time series basis using the same well designed and managed governance approach."
+    },
+    {
+      "dda_id": "DMD000000031",
+      "code": "Interactions",
+      "prefix": "INT",
+      "name": "Interactions",
+      "definition": "The Interactions domain represents all person-to-person interactions between individuals inside our organization and individuals outside.  Interactions can be across multiple channels such as email, phone, message, and can often involve more than two people. "
+    },
+    {
+      "dda_id": "DMD000000032",
+      "code": "Products",
+      "prefix": "PRD",
+      "name": "Products, Goods & Services",
+      "definition": "The Products (& Services) Domain (aka Product, Item, SKU, Offering, Catalogue) defines everything an organization makes, buys, sells, or delivers as part of its core business model, including finished goods, products, and services offered directly to customers or counterparties whether physical, digital, or experiential in nature; sub-products, components, parts, raw materials, and ingredients that are assembled or combined to produce a finished product, establishing a complete hierarchical Bill of Materials (BoM) for each product; services and service variants including bundled offerings that combine physical goods with associated service entitlements; and product variants, configurations, and pack formats that represent different commercial expressions of the same underlying product definition. The domain is subject-based and models what a product fundamentally is, independent of how it is priced, sold, or transacted — pricing and transaction economics are governed in the Transactions domain, the organisation that makes or sells a product is governed in the LegalEntities domain, and the market or regulatory classification of a financial product is governed in the Instruments domain, which is distinct from Products. The hierarchical Bill of Materials is a self-referential relationship within this domain where a Product record at any level points up to its immediate parent Product, with composition quantity or percentage held as an attribute of the relationship rather than of the component record itself. Roles derived from this domain — Manufacturer, Retailer, Supplier, Consumer — are not modelled as separate domains but are derived from the relationships between this domain and the LegalEntities and People domains."
+    },
+    {
+      "dda_id": "DMD000000033",
+      "code": "Campaigns",
+      "prefix": "CMP",
+      "name": "Campaigns",
+      "definition": "The Campaigns Domain (aka Marketing Campaign, Program, Initiative, Promotion, Activity) defines all planned and executed marketing activities an organization undertakes to reach, engage, acquire, or retain customers and prospects, including above-the-line brand campaigns delivered through broadcast, print, and digital mass media; below-the-line direct marketing activities such as email, direct mail, telemarketing, and targeted digital advertising; promotional campaigns including price promotions, trade promotions, loyalty programs, and incentive schemes; and campaign variants, flights, and waves that represent distinct time-bounded executions within a broader campaign program. A campaign is hierarchical by nature — a Program contains one or more Campaigns, a Campaign contains one or more Activities or Flights, and an Activity targets one or more Audience Segments — and this hierarchy is a self-referential relationship within this domain where a Campaign record at any level points up to its immediate parent Program or Campaign. The domain optionally includes data relating to media plans, channel allocations, and budget commitments where these require governed master data management separate from the transaction or spend record."
+    },
+    {
+      "dda_id": "DMD000000034",
+      "code": "Locations",
+      "prefix": "LOC",
+      "name": "Locations",
+      "definition": "The Locations Domain (aka Place, Site, Venue, Facility, Point of Interest) defines all physical points on earth that an organization needs to identify, reference, or track for any purpose, including places at which the organization operates, conducts business, stores inventory, serves customers, or delivers services; places visited by customers, employees, or counterparties in the course of business activity; points of interest relevant to the organization's market, territory, or operational context; and any other named or identifiable physical location that requires a governed master record. Every location record represents a specific, identifiable point on earth defined by its geospatial coordinates and physical address, and may optionally carry a named place designation, a site classification, and operational attributes such as trading hours, capacity, and service capabilities. A location may be organized hierarchically for reporting and operational purposes — grouping individual points into sites, sites into markets, and markets into regions — and this hierarchy is a self-referential relationship within this domain where a Location record points up to its immediate parent grouping."
     }
   ],
   "standards": [
@@ -54,228 +145,332 @@
       "code": "DataSharedEnterpriseAsset",
       "name": "Data is a shared, valuable enterprise asset",
       "category": "Data Principles",
-      "description": "Data is a shared, valuable enterprise asset",
-      "content_hash": "f9e35439d28d4563"
+      "description": "Our data is not “owned” by a single department or group but rather a shared asset of the organization that needs to be looked after and cared for just like any other asset for the benefit of the whole organization.\n\nThis principle establishes that data is an enterprise asset and therefore:\n- Governance decisions must prioritize enterprise-wide consistency and reuse over localized optimization.\n- Data must be managed with appropriate discipline, accountability, and lifecycle care (creation, maintenance, protection, and retirement as applicable).\n- The firm must treat data as a foundational enabler of business outcomes and risk management..",
+      "content_hash": "534058049e904721b3d287990805b89c10cf07eb6343f71dc2d22981c20fe531"
     },
     {
       "dda_id": "DMS000000142",
       "code": "EveryoneResponsibleForData",
       "name": "Everyone has a role in good data management",
       "category": "Data Principles",
-      "description": "Everyone has a role in good data management",
-      "content_hash": "63d270dd377b337d"
+      "description": "It is everyone’s collective responsibility to ensure that data can be used as effectively as possible to further our business objectives, with availability of data to all individuals who have a legitimate business need for it, consistent with our organization’s responsibility to preserve and protect such information by all appropriate means.\n\nThis principle establishes shared accountability across the enterprise:\n- Producers, consumers, operations, and technology all contribute to data outcomes.\n- Data must be accessible for legitimate use while remaining protected under security, privacy, and regulatory obligations.\n- Material data issues must be surfaced through governance channels rather than resolved through unmanaged local workarounds.",
+      "content_hash": "c6eaeae60dd0baa363dfb2e5b805878cab57705b2d0d83f3c03aaf1ef17da1fb"
     },
     {
       "dda_id": "DMS000000143",
       "code": "PolicyOwnedByCDO",
       "name": "The Chief Data Officer owns and approves the Data Governance Policy",
       "category": "Policy Governance",
-      "description": "The Chief Data Officer owns and approves the Data Governance Policy",
-      "content_hash": "35e1036d709968b3"
+      "description": "This policy document is owned by the current Chief Data Officer and approved by the Data Governance Steering Committee.\n\nLifecycle requirements:\n- This policy must be reviewed and (re)approved at least on an annual basis.\n- The Chief Data Officer is accountable for ensuring the policy remains current and that appropriate governance structures support its implementation.",
+      "content_hash": "eac0b8da26e3051f068b7434a8b8a29372eba9b193817d1ee75947f7b2525dc3"
     },
     {
       "dda_id": "DMS000000144",
       "code": "PolicyAlignedWithOtherPolicies",
       "name": "Data Governance Policy aligns with and defers to more specific policies",
       "category": "Policy Governance",
-      "description": "Data Governance Policy aligns with and defers to more specific policies",
-      "content_hash": "a82cb74ed045c5a1"
+      "description": "This policy recognizes that other policies may refer to the management and usage of data. In general, these specific policies and requirements will always take precedence over this broad data policy.\n\nConflict handling:\n- Any discrepancies or conflicts should be escalated through the respective oversight structures for both policies.\n\nExamples of related policies that touch data include:\n1. Records Retention Policy – describes retention periods to meet business, operational, and legal obligations.\n2. Data Privacy Policy – classifies data based on sensitivity (including Personal Identifiable Information) and describes handling requirements.\n3. Cross Border Data Transfer Policy – describes policies and processes for managing data across multiple jurisdictions.\n4. Technology Architecture Policy – sets standards for how technology solutions are designed, implemented, and operated including data storage technologies.\n5. Information Security Policy – describes how to manage security risk including securely handling data.\n6. Data Analytics and Model Policy – describes how to manage analytics and models that consume data to create critical outcomes for financial, operational, risk and regulatory reporting and decision making.",
+      "content_hash": "8d17da8d9ab484fa2d18b52a77e141546d51177f5ca509746925cb7542ec8a19"
     },
     {
       "dda_id": "DMS000000145",
       "code": "PolicyAppliesToCriticalData",
       "name": "Data Governance Policy applies to all critical business data",
       "category": "Policy Scope",
-      "description": "Data Governance Policy applies to all critical business data",
-      "content_hash": "a0b2dba74cf42c99"
+      "description": "This policy applies to all data consumed, stored, created, and leveraged by the firm to support critical financial, risk, regulatory, and operational business processes.\n\nApplicability:\n- The final decision relating to the applicability of these Data Policies to any specific data elements lies with the Data Governance Committee established by this policy.",
+      "content_hash": "7895ab06b93287f187f7a24775fac248a7c67f01dea6cfbac47e4c2124c87559"
     },
     {
       "dda_id": "DMS000000146",
       "code": "GovernanceCommitteeEstablished",
       "name": "A Data Governance Committee must be established",
       "category": "Governance Structure",
-      "description": "A Data Governance Committee must be established",
-      "content_hash": "ddfb76e415173d09"
+      "description": "Following the establishment of this policy document an ongoing Governance Committee will be established responsible for all aspects of this policy as well as establishing the processes, procedures and standards required to implement this policy.\n\nCommittee composition:\n- The Data Governance Committee should be chaired by a senior executive with a title of Chief Data Officer or equivalent.\n- The Committee should be comprised of senior representatives of all business areas, corporate functions, Operations and Technology.\n- Current membership of this committee should be broadly published and visible across the firm.\n\nAuthority and cadence:\n- The Committee should have the authority to influence financial planning and budget planning of departments to meet the policy requirements outlined in this document.\n- The Committee should meet at least quarterly; it is recommended that it meets more frequently as needed, especially during early phases of adoption.\n\nThe Data Governance Committee is responsible for all aspects of data governance oversight including but not limited to:\n1. Establishing a “Data Management Program Office” to establish a roadmap/list of all appropriate data related projects and initiatives across all departments and influence direction of these projects based on policy.\n2. Maintaining and publishing the current list of Data Domains and Definitions.\n3. Maintaining and publishing the current list of Data Governance members and their roles.\n4. Maintaining and publishing the current list of approved data sources and authoritative systems.\n5. Establishing a “Data Quality Program” to measure data quality of critical data.\n6. Establishing a “Data Issues for Management Resolution” Program to manage the timely identification and resolution of structural and systematic data issues across the firm.\n7. Establishing a broad firmwide data awareness and education program to improve knowledge around data across the firm.\n8. Measuring and monitoring Data Policy Adoption across all business areas and corporate functions.\n9. Measuring and monitoring overall firm-wide Data Governance Maturity leveraging an industry recognized approach including benchmarking against peer organizations at least once a year.\n10. Publishing an annual report on the firm’s Data Management practice.\n\nDelegation:\n- The Data Governance Committee can decide to delegate execution responsibility to the Chief Data Office while continuing to provide oversight.",
+      "content_hash": "c34244772aa3433329d0de49e6da450889be7b7e8d9c4048277a2ba1f0a46b0e"
     },
     {
       "dda_id": "DMS000000147",
       "code": "SubjectBasedDataDomains",
       "name": "Data domains must be defined based on the subject of the data",
       "category": "Data Domains",
-      "description": "Data domains must be defined based on the subject of the data",
-      "content_hash": "97a1de355e4ccb24"
+      "description": "For the purposes of applying good governance and data standards, this policy establishes different data domains for different types of data. In recognition of the core principle that data is owned by the firm rather than individuals or groups, domains are to be organized around the subject (i.e., a Company or a Security) of the data and not the business processes (i.e., Ratings or Valuations) that create and/or consume the data.\n\nDomain requirements:\n- All in-scope data across the firm must be aligned to one and only one data domain.\n- All governance processes including data model design, data quality, data stewardship, etc. should be organized around these data domains going forward.\n- Specific attributes associated to records within a Data Domain can be further logically grouped and governed together as part of a Data Concept.\n\nCommittee responsibilities:\n- Establish processes and procedures for identification and management of data domains.\n- Publish the current list of data domains and descriptions publicly across the firm.",
+      "content_hash": "efc3c383f91f685d0f987e58681342639082810e8e535e9487750912a95edc4e"
     },
     {
       "dda_id": "DMS000000148",
       "code": "CommonDataRolesDefined",
       "name": "Standard data governance roles must be defined",
       "category": "Roles and Responsibilities",
-      "description": "Standard data governance roles must be defined",
-      "content_hash": "600c848a5f0b5f8a"
+      "description": "For the purpose of establishing consistent roles and responsibilities across the firm, this policy establishes a common list of data roles that apply across all domains. Collectively these roles are defined to reinforce the core data principles that data is a shared asset of the firm which everyone has a responsibility to protect, while recognizing the different roles that produce and consume data within the firm.\n\n\n*Stewardship:*\n- Data Steward roles are responsible for the consistent and complete definition of data within a data domain including data modelling (structure) and data quality (content) standards, considering all data-consumer needs and objectives and all data-producer outputs.\n- Depending on domain requirements, stewardship may be broken down into Producer Stewards, Consumer Stewards, and Domain Stewards.\n- While each Data Domain will usually have a single named Domain Steward, there may be multiple Producer and Consumer Stewards.\n- In the absence of additional Producer and Consumer Stewards, the Domain Steward assumes all responsibilities.\n\nCustodianship:\n- Data Custodians are responsible for day-to-day data quality of the data content based on predefined data quality rules and standards.\n- Data Custodians often fix incorrect or missing data in designated systems; ideally this work is driven through a Data Quality workflow tool.\n\nCommittee responsibilities:\n- Establish processes and procedures for identification of individuals to roles and ensure all roles are always filled.",
+      "content_hash": "0d52947b52fa0c9e7a270745e87c85f62cfcd0d6593eb923e138e751e96ac430"
     },
     {
       "dda_id": "DMS000000149",
       "code": "SingleDataModelPerDomain",
       "name": "Each data domain must have a single authoritative data model",
       "category": "Data Modeling",
-      "description": "Each data domain must have a single authoritative data model",
-      "content_hash": "5119d08b16a8db2e"
+      "description": "For the purpose of ensuring consistent usage and understanding of data across the firm, this policy establishes a single data model for each domain which describes all attributes, relationships, and data content roles for that domain.\n\nData model requirements:\n- The data model should include sufficient business and technical detail to support complete understanding of the data design, quality standards and intended usage.\n\nOwnership and publication:\n- Overall ownership of “the” data model for each domain resides with the Domain Data Steward for that domain.\n- The Data Governance Committee is responsible for establishing processes and procedures for changes to the domain data models.\n- The Data Governance Committee is responsible for publishing the current data model in a broad business-understandable format across the firm.",
+      "content_hash": "b0cd368cc549ebf2ac721a8a56e549bcd35e9376ab35661742c11a4ca64ffeb3"
     },
     {
       "dda_id": "DMS000000150",
       "code": "AuthoritativeRepositoryDefined",
       "name": "Each data domain must have an Authoritative Data Repository",
       "category": "Authoritative Sources",
-      "description": "Each data domain must have an Authoritative Data Repository",
-      "content_hash": "6e66cbefadd4fbad"
-    },
-    {
-      "dda_id": "DMS000000151",
-      "code": "PrimaryIdentifiersEstablished",
-      "name": "Primary record identifiers must be established by domain",
-      "category": "Data Identification",
-      "description": "Primary record identifiers must be established by domain",
-      "content_hash": "bad228de4bd6b699"
-    },
-    {
-      "dda_id": "DMS000000152",
-      "code": "CriticalDataElementsIdentified",
-      "name": "Critical Data Elements must be identified and governed",
-      "category": "Data Quality",
-      "description": "Critical Data Elements must be identified and governed",
-      "content_hash": "9fe5f44e4b6f5a8e"
-    },
-    {
-      "dda_id": "DMS000000153",
-      "code": "IssuesManagementProgram",
-      "name": "A Data Issues for Management Resolution program must be established",
-      "category": "Issue Management",
-      "description": "A Data Issues for Management Resolution program must be established",
-      "content_hash": "f582cf1ba2758239"
-    },
-    {
-      "dda_id": "DMS000000154",
-      "code": "PolicyChangeControlled",
-      "name": "Changes to the Data Governance Policy must be formally controlled",
-      "category": "Policy Lifecycle",
-      "description": "Changes to the Data Governance Policy must be formally controlled",
-      "content_hash": "b1e3bbf408164a32"
-    },
-    {
-      "dda_id": "DMS000000156",
-      "code": "DataDomainDefinition",
-      "name": "Definition of Data Domain",
-      "category": "Glossary",
-      "description": "Definition of Data Domain",
-      "content_hash": "356d87ed405b2c3e"
-    },
-    {
-      "dda_id": "DMS000000157",
-      "code": "DataModelDefinition",
-      "name": "Definition of Data Model",
-      "category": "Glossary",
-      "description": "Definition of Data Model",
-      "content_hash": "ba798ebaa1b8f7e0"
-    },
-    {
-      "dda_id": "DMS000000158",
-      "code": "DataConceptDefinition",
-      "name": "Definition of Data Concept",
-      "category": "Glossary",
-      "description": "Definition of Data Concept",
-      "content_hash": "5923806de50ce034"
-    },
-    {
-      "dda_id": "DMS000000159",
-      "code": "DataAttributeDefinition",
-      "name": "Definition of Data Attribute",
-      "category": "Glossary",
-      "description": "Definition of Data Attribute",
-      "content_hash": "88c87fe0bb49ac17"
-    },
-    {
-      "dda_id": "DMS000000160",
-      "code": "DataProducerDefinition",
-      "name": "Definition of Data Producer",
-      "category": "Glossary",
-      "description": "Definition of Data Producer",
-      "content_hash": "1c72a19749d48363"
-    },
-    {
-      "dda_id": "DMS000000161",
-      "code": "DataConsumerDefinition",
-      "name": "Definition of Data Consumer",
-      "category": "Glossary",
-      "description": "Definition of Data Consumer",
-      "content_hash": "43d23e041352db20"
-    },
-    {
-      "dda_id": "DMS000000162",
-      "code": "DataCustodianDefinition",
-      "name": "Definition of Data Custodian",
-      "category": "Glossary",
-      "description": "Definition of Data Custodian",
-      "content_hash": "89b8c86d1610454b"
-    },
-    {
-      "dda_id": "DMS000000163",
-      "code": "OperationalDataStoreDefinition",
-      "name": "Definition of Operational Data Store (ODS)",
-      "category": "Glossary",
-      "description": "Definition of Operational Data Store (ODS)",
-      "content_hash": "02bb558a0f426d00"
-    },
-    {
-      "dda_id": "DMS000000164",
-      "code": "MasterDataManagementDefinition",
-      "name": "Definition of Master Data Management (MDM)",
-      "category": "Glossary",
-      "description": "Definition of Master Data Management (MDM)",
-      "content_hash": "129663c466e44db8"
-    },
-    {
-      "dda_id": "DMS000000165",
-      "code": "DataWarehouseDefinition",
-      "name": "Definition of Data Warehouse",
-      "category": "Glossary",
-      "description": "Definition of Data Warehouse",
-      "content_hash": "10a1a80153ab0c6a"
-    },
-    {
-      "dda_id": "DMS000000166",
-      "code": "DataLakeDefinition",
-      "name": "Definition of Data Lake",
-      "category": "Glossary",
-      "description": "Definition of Data Lake",
-      "content_hash": "bd284b2f84cb777c"
-    },
-    {
-      "dda_id": "DMS000000167",
-      "code": "CriticalDataElementDefinition",
-      "name": "Definition of Critical Data Element (CDE)",
-      "category": "Glossary",
-      "description": "Definition of Critical Data Element (CDE)",
-      "content_hash": "66f2aa9176e6037e"
+      "description": "For the purpose of ensuring consistent usage of data across the firm while minimizing the operational cost to maintaining data, this policy establishes the role of a single “Authoritative Data Repository” (ADR) for each data domain which should be leveraged by all consuming business processes and corporate functions internally within the firm.\n\nDownstream content control:\n- Data content and meaning should not be updated or changed once it has left the Authoritative Data Repository — i.e., all data custodian functions must take place before or within the ADR.\n- This statement is focused on data content and eliminating operational overrides and corrections in downstream applications; it does not restrict transformation of data structure by business processes as data moves between systems.\n\nADR requirements and forms:\n- The designated ADR should leverage and support the strategic data model for the domain — i.e., all attributes and records should be consumable from the ADR.\n- An ADR can be an operational data system (ODS), a 3rd party vendor, a consolidating data warehouse, or a master data management system based on domain consolidation and aggregation requirements.\n\nCommittee responsibilities:\n- Establish processes and procedures for establishing authoritative sources by domain, including validating target solution approach (ODS vs Data Warehouse vs Mastering solution) based on requirements.\n- Publish the current list of ADRs to the firm.",
+      "content_hash": "264a51aa8b0e4db1d2b2238f42c063f6dac004797102673d2d4fef04821e6865"
     },
     {
       "dda_id": "DMS000000168",
       "code": "DataLineageStandard",
       "name": "Data lineage must be defined and maintained for all critical data",
       "category": "Data Lineage",
-      "description": "Data lineage must be defined and maintained for all critical data",
-      "content_hash": "830921eaedb33308"
+      "description": "For the purpose of ensuring transparency and traceability across the data lifecycle, this policy establishes the requirement to document and maintain data lineage for all Critical Data Elements (CDEs) and governed data concepts across all data domains.\n\nData lineage describes the origin of a data record, the transformations applied to it, and the downstream systems and processes that consume it.\n\nLineage requirements:\n- Lineage must be captured and maintained within an Authoritative Lineage Repository for the organization.\n- Lineage must be documented at the attribute level for all Critical Data Elements and at the concept level for all other governed data.\n- Lineage records must be updated whenever a material change occurs to a source system, a transformation process, or a downstream consumption path.\n\nRoles and responsibilities:\n- Data Producers are responsible for documenting the origin and any transformations applied to data before it is published to downstream consumers.\n- Data Consumers are responsible for documenting any incremental transformation they apply in the usage of that data to extract a business outcome or decision.\n- Data Custodians are responsible for ensuring lineage records remain current and accurate within their designated platforms.\n\nCommittee responsibilities:\n- Establish processes and procedures for lineage capture and maintenance across all data domains.\n- Ensure that lineage coverage is included as a measured component of the Data Quality Program.\n- Publish minimum lineage documentation standards for Data Producers and Custodians",
+      "content_hash": "ce58a031ecb15695c2712890139e04b33ab004ba86ec237fe14a57e3e36af92d"
+    },
+    {
+      "dda_id": "DMS000000151",
+      "code": "PrimaryIdentifiersEstablished",
+      "name": "Primary record identifiers must be established by domain",
+      "category": "Data Identification",
+      "description": "For the purpose of ensuring consistent usage across the firm, this policy establishes a single firm wide primary identifier for each domain that uniquely identifies each record. Ideally all-consuming processes should leverage this primary identifier for the unique identification and cross reference of records between systems.\n\nPrimary Record identifiers should be managed and maintained within the Authoritative Data Repository for each domain.\n\nIdeally downstream consumer platforms should leverage these primary identifiers for managing records. Downstream consumer platforms can continue to leverage alternative secondary identifiers as their master keys; however these secondary keys must also be managed within the approved Authoritative Data Repository for the domain as cross-reference keys.\n\nEvery record within a consumer system must have one and only one primary or secondary key per record.\n\nThe Data Governance Committee is responsible for establishing processes and procedures around the identification and approval of secondary keys and publishing the approved list of primary and secondary identifiers.",
+      "content_hash": "9ba0c063c441df0647ba763fe424c9ed1fcdda1373ca11f8d5c114b728a7cbc7"
+    },
+    {
+      "dda_id": "DMS000000152",
+      "code": "CriticalDataElementsIdentified",
+      "name": "Critical Data Elements must be identified and governed",
+      "category": "Data Quality",
+      "description": "For the purpose of ensuring accurate and timely data for the support of key business processes, this policy establishes the need to identify Critical Data Elements (CDEs) within each domain that directly support critical business and operational processes including financial, regulatory and legal obligations.\n\nFollowing identification of CDEs, these should be incorporated into the Data Quality Program to enable ongoing data quality reporting.\n\nThe Data Governance Committee is responsible for establishing processes and procedures to identify and establish CDEs across the environment and publishing the current list of CDEs across the firm.",
+      "content_hash": "a5761a371b10ecd52b56c32d8715dad5c5df94fdf4f437e3d0dd23946ad42919"
+    },
+    {
+      "dda_id": "DMS000000153",
+      "code": "IssuesManagementProgram",
+      "name": "A Data Issues for Management Resolution program must be established",
+      "category": "Issue Management",
+      "description": "A Data Issues for Management Resolution (IMR) program shall be established to manage the timely identification and resolution of structural and systematic data issues across the firm.\n\nProgram intent:\n- Ensure recurring and material data issues are resolved through governance rather than unmanaged workarounds.\n- Drive prioritization, accountability, and management visibility for systemic issues.\n\nGovernance:\n- Oversight resides with the Data Governance Committee, which may delegate execution to the Chief Data Office while retaining oversight.",
+      "content_hash": "fec8c75bcfa384ede87cf175dabc85663df3e6ec8042e5bce6c5ea05b3bd769e"
+    },
+    {
+      "dda_id": "DMS000000154",
+      "code": "PolicyChangeControlled",
+      "name": "Changes to the Data Governance Policy must be formally controlled",
+      "category": "Policy Lifecycle",
+      "description": "We expect this policy to iterate and expand over time as the type and scale of data managed within the firm increases and overall data governance maturity improves.\n\nChange control:\n- All changes to this policy and consequent approvals must be logged.\n- Major updates should be logged as a major version change.\n- Minor incremental changes can be logged through a minor release.\n- Final decision on minor vs major release resides with the Chief Data Officer as the owner of this document.",
+      "content_hash": "7cb5a498edde29480f3c1d7643573ccf00e8a20a6799908cfa0326cf834564a7"
+    },
+    {
+      "dda_id": "DMS000000156",
+      "code": "DataDomainDefinition",
+      "name": "Definition of Data Domain",
+      "category": "Glossary",
+      "description": "Data Domain — Data Domains describe different data sets based on the “subject” of data elements that each record represents. A data domain describes the data records themselves, and the data concepts and data attributes that make up the data model for that domain.\n\nExamples:\n\n- Legal Entities\n- Securities / Instruments\n- Transactions\n- People\n- Documents\n- Universal standards",
+      "content_hash": "29ee3de96a1d3913b816658b70ce7f32f5bf72de99b6e27a27fc981703c00d97"
+    },
+    {
+      "dda_id": "DMS000000157",
+      "code": "DataModelDefinition",
+      "name": "Definition of Data Model",
+      "category": "Glossary",
+      "description": "Data Model — Data models provide a comprehensive description of the data content that makes up a data domain including the types of record, data concepts, data attributes, relationships, and other structural information. Data models can take multiple forms depending on purpose and characteristics and the data storage systems in use.",
+      "content_hash": "7061b78f0bbfa6178b35fb471b88b5b446690bb8a85a7edc1826206afd80b2bc"
+    },
+    {
+      "dda_id": "DMS000000158",
+      "code": "DataConceptDefinition",
+      "name": "Definition of Data Concept",
+      "category": "Glossary",
+      "description": "Data Concept — Data Concepts describe a group of attributes that work together to describe a specific aspect of a data record.\n\nExamples:\n- Ratings, Identifiers, Exchange Listings (Securities)\n- Alternate Names, Operating Locations, Ratings (Legal Entities)",
+      "content_hash": "931edefde353533ae900dbdb5b7656f08b9b7c10cee67d49b48433f69d0f7363"
+    },
+    {
+      "dda_id": "DMS000000159",
+      "code": "DataAttributeDefinition",
+      "name": "Definition of Data Attribute",
+      "category": "Glossary",
+      "description": "Data Attribute — Data Attributes are the individual data elements or fields that represent the informational value stored about the data record.",
+      "content_hash": "e8f027c88396da6fe07136aef6c8097ea1aad323c48531220d64989bcc41e8ac"
+    },
+    {
+      "dda_id": "DMS000000160",
+      "code": "DataProducerDefinition",
+      "name": "Definition of Data Producer",
+      "category": "Glossary",
+      "description": "Data Producer / Source — Any system, process, group, or individual that generates data content of value, often creating or maintaining records. Data Producers may be internal or external. Data producers may consume data from one domain to aid the creation of data in another.",
+      "content_hash": "203d1f85ebcac81f7ffc33840590e5e641bf2a486d8f0f537bdd320557a639f7"
+    },
+    {
+      "dda_id": "DMS000000161",
+      "code": "DataConsumerDefinition",
+      "name": "Definition of Data Consumer",
+      "category": "Glossary",
+      "description": "Data Consumer / User — Any system, process, group, or individual that consumes data from one or more data domains to create value to the organization.",
+      "content_hash": "e347c41ddbc7e3246f5faa4307fa6f058284a7e4769190f886a1a2218936ff9f"
+    },
+    {
+      "dda_id": "DMS000000162",
+      "code": "DataCustodianDefinition",
+      "name": "Definition of Data Custodian",
+      "category": "Glossary",
+      "description": "Data Custodian — Responsible for the day-to-day data content quality within a Data Producer system or a designated ADR. Custodians maintain and correct data based on predefined data quality rules and standards established by Data Stewards, ideally using workflow tools and governed processes.",
+      "content_hash": "dad5e15d43ba6cfa0f4bc9de697594cfea2b5606f0ef3667927b7ce1f3f56cf9"
+    },
+    {
+      "dda_id": "DMS000000163",
+      "code": "OperationalDataStoreDefinition",
+      "name": "Definition of Operational Data Store (ODS)",
+      "category": "Glossary",
+      "description": "Operational Data Store (ODS) / Product Processor / Business Application — Provides the core business value-add functionality required to perform and/or manage the firm’s business activities. These platforms often consume data to support their functions and often generate data relating to primary business transactions as Data Producers.",
+      "content_hash": "cf4f4b412f2e3adb5d1f1bcdfbc279af63fbf2ff4d30c0c509c1dc74bc7642c7"
+    },
+    {
+      "dda_id": "DMS000000164",
+      "code": "MasterDataManagementDefinition",
+      "name": "Definition of Master Data Management (MDM)",
+      "category": "Glossary",
+      "description": "Master Data Management (MDM) / Data Master — Provides comprehensive data management capabilities to consolidate data from multiple sources into a single consistent and clean data set ready for use by multiple business processes.\n\nCommon capabilities:\n- Source, normalize, concord, consolidate and cleanse via pipeline approach\n- Embedded rules engine, workflow, and data validation\n- Horizontal (attributes) and vertical (sources/records) consolidation and enrichment\n- Manual data operations to support custodian functions",
+      "content_hash": "b07313ea9963891c38a5b39c4ce564adce52c62f4a76eb00292ab67e3881c3e4"
+    },
+    {
+      "dda_id": "DMS000000165",
+      "code": "DataWarehouseDefinition",
+      "name": "Definition of Data Warehouse",
+      "category": "Glossary",
+      "description": "Data Warehouse — Centrally stores large quantities of data from many providers while attempting to bring consistency of data content and structure to improve consumption. Data Warehouses are often optimized for fast and efficient consumption of data and generally do not include manual data operations capabilities to support custodian functions.",
+      "content_hash": "b13b53d21023c6c5127bac480396fd678a3932d260f37a96c27c9cd43d4c9751"
+    },
+    {
+      "dda_id": "DMS000000166",
+      "code": "DataLakeDefinition",
+      "name": "Definition of Data Lake",
+      "category": "Glossary",
+      "description": "Data Lake — Centralizes storage of large quantities of data from many providers, often in their native original form. Data Lakes are optimized for fast ingest and efficient storage and generally do not include manual data operations capabilities to support custodian functions.",
+      "content_hash": "4dafc1d075d73c21ca8418d2c495ab315b7f681bc79447e4eb4e8f46f2cd5625"
+    },
+    {
+      "dda_id": "DMS000000167",
+      "code": "CriticalDataElementDefinition",
+      "name": "Definition of Critical Data Element (CDE)",
+      "category": "Glossary",
+      "description": "Critical Data Element (CDE) — A data element identified within a domain that directly supports critical business and operational processes including financial, regulatory, and legal obligations, and is therefore subject to heightened data quality monitoring and reporting through the Data Quality Program.",
+      "content_hash": "fab7cfc7d705f0b32347740caf8052b398fab3bbb1a6ed6dcaeb43422e79ed57"
     },
     {
       "dda_id": "DMS000000169",
       "code": "DataModelDesignPrinciples",
       "name": "Data Model Design Principles",
       "category": "APPENDIX",
-      "description": "Data Model Design Principles",
-      "content_hash": "a24042d3b115c5e6"
+      "description": "### The Principles\n\n| # | Principle | Outcome and impact |\n|---|---|---|\n| 1 | Represent the enduring business subject once, and model the roles it performs separately. | Identity survives a change of role, system, or year, and a single view of a traveler stops being a reconciliation exercise. |\n| 2 | Understand and approve business meaning before selecting physical structures, tools, or pipelines. | Fewer clarification and rework cycles, and definitions that outlive the platform they were first built on. |\n| 3 | Understand what source data represents before integrating or distributing it. | Reconciliation is done once rather than by every consumer, and the line from source to business meaning stays visible. |\n| 4 | Establish enterprise identity for the principal business subjects independently of any analytical product. | Identity survives source replacement, and analytics, operations, and AI all draw on the same answer. |\n| 5 | Reports should consume governed business information, not become the place where enterprise information is defined. | Dashboards agree with one another, and the same definitions serve APIs, operations, and AI. |\n| 6 | Author reusable business information once, and publish it through several purpose-built products. | New products are quicker to build because the core design work has already been completed and can be reused. |\n| 7 | Model, govern, and preserve relationships with the same care applied to the subjects they connect. | Cross-role questions, operational authorization, and AI context all become answerable rather than reconstructed. |\n| 8 | Approved business metadata should generate or validate the implementation and its documentation. | Less manual schema work, design and implementation that stay in step, and lineage that is produced rather than written. |\n| 9 | Use the language of the business consistently across definitions, governance, product contracts, and delivery. | Non-technical stakeholders can take part in design decisions, and ownership of a definition is unambiguous. |\n| 10 | Business information exists independently of the applications, projects, reports, and AI initiatives that use it. | Institutional knowledge outlives the systems and projects that produced it. |\n| 11 | Package governed information into products with defined consumers, ownership, quality, freshness, access, and lifecycle. | Consumers know what they are getting, and it can be changed without breaking them. |\n| 12 | Publish trusted information at the frequency the business decision actually requires. | Decisions use information at the frequency required without imposing real-time processing where it is unnecessary. |\n| 13 | Define privacy, security, quality, retention, provenance, and stewardship as part of information design. | Protection is consistent by construction, and correction, audit, and erasure are possible rather than aspirational. |\n| 14 | The information architecture should describe the same enduring subjects, capabilities, and relationships through which the business operates. | The business recognizes itself in the model, which is what makes ownership real rather than nominal. |\n\nA proposed design should state how it satisfies each principle that applies to it. Where one is not satisfied, the exception should name the consequence, the owner, and the route back, rather than being left as a gap for someone to find later.",
+      "content_hash": "fc56357c5a3643fe44ef9b66237f61d9b593e0b92d3be833780f7782d02c5d11"
     }
   ],
-  "resources": [],
-  "prompts": [],
+  "resources": [
+    {
+      "uri": "dda://guides/data-design-authority",
+      "name": "Data Design Authority — Start Here",
+      "content_hash": null,
+      "read": true
+    },
+    {
+      "uri": "dda://guides/data-products",
+      "name": "Data Products Guide",
+      "content_hash": null,
+      "read": false
+    },
+    {
+      "uri": "dda://guides/display-ids",
+      "name": "Display ID Reference",
+      "content_hash": null,
+      "read": true
+    },
+    {
+      "uri": "dda://guides/get-started",
+      "name": "Get Started",
+      "content_hash": null,
+      "read": false
+    },
+    {
+      "uri": "dda://guides/platform-overview",
+      "name": "Platform Overview",
+      "content_hash": null,
+      "read": false
+    },
+    {
+      "uri": "dda://guides/rules-language",
+      "name": "Rules Language Reference",
+      "content_hash": null,
+      "read": false
+    },
+    {
+      "uri": "dda://guides/subject-based-modelling",
+      "name": "Subject-Based Data Modelling",
+      "content_hash": null,
+      "read": true
+    },
+    {
+      "uri": "dda://guides/workflow",
+      "name": "Workflow and Governance Guide",
+      "content_hash": null,
+      "read": true
+    },
+    {
+      "uri": "dda://skills/data-modelling",
+      "name": "Data Modelling Guide",
+      "content_hash": null,
+      "read": true
+    },
+    {
+      "uri": "dda://skills/data-quality",
+      "name": "Data Quality Guide",
+      "content_hash": null,
+      "read": false
+    },
+    {
+      "uri": "dda://skills/debug-workflow",
+      "name": "Debug Workflow",
+      "content_hash": null,
+      "read": false
+    },
+    {
+      "uri": "dda://skills/ingestion",
+      "name": "Data Ingestion Guide",
+      "content_hash": null,
+      "read": false
+    },
+    {
+      "uri": "dda://skills/normalisation",
+      "name": "Normalisation Guide",
+      "content_hash": null,
+      "read": false
+    }
+  ],
+  "prompts": [
+    {
+      "name": "onboard_me",
+      "description": "First-time user wants a guided tour of the platform and its capabilities via MCP."
+    },
+    {
+      "name": "explore_domain",
+      "description": "Show every concept, attribute, and relationship under a single domain."
+    },
+    {
+      "name": "trace_lineage",
+      "description": "Given a concept, show everything that contributes to it."
+    },
+    {
+      "name": "find_sensitive_attributes",
+      "description": "Identify attributes tagged with a privacy- or sensitivity-classification."
+    },
+    {
+      "name": "compare_concepts",
+      "description": "Side-by-side comparison of two concepts: attributes, domains, quality rules."
+    },
+    {
+      "name": "concept_coverage_gaps",
+      "description": "Given a domain, identify concepts that look incomplete."
+    }
+  ],
   "attribute_types": [
     "TEXT",
     "LONGTEXT",
@@ -298,134 +493,713 @@
     "DOMAINID"
   ],
   "classification_types": [
-    "INTERNAL",
     "PUBLIC",
+    "INTERNAL",
     "CUSTOMER",
     "INTERNAL_PII",
     "CUSTOMER_PII",
     "CUSTOMER_PCI",
     "HIPAA"
   ],
-  "quality_types": [],
-  "lookup_types": [],
-  "state_transitions": [],
-  "loaded_domains": {
-    "DMD000000001": {
-      "concepts": [
-        "DMC000000143",
-        "DMC000000144",
-        "DMC000000145",
-        "DMC000000147",
-        "DMC000000024"
-      ],
-      "attributes": [],
-      "relationships": [],
-      "retrieved": "2026-09-22T12:00:00Z"
+  "quality_types": [
+    "COMPLETENESS",
+    "dd",
+    "ss"
+  ],
+  "lookup_types": [
+    {
+      "dda_id": "DLT000000034",
+      "code": "MasterTypes",
+      "active": true
     },
+    {
+      "dda_id": "DLT000000035",
+      "code": "AccountProductTypes",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000036",
+      "code": "AccountTypes",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000037",
+      "code": "UniversalRatingAgencies",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000038",
+      "code": "GlobalRatingAgencyRatingTypes",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000039",
+      "code": "InstrumentClassificationTypes1",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000040",
+      "code": "InstrumentClassificationTypes2",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000041",
+      "code": "InstrumentClassificationTypes3",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000042",
+      "code": "InstrumentCreditDerivativesSeniorityTypes",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000043",
+      "code": "InstrumentCurrencyTypes",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000044",
+      "code": "InstrumentDateTypes",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000045",
+      "code": "InstrumentForexTypes",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000046",
+      "code": "InstrumentOptionStrikePriceTypes",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000047",
+      "code": "InstrumentOptionStyleTypes",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000048",
+      "code": "InstrumentTradingStatusTypes",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000049",
+      "code": "InstrumentOptionTypes",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000050",
+      "code": "LegalEntityAddressTypes",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000051",
+      "code": "LegalEntityAlternateNameTypes",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000052",
+      "code": "LegalEntityClassificationTypes1",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000053",
+      "code": "LegalEntityClassificationTypes2",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000054",
+      "code": "LegalEntityClassificationTypes3",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000055",
+      "code": "LegalEntityContactTypes",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000056",
+      "code": "LegalEntityESGFieldTypes",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000057",
+      "code": "LegalEntityESGFrameworkTypes",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000058",
+      "code": "LegalEntityFinancialsAccountTypes",
+      "active": false
+    },
+    {
+      "dda_id": "DLT000000059",
+      "code": "LegalEntityKeyDatesTypes",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000060",
+      "code": "LegalEntityKYCStatusTypes",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000061",
+      "code": "LegalEntityRelationshipTypes",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000062",
+      "code": "LegalEntityRoleType",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000063",
+      "code": "LegalEntityValuationTypes",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000064",
+      "code": "MasterCrossRefTypes",
+      "active": true,
+      "description": "MasterCrossRefTypes provides information on the type of identifier being managed. Examples include tickers, SEDOLS, ISINS etc"
+    },
+    {
+      "dda_id": "DLT000000065",
+      "code": "MasterInactiveReasonTypes",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000066",
+      "code": "MasterRelationshipTypes",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000067",
+      "code": "MasterStatusTypes",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000068",
+      "code": "PersonAddressType",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000069",
+      "code": "PersonEmploymentStatusTypes",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000070",
+      "code": "PersonGenderTypes",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000071",
+      "code": "UniversalCountryCodes",
+      "active": true,
+      "description": "We use the ISO3166 3-Letter country codes as our Golden Copy recomendation. The purpose of ISO 3166 is to define internationally recognized codes of letters and/or numbers that we can use when we refer to countries and their subdivisions. However, it does not define the names of countries � this information comes from United Nations sources (Terminology Bulletin Country Names and the Country and Region Codes for Statistical Use maintained by the United Nations Statistics Divisions)."
+    },
+    {
+      "dda_id": "DLT000000072",
+      "code": "UniversalCurrencyCodes",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000073",
+      "code": "UniversalIndustries1",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000074",
+      "code": "UniversalIndustries2",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000075",
+      "code": "UniversalIndustries3",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000076",
+      "code": "UniversalRiskFactorTypes1",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000077",
+      "code": "UniversalRiskFactorTypes2",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000078",
+      "code": "UniversalRiskFactorTypes3",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000079",
+      "code": "UniversalIndustries4",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000080",
+      "code": "UniversalIndustries5",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000081",
+      "code": "UniversalIndustries6",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000082",
+      "code": "UniversalLanguageCodes",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000083",
+      "code": "AccountOwnershipType",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000084",
+      "code": "PersonTitleTypes",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000085",
+      "code": "InstrumentVenueCodes",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000086",
+      "code": "PersonAlternativeNameType",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000087",
+      "code": "LegalEntityClassificationSchemaTypes",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000088",
+      "code": "MasterCreationTypes",
+      "active": false
+    },
+    {
+      "dda_id": "DLT000000089",
+      "code": "UniversalTimezones",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000090",
+      "code": "LegalEntityIndustryTypes",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000091",
+      "code": "UniversalMarketIdentifierCodes",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000092",
+      "code": "LegalEntityClientSummaryTypes3",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000093",
+      "code": "LegalEntityClientSummary2",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000095",
+      "code": "LegalEntityClientSummary1",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000096",
+      "code": "UniversalUSStates",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000097",
+      "code": "LegalEntityKeyMetricTypes",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000098",
+      "code": "LegalEntityRegulationTypes",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000099",
+      "code": "PersonRoles",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000100",
+      "code": "MetricPeriodTypes",
+      "active": true
+    },
+    {
+      "dda_id": "DLT000000102",
+      "code": "LegalEntityFundLPCommitmentTypes",
+      "active": true
+    }
+  ],
+  "state_transitions": [
+    {
+      "entity": "stateTransitions",
+      "denied": false,
+      "error": "An internal error occurred",
+      "attempts": [
+        "list_model(stateTransitions, limit 100) on 2026-09-28 after the account was re-authorised",
+        "list_model(stateTransitions, filter st_object_type = CONCEPT, limit 10)"
+      ],
+      "earlier": "Before re-authorisation the same call was denied: User does not have 'read' permission for 'stateTransitions' from source 'mcp' (grant STATE-TRANSITION:read). The permission now passes and the server fails instead.",
+      "note": "The permitted status moves for DOMAIN, CONCEPT, ATTRIBUTE and LOOKUP could not be read, so the change package carries no preconditions."
+    }
+  ],
+  "loaded_domains": {
     "DMD000000012": {
       "concepts": [
-        "DMC000000106",
-        "DMC000000023",
-        "DMC000000108",
-        "DMC000000107",
-        "DMC000000011",
-        "DMC000000113"
+        {
+          "dda_id": "DMC000000106",
+          "code": "LegalEntity",
+          "name": "LegalEntity",
+          "parent_id": "DMC000000100",
+          "parent_rel": "ONE_TO_ONE_MANDATORY",
+          "definition": "The LegalEntity Concept is the primary concept for all legal entities and provides the core base information for all Legal Entities mastered within the system independent if entity type including Entity Name and Entity Type. "
+        },
+        {
+          "dda_id": "DMC000000023",
+          "code": "LegalEntityIdentifiers",
+          "name": "LegalEntityIdentifiers",
+          "parent_id": "DMC000000106",
+          "parent_rel": "ONE_TO_MANY_OPTIONAL",
+          "definition": "The Legal Entity Identifiers concept provides a single place to look up and cross reference a single legal entity using any identification code"
+        },
+        {
+          "dda_id": "DMC000000108",
+          "code": "LegalEntityAddress",
+          "name": "LegalEntityAddress",
+          "parent_id": "DMC000000106",
+          "parent_rel": "ONE_TO_ONE_OPTIONAL",
+          "definition": "The LegalEntityAddress Concept provides location address information for a legal entity including the address type.  "
+        },
+        {
+          "dda_id": "DMC000000011"
+        },
+        {
+          "dda_id": "DMC000000107"
+        },
+        {
+          "dda_id": "DMC000000109"
+        },
+        {
+          "dda_id": "DMC000000110"
+        },
+        {
+          "dda_id": "DMC000000111"
+        },
+        {
+          "dda_id": "DMC000000112"
+        },
+        {
+          "dda_id": "DMC000000113"
+        },
+        {
+          "dda_id": "DMC000000114"
+        },
+        {
+          "dda_id": "DMC000000115"
+        },
+        {
+          "dda_id": "DMC000000116"
+        },
+        {
+          "dda_id": "DMC000000117"
+        },
+        {
+          "dda_id": "DMC000000120"
+        },
+        {
+          "dda_id": "DMC000000013"
+        },
+        {
+          "dda_id": "DMC000000016"
+        },
+        {
+          "dda_id": "DMC000000017"
+        },
+        {
+          "dda_id": "DMC000000018"
+        },
+        {
+          "dda_id": "DMC000000019"
+        },
+        {
+          "dda_id": "DMC000000025"
+        }
       ],
-      "attributes": [],
+      "attributes": [
+        {
+          "dda_id": "DMA000000664"
+        },
+        {
+          "dda_id": "DMA000000667"
+        },
+        {
+          "dda_id": "DMA000000660"
+        },
+        {
+          "dda_id": "DMA000000661"
+        },
+        {
+          "dda_id": "DMA000000662"
+        },
+        {
+          "dda_id": "DMA000000666"
+        },
+        {
+          "dda_id": "DMA000000665"
+        },
+        {
+          "dda_id": "DMA000000658"
+        },
+        {
+          "dda_id": "DMA000000795"
+        },
+        {
+          "dda_id": "DMA000000659"
+        },
+        {
+          "dda_id": "DMA000000808"
+        },
+        {
+          "dda_id": "DMA000000811"
+        },
+        {
+          "dda_id": "DMA000000812"
+        },
+        {
+          "dda_id": "DMA000000813"
+        },
+        {
+          "dda_id": "DMA000000814"
+        },
+        {
+          "dda_id": "DMA000000815"
+        }
+      ],
       "relationships": [
-        "DMR000000001",
-        "DMR000000002"
+        {
+          "dda_id": "DMR000000001",
+          "code": "LegalEntityFundManagedBy",
+          "source_domain": "DMD000000012",
+          "destination_domain": "DMD000000012",
+          "forward_verb": "Managed By",
+          "inverse_verb": "Invests In",
+          "source_role": "Fund",
+          "target_role": "GP",
+          "cardinality": "MANY_TO_ONE",
+          "dates": true
+        },
+        {
+          "dda_id": "DMR000000002",
+          "code": "LegalEntityPEInvestor",
+          "source_domain": "DMD000000012",
+          "destination_domain": "DMD000000012",
+          "forward_verb": "Investor",
+          "inverse_verb": "Invests In",
+          "source_role": "PortCo",
+          "target_role": "LP Investor",
+          "cardinality": "MANY_TO_MANY",
+          "dates": true
+        },
+        {
+          "dda_id": "DMR000000003",
+          "code": "PersonLegalEntityAssociations",
+          "source_domain": "DMD000000001",
+          "destination_domain": "DMD000000012",
+          "forward_verb": "Employed By",
+          "inverse_verb": "Employer",
+          "source_role": "Employee",
+          "target_role": "Employer",
+          "cardinality": "ONE_TO_MANY",
+          "dates": true
+        },
+        {
+          "dda_id": "DMR000000004",
+          "code": "LegalEntityFundLPCommitment",
+          "source_domain": "DMD000000012",
+          "destination_domain": "DMD000000012",
+          "forward_verb": "Committed To",
+          "inverse_verb": "Commitment From",
+          "source_role": "LP",
+          "target_role": "Fund",
+          "cardinality": "MANY_TO_ONE",
+          "dates": true
+        }
       ],
-      "retrieved": "2026-09-22T12:00:00Z"
+      "retrieved": "2026-09-28T13:50:00Z"
+    },
+    "DMD000000032": {
+      "concepts": [],
+      "attributes": [],
+      "relationships": [],
+      "retrieved": "2026-09-28T13:50:00Z"
     },
     "DMD000000016": {
       "concepts": [
-        "DMC000000142"
+        {
+          "dda_id": "DMC000000142",
+          "code": "Document",
+          "name": "Document",
+          "parent_id": "DMC000000100",
+          "parent_rel": "ONE_TO_ONE_OPTIONAL",
+          "definition": "The DocumentBase Concept provides basic details about a single document including its name, type, brief description and link to the document"
+        }
       ],
       "attributes": [],
       "relationships": [],
-      "retrieved": "2026-09-22T12:00:00Z"
-    },
-    "DMD000000020": {
-      "concepts": [],
-      "attributes": [],
-      "relationships": [],
-      "retrieved": "2026-09-22T12:00:00Z"
-    },
-    "DMD000000022": {
-      "concepts": [],
-      "attributes": [],
-      "relationships": [],
-      "retrieved": "2026-09-22T12:00:00Z"
+      "retrieved": "2026-09-28T13:50:00Z"
     }
   },
   "platform_findings": [
     {
       "id": "PLF001",
       "dda_id": "DMC000000011",
-      "check": "M01 / DMS000000169 principle 1",
-      "finding": "LegalEntityRoles stores roles — investor, vendor, client — on the organisation. Roles come from the relationships in force; this model derives supplier, outside manufacturer and certifying body instead."
+      "check": "M01",
+      "finding": "The LegalEntityRoles concept stores the roles an entity plays — Investor, Vendor, Client, Partner — as records on the entity. Its name reads “The LegalEntityRole” where its code is LegalEntityRoles."
     },
     {
       "id": "PLF002",
-      "dda_id": "DMC000000024",
-      "check": "M01, naming",
-      "finding": "PeopleRoles stores roles on the person, and uses the plural People where its siblings use the singular Person."
+      "dda_id": "DLT000000062",
+      "check": "M01",
+      "finding": "The lookup type LegalEntityRoleType lists roles such as Vendor, Client and Investor as values held against the entity. Roles are meant to come from the relationships in force."
     },
     {
       "id": "PLF003",
-      "dda_id": "DMC000000107",
-      "check": "M10",
-      "finding": "LegalEntityRelationships holds relationships as a concept. DDA now holds relationships as their own records; not reused here."
+      "dda_id": "DMC000000108",
+      "check": "naming",
+      "finding": "LegalEntityAddress is singular where the naming rule makes a child concept the root name plus a plural noun."
     },
     {
       "id": "PLF004",
-      "dda_id": "DMD000000020",
-      "check": "DT-anchor",
-      "finding": "The Events domain holds no concepts, so it has no anchor. Its definition describes corporate and life events only, and does not cover operational occurrences."
+      "dda_id": "DMA000000814",
+      "check": "naming",
+      "finding": "The codes LegalEntityIdenticfiersEndDate (DMA000000814) and LegalEntityIdenticfiersValue (DMA000000815) are misspelt, and neither matches its concept's name."
     },
     {
       "id": "PLF005",
-      "dda_id": "DMD000000022",
-      "check": "DT-anchor",
-      "finding": "The Transactions domain holds no concepts, so it has no anchor. Its definition is written for trades in securities and does not cover exchanges of goods."
+      "dda_id": "DMA000000808",
+      "check": "naming",
+      "finding": "LegalEntityStateRegion sits on LegalEntityAddress but does not carry the concept's name as a prefix, as the attribute naming rule requires."
     },
     {
       "id": "PLF006",
-      "dda_id": "DMC000000142",
+      "dda_id": "DMA000000659",
       "check": "naming",
-      "finding": "The Document concept's description calls it DocumentBase, which disagrees with its name."
+      "finding": "The fully qualified name of LegalEntityAddressGeo reads LegalEntityAddressLattitude, which differs from its code. Seven attributes on these concepts (DMA000000795, 808, 811–815) have no fully qualified name."
     },
     {
       "id": "PLF007",
-      "dda_id": "DMC000000147",
-      "check": "naming",
-      "finding": "PersonCitizenship is singular where its siblings are plural."
+      "dda_id": "DMA000000811",
+      "check": "definition",
+      "finding": "Attributes DMA000000811 to DMA000000815 carry a description that repeats their code, so no definition is held. DMA000000662 is cut off after its name."
     },
     {
       "id": "PLF008",
-      "dda_id": "DMR000000001",
-      "check": "R01",
-      "finding": "The relationship reads Managed By forward and Invests In back. The inverse does not read the forward verb back, so the pair describes two arrangements under one name."
+      "dda_id": "DMC000000142",
+      "check": "definition",
+      "finding": "The Document concept describes itself as DocumentBase, holds no attributes, and has no status beyond NOT_STARTED."
     },
     {
       "id": "PLF009",
-      "dda_id": "DMR000000002",
-      "check": "R01",
-      "finding": "The forward verb is Investor, which is a noun. A role has been entered in the verb field."
+      "dda_id": "DLT000000037",
+      "check": "naming",
+      "finding": "The lookup type coded UniversalRatingAgencies is named GlobalRatingAgencies, and its sibling GlobalRatingAgencyRatingTypes still uses the Global prefix."
     },
     {
       "id": "PLF010",
+      "dda_id": "DLT000000093",
+      "check": "definition",
+      "finding": "The lookup types LegalEntityClientSummary1 and LegalEntityClientSummary2, and PersonRoles, carry a description that repeats their code."
+    },
+    {
+      "id": "PLF011",
+      "dda_id": "DQT000000016",
+      "check": "definition",
+      "finding": "Two quality types, dd (DQT000000016) and ss (DQT000000001), hold only placeholder text."
+    },
+    {
+      "id": "PLF012",
+      "dda_id": "DML000003040",
+      "check": "definition",
+      "finding": "The country value Afghanistan (DML000003040) carries the description “Afghanistan(AFG) TEST UPDATE”, a leftover test edit."
+    },
+    {
+      "id": "PLF013",
+      "dda_id": "DLT000000071",
+      "check": "definition",
+      "finding": "The description of UniversalCountryCodes contains a garbled character where a dash belongs, so it does not display correctly."
+    },
+    {
+      "id": "PLF014",
+      "dda_id": "DMR000000002",
+      "check": "R01",
+      "finding": "The forward verb of LegalEntityPEInvestor is Investor, a noun, so the row reads “PortCo Investor LP Investor”. Its inverse Invests In reads from the wrong end."
+    },
+    {
+      "id": "PLF015",
       "dda_id": "DMR000000001",
-      "check": "R06",
-      "finding": "The stored forward view is LegalEntityGP; the roles on the record derive LegalEntityGPs. A stored derived name has drifted from what it derives from."
+      "check": "R01",
+      "finding": "LegalEntityFundManagedBy gives Invests In as the inverse of Managed By. A manager manages a fund; it does not invest in it by managing it."
+    },
+    {
+      "id": "PLF016",
+      "dda_id": "DMR000000004",
+      "check": "R01",
+      "finding": "LegalEntityFundLPCommitment has an inverse of Commitment From, which is a noun phrase, and a many-to-one cardinality although its description says a limited partner may commit to several funds."
+    },
+    {
+      "id": "PLF017",
+      "dda_id": "DMR000000003",
+      "check": "naming",
+      "finding": "PersonLegalEntityAssociations describes itself as PersonLegalEntityEmployer, misspells “employment”, has a noun (Employer) for its inverse verb, and leaves both plural role names empty."
+    },
+    {
+      "id": "PLF018",
+      "dda_id": "DMD000000032",
+      "check": "definition",
+      "finding": "The Products domain says the bill of materials is a hierarchy in which each product points up to its immediate parent product. That gives a product one parent. The same ingredient goes into many products, so a product can have many parents, and the design's composition relationship is many to many."
+    },
+    {
+      "id": "PLF019",
+      "dda_id": "DMD000000032",
+      "check": "concepts",
+      "finding": "The Products domain has no concepts at the time of reading, so this design's Product concept and the eleven beneath it have nothing to reuse or extend."
     }
   ],
   "guide_disagreements": [
     {
-      "guide": "dda://guides/data-design-authority",
-      "records": "list_model(stateTransitions)",
-      "finding": "The guide lists state transitions as readable; the call returns an internal error, so the change package carries no preconditions."
+      "guide": "dda://skills/data-modelling",
+      "records": "list_model(domains)",
+      "finding": "The guide says domain_name is the same string as domain_code. Every domain record holds a long descriptive name, for example “Legal Entities (incl. Relationships, Companies, Funds, Charities, Governments, Agencies etc.)” against the code LegalEntities."
+    },
+    {
+      "guide": "dda://skills/data-modelling",
+      "records": "concept DMC000000011",
+      "finding": "The guide says concept_name is the same string as concept_code. This record holds the name “The LegalEntityRole” against the code LegalEntityRoles."
+    },
+    {
+      "guide": "dda://guides/subject-based-modelling",
+      "records": "DMS000000169 principle 1",
+      "finding": "The guide directs roles to be modelled as classifications on the subject record. Principle 1 says to model the roles a subject performs separately, and this method derives roles from relationships."
+    },
+    {
+      "guide": "dda://guides/workflow",
+      "records": "tool surface",
+      "finding": "The guide names the tools list_state_transitions, list_workflow_instances and get_workflow_definitions. The server exposes list_model with the entity keys stateTransitions, workflowInstances and workflowDefinitions instead."
     }
   ]
 }

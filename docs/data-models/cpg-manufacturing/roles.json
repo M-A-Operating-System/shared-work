@@ -7,14 +7,8 @@
     "played_by_domain_ids": [
       "DOM006"
     ],
-    "counterpart_role_ids": [
-      "ROL002"
-    ],
-    "is_symmetric": false,
     "aliases": [],
-    "established_by": [
-      "REL001"
-    ],
+    "established_by": [],
     "stated_in": [
       "REQ002",
       "REQ003",
@@ -23,8 +17,8 @@
     "evidence_source_ids": [
       "SRC005"
     ],
-    "status": "active",
-    "withdrawn_reason": null
+    "status": "withdrawn",
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
   },
   {
     "id": "ROL002",
@@ -34,14 +28,8 @@
     "played_by_domain_ids": [
       "DOM006"
     ],
-    "counterpart_role_ids": [
-      "ROL001"
-    ],
-    "is_symmetric": false,
     "aliases": [],
-    "established_by": [
-      "REL001"
-    ],
+    "established_by": [],
     "stated_in": [
       "REQ002",
       "REQ004"
@@ -49,8 +37,8 @@
     "evidence_source_ids": [
       "SRC005"
     ],
-    "status": "active",
-    "withdrawn_reason": null
+    "status": "withdrawn",
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
   },
   {
     "id": "ROL003",
@@ -60,22 +48,16 @@
     "played_by_domain_ids": [
       "DOM006"
     ],
-    "counterpart_role_ids": [
-      "ROL004"
-    ],
-    "is_symmetric": false,
     "aliases": [],
-    "established_by": [
-      "REL002"
-    ],
+    "established_by": [],
     "stated_in": [
       "REQ019"
     ],
     "evidence_source_ids": [
       "SRC030"
     ],
-    "status": "active",
-    "withdrawn_reason": null
+    "status": "withdrawn",
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
   },
   {
     "id": "ROL004",
@@ -85,22 +67,16 @@
     "played_by_domain_ids": [
       "DOM006"
     ],
-    "counterpart_role_ids": [
-      "ROL003"
-    ],
-    "is_symmetric": false,
     "aliases": [],
-    "established_by": [
-      "REL002"
-    ],
+    "established_by": [],
     "stated_in": [
       "REQ019"
     ],
     "evidence_source_ids": [
       "SRC031"
     ],
-    "status": "active",
-    "withdrawn_reason": null
+    "status": "withdrawn",
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
   },
   {
     "id": "ROL005",
@@ -110,22 +86,16 @@
     "played_by_domain_ids": [
       "DOM006"
     ],
-    "counterpart_role_ids": [
-      "ROL006"
-    ],
-    "is_symmetric": false,
     "aliases": [],
-    "established_by": [
-      "REL003"
-    ],
+    "established_by": [],
     "stated_in": [
       "REQ008"
     ],
     "evidence_source_ids": [
       "SRC020"
     ],
-    "status": "active",
-    "withdrawn_reason": null
+    "status": "withdrawn",
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
   },
   {
     "id": "ROL006",
@@ -135,14 +105,8 @@
     "played_by_domain_ids": [
       "DOM002"
     ],
-    "counterpart_role_ids": [
-      "ROL005"
-    ],
-    "is_symmetric": false,
     "aliases": [],
-    "established_by": [
-      "REL003"
-    ],
+    "established_by": [],
     "stated_in": [
       "REQ008",
       "REQ058"
@@ -151,8 +115,8 @@
       "SRC020",
       "SRC029"
     ],
-    "status": "active",
-    "withdrawn_reason": null
+    "status": "withdrawn",
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
   },
   {
     "id": "ROL007",
@@ -162,22 +126,16 @@
     "played_by_domain_ids": [
       "DOM006"
     ],
-    "counterpart_role_ids": [
-      "ROL009"
-    ],
-    "is_symmetric": false,
     "aliases": [],
-    "established_by": [
-      "REL004"
-    ],
+    "established_by": [],
     "stated_in": [
       "REQ011"
     ],
     "evidence_source_ids": [
       "SRC030"
     ],
-    "status": "active",
-    "withdrawn_reason": null
+    "status": "withdrawn",
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
   },
   {
     "id": "ROL008",
@@ -187,22 +145,16 @@
     "played_by_domain_ids": [
       "DOM010"
     ],
-    "counterpart_role_ids": [
-      "ROL009"
-    ],
-    "is_symmetric": false,
     "aliases": [],
-    "established_by": [
-      "REL017"
-    ],
+    "established_by": [],
     "stated_in": [
       "REQ011"
     ],
     "evidence_source_ids": [
       "SRC022"
     ],
-    "status": "active",
-    "withdrawn_reason": null
+    "status": "withdrawn",
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
   },
   {
     "id": "ROL009",
@@ -212,16 +164,8 @@
     "played_by_domain_ids": [
       "DOM002"
     ],
-    "counterpart_role_ids": [
-      "ROL007",
-      "ROL008"
-    ],
-    "is_symmetric": false,
     "aliases": [],
-    "established_by": [
-      "REL004",
-      "REL017"
-    ],
+    "established_by": [],
     "stated_in": [
       "REQ011"
     ],
@@ -229,21 +173,17 @@
       "SRC030",
       "SRC022"
     ],
-    "status": "active",
-    "withdrawn_reason": null
+    "status": "withdrawn",
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
   },
   {
     "id": "ROL010",
     "name": "Contracted Product",
     "plural": "Contracted Products",
-    "definition": "A product is a Contracted Product while it is manufactured by an organisation, which is its Outside Manufacturer.",
+    "definition": "A product is a Contracted Product while it is made for the organisation by another company. It says that the organisation relies on an outside company to make or pack it. That is not the same as being a Routed Product, which says that the organisation has a method of its own for making it.",
     "played_by_domain_ids": [
       "DOM006"
     ],
-    "counterpart_role_ids": [
-      "ROL011"
-    ],
-    "is_symmetric": false,
     "aliases": [],
     "established_by": [
       "REL005"
@@ -255,20 +195,17 @@
       "SRC024"
     ],
     "status": "active",
-    "withdrawn_reason": null
+    "withdrawn_reason": null,
+    "distinct_need": "Names the capacity in which that the organisation relies on an outside company to make or pack it; no other role in this model says it."
   },
   {
     "id": "ROL011",
     "name": "Outside Manufacturer",
     "plural": "Outside Manufacturers",
-    "definition": "An organisation is an Outside Manufacturer while it manufactures a product for this organisation, which is its Contracted Product.",
+    "definition": "A company is an Outside Manufacturer while it makes or packs a product for the organisation. It says that the company holds a contract to make or pack goods for the organisation. That is not the same as being a Site Operator, which says that the company runs a place, whatever it makes there.",
     "played_by_domain_ids": [
       "DOM002"
     ],
-    "counterpart_role_ids": [
-      "ROL010"
-    ],
-    "is_symmetric": false,
     "aliases": [],
     "established_by": [
       "REL005"
@@ -282,20 +219,17 @@
       "SRC024"
     ],
     "status": "active",
-    "withdrawn_reason": null
+    "withdrawn_reason": null,
+    "distinct_need": "Names the capacity in which that the company holds a contract to make or pack goods for the organisation; no other role in this model says it."
   },
   {
     "id": "ROL012",
     "name": "Routed Product",
     "plural": "Routed Products",
-    "definition": "A product is a Routed Product while it is made by a method, which is its Making Method.",
+    "definition": "A product is a Routed Product while it is made by a method the organisation has defined. It says that the organisation has a defined way of making it. That is not the same as being a Contracted Product, which says that an outside company makes it.",
     "played_by_domain_ids": [
       "DOM006"
     ],
-    "counterpart_role_ids": [
-      "ROL013"
-    ],
-    "is_symmetric": false,
     "aliases": [],
     "established_by": [
       "REL006"
@@ -307,20 +241,17 @@
       "SRC002"
     ],
     "status": "active",
-    "withdrawn_reason": null
+    "withdrawn_reason": null,
+    "distinct_need": "Names the capacity in which that the organisation has a defined way of making it; no other role in this model says it."
   },
   {
     "id": "ROL013",
     "name": "Making Method",
     "plural": "Making Methods",
-    "definition": "A method is a Making Method while it makes a product, which is its Routed Product.",
+    "definition": "A method is a Making Method while it describes how a product is made. It says that this is the way the organisation makes the product. That is not the same as being a Permitted Step, which says one step within a method, not the whole method.",
     "played_by_domain_ids": [
       "DOM009"
     ],
-    "counterpart_role_ids": [
-      "ROL012"
-    ],
-    "is_symmetric": false,
     "aliases": [],
     "established_by": [
       "REL006"
@@ -334,20 +265,17 @@
       "SRC004"
     ],
     "status": "active",
-    "withdrawn_reason": null
+    "withdrawn_reason": null,
+    "distinct_need": "Names the capacity in which that this is the way the organisation makes the product; no other role in this model says it."
   },
   {
     "id": "ROL014",
     "name": "Later Step",
     "plural": "Later Steps",
-    "definition": "A step is a Later Step while it follows another step, which is its Earlier Step.",
+    "definition": "A step is a Later Step while it follows another step in a method. It says that the step comes after another and starts only once that one is done. That is not the same as being an Earlier Step, which says the step that must come first.",
     "played_by_domain_ids": [
       "DOM009"
     ],
-    "counterpart_role_ids": [
-      "ROL015"
-    ],
-    "is_symmetric": false,
     "aliases": [],
     "established_by": [
       "REL007"
@@ -359,20 +287,17 @@
       "SRC002"
     ],
     "status": "active",
-    "withdrawn_reason": null
+    "withdrawn_reason": null,
+    "distinct_need": "Names the capacity in which that the step comes after another and starts only once that one is done; no other role in this model says it."
   },
   {
     "id": "ROL015",
     "name": "Earlier Step",
     "plural": "Earlier Steps",
-    "definition": "A step is an Earlier Step while it precedes another step, which is its Later Step.",
+    "definition": "A step is an Earlier Step while it comes before another step in a method. It says that another step depends on this one being done first. That is not the same as being a Later Step, which says the step that follows.",
     "played_by_domain_ids": [
       "DOM009"
     ],
-    "counterpart_role_ids": [
-      "ROL014"
-    ],
-    "is_symmetric": false,
     "aliases": [],
     "established_by": [
       "REL007"
@@ -384,20 +309,17 @@
       "SRC002"
     ],
     "status": "active",
-    "withdrawn_reason": null
+    "withdrawn_reason": null,
+    "distinct_need": "Names the capacity in which that another step depends on this one being done first; no other role in this model says it."
   },
   {
     "id": "ROL016",
-    "name": "Approved Step",
-    "plural": "Approved Steps",
-    "definition": "A step is an Approved Step while it is approved at a place in the plant, which is its Approved Position.",
+    "name": "Permitted Step",
+    "plural": "Permitted Steps",
+    "definition": "A step is a Permitted Step while it may be run at a particular place. It says that the step may be carried out in that place. That is not the same as being a Qualified Work, which says that the step needs a qualified person, whatever the place.",
     "played_by_domain_ids": [
       "DOM009"
     ],
-    "counterpart_role_ids": [
-      "ROL017"
-    ],
-    "is_symmetric": false,
     "aliases": [],
     "established_by": [
       "REL008"
@@ -410,20 +332,17 @@
       "SRC003"
     ],
     "status": "active",
-    "withdrawn_reason": null
+    "withdrawn_reason": null,
+    "distinct_need": "Names the capacity in which that the step may be carried out in that place; no other role in this model says it."
   },
   {
     "id": "ROL017",
-    "name": "Approved Position",
-    "plural": "Approved Positions",
-    "definition": "A place in the plant is an Approved Position while it is approved for a step, which is its Approved Step.",
+    "name": "Permitted Place",
+    "plural": "Permitted Places",
+    "definition": "A place is a Permitted Place while it is allowed to run a particular step. It says that the place is fit to host that step. That is not the same as being a Production Place, which says the place where a run actually took place.",
     "played_by_domain_ids": [
-      "DOM008"
+      "DOM010"
     ],
-    "counterpart_role_ids": [
-      "ROL016"
-    ],
-    "is_symmetric": false,
     "aliases": [],
     "established_by": [
       "REL008"
@@ -437,20 +356,17 @@
       "SRC004"
     ],
     "status": "active",
-    "withdrawn_reason": null
+    "withdrawn_reason": null,
+    "distinct_need": "Names the capacity in which that the place is fit to host that step; no other role in this model says it."
   },
   {
     "id": "ROL018",
     "name": "Derived Recipe",
     "plural": "Derived Recipes",
-    "definition": "A recipe is a Derived Recipe while it is derived from another recipe, which is its Source Recipe.",
+    "definition": "A recipe is a Derived Recipe while it is written from a more general recipe. It says that its instructions come from a more general level. That is not the same as being a Source Recipe, which says the recipe that others are written from.",
     "played_by_domain_ids": [
       "DOM009"
     ],
-    "counterpart_role_ids": [
-      "ROL019"
-    ],
-    "is_symmetric": false,
     "aliases": [],
     "established_by": [
       "REL009"
@@ -463,20 +379,17 @@
       "SRC002"
     ],
     "status": "active",
-    "withdrawn_reason": null
+    "withdrawn_reason": null,
+    "distinct_need": "Names the capacity in which that its instructions come from a more general level; no other role in this model says it."
   },
   {
     "id": "ROL019",
     "name": "Source Recipe",
     "plural": "Source Recipes",
-    "definition": "A recipe is a Source Recipe while it is the source of another recipe, which is its Derived Recipe.",
+    "definition": "A recipe is a Source Recipe while it is the starting point for a more specific recipe. It says that other recipes are written from it. That is not the same as being a Derived Recipe, which says the recipe written from another.",
     "played_by_domain_ids": [
       "DOM009"
     ],
-    "counterpart_role_ids": [
-      "ROL018"
-    ],
-    "is_symmetric": false,
     "aliases": [],
     "established_by": [
       "REL009"
@@ -489,7 +402,8 @@
       "SRC003"
     ],
     "status": "active",
-    "withdrawn_reason": null
+    "withdrawn_reason": null,
+    "distinct_need": "Names the capacity in which that other recipes are written from it; no other role in this model says it."
   },
   {
     "id": "ROL020",
@@ -499,22 +413,16 @@
     "played_by_domain_ids": [
       "DOM008"
     ],
-    "counterpart_role_ids": [
-      "ROL021"
-    ],
-    "is_symmetric": false,
     "aliases": [],
-    "established_by": [
-      "REL010"
-    ],
+    "established_by": [],
     "stated_in": [
       "REQ033"
     ],
     "evidence_source_ids": [
       "SRC001"
     ],
-    "status": "active",
-    "withdrawn_reason": null
+    "status": "withdrawn",
+    "withdrawn_reason": "Plant structure is held in the Locations hierarchy, which runs down to the shop floor."
   },
   {
     "id": "ROL021",
@@ -524,35 +432,25 @@
     "played_by_domain_ids": [
       "DOM008"
     ],
-    "counterpart_role_ids": [
-      "ROL020"
-    ],
-    "is_symmetric": false,
     "aliases": [],
-    "established_by": [
-      "REL010"
-    ],
+    "established_by": [],
     "stated_in": [
       "REQ033"
     ],
     "evidence_source_ids": [
       "SRC001"
     ],
-    "status": "active",
-    "withdrawn_reason": null
+    "status": "withdrawn",
+    "withdrawn_reason": "Plant structure is held in the Locations hierarchy, which runs down to the shop floor."
   },
   {
     "id": "ROL022",
-    "name": "Occupied Position",
-    "plural": "Occupied Positions",
-    "definition": "A place in the plant is an Occupied Position while it is occupied by a machine, which is its Installed Machine.",
+    "name": "Occupied Place",
+    "plural": "Occupied Places",
+    "definition": "A place is an Occupied Place while it has a machine standing in it. It says that a machine is fitted in the place for a stated period. That is not the same as being a Production Place, which says that a run took place there, whether or not a machine is fitted.",
     "played_by_domain_ids": [
-      "DOM008"
+      "DOM010"
     ],
-    "counterpart_role_ids": [
-      "ROL023"
-    ],
-    "is_symmetric": false,
     "aliases": [],
     "established_by": [
       "REL011"
@@ -564,20 +462,17 @@
       "SRC001"
     ],
     "status": "active",
-    "withdrawn_reason": null
+    "withdrawn_reason": null,
+    "distinct_need": "Names the capacity in which that a machine is fitted in the place for a stated period; no other role in this model says it."
   },
   {
     "id": "ROL023",
     "name": "Installed Machine",
     "plural": "Installed Machines",
-    "definition": "A machine is an Installed Machine while it occupies a place in the plant, which is its Occupied Position.",
+    "definition": "A machine is an Installed Machine while it stands in a place in the plant. It says that the machine occupies a place for a stated period. That is not the same as being a Stopped Machine, which says a machine a stoppage halted, wherever it stands.",
     "played_by_domain_ids": [
       "DOM007"
     ],
-    "counterpart_role_ids": [
-      "ROL022"
-    ],
-    "is_symmetric": false,
     "aliases": [],
     "established_by": [
       "REL011"
@@ -591,7 +486,8 @@
       "SRC018"
     ],
     "status": "active",
-    "withdrawn_reason": null
+    "withdrawn_reason": null,
+    "distinct_need": "Names the capacity in which that the machine occupies a place for a stated period; no other role in this model says it."
   },
   {
     "id": "ROL024",
@@ -601,14 +497,8 @@
     "played_by_domain_ids": [
       "DOM008"
     ],
-    "counterpart_role_ids": [
-      "ROL025"
-    ],
-    "is_symmetric": false,
     "aliases": [],
-    "established_by": [
-      "REL012"
-    ],
+    "established_by": [],
     "stated_in": [
       "REQ033",
       "REQ065"
@@ -616,8 +506,8 @@
     "evidence_source_ids": [
       "SRC001"
     ],
-    "status": "active",
-    "withdrawn_reason": null
+    "status": "withdrawn",
+    "withdrawn_reason": "Plant structure is held in the Locations hierarchy, which runs down to the shop floor."
   },
   {
     "id": "ROL025",
@@ -627,35 +517,25 @@
     "played_by_domain_ids": [
       "DOM010"
     ],
-    "counterpart_role_ids": [
-      "ROL024"
-    ],
-    "is_symmetric": false,
     "aliases": [],
-    "established_by": [
-      "REL012"
-    ],
+    "established_by": [],
     "stated_in": [
       "REQ065"
     ],
     "evidence_source_ids": [
       "SRC001"
     ],
-    "status": "active",
-    "withdrawn_reason": null
+    "status": "withdrawn",
+    "withdrawn_reason": "Plant structure is held in the Locations hierarchy, which runs down to the shop floor."
   },
   {
     "id": "ROL026",
     "name": "Individual Unit",
     "plural": "Individual Units",
-    "definition": "A unit is an Individual Unit while it is a unit of a product, which is its Defining Product.",
+    "definition": "An unit is an Individual Unit while it is a single item made to a product. It says that the item is identified on its own and made to a product. That is not the same as being a Fitted Unit, which says an item built into another item.",
     "played_by_domain_ids": [
       "DOM007"
     ],
-    "counterpart_role_ids": [
-      "ROL027"
-    ],
-    "is_symmetric": false,
     "aliases": [],
     "established_by": [
       "REL013"
@@ -669,20 +549,17 @@
       "SRC037"
     ],
     "status": "active",
-    "withdrawn_reason": null
+    "withdrawn_reason": null,
+    "distinct_need": "Names the capacity in which that the item is identified on its own and made to a product; no other role in this model says it."
   },
   {
     "id": "ROL027",
     "name": "Defining Product",
     "plural": "Defining Products",
-    "definition": "A product is a Defining Product while individually identified units are made to it, which are its Individual Units.",
+    "definition": "A product is a Defining Product while it is the product that individually identified units are made to. It says that units are made to it. That is not the same as being a Traded Product, which says goods bought or sold, not the units made to it.",
     "played_by_domain_ids": [
       "DOM006"
     ],
-    "counterpart_role_ids": [
-      "ROL026"
-    ],
-    "is_symmetric": false,
     "aliases": [],
     "established_by": [
       "REL013"
@@ -694,21 +571,17 @@
       "SRC037"
     ],
     "status": "active",
-    "withdrawn_reason": null
+    "withdrawn_reason": null,
+    "distinct_need": "Names the capacity in which that units are made to it; no other role in this model says it."
   },
   {
     "id": "ROL028",
     "name": "Assembled Unit",
     "plural": "Assembled Units",
-    "definition": "A unit is an Assembled Unit while it is built from another unit or incorporates a batch, which are its Fitted Unit and Incorporated Batch.",
+    "definition": "An unit is an Assembled Unit while it is built from other units or from batches. It says that the unit is put together from parts. That is not the same as being an Individual Unit, which says a unit identified on its own, whether or not it is assembled.",
     "played_by_domain_ids": [
       "DOM007"
     ],
-    "counterpart_role_ids": [
-      "ROL029",
-      "ROL030"
-    ],
-    "is_symmetric": false,
     "aliases": [],
     "established_by": [
       "REL014",
@@ -721,20 +594,17 @@
       "SRC007"
     ],
     "status": "active",
-    "withdrawn_reason": null
+    "withdrawn_reason": null,
+    "distinct_need": "Names the capacity in which that the unit is put together from parts; no other role in this model says it."
   },
   {
     "id": "ROL029",
     "name": "Fitted Unit",
     "plural": "Fitted Units",
-    "definition": "A unit is a Fitted Unit while it is built into another unit, which is its Assembled Unit.",
+    "definition": "An unit is a Fitted Unit while it is built into another unit. It says that the unit is a part of a larger one. That is not the same as being an Assembled Unit, which says the larger unit it is built into.",
     "played_by_domain_ids": [
       "DOM007"
     ],
-    "counterpart_role_ids": [
-      "ROL028"
-    ],
-    "is_symmetric": false,
     "aliases": [],
     "established_by": [
       "REL014"
@@ -746,7 +616,8 @@
       "SRC007"
     ],
     "status": "active",
-    "withdrawn_reason": null
+    "withdrawn_reason": null,
+    "distinct_need": "Names the capacity in which that the unit is a part of a larger one; no other role in this model says it."
   },
   {
     "id": "ROL030",
@@ -756,35 +627,25 @@
     "played_by_domain_ids": [
       "DOM006"
     ],
-    "counterpart_role_ids": [
-      "ROL028"
-    ],
-    "is_symmetric": false,
     "aliases": [],
-    "established_by": [
-      "REL015"
-    ],
+    "established_by": [],
     "stated_in": [
       "REQ023"
     ],
     "evidence_source_ids": [
       "SRC007"
     ],
-    "status": "active",
-    "withdrawn_reason": null
+    "status": "withdrawn",
+    "withdrawn_reason": "Every batch in a traced link is a Traced Batch; one role covers them all."
   },
   {
     "id": "ROL031",
     "name": "Contained Place",
     "plural": "Contained Places",
-    "definition": "A place is a Contained Place while it is within another place, which is its Containing Place.",
+    "definition": "A place is a Contained Place while it sits within a larger place. It says that the place is inside another, such as a line within an area. That is not the same as being a Containing Place, which says the larger place that holds it.",
     "played_by_domain_ids": [
       "DOM010"
     ],
-    "counterpart_role_ids": [
-      "ROL032"
-    ],
-    "is_symmetric": false,
     "aliases": [],
     "established_by": [
       "REL016"
@@ -796,20 +657,17 @@
       "SRC039"
     ],
     "status": "active",
-    "withdrawn_reason": null
+    "withdrawn_reason": null,
+    "distinct_need": "Names the capacity in which that the place is inside another, such as a line within an area; no other role in this model says it."
   },
   {
     "id": "ROL032",
     "name": "Containing Place",
     "plural": "Containing Places",
-    "definition": "A place is a Containing Place while it contains another place, which is its Contained Place.",
+    "definition": "A place is a Containing Place while it holds smaller places within it. It says that other places sit inside it. That is not the same as being a Contained Place, which says the place that sits inside another.",
     "played_by_domain_ids": [
       "DOM010"
     ],
-    "counterpart_role_ids": [
-      "ROL031"
-    ],
-    "is_symmetric": false,
     "aliases": [],
     "established_by": [
       "REL016"
@@ -821,20 +679,17 @@
       "SRC039"
     ],
     "status": "active",
-    "withdrawn_reason": null
+    "withdrawn_reason": null,
+    "distinct_need": "Names the capacity in which that other places sit inside it; no other role in this model says it."
   },
   {
     "id": "ROL033",
     "name": "Site Operator",
     "plural": "Site Operators",
-    "definition": "An organisation is a Site Operator while it operates a place, which is its Operated Site.",
+    "definition": "A company is a Site Operator while it runs a place. It says that the company is responsible for running a place. That is not the same as being a Registering Authority, which says an authority that records a place without running it.",
     "played_by_domain_ids": [
       "DOM002"
     ],
-    "counterpart_role_ids": [
-      "ROL034"
-    ],
-    "is_symmetric": false,
     "aliases": [],
     "established_by": [
       "REL019"
@@ -847,20 +702,17 @@
       "SRC022"
     ],
     "status": "active",
-    "withdrawn_reason": null
+    "withdrawn_reason": null,
+    "distinct_need": "Names the capacity in which that the company is responsible for running a place; no other role in this model says it."
   },
   {
     "id": "ROL034",
     "name": "Operated Site",
     "plural": "Operated Sites",
-    "definition": "A place is an Operated Site while it is operated by an organisation, which is its Site Operator.",
+    "definition": "A place is an Operated Site while it is run by a company. It says that a company is responsible for running it. That is not the same as being a Registered Place, which says a place recorded by an authority, whoever runs it.",
     "played_by_domain_ids": [
       "DOM010"
     ],
-    "counterpart_role_ids": [
-      "ROL033"
-    ],
-    "is_symmetric": false,
     "aliases": [],
     "established_by": [
       "REL019"
@@ -872,20 +724,17 @@
       "SRC022"
     ],
     "status": "active",
-    "withdrawn_reason": null
+    "withdrawn_reason": null,
+    "distinct_need": "Names the capacity in which that a company is responsible for running it; no other role in this model says it."
   },
   {
     "id": "ROL035",
     "name": "Registered Place",
     "plural": "Registered Places",
-    "definition": "A place is a Registered Place while it is registered with an organisation, which is its Registering Authority.",
+    "definition": "A place is a Registered Place while it is recorded on a register kept by an authority. It says that an authority knows the place under its own number. That is not the same as being an Operated Site, which says a place a company runs, whether or not it is registered.",
     "played_by_domain_ids": [
       "DOM010"
     ],
-    "counterpart_role_ids": [
-      "ROL036"
-    ],
-    "is_symmetric": false,
     "aliases": [],
     "established_by": [
       "REL018"
@@ -897,20 +746,17 @@
       "SRC011"
     ],
     "status": "active",
-    "withdrawn_reason": null
+    "withdrawn_reason": null,
+    "distinct_need": "Names the capacity in which that an authority knows the place under its own number; no other role in this model says it."
   },
   {
     "id": "ROL036",
     "name": "Registering Authority",
     "plural": "Registering Authorities",
-    "definition": "An organisation is a Registering Authority while it registers a place, which is its Registered Place.",
+    "definition": "A company is a Registering Authority while it keeps a register of places. It says that the body holds the register a place appears on. That is not the same as being a Site Operator, which says a company that runs a place.",
     "played_by_domain_ids": [
       "DOM002"
     ],
-    "counterpart_role_ids": [
-      "ROL035"
-    ],
-    "is_symmetric": false,
     "aliases": [],
     "established_by": [
       "REL018"
@@ -922,20 +768,17 @@
       "SRC011"
     ],
     "status": "active",
-    "withdrawn_reason": null
+    "withdrawn_reason": null,
+    "distinct_need": "Names the capacity in which that the body holds the register a place appears on; no other role in this model says it."
   },
   {
     "id": "ROL037",
     "name": "Employee",
     "plural": "Employees",
-    "definition": "A person is an Employee while they work for an organisation, which is their Employer.",
+    "definition": "A person is an Employee while it works for a company. It says that the person is employed by a company. That is not the same as being a Performer, which says a person who did a piece of work, whoever employs them.",
     "played_by_domain_ids": [
       "DOM001"
     ],
-    "counterpart_role_ids": [
-      "ROL038"
-    ],
-    "is_symmetric": false,
     "aliases": [],
     "established_by": [
       "REL020"
@@ -947,20 +790,17 @@
       "SRC033"
     ],
     "status": "active",
-    "withdrawn_reason": null
+    "withdrawn_reason": null,
+    "distinct_need": "Names the capacity in which that the person is employed by a company; no other role in this model says it."
   },
   {
     "id": "ROL038",
     "name": "Employer",
     "plural": "Employers",
-    "definition": "An organisation is an Employer while a person works for it, who is its Employee.",
+    "definition": "A company is an Employer while it employs people. It says that the company has people working for it. That is not the same as being a Site Operator, which says a company that runs a place, whether or not it employs the people in it.",
     "played_by_domain_ids": [
       "DOM002"
     ],
-    "counterpart_role_ids": [
-      "ROL037"
-    ],
-    "is_symmetric": false,
     "aliases": [],
     "established_by": [
       "REL020"
@@ -972,20 +812,17 @@
       "SRC033"
     ],
     "status": "active",
-    "withdrawn_reason": null
+    "withdrawn_reason": null,
+    "distinct_need": "Names the capacity in which that the company has people working for it; no other role in this model says it."
   },
   {
     "id": "ROL039",
     "name": "Qualified Person",
     "plural": "Qualified People",
-    "definition": "A person is a Qualified Person while they are qualified for a step of work, which is their Qualified Work.",
+    "definition": "A person is a Qualified Person while it holds a qualification for a kind of work. It says that the person may carry out that work. That is not the same as being a Performer, which says a person who actually did a piece of work.",
     "played_by_domain_ids": [
       "DOM001"
     ],
-    "counterpart_role_ids": [
-      "ROL040"
-    ],
-    "is_symmetric": false,
     "aliases": [],
     "established_by": [
       "REL021"
@@ -999,20 +836,17 @@
       "SRC022"
     ],
     "status": "active",
-    "withdrawn_reason": null
+    "withdrawn_reason": null,
+    "distinct_need": "Names the capacity in which that the person may carry out that work; no other role in this model says it."
   },
   {
     "id": "ROL040",
     "name": "Qualified Work",
     "plural": "Qualified Works",
-    "definition": "A step is Qualified Work while it may be performed by a person, who is its Qualified Person.",
+    "definition": "A step is a Qualified Work while it may be carried out by people holding the right qualification. It says that the step needs a qualified person. That is not the same as being a Permitted Step, which says a step that may be run at a place.",
     "played_by_domain_ids": [
       "DOM009"
     ],
-    "counterpart_role_ids": [
-      "ROL039"
-    ],
-    "is_symmetric": false,
     "aliases": [],
     "established_by": [
       "REL021"
@@ -1024,23 +858,17 @@
       "SRC001"
     ],
     "status": "active",
-    "withdrawn_reason": null
+    "withdrawn_reason": null,
+    "distinct_need": "Names the capacity in which that the step needs a qualified person; no other role in this model says it."
   },
   {
     "id": "ROL041",
     "name": "Recorded Exchange",
     "plural": "Recorded Exchanges",
-    "definition": "An exchange is a Recorded Exchange while it is transacted with an organisation, in a place, or concerns a product — its Trading Party, Despatching or Receiving Place, and Traded Product.",
+    "definition": "An exchange is a Recorded Exchange while it records goods moving between places and companies. It says that goods moved, and when. That is not the same as being a Production Run, which says goods made, not moved.",
     "played_by_domain_ids": [
       "DOM005"
     ],
-    "counterpart_role_ids": [
-      "ROL042",
-      "ROL043",
-      "ROL044",
-      "ROL045"
-    ],
-    "is_symmetric": false,
     "aliases": [],
     "established_by": [
       "REL022",
@@ -1056,20 +884,17 @@
       "SRC040"
     ],
     "status": "active",
-    "withdrawn_reason": null
+    "withdrawn_reason": null,
+    "distinct_need": "Names the capacity in which that goods moved, and when; no other role in this model says it."
   },
   {
     "id": "ROL042",
     "name": "Trading Party",
     "plural": "Trading Parties",
-    "definition": "An organisation is a Trading Party while an exchange is transacted with it, which is its Recorded Exchange.",
+    "definition": "A company is a Trading Party while it is on the other side of a movement of goods. It says that the company sold to, bought from or received goods from the organisation. That is not the same as being an Outside Manufacturer, which says a company that makes goods for the organisation under contract.",
     "played_by_domain_ids": [
       "DOM002"
     ],
-    "counterpart_role_ids": [
-      "ROL041"
-    ],
-    "is_symmetric": false,
     "aliases": [],
     "established_by": [
       "REL022"
@@ -1081,20 +906,17 @@
       "SRC023"
     ],
     "status": "active",
-    "withdrawn_reason": null
+    "withdrawn_reason": null,
+    "distinct_need": "Names the capacity in which that the company sold to, bought from or received goods from the organisation; no other role in this model says it."
   },
   {
     "id": "ROL043",
     "name": "Traded Product",
     "plural": "Traded Products",
-    "definition": "A product is a Traded Product while an exchange concerns it, which is its Recorded Exchange.",
+    "definition": "A product is a Traded Product while it is the product named on a movement of goods. It says that the product moved. That is not the same as being a Traced Batch, which says the particular batch, rather than the product.",
     "played_by_domain_ids": [
       "DOM006"
     ],
-    "counterpart_role_ids": [
-      "ROL041"
-    ],
-    "is_symmetric": false,
     "aliases": [],
     "established_by": [
       "REL023"
@@ -1106,20 +928,17 @@
       "SRC039"
     ],
     "status": "active",
-    "withdrawn_reason": null
+    "withdrawn_reason": null,
+    "distinct_need": "Names the capacity in which that the product moved; no other role in this model says it."
   },
   {
     "id": "ROL044",
     "name": "Despatching Place",
     "plural": "Despatching Places",
-    "definition": "A place is a Despatching Place while an exchange ships from it, which is its Recorded Exchange.",
+    "definition": "A place is a Despatching Place while it is where a movement of goods starts. It says that goods left from the place. That is not the same as being a Receiving Place, which says where goods arrive.",
     "played_by_domain_ids": [
       "DOM010"
     ],
-    "counterpart_role_ids": [
-      "ROL041"
-    ],
-    "is_symmetric": false,
     "aliases": [],
     "established_by": [
       "REL024"
@@ -1131,20 +950,17 @@
       "SRC009"
     ],
     "status": "active",
-    "withdrawn_reason": null
+    "withdrawn_reason": null,
+    "distinct_need": "Names the capacity in which that goods left from the place; no other role in this model says it."
   },
   {
     "id": "ROL045",
     "name": "Receiving Place",
     "plural": "Receiving Places",
-    "definition": "A place is a Receiving Place while an exchange is delivered to it, which is its Recorded Exchange.",
+    "definition": "A place is a Receiving Place while it is where a movement of goods ends. It says that goods arrived at the place. That is not the same as being a Despatching Place, which says where goods left from.",
     "played_by_domain_ids": [
       "DOM010"
     ],
-    "counterpart_role_ids": [
-      "ROL041"
-    ],
-    "is_symmetric": false,
     "aliases": [],
     "established_by": [
       "REL025"
@@ -1156,25 +972,23 @@
       "SRC009"
     ],
     "status": "active",
-    "withdrawn_reason": null
+    "withdrawn_reason": null,
+    "distinct_need": "Names the capacity in which that goods arrived at the place; no other role in this model says it."
   },
   {
     "id": "ROL046",
     "name": "Production Run",
     "plural": "Production Runs",
-    "definition": "An occurrence is a Production Run while it ran at a place in the plant and under a recipe, which are its Running Position and Issued Instructions.",
+    "definition": "A recorded event is a Production Run while it is the making of a batch on a line. It says that a batch was made, using some batches and producing others. That is not the same as being a Stoppage, which says an interruption within or between runs.",
     "played_by_domain_ids": [
       "DOM004"
     ],
-    "counterpart_role_ids": [
-      "ROL047",
-      "ROL048"
-    ],
-    "is_symmetric": false,
     "aliases": [],
     "established_by": [
       "REL026",
-      "REL027"
+      "REL027",
+      "REL029",
+      "REL030"
     ],
     "stated_in": [
       "REQ040"
@@ -1183,20 +997,17 @@
       "SRC033"
     ],
     "status": "active",
-    "withdrawn_reason": null
+    "withdrawn_reason": null,
+    "distinct_need": "Names the capacity in which that a batch was made, using some batches and producing others; no other role in this model says it."
   },
   {
     "id": "ROL047",
-    "name": "Running Position",
-    "plural": "Running Positions",
-    "definition": "A place in the plant is a Running Position while a run ran at it, which is its Production Run.",
+    "name": "Production Place",
+    "plural": "Production Places",
+    "definition": "A place is a Production Place while it is where a production run took place. It says that the run happened there. That is not the same as being a Permitted Place, which says a place allowed to run a step, whether or not a run happened there.",
     "played_by_domain_ids": [
-      "DOM008"
+      "DOM010"
     ],
-    "counterpart_role_ids": [
-      "ROL046"
-    ],
-    "is_symmetric": false,
     "aliases": [],
     "established_by": [
       "REL026"
@@ -1209,20 +1020,17 @@
       "SRC016"
     ],
     "status": "active",
-    "withdrawn_reason": null
+    "withdrawn_reason": null,
+    "distinct_need": "Names the capacity in which that the run happened there; no other role in this model says it."
   },
   {
     "id": "ROL048",
     "name": "Issued Instructions",
     "plural": "Issued Instructions",
-    "definition": "A recipe is Issued Instructions while a run ran under it, which is its Production Run.",
+    "definition": "A recipe is an Issued Instructions while it is the set of instructions a production run was issued. It says that a run was made to these instructions. That is not the same as being a Source Recipe, which says a more general recipe that others are written from.",
     "played_by_domain_ids": [
       "DOM009"
     ],
-    "counterpart_role_ids": [
-      "ROL046"
-    ],
-    "is_symmetric": false,
     "aliases": [],
     "established_by": [
       "REL027"
@@ -1234,20 +1042,17 @@
       "SRC003"
     ],
     "status": "active",
-    "withdrawn_reason": null
+    "withdrawn_reason": null,
+    "distinct_need": "Names the capacity in which that a run was made to these instructions; no other role in this model says it."
   },
   {
     "id": "ROL049",
     "name": "Performed Work",
     "plural": "Performed Works",
-    "definition": "An occurrence is Performed Work while it was performed by a person, who is its Performer.",
+    "definition": "A recorded event is a Performed Work while it was carried out by a person. It says that a named person did the work. That is not the same as being a Production Run, which says the making of a batch, whoever did it.",
     "played_by_domain_ids": [
       "DOM004"
     ],
-    "counterpart_role_ids": [
-      "ROL050"
-    ],
-    "is_symmetric": false,
     "aliases": [],
     "established_by": [
       "REL028"
@@ -1262,20 +1067,17 @@
       "SRC033"
     ],
     "status": "active",
-    "withdrawn_reason": null
+    "withdrawn_reason": null,
+    "distinct_need": "Names the capacity in which that a named person did the work; no other role in this model says it."
   },
   {
     "id": "ROL050",
     "name": "Performer",
     "plural": "Performers",
-    "definition": "A person is a Performer while they performed an occurrence, which is their Performed Work.",
+    "definition": "A person is a Performer while it carries out recorded work. It says that the person did a piece of work, in a stated capacity. That is not the same as being a Qualified Person, which says a person entitled to do the work, whether or not they did it.",
     "played_by_domain_ids": [
       "DOM001"
     ],
-    "counterpart_role_ids": [
-      "ROL049"
-    ],
-    "is_symmetric": false,
     "aliases": [],
     "established_by": [
       "REL028"
@@ -1290,7 +1092,8 @@
       "SRC006"
     ],
     "status": "active",
-    "withdrawn_reason": null
+    "withdrawn_reason": null,
+    "distinct_need": "Names the capacity in which that the person did a piece of work, in a stated capacity; no other role in this model says it."
   },
   {
     "id": "ROL051",
@@ -1300,14 +1103,8 @@
     "played_by_domain_ids": [
       "DOM004"
     ],
-    "counterpart_role_ids": [
-      "ROL052"
-    ],
-    "is_symmetric": false,
     "aliases": [],
-    "established_by": [
-      "REL029"
-    ],
+    "established_by": [],
     "stated_in": [
       "REQ006",
       "REQ022"
@@ -1315,8 +1112,8 @@
     "evidence_source_ids": [
       "SRC005"
     ],
-    "status": "active",
-    "withdrawn_reason": null
+    "status": "withdrawn",
+    "withdrawn_reason": "Every batch in a traced link is a Traced Batch; one role covers them all."
   },
   {
     "id": "ROL052",
@@ -1326,14 +1123,8 @@
     "played_by_domain_ids": [
       "DOM006"
     ],
-    "counterpart_role_ids": [
-      "ROL051"
-    ],
-    "is_symmetric": false,
     "aliases": [],
-    "established_by": [
-      "REL029"
-    ],
+    "established_by": [],
     "stated_in": [
       "REQ022",
       "REQ051"
@@ -1342,8 +1133,8 @@
       "SRC005",
       "SRC009"
     ],
-    "status": "active",
-    "withdrawn_reason": null
+    "status": "withdrawn",
+    "withdrawn_reason": "Every batch in a traced link is a Traced Batch; one role covers them all."
   },
   {
     "id": "ROL053",
@@ -1353,22 +1144,16 @@
     "played_by_domain_ids": [
       "DOM004"
     ],
-    "counterpart_role_ids": [
-      "ROL054"
-    ],
-    "is_symmetric": false,
     "aliases": [],
-    "established_by": [
-      "REL030"
-    ],
+    "established_by": [],
     "stated_in": [
       "REQ022"
     ],
     "evidence_source_ids": [
       "SRC005"
     ],
-    "status": "active",
-    "withdrawn_reason": null
+    "status": "withdrawn",
+    "withdrawn_reason": "Every batch in a traced link is a Traced Batch; one role covers them all."
   },
   {
     "id": "ROL054",
@@ -1378,14 +1163,8 @@
     "played_by_domain_ids": [
       "DOM006"
     ],
-    "counterpart_role_ids": [
-      "ROL053"
-    ],
-    "is_symmetric": false,
     "aliases": [],
-    "established_by": [
-      "REL030"
-    ],
+    "established_by": [],
     "stated_in": [
       "REQ022",
       "REQ053"
@@ -1393,21 +1172,17 @@
     "evidence_source_ids": [
       "SRC011"
     ],
-    "status": "active",
-    "withdrawn_reason": null
+    "status": "withdrawn",
+    "withdrawn_reason": "Every batch in a traced link is a Traced Batch; one role covers them all."
   },
   {
     "id": "ROL055",
     "name": "Stoppage",
     "plural": "Stoppages",
-    "definition": "An occurrence is a Stoppage while it stopped a machine, which is its Stopped Machine.",
+    "definition": "A recorded event is a Stoppage while it halts a machine. It says that production stopped, for a reason. That is not the same as being a Production Run, which says the making of a batch.",
     "played_by_domain_ids": [
       "DOM004"
     ],
-    "counterpart_role_ids": [
-      "ROL056"
-    ],
-    "is_symmetric": false,
     "aliases": [],
     "established_by": [
       "REL031"
@@ -1420,20 +1195,17 @@
       "SRC016"
     ],
     "status": "active",
-    "withdrawn_reason": null
+    "withdrawn_reason": null,
+    "distinct_need": "Names the capacity in which that production stopped, for a reason; no other role in this model says it."
   },
   {
     "id": "ROL056",
     "name": "Stopped Machine",
     "plural": "Stopped Machines",
-    "definition": "A machine is a Stopped Machine while a stoppage stopped it, which is its Stoppage.",
+    "definition": "A machine is a Stopped Machine while it is halted by a stoppage. It says that this is the machine that stopped. That is not the same as being an Installed Machine, which says a machine standing in a place, whether or not it stopped.",
     "played_by_domain_ids": [
       "DOM007"
     ],
-    "counterpart_role_ids": [
-      "ROL055"
-    ],
-    "is_symmetric": false,
     "aliases": [],
     "established_by": [
       "REL031"
@@ -1447,23 +1219,21 @@
       "SRC018"
     ],
     "status": "active",
-    "withdrawn_reason": null
+    "withdrawn_reason": null,
+    "distinct_need": "Names the capacity in which that this is the machine that stopped; no other role in this model says it."
   },
   {
     "id": "ROL057",
     "name": "Finding",
     "plural": "Findings",
-    "definition": "An occurrence is a Finding while it is raised against a product batch, which is its Affected Batch.",
+    "definition": "A recorded event is a Finding while it reports a departure from procedure, a failure against specification or a problem with a supplier. It says that something went wrong and needs a response. That is not the same as being a Complaint, which says a problem reported by a customer.",
     "played_by_domain_ids": [
       "DOM004"
     ],
-    "counterpart_role_ids": [
-      "ROL058"
-    ],
-    "is_symmetric": false,
     "aliases": [],
     "established_by": [
-      "REL032"
+      "REL032",
+      "REL036"
     ],
     "stated_in": [
       "REQ046",
@@ -1474,7 +1244,8 @@
       "SRC014"
     ],
     "status": "active",
-    "withdrawn_reason": null
+    "withdrawn_reason": null,
+    "distinct_need": "Names the capacity in which that something went wrong and needs a response; no other role in this model says it."
   },
   {
     "id": "ROL058",
@@ -1484,35 +1255,25 @@
     "played_by_domain_ids": [
       "DOM006"
     ],
-    "counterpart_role_ids": [
-      "ROL057"
-    ],
-    "is_symmetric": false,
     "aliases": [],
-    "established_by": [
-      "REL032"
-    ],
+    "established_by": [],
     "stated_in": [
       "REQ046"
     ],
     "evidence_source_ids": [
       "SRC014"
     ],
-    "status": "active",
-    "withdrawn_reason": null
+    "status": "withdrawn",
+    "withdrawn_reason": "Every batch in a traced link is a Traced Batch; one role covers them all."
   },
   {
     "id": "ROL059",
     "name": "Complaint",
     "plural": "Complaints",
-    "definition": "An occurrence is a Complaint while it reports a problem with a product batch, which is its Complained-of Batch.",
+    "definition": "A recorded event is a Complaint while it reports a problem raised by a customer. It says that a customer raised a problem with goods. That is not the same as being a Finding, which says a problem found by the organisation itself.",
     "played_by_domain_ids": [
       "DOM004"
     ],
-    "counterpart_role_ids": [
-      "ROL060"
-    ],
-    "is_symmetric": false,
     "aliases": [],
     "established_by": [
       "REL033"
@@ -1524,7 +1285,8 @@
       "SRC022"
     ],
     "status": "active",
-    "withdrawn_reason": null
+    "withdrawn_reason": null,
+    "distinct_need": "Names the capacity in which that a customer raised a problem with goods; no other role in this model says it."
   },
   {
     "id": "ROL060",
@@ -1534,35 +1296,25 @@
     "played_by_domain_ids": [
       "DOM006"
     ],
-    "counterpart_role_ids": [
-      "ROL059"
-    ],
-    "is_symmetric": false,
     "aliases": [],
-    "established_by": [
-      "REL033"
-    ],
+    "established_by": [],
     "stated_in": [
       "REQ054"
     ],
     "evidence_source_ids": [
       "SRC022"
     ],
-    "status": "active",
-    "withdrawn_reason": null
+    "status": "withdrawn",
+    "withdrawn_reason": "Every batch in a traced link is a Traced Batch; one role covers them all."
   },
   {
     "id": "ROL061",
     "name": "Response",
     "plural": "Responses",
-    "definition": "An occurrence is a Response while it responds to another occurrence, which is its Trigger.",
+    "definition": "A recorded event is a Response while it is an action taken in answer to another event. It says that it was prompted by something else, such as a corrective action following a finding. That is not the same as being a Trigger, which says the event that prompted it.",
     "played_by_domain_ids": [
       "DOM004"
     ],
-    "counterpart_role_ids": [
-      "ROL062"
-    ],
-    "is_symmetric": false,
     "aliases": [],
     "established_by": [
       "REL034"
@@ -1574,20 +1326,17 @@
       "SRC013"
     ],
     "status": "active",
-    "withdrawn_reason": null
+    "withdrawn_reason": null,
+    "distinct_need": "Names the capacity in which that it was prompted by something else, such as a corrective action following a finding; no other role in this model says it."
   },
   {
     "id": "ROL062",
     "name": "Trigger",
     "plural": "Triggers",
-    "definition": "An occurrence is a Trigger while it prompted another occurrence, which is its Response.",
+    "definition": "A recorded event is a Trigger while it prompts another event. It says that something else was done because of it. That is not the same as being a Response, which says the event that answered it.",
     "played_by_domain_ids": [
       "DOM004"
     ],
-    "counterpart_role_ids": [
-      "ROL061"
-    ],
-    "is_symmetric": false,
     "aliases": [],
     "established_by": [
       "REL034"
@@ -1599,20 +1348,17 @@
       "SRC013"
     ],
     "status": "active",
-    "withdrawn_reason": null
+    "withdrawn_reason": null,
+    "distinct_need": "Names the capacity in which that something else was done because of it; no other role in this model says it."
   },
   {
     "id": "ROL063",
     "name": "Correction",
     "plural": "Corrections",
-    "definition": "An occurrence is a Correction while it corrects a record, which is its Corrected Record.",
+    "definition": "A recorded event is a Correction while it corrects an earlier record. It says that an earlier record was altered, and why. That is not the same as being a Corrected Record, which says the record that was corrected.",
     "played_by_domain_ids": [
       "DOM004"
     ],
-    "counterpart_role_ids": [
-      "ROL064"
-    ],
-    "is_symmetric": false,
     "aliases": [],
     "established_by": [
       "REL035"
@@ -1624,20 +1370,17 @@
       "SRC032"
     ],
     "status": "active",
-    "withdrawn_reason": null
+    "withdrawn_reason": null,
+    "distinct_need": "Names the capacity in which that an earlier record was altered, and why; no other role in this model says it."
   },
   {
     "id": "ROL064",
     "name": "Corrected Record",
     "plural": "Corrected Records",
-    "definition": "An occurrence is a Corrected Record while a correction corrects it, which is its Correction.",
+    "definition": "A recorded event is a Corrected Record while it has been corrected by a later entry. It says that the record stands corrected and is kept as it was. That is not the same as being a Correction, which says the entry that corrects it.",
     "played_by_domain_ids": [
       "DOM004"
     ],
-    "counterpart_role_ids": [
-      "ROL063"
-    ],
-    "is_symmetric": false,
     "aliases": [],
     "established_by": [
       "REL035"
@@ -1649,7 +1392,8 @@
       "SRC032"
     ],
     "status": "active",
-    "withdrawn_reason": null
+    "withdrawn_reason": null,
+    "distinct_need": "Names the capacity in which that the record stands corrected and is kept as it was; no other role in this model says it."
   },
   {
     "id": "ROL065",
@@ -1659,35 +1403,25 @@
     "played_by_domain_ids": [
       "DOM004"
     ],
-    "counterpart_role_ids": [
-      "ROL066"
-    ],
-    "is_symmetric": false,
     "aliases": [],
-    "established_by": [
-      "REL036"
-    ],
+    "established_by": [],
     "stated_in": [
       "REQ059"
     ],
     "evidence_source_ids": [
       "SRC014"
     ],
-    "status": "active",
-    "withdrawn_reason": null
+    "status": "withdrawn",
+    "withdrawn_reason": "A finding raised with a supplier is the same Finding as any other."
   },
   {
     "id": "ROL066",
     "name": "Responsible Supplier",
     "plural": "Responsible Suppliers",
-    "definition": "An organisation is a Responsible Supplier while a finding is raised with it, which is its Supplier Finding.",
+    "definition": "A company is a Responsible Supplier while it is the supplier a problem is raised with. It says that the supplier is answerable for a problem. That is not the same as being a Trading Party, which says a company goods were bought from or sold to.",
     "played_by_domain_ids": [
       "DOM002"
     ],
-    "counterpart_role_ids": [
-      "ROL065"
-    ],
-    "is_symmetric": false,
     "aliases": [],
     "established_by": [
       "REL036"
@@ -1700,20 +1434,17 @@
       "SRC020"
     ],
     "status": "active",
-    "withdrawn_reason": null
+    "withdrawn_reason": null,
+    "distinct_need": "Names the capacity in which that the supplier is answerable for a problem; no other role in this model says it."
   },
   {
     "id": "ROL067",
     "name": "Declaring Document",
     "plural": "Declaring Documents",
-    "definition": "A document is a Declaring Document while it declares properties of a product batch, which is its Declared Batch.",
+    "definition": "A document is a Declaring Document while it states properties of a batch. It says that the document makes a claim about a batch. That is not the same as being a Traced Batch, which says the batch the claim is about.",
     "played_by_domain_ids": [
       "DOM003"
     ],
-    "counterpart_role_ids": [
-      "ROL068"
-    ],
-    "is_symmetric": false,
     "aliases": [],
     "established_by": [
       "REL037"
@@ -1726,7 +1457,8 @@
       "SRC039"
     ],
     "status": "active",
-    "withdrawn_reason": null
+    "withdrawn_reason": null,
+    "distinct_need": "Names the capacity in which that the document makes a claim about a batch; no other role in this model says it."
   },
   {
     "id": "ROL068",
@@ -1736,35 +1468,25 @@
     "played_by_domain_ids": [
       "DOM006"
     ],
-    "counterpart_role_ids": [
-      "ROL067"
-    ],
-    "is_symmetric": false,
     "aliases": [],
-    "established_by": [
-      "REL037"
-    ],
+    "established_by": [],
     "stated_in": [
       "REQ009"
     ],
     "evidence_source_ids": [
       "SRC020"
     ],
-    "status": "active",
-    "withdrawn_reason": null
+    "status": "withdrawn",
+    "withdrawn_reason": "Every batch in a traced link is a Traced Batch; one role covers them all."
   },
   {
     "id": "ROL069",
     "name": "Storage Breach",
     "plural": "Storage Breaches",
-    "definition": "An occurrence is a Storage Breach while it exposed a product batch, which is its Exposed Batch.",
+    "definition": "A recorded event is a Storage Breach while it records stock held outside its conditions. It says that stock was exposed to conditions it should not have been. That is not the same as being a Finding, which says a problem found by checking, not by exposure.",
     "played_by_domain_ids": [
       "DOM004"
     ],
-    "counterpart_role_ids": [
-      "ROL070"
-    ],
-    "is_symmetric": false,
     "aliases": [],
     "established_by": [
       "REL038"
@@ -1776,7 +1498,8 @@
       "SRC020"
     ],
     "status": "active",
-    "withdrawn_reason": null
+    "withdrawn_reason": null,
+    "distinct_need": "Names the capacity in which that stock was exposed to conditions it should not have been; no other role in this model says it."
   },
   {
     "id": "ROL070",
@@ -1786,19 +1509,44 @@
     "played_by_domain_ids": [
       "DOM006"
     ],
-    "counterpart_role_ids": [
-      "ROL069"
-    ],
-    "is_symmetric": false,
     "aliases": [],
-    "established_by": [
-      "REL038"
-    ],
+    "established_by": [],
     "stated_in": [
       "REQ066"
     ],
     "evidence_source_ids": [
       "SRC020"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Every batch in a traced link is a Traced Batch; one role covers them all."
+  },
+  {
+    "id": "ROL071",
+    "name": "Traced Batch",
+    "plural": "Traced Batches",
+    "definition": "A product is a Traced Batch while it is a batch that can be followed back to its inputs and forward to where it went. It says that the batch is the thing traceability follows, in either direction. That is not the same as being a Traded Product, which says the product named on a movement, not one batch of it.",
+    "played_by_domain_ids": [
+      "DOM006"
+    ],
+    "distinct_need": "Names the capacity in which that the batch is the thing traceability follows, in either direction; no other role in this model says it.",
+    "aliases": [],
+    "established_by": [
+      "REL015",
+      "REL029",
+      "REL030",
+      "REL032",
+      "REL033",
+      "REL037",
+      "REL038"
+    ],
+    "stated_in": [
+      "REQ016",
+      "REQ027",
+      "REQ051"
+    ],
+    "evidence_source_ids": [
+      "SRC005",
+      "SRC009"
     ],
     "status": "active",
     "withdrawn_reason": null

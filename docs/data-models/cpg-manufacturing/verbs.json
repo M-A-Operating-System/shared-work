@@ -17,16 +17,12 @@
     "dda_action": "create",
     "dda_id": null,
     "reuse_search": "searched DDA relationships between DOM006 and DOM006 for 'is made from'",
-    "data_requirement_ids": [
-      "DRQ001",
-      "DRQ002",
-      "DRQ003"
-    ],
+    "data_requirement_ids": [],
     "evidence_source_ids": [
       "SRC005"
     ],
-    "status": "active",
-    "withdrawn_reason": null
+    "status": "withdrawn",
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
   },
   {
     "id": "REL002",
@@ -46,14 +42,12 @@
     "dda_action": "create",
     "dda_id": null,
     "reuse_search": "searched DDA relationships between DOM006 and DOM006 for 'is a variant within'",
-    "data_requirement_ids": [
-      "DRQ014"
-    ],
+    "data_requirement_ids": [],
     "evidence_source_ids": [
       "SRC030"
     ],
-    "status": "active",
-    "withdrawn_reason": null
+    "status": "withdrawn",
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
   },
   {
     "id": "REL003",
@@ -79,8 +73,8 @@
     "evidence_source_ids": [
       "SRC020"
     ],
-    "status": "active",
-    "withdrawn_reason": null
+    "status": "withdrawn",
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
   },
   {
     "id": "REL004",
@@ -100,14 +94,12 @@
     "dda_action": "create",
     "dda_id": null,
     "reuse_search": "searched DDA relationships between DOM006 and DOM002 for 'is certified by'",
-    "data_requirement_ids": [
-      "DRQ009"
-    ],
+    "data_requirement_ids": [],
     "evidence_source_ids": [
       "SRC030"
     ],
-    "status": "active",
-    "withdrawn_reason": null
+    "status": "withdrawn",
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
   },
   {
     "id": "REL005",
@@ -126,7 +118,7 @@
     "name_override": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "searched DDA relationships between DOM006 and DOM002 for 'is manufactured by'",
+    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a relationship between Products and LegalEntities that says 'is manufactured by'; none found. Searched this model's own relationships for the same arrangement; none says it.",
     "data_requirement_ids": [
       "DRQ033"
     ],
@@ -153,7 +145,7 @@
     "name_override": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "searched DDA relationships between DOM006 and DOM009 for 'is made by'",
+    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a relationship between Products and Processes that says 'is made by'; none found. Searched this model's own relationships for the same arrangement; none says it.",
     "data_requirement_ids": [
       "DRQ017"
     ],
@@ -180,7 +172,7 @@
     "name_override": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "searched DDA relationships between DOM009 and DOM009 for 'follows'",
+    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a relationship between Processes and Processes that says 'follows'; none found. Searched this model's own relationships for the same arrangement; none says it.",
     "data_requirement_ids": [
       "DRQ017"
     ],
@@ -192,11 +184,11 @@
   },
   {
     "id": "REL008",
-    "code": "ProcessSegmentApprovals",
+    "code": "ProcessSegmentPlaces",
     "source_domain_id": "DOM009",
-    "destination_domain_id": "DOM008",
-    "forward_verb": "is approved at",
-    "inverse_verb": "is approved for",
+    "destination_domain_id": "DOM010",
+    "forward_verb": "may be run at",
+    "inverse_verb": "may run",
     "source_role_id": "ROL016",
     "target_role_id": "ROL017",
     "cardinality": "MANY_TO_MANY",
@@ -207,7 +199,7 @@
     "name_override": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "searched DDA relationships between DOM009 and DOM008 for 'is approved at'",
+    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a relationship between Processes and Locations that says 'may be run at'; none found. Searched this model's own relationships for the same arrangement; none says it.",
     "data_requirement_ids": [
       "DRQ017"
     ],
@@ -234,7 +226,7 @@
     "name_override": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "searched DDA relationships between DOM009 and DOM009 for 'is derived from'",
+    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a relationship between Processes and Processes that says 'is derived from'; none found. Searched this model's own relationships for the same arrangement; none says it.",
     "data_requirement_ids": [
       "DRQ018"
     ],
@@ -268,13 +260,13 @@
     "evidence_source_ids": [
       "SRC001"
     ],
-    "status": "active",
-    "withdrawn_reason": null
+    "status": "withdrawn",
+    "withdrawn_reason": "Plant structure is held in the Locations hierarchy, which runs down to the shop floor."
   },
   {
     "id": "REL011",
-    "code": "EquipmentInstallations",
-    "source_domain_id": "DOM008",
+    "code": "LocationInstallations",
+    "source_domain_id": "DOM010",
     "destination_domain_id": "DOM007",
     "forward_verb": "is occupied by",
     "inverse_verb": "occupies",
@@ -288,7 +280,7 @@
     "name_override": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "searched DDA relationships between DOM008 and DOM007 for 'is occupied by'",
+    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a relationship between Locations and Instances that says 'is occupied by'; none found. Searched this model's own relationships for the same arrangement; none says it.",
     "data_requirement_ids": [
       "DRQ020"
     ],
@@ -322,8 +314,8 @@
     "evidence_source_ids": [
       "SRC001"
     ],
-    "status": "active",
-    "withdrawn_reason": null
+    "status": "withdrawn",
+    "withdrawn_reason": "Plant structure is held in the Locations hierarchy, which runs down to the shop floor."
   },
   {
     "id": "REL013",
@@ -342,7 +334,7 @@
     "name_override": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "searched DDA relationships between DOM007 and DOM006 for 'is a unit of'",
+    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a relationship between Instances and Products that says 'is a unit of'; none found. Searched this model's own relationships for the same arrangement; none says it.",
     "data_requirement_ids": [
       "DRQ016"
     ],
@@ -369,7 +361,7 @@
     "name_override": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "searched DDA relationships between DOM007 and DOM007 for 'is built from'",
+    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a relationship between Instances and Instances that says 'is built from'; none found. Searched this model's own relationships for the same arrangement; none says it.",
     "data_requirement_ids": [
       "DRQ016"
     ],
@@ -387,7 +379,7 @@
     "forward_verb": "incorporates batch",
     "inverse_verb": "is incorporated into",
     "source_role_id": "ROL028",
-    "target_role_id": "ROL030",
+    "target_role_id": "ROL071",
     "cardinality": "MANY_TO_MANY",
     "dates": false,
     "is_symmetric": false,
@@ -396,7 +388,7 @@
     "name_override": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "searched DDA relationships between DOM007 and DOM006 for 'incorporates batch'",
+    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a relationship between Instances and Products that says 'incorporates batch'; none found. Searched this model's own relationships for the same arrangement; none says it.",
     "data_requirement_ids": [
       "DRQ016"
     ],
@@ -423,7 +415,7 @@
     "name_override": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "searched DDA relationships between DOM010 and DOM010 for 'is within'",
+    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a relationship between Locations and Locations that says 'is within'; none found. Searched this model's own relationships for the same arrangement; none says it.",
     "data_requirement_ids": [
       "DRQ024"
     ],
@@ -457,8 +449,8 @@
     "evidence_source_ids": [
       "SRC022"
     ],
-    "status": "active",
-    "withdrawn_reason": null
+    "status": "withdrawn",
+    "withdrawn_reason": "Which body certified a place is not asked for by any data requirement that remains."
   },
   {
     "id": "REL018",
@@ -477,7 +469,7 @@
     "name_override": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "searched DDA relationships between DOM010 and DOM002 for 'is registered with'",
+    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a relationship between Locations and LegalEntities that says 'is registered with'; none found. Searched this model's own relationships for the same arrangement; none says it.",
     "data_requirement_ids": [
       "DRQ035"
     ],
@@ -504,7 +496,7 @@
     "name_override": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "searched DDA relationships between DOM002 and DOM010 for 'operates'",
+    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a relationship between LegalEntities and Locations that says 'operates'; none found. Searched this model's own relationships for the same arrangement; none says it.",
     "data_requirement_ids": [
       "DRQ033"
     ],
@@ -531,7 +523,7 @@
     "name_override": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "searched DDA relationships between DOM001 and DOM002 for 'works for'",
+    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a relationship between People and LegalEntities that says 'works for'; none found. Searched this model's own relationships for the same arrangement; none says it.",
     "data_requirement_ids": [
       "DRQ023"
     ],
@@ -558,7 +550,7 @@
     "name_override": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "searched DDA relationships between DOM001 and DOM009 for 'is qualified for'",
+    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a relationship between People and Processes that says 'is qualified for'; none found. Searched this model's own relationships for the same arrangement; none says it.",
     "data_requirement_ids": [
       "DRQ023"
     ],
@@ -585,7 +577,7 @@
     "name_override": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "searched DDA relationships between DOM005 and DOM002 for 'is transacted with'",
+    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a relationship between Transactions and LegalEntities that says 'is transacted with'; none found. Searched this model's own relationships for the same arrangement; none says it.",
     "data_requirement_ids": [
       "DRQ033"
     ],
@@ -612,7 +604,7 @@
     "name_override": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "searched DDA relationships between DOM005 and DOM006 for 'concerns'",
+    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a relationship between Transactions and Products that says 'concerns'; none found. Searched this model's own relationships for the same arrangement; none says it.",
     "data_requirement_ids": [
       "DRQ024"
     ],
@@ -639,7 +631,7 @@
     "name_override": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "searched DDA relationships between DOM005 and DOM010 for 'ships from'",
+    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a relationship between Transactions and Locations that says 'ships from'; none found. Searched this model's own relationships for the same arrangement; none says it.",
     "data_requirement_ids": [
       "DRQ024"
     ],
@@ -666,7 +658,7 @@
     "name_override": "TransactionReceivingPlaces",
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "searched DDA relationships between DOM005 and DOM010 for 'is delivered to'",
+    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a relationship between Transactions and Locations that says 'is delivered to'; none found. Searched this model's own relationships for the same arrangement; none says it.",
     "data_requirement_ids": [
       "DRQ024"
     ],
@@ -678,9 +670,9 @@
   },
   {
     "id": "REL026",
-    "code": "EventRunPositions",
+    "code": "EventRunPlaces",
     "source_domain_id": "DOM004",
-    "destination_domain_id": "DOM008",
+    "destination_domain_id": "DOM010",
     "forward_verb": "ran at",
     "inverse_verb": "ran",
     "source_role_id": "ROL046",
@@ -693,7 +685,7 @@
     "name_override": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "searched DDA relationships between DOM004 and DOM008 for 'ran at'",
+    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a relationship between Events and Locations that says 'ran at'; none found. Searched this model's own relationships for the same arrangement; none says it.",
     "data_requirement_ids": [
       "DRQ020",
       "DRQ023"
@@ -721,7 +713,7 @@
     "name_override": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "searched DDA relationships between DOM004 and DOM009 for 'ran under'",
+    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a relationship between Events and Processes that says 'ran under'; none found. Searched this model's own relationships for the same arrangement; none says it.",
     "data_requirement_ids": [
       "DRQ018"
     ],
@@ -748,7 +740,7 @@
     "name_override": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "searched DDA relationships between DOM004 and DOM001 for 'was performed by'",
+    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a relationship between Events and People that says 'was performed by'; none found. Searched this model's own relationships for the same arrangement; none says it.",
     "data_requirement_ids": [
       "DRQ023",
       "DRQ027",
@@ -767,17 +759,17 @@
     "destination_domain_id": "DOM006",
     "forward_verb": "consumed",
     "inverse_verb": "was consumed by",
-    "source_role_id": "ROL051",
-    "target_role_id": "ROL052",
+    "source_role_id": "ROL046",
+    "target_role_id": "ROL071",
     "cardinality": "MANY_TO_MANY",
     "dates": false,
     "is_symmetric": false,
     "is_composition": false,
-    "quantified": false,
-    "name_override": null,
+    "quantified": true,
+    "name_override": "EventBatchesConsumed",
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "searched DDA relationships between DOM004 and DOM006 for 'consumed'",
+    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a relationship between Events and Products that says 'consumed'; none found. Searched this model's own relationships for the same arrangement; none says it.",
     "data_requirement_ids": [
       "DRQ004",
       "DRQ030"
@@ -795,17 +787,17 @@
     "destination_domain_id": "DOM006",
     "forward_verb": "produced",
     "inverse_verb": "was produced by",
-    "source_role_id": "ROL053",
-    "target_role_id": "ROL054",
+    "source_role_id": "ROL046",
+    "target_role_id": "ROL071",
     "cardinality": "MANY_TO_MANY",
     "dates": false,
     "is_symmetric": false,
     "is_composition": false,
-    "quantified": false,
-    "name_override": null,
+    "quantified": true,
+    "name_override": "EventBatchesProduced",
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "searched DDA relationships between DOM004 and DOM006 for 'produced'",
+    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a relationship between Events and Products that says 'produced'; none found. Searched this model's own relationships for the same arrangement; none says it.",
     "data_requirement_ids": [
       "DRQ030"
     ],
@@ -832,7 +824,7 @@
     "name_override": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "searched DDA relationships between DOM004 and DOM007 for 'stopped'",
+    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a relationship between Events and Instances that says 'stopped'; none found. Searched this model's own relationships for the same arrangement; none says it.",
     "data_requirement_ids": [
       "DRQ021",
       "DRQ022"
@@ -851,16 +843,16 @@
     "forward_verb": "is raised against",
     "inverse_verb": "is subject of",
     "source_role_id": "ROL057",
-    "target_role_id": "ROL058",
+    "target_role_id": "ROL071",
     "cardinality": "MANY_TO_MANY",
     "dates": false,
     "is_symmetric": false,
     "is_composition": false,
     "quantified": false,
-    "name_override": null,
+    "name_override": "EventBatchesFoundAgainst",
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "searched DDA relationships between DOM004 and DOM006 for 'is raised against'",
+    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a relationship between Events and Products that says 'is raised against'; none found. Searched this model's own relationships for the same arrangement; none says it.",
     "data_requirement_ids": [
       "DRQ026",
       "DRQ027"
@@ -879,16 +871,16 @@
     "forward_verb": "reports a problem with",
     "inverse_verb": "is complained about in",
     "source_role_id": "ROL059",
-    "target_role_id": "ROL060",
+    "target_role_id": "ROL071",
     "cardinality": "MANY_TO_ONE",
     "dates": false,
     "is_symmetric": false,
     "is_composition": false,
     "quantified": false,
-    "name_override": null,
+    "name_override": "EventBatchesComplainedOf",
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "searched DDA relationships between DOM004 and DOM006 for 'reports a problem with'",
+    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a relationship between Events and Products that says 'reports a problem with'; none found. Searched this model's own relationships for the same arrangement; none says it.",
     "data_requirement_ids": [
       "DRQ031"
     ],
@@ -915,7 +907,7 @@
     "name_override": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "searched DDA relationships between DOM004 and DOM004 for 'responds to'",
+    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a relationship between Events and Events that says 'responds to'; none found. Searched this model's own relationships for the same arrangement; none says it.",
     "data_requirement_ids": [
       "DRQ028"
     ],
@@ -942,7 +934,7 @@
     "name_override": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "searched DDA relationships between DOM004 and DOM004 for 'corrects'",
+    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a relationship between Events and Events that says 'corrects'; none found. Searched this model's own relationships for the same arrangement; none says it.",
     "data_requirement_ids": [
       "DRQ032"
     ],
@@ -959,7 +951,7 @@
     "destination_domain_id": "DOM002",
     "forward_verb": "is raised with",
     "inverse_verb": "received",
-    "source_role_id": "ROL065",
+    "source_role_id": "ROL057",
     "target_role_id": "ROL066",
     "cardinality": "MANY_TO_ONE",
     "dates": true,
@@ -969,7 +961,7 @@
     "name_override": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "searched DDA relationships between DOM004 and DOM002 for 'is raised with'",
+    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a relationship between Events and LegalEntities that says 'is raised with'; none found. Searched this model's own relationships for the same arrangement; none says it.",
     "data_requirement_ids": [
       "DRQ028"
     ],
@@ -987,7 +979,7 @@
     "forward_verb": "declares properties of",
     "inverse_verb": "is declared by",
     "source_role_id": "ROL067",
-    "target_role_id": "ROL068",
+    "target_role_id": "ROL071",
     "cardinality": "MANY_TO_MANY",
     "dates": false,
     "is_symmetric": false,
@@ -996,7 +988,7 @@
     "name_override": null,
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "searched DDA relationships between DOM003 and DOM006 for 'declares properties of'",
+    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a relationship between Documents and Products that says 'declares properties of'; none found. Searched this model's own relationships for the same arrangement; none says it.",
     "data_requirement_ids": [
       "DRQ007"
     ],
@@ -1014,16 +1006,16 @@
     "forward_verb": "exposed",
     "inverse_verb": "was exposed in",
     "source_role_id": "ROL069",
-    "target_role_id": "ROL070",
+    "target_role_id": "ROL071",
     "cardinality": "MANY_TO_MANY",
     "dates": false,
     "is_symmetric": false,
     "is_composition": false,
     "quantified": false,
-    "name_override": null,
+    "name_override": "EventBatchesExposed",
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "searched DDA relationships between DOM004 and DOM006 for 'exposed'",
+    "reuse_search": "Searched the DDA baseline read on 28 September 2026 for a relationship between Events and Products that says 'exposed'; none found. Searched this model's own relationships for the same arrangement; none says it.",
     "data_requirement_ids": [
       "DRQ034"
     ],

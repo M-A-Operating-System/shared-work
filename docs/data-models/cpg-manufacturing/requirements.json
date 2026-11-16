@@ -11,8 +11,7 @@
       "SRC039"
     ],
     "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "withdrawn_reason": null
   },
   {
     "id": "REQ002",
@@ -22,13 +21,12 @@
     "subgroup_id": null,
     "satisfied_by": "model",
     "source_ids": [
-      "SRC002",
+      "SRC045",
       "SRC005",
       "SRC008"
     ],
-    "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "status": "withdrawn",
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
   },
   {
     "id": "REQ003",
@@ -41,9 +39,8 @@
       "SRC005",
       "SRC006"
     ],
-    "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "status": "withdrawn",
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
   },
   {
     "id": "REQ004",
@@ -56,9 +53,8 @@
       "SRC005",
       "SRC030"
     ],
-    "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "status": "withdrawn",
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
   },
   {
     "id": "REQ005",
@@ -71,9 +67,8 @@
       "SRC005",
       "SRC006"
     ],
-    "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "status": "withdrawn",
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
   },
   {
     "id": "REQ006",
@@ -87,13 +82,12 @@
       "SRC033"
     ],
     "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "withdrawn_reason": null
   },
   {
     "id": "REQ007",
     "category": "Material",
-    "statement": "An approved alternative may be used in place of a specified input, and which one was used on a batch must be known.",
+    "statement": "Where a specified input is replaced on a batch, which input was actually used must be known.",
     "owner": "Technical lead",
     "subgroup_id": null,
     "satisfied_by": "model",
@@ -102,8 +96,7 @@
       "SRC033"
     ],
     "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "withdrawn_reason": null
   },
   {
     "id": "REQ008",
@@ -116,9 +109,8 @@
       "SRC020",
       "SRC029"
     ],
-    "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "status": "withdrawn",
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
   },
   {
     "id": "REQ009",
@@ -132,8 +124,7 @@
       "SRC039"
     ],
     "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "withdrawn_reason": null
   },
   {
     "id": "REQ010",
@@ -147,8 +138,7 @@
       "SRC024"
     ],
     "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "withdrawn_reason": null
   },
   {
     "id": "REQ011",
@@ -162,9 +152,8 @@
       "SRC035",
       "SRC007"
     ],
-    "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "status": "withdrawn",
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
   },
   {
     "id": "REQ012",
@@ -178,9 +167,8 @@
       "SRC035",
       "SRC008"
     ],
-    "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "status": "withdrawn",
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
   },
   {
     "id": "REQ013",
@@ -193,9 +181,8 @@
       "SRC025",
       "SRC026"
     ],
-    "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "status": "withdrawn",
+    "withdrawn_reason": "Outside the food and beverage focus of this model."
   },
   {
     "id": "REQ014",
@@ -210,9 +197,8 @@
       "SRC025",
       "SRC028"
     ],
-    "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "status": "withdrawn",
+    "withdrawn_reason": "Outside the food and beverage focus of this model."
   },
   {
     "id": "REQ015",
@@ -225,9 +211,8 @@
       "SRC007",
       "SRC039"
     ],
-    "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "status": "withdrawn",
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
   },
   {
     "id": "REQ016",
@@ -241,8 +226,7 @@
       "SRC007"
     ],
     "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "withdrawn_reason": null
   },
   {
     "id": "REQ017",
@@ -256,8 +240,7 @@
       "SRC005"
     ],
     "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "withdrawn_reason": null
   },
   {
     "id": "REQ018",
@@ -271,8 +254,7 @@
       "SRC014"
     ],
     "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "withdrawn_reason": null
   },
   {
     "id": "REQ019",
@@ -285,9 +267,8 @@
       "SRC030",
       "SRC031"
     ],
-    "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "status": "withdrawn",
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
   },
   {
     "id": "REQ020",
@@ -300,9 +281,8 @@
       "SRC030",
       "SRC031"
     ],
-    "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "status": "withdrawn",
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
   },
   {
     "id": "REQ021",
@@ -313,11 +293,10 @@
     "satisfied_by": "model",
     "source_ids": [
       "SRC030",
-      "SRC002"
+      "SRC045"
     ],
-    "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "status": "withdrawn",
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
   },
   {
     "id": "REQ022",
@@ -331,8 +310,7 @@
       "SRC033"
     ],
     "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "withdrawn_reason": null
   },
   {
     "id": "REQ023",
@@ -346,8 +324,7 @@
       "SRC037"
     ],
     "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "withdrawn_reason": null
   },
   {
     "id": "REQ024",
@@ -361,8 +338,7 @@
       "SRC038"
     ],
     "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "withdrawn_reason": null
   },
   {
     "id": "REQ025",
@@ -372,12 +348,11 @@
     "subgroup_id": null,
     "satisfied_by": "model",
     "source_ids": [
-      "SRC002",
+      "SRC045",
       "SRC003"
     ],
     "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "withdrawn_reason": null
   },
   {
     "id": "REQ026",
@@ -387,12 +362,11 @@
     "subgroup_id": null,
     "satisfied_by": "model",
     "source_ids": [
-      "SRC002",
+      "SRC045",
       "SRC001"
     ],
     "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "withdrawn_reason": null
   },
   {
     "id": "REQ027",
@@ -406,8 +380,7 @@
       "SRC004"
     ],
     "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "withdrawn_reason": null
   },
   {
     "id": "REQ028",
@@ -421,8 +394,7 @@
       "SRC004"
     ],
     "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "withdrawn_reason": null
   },
   {
     "id": "REQ029",
@@ -432,12 +404,11 @@
     "subgroup_id": null,
     "satisfied_by": "model",
     "source_ids": [
-      "SRC002",
+      "SRC045",
       "SRC003"
     ],
     "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "withdrawn_reason": null
   },
   {
     "id": "REQ030",
@@ -451,8 +422,7 @@
       "SRC033"
     ],
     "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "withdrawn_reason": null
   },
   {
     "id": "REQ031",
@@ -465,8 +435,7 @@
       "SRC034"
     ],
     "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "withdrawn_reason": null
   },
   {
     "id": "REQ032",
@@ -480,8 +449,7 @@
       "SRC017"
     ],
     "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "withdrawn_reason": null
   },
   {
     "id": "REQ033",
@@ -495,8 +463,7 @@
       "SRC004"
     ],
     "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "withdrawn_reason": null
   },
   {
     "id": "REQ034",
@@ -510,8 +477,7 @@
       "SRC004"
     ],
     "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "withdrawn_reason": null
   },
   {
     "id": "REQ035",
@@ -525,8 +491,7 @@
       "SRC016"
     ],
     "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "withdrawn_reason": null
   },
   {
     "id": "REQ036",
@@ -539,8 +504,7 @@
       "SRC018"
     ],
     "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "withdrawn_reason": null
   },
   {
     "id": "REQ037",
@@ -553,8 +517,7 @@
       "SRC016"
     ],
     "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "withdrawn_reason": null
   },
   {
     "id": "REQ038",
@@ -568,8 +531,7 @@
       "SRC018"
     ],
     "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "withdrawn_reason": null
   },
   {
     "id": "REQ039",
@@ -583,8 +545,7 @@
       "SRC018"
     ],
     "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "withdrawn_reason": null
   },
   {
     "id": "REQ040",
@@ -600,8 +561,7 @@
       "SRC027"
     ],
     "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "withdrawn_reason": null
   },
   {
     "id": "REQ041",
@@ -616,8 +576,7 @@
       "SRC033"
     ],
     "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "withdrawn_reason": null
   },
   {
     "id": "REQ042",
@@ -631,8 +590,7 @@
       "SRC040"
     ],
     "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "withdrawn_reason": null
   },
   {
     "id": "REQ043",
@@ -643,8 +601,7 @@
     "satisfied_by": "model",
     "source_ids": [],
     "status": "withdrawn",
-    "withdrawn_reason": "No source in this research covers production planning. Recorded as an unsourced area rather than kept on reasoning.",
-    "certified": false
+    "withdrawn_reason": "No source in this research covers production planning. Recorded as an unsourced area rather than kept on reasoning."
   },
   {
     "id": "REQ044",
@@ -658,8 +615,7 @@
       "SRC012"
     ],
     "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "withdrawn_reason": null
   },
   {
     "id": "REQ045",
@@ -673,8 +629,7 @@
       "SRC022"
     ],
     "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "withdrawn_reason": null
   },
   {
     "id": "REQ046",
@@ -685,11 +640,11 @@
     "satisfied_by": "model",
     "source_ids": [
       "SRC012",
-      "SRC013"
+      "SRC013",
+      "SRC046"
     ],
     "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "withdrawn_reason": null
   },
   {
     "id": "REQ047",
@@ -700,11 +655,11 @@
     "satisfied_by": "model",
     "source_ids": [
       "SRC014",
-      "SRC013"
+      "SRC013",
+      "SRC046"
     ],
     "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "withdrawn_reason": null
   },
   {
     "id": "REQ048",
@@ -715,11 +670,11 @@
     "satisfied_by": "model",
     "source_ids": [
       "SRC015",
-      "SRC013"
+      "SRC013",
+      "SRC046"
     ],
     "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "withdrawn_reason": null
   },
   {
     "id": "REQ049",
@@ -730,11 +685,11 @@
     "satisfied_by": "model",
     "source_ids": [
       "SRC014",
-      "SRC013"
+      "SRC013",
+      "SRC046"
     ],
     "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "withdrawn_reason": null
   },
   {
     "id": "REQ050",
@@ -748,37 +703,37 @@
       "SRC003"
     ],
     "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "withdrawn_reason": null
   },
   {
     "id": "REQ051",
     "category": "Quality",
-    "statement": "When a batch is implicated in a food safety issue, the records of what went into it and where it went must be produced within twenty-four hours.",
+    "statement": "For foods covered by the United States food traceability rule, the records of what went into a batch and where it went must be produced within twenty-four hours of the regulator's request.",
     "owner": "Quality manager",
     "subgroup_id": "SCG001",
     "satisfied_by": "model",
     "source_ids": [
       "SRC009",
-      "SRC010"
+      "SRC010",
+      "SRC044",
+      "SRC043"
     ],
     "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "withdrawn_reason": null
   },
   {
     "id": "REQ052",
     "category": "Quality",
-    "statement": "Traceability records must be kept for two years.",
+    "statement": "For foods covered by the United States food traceability rule, traceability records must be kept for two years.",
     "owner": "Quality manager",
     "subgroup_id": "SCG001",
     "satisfied_by": "model",
     "source_ids": [
-      "SRC011"
+      "SRC011",
+      "SRC009"
     ],
     "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "withdrawn_reason": null
   },
   {
     "id": "REQ053",
@@ -792,8 +747,7 @@
       "SRC009"
     ],
     "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "withdrawn_reason": null
   },
   {
     "id": "REQ054",
@@ -807,13 +761,12 @@
       "SRC005"
     ],
     "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "withdrawn_reason": null
   },
   {
     "id": "REQ055",
     "category": "Quality",
-    "statement": "Some records must be signed, and a signature must show who signed, what, when and what the signature meant.",
+    "statement": "Some records must be signed, and the signing must show who signed, what was signed, when, and what the signing meant.",
     "owner": "Compliance officer",
     "subgroup_id": null,
     "satisfied_by": "model",
@@ -822,8 +775,7 @@
       "SRC033"
     ],
     "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "withdrawn_reason": null
   },
   {
     "id": "REQ056",
@@ -836,13 +788,12 @@
       "SRC032"
     ],
     "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "withdrawn_reason": null
   },
   {
     "id": "REQ057",
     "category": "Quality",
-    "statement": "Some steps must be checked by a second qualified person or by approved equipment.",
+    "statement": "Some steps must be checked by a second qualified person or by equipment qualified for the purpose.",
     "owner": "Quality manager",
     "subgroup_id": null,
     "satisfied_by": "model",
@@ -850,8 +801,7 @@
       "SRC033"
     ],
     "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "withdrawn_reason": null
   },
   {
     "id": "REQ058",
@@ -862,11 +812,11 @@
     "satisfied_by": "model",
     "source_ids": [
       "SRC020",
-      "SRC029"
+      "SRC029",
+      "SRC046"
     ],
     "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "withdrawn_reason": null
   },
   {
     "id": "REQ059",
@@ -877,11 +827,11 @@
     "satisfied_by": "model",
     "source_ids": [
       "SRC014",
-      "SRC020"
+      "SRC020",
+      "SRC046"
     ],
     "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "withdrawn_reason": null
   },
   {
     "id": "REQ060",
@@ -895,8 +845,7 @@
       "SRC024"
     ],
     "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "withdrawn_reason": null
   },
   {
     "id": "REQ061",
@@ -910,8 +859,7 @@
       "SRC024"
     ],
     "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "withdrawn_reason": null
   },
   {
     "id": "REQ062",
@@ -924,8 +872,7 @@
       "SRC022"
     ],
     "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "withdrawn_reason": null
   },
   {
     "id": "REQ063",
@@ -939,8 +886,7 @@
       "SRC011"
     ],
     "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "withdrawn_reason": null
   },
   {
     "id": "REQ064",
@@ -951,11 +897,11 @@
     "satisfied_by": "model",
     "source_ids": [
       "SRC001",
-      "SRC022"
+      "SRC022",
+      "SRC046"
     ],
     "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "withdrawn_reason": null
   },
   {
     "id": "REQ065",
@@ -969,8 +915,7 @@
       "SRC039"
     ],
     "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "withdrawn_reason": null
   },
   {
     "id": "REQ066",
@@ -983,8 +928,7 @@
       "SRC020"
     ],
     "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "withdrawn_reason": null
   },
   {
     "id": "REQ067",
@@ -997,13 +941,12 @@
       "SRC011"
     ],
     "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "withdrawn_reason": null
   },
   {
     "id": "REQ068",
     "category": "Identity",
-    "statement": "Two records may turn out to describe the same material, supplier or place.",
+    "statement": "Two records may turn out to describe the same place, supplier or machine, and one record then stands in for the other.",
     "owner": "Data steward",
     "subgroup_id": null,
     "satisfied_by": "platform",
@@ -1011,8 +954,7 @@
       "SRC005"
     ],
     "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "withdrawn_reason": null
   },
   {
     "id": "REQ069",
@@ -1026,8 +968,7 @@
       "SRC011"
     ],
     "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "withdrawn_reason": null
   },
   {
     "id": "REQ070",
@@ -1040,9 +981,8 @@
       "SRC014",
       "SRC018"
     ],
-    "status": "active",
-    "withdrawn_reason": null,
-    "certified": false
+    "status": "withdrawn",
+    "withdrawn_reason": "A cost is a calculation over what happened, not something observed. What happened is held; the sum is not."
   },
   {
     "id": "REQ071",
@@ -1053,7 +993,34 @@
     "satisfied_by": "model",
     "source_ids": [],
     "status": "withdrawn",
-    "withdrawn_reason": "No source in this research covers automated decisions in manufacturing. Recorded as an unsourced area rather than kept on reasoning.",
-    "certified": false
+    "withdrawn_reason": "No source in this research covers automated decisions in manufacturing. Recorded as an unsourced area rather than kept on reasoning."
+  },
+  {
+    "id": "REQ071",
+    "category": "Quality",
+    "statement": "A food business must be able to identify who supplied it and which businesses it supplied, and give that information to the authorities when asked.",
+    "owner": "Regulatory lead",
+    "subgroup_id": null,
+    "satisfied_by": "model",
+    "source_ids": [
+      "SRC041",
+      "SRC042"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "REQ072",
+    "category": "Product identity",
+    "statement": "A product is packed in levels — a single unit, a case of units, a pallet of cases — and each level is identified, counted and moved as a thing in its own right.",
+    "owner": "Supply chain lead",
+    "subgroup_id": null,
+    "satisfied_by": "model",
+    "source_ids": [
+      "SRC030",
+      "SRC031"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
   }
 ]
