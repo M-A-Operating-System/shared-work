@@ -670,7 +670,7 @@
       "REQ051",
       "REQ052",
       "REQ053",
-      "REQ071"
+      "REQ073"
     ],
     "must_record": [
       "The lot code given at first packing or transformation, carried at every later movement, kept for two years"

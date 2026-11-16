@@ -1,5 +1,5 @@
 {
-  "spec_version": "1.0",
+  "spec_version": "31.5",
   "spec_uri": "dda://skills/domain-discovery",
   "mechanics": "manual",
   "pass": 2,
@@ -958,6 +958,19 @@
       "decision": "",
       "by": "",
       "date": ""
+    },
+    {
+      "id": "DEC012",
+      "question": "The list of units of measure is proposed here as UniversalUnitOfMeasure and by CPG - Product Definition as UniversalUnitCodes. DDA holds neither. Which model creates the list, and under which name?",
+      "options": [
+        "CPG - Product Definition creates it as UniversalUnitCodes, and this model uses it",
+        "this model creates it as UniversalUnitOfMeasure"
+      ],
+      "raised_at_pass": 2,
+      "status": "open",
+      "decision": "",
+      "by": "",
+      "date": ""
     }
   ],
   "converged": false,
@@ -966,7 +979,7 @@
   "document": {
     "edition": "lite",
     "requested_by": "Andrew Bush",
-    "rendered": ""
+    "rendered": "2026-11-16"
   },
   "minimality": [
     {

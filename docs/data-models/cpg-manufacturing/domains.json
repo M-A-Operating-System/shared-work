@@ -18,7 +18,8 @@
         "SBJ002",
         "SBJ003",
         "SBJ004"
-      ]
+      ],
+      "used_here": "Holds each person the factory deals with, such as an operator, a technician or a supplier's contact, with their qualifications, the shifts they work and what they have signed."
     },
     {
       "id": "DOM002",
@@ -39,7 +40,8 @@
         "SBJ007",
         "SBJ008",
         "SBJ009"
-      ]
+      ],
+      "used_here": "Holds the companies the organisation deals with, such as suppliers, outside manufacturers, operators of sites and regulators, with their identifiers and addresses, the assessments made of suppliers and outside manufacturers, and the requests made of suppliers."
     },
     {
       "id": "DOM003",
@@ -57,7 +59,8 @@
       "subject_ids": [
         "SBJ010",
         "SBJ011"
-      ]
+      ],
+      "used_here": "Holds the documents that state facts about a batch, such as a supplier's certificate of analysis, with what each one declares and whether the organisation checked it."
     },
     {
       "id": "DOM004",
@@ -88,7 +91,8 @@
         "SBJ064",
         "SBJ065",
         "SBJ066"
-      ]
+      ],
+      "used_here": "Holds what happens in making and moving product: production runs, splits of batches, changeovers, stoppages, maintenance, tests, findings, decisions, corrective actions, releases, recalls, complaints, corrections and storage breaches."
     },
     {
       "id": "DOM005",
@@ -107,7 +111,8 @@
         "SBJ046",
         "SBJ047",
         "SBJ048"
-      ]
+      ],
+      "used_here": "Holds the exchanges of goods the organisation records, with their lines and the stock position each one leaves."
     },
     {
       "id": "DOM006",
@@ -127,7 +132,8 @@
         "SBJ016",
         "SBJ017",
         "SBJ067"
-      ]
+      ],
+      "used_here": "Holds each batch of a product, the batches split from or combined into it, and the levels a product is packed in: unit, case and pallet. What a product is made from and what it must be are held by CPG - Product Definition."
     },
     {
       "id": "DOM007",

@@ -1,9 +1,23 @@
 {
-  "defect_count": 5,
-  "blocking": 0,
+  "defect_count": 7,
+  "blocking": 2,
   "material": 0,
   "advisory": 5,
   "defects": [
+    {
+      "check": "RN03",
+      "severity": "blocking",
+      "routes_to": "9",
+      "artefact_ids": [],
+      "detail": "change vocabulary 'changed' appears in the document"
+    },
+    {
+      "check": "RN07",
+      "severity": "blocking",
+      "routes_to": "10",
+      "artefact_ids": [],
+      "detail": "process vocabulary 'review' appears in the document (1x)"
+    },
     {
       "check": "DF04a",
       "severity": "advisory",

@@ -211,7 +211,7 @@
     ],
     "type": "practitioner",
     "establishes": "Affected material is contained, a disposition decided — use as is, rework, repair, scrap or return to supplier — with approvals, root cause found for significant or repeat issues, and closure verified.",
-    "why_included": "Sets out the disposition choices and that each needs approval.",
+    "why_included": "Sets out the disposition choices and that each needs a recorded decision.",
     "status": "active",
     "withdrawn_reason": null
   },
@@ -443,7 +443,7 @@
     ],
     "type": "practitioner",
     "establishes": "Responsible pet food makers run supplier approval, precise formulation, and batch records of finished product and where it went.",
-    "why_included": "Industry-body evidence for supplier approval and batch records in pet food.",
+    "why_included": "Industry-body evidence for the checking of suppliers and for batch records in pet food.",
     "status": "active",
     "withdrawn_reason": null
   },
