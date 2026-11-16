@@ -201,7 +201,7 @@
   {
     "id": "SBJ008",
     "code": "Transaction",
-    "definition": "There is one of these for each time money or a holding moved between parties in a single event, such as a capital call, a distribution, an acquisition, a follow-on investment, a partial or full exit, or a transfer to a continuation vehicle. If you need to know what happened on a date, what kind of event it was and who paid or received what, this is what you go by. It does not hold a fund's position, which is worked out from all of its transactions.",
+    "definition": "There is one of these for each time money or a holding moved between parties in a single event, such as a capital call, a distribution, an acquisition, a follow-on investment, a partial or full exit, or a transfer to a continuation vehicle. If you need to know what happened on a date, what kind of event it was and why, this is what you go by. The parties and the amounts each paid or received are held on its legs. It does not hold a fund's position, which is worked out from all of its transactions.",
     "kind": "occurrence",
     "mastery": "mastered",
     "domain_id": "DOM003",
@@ -210,11 +210,11 @@
     "parent_cardinality": null,
     "singled_out_by": null,
     "independence": null,
-    "distinct_need": "Holds the type, date and currency of each event in which money or a holding moves; the Transactions domain has no root concept, so nothing in DDA holds it.",
+    "distinct_need": null,
     "template_dda_id": null,
-    "dda_action": "create",
-    "dda_id": null,
-    "reuse_search": "Searched DDA: the Transactions domain DMD000000022 has no root concept and no concepts of its own (discover_entities, list_model concepts). Searched this model: no other subject records an event in which money moves.",
+    "dda_action": "reuse",
+    "dda_id": "DMC000000031",
+    "reuse_search": "Searched DDA: Transaction DMC000000031 already exists in Transactions with reference, status, trade date, purpose, supporting document and the transaction it corrects. The design adds the type of event.",
     "data_requirement_ids": [
       "DRQ005",
       "DRQ007"
@@ -242,9 +242,9 @@
     "independence": null,
     "distinct_need": null,
     "template_dda_id": null,
-    "dda_action": "create",
-    "dda_id": null,
-    "reuse_search": "Searched DDA: LegalEntityValuations DMC000000112 holds dated valuations of a legal entity only and is a child of the legal entity; Valuation is held in Transactions beside the transaction and linked to the legal entity valued by DMR000000039, so that the same concept can serve other things valued later. DMC000000112 is retired in its favour.",
+    "dda_action": "extend",
+    "dda_id": "DMC000000030",
+    "reuse_search": "Searched DDA: Valuation DMC000000030 already exists in Transactions with date, amount, currency, status, basis, method, hierarchy level and valuer. The design extends it with the measure of value and links it to the fund or portfolio company valued by relationships DMR000000039 and DMR000000050, which replace its legal-entity-valued and instrument-valued ID attributes.",
     "data_requirement_ids": [
       "DRQ008"
     ],
@@ -252,6 +252,36 @@
       "SRC005",
       "SRC006",
       "SRC007"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SBJ010",
+    "code": "TransactionLeg",
+    "definition": "There is one of these for each movement of money or of a holding within a transaction, for one party and one purpose. If you need to know who paid or received what, in which currency, for which instrument and how many units, and when it settled, this is what you go by. A capital call has one leg for each investor. It is not the transaction itself, which holds what the event was and when it took place.",
+    "kind": "occurrence",
+    "mastery": "mastered",
+    "domain_id": "DOM003",
+    "is_anchor": false,
+    "parent_id": "SBJ008",
+    "parent_cardinality": "ONE_TO_MANY_OPTIONAL",
+    "singled_out_by": "the party, the direction and the purpose of each movement",
+    "independence": null,
+    "distinct_need": null,
+    "template_dda_id": null,
+    "dda_action": "extend",
+    "dda_id": "DMC000000032",
+    "reuse_search": "Searched DDA: TransactionLeg DMC000000032 already holds party, account, direction, kind, amount, currency, reporting amount, rate, instrument, units, price and settlement date. The design adds the purpose of the leg.",
+    "data_requirement_ids": [
+      "DRQ005",
+      "DRQ007"
+    ],
+    "evidence_source_ids": [
+      "SRC001",
+      "SRC002",
+      "SRC003",
+      "SRC015"
     ],
     "status": "active",
     "withdrawn_reason": null
