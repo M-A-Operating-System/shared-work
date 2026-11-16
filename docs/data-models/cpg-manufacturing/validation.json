@@ -1,0 +1,42 @@
+{
+  "defect_count": 4,
+  "blocking": 3,
+  "material": 1,
+  "advisory": 0,
+  "defects": [
+    {
+      "check": "RN03",
+      "severity": "blocking",
+      "routes_to": "9",
+      "artefact_ids": [],
+      "detail": "change vocabulary 'changed' appears in the document"
+    },
+    {
+      "check": "X01",
+      "severity": "blocking",
+      "routes_to": "\u2014",
+      "artefact_ids": [
+        "EXC001"
+      ],
+      "detail": "exception is unapproved"
+    },
+    {
+      "check": "X01",
+      "severity": "blocking",
+      "routes_to": "\u2014",
+      "artefact_ids": [
+        "EXC002"
+      ],
+      "detail": "exception is unapproved"
+    },
+    {
+      "check": "Q02",
+      "severity": "material",
+      "routes_to": "4",
+      "artefact_ids": [
+        "SCN039"
+      ],
+      "detail": "test case result is 'fail'"
+    }
+  ]
+}

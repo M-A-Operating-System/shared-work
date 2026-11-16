@@ -1,0 +1,71 @@
+{
+  "reused": [
+    "DMC000000143",
+    "DMC000000106",
+    "DMC000000023",
+    "DMC000000108",
+    "DMC000000142",
+    "DMD000000001",
+    "DMD000000012",
+    "DMD000000016",
+    "DMD000000020",
+    "DMD000000022"
+  ],
+  "platform_findings": [
+    {
+      "id": "PLF001",
+      "dda_id": "DMC000000011",
+      "name": "LegalEntityRoles",
+      "finding": "Stores roles — investor, vendor, client — on the organisation. The principles say roles come from relationships; this model derives supplier and outside manufacturer instead of storing them."
+    },
+    {
+      "id": "PLF002",
+      "dda_id": "DMC000000024",
+      "name": "PeopleRoles",
+      "finding": "Stores roles on the person, and uses the plural People where its siblings use Person."
+    },
+    {
+      "id": "PLF003",
+      "dda_id": "DMC000000107",
+      "name": "LegalEntityRelationships",
+      "finding": "Holds relationships as a concept. Relationships are now their own kind of record; not reused here."
+    },
+    {
+      "id": "PLF004",
+      "dda_id": "DMD000000020",
+      "name": "Events domain",
+      "finding": "Holds no concepts. Its definition describes corporate and life events only."
+    },
+    {
+      "id": "PLF005",
+      "dda_id": "DMD000000022",
+      "name": "Transactions domain",
+      "finding": "Holds no concepts. Its definition is written for trades in securities."
+    },
+    {
+      "id": "PLF006",
+      "dda_id": "DMC000000142",
+      "name": "Document",
+      "finding": "Its description calls it DocumentBase, which disagrees with its name."
+    },
+    {
+      "id": "PLF007",
+      "dda_id": "DMC000000147",
+      "name": "PersonCitizenship",
+      "finding": "Singular name where its siblings are plural."
+    },
+    {
+      "id": "PLF008",
+      "dda_id": "DMR000000001",
+      "name": "LegalEntityFundManagedBy",
+      "finding": "Inverse verb Invests In does not read back Managed By; the stored view name LegalEntityGP disagrees with its roles."
+    },
+    {
+      "id": "PLF009",
+      "dda_id": "DMR000000002",
+      "name": "LegalEntityPEInvestor",
+      "finding": "Forward verb Investor is a noun, not a verb."
+    }
+  ],
+  "standards_refreshed": false
+}

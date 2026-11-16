@@ -1,0 +1,4453 @@
+{
+  "spec_version": "1.0",
+  "package_ref": "cpg-bdd",
+  "apply_mode": "web-ui",
+  "preconditions": [],
+  "preconditions_note": "State transitions could not be read from the platform; see DEC007.",
+  "operations": [
+    {
+      "seq": 1,
+      "op": "create",
+      "entity": "domains",
+      "local_id": "DOM006",
+      "dda_id": null,
+      "fields": {
+        "domain_code": "Products",
+        "domain_name": "Products",
+        "domain_id_structure": "PRD",
+        "domain_description": "Products are the things an organisation buys, makes or sells, at every level of processing and packing — ingredients, packaging components, part-made goods, finished packs and cases — together with what each is defined to be and what it is made from. Includes the batches in which they are made or received. Excludes the individual serial-numbered units made to a product definition, which are Instances, and the financial instruments an organisation issues or trades, which are Instruments."
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 2,
+      "op": "create",
+      "entity": "domains",
+      "local_id": "DOM007",
+      "dda_id": null,
+      "fields": {
+        "domain_code": "Instances",
+        "domain_name": "Instances",
+        "domain_id_structure": "UNT",
+        "domain_description": "Instances are individually identified physical things — a serial-numbered pack, a machine, a vessel, a tool — each made to a product definition and traceable as itself for its whole life. Includes what is fitted into each and what condition it is in. Excludes the product definition it is made to, which is a Product, and the batch it belongs to where it is not individually identified, which is a concept of Products."
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 3,
+      "op": "create",
+      "entity": "domains",
+      "local_id": "DOM008",
+      "dda_id": null,
+      "fields": {
+        "domain_code": "Equipment",
+        "domain_name": "Equipment",
+        "domain_id_structure": "EQP",
+        "domain_description": "Equipment covers the places in a plant where work is performed — site, area, work centre, work unit and equipment module — what each is able to do, and the rules that constrain what may run there. Includes the plant structure as ISA-95 defines it. Excludes the machines that stand in those places, which are Instances, and the geographic places goods are held at, which are Locations."
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 4,
+      "op": "create",
+      "entity": "domains",
+      "local_id": "DOM009",
+      "dda_id": null,
+      "fields": {
+        "domain_code": "Processes",
+        "domain_name": "Processes",
+        "domain_id_structure": "PRC",
+        "domain_description": "Processes are the defined steps of work by which products are made — mixing, pasteurising, filling, labelling — the order they run in, the settings they run at, and the recipes that state them at each level of specificity from formulation to the instructions issued for one batch. Includes what each step requires of equipment, people and materials. Excludes what a product is made from, which is Products, and the record of a step actually being performed, which is an Event."
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 5,
+      "op": "create",
+      "entity": "domains",
+      "local_id": "DOM010",
+      "dda_id": null,
+      "fields": {
+        "domain_code": "Locations",
+        "domain_name": "Locations",
+        "domain_id_structure": "LOC",
+        "domain_description": "Locations are identifiable geographic places at which things are held or handled — a site, a plant, a warehouse, a storage position within one — the conditions each must keep, and the identifiers each is known by. Includes places operated by other organisations where goods are received from or delivered to. Excludes the production structure within a site, which is Equipment."
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 6,
+      "op": "create",
+      "entity": "lookupTypes",
+      "local_id": "LKP001",
+      "dda_id": null,
+      "fields": {
+        "lookup_type_code": "ProductKindType",
+        "lookup_type_description": "What a product is to this organisation, deciding whether it may be bought, made, used or sold. A product may be more than one kind at once.",
+        "values": 8
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 7,
+      "op": "create",
+      "entity": "lookupTypes",
+      "local_id": "LKP002",
+      "dda_id": null,
+      "fields": {
+        "lookup_type_code": "ProductHazardType",
+        "lookup_type_description": "The kind of hazard a product carries, and therefore which declaration regime applies to it.",
+        "values": 4
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 8,
+      "op": "create",
+      "entity": "lookupTypes",
+      "local_id": "LKP003",
+      "dda_id": null,
+      "fields": {
+        "lookup_type_code": "ProductIdentifiersType",
+        "lookup_type_description": "The scheme an identifier belongs to.",
+        "values": 3
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 9,
+      "op": "create",
+      "entity": "lookupTypes",
+      "local_id": "LKP004",
+      "dda_id": null,
+      "fields": {
+        "lookup_type_code": "ProcessRecipeLevelsType",
+        "lookup_type_description": "How specific a recipe is, following ISA-88.",
+        "values": 4
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 10,
+      "op": "create",
+      "entity": "lookupTypes",
+      "local_id": "LKP005",
+      "dda_id": null,
+      "fields": {
+        "lookup_type_code": "EquipmentPositionLevelType",
+        "lookup_type_description": "The level of a place in the plant structure, following ISA-95.",
+        "values": 7
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 11,
+      "op": "create",
+      "entity": "lookupTypes",
+      "local_id": "LKP006",
+      "dda_id": null,
+      "fields": {
+        "lookup_type_code": "EventStoppagesReasonType",
+        "lookup_type_description": "Why production stopped, from a governed list.",
+        "values": 10
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 12,
+      "op": "create",
+      "entity": "lookupTypes",
+      "local_id": "LKP007",
+      "dda_id": null,
+      "fields": {
+        "lookup_type_code": "EventDispositionsDecisionType",
+        "lookup_type_description": "What is done with material that failed its specification.",
+        "values": 5
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 13,
+      "op": "create",
+      "entity": "lookupTypes",
+      "local_id": "LKP008",
+      "dda_id": null,
+      "fields": {
+        "lookup_type_code": "TransactionKindType",
+        "lookup_type_description": "What kind of exchange a transaction is.",
+        "values": 5
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 14,
+      "op": "create",
+      "entity": "lookupTypes",
+      "local_id": "LKP009",
+      "dda_id": null,
+      "fields": {
+        "lookup_type_code": "UniversalUnitOfMeasure",
+        "lookup_type_description": "The unit a quantity is expressed in. Used wherever a quantity is recorded.",
+        "values": 6
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 15,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ002",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "PersonQualificationRecords",
+        "concept_name": "PersonQualificationRecords",
+        "concept_description": "One qualification a person holds to perform particular work, with the basis on which it was awarded.",
+        "concept_is_domain": null,
+        "concept_parent": "DMC000000143",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 16,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ003",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "PersonShiftAssignments",
+        "concept_name": "PersonShiftAssignments",
+        "concept_description": "One period a person was assigned to work at a place.",
+        "concept_is_domain": null,
+        "concept_parent": "DMC000000143",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 17,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ004",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "PersonSignatures",
+        "concept_name": "PersonSignatures",
+        "concept_description": "One signature a person applied to a record — what was signed, when, and what the signature meant.",
+        "concept_is_domain": null,
+        "concept_parent": "DMC000000143",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 18,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ008",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "LegalEntityAssessments",
+        "concept_name": "LegalEntityAssessments",
+        "concept_description": "One assessment of a supplier or outside manufacturer — its scope, its result, and how long it is valid.",
+        "concept_is_domain": null,
+        "concept_parent": "DMC000000106",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 19,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ009",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "LegalEntitySupplierRequests",
+        "concept_name": "LegalEntitySupplierRequests",
+        "concept_description": "One problem formally raised with a supplier, with their response and its closure.",
+        "concept_is_domain": null,
+        "concept_parent": "DMC000000106",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 20,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ011",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "DocumentDeclarations",
+        "concept_name": "DocumentDeclarations",
+        "concept_description": "One property a document states about a batch or product, and whether the organisation verified it.",
+        "concept_is_domain": null,
+        "concept_parent": "DMC000000142",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 21,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ012",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "Product",
+        "concept_name": "Product",
+        "concept_description": "One thing the organisation buys, makes or sells, at one level of processing or packing.",
+        "concept_is_domain": "DOM006",
+        "concept_parent": "Master",
+        "concept_parent_rel": null
+      },
+      "depends_on": [
+        1
+      ]
+    },
+    {
+      "seq": 22,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ013",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "ProductIdentifiers",
+        "concept_name": "ProductIdentifiers",
+        "concept_description": "One identifier by which a product is known, in one scheme.",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ012",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        1,
+        21
+      ]
+    },
+    {
+      "seq": 23,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ014",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "ProductSpecifications",
+        "concept_name": "ProductSpecifications",
+        "concept_description": "One version of what a product must be, with its limits and how conformance is checked.",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ012",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        1,
+        21
+      ]
+    },
+    {
+      "seq": 24,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ015",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "ProductStructureVersions",
+        "concept_name": "ProductStructureVersions",
+        "concept_description": "One complete statement of what goes into a product, for a site, market or period.",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ012",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        1,
+        21
+      ]
+    },
+    {
+      "seq": 25,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ016",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "ProductBatches",
+        "concept_name": "ProductBatches",
+        "concept_description": "One quantity made or received as one unit of traceability, with its lot code and date.",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ012",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        1,
+        21
+      ]
+    },
+    {
+      "seq": 26,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ017",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "ProductSubBatches",
+        "concept_name": "ProductSubBatches",
+        "concept_description": "One part of a batch separated for handling, retaining its link to the batch.",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ016",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        1,
+        25
+      ]
+    },
+    {
+      "seq": 27,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ018",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "ProductHazards",
+        "concept_name": "ProductHazards",
+        "concept_description": "One hazard a product carries — an allergen, an irritant, a classified chemical — with the basis of the declaration.",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ012",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        1,
+        21
+      ]
+    },
+    {
+      "seq": 28,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ019",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "ProductDisclosures",
+        "concept_name": "ProductDisclosures",
+        "concept_description": "One ingredient a product must disclose, how much of it there is, and whether it is withheld as confidential.",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ012",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        1,
+        21
+      ]
+    },
+    {
+      "seq": 29,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ020",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "ProductOrigins",
+        "concept_name": "ProductOrigins",
+        "concept_description": "One stated country or region of origin, with the basis of the statement.",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ012",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        1,
+        21
+      ]
+    },
+    {
+      "seq": 30,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ021",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "ProductShelfLives",
+        "concept_name": "ProductShelfLives",
+        "concept_description": "How long a product lasts under one set of storage conditions.",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ012",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        1,
+        21
+      ]
+    },
+    {
+      "seq": 31,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ022",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "ProductSubstitutions",
+        "concept_name": "ProductSubstitutions",
+        "concept_description": "One approved alternative for an input, with the conditions for using it.",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ012",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        1,
+        21
+      ]
+    },
+    {
+      "seq": 32,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ023",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "ProductVariantAxes",
+        "concept_name": "ProductVariantAxes",
+        "concept_description": "One way the members of a family differ — size, format, pack count — and the values allowed.",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ012",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        1,
+        21
+      ]
+    },
+    {
+      "seq": 33,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ024",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "ProductCostings",
+        "concept_name": "ProductCostings",
+        "concept_description": "The expected or actual cost of a product, by element, for a period.",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ012",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        1,
+        21
+      ]
+    },
+    {
+      "seq": 34,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ025",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "ProductIdentityChanges",
+        "concept_name": "ProductIdentityChanges",
+        "concept_description": "One change to a product, and whether it made a new product or a new version of what goes in.",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ012",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        1,
+        21
+      ]
+    },
+    {
+      "seq": 35,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ026",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "Instance",
+        "concept_name": "Instance",
+        "concept_description": "One individually identified physical thing — a serialised pack or a machine — made to a product definition.",
+        "concept_is_domain": "DOM007",
+        "concept_parent": "Master",
+        "concept_parent_rel": null
+      },
+      "depends_on": [
+        2
+      ]
+    },
+    {
+      "seq": 36,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ027",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "InstanceIdentifiers",
+        "concept_name": "InstanceIdentifiers",
+        "concept_description": "One identifier by which a unit is individually known, in one scheme.",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ026",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        2,
+        35
+      ]
+    },
+    {
+      "seq": 37,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ028",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "InstanceConditions",
+        "concept_name": "InstanceConditions",
+        "concept_description": "One reading of a unit's state — hours run, cycles, wear, calibration result.",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ026",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        2,
+        35
+      ]
+    },
+    {
+      "seq": 38,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ029",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "InstanceFailureModes",
+        "concept_name": "InstanceFailureModes",
+        "concept_description": "One way a machine characteristically fails, and what that failure causes.",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ026",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        2,
+        35
+      ]
+    },
+    {
+      "seq": 39,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ030",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "InstanceCriticalities",
+        "concept_name": "InstanceCriticalities",
+        "concept_description": "One assessment of how much a machine matters — to output, to safety, and whether a spare exists.",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ026",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        2,
+        35
+      ]
+    },
+    {
+      "seq": 40,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ031",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "EquipmentPosition",
+        "concept_name": "EquipmentPosition",
+        "concept_description": "One place in a plant where work is performed — a site level, an area, a work centre, a work unit, an equipment module.",
+        "concept_is_domain": "DOM008",
+        "concept_parent": "Master",
+        "concept_parent_rel": null
+      },
+      "depends_on": [
+        3
+      ]
+    },
+    {
+      "seq": 41,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ032",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "EquipmentPositionIdentifiers",
+        "concept_name": "EquipmentPositionIdentifiers",
+        "concept_description": "One identifier by which a place is known, in one scheme.",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ031",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        3,
+        40
+      ]
+    },
+    {
+      "seq": 42,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ033",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "EquipmentCapabilities",
+        "concept_name": "EquipmentCapabilities",
+        "concept_description": "One thing a place is able to do, and how much of it.",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ031",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        3,
+        40
+      ]
+    },
+    {
+      "seq": 43,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ034",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "EquipmentSequencingRules",
+        "concept_name": "EquipmentSequencingRules",
+        "concept_description": "One constraint on what may run after what at a place, with the reason.",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ031",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        3,
+        40
+      ]
+    },
+    {
+      "seq": 44,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ035",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "EquipmentMaintenancePlans",
+        "concept_name": "EquipmentMaintenancePlans",
+        "concept_description": "One planned maintenance regime for a place, and what triggers it.",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ031",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        3,
+        40
+      ]
+    },
+    {
+      "seq": 45,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ036",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "ProcessSegment",
+        "concept_name": "ProcessSegment",
+        "concept_description": "One step of work, defined independently of any product — mixing, pasteurising, filling.",
+        "concept_is_domain": "DOM009",
+        "concept_parent": "Master",
+        "concept_parent_rel": null
+      },
+      "depends_on": [
+        4
+      ]
+    },
+    {
+      "seq": 46,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ037",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "ProcessSegmentRequirements",
+        "concept_name": "ProcessSegmentRequirements",
+        "concept_description": "One thing a step needs to run — a capability, a qualification, a kind of material.",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ036",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        4,
+        45
+      ]
+    },
+    {
+      "seq": 47,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ038",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "ProcessParameters",
+        "concept_name": "ProcessParameters",
+        "concept_description": "One setting a step can be run at, with the range allowed.",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ036",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        4,
+        45
+      ]
+    },
+    {
+      "seq": 48,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ039",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "ProcessSamplingPlans",
+        "concept_name": "ProcessSamplingPlans",
+        "concept_description": "One rule stating what is sampled at a step, when, how much, and against which specification.",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ036",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        4,
+        45
+      ]
+    },
+    {
+      "seq": 49,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ040",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "ProcessRoutings",
+        "concept_name": "ProcessRoutings",
+        "concept_description": "The steps, in order, that turn a product's inputs into the product.",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ036",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        4,
+        45
+      ]
+    },
+    {
+      "seq": 50,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ041",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "ProcessRecipeLevels",
+        "concept_name": "ProcessRecipeLevels",
+        "concept_description": "One statement of a routing at one level of specificity — general, site, master, or the instructions for one batch.",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ040",
+        "concept_parent_rel": "ONE_TO_MANY_MANDATORY"
+      },
+      "depends_on": [
+        4,
+        49
+      ]
+    },
+    {
+      "seq": 51,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ042",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "ProcessParameterValues",
+        "concept_name": "ProcessParameterValues",
+        "concept_description": "One value set for a setting at one recipe level, for one product at one place.",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ041",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        4,
+        50
+      ]
+    },
+    {
+      "seq": 52,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ043",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "Location",
+        "concept_name": "Location",
+        "concept_description": "One identifiable place — a site, a plant, a warehouse, a storage position.",
+        "concept_is_domain": "DOM010",
+        "concept_parent": "Master",
+        "concept_parent_rel": null
+      },
+      "depends_on": [
+        5
+      ]
+    },
+    {
+      "seq": 53,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ044",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "LocationIdentifiers",
+        "concept_name": "LocationIdentifiers",
+        "concept_description": "One identifier by which a place is known, and who issued it.",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ043",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        5,
+        52
+      ]
+    },
+    {
+      "seq": 54,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ045",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "LocationStorageConditions",
+        "concept_name": "LocationStorageConditions",
+        "concept_description": "One condition a place must keep — temperature, humidity — with its limits.",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ043",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        5,
+        52
+      ]
+    },
+    {
+      "seq": 55,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ046",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "Transaction",
+        "concept_name": "Transaction",
+        "concept_description": "One exchange of goods of a stated kind — a purchase, a receipt, an issue to production, a transfer, a despatch.",
+        "concept_is_domain": "DMD000000022",
+        "concept_parent": "Master",
+        "concept_parent_rel": null
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 56,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ047",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "TransactionLines",
+        "concept_name": "TransactionLines",
+        "concept_description": "One line of an exchange: one product, one quantity, one batch.",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ046",
+        "concept_parent_rel": "ONE_TO_MANY_MANDATORY"
+      },
+      "depends_on": [
+        55
+      ]
+    },
+    {
+      "seq": 57,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ048",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "TransactionInventoryPositions",
+        "concept_name": "TransactionInventoryPositions",
+        "concept_description": "One quantity of a product, in one condition, at one place, at one time.",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ046",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        55
+      ]
+    },
+    {
+      "seq": 58,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ049",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "Event",
+        "concept_name": "Event",
+        "concept_description": "One thing that happened in the operation, at a time and a place.",
+        "concept_is_domain": "DMD000000020",
+        "concept_parent": "Master",
+        "concept_parent_rel": null
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 59,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ050",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "EventProductionOrders",
+        "concept_name": "EventProductionOrders",
+        "concept_description": "One instruction to make a quantity of a product.",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ049",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        58
+      ]
+    },
+    {
+      "seq": 60,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ051",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "EventProductionRuns",
+        "concept_name": "EventProductionRuns",
+        "concept_description": "One batch actually made — what was instructed, what was done, and what came out.",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ049",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        58
+      ]
+    },
+    {
+      "seq": 61,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ052",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "EventMaterialConsumptions",
+        "concept_name": "EventMaterialConsumptions",
+        "concept_description": "One quantity of one input batch used in one run, filling one place in the recipe.",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ049",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        58
+      ]
+    },
+    {
+      "seq": 62,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ053",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "EventBatchSplits",
+        "concept_name": "EventBatchSplits",
+        "concept_description": "One batch divided into parts, or several combined into one.",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ049",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        58
+      ]
+    },
+    {
+      "seq": 63,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ054",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "EventChangeovers",
+        "concept_name": "EventChangeovers",
+        "concept_description": "One change of a place from one product to another, including any clean.",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ049",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        58
+      ]
+    },
+    {
+      "seq": 64,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ055",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "EventStoppages",
+        "concept_name": "EventStoppages",
+        "concept_description": "One stop in production at one place — start, end, and why.",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ049",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        58
+      ]
+    },
+    {
+      "seq": 65,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ056",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "EventMaintenanceWork",
+        "concept_name": "EventMaintenanceWork",
+        "concept_description": "One piece of maintenance work — what prompted it, what was found, what was done.",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ049",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        58
+      ]
+    },
+    {
+      "seq": 66,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ057",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "EventTests",
+        "concept_name": "EventTests",
+        "concept_description": "One test against a specification — its method, its sample and its result.",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ049",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        58
+      ]
+    },
+    {
+      "seq": 67,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ058",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "EventDeviations",
+        "concept_name": "EventDeviations",
+        "concept_description": "One departure from a defined procedure during a run.",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ049",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        58
+      ]
+    },
+    {
+      "seq": 68,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ059",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "EventNonConformances",
+        "concept_name": "EventNonConformances",
+        "concept_description": "One failure of a batch or material against its specification.",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ049",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        58
+      ]
+    },
+    {
+      "seq": 69,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ060",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "EventDispositions",
+        "concept_name": "EventDispositions",
+        "concept_description": "One decision about failed material, with its reason and its approver.",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ049",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        58
+      ]
+    },
+    {
+      "seq": 70,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ061",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "EventCorrectiveActions",
+        "concept_name": "EventCorrectiveActions",
+        "concept_description": "One response to a problem — its cause, what was done, the check that it worked, and its closure.",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ049",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        58
+      ]
+    },
+    {
+      "seq": 71,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ062",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "EventReleases",
+        "concept_name": "EventReleases",
+        "concept_description": "One act of making output available, by one person, on a stated basis.",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ049",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        58
+      ]
+    },
+    {
+      "seq": 72,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ063",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "EventRecalls",
+        "concept_name": "EventRecalls",
+        "concept_description": "One safety or quality incident, its scope and its resolution.",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ049",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        58
+      ]
+    },
+    {
+      "seq": 73,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ064",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "EventComplaints",
+        "concept_name": "EventComplaints",
+        "concept_description": "One report from outside the organisation about a product.",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ049",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        58
+      ]
+    },
+    {
+      "seq": 74,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ065",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "EventCorrections",
+        "concept_name": "EventCorrections",
+        "concept_description": "One correction to something already recorded, replacing it without erasing it.",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ049",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        58
+      ]
+    },
+    {
+      "seq": 75,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ066",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "EventStorageBreaches",
+        "concept_name": "EventStorageBreaches",
+        "concept_description": "One period a place failed to keep its required conditions.",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ049",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        58
+      ]
+    },
+    {
+      "seq": 76,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL001",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "ProductBillOfMaterials",
+        "relationship_forward_verb": "is made from",
+        "relationship_inverse_verb": "is used in",
+        "relationship_source_role": "ROL002",
+        "relationship_target_role": "ROL001",
+        "relationship_cardinality": "MANY_TO_MANY",
+        "relationship_dates": true
+      },
+      "depends_on": [
+        21
+      ]
+    },
+    {
+      "seq": 77,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL002",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "ProductVariants",
+        "relationship_forward_verb": "is a variant within",
+        "relationship_inverse_verb": "has variant",
+        "relationship_source_role": "ROL003",
+        "relationship_target_role": "ROL004",
+        "relationship_cardinality": "MANY_TO_ONE",
+        "relationship_dates": true
+      },
+      "depends_on": [
+        21
+      ]
+    },
+    {
+      "seq": 78,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL003",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "ProductApprovedSources",
+        "relationship_forward_verb": "may be sourced from",
+        "relationship_inverse_verb": "may supply",
+        "relationship_source_role": "ROL005",
+        "relationship_target_role": "ROL006",
+        "relationship_cardinality": "MANY_TO_MANY",
+        "relationship_dates": true
+      },
+      "depends_on": [
+        21
+      ]
+    },
+    {
+      "seq": 79,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL004",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "ProductCertifications",
+        "relationship_forward_verb": "is certified by",
+        "relationship_inverse_verb": "certifies",
+        "relationship_source_role": "ROL007",
+        "relationship_target_role": "ROL009",
+        "relationship_cardinality": "MANY_TO_MANY",
+        "relationship_dates": true
+      },
+      "depends_on": [
+        21
+      ]
+    },
+    {
+      "seq": 80,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL005",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "ProductContractManufacture",
+        "relationship_forward_verb": "is manufactured by",
+        "relationship_inverse_verb": "manufactures",
+        "relationship_source_role": "ROL010",
+        "relationship_target_role": "ROL011",
+        "relationship_cardinality": "MANY_TO_MANY",
+        "relationship_dates": true
+      },
+      "depends_on": [
+        21
+      ]
+    },
+    {
+      "seq": 81,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL006",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "ProductRoutings",
+        "relationship_forward_verb": "is made by",
+        "relationship_inverse_verb": "makes",
+        "relationship_source_role": "ROL012",
+        "relationship_target_role": "ROL013",
+        "relationship_cardinality": "MANY_TO_ONE",
+        "relationship_dates": true
+      },
+      "depends_on": [
+        21,
+        45
+      ]
+    },
+    {
+      "seq": 82,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL007",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "ProcessSegmentSequences",
+        "relationship_forward_verb": "follows",
+        "relationship_inverse_verb": "precedes",
+        "relationship_source_role": "ROL014",
+        "relationship_target_role": "ROL015",
+        "relationship_cardinality": "MANY_TO_MANY",
+        "relationship_dates": false
+      },
+      "depends_on": [
+        45
+      ]
+    },
+    {
+      "seq": 83,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL008",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "ProcessSegmentApprovals",
+        "relationship_forward_verb": "is approved at",
+        "relationship_inverse_verb": "is approved for",
+        "relationship_source_role": "ROL016",
+        "relationship_target_role": "ROL017",
+        "relationship_cardinality": "MANY_TO_MANY",
+        "relationship_dates": true
+      },
+      "depends_on": [
+        40,
+        45
+      ]
+    },
+    {
+      "seq": 84,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL009",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "ProcessRecipeDerivations",
+        "relationship_forward_verb": "is derived from",
+        "relationship_inverse_verb": "is the source of",
+        "relationship_source_role": "ROL018",
+        "relationship_target_role": "ROL019",
+        "relationship_cardinality": "MANY_TO_ONE",
+        "relationship_dates": true
+      },
+      "depends_on": [
+        45
+      ]
+    },
+    {
+      "seq": 85,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL010",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "EquipmentPositionStructures",
+        "relationship_forward_verb": "is within",
+        "relationship_inverse_verb": "contains",
+        "relationship_source_role": "ROL020",
+        "relationship_target_role": "ROL021",
+        "relationship_cardinality": "MANY_TO_ONE",
+        "relationship_dates": false
+      },
+      "depends_on": [
+        40
+      ]
+    },
+    {
+      "seq": 86,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL011",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "EquipmentInstallations",
+        "relationship_forward_verb": "is occupied by",
+        "relationship_inverse_verb": "occupies",
+        "relationship_source_role": "ROL022",
+        "relationship_target_role": "ROL023",
+        "relationship_cardinality": "MANY_TO_MANY",
+        "relationship_dates": true
+      },
+      "depends_on": [
+        35,
+        40
+      ]
+    },
+    {
+      "seq": 87,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL012",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "EquipmentSitings",
+        "relationship_forward_verb": "is sited at",
+        "relationship_inverse_verb": "houses",
+        "relationship_source_role": "ROL024",
+        "relationship_target_role": "ROL025",
+        "relationship_cardinality": "MANY_TO_ONE",
+        "relationship_dates": false
+      },
+      "depends_on": [
+        40,
+        52
+      ]
+    },
+    {
+      "seq": 88,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL013",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "InstanceDefinitions",
+        "relationship_forward_verb": "is a unit of",
+        "relationship_inverse_verb": "is made as",
+        "relationship_source_role": "ROL026",
+        "relationship_target_role": "ROL027",
+        "relationship_cardinality": "MANY_TO_ONE",
+        "relationship_dates": false
+      },
+      "depends_on": [
+        21,
+        35
+      ]
+    },
+    {
+      "seq": 89,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL014",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "InstanceComposition",
+        "relationship_forward_verb": "is built from",
+        "relationship_inverse_verb": "is built into",
+        "relationship_source_role": "ROL028",
+        "relationship_target_role": "ROL029",
+        "relationship_cardinality": "MANY_TO_MANY",
+        "relationship_dates": true
+      },
+      "depends_on": [
+        35
+      ]
+    },
+    {
+      "seq": 90,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL015",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "InstanceBatchComposition",
+        "relationship_forward_verb": "incorporates batch",
+        "relationship_inverse_verb": "is incorporated into",
+        "relationship_source_role": "ROL028",
+        "relationship_target_role": "ROL030",
+        "relationship_cardinality": "MANY_TO_MANY",
+        "relationship_dates": false
+      },
+      "depends_on": [
+        21,
+        35
+      ]
+    },
+    {
+      "seq": 91,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL016",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "LocationHierarchies",
+        "relationship_forward_verb": "is within",
+        "relationship_inverse_verb": "contains",
+        "relationship_source_role": "ROL031",
+        "relationship_target_role": "ROL032",
+        "relationship_cardinality": "MANY_TO_ONE",
+        "relationship_dates": false
+      },
+      "depends_on": [
+        52
+      ]
+    },
+    {
+      "seq": 92,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL017",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "LocationCertifications",
+        "relationship_forward_verb": "is certified by",
+        "relationship_inverse_verb": "certifies",
+        "relationship_source_role": "ROL008",
+        "relationship_target_role": "ROL009",
+        "relationship_cardinality": "MANY_TO_MANY",
+        "relationship_dates": true
+      },
+      "depends_on": [
+        52
+      ]
+    },
+    {
+      "seq": 93,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL018",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "LocationRegistrations",
+        "relationship_forward_verb": "is registered with",
+        "relationship_inverse_verb": "registers",
+        "relationship_source_role": "ROL035",
+        "relationship_target_role": "ROL036",
+        "relationship_cardinality": "MANY_TO_MANY",
+        "relationship_dates": true
+      },
+      "depends_on": [
+        52
+      ]
+    },
+    {
+      "seq": 94,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL019",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "LegalEntitySiteOperations",
+        "relationship_forward_verb": "operates",
+        "relationship_inverse_verb": "is operated by",
+        "relationship_source_role": "ROL033",
+        "relationship_target_role": "ROL034",
+        "relationship_cardinality": "MANY_TO_MANY",
+        "relationship_dates": true
+      },
+      "depends_on": [
+        52
+      ]
+    },
+    {
+      "seq": 95,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL020",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "PersonEmployments",
+        "relationship_forward_verb": "works for",
+        "relationship_inverse_verb": "employs",
+        "relationship_source_role": "ROL037",
+        "relationship_target_role": "ROL038",
+        "relationship_cardinality": "MANY_TO_MANY",
+        "relationship_dates": true
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 96,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL021",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "PersonWorkQualifications",
+        "relationship_forward_verb": "is qualified for",
+        "relationship_inverse_verb": "may be performed by",
+        "relationship_source_role": "ROL039",
+        "relationship_target_role": "ROL040",
+        "relationship_cardinality": "MANY_TO_MANY",
+        "relationship_dates": true
+      },
+      "depends_on": [
+        45
+      ]
+    },
+    {
+      "seq": 97,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL022",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "TransactionParties",
+        "relationship_forward_verb": "is transacted with",
+        "relationship_inverse_verb": "transacts",
+        "relationship_source_role": "ROL041",
+        "relationship_target_role": "ROL042",
+        "relationship_cardinality": "MANY_TO_MANY",
+        "relationship_dates": false
+      },
+      "depends_on": [
+        55
+      ]
+    },
+    {
+      "seq": 98,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL023",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "TransactionSubjects",
+        "relationship_forward_verb": "concerns",
+        "relationship_inverse_verb": "is traded in",
+        "relationship_source_role": "ROL041",
+        "relationship_target_role": "ROL043",
+        "relationship_cardinality": "MANY_TO_MANY",
+        "relationship_dates": false
+      },
+      "depends_on": [
+        21,
+        55
+      ]
+    },
+    {
+      "seq": 99,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL024",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "TransactionOrigins",
+        "relationship_forward_verb": "ships from",
+        "relationship_inverse_verb": "despatches",
+        "relationship_source_role": "ROL041",
+        "relationship_target_role": "ROL044",
+        "relationship_cardinality": "MANY_TO_ONE",
+        "relationship_dates": false
+      },
+      "depends_on": [
+        52,
+        55
+      ]
+    },
+    {
+      "seq": 100,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL025",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "TransactionDestinations",
+        "relationship_forward_verb": "is delivered to",
+        "relationship_inverse_verb": "receives",
+        "relationship_source_role": "ROL041",
+        "relationship_target_role": "ROL045",
+        "relationship_cardinality": "MANY_TO_ONE",
+        "relationship_dates": false
+      },
+      "depends_on": [
+        52,
+        55
+      ]
+    },
+    {
+      "seq": 101,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL026",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "EventRunPositions",
+        "relationship_forward_verb": "ran at",
+        "relationship_inverse_verb": "ran",
+        "relationship_source_role": "ROL046",
+        "relationship_target_role": "ROL047",
+        "relationship_cardinality": "MANY_TO_ONE",
+        "relationship_dates": false
+      },
+      "depends_on": [
+        40,
+        58
+      ]
+    },
+    {
+      "seq": 102,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL027",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "EventRunRecipes",
+        "relationship_forward_verb": "ran under",
+        "relationship_inverse_verb": "governed",
+        "relationship_source_role": "ROL046",
+        "relationship_target_role": "ROL048",
+        "relationship_cardinality": "MANY_TO_ONE",
+        "relationship_dates": false
+      },
+      "depends_on": [
+        45,
+        58
+      ]
+    },
+    {
+      "seq": 103,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL028",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "EventPerformers",
+        "relationship_forward_verb": "was performed by",
+        "relationship_inverse_verb": "performed",
+        "relationship_source_role": "ROL049",
+        "relationship_target_role": "ROL050",
+        "relationship_cardinality": "MANY_TO_MANY",
+        "relationship_dates": true
+      },
+      "depends_on": [
+        58
+      ]
+    },
+    {
+      "seq": 104,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL029",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "EventBatchInputs",
+        "relationship_forward_verb": "consumed",
+        "relationship_inverse_verb": "was consumed by",
+        "relationship_source_role": "ROL051",
+        "relationship_target_role": "ROL052",
+        "relationship_cardinality": "MANY_TO_MANY",
+        "relationship_dates": false
+      },
+      "depends_on": [
+        21,
+        58
+      ]
+    },
+    {
+      "seq": 105,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL030",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "EventBatchOutputs",
+        "relationship_forward_verb": "produced",
+        "relationship_inverse_verb": "was produced by",
+        "relationship_source_role": "ROL053",
+        "relationship_target_role": "ROL054",
+        "relationship_cardinality": "MANY_TO_MANY",
+        "relationship_dates": false
+      },
+      "depends_on": [
+        21,
+        58
+      ]
+    },
+    {
+      "seq": 106,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL031",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "EventStoppageMachines",
+        "relationship_forward_verb": "stopped",
+        "relationship_inverse_verb": "was stopped in",
+        "relationship_source_role": "ROL055",
+        "relationship_target_role": "ROL056",
+        "relationship_cardinality": "MANY_TO_ONE",
+        "relationship_dates": false
+      },
+      "depends_on": [
+        35,
+        58
+      ]
+    },
+    {
+      "seq": 107,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL032",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "EventFindingBatches",
+        "relationship_forward_verb": "is raised against",
+        "relationship_inverse_verb": "is subject of",
+        "relationship_source_role": "ROL057",
+        "relationship_target_role": "ROL058",
+        "relationship_cardinality": "MANY_TO_MANY",
+        "relationship_dates": false
+      },
+      "depends_on": [
+        21,
+        58
+      ]
+    },
+    {
+      "seq": 108,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL033",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "EventComplaintBatches",
+        "relationship_forward_verb": "reports a problem with",
+        "relationship_inverse_verb": "is complained about in",
+        "relationship_source_role": "ROL059",
+        "relationship_target_role": "ROL060",
+        "relationship_cardinality": "MANY_TO_ONE",
+        "relationship_dates": false
+      },
+      "depends_on": [
+        21,
+        58
+      ]
+    },
+    {
+      "seq": 109,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL034",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "EventActionTriggers",
+        "relationship_forward_verb": "responds to",
+        "relationship_inverse_verb": "prompted",
+        "relationship_source_role": "ROL061",
+        "relationship_target_role": "ROL062",
+        "relationship_cardinality": "MANY_TO_MANY",
+        "relationship_dates": false
+      },
+      "depends_on": [
+        58
+      ]
+    },
+    {
+      "seq": 110,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL035",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "EventCorrectionTargets",
+        "relationship_forward_verb": "corrects",
+        "relationship_inverse_verb": "is corrected by",
+        "relationship_source_role": "ROL063",
+        "relationship_target_role": "ROL064",
+        "relationship_cardinality": "MANY_TO_ONE",
+        "relationship_dates": false
+      },
+      "depends_on": [
+        58
+      ]
+    },
+    {
+      "seq": 111,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL036",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "EventSupplierFindings",
+        "relationship_forward_verb": "is raised with",
+        "relationship_inverse_verb": "received",
+        "relationship_source_role": "ROL065",
+        "relationship_target_role": "ROL066",
+        "relationship_cardinality": "MANY_TO_ONE",
+        "relationship_dates": true
+      },
+      "depends_on": [
+        58
+      ]
+    },
+    {
+      "seq": 112,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL037",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "DocumentBatchDeclarations",
+        "relationship_forward_verb": "declares properties of",
+        "relationship_inverse_verb": "is declared by",
+        "relationship_source_role": "ROL067",
+        "relationship_target_role": "ROL068",
+        "relationship_cardinality": "MANY_TO_MANY",
+        "relationship_dates": false
+      },
+      "depends_on": [
+        21
+      ]
+    },
+    {
+      "seq": 113,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL038",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "EventStorageExposures",
+        "relationship_forward_verb": "exposed",
+        "relationship_inverse_verb": "was exposed in",
+        "relationship_source_role": "ROL069",
+        "relationship_target_role": "ROL070",
+        "relationship_cardinality": "MANY_TO_MANY",
+        "relationship_dates": false
+      },
+      "depends_on": [
+        21,
+        58
+      ]
+    },
+    {
+      "seq": 114,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR001",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductBillOfMaterialsSpecifiedQuantity",
+        "attribute_name": "ProductBillOfMaterialsSpecifiedQuantity",
+        "attribute_fqn_name": "ProductBillOfMaterialsSpecifiedQuantity",
+        "attribute_description": "How much of the input goes into one of the output product.",
+        "attribute_type": "FLOAT",
+        "attribute_lookup_type": null,
+        "attribute_concept": null,
+        "attribute_classification": null
+      },
+      "depends_on": [
+        76
+      ]
+    },
+    {
+      "seq": 115,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR002",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductBillOfMaterialsUnitOfMeasure",
+        "attribute_name": "ProductBillOfMaterialsUnitOfMeasure",
+        "attribute_fqn_name": "ProductBillOfMaterialsUnitOfMeasure",
+        "attribute_description": "The unit the specified quantity is expressed in.",
+        "attribute_type": "LOOKUP",
+        "attribute_lookup_type": "LKP009",
+        "attribute_concept": null,
+        "attribute_classification": null
+      },
+      "depends_on": [
+        14,
+        76
+      ]
+    },
+    {
+      "seq": 116,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR003",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductBillOfMaterialsPosition",
+        "attribute_name": "ProductBillOfMaterialsPosition",
+        "attribute_fqn_name": "ProductBillOfMaterialsPosition",
+        "attribute_description": "The place in the recipe this input fills.",
+        "attribute_type": "TEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": null,
+        "attribute_classification": null
+      },
+      "depends_on": [
+        76
+      ]
+    },
+    {
+      "seq": 117,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR004",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductBillOfMaterialsStructureVersion",
+        "attribute_name": "ProductBillOfMaterialsStructureVersion",
+        "attribute_fqn_name": "ProductBillOfMaterialsStructureVersion",
+        "attribute_description": "The version of the recipe this line belongs to.",
+        "attribute_type": "TEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": null,
+        "attribute_classification": null
+      },
+      "depends_on": [
+        76
+      ]
+    },
+    {
+      "seq": 118,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR005",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductBillOfMaterialsIsSubstitutable",
+        "attribute_name": "ProductBillOfMaterialsIsSubstitutable",
+        "attribute_fqn_name": "ProductBillOfMaterialsIsSubstitutable",
+        "attribute_description": "Whether an approved alternative may fill this place.",
+        "attribute_type": "BOOLEAN",
+        "attribute_lookup_type": null,
+        "attribute_concept": null,
+        "attribute_classification": null
+      },
+      "depends_on": [
+        76
+      ]
+    },
+    {
+      "seq": 119,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR006",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "InstanceBatchCompositionQuantity",
+        "attribute_name": "InstanceBatchCompositionQuantity",
+        "attribute_fqn_name": "InstanceBatchCompositionQuantity",
+        "attribute_description": "How much of the batch was incorporated into the unit.",
+        "attribute_type": "FLOAT",
+        "attribute_lookup_type": null,
+        "attribute_concept": null,
+        "attribute_classification": null
+      },
+      "depends_on": [
+        90
+      ]
+    },
+    {
+      "seq": 120,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR007",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductApprovedSourcesApprovalState",
+        "attribute_name": "ProductApprovedSourcesApprovalState",
+        "attribute_fqn_name": "ProductApprovedSourcesApprovalState",
+        "attribute_description": "Whether the approval is in force, suspended or lapsed.",
+        "attribute_type": "TEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": null,
+        "attribute_classification": null
+      },
+      "depends_on": [
+        78
+      ]
+    },
+    {
+      "seq": 121,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR008",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductContractManufactureScope",
+        "attribute_name": "ProductContractManufactureScope",
+        "attribute_fqn_name": "ProductContractManufactureScope",
+        "attribute_description": "Whether the outside manufacturer makes the product, packs it, or both.",
+        "attribute_type": "TEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": null,
+        "attribute_classification": null
+      },
+      "depends_on": [
+        80
+      ]
+    },
+    {
+      "seq": 122,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR009",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EquipmentInstallationsInstalledBy",
+        "attribute_name": "EquipmentInstallationsInstalledBy",
+        "attribute_fqn_name": "EquipmentInstallationsInstalledBy",
+        "attribute_description": "Who installed the machine at the place.",
+        "attribute_type": "USER",
+        "attribute_lookup_type": null,
+        "attribute_concept": null,
+        "attribute_classification": "INTERNAL"
+      },
+      "depends_on": [
+        86
+      ]
+    },
+    {
+      "seq": 123,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR010",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventPerformersCapacity",
+        "attribute_name": "EventPerformersCapacity",
+        "attribute_fqn_name": "EventPerformersCapacity",
+        "attribute_description": "In what capacity the person performed the work — operator, approver, releaser, second checker.",
+        "attribute_type": "TEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": null,
+        "attribute_classification": null
+      },
+      "depends_on": [
+        103
+      ]
+    },
+    {
+      "seq": 124,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR011",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventBatchInputsQuantityUsed",
+        "attribute_name": "EventBatchInputsQuantityUsed",
+        "attribute_fqn_name": "EventBatchInputsQuantityUsed",
+        "attribute_description": "How much of the input batch the run actually used.",
+        "attribute_type": "FLOAT",
+        "attribute_lookup_type": null,
+        "attribute_concept": null,
+        "attribute_classification": null
+      },
+      "depends_on": [
+        104
+      ]
+    },
+    {
+      "seq": 125,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR012",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventBatchOutputsQuantityProduced",
+        "attribute_name": "EventBatchOutputsQuantityProduced",
+        "attribute_fqn_name": "EventBatchOutputsQuantityProduced",
+        "attribute_description": "How much the run produced.",
+        "attribute_type": "FLOAT",
+        "attribute_lookup_type": null,
+        "attribute_concept": null,
+        "attribute_classification": null
+      },
+      "depends_on": [
+        105
+      ]
+    },
+    {
+      "seq": 126,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR013",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventStoppageMachinesFailureMode",
+        "attribute_name": "EventStoppageMachinesFailureMode",
+        "attribute_fqn_name": "EventStoppageMachinesFailureMode",
+        "attribute_description": "How the machine failed on this stoppage.",
+        "attribute_type": "TEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": null,
+        "attribute_classification": null
+      },
+      "depends_on": [
+        106
+      ]
+    },
+    {
+      "seq": 127,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR014",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "DocumentBatchDeclarationsVerified",
+        "attribute_name": "DocumentBatchDeclarationsVerified",
+        "attribute_fqn_name": "DocumentBatchDeclarationsVerified",
+        "attribute_description": "Whether the organisation checked what the document states.",
+        "attribute_type": "BOOLEAN",
+        "attribute_lookup_type": null,
+        "attribute_concept": null,
+        "attribute_classification": null
+      },
+      "depends_on": [
+        112
+      ]
+    },
+    {
+      "seq": 128,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR015",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventStorageExposuresDuration",
+        "attribute_name": "EventStorageExposuresDuration",
+        "attribute_fqn_name": "EventStorageExposuresDuration",
+        "attribute_description": "How long the batch was exposed to conditions outside the limits.",
+        "attribute_type": "FLOAT",
+        "attribute_lookup_type": null,
+        "attribute_concept": null,
+        "attribute_classification": null
+      },
+      "depends_on": [
+        113
+      ]
+    },
+    {
+      "seq": 129,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR016",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductName",
+        "attribute_name": "ProductName",
+        "attribute_fqn_name": "ProductName",
+        "attribute_description": "The name the product is known by.",
+        "attribute_type": "TEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ012",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        21
+      ]
+    },
+    {
+      "seq": 130,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR017",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductKind",
+        "attribute_name": "ProductKind",
+        "attribute_fqn_name": "ProductKind",
+        "attribute_description": "What the product is to this organisation.",
+        "attribute_type": "LOOKUP",
+        "attribute_lookup_type": "LKP001",
+        "attribute_concept": "SBJ012",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        6,
+        21
+      ]
+    },
+    {
+      "seq": 131,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR018",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductIsPurchased",
+        "attribute_name": "ProductIsPurchased",
+        "attribute_fqn_name": "ProductIsPurchased",
+        "attribute_description": "Whether the product is bought in, so that what it is made from is the supplier's to declare.",
+        "attribute_type": "BOOLEAN",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ012",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        21
+      ]
+    },
+    {
+      "seq": 132,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR019",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductIdentifiersType",
+        "attribute_name": "ProductIdentifiersType",
+        "attribute_fqn_name": "ProductIdentifiersType",
+        "attribute_description": "The scheme the identifier belongs to.",
+        "attribute_type": "LOOKUP",
+        "attribute_lookup_type": "LKP003",
+        "attribute_concept": "SBJ013",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        8,
+        22
+      ]
+    },
+    {
+      "seq": 133,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR020",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductIdentifiersValue",
+        "attribute_name": "ProductIdentifiersValue",
+        "attribute_fqn_name": "ProductIdentifiersValue",
+        "attribute_description": "The identifier itself.",
+        "attribute_type": "TEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ013",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        22
+      ]
+    },
+    {
+      "seq": 134,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR021",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductIdentifiersStartDate",
+        "attribute_name": "ProductIdentifiersStartDate",
+        "attribute_fqn_name": "ProductIdentifiersStartDate",
+        "attribute_description": "When the identifier came into use.",
+        "attribute_type": "DATE",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ013",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        22
+      ]
+    },
+    {
+      "seq": 135,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR022",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductIdentifiersExpiryDate",
+        "attribute_name": "ProductIdentifiersExpiryDate",
+        "attribute_fqn_name": "ProductIdentifiersExpiryDate",
+        "attribute_description": "When the identifier ceased to be used.",
+        "attribute_type": "DATE",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ013",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        22
+      ]
+    },
+    {
+      "seq": 136,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR023",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductSpecificationsVersion",
+        "attribute_name": "ProductSpecificationsVersion",
+        "attribute_fqn_name": "ProductSpecificationsVersion",
+        "attribute_description": "Which version of the specification this is.",
+        "attribute_type": "TEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ014",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        23
+      ]
+    },
+    {
+      "seq": 137,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR024",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductSpecificationsEffectiveFrom",
+        "attribute_name": "ProductSpecificationsEffectiveFrom",
+        "attribute_fqn_name": "ProductSpecificationsEffectiveFrom",
+        "attribute_description": "The date from which this version applies.",
+        "attribute_type": "DATE",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ014",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        23
+      ]
+    },
+    {
+      "seq": 138,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR025",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductSpecificationsLimit",
+        "attribute_name": "ProductSpecificationsLimit",
+        "attribute_fqn_name": "ProductSpecificationsLimit",
+        "attribute_description": "The limit a characteristic must fall within.",
+        "attribute_type": "TEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ014",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        23
+      ]
+    },
+    {
+      "seq": 139,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR026",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductStructureVersionsVersion",
+        "attribute_name": "ProductStructureVersionsVersion",
+        "attribute_fqn_name": "ProductStructureVersionsVersion",
+        "attribute_description": "Which version of the recipe this is.",
+        "attribute_type": "TEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ015",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        24
+      ]
+    },
+    {
+      "seq": 140,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR027",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductStructureVersionsEffectiveFrom",
+        "attribute_name": "ProductStructureVersionsEffectiveFrom",
+        "attribute_fqn_name": "ProductStructureVersionsEffectiveFrom",
+        "attribute_description": "The date from which this version of the recipe applies.",
+        "attribute_type": "DATE",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ015",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        24
+      ]
+    },
+    {
+      "seq": 141,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR028",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductStructureVersionsScope",
+        "attribute_name": "ProductStructureVersionsScope",
+        "attribute_fqn_name": "ProductStructureVersionsScope",
+        "attribute_description": "The site, market or period this version applies to.",
+        "attribute_type": "TEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ015",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        24
+      ]
+    },
+    {
+      "seq": 142,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR029",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductBatchesLotCode",
+        "attribute_name": "ProductBatchesLotCode",
+        "attribute_fqn_name": "ProductBatchesLotCode",
+        "attribute_description": "The lot code assigned when the batch was first packed or transformed.",
+        "attribute_type": "TEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ016",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        25
+      ]
+    },
+    {
+      "seq": 143,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR030",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductBatchesMadeOn",
+        "attribute_name": "ProductBatchesMadeOn",
+        "attribute_fqn_name": "ProductBatchesMadeOn",
+        "attribute_description": "When the batch was made or received.",
+        "attribute_type": "DATE",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ016",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        25
+      ]
+    },
+    {
+      "seq": 144,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR031",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductBatchesUsableUntil",
+        "attribute_name": "ProductBatchesUsableUntil",
+        "attribute_fqn_name": "ProductBatchesUsableUntil",
+        "attribute_description": "The latest date the batch may be used, taken from its inputs and its shelf life.",
+        "attribute_type": "DATE",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ016",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        25
+      ]
+    },
+    {
+      "seq": 145,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR032",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductBatchesQuantityMade",
+        "attribute_name": "ProductBatchesQuantityMade",
+        "attribute_fqn_name": "ProductBatchesQuantityMade",
+        "attribute_description": "How much the batch contains.",
+        "attribute_type": "FLOAT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ016",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        25
+      ]
+    },
+    {
+      "seq": 146,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR033",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductSubBatchesQuantity",
+        "attribute_name": "ProductSubBatchesQuantity",
+        "attribute_fqn_name": "ProductSubBatchesQuantity",
+        "attribute_description": "How much of the batch this part holds.",
+        "attribute_type": "FLOAT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ017",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        26
+      ]
+    },
+    {
+      "seq": 147,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR034",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductHazardsType",
+        "attribute_name": "ProductHazardsType",
+        "attribute_fqn_name": "ProductHazardsType",
+        "attribute_description": "The kind of hazard, which decides the declaration regime.",
+        "attribute_type": "LOOKUP",
+        "attribute_lookup_type": "LKP002",
+        "attribute_concept": "SBJ018",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        7,
+        27
+      ]
+    },
+    {
+      "seq": 148,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR035",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductHazardsSubstance",
+        "attribute_name": "ProductHazardsSubstance",
+        "attribute_fqn_name": "ProductHazardsSubstance",
+        "attribute_description": "The substance the hazard concerns, named as it must be declared.",
+        "attribute_type": "TEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ018",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        27
+      ]
+    },
+    {
+      "seq": 149,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR036",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductHazardsIsDeclaredBySupplier",
+        "attribute_name": "ProductHazardsIsDeclaredBySupplier",
+        "attribute_fqn_name": "ProductHazardsIsDeclaredBySupplier",
+        "attribute_description": "Whether the hazard is known only because a supplier declared it.",
+        "attribute_type": "BOOLEAN",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ018",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        27
+      ]
+    },
+    {
+      "seq": 150,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR037",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductDisclosuresSubstance",
+        "attribute_name": "ProductDisclosuresSubstance",
+        "attribute_fqn_name": "ProductDisclosuresSubstance",
+        "attribute_description": "The ingredient being disclosed.",
+        "attribute_type": "TEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ019",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        28
+      ]
+    },
+    {
+      "seq": 151,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR038",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductDisclosuresWeightBand",
+        "attribute_name": "ProductDisclosuresWeightBand",
+        "attribute_fqn_name": "ProductDisclosuresWeightBand",
+        "attribute_description": "How much of it there is, as the regime requires it to be stated.",
+        "attribute_type": "TEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ019",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        28
+      ]
+    },
+    {
+      "seq": 152,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR039",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductDisclosuresIsWithheld",
+        "attribute_name": "ProductDisclosuresIsWithheld",
+        "attribute_fqn_name": "ProductDisclosuresIsWithheld",
+        "attribute_description": "Whether the identity is withheld as confidential business information.",
+        "attribute_type": "BOOLEAN",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ019",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        28
+      ]
+    },
+    {
+      "seq": 153,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR040",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductOriginsCountry",
+        "attribute_name": "ProductOriginsCountry",
+        "attribute_fqn_name": "ProductOriginsCountry",
+        "attribute_description": "The country or region of origin stated.",
+        "attribute_type": "TEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ020",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        29
+      ]
+    },
+    {
+      "seq": 154,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR041",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductShelfLivesDays",
+        "attribute_name": "ProductShelfLivesDays",
+        "attribute_fqn_name": "ProductShelfLivesDays",
+        "attribute_description": "How many days the product lasts under the stated conditions.",
+        "attribute_type": "INTEGER",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ021",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        30
+      ]
+    },
+    {
+      "seq": 155,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR042",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductSubstitutionsConditions",
+        "attribute_name": "ProductSubstitutionsConditions",
+        "attribute_fqn_name": "ProductSubstitutionsConditions",
+        "attribute_description": "The conditions under which the alternative may be used.",
+        "attribute_type": "LONGTEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ022",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        31
+      ]
+    },
+    {
+      "seq": 156,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR043",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductVariantAxesAxis",
+        "attribute_name": "ProductVariantAxesAxis",
+        "attribute_fqn_name": "ProductVariantAxesAxis",
+        "attribute_description": "The dimension along which the family's members differ.",
+        "attribute_type": "TEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ023",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        32
+      ]
+    },
+    {
+      "seq": 157,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR044",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductCostingsStandardCost",
+        "attribute_name": "ProductCostingsStandardCost",
+        "attribute_fqn_name": "ProductCostingsStandardCost",
+        "attribute_description": "What the product was expected to cost, by element.",
+        "attribute_type": "CURRENCY",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ024",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        33
+      ]
+    },
+    {
+      "seq": 158,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR045",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductCostingsActualCost",
+        "attribute_name": "ProductCostingsActualCost",
+        "attribute_fqn_name": "ProductCostingsActualCost",
+        "attribute_description": "What the product actually cost, built from what went into it and what was done to it.",
+        "attribute_type": "CURRENCY",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ024",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        33
+      ]
+    },
+    {
+      "seq": 159,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR046",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductIdentityChangesMadeNewProduct",
+        "attribute_name": "ProductIdentityChangesMadeNewProduct",
+        "attribute_fqn_name": "ProductIdentityChangesMadeNewProduct",
+        "attribute_description": "Whether the change made a new product rather than a new version of what goes in.",
+        "attribute_type": "BOOLEAN",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ025",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        34
+      ]
+    },
+    {
+      "seq": 160,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR047",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductIdentityChangesReason",
+        "attribute_name": "ProductIdentityChangesReason",
+        "attribute_fqn_name": "ProductIdentityChangesReason",
+        "attribute_description": "Why the change was made, and which rule decided it.",
+        "attribute_type": "LONGTEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ025",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        34
+      ]
+    },
+    {
+      "seq": 161,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR048",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "InstanceBuiltOn",
+        "attribute_name": "InstanceBuiltOn",
+        "attribute_fqn_name": "InstanceBuiltOn",
+        "attribute_description": "When the unit was made.",
+        "attribute_type": "DATE",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ026",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        35
+      ]
+    },
+    {
+      "seq": 162,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR049",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "InstanceIdentifiersValue",
+        "attribute_name": "InstanceIdentifiersValue",
+        "attribute_fqn_name": "InstanceIdentifiersValue",
+        "attribute_description": "The serial or asset number itself.",
+        "attribute_type": "TEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ027",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        36
+      ]
+    },
+    {
+      "seq": 163,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR050",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "InstanceConditionsMeasure",
+        "attribute_name": "InstanceConditionsMeasure",
+        "attribute_fqn_name": "InstanceConditionsMeasure",
+        "attribute_description": "What was measured — hours run, cycles, wear, calibration result.",
+        "attribute_type": "TEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ028",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        37
+      ]
+    },
+    {
+      "seq": 164,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR051",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "InstanceConditionsValue",
+        "attribute_name": "InstanceConditionsValue",
+        "attribute_fqn_name": "InstanceConditionsValue",
+        "attribute_description": "The value measured.",
+        "attribute_type": "FLOAT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ028",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        37
+      ]
+    },
+    {
+      "seq": 165,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR052",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "InstanceFailureModesEffect",
+        "attribute_name": "InstanceFailureModesEffect",
+        "attribute_fqn_name": "InstanceFailureModesEffect",
+        "attribute_description": "What the failure causes when it happens.",
+        "attribute_type": "LONGTEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ029",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        38
+      ]
+    },
+    {
+      "seq": 166,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR053",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "InstanceCriticalitiesScore",
+        "attribute_name": "InstanceCriticalitiesScore",
+        "attribute_fqn_name": "InstanceCriticalitiesScore",
+        "attribute_description": "How much the machine matters, on the organisation's scale.",
+        "attribute_type": "INTEGER",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ030",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        39
+      ]
+    },
+    {
+      "seq": 167,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR054",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EquipmentPositionLevel",
+        "attribute_name": "EquipmentPositionLevel",
+        "attribute_fqn_name": "EquipmentPositionLevel",
+        "attribute_description": "Which level of the plant structure the place sits at.",
+        "attribute_type": "LOOKUP",
+        "attribute_lookup_type": "LKP005",
+        "attribute_concept": "SBJ031",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        10,
+        40
+      ]
+    },
+    {
+      "seq": 168,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR055",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EquipmentPositionName",
+        "attribute_name": "EquipmentPositionName",
+        "attribute_fqn_name": "EquipmentPositionName",
+        "attribute_description": "The name the place is known by on the floor.",
+        "attribute_type": "TEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ031",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        40
+      ]
+    },
+    {
+      "seq": 169,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR056",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EquipmentCapabilitiesCapacity",
+        "attribute_name": "EquipmentCapabilitiesCapacity",
+        "attribute_fqn_name": "EquipmentCapabilitiesCapacity",
+        "attribute_description": "How much the place can handle, in its own unit.",
+        "attribute_type": "FLOAT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ033",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        42
+      ]
+    },
+    {
+      "seq": 170,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR057",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EquipmentSequencingRulesReason",
+        "attribute_name": "EquipmentSequencingRulesReason",
+        "attribute_fqn_name": "EquipmentSequencingRulesReason",
+        "attribute_description": "Why the constraint exists, and whether it is enforced or advisory.",
+        "attribute_type": "LONGTEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ034",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        43
+      ]
+    },
+    {
+      "seq": 171,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR058",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EquipmentSequencingRulesRequiresClean",
+        "attribute_name": "EquipmentSequencingRulesRequiresClean",
+        "attribute_fqn_name": "EquipmentSequencingRulesRequiresClean",
+        "attribute_description": "Whether a clean is required between the two products.",
+        "attribute_type": "BOOLEAN",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ034",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        43
+      ]
+    },
+    {
+      "seq": 172,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR059",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EquipmentMaintenancePlansTrigger",
+        "attribute_name": "EquipmentMaintenancePlansTrigger",
+        "attribute_fqn_name": "EquipmentMaintenancePlansTrigger",
+        "attribute_description": "What prompts the work — a date, a count, a condition.",
+        "attribute_type": "TEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ035",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        44
+      ]
+    },
+    {
+      "seq": 173,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR060",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProcessSegmentName",
+        "attribute_name": "ProcessSegmentName",
+        "attribute_fqn_name": "ProcessSegmentName",
+        "attribute_description": "The name the step is known by.",
+        "attribute_type": "TEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ036",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        45
+      ]
+    },
+    {
+      "seq": 174,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR061",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProcessSegmentRequirementsKind",
+        "attribute_name": "ProcessSegmentRequirementsKind",
+        "attribute_fqn_name": "ProcessSegmentRequirementsKind",
+        "attribute_description": "What kind of thing the step needs — a capability, a qualification, a kind of material.",
+        "attribute_type": "TEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ037",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        46
+      ]
+    },
+    {
+      "seq": 175,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR062",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProcessParametersLowerLimit",
+        "attribute_name": "ProcessParametersLowerLimit",
+        "attribute_fqn_name": "ProcessParametersLowerLimit",
+        "attribute_description": "The lowest value the setting may take.",
+        "attribute_type": "FLOAT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ038",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        47
+      ]
+    },
+    {
+      "seq": 176,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR063",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProcessParametersUpperLimit",
+        "attribute_name": "ProcessParametersUpperLimit",
+        "attribute_fqn_name": "ProcessParametersUpperLimit",
+        "attribute_description": "The highest value the setting may take.",
+        "attribute_type": "FLOAT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ038",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        47
+      ]
+    },
+    {
+      "seq": 177,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR064",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProcessParameterValuesValue",
+        "attribute_name": "ProcessParameterValuesValue",
+        "attribute_fqn_name": "ProcessParameterValuesValue",
+        "attribute_description": "The value the setting is run at for this product at this place.",
+        "attribute_type": "FLOAT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ042",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        51
+      ]
+    },
+    {
+      "seq": 178,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR065",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProcessRecipeLevelsLevel",
+        "attribute_name": "ProcessRecipeLevelsLevel",
+        "attribute_fqn_name": "ProcessRecipeLevelsLevel",
+        "attribute_description": "How specific this statement of the method is.",
+        "attribute_type": "LOOKUP",
+        "attribute_lookup_type": "LKP004",
+        "attribute_concept": "SBJ041",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        9,
+        50
+      ]
+    },
+    {
+      "seq": 179,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR066",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProcessRecipeLevelsIssuedOn",
+        "attribute_name": "ProcessRecipeLevelsIssuedOn",
+        "attribute_fqn_name": "ProcessRecipeLevelsIssuedOn",
+        "attribute_description": "When this statement of the method was issued.",
+        "attribute_type": "DATE",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ041",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        50
+      ]
+    },
+    {
+      "seq": 180,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR067",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProcessSamplingPlansFrequency",
+        "attribute_name": "ProcessSamplingPlansFrequency",
+        "attribute_fqn_name": "ProcessSamplingPlansFrequency",
+        "attribute_description": "How often a sample is taken at this step.",
+        "attribute_type": "TEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ039",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        48
+      ]
+    },
+    {
+      "seq": 181,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR068",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProcessRoutingsName",
+        "attribute_name": "ProcessRoutingsName",
+        "attribute_fqn_name": "ProcessRoutingsName",
+        "attribute_description": "The name the method is known by.",
+        "attribute_type": "TEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ040",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        49
+      ]
+    },
+    {
+      "seq": 182,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR069",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "LocationName",
+        "attribute_name": "LocationName",
+        "attribute_fqn_name": "LocationName",
+        "attribute_description": "The name the place is known by.",
+        "attribute_type": "TEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ043",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        52
+      ]
+    },
+    {
+      "seq": 183,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR070",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "LocationIdentifiersValue",
+        "attribute_name": "LocationIdentifiersValue",
+        "attribute_fqn_name": "LocationIdentifiersValue",
+        "attribute_description": "The identifier itself.",
+        "attribute_type": "TEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ044",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        53
+      ]
+    },
+    {
+      "seq": 184,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR071",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "LocationIdentifiersIssuer",
+        "attribute_name": "LocationIdentifiersIssuer",
+        "attribute_fqn_name": "LocationIdentifiersIssuer",
+        "attribute_description": "Who issued the identifier.",
+        "attribute_type": "TEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ044",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        53
+      ]
+    },
+    {
+      "seq": 185,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR072",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "LocationStorageConditionsLowerLimit",
+        "attribute_name": "LocationStorageConditionsLowerLimit",
+        "attribute_fqn_name": "LocationStorageConditionsLowerLimit",
+        "attribute_description": "The lowest value the condition may reach.",
+        "attribute_type": "FLOAT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ045",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        54
+      ]
+    },
+    {
+      "seq": 186,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR073",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "LocationStorageConditionsUpperLimit",
+        "attribute_name": "LocationStorageConditionsUpperLimit",
+        "attribute_fqn_name": "LocationStorageConditionsUpperLimit",
+        "attribute_description": "The highest value the condition may reach.",
+        "attribute_type": "FLOAT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ045",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        54
+      ]
+    },
+    {
+      "seq": 187,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR074",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "PersonQualificationRecordsAwardedOn",
+        "attribute_name": "PersonQualificationRecordsAwardedOn",
+        "attribute_fqn_name": "PersonQualificationRecordsAwardedOn",
+        "attribute_description": "When the qualification was awarded.",
+        "attribute_type": "DATE",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ002",
+        "attribute_classification": "INTERNAL_PII"
+      },
+      "depends_on": [
+        15
+      ]
+    },
+    {
+      "seq": 188,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR075",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "PersonQualificationRecordsExpiresOn",
+        "attribute_name": "PersonQualificationRecordsExpiresOn",
+        "attribute_fqn_name": "PersonQualificationRecordsExpiresOn",
+        "attribute_description": "When the qualification expires.",
+        "attribute_type": "DATE",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ002",
+        "attribute_classification": "INTERNAL_PII"
+      },
+      "depends_on": [
+        15
+      ]
+    },
+    {
+      "seq": 189,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR076",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "PersonShiftAssignmentsStartedAt",
+        "attribute_name": "PersonShiftAssignmentsStartedAt",
+        "attribute_fqn_name": "PersonShiftAssignmentsStartedAt",
+        "attribute_description": "When the period of work began.",
+        "attribute_type": "DATETIME",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ003",
+        "attribute_classification": "INTERNAL_PII"
+      },
+      "depends_on": [
+        16
+      ]
+    },
+    {
+      "seq": 190,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR077",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "PersonSignaturesMeaning",
+        "attribute_name": "PersonSignaturesMeaning",
+        "attribute_fqn_name": "PersonSignaturesMeaning",
+        "attribute_description": "What the signature meant — approved, reviewed, checked.",
+        "attribute_type": "TEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ004",
+        "attribute_classification": "INTERNAL_PII"
+      },
+      "depends_on": [
+        17
+      ]
+    },
+    {
+      "seq": 191,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR078",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "PersonSignaturesSignedAt",
+        "attribute_name": "PersonSignaturesSignedAt",
+        "attribute_fqn_name": "PersonSignaturesSignedAt",
+        "attribute_description": "When the signature was applied.",
+        "attribute_type": "DATETIME",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ004",
+        "attribute_classification": "INTERNAL_PII"
+      },
+      "depends_on": [
+        17
+      ]
+    },
+    {
+      "seq": 192,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR079",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "PersonSignaturesIsSecondCheck",
+        "attribute_name": "PersonSignaturesIsSecondCheck",
+        "attribute_fqn_name": "PersonSignaturesIsSecondCheck",
+        "attribute_description": "Whether this signature is the second qualified check of the step.",
+        "attribute_type": "BOOLEAN",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ004",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        17
+      ]
+    },
+    {
+      "seq": 193,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR080",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "LegalEntityAssessmentsScope",
+        "attribute_name": "LegalEntityAssessmentsScope",
+        "attribute_fqn_name": "LegalEntityAssessmentsScope",
+        "attribute_description": "What the assessment covered.",
+        "attribute_type": "LONGTEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ008",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        18
+      ]
+    },
+    {
+      "seq": 194,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR081",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "LegalEntityAssessmentsValidUntil",
+        "attribute_name": "LegalEntityAssessmentsValidUntil",
+        "attribute_fqn_name": "LegalEntityAssessmentsValidUntil",
+        "attribute_description": "When the assessment ceases to be valid.",
+        "attribute_type": "DATE",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ008",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        18
+      ]
+    },
+    {
+      "seq": 195,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR082",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "LegalEntitySupplierRequestsResponse",
+        "attribute_name": "LegalEntitySupplierRequestsResponse",
+        "attribute_fqn_name": "LegalEntitySupplierRequestsResponse",
+        "attribute_description": "What the supplier said in reply.",
+        "attribute_type": "LONGTEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ009",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        19
+      ]
+    },
+    {
+      "seq": 196,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR083",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "DocumentDeclarationsProperty",
+        "attribute_name": "DocumentDeclarationsProperty",
+        "attribute_fqn_name": "DocumentDeclarationsProperty",
+        "attribute_description": "The property the document states.",
+        "attribute_type": "TEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ011",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        20
+      ]
+    },
+    {
+      "seq": 197,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR084",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "DocumentDeclarationsValue",
+        "attribute_name": "DocumentDeclarationsValue",
+        "attribute_fqn_name": "DocumentDeclarationsValue",
+        "attribute_description": "The value the document states for it.",
+        "attribute_type": "TEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ011",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        20
+      ]
+    },
+    {
+      "seq": 198,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR085",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "TransactionKind",
+        "attribute_name": "TransactionKind",
+        "attribute_fqn_name": "TransactionKind",
+        "attribute_description": "What kind of exchange this is.",
+        "attribute_type": "LOOKUP",
+        "attribute_lookup_type": "LKP008",
+        "attribute_concept": "SBJ046",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        13,
+        55
+      ]
+    },
+    {
+      "seq": 199,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR086",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "TransactionOccurredAt",
+        "attribute_name": "TransactionOccurredAt",
+        "attribute_fqn_name": "TransactionOccurredAt",
+        "attribute_description": "When the exchange happened.",
+        "attribute_type": "DATETIME",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ046",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        55
+      ]
+    },
+    {
+      "seq": 200,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR087",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "TransactionTitlePassesOnReceipt",
+        "attribute_name": "TransactionTitlePassesOnReceipt",
+        "attribute_fqn_name": "TransactionTitlePassesOnReceipt",
+        "attribute_description": "Whether title passes to the organisation when the goods arrive.",
+        "attribute_type": "BOOLEAN",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ046",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        55
+      ]
+    },
+    {
+      "seq": 201,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR088",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "TransactionLinesQuantity",
+        "attribute_name": "TransactionLinesQuantity",
+        "attribute_fqn_name": "TransactionLinesQuantity",
+        "attribute_description": "How much of the product the line concerns.",
+        "attribute_type": "FLOAT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ047",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        56
+      ]
+    },
+    {
+      "seq": 202,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR089",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "TransactionInventoryPositionsCondition",
+        "attribute_name": "TransactionInventoryPositionsCondition",
+        "attribute_fqn_name": "TransactionInventoryPositionsCondition",
+        "attribute_description": "Whether the stock is available, on hold or rejected.",
+        "attribute_type": "TEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ048",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        57
+      ]
+    },
+    {
+      "seq": 203,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR090",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "TransactionInventoryPositionsQuantity",
+        "attribute_name": "TransactionInventoryPositionsQuantity",
+        "attribute_fqn_name": "TransactionInventoryPositionsQuantity",
+        "attribute_description": "How much is held.",
+        "attribute_type": "FLOAT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ048",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        57
+      ]
+    },
+    {
+      "seq": 204,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR091",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "TransactionInventoryPositionsCountedAt",
+        "attribute_name": "TransactionInventoryPositionsCountedAt",
+        "attribute_fqn_name": "TransactionInventoryPositionsCountedAt",
+        "attribute_description": "When the quantity was established.",
+        "attribute_type": "DATETIME",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ048",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        57
+      ]
+    },
+    {
+      "seq": 205,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR092",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventOccurredAt",
+        "attribute_name": "EventOccurredAt",
+        "attribute_fqn_name": "EventOccurredAt",
+        "attribute_description": "When it happened.",
+        "attribute_type": "DATETIME",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ049",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        58
+      ]
+    },
+    {
+      "seq": 206,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR093",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventProductionRunsStartedAt",
+        "attribute_name": "EventProductionRunsStartedAt",
+        "attribute_fqn_name": "EventProductionRunsStartedAt",
+        "attribute_description": "When the run began.",
+        "attribute_type": "DATETIME",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ051",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        60
+      ]
+    },
+    {
+      "seq": 207,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR094",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventProductionRunsEndedAt",
+        "attribute_name": "EventProductionRunsEndedAt",
+        "attribute_fqn_name": "EventProductionRunsEndedAt",
+        "attribute_description": "When the run ended.",
+        "attribute_type": "DATETIME",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ051",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        60
+      ]
+    },
+    {
+      "seq": 208,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR095",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventMaterialConsumptionsYieldVariance",
+        "attribute_name": "EventMaterialConsumptionsYieldVariance",
+        "attribute_fqn_name": "EventMaterialConsumptionsYieldVariance",
+        "attribute_description": "The difference between what the recipe specified and what was used.",
+        "attribute_type": "FLOAT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ052",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        61
+      ]
+    },
+    {
+      "seq": 209,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR096",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventBatchSplitsReason",
+        "attribute_name": "EventBatchSplitsReason",
+        "attribute_fqn_name": "EventBatchSplitsReason",
+        "attribute_description": "Why the batch was split or combined.",
+        "attribute_type": "TEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ053",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        62
+      ]
+    },
+    {
+      "seq": 210,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR097",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventChangeoversDuration",
+        "attribute_name": "EventChangeoversDuration",
+        "attribute_fqn_name": "EventChangeoversDuration",
+        "attribute_description": "How long the changeover took.",
+        "attribute_type": "FLOAT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ054",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        63
+      ]
+    },
+    {
+      "seq": 211,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR098",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventChangeoversIncludedClean",
+        "attribute_name": "EventChangeoversIncludedClean",
+        "attribute_fqn_name": "EventChangeoversIncludedClean",
+        "attribute_description": "Whether the line was cleaned during the changeover.",
+        "attribute_type": "BOOLEAN",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ054",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        63
+      ]
+    },
+    {
+      "seq": 212,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR099",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventStoppagesReason",
+        "attribute_name": "EventStoppagesReason",
+        "attribute_fqn_name": "EventStoppagesReason",
+        "attribute_description": "Why production stopped.",
+        "attribute_type": "LOOKUP",
+        "attribute_lookup_type": "LKP006",
+        "attribute_concept": "SBJ055",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        11,
+        64
+      ]
+    },
+    {
+      "seq": 213,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR100",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventStoppagesStartedAt",
+        "attribute_name": "EventStoppagesStartedAt",
+        "attribute_fqn_name": "EventStoppagesStartedAt",
+        "attribute_description": "When production stopped.",
+        "attribute_type": "DATETIME",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ055",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        64
+      ]
+    },
+    {
+      "seq": 214,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR101",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventStoppagesEndedAt",
+        "attribute_name": "EventStoppagesEndedAt",
+        "attribute_fqn_name": "EventStoppagesEndedAt",
+        "attribute_description": "When production resumed.",
+        "attribute_type": "DATETIME",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ055",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        64
+      ]
+    },
+    {
+      "seq": 215,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR102",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventMaintenanceWorkStoppageReference",
+        "attribute_name": "EventMaintenanceWorkStoppageReference",
+        "attribute_fqn_name": "EventMaintenanceWorkStoppageReference",
+        "attribute_description": "The stoppage this work responded to, so production loss and repair describe one event.",
+        "attribute_type": "TEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ056",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        65
+      ]
+    },
+    {
+      "seq": 216,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR103",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventTestsMethod",
+        "attribute_name": "EventTestsMethod",
+        "attribute_fqn_name": "EventTestsMethod",
+        "attribute_description": "The method the test was performed by.",
+        "attribute_type": "TEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ057",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        66
+      ]
+    },
+    {
+      "seq": 217,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR104",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventTestsResult",
+        "attribute_name": "EventTestsResult",
+        "attribute_fqn_name": "EventTestsResult",
+        "attribute_description": "The result the test returned.",
+        "attribute_type": "TEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ057",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        66
+      ]
+    },
+    {
+      "seq": 218,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR105",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventTestsConformed",
+        "attribute_name": "EventTestsConformed",
+        "attribute_fqn_name": "EventTestsConformed",
+        "attribute_description": "Whether the result met the specification in force.",
+        "attribute_type": "BOOLEAN",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ057",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        66
+      ]
+    },
+    {
+      "seq": 219,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR106",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventDeviationsClassification",
+        "attribute_name": "EventDeviationsClassification",
+        "attribute_fqn_name": "EventDeviationsClassification",
+        "attribute_description": "How serious the departure is.",
+        "attribute_type": "TEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ058",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        67
+      ]
+    },
+    {
+      "seq": 220,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR107",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventDeviationsContainedAt",
+        "attribute_name": "EventDeviationsContainedAt",
+        "attribute_fqn_name": "EventDeviationsContainedAt",
+        "attribute_description": "When the affected material was held back.",
+        "attribute_type": "DATETIME",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ058",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        67
+      ]
+    },
+    {
+      "seq": 221,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR108",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventNonConformancesClassification",
+        "attribute_name": "EventNonConformancesClassification",
+        "attribute_fqn_name": "EventNonConformancesClassification",
+        "attribute_description": "How serious the failure is.",
+        "attribute_type": "TEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ059",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        68
+      ]
+    },
+    {
+      "seq": 222,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR109",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventNonConformancesContainedAt",
+        "attribute_name": "EventNonConformancesContainedAt",
+        "attribute_fqn_name": "EventNonConformancesContainedAt",
+        "attribute_description": "When the affected material was held back.",
+        "attribute_type": "DATETIME",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ059",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        68
+      ]
+    },
+    {
+      "seq": 223,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR110",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventDispositionsDecision",
+        "attribute_name": "EventDispositionsDecision",
+        "attribute_fqn_name": "EventDispositionsDecision",
+        "attribute_description": "What was decided about the failed material.",
+        "attribute_type": "LOOKUP",
+        "attribute_lookup_type": "LKP007",
+        "attribute_concept": "SBJ060",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        12,
+        69
+      ]
+    },
+    {
+      "seq": 224,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR111",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventDispositionsJustification",
+        "attribute_name": "EventDispositionsJustification",
+        "attribute_fqn_name": "EventDispositionsJustification",
+        "attribute_description": "Why that decision was taken.",
+        "attribute_type": "LONGTEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ060",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        69
+      ]
+    },
+    {
+      "seq": 225,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR112",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventCorrectiveActionsRootCause",
+        "attribute_name": "EventCorrectiveActionsRootCause",
+        "attribute_fqn_name": "EventCorrectiveActionsRootCause",
+        "attribute_description": "The cause found by investigation.",
+        "attribute_type": "LONGTEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ061",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        70
+      ]
+    },
+    {
+      "seq": 226,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR113",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventCorrectiveActionsEffectivenessVerifiedAt",
+        "attribute_name": "EventCorrectiveActionsEffectivenessVerifiedAt",
+        "attribute_fqn_name": "EventCorrectiveActionsEffectivenessVerifiedAt",
+        "attribute_description": "When the action was shown to have worked.",
+        "attribute_type": "DATE",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ061",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        70
+      ]
+    },
+    {
+      "seq": 227,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR114",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventCorrectiveActionsClosedAt",
+        "attribute_name": "EventCorrectiveActionsClosedAt",
+        "attribute_fqn_name": "EventCorrectiveActionsClosedAt",
+        "attribute_description": "When the action was closed.",
+        "attribute_type": "DATE",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ061",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        70
+      ]
+    },
+    {
+      "seq": 228,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR115",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventReleasesBasis",
+        "attribute_name": "EventReleasesBasis",
+        "attribute_fqn_name": "EventReleasesBasis",
+        "attribute_description": "What the release was made on the strength of.",
+        "attribute_type": "LONGTEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ062",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        71
+      ]
+    },
+    {
+      "seq": 229,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR116",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventReleasesReleasedAt",
+        "attribute_name": "EventReleasesReleasedAt",
+        "attribute_fqn_name": "EventReleasesReleasedAt",
+        "attribute_description": "When the output was made available.",
+        "attribute_type": "DATETIME",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ062",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        71
+      ]
+    },
+    {
+      "seq": 230,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR117",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventRecallsScope",
+        "attribute_name": "EventRecallsScope",
+        "attribute_fqn_name": "EventRecallsScope",
+        "attribute_description": "What the incident covers.",
+        "attribute_type": "LONGTEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ063",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        72
+      ]
+    },
+    {
+      "seq": 231,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR118",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventComplaintsReport",
+        "attribute_name": "EventComplaintsReport",
+        "attribute_fqn_name": "EventComplaintsReport",
+        "attribute_description": "What the person outside the organisation reported.",
+        "attribute_type": "LONGTEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ064",
+        "attribute_classification": "CUSTOMER"
+      },
+      "depends_on": [
+        73
+      ]
+    },
+    {
+      "seq": 232,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR119",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventCorrectionsReason",
+        "attribute_name": "EventCorrectionsReason",
+        "attribute_fqn_name": "EventCorrectionsReason",
+        "attribute_description": "Why the record needed correcting.",
+        "attribute_type": "LONGTEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ065",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        74
+      ]
+    },
+    {
+      "seq": 233,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR120",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventStorageBreachesStartedAt",
+        "attribute_name": "EventStorageBreachesStartedAt",
+        "attribute_fqn_name": "EventStorageBreachesStartedAt",
+        "attribute_description": "When the conditions went outside their limits.",
+        "attribute_type": "DATETIME",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ066",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        75
+      ]
+    }
+  ]
+}

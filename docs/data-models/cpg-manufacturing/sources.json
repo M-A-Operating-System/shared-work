@@ -1,0 +1,618 @@
+[
+  {
+    "id": "SRC001",
+    "title": "OPC 10030 ISA-95 Common Object Model — ISA-95 Base Information Model",
+    "organisation": "OPC Foundation",
+    "url": "https://reference.opcfoundation.org/specs/OPC-10030/7",
+    "retrieved": "2026-09-22",
+    "scope_ids": [
+      "SCI004"
+    ],
+    "type": "standard",
+    "establishes": "ISA-95 sets out a role-based equipment hierarchy — enterprise, site, area, work centre, work unit, equipment module and control module — and records a person's qualifications alongside results.",
+    "why_included": "The formal standard for how a factory is structured. The only source defining the levels of the plant, and the basis for keeping a place on a line separate from the machine in it.",
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SRC002",
+    "title": "ISA-88",
+    "organisation": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/ISA-88",
+    "retrieved": "2026-09-22",
+    "scope_ids": [
+      "SCI003"
+    ],
+    "type": "reference-model",
+    "establishes": "A batch procedure is an ordered set of unit procedures, operations and phases; recipes are general, site, master or control, and carry a formula, equipment requirements and a procedure.",
+    "why_included": "The standard for how batch recipes are structured. It establishes the four levels of a recipe and that a recipe names the equipment it needs.",
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SRC003",
+    "title": "ISA-88 (S88) Batch Control Standard",
+    "organisation": "SG Systems Global",
+    "url": "https://sgsystemsglobal.com/?p=16813",
+    "retrieved": "2026-09-22",
+    "scope_ids": [
+      "SCI003"
+    ],
+    "type": "practitioner",
+    "establishes": "S88 separates what is to be done from how equipment is driven, with parameter limits, recipe hierarchy, and batch records under electronic-record rules.",
+    "why_included": "A practitioner reading of ISA-88. It confirms that recipes and equipment are held apart in practice and that parameters carry limits.",
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SRC004",
+    "title": "ISA-88",
+    "organisation": "Fabrico",
+    "url": "https://www.fabrico.io/blog/isa-88/",
+    "retrieved": "2026-09-22",
+    "scope_ids": [
+      "SCI003",
+      "SCI004"
+    ],
+    "type": "practitioner",
+    "establishes": "The equipment model says what the plant can do and the recipe says what to do; a recipe asks for 'heat to 80 for 20 minutes' and a new product variant becomes a new recipe, not new code.",
+    "why_included": "Shows the recipe and the method used across several products on one tank, and that the plant structure maps onto how maintenance records machines.",
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SRC005",
+    "title": "Batch Genealogy",
+    "organisation": "SG Systems Global",
+    "url": "https://sgsystemsglobal.com/?p=15659",
+    "retrieved": "2026-09-22",
+    "scope_ids": [
+      "SCI005",
+      "SCI007"
+    ],
+    "type": "practitioner",
+    "establishes": "Genealogy links every raw-material lot, intermediate, step, test, packaging operation and shipping unit; the bill of materials defines expected links and the batch record the links that actually occurred, including splits and merges.",
+    "why_included": "The clearest source separating what a batch should have used from what it did use. Also the main source on splitting and merging lots.",
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SRC006",
+    "title": "MES Traceability and Genealogy",
+    "organisation": "GE Vernova",
+    "url": "https://gevernova.com/software/blog/mes-traceability-genealogy",
+    "retrieved": "2026-09-22",
+    "scope_ids": [
+      "SCI005",
+      "SCI007"
+    ],
+    "type": "practitioner",
+    "establishes": "Manufacturers need to answer which raw-material lots went into a batch, which finished products were affected, which operators and equipment were involved, and whether checks were completed.",
+    "why_included": "States the questions a plant is asked in plain terms. Several data requirements are those questions.",
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SRC007",
+    "title": "How to do batch tracking for manufacturing",
+    "organisation": "Cleverence",
+    "url": "https://www.cleverence.com/amp/articles/business-blogs/how-to-batch-tracking-for-manufacturing-7284/",
+    "retrieved": "2026-09-22",
+    "scope_ids": [
+      "SCI005",
+      "SCI007",
+      "SCI008"
+    ],
+    "type": "practitioner",
+    "establishes": "Many manufacturers track some parts by serial number and bulk materials by batch; a blend of two lots must record both; returned stock keeps its batch identity and remaining shelf life.",
+    "why_included": "The only source stating that serial and batch tracking are mixed within one operation.",
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SRC008",
+    "title": "What is a manufacturing execution system?",
+    "organisation": "IBM",
+    "url": "https://www.ibm.com/topics/mes-system",
+    "retrieved": "2026-09-22",
+    "scope_ids": [
+      "SCI002",
+      "SCI005"
+    ],
+    "type": "reference-model",
+    "establishes": "Food and beverage production systems manage recipes, formulation, lot traceability and allergen control.",
+    "why_included": "A general reference placing recipes, formulation and allergen control together in food manufacturing.",
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SRC009",
+    "title": "FSMA Final Rule on Requirements for Additional Traceability Records for Certain Foods",
+    "organisation": "US Food and Drug Administration",
+    "url": "https://www.fda.gov/food/food-safety-modernization-act-fsma/fsma-proposed-rule-food-traceability",
+    "retrieved": "2026-09-22",
+    "scope_ids": [
+      "SCI007"
+    ],
+    "type": "regulatory",
+    "establishes": "Businesses handling listed foods must keep key data elements for critical tracking events and provide them to the FDA within 24 hours, and must share information with supply-chain partners.",
+    "why_included": "The regulation setting the twenty-four-hour limit on traceability records. The primary legal source for recall.",
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SRC010",
+    "title": "FDA FSMA 204 Food Traceability Rule",
+    "organisation": "NC State Extension",
+    "url": "https://foodbusiness.ces.ncsu.edu/news/fda-fsma-204-food-traceability-rule/",
+    "retrieved": "2026-09-22",
+    "scope_ids": [
+      "SCI007"
+    ],
+    "type": "regulatory",
+    "establishes": "The FDA has proposed extending the FSMA 204 compliance date to 20 July 2028; critical tracking events include packing, shipping and receiving.",
+    "why_included": "Gives the current compliance date, which the model must be ready for.",
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SRC011",
+    "title": "FSMA 204 General Summary",
+    "organisation": "Famous Software",
+    "url": "https://support.famoussoftware.com/article/fsma-204-general-summary",
+    "retrieved": "2026-09-22",
+    "scope_ids": [
+      "SCI007"
+    ],
+    "type": "practitioner",
+    "establishes": "A traceability lot code is assigned at initial packing or transformation, linked at each tracking event, exchanged between trading partners, and kept for two years; its source may be identified by registration number, location number or web address.",
+    "why_included": "States when lot codes are assigned, how long they are kept, and that places are identified by several authorities.",
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SRC012",
+    "title": "Nonconformance: Definition, Types, Causes, and Process",
+    "organisation": "SimplerQMS",
+    "url": "https://simplerqms.com/non-conformance/",
+    "retrieved": "2026-09-22",
+    "scope_ids": [
+      "SCI006"
+    ],
+    "type": "practitioner",
+    "establishes": "A deviation is a departure from an approved procedure; a nonconformance is a failure to meet a requirement; nonconformances are classified minor, major or critical.",
+    "why_included": "Draws the line between a departure from procedure and a failure against specification.",
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SRC013",
+    "title": "Deviation Management Process in GMP",
+    "organisation": "GMP Insiders",
+    "url": "https://gmpinsiders.com/deviation-management-process/",
+    "retrieved": "2026-09-22",
+    "scope_ids": [
+      "SCI006"
+    ],
+    "type": "practitioner",
+    "establishes": "Deviations are recorded, risk-classified and investigated, lead to corrective action, and support decisions about what to do with the batch.",
+    "why_included": "Connects a departure from procedure to investigation, corrective action and the decision on the batch.",
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SRC014",
+    "title": "Non-conformance report",
+    "organisation": "Fabrico",
+    "url": "https://www.fabrico.io/de/blog/non-conformance-report/",
+    "retrieved": "2026-09-22",
+    "scope_ids": [
+      "SCI006"
+    ],
+    "type": "practitioner",
+    "establishes": "Affected material is contained, a disposition decided — use as is, rework, repair, scrap or return to supplier — with approvals, root cause found for significant or repeat issues, and closure verified.",
+    "why_included": "Sets out the disposition choices and that each needs approval.",
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SRC015",
+    "title": "Deviation management",
+    "organisation": "Pharmaceutical Technology",
+    "url": "https://www.pharmaceutical-technology.com/?p=1983",
+    "retrieved": "2026-09-22",
+    "scope_ids": [
+      "SCI006"
+    ],
+    "type": "practitioner",
+    "establishes": "US GMP rule 21 CFR 211.192 requires a thorough investigation of any deviation, with conclusions and follow-up recorded.",
+    "why_included": "The regulatory basis for investigating every departure from procedure.",
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SRC016",
+    "title": "MES and CMMS integration",
+    "organisation": "OxMaint",
+    "url": "https://oxmaint.com/industries/manufacturing-plant/manufacturing-execution-system-maintenance-integration-mes",
+    "retrieved": "2026-09-22",
+    "scope_ids": [
+      "SCI004",
+      "SCI005"
+    ],
+    "type": "practitioner",
+    "establishes": "The production system often knows a line stopped with a reason code while the maintenance system still shows the machine as available; connecting them makes one stoppage drive both.",
+    "why_included": "The source for recording a stoppage once, seen by production and maintenance alike.",
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SRC017",
+    "title": "OEE data accuracy best practices",
+    "organisation": "OxMaint",
+    "url": "https://oxmaint.com/industries/steel-plant/oee-data-accuracy-best-practices",
+    "retrieved": "2026-09-22",
+    "scope_ids": [
+      "SCI004"
+    ],
+    "type": "practitioner",
+    "establishes": "Downtime reasons must be standardised into tiers; when operators pick from many vague reasons, a changeover is logged four different ways.",
+    "why_included": "Establishes that stoppage reasons must come from a governed list.",
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SRC018",
+    "title": "Food plant production uptime",
+    "organisation": "OxMaint",
+    "url": "https://oxmaint.com/industries/food-manufacturing/food-plant-production-uptime-cmms-guide-2026",
+    "retrieved": "2026-09-22",
+    "scope_ids": [
+      "SCI004"
+    ],
+    "type": "practitioner",
+    "establishes": "Equipment effectiveness is availability times performance times quality; food plants start with structured failure codes on every stoppage and focus on their most critical machines.",
+    "why_included": "Food-specific evidence on critical machines and failure recording.",
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SRC019",
+    "title": "ISO 22716 batch traceability",
+    "organisation": "Registrar Corp",
+    "url": "https://www.registrarcorp.com/blog/cosmetics/iso-22716/iso22716-batch-traceability/",
+    "retrieved": "2026-09-22",
+    "scope_ids": [
+      "SCI002",
+      "SCI007"
+    ],
+    "type": "standard",
+    "establishes": "ISO 22716 requires documentation of every stage of cosmetic production from raw materials to distribution, and US cosmetics law now aligns with it on traceability.",
+    "why_included": "Evidence that the traceability structures used in food also apply to cosmetics.",
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SRC020",
+    "title": "ISO 22716 and raw material management",
+    "organisation": "Registrar Corp",
+    "url": "https://www.registrarcorp.com/iso-22716-raw-materials/",
+    "retrieved": "2026-09-22",
+    "scope_ids": [
+      "SCI001"
+    ],
+    "type": "standard",
+    "establishes": "Raw materials require supplier qualification, testing against specification, documented receipt, controlled storage, and batch tracking with deviation management.",
+    "why_included": "The main source on qualifying suppliers and checking what arrives.",
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SRC021",
+    "title": "Guidance for Industry: Cosmetic Good Manufacturing Practices",
+    "organisation": "US Food and Drug Administration",
+    "url": "https://fda.gov/media/86366/download",
+    "retrieved": "2026-09-22",
+    "scope_ids": [
+      "SCI005",
+      "SCI006"
+    ],
+    "type": "regulatory",
+    "establishes": "Documentation should capture every aspect of manufacturing so that problems can be traced and corrected.",
+    "why_included": "The US regulator's position on cosmetics records.",
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SRC022",
+    "title": "ISO 22716 — Cosmetics GMP",
+    "organisation": "SG Systems Global",
+    "url": "https://sgsystemsglobal.com/?p=16831",
+    "retrieved": "2026-09-22",
+    "scope_ids": [
+      "SCI009",
+      "SCI006"
+    ],
+    "type": "standard",
+    "establishes": "ISO 22716 covers personnel, premises, equipment and maintenance, materials, production, quality control, contract and outsourced activities, recalls and complaints, and expects any batch to be reconstructable.",
+    "why_included": "The only source putting outside manufacturers under the same good-practice rules as own plants.",
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SRC023",
+    "title": "Turnkey vs. Tolling — Which Makes Sense for Me?",
+    "organisation": "Ryder",
+    "url": "https://prod.ryder.com/en-us/insights/blogs/logistics/turnkey-vs-tolling",
+    "retrieved": "2026-09-22",
+    "scope_ids": [
+      "SCI009"
+    ],
+    "type": "practitioner",
+    "establishes": "In tolling the brand supplies its own raw materials; in turnkey manufacturing the contract manufacturer provides them.",
+    "why_included": "Defines the two arrangements. The scope settles on turnkey.",
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SRC024",
+    "title": "Contract Manufacturing Solutions",
+    "organisation": "Ryder",
+    "url": "https://prod.ryder.com/en-us/logistics/co-packaging/contract-manufacturing",
+    "retrieved": "2026-09-22",
+    "scope_ids": [
+      "SCI009"
+    ],
+    "type": "practitioner",
+    "establishes": "In turnkey contract manufacturing the manufacturer sources materials, makes, checks and packs the product; the client provides specifications and approvals.",
+    "why_included": "States who does what in turnkey manufacturing.",
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SRC025",
+    "title": "California Cleaning Products Right to Know Act",
+    "organisation": "Davis Wright Tremaine",
+    "url": "https://www.dwt.com/blogs/energy--environmental-law-blog/2019/11/california-cleaning-products-right-to-know-act",
+    "retrieved": "2026-09-22",
+    "scope_ids": [
+      "SCI002"
+    ],
+    "type": "regulatory",
+    "establishes": "Household cleaning manufacturers must disclose each ingredient, its CAS number, its function and a link to its safety data sheet; some may be withheld as confidential under a generic name.",
+    "why_included": "The household-products regime for ingredient disclosure — a subgroup otherwise unsourced.",
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SRC026",
+    "title": "Cleansing Product Information Disclosure Program: Recommended Best Management Practices",
+    "organisation": "New York State Department of Environmental Conservation",
+    "url": "https://extapps.dec.ny.gov/docs/materials_minerals_pdf/cpidbmps.pdf",
+    "retrieved": "2026-09-22",
+    "scope_ids": [
+      "SCI002"
+    ],
+    "type": "regulatory",
+    "establishes": "Manufacturers of household cleansing products furnish each ingredient and its content by weight; confidential business information may be withheld.",
+    "why_included": "A second state regime confirming ingredient disclosure by weight for household products.",
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SRC027",
+    "title": "FSMA: legal ramifications of cGMPs are important to pet food safety",
+    "organisation": "Michigan State University Extension",
+    "url": "https://www.canr.msu.edu/news/fsma-legal-ramifications-of-cgmps-are-important-to-pet-food-safety",
+    "retrieved": "2026-09-22",
+    "scope_ids": [
+      "SCI005",
+      "SCI006"
+    ],
+    "type": "regulatory",
+    "establishes": "Facilities making animal food, including pet food, must comply with good manufacturing practice under 21 CFR Part 507.",
+    "why_included": "The regulatory basis for pet food manufacturing — a subgroup otherwise unsourced.",
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SRC028",
+    "title": "Managing pet food ingredients",
+    "organisation": "Food Engineering",
+    "url": "https://www.foodengineeringmag.com/articles/99611-managing-pet-food-ingredients",
+    "retrieved": "2026-09-22",
+    "scope_ids": [
+      "SCI001",
+      "SCI002"
+    ],
+    "type": "practitioner",
+    "establishes": "Pet food uses more than 500 ingredients; manufacturers identify hazards and put preventive controls such as heat treatment in place; the FDA regulates both finished pet food and its ingredients.",
+    "why_included": "Evidence that pet food carries the same ingredient and control structures as human food.",
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SRC029",
+    "title": "Good pet food manufacturing practice",
+    "organisation": "UK Pet Food",
+    "url": "https://ukpetfood.org/asset/14810E67%2DFA8C%2D48E8%2D924792E5213FFF43",
+    "retrieved": "2026-09-22",
+    "scope_ids": [
+      "SCI001",
+      "SCI007"
+    ],
+    "type": "practitioner",
+    "establishes": "Responsible pet food makers run supplier approval, precise formulation, and batch records of finished product and where it went.",
+    "why_included": "Industry-body evidence for supplier approval and batch records in pet food.",
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SRC030",
+    "title": "The GTIN management handbook",
+    "organisation": "GS1 UK",
+    "url": "https://www.gs1uk.org/sites/default/files/The_GTIN_management_handbook.pdf",
+    "retrieved": "2026-09-22",
+    "scope_ids": [
+      "SCI002"
+    ],
+    "type": "standard",
+    "establishes": "A change to declared formulation — such as adding nuts, which introduces an allergen — net content, a certification mark or pack quantity requires a new product number at every packing level.",
+    "why_included": "The external rule for when a change makes a new product rather than a new version.",
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SRC031",
+    "title": "GTIN allocation rules",
+    "organisation": "GS1 New Zealand",
+    "url": "https://www.gs1nz.org/assets/Resources/Services/GS1NZ_Fact-sheet-gtin-allocation-rules.-V2.pdf",
+    "retrieved": "2026-09-22",
+    "scope_ids": [
+      "SCI002"
+    ],
+    "type": "standard",
+    "establishes": "Formulation is the list of ingredients or components used to create a trade item; any change to the declared net content requires a new product number.",
+    "why_included": "Confirms the same rule and defines formulation.",
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SRC032",
+    "title": "21 CFR Part 11",
+    "organisation": "SG Systems Global",
+    "url": "https://sgsystemsglobal.com/glossary/21-cfr-part-11-electronic-records-signatures/",
+    "retrieved": "2026-09-22",
+    "scope_ids": [
+      "SCI006"
+    ],
+    "type": "regulatory",
+    "establishes": "Part 11 sets when electronic records and signatures are acceptable — identity, authority, auditability and retention — across food, cosmetics and other regulated manufacturing.",
+    "why_included": "The regulatory basis for signatures and for never altering a recorded entry.",
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SRC033",
+    "title": "Electronic Batch Record",
+    "organisation": "CASRAI",
+    "url": "https://casrai.org/dictionary/term/electronic-batch-record-ebr",
+    "retrieved": "2026-09-22",
+    "scope_ids": [
+      "SCI005"
+    ],
+    "type": "reference-model",
+    "establishes": "A batch record documents each step — by whom or by which equipment, when, with what materials and quantities, and with what results — including checks by a second qualified person.",
+    "why_included": "Defines what a batch record must hold.",
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SRC034",
+    "title": "CPG Sec. 555.250 Statement of Policy for Labeling and Preventing Cross-contact of Common Food Allergens",
+    "organisation": "US Food and Drug Administration",
+    "url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/cpg-sec-555250-statement-policy-labeling-and-preventing-cross-contact-common-food-allergens",
+    "retrieved": "2026-09-22",
+    "scope_ids": [
+      "SCI002",
+      "SCI005"
+    ],
+    "type": "regulatory",
+    "establishes": "Allergens must be declared; cross-contact arises from rework, carry-over on shared equipment and production sequencing.",
+    "why_included": "The regulator's statement that the order products run in is a safety matter.",
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SRC035",
+    "title": "FDA Releases Draft Compliance Policy Guide for Major Food Allergen Labeling and Cross-contact",
+    "organisation": "Hogan Lovells",
+    "url": "https://www.hoganlovells.com/en/publications/fda-releases-draft-compliance-policy-guide-for-major-food-allergen-labeling-and-cross-contact",
+    "retrieved": "2026-09-22",
+    "scope_ids": [
+      "SCI002"
+    ],
+    "type": "regulatory",
+    "establishes": "Nine major food allergens must be declared by the food they come from — whey must be declared as milk.",
+    "why_included": "Establishes that an allergen is declared by its source, including when it arrives inside another ingredient.",
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SRC036",
+    "title": "FDA Issues Two Guidance Documents on Food Allergen Labeling Requirements",
+    "organisation": "Hyman, Phelps & McNamara (FDA Law Blog)",
+    "url": "https://www.thefdalawblog.com/2022/12/fda-issues-two-guidance-documents-on-food-allergen-labeling-requirements/",
+    "retrieved": "2026-09-22",
+    "scope_ids": [
+      "SCI002"
+    ],
+    "type": "regulatory",
+    "establishes": "Food allergen labelling rules do not apply to pet foods, animal feeds, cosmetics, drugs or household cleaning products.",
+    "why_included": "The only source stating that hazard declaration rules differ by subgroup.",
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SRC037",
+    "title": "GS1 2D code printing",
+    "organisation": "Linx",
+    "url": "https://www.linxglobal.com/en/solutions/coding-types/gs1/",
+    "retrieved": "2026-09-22",
+    "scope_ids": [
+      "SCI007"
+    ],
+    "type": "standard",
+    "establishes": "A GS1 2D code carries the product number, batch, production date, expiry date and serial number; retailers are to accept 2D codes by the end of 2027.",
+    "why_included": "Evidence that individual serial numbers are becoming readable on consumer packs.",
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SRC038",
+    "title": "GS1 Sunrise 2027",
+    "organisation": "QRStuff",
+    "url": "https://www.qrstuff.com/feeds/blog/gs1-sunrise-2027",
+    "retrieved": "2026-09-22",
+    "scope_ids": [
+      "SCI007"
+    ],
+    "type": "practitioner",
+    "establishes": "Sunrise 2027 is not a legal requirement, but major retailers are aligning to it, with packs carrying both codes during the transition.",
+    "why_included": "Establishes that individual identification is expected commercially rather than required by law.",
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SRC039",
+    "title": "Guide to batch tracking",
+    "organisation": "Cleverence",
+    "url": "https://www.cleverence.com/amp/articles/business-blogs/guide-batch-tracking-5829/",
+    "retrieved": "2026-09-22",
+    "scope_ids": [
+      "SCI001",
+      "SCI008"
+    ],
+    "type": "practitioner",
+    "establishes": "At receipt, capture supplier lot, quantity, expiry and certificate reference; record exact storage locations; issue lot-tracked materials to production orders.",
+    "why_included": "The source for what is captured when material arrives and where it is kept.",
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SRC040",
+    "title": "Traceability — End-to-End Lot Genealogy",
+    "organisation": "SG Systems Global",
+    "url": "https://sgsystemsglobal.com/traceability/",
+    "retrieved": "2026-09-22",
+    "scope_ids": [
+      "SCI007",
+      "SCI008"
+    ],
+    "type": "practitioner",
+    "establishes": "Traceability links identity (product number, lot, serial), status (quarantined, released) and events (receipt, consume, transform, pack, ship, return).",
+    "why_included": "Establishes that stock carries a status such as quarantined or released, separate from its identity.",
+    "status": "active",
+    "withdrawn_reason": null
+  }
+]

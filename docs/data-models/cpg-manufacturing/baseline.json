@@ -1,0 +1,431 @@
+{
+  "retrieved": "2026-09-22T12:00:00Z",
+  "apply_mode": "web-ui",
+  "prefixes": [
+    "DMA",
+    "DMC",
+    "DMD",
+    "DMR",
+    "DMS",
+    "DMT",
+    "DCT",
+    "DLT"
+  ],
+  "domains": [
+    {
+      "dda_id": "DMD000000001",
+      "code": "People",
+      "prefix": "",
+      "name": "People",
+      "definition": "People (incl Family Units). The People Domain contains information about individuals."
+    },
+    {
+      "dda_id": "DMD000000012",
+      "code": "LegalEntities",
+      "prefix": "",
+      "name": "LegalEntities",
+      "definition": "Legal Entities (incl. Relationships, Companies, Funds, Charities, Governments, Agencies etc.). The LegalEntities Domain defines the different entities involved in business transactions, services or other processes in any capacity."
+    },
+    {
+      "dda_id": "DMD000000016",
+      "code": "Documents",
+      "prefix": "",
+      "name": "Documents",
+      "definition": "Documents (including Contracts, Agreements, Amendments, etc). The Documents Domain contains records that provide documentary evidence or support for business processes including Legal, Transactional, Regulatory, Identification and Commercial."
+    },
+    {
+      "dda_id": "DMD000000020",
+      "code": "Events",
+      "prefix": "",
+      "name": "Events",
+      "definition": "Events describe meaningful events in the lifecycle of various data assets including Mergers, Births, Deaths, Stock-Splits etc."
+    },
+    {
+      "dda_id": "DMD000000022",
+      "code": "Transactions",
+      "prefix": "",
+      "name": "Transactions",
+      "definition": "Transactions are records of an individual trade/transaction which represents a transfer of ownership or investment usually in return for capital."
+    }
+  ],
+  "standards": [
+    {
+      "dda_id": "DMS000000141",
+      "code": "DataSharedEnterpriseAsset",
+      "name": "Data is a shared, valuable enterprise asset",
+      "category": "Data Principles",
+      "description": "Data is a shared, valuable enterprise asset",
+      "content_hash": "f9e35439d28d4563"
+    },
+    {
+      "dda_id": "DMS000000142",
+      "code": "EveryoneResponsibleForData",
+      "name": "Everyone has a role in good data management",
+      "category": "Data Principles",
+      "description": "Everyone has a role in good data management",
+      "content_hash": "63d270dd377b337d"
+    },
+    {
+      "dda_id": "DMS000000143",
+      "code": "PolicyOwnedByCDO",
+      "name": "The Chief Data Officer owns and approves the Data Governance Policy",
+      "category": "Policy Governance",
+      "description": "The Chief Data Officer owns and approves the Data Governance Policy",
+      "content_hash": "35e1036d709968b3"
+    },
+    {
+      "dda_id": "DMS000000144",
+      "code": "PolicyAlignedWithOtherPolicies",
+      "name": "Data Governance Policy aligns with and defers to more specific policies",
+      "category": "Policy Governance",
+      "description": "Data Governance Policy aligns with and defers to more specific policies",
+      "content_hash": "a82cb74ed045c5a1"
+    },
+    {
+      "dda_id": "DMS000000145",
+      "code": "PolicyAppliesToCriticalData",
+      "name": "Data Governance Policy applies to all critical business data",
+      "category": "Policy Scope",
+      "description": "Data Governance Policy applies to all critical business data",
+      "content_hash": "a0b2dba74cf42c99"
+    },
+    {
+      "dda_id": "DMS000000146",
+      "code": "GovernanceCommitteeEstablished",
+      "name": "A Data Governance Committee must be established",
+      "category": "Governance Structure",
+      "description": "A Data Governance Committee must be established",
+      "content_hash": "ddfb76e415173d09"
+    },
+    {
+      "dda_id": "DMS000000147",
+      "code": "SubjectBasedDataDomains",
+      "name": "Data domains must be defined based on the subject of the data",
+      "category": "Data Domains",
+      "description": "Data domains must be defined based on the subject of the data",
+      "content_hash": "97a1de355e4ccb24"
+    },
+    {
+      "dda_id": "DMS000000148",
+      "code": "CommonDataRolesDefined",
+      "name": "Standard data governance roles must be defined",
+      "category": "Roles and Responsibilities",
+      "description": "Standard data governance roles must be defined",
+      "content_hash": "600c848a5f0b5f8a"
+    },
+    {
+      "dda_id": "DMS000000149",
+      "code": "SingleDataModelPerDomain",
+      "name": "Each data domain must have a single authoritative data model",
+      "category": "Data Modeling",
+      "description": "Each data domain must have a single authoritative data model",
+      "content_hash": "5119d08b16a8db2e"
+    },
+    {
+      "dda_id": "DMS000000150",
+      "code": "AuthoritativeRepositoryDefined",
+      "name": "Each data domain must have an Authoritative Data Repository",
+      "category": "Authoritative Sources",
+      "description": "Each data domain must have an Authoritative Data Repository",
+      "content_hash": "6e66cbefadd4fbad"
+    },
+    {
+      "dda_id": "DMS000000151",
+      "code": "PrimaryIdentifiersEstablished",
+      "name": "Primary record identifiers must be established by domain",
+      "category": "Data Identification",
+      "description": "Primary record identifiers must be established by domain",
+      "content_hash": "bad228de4bd6b699"
+    },
+    {
+      "dda_id": "DMS000000152",
+      "code": "CriticalDataElementsIdentified",
+      "name": "Critical Data Elements must be identified and governed",
+      "category": "Data Quality",
+      "description": "Critical Data Elements must be identified and governed",
+      "content_hash": "9fe5f44e4b6f5a8e"
+    },
+    {
+      "dda_id": "DMS000000153",
+      "code": "IssuesManagementProgram",
+      "name": "A Data Issues for Management Resolution program must be established",
+      "category": "Issue Management",
+      "description": "A Data Issues for Management Resolution program must be established",
+      "content_hash": "f582cf1ba2758239"
+    },
+    {
+      "dda_id": "DMS000000154",
+      "code": "PolicyChangeControlled",
+      "name": "Changes to the Data Governance Policy must be formally controlled",
+      "category": "Policy Lifecycle",
+      "description": "Changes to the Data Governance Policy must be formally controlled",
+      "content_hash": "b1e3bbf408164a32"
+    },
+    {
+      "dda_id": "DMS000000156",
+      "code": "DataDomainDefinition",
+      "name": "Definition of Data Domain",
+      "category": "Glossary",
+      "description": "Definition of Data Domain",
+      "content_hash": "356d87ed405b2c3e"
+    },
+    {
+      "dda_id": "DMS000000157",
+      "code": "DataModelDefinition",
+      "name": "Definition of Data Model",
+      "category": "Glossary",
+      "description": "Definition of Data Model",
+      "content_hash": "ba798ebaa1b8f7e0"
+    },
+    {
+      "dda_id": "DMS000000158",
+      "code": "DataConceptDefinition",
+      "name": "Definition of Data Concept",
+      "category": "Glossary",
+      "description": "Definition of Data Concept",
+      "content_hash": "5923806de50ce034"
+    },
+    {
+      "dda_id": "DMS000000159",
+      "code": "DataAttributeDefinition",
+      "name": "Definition of Data Attribute",
+      "category": "Glossary",
+      "description": "Definition of Data Attribute",
+      "content_hash": "88c87fe0bb49ac17"
+    },
+    {
+      "dda_id": "DMS000000160",
+      "code": "DataProducerDefinition",
+      "name": "Definition of Data Producer",
+      "category": "Glossary",
+      "description": "Definition of Data Producer",
+      "content_hash": "1c72a19749d48363"
+    },
+    {
+      "dda_id": "DMS000000161",
+      "code": "DataConsumerDefinition",
+      "name": "Definition of Data Consumer",
+      "category": "Glossary",
+      "description": "Definition of Data Consumer",
+      "content_hash": "43d23e041352db20"
+    },
+    {
+      "dda_id": "DMS000000162",
+      "code": "DataCustodianDefinition",
+      "name": "Definition of Data Custodian",
+      "category": "Glossary",
+      "description": "Definition of Data Custodian",
+      "content_hash": "89b8c86d1610454b"
+    },
+    {
+      "dda_id": "DMS000000163",
+      "code": "OperationalDataStoreDefinition",
+      "name": "Definition of Operational Data Store (ODS)",
+      "category": "Glossary",
+      "description": "Definition of Operational Data Store (ODS)",
+      "content_hash": "02bb558a0f426d00"
+    },
+    {
+      "dda_id": "DMS000000164",
+      "code": "MasterDataManagementDefinition",
+      "name": "Definition of Master Data Management (MDM)",
+      "category": "Glossary",
+      "description": "Definition of Master Data Management (MDM)",
+      "content_hash": "129663c466e44db8"
+    },
+    {
+      "dda_id": "DMS000000165",
+      "code": "DataWarehouseDefinition",
+      "name": "Definition of Data Warehouse",
+      "category": "Glossary",
+      "description": "Definition of Data Warehouse",
+      "content_hash": "10a1a80153ab0c6a"
+    },
+    {
+      "dda_id": "DMS000000166",
+      "code": "DataLakeDefinition",
+      "name": "Definition of Data Lake",
+      "category": "Glossary",
+      "description": "Definition of Data Lake",
+      "content_hash": "bd284b2f84cb777c"
+    },
+    {
+      "dda_id": "DMS000000167",
+      "code": "CriticalDataElementDefinition",
+      "name": "Definition of Critical Data Element (CDE)",
+      "category": "Glossary",
+      "description": "Definition of Critical Data Element (CDE)",
+      "content_hash": "66f2aa9176e6037e"
+    },
+    {
+      "dda_id": "DMS000000168",
+      "code": "DataLineageStandard",
+      "name": "Data lineage must be defined and maintained for all critical data",
+      "category": "Data Lineage",
+      "description": "Data lineage must be defined and maintained for all critical data",
+      "content_hash": "830921eaedb33308"
+    },
+    {
+      "dda_id": "DMS000000169",
+      "code": "DataModelDesignPrinciples",
+      "name": "Data Model Design Principles",
+      "category": "APPENDIX",
+      "description": "Data Model Design Principles",
+      "content_hash": "a24042d3b115c5e6"
+    }
+  ],
+  "resources": [],
+  "prompts": [],
+  "attribute_types": [
+    "TEXT",
+    "LONGTEXT",
+    "INTEGER",
+    "BIGINT",
+    "FLOAT",
+    "CURRENCY",
+    "DATE",
+    "DATETIME",
+    "TIME",
+    "BOOLEAN",
+    "GUID",
+    "LOOKUP",
+    "MASTERID",
+    "IPADDRESS",
+    "USER",
+    "EMAIL",
+    "URL",
+    "GEOLOCATION",
+    "DOMAINID"
+  ],
+  "classification_types": [
+    "INTERNAL",
+    "PUBLIC",
+    "CUSTOMER",
+    "INTERNAL_PII",
+    "CUSTOMER_PII",
+    "CUSTOMER_PCI",
+    "HIPAA"
+  ],
+  "quality_types": [],
+  "lookup_types": [],
+  "state_transitions": [],
+  "loaded_domains": {
+    "DMD000000001": {
+      "concepts": [
+        "DMC000000143",
+        "DMC000000144",
+        "DMC000000145",
+        "DMC000000147",
+        "DMC000000024"
+      ],
+      "attributes": [],
+      "relationships": [],
+      "retrieved": "2026-09-22T12:00:00Z"
+    },
+    "DMD000000012": {
+      "concepts": [
+        "DMC000000106",
+        "DMC000000023",
+        "DMC000000108",
+        "DMC000000107",
+        "DMC000000011",
+        "DMC000000113"
+      ],
+      "attributes": [],
+      "relationships": [
+        "DMR000000001",
+        "DMR000000002"
+      ],
+      "retrieved": "2026-09-22T12:00:00Z"
+    },
+    "DMD000000016": {
+      "concepts": [
+        "DMC000000142"
+      ],
+      "attributes": [],
+      "relationships": [],
+      "retrieved": "2026-09-22T12:00:00Z"
+    },
+    "DMD000000020": {
+      "concepts": [],
+      "attributes": [],
+      "relationships": [],
+      "retrieved": "2026-09-22T12:00:00Z"
+    },
+    "DMD000000022": {
+      "concepts": [],
+      "attributes": [],
+      "relationships": [],
+      "retrieved": "2026-09-22T12:00:00Z"
+    }
+  },
+  "platform_findings": [
+    {
+      "id": "PLF001",
+      "dda_id": "DMC000000011",
+      "check": "M01 / DMS000000169 principle 1",
+      "finding": "LegalEntityRoles stores roles — investor, vendor, client — on the organisation. Roles come from the relationships in force; this model derives supplier, outside manufacturer and certifying body instead."
+    },
+    {
+      "id": "PLF002",
+      "dda_id": "DMC000000024",
+      "check": "M01, naming",
+      "finding": "PeopleRoles stores roles on the person, and uses the plural People where its siblings use the singular Person."
+    },
+    {
+      "id": "PLF003",
+      "dda_id": "DMC000000107",
+      "check": "M10",
+      "finding": "LegalEntityRelationships holds relationships as a concept. DDA now holds relationships as their own records; not reused here."
+    },
+    {
+      "id": "PLF004",
+      "dda_id": "DMD000000020",
+      "check": "DT-anchor",
+      "finding": "The Events domain holds no concepts, so it has no anchor. Its definition describes corporate and life events only, and does not cover operational occurrences."
+    },
+    {
+      "id": "PLF005",
+      "dda_id": "DMD000000022",
+      "check": "DT-anchor",
+      "finding": "The Transactions domain holds no concepts, so it has no anchor. Its definition is written for trades in securities and does not cover exchanges of goods."
+    },
+    {
+      "id": "PLF006",
+      "dda_id": "DMC000000142",
+      "check": "naming",
+      "finding": "The Document concept's description calls it DocumentBase, which disagrees with its name."
+    },
+    {
+      "id": "PLF007",
+      "dda_id": "DMC000000147",
+      "check": "naming",
+      "finding": "PersonCitizenship is singular where its siblings are plural."
+    },
+    {
+      "id": "PLF008",
+      "dda_id": "DMR000000001",
+      "check": "R01",
+      "finding": "The relationship reads Managed By forward and Invests In back. The inverse does not read the forward verb back, so the pair describes two arrangements under one name."
+    },
+    {
+      "id": "PLF009",
+      "dda_id": "DMR000000002",
+      "check": "R01",
+      "finding": "The forward verb is Investor, which is a noun. A role has been entered in the verb field."
+    },
+    {
+      "id": "PLF010",
+      "dda_id": "DMR000000001",
+      "check": "R06",
+      "finding": "The stored forward view is LegalEntityGP; the roles on the record derive LegalEntityGPs. A stored derived name has drifted from what it derives from."
+    }
+  ],
+  "guide_disagreements": [
+    {
+      "guide": "dda://guides/data-design-authority",
+      "records": "list_model(stateTransitions)",
+      "finding": "The guide lists state transitions as readable; the call returns an internal error, so the change package carries no preconditions."
+    }
+  ]
+}

@@ -1,0 +1,102 @@
+[
+  {
+    "id": "SRC028",
+    "organisation": "SGS Systems Global",
+    "title": "ISO 22716 Cosmetics GMP",
+    "reference": "",
+    "retrieved": "2026-09-20",
+    "scope_area": "Personal care and cosmetics",
+    "establishes": "ISO 22716 covers people, premises, equipment, materials, production, laboratory controls, packaging and labelling, storage, distribution and the quality system binding them. Electronic records supporting it must be validated, with attributable entries, identity and time control, and audit-ready retention.",
+    "type": "standard"
+  },
+  {
+    "id": "SRC029",
+    "organisation": "ISO",
+    "title": "ISO 22716:2007",
+    "reference": "",
+    "retrieved": "2026-09-20",
+    "scope_area": "Personal care and cosmetics",
+    "establishes": "Gives guidelines for the production, control, storage and shipment of cosmetic products, covering quality aspects. Research and development and distribution of finished product are outside its scope.",
+    "type": "standard"
+  },
+  {
+    "id": "SRC030",
+    "organisation": "Cosmetics Assessment",
+    "title": "ISO 22716 GMP requirements",
+    "reference": "",
+    "retrieved": "2026-09-20",
+    "scope_area": "Personal care and cosmetics",
+    "establishes": "Production procedures must carry full formulation in percentages and weight or volume, the complete list of raw materials with batch numbers and quantities used, the manufacturing method with documented sign-off at key stages, defined acceptable ranges for critical process parameters, and instructions for handling deviation. Every ingredient entering the facility needs batch information so it can be traced at any point.",
+    "type": "standard"
+  },
+  {
+    "id": "SRC031",
+    "organisation": "FDA",
+    "title": "Cosmetic Good Manufacturing Practices draft guidance",
+    "reference": "",
+    "retrieved": "2026-09-20",
+    "scope_area": "Personal care and cosmetics",
+    "establishes": "Raw material records should cover origin, receipt, examination, testing, disposition and use. Disposition of rejected materials and returned goods must be documented.",
+    "type": "regulatory"
+  },
+  {
+    "id": "SRC032",
+    "organisation": "Packaging World",
+    "title": "External Manufacturing Outlook 2026",
+    "reference": "",
+    "retrieved": "2026-09-20",
+    "scope_area": "External manufacturing",
+    "establishes": "A fifth of surveyed brand owners have no manufacturing or packaging facilities at all, relying entirely on external partners. Owning a facility is no longer a precondition of competing as a CPG brand.",
+    "type": "practitioner"
+  },
+  {
+    "id": "SRC033",
+    "organisation": "MRPeasy",
+    "title": "Co-manufacturing and co-packing guide",
+    "reference": "",
+    "retrieved": "2026-09-20",
+    "scope_area": "External manufacturing",
+    "establishes": "Roles in the supply chain must be defined explicitly \u2014 tolling versus turnkey determines who owns the materials. Traceability is maintained through certificates of analysis and batch records exchanged with the partner, and brands must set quality standards and audit against them.",
+    "type": "practitioner"
+  },
+  {
+    "id": "SRC034",
+    "organisation": "Startup CPG",
+    "title": "Managing inventory with a contract manufacturer",
+    "reference": "",
+    "retrieved": "2026-09-20",
+    "scope_area": "External manufacturing",
+    "establishes": "Raw materials are consumed and finished goods produced in batches at a facility the brand does not own. The common structure is to treat the partner as a separate inventory location, transferring material to it and receiving output from it.",
+    "type": "practitioner"
+  },
+  {
+    "id": "SRC035",
+    "organisation": "Copack Connect",
+    "title": "Co-manufacturer and co-packer definitions",
+    "reference": "",
+    "retrieved": "2026-09-20",
+    "scope_area": "External manufacturing",
+    "establishes": "A co-manufacturer makes the product and usually packs it; a co-packer only packs, receiving bulk from elsewhere. The two are distinct arrangements and a product may pass through both.",
+    "type": "practitioner"
+  },
+  {
+    "id": "SRC036",
+    "organisation": "MSI Express",
+    "title": "Connectivity in contract manufacturing",
+    "reference": "",
+    "retrieved": "2026-09-20",
+    "scope_area": "External manufacturing",
+    "establishes": "A partner's ability to provide current, accurate data for raw, in-process and ready-to-ship levels is a condition of ongoing support. Integration and system connectivity are selection criteria alongside physical production capability.",
+    "type": "practitioner"
+  },
+  {
+    "id": "SRC037",
+    "organisation": "Endless Commerce",
+    "title": "Co-packing partnership playbook",
+    "reference": "",
+    "retrieved": "2026-09-20",
+    "scope_area": "External manufacturing",
+    "establishes": "Partner performance is measured on on-time completion, quality rejection rate, waste rate, changeover time and cost variance against quote. The brand owner's own forecast accuracy is part of the same scorecard, because it determines the partner's ability to plan.",
+    "type": "practitioner"
+  }
+]

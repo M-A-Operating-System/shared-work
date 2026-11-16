@@ -1,0 +1,812 @@
+[
+  {
+    "id": "DRQ001",
+    "business_requirement_ids": [
+      "REQ002",
+      "REQ003",
+      "REQ005"
+    ],
+    "must_record": [
+      "Every recipe line: the product made, the input, and how much of the input goes into one of the product",
+      "The version of the recipe each line belongs to"
+    ],
+    "must_answer": [
+      "What goes into this product, and how much of each input ends up in one finished unit?"
+    ],
+    "temporality": "both",
+    "must_prevent": [
+      "A product that contains itself, however many steps away",
+      "A recipe read from lines belonging to two different versions"
+    ],
+    "status": "active",
+    "prevent_resolution": [
+      {
+        "must_prevent_index": 0,
+        "expressed_by": "composition",
+        "artefact_id": "REL001"
+      },
+      {
+        "must_prevent_index": 1,
+        "expressed_by": "parent-cardinality",
+        "artefact_id": "SBJ015"
+      }
+    ],
+    "withdrawn_reason": null
+  },
+  {
+    "id": "DRQ002",
+    "business_requirement_ids": [
+      "REQ003",
+      "REQ005"
+    ],
+    "must_record": [
+      "The same recipe lines, read from the input upwards"
+    ],
+    "must_answer": [
+      "Which finished products contain this ingredient, by any route?"
+    ],
+    "temporality": "current",
+    "must_prevent": [],
+    "status": "active",
+    "prevent_resolution": [],
+    "withdrawn_reason": null
+  },
+  {
+    "id": "DRQ003",
+    "business_requirement_ids": [
+      "REQ004"
+    ],
+    "must_record": [
+      "Use of an input as a whole, never of what lies inside it"
+    ],
+    "must_answer": [
+      "Which products use this intermediate, and are any using a variant of it that should be its own product?"
+    ],
+    "temporality": "current",
+    "must_prevent": [
+      "Adjusting what goes into an input from inside the product that uses it"
+    ],
+    "status": "active",
+    "prevent_resolution": [
+      {
+        "must_prevent_index": 0,
+        "expressed_by": "composition",
+        "artefact_id": "REL001"
+      }
+    ],
+    "withdrawn_reason": null
+  },
+  {
+    "id": "DRQ004",
+    "business_requirement_ids": [
+      "REQ006",
+      "REQ022"
+    ],
+    "must_record": [
+      "The quantity the recipe specified for each input",
+      "The quantity each batch actually used"
+    ],
+    "must_answer": [
+      "How much more or less of each input did this batch use than the recipe specified?"
+    ],
+    "temporality": "as-at",
+    "must_prevent": [],
+    "status": "active",
+    "prevent_resolution": [],
+    "withdrawn_reason": null
+  },
+  {
+    "id": "DRQ005",
+    "business_requirement_ids": [
+      "REQ007"
+    ],
+    "must_record": [
+      "Which input actually filled each place in the recipe on each batch",
+      "Approved alternatives and the conditions for using them"
+    ],
+    "must_answer": [
+      "Which batches used an alternative input, and for which ingredient?"
+    ],
+    "temporality": "as-at",
+    "must_prevent": [
+      "An alternative used without approval"
+    ],
+    "status": "active",
+    "prevent_resolution": [
+      {
+        "must_prevent_index": 0,
+        "expressed_by": "mandatory-attribute",
+        "artefact_id": "ATR042"
+      }
+    ],
+    "withdrawn_reason": null
+  },
+  {
+    "id": "DRQ006",
+    "business_requirement_ids": [
+      "REQ008",
+      "REQ058"
+    ],
+    "must_record": [
+      "Each supplier's approval for each material, with the dates it held",
+      "Each assessment of a supplier, its scope and how long it is valid"
+    ],
+    "must_answer": [
+      "Was this supplier approved for this material on the day it was received?"
+    ],
+    "temporality": "as-at",
+    "must_prevent": [
+      "An approval treated as current after it lapsed"
+    ],
+    "status": "active",
+    "prevent_resolution": [
+      {
+        "must_prevent_index": 0,
+        "expressed_by": "dates",
+        "artefact_id": "REL003"
+      }
+    ],
+    "withdrawn_reason": null
+  },
+  {
+    "id": "DRQ007",
+    "business_requirement_ids": [
+      "REQ009"
+    ],
+    "must_record": [
+      "What a supplier's document states about a batch, who issued it, and whether the organisation checked it"
+    ],
+    "must_answer": [
+      "Which of this batch's stated properties were tested here, and which were taken on the supplier's word?"
+    ],
+    "temporality": "current",
+    "must_prevent": [
+      "A supplier's claim reported as though it were the organisation's own test"
+    ],
+    "status": "active",
+    "prevent_resolution": [
+      {
+        "must_prevent_index": 0,
+        "expressed_by": "mandatory-attribute",
+        "artefact_id": "ATR014"
+      }
+    ],
+    "withdrawn_reason": null
+  },
+  {
+    "id": "DRQ008",
+    "business_requirement_ids": [
+      "REQ010",
+      "REQ063"
+    ],
+    "must_record": [
+      "Which inputs are bought in finished, with contents the organisation does not know"
+    ],
+    "must_answer": [
+      "Which products depend on a bought-in ingredient whose contents we rely on the supplier to declare?"
+    ],
+    "temporality": "current",
+    "must_prevent": [],
+    "status": "active",
+    "prevent_resolution": [],
+    "withdrawn_reason": null
+  },
+  {
+    "id": "DRQ009",
+    "business_requirement_ids": [
+      "REQ011",
+      "REQ012",
+      "REQ014"
+    ],
+    "must_record": [
+      "The allergens, other hazards, certifications and origin of each input, and which rules apply to each kind of product"
+    ],
+    "must_answer": [
+      "What allergens, hazards and certifications does this product carry, and from which inputs?"
+    ],
+    "temporality": "both",
+    "must_prevent": [
+      "A product declared free of something one of its inputs contains"
+    ],
+    "status": "active",
+    "prevent_resolution": [
+      {
+        "must_prevent_index": 0,
+        "expressed_by": "composition",
+        "artefact_id": "REL001"
+      }
+    ],
+    "withdrawn_reason": null
+  },
+  {
+    "id": "DRQ010",
+    "business_requirement_ids": [
+      "REQ013"
+    ],
+    "must_record": [
+      "Each ingredient of a household product, how much of it there is, and whether it is withheld as confidential"
+    ],
+    "must_answer": [
+      "What must be disclosed for this household product, and what is withheld?"
+    ],
+    "temporality": "current",
+    "must_prevent": [],
+    "status": "active",
+    "prevent_resolution": [],
+    "withdrawn_reason": null
+  },
+  {
+    "id": "DRQ011",
+    "business_requirement_ids": [
+      "REQ015"
+    ],
+    "must_record": [
+      "The use-by date of each batch, and the inputs that set it"
+    ],
+    "must_answer": [
+      "What is the latest date this finished batch can be used, given what went into it?"
+    ],
+    "temporality": "current",
+    "must_prevent": [],
+    "status": "active",
+    "prevent_resolution": [],
+    "withdrawn_reason": null
+  },
+  {
+    "id": "DRQ012",
+    "business_requirement_ids": [
+      "REQ016"
+    ],
+    "must_record": [
+      "Every split and every combination of batches, with the quantities of each part"
+    ],
+    "must_answer": [
+      "Which batches came from this one, and which batches made up this combined one?"
+    ],
+    "temporality": "current",
+    "must_prevent": [
+      "A split that produces a quantity with no batch it came from"
+    ],
+    "status": "active",
+    "prevent_resolution": [
+      {
+        "must_prevent_index": 0,
+        "expressed_by": "relationship-cardinality",
+        "artefact_id": "REL001"
+      }
+    ],
+    "withdrawn_reason": null
+  },
+  {
+    "id": "DRQ013",
+    "business_requirement_ids": [
+      "REQ001",
+      "REQ017",
+      "REQ018"
+    ],
+    "must_record": [
+      "How much of each item is held, in what condition, at which place, at what time"
+    ],
+    "must_answer": [
+      "How much of this material is available, on hold, or rejected at each site right now?"
+    ],
+    "temporality": "both",
+    "must_prevent": [
+      "Stock on hold counted as available"
+    ],
+    "status": "active",
+    "prevent_resolution": [
+      {
+        "must_prevent_index": 0,
+        "expressed_by": "parent-cardinality",
+        "artefact_id": "SBJ048"
+      }
+    ],
+    "withdrawn_reason": null
+  },
+  {
+    "id": "DRQ014",
+    "business_requirement_ids": [
+      "REQ019",
+      "REQ020"
+    ],
+    "must_record": [
+      "Each size and pack as its own product, related to its family",
+      "Each change to a product, and whether it made a new product or a new version, and why"
+    ],
+    "must_answer": [
+      "Which pack sizes of this product exist, and did this change create a new product or a new version?"
+    ],
+    "temporality": "as-at",
+    "must_prevent": [],
+    "status": "active",
+    "prevent_resolution": [],
+    "withdrawn_reason": null
+  },
+  {
+    "id": "DRQ015",
+    "business_requirement_ids": [
+      "REQ021",
+      "REQ022"
+    ],
+    "must_record": [
+      "The versions of each recipe, when each took effect, and which version each batch was made to"
+    ],
+    "must_answer": [
+      "What recipe was this batch made to, and what was it meant to contain at the time?"
+    ],
+    "temporality": "as-at",
+    "must_prevent": [],
+    "status": "active",
+    "prevent_resolution": [],
+    "withdrawn_reason": null
+  },
+  {
+    "id": "DRQ016",
+    "business_requirement_ids": [
+      "REQ023",
+      "REQ024"
+    ],
+    "must_record": [
+      "Each individually identified unit, the product it is a unit of, and which unit or batch filled each part of it"
+    ],
+    "must_answer": [
+      "What exactly is inside this individual unit, and which batch did each part come from?"
+    ],
+    "temporality": "as-at",
+    "must_prevent": [
+      "A unit recorded with a part its definition does not call for"
+    ],
+    "status": "active",
+    "prevent_resolution": [
+      {
+        "must_prevent_index": 0,
+        "expressed_by": "relationship-cardinality",
+        "artefact_id": "REL015"
+      }
+    ],
+    "withdrawn_reason": null
+  },
+  {
+    "id": "DRQ017",
+    "business_requirement_ids": [
+      "REQ025",
+      "REQ026",
+      "REQ027",
+      "REQ028"
+    ],
+    "must_record": [
+      "The steps of each method in order, what each step needs, and its settings for each product on each line"
+    ],
+    "must_answer": [
+      "What steps, equipment, qualifications and settings does making this product need on this line?"
+    ],
+    "temporality": "current",
+    "must_prevent": [],
+    "status": "active",
+    "prevent_resolution": [],
+    "withdrawn_reason": null
+  },
+  {
+    "id": "DRQ018",
+    "business_requirement_ids": [
+      "REQ029",
+      "REQ030"
+    ],
+    "must_record": [
+      "The four levels of each recipe, and which level each came from"
+    ],
+    "must_answer": [
+      "Which instructions were issued for this batch, and which formulation did they come from?"
+    ],
+    "temporality": "as-at",
+    "must_prevent": [],
+    "status": "active",
+    "prevent_resolution": [],
+    "withdrawn_reason": null
+  },
+  {
+    "id": "DRQ019",
+    "business_requirement_ids": [
+      "REQ031",
+      "REQ032"
+    ],
+    "must_record": [
+      "The rules about what may run after what on each line, and why",
+      "Each changeover and each clean, with how long it took"
+    ],
+    "must_answer": [
+      "What ran on this line just before this batch, and was the line cleaned in between?"
+    ],
+    "temporality": "as-at",
+    "must_prevent": [
+      "A product free of an allergen run straight after one containing it, with no clean between"
+    ],
+    "status": "active",
+    "prevent_resolution": [
+      {
+        "must_prevent_index": 0,
+        "expressed_by": "mandatory-attribute",
+        "artefact_id": "ATR058"
+      }
+    ],
+    "withdrawn_reason": null
+  },
+  {
+    "id": "DRQ020",
+    "business_requirement_ids": [
+      "REQ033",
+      "REQ034"
+    ],
+    "must_record": [
+      "Each place in the plant and what it sits within",
+      "Which machine stood in each place, from when to when"
+    ],
+    "must_answer": [
+      "Which machine was in this place on the day this batch was made?"
+    ],
+    "temporality": "as-at",
+    "must_prevent": [],
+    "status": "active",
+    "prevent_resolution": [],
+    "withdrawn_reason": null
+  },
+  {
+    "id": "DRQ021",
+    "business_requirement_ids": [
+      "REQ035",
+      "REQ036",
+      "REQ039"
+    ],
+    "must_record": [
+      "Each machine's failures and how it failed, its repairs, its readings, and how much it matters"
+    ],
+    "must_answer": [
+      "Which machines cause the most unplanned stoppage, and how do they fail?"
+    ],
+    "temporality": "both",
+    "must_prevent": [],
+    "status": "active",
+    "prevent_resolution": [],
+    "withdrawn_reason": null
+  },
+  {
+    "id": "DRQ022",
+    "business_requirement_ids": [
+      "REQ037",
+      "REQ038"
+    ],
+    "must_record": [
+      "One record of each stoppage — start, end, and reason from a set list — with the lost output and the repair both tied to it"
+    ],
+    "must_answer": [
+      "How long did this line stop, why, and what did maintenance do about it?"
+    ],
+    "temporality": "as-at",
+    "must_prevent": [
+      "One stoppage recorded twice",
+      "A stoppage with no reason"
+    ],
+    "status": "active",
+    "prevent_resolution": [
+      {
+        "must_prevent_index": 0,
+        "expressed_by": "relationship-cardinality",
+        "artefact_id": "REL031"
+      },
+      {
+        "must_prevent_index": 1,
+        "expressed_by": "lookup",
+        "artefact_id": "LKP006"
+      }
+    ],
+    "withdrawn_reason": null
+  },
+  {
+    "id": "DRQ023",
+    "business_requirement_ids": [
+      "REQ040",
+      "REQ041",
+      "REQ064"
+    ],
+    "must_record": [
+      "What each step of a batch was told to do, what it did, what resulted, who did it, and whether they were qualified at the time"
+    ],
+    "must_answer": [
+      "Who carried out each step of this batch, and were they qualified on that day?"
+    ],
+    "temporality": "as-at",
+    "must_prevent": [
+      "Work by someone not qualified going unnoticed"
+    ],
+    "status": "active",
+    "prevent_resolution": [
+      {
+        "must_prevent_index": 0,
+        "expressed_by": "dates",
+        "artefact_id": "REL021"
+      }
+    ],
+    "withdrawn_reason": null
+  },
+  {
+    "id": "DRQ024",
+    "business_requirement_ids": [
+      "REQ042",
+      "REQ065"
+    ],
+    "must_record": [
+      "Each movement of goods — from where, to where, when, how much, which batch"
+    ],
+    "must_answer": [
+      "Where has this batch been, and where is it now?"
+    ],
+    "temporality": "both",
+    "must_prevent": [],
+    "status": "active",
+    "prevent_resolution": [],
+    "withdrawn_reason": null
+  },
+  {
+    "id": "DRQ025",
+    "business_requirement_ids": [
+      "REQ044",
+      "REQ045"
+    ],
+    "must_record": [
+      "Each version of a specification, and each test with its method, sample, sampling plan and result"
+    ],
+    "must_answer": [
+      "Did this batch meet the specification in force when it was made, and by what test?"
+    ],
+    "temporality": "as-at",
+    "must_prevent": [],
+    "status": "active",
+    "prevent_resolution": [],
+    "withdrawn_reason": null
+  },
+  {
+    "id": "DRQ026",
+    "business_requirement_ids": [
+      "REQ046",
+      "REQ048"
+    ],
+    "must_record": [
+      "Departures from procedure against the batch run, and failures against specification against the batch made — separately, each with how serious it is and how it was contained"
+    ],
+    "must_answer": [
+      "What went wrong on this batch — a procedure not followed, the product out of specification, or both?"
+    ],
+    "temporality": "current",
+    "must_prevent": [
+      "The two being recorded as one"
+    ],
+    "status": "active",
+    "prevent_resolution": [
+      {
+        "must_prevent_index": 0,
+        "expressed_by": "platform",
+        "artefact_id": null
+      }
+    ],
+    "withdrawn_reason": null
+  },
+  {
+    "id": "DRQ027",
+    "business_requirement_ids": [
+      "REQ047"
+    ],
+    "must_record": [
+      "Each hold, the decision taken, the reason, and who approved it"
+    ],
+    "must_answer": [
+      "What was decided about this failed material, why, and by whom?"
+    ],
+    "temporality": "current",
+    "must_prevent": [
+      "A decision with no named approver"
+    ],
+    "status": "active",
+    "prevent_resolution": [
+      {
+        "must_prevent_index": 0,
+        "expressed_by": "mandatory-attribute",
+        "artefact_id": "ATR010"
+      }
+    ],
+    "withdrawn_reason": null
+  },
+  {
+    "id": "DRQ028",
+    "business_requirement_ids": [
+      "REQ049",
+      "REQ059"
+    ],
+    "must_record": [
+      "For each corrective action: the cause, what was done, the check that it worked, and when it was closed"
+    ],
+    "must_answer": [
+      "Which corrective actions are open, and were any closed without checking they worked?"
+    ],
+    "temporality": "current",
+    "must_prevent": [
+      "Closing an action before checking it worked"
+    ],
+    "status": "active",
+    "prevent_resolution": [
+      {
+        "must_prevent_index": 0,
+        "expressed_by": "mandatory-attribute",
+        "artefact_id": "ATR113"
+      }
+    ],
+    "withdrawn_reason": null
+  },
+  {
+    "id": "DRQ029",
+    "business_requirement_ids": [
+      "REQ050"
+    ],
+    "must_record": [
+      "Each release — who released it, when, on what basis, and what it covered"
+    ],
+    "must_answer": [
+      "Who released this batch, when, and on what basis?"
+    ],
+    "temporality": "current",
+    "must_prevent": [
+      "Stock treated as available because a batch finished"
+    ],
+    "status": "active",
+    "prevent_resolution": [
+      {
+        "must_prevent_index": 0,
+        "expressed_by": "mandatory-attribute",
+        "artefact_id": "ATR115"
+      }
+    ],
+    "withdrawn_reason": null
+  },
+  {
+    "id": "DRQ030",
+    "business_requirement_ids": [
+      "REQ051",
+      "REQ052",
+      "REQ053"
+    ],
+    "must_record": [
+      "The lot code given at first packing or transformation, carried at every later movement, kept for two years"
+    ],
+    "must_answer": [
+      "Every batch this ingredient batch went into, and everywhere those went — within twenty-four hours"
+    ],
+    "temporality": "current",
+    "must_prevent": [
+      "A movement recorded without its lot code"
+    ],
+    "status": "active",
+    "prevent_resolution": [
+      {
+        "must_prevent_index": 0,
+        "expressed_by": "mandatory-attribute",
+        "artefact_id": "ATR029"
+      }
+    ],
+    "withdrawn_reason": null
+  },
+  {
+    "id": "DRQ031",
+    "business_requirement_ids": [
+      "REQ054"
+    ],
+    "must_record": [
+      "Each complaint, and the batch where the person can supply it"
+    ],
+    "must_answer": [
+      "Which complaints concern this batch, and what else was made from the same inputs?"
+    ],
+    "temporality": "current",
+    "must_prevent": [],
+    "status": "active",
+    "prevent_resolution": [],
+    "withdrawn_reason": null
+  },
+  {
+    "id": "DRQ032",
+    "business_requirement_ids": [
+      "REQ055",
+      "REQ056",
+      "REQ057"
+    ],
+    "must_record": [
+      "Each signature — who, what, when, and what it meant — each second check, and each correction as a new entry"
+    ],
+    "must_answer": [
+      "Who signed this record, what did it mean, and has anything been corrected since?"
+    ],
+    "temporality": "as-at",
+    "must_prevent": [
+      "An entry altered without a correction being recorded"
+    ],
+    "status": "active",
+    "prevent_resolution": [
+      {
+        "must_prevent_index": 0,
+        "expressed_by": "relationship-cardinality",
+        "artefact_id": "REL035"
+      }
+    ],
+    "withdrawn_reason": null
+  },
+  {
+    "id": "DRQ033",
+    "business_requirement_ids": [
+      "REQ060",
+      "REQ061",
+      "REQ062"
+    ],
+    "must_record": [
+      "Which party made or packed each batch, the specification they were given, and when the goods became the organisation's"
+    ],
+    "must_answer": [
+      "Which of our finished batches were made by an outside manufacturer, to which specification, and when did they become ours?"
+    ],
+    "temporality": "as-at",
+    "must_prevent": [],
+    "status": "active",
+    "prevent_resolution": [],
+    "withdrawn_reason": null
+  },
+  {
+    "id": "DRQ034",
+    "business_requirement_ids": [
+      "REQ066"
+    ],
+    "must_record": [
+      "The conditions each place must keep, and any breach against the stock held there"
+    ],
+    "must_answer": [
+      "Was this batch ever stored outside its permitted conditions?"
+    ],
+    "temporality": "as-at",
+    "must_prevent": [],
+    "status": "active",
+    "prevent_resolution": [],
+    "withdrawn_reason": null
+  },
+  {
+    "id": "DRQ035",
+    "business_requirement_ids": [
+      "REQ067",
+      "REQ069"
+    ],
+    "must_record": [
+      "The identifiers each place and each product carries, and who issued each"
+    ],
+    "must_answer": [
+      "Which place or product is this, whatever identifier the supplier or regulator used?"
+    ],
+    "temporality": "current",
+    "must_prevent": [],
+    "status": "active",
+    "prevent_resolution": [],
+    "withdrawn_reason": null
+  },
+  {
+    "id": "DRQ036",
+    "business_requirement_ids": [
+      "REQ070"
+    ],
+    "must_record": [
+      "The expected and actual cost of each product, by element"
+    ],
+    "must_answer": [
+      "What did this batch cost against its standard, and why?"
+    ],
+    "temporality": "as-at",
+    "must_prevent": [],
+    "status": "active",
+    "prevent_resolution": [],
+    "withdrawn_reason": null
+  }
+]

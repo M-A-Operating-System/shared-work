@@ -1,0 +1,112 @@
+[
+  {
+    "id": "DOM001",
+    "name": "People",
+    "prefix": "PER",
+    "dda_id": "DMD000000001",
+    "anchor_subject_id": "SBJ001",
+    "status": "existing",
+    "admission_gate": null
+  },
+  {
+    "id": "DOM002",
+    "name": "LegalEntities",
+    "prefix": "LEG",
+    "dda_id": "DMD000000012",
+    "anchor_subject_id": "SBJ005",
+    "status": "existing",
+    "admission_gate": null
+  },
+  {
+    "id": "DOM003",
+    "name": "Documents",
+    "prefix": "DOC",
+    "dda_id": "DMD000000016",
+    "anchor_subject_id": "SBJ010",
+    "status": "existing",
+    "admission_gate": null
+  },
+  {
+    "id": "DOM004",
+    "name": "Events",
+    "prefix": "EVT",
+    "dda_id": "DMD000000020",
+    "anchor_subject_id": "SBJ050",
+    "status": "existing — anchor created",
+    "admission_gate": null
+  },
+  {
+    "id": "DOM005",
+    "name": "Transactions",
+    "prefix": "TRX",
+    "dda_id": "DMD000000022",
+    "anchor_subject_id": "SBJ047",
+    "status": "existing — anchor created",
+    "admission_gate": null
+  },
+  {
+    "id": "DOM006",
+    "name": "Products",
+    "prefix": "PRD",
+    "dda_id": null,
+    "anchor_subject_id": "SBJ012",
+    "status": "proposed",
+    "admission_gate": [
+      "A product definition exists whether or not any batch is being made.",
+      "It survives discontinuation as the record of what was made and sold.",
+      "Technical, quality and supply chain roles name products every day."
+    ]
+  },
+  {
+    "id": "DOM007",
+    "name": "Instances",
+    "prefix": "UNT",
+    "dda_id": null,
+    "anchor_subject_id": "SBJ027",
+    "status": "proposed",
+    "admission_gate": [
+      "An individually identified unit — a serialised pack or a machine — exists apart from the organisation that made or owns it.",
+      "Its record survives disposal as a history of repairs, failures and recalls.",
+      "A maintenance lead and a recall coordinator name units every day."
+    ]
+  },
+  {
+    "id": "DOM008",
+    "name": "Equipment",
+    "prefix": "EQP",
+    "dda_id": null,
+    "anchor_subject_id": "SBJ032",
+    "status": "proposed",
+    "admission_gate": [
+      "A place in the plant exists independently of the machine standing in it.",
+      "It survives the replacement of that machine.",
+      "A plant manager names lines, cells and units every day."
+    ]
+  },
+  {
+    "id": "DOM009",
+    "name": "Processes",
+    "prefix": "PRC",
+    "dda_id": null,
+    "anchor_subject_id": "SBJ036",
+    "status": "proposed",
+    "admission_gate": [
+      "A step of work is defined once, independently of any product using it.",
+      "It survives the discontinuation of any product using it.",
+      "Technical and plant roles name steps — pasteurising, filling — every day."
+    ]
+  },
+  {
+    "id": "DOM010",
+    "name": "Locations",
+    "prefix": "LOC",
+    "dda_id": null,
+    "anchor_subject_id": "SBJ043",
+    "status": "proposed",
+    "admission_gate": [
+      "A site or warehouse exists independently of what is stored in it.",
+      "It survives closure as the place history refers to.",
+      "Supply chain and quality roles name sites and stores every day."
+    ]
+  }
+]

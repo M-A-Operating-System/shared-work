@@ -1,0 +1,1027 @@
+{
+  "subjects": [
+    {
+      "id": "SBJ001",
+      "code": "Person",
+      "definition": "One natural person — an operator, a technician, a supplier's contact.",
+      "kind": "subject",
+      "mastery": "mastered",
+      "domain_id": "DOM001",
+      "parent_id": null,
+      "dda_action": "reuse",
+      "dda_id": "DMC000000143",
+      "data_requirement_ids": [
+        "DRQ023"
+      ]
+    },
+    {
+      "id": "SBJ003",
+      "code": "PersonShiftAssignments",
+      "definition": "One period a person was assigned to work at a place.",
+      "kind": "subject",
+      "mastery": "ingested",
+      "domain_id": "DOM001",
+      "parent_id": "SBJ001",
+      "dda_action": "create",
+      "dda_id": null,
+      "data_requirement_ids": [
+        "DRQ023"
+      ]
+    },
+    {
+      "id": "SBJ004",
+      "code": "PersonSignatures",
+      "definition": "One signature a person applied: what was signed, when, and what it meant.",
+      "kind": "occurrence",
+      "mastery": "ingested",
+      "domain_id": "DOM001",
+      "parent_id": "SBJ001",
+      "dda_action": "create",
+      "dda_id": null,
+      "data_requirement_ids": [
+        "DRQ032"
+      ]
+    },
+    {
+      "id": "SBJ005",
+      "code": "LegalEntity",
+      "definition": "One organisation — a supplier, an outside manufacturer, a certifying body, or one of the organisation's own companies.",
+      "kind": "subject",
+      "mastery": "ingested",
+      "domain_id": "DOM002",
+      "parent_id": null,
+      "dda_action": "reuse",
+      "dda_id": "DMC000000106",
+      "data_requirement_ids": [
+        "DRQ006",
+        "DRQ033"
+      ]
+    },
+    {
+      "id": "SBJ006",
+      "code": "LegalEntityIdentifiers",
+      "definition": "One identifier by which an organisation is known.",
+      "kind": "subject",
+      "mastery": "ingested",
+      "domain_id": "DOM002",
+      "parent_id": "SBJ005",
+      "dda_action": "reuse",
+      "dda_id": "DMC000000023",
+      "data_requirement_ids": [
+        "DRQ035"
+      ]
+    },
+    {
+      "id": "SBJ007",
+      "code": "LegalEntityAddress",
+      "definition": "One address of an organisation.",
+      "kind": "subject",
+      "mastery": "ingested",
+      "domain_id": "DOM002",
+      "parent_id": "SBJ005",
+      "dda_action": "reuse",
+      "dda_id": "DMC000000108",
+      "data_requirement_ids": [
+        "DRQ006"
+      ]
+    },
+    {
+      "id": "SBJ008",
+      "code": "LegalEntityAssessments",
+      "definition": "One assessment of a supplier or outside manufacturer — its scope, its result and how long it is valid.",
+      "kind": "subject",
+      "mastery": "mastered",
+      "domain_id": "DOM002",
+      "parent_id": "SBJ005",
+      "dda_action": "create",
+      "dda_id": null,
+      "data_requirement_ids": [
+        "DRQ006"
+      ]
+    },
+    {
+      "id": "SBJ009",
+      "code": "LegalEntitySupplierRequests",
+      "definition": "One problem formally raised with a supplier, with their response and its closure.",
+      "kind": "subject",
+      "mastery": "mastered",
+      "domain_id": "DOM002",
+      "parent_id": "SBJ005",
+      "dda_action": "create",
+      "dda_id": null,
+      "data_requirement_ids": [
+        "DRQ028"
+      ]
+    },
+    {
+      "id": "SBJ010",
+      "code": "Document",
+      "definition": "One document — a certificate of analysis, a specification sheet, a safety data sheet.",
+      "kind": "subject",
+      "mastery": "ingested",
+      "domain_id": "DOM003",
+      "parent_id": null,
+      "dda_action": "reuse",
+      "dda_id": "DMC000000142",
+      "data_requirement_ids": [
+        "DRQ007"
+      ]
+    },
+    {
+      "id": "SBJ011",
+      "code": "DocumentDeclarations",
+      "definition": "One statement a document makes about a product or batch, and whether the organisation checked it.",
+      "kind": "subject",
+      "mastery": "ingested",
+      "domain_id": "DOM003",
+      "parent_id": "SBJ010",
+      "dda_action": "create",
+      "dda_id": null,
+      "data_requirement_ids": [
+        "DRQ007",
+        "DRQ008"
+      ]
+    },
+    {
+      "id": "SBJ012",
+      "code": "Product",
+      "definition": "One thing the organisation buys, makes or sells, at one level of packing or processing — an ingredient, a part-made good, a finished pack, a case.",
+      "kind": "subject",
+      "mastery": "mastered",
+      "domain_id": "DOM006",
+      "parent_id": null,
+      "dda_action": "create",
+      "dda_id": null,
+      "data_requirement_ids": [
+        "DRQ001",
+        "DRQ013"
+      ]
+    },
+    {
+      "id": "SBJ013",
+      "code": "ProductIdentifiers",
+      "definition": "One identifier by which a product is known — a trade item number, an internal number, a supplier's part number.",
+      "kind": "subject",
+      "mastery": "mastered",
+      "domain_id": "DOM006",
+      "parent_id": "SBJ012",
+      "dda_action": "create",
+      "dda_id": null,
+      "data_requirement_ids": [
+        "DRQ014",
+        "DRQ035"
+      ]
+    },
+    {
+      "id": "SBJ014",
+      "code": "ProductSpecifications",
+      "definition": "One version of what a product must be, its limits, and how it is checked.",
+      "kind": "subject",
+      "mastery": "mastered",
+      "domain_id": "DOM006",
+      "parent_id": "SBJ012",
+      "dda_action": "create",
+      "dda_id": null,
+      "data_requirement_ids": [
+        "DRQ025"
+      ]
+    },
+    {
+      "id": "SBJ015",
+      "code": "ProductStructureVersions",
+      "definition": "One complete definition of what goes into a product, for a site, a market or a period, with when it takes effect.",
+      "kind": "subject",
+      "mastery": "mastered",
+      "domain_id": "DOM006",
+      "parent_id": "SBJ012",
+      "dda_action": "create",
+      "dda_id": null,
+      "data_requirement_ids": [
+        "DRQ001",
+        "DRQ015"
+      ]
+    },
+    {
+      "id": "SBJ016",
+      "code": "ProductLots",
+      "definition": "One batch made or received, with its lot code, its date and who made it.",
+      "kind": "subject",
+      "mastery": "ingested",
+      "domain_id": "DOM006",
+      "parent_id": "SBJ012",
+      "dda_action": "create",
+      "dda_id": null,
+      "data_requirement_ids": [
+        "DRQ012",
+        "DRQ030"
+      ]
+    },
+    {
+      "id": "SBJ017",
+      "code": "ProductSublots",
+      "definition": "One part of a batch separated for handling.",
+      "kind": "subject",
+      "mastery": "ingested",
+      "domain_id": "DOM006",
+      "parent_id": "SBJ016",
+      "dda_action": "create",
+      "dda_id": null,
+      "data_requirement_ids": [
+        "DRQ012"
+      ]
+    },
+    {
+      "id": "SBJ018",
+      "code": "ProductHazards",
+      "definition": "One hazard a product carries or may carry — an allergen, an irritant, a classified chemical — and on what basis.",
+      "kind": "subject",
+      "mastery": "mastered",
+      "domain_id": "DOM006",
+      "parent_id": "SBJ012",
+      "dda_action": "create",
+      "dda_id": null,
+      "data_requirement_ids": [
+        "DRQ009"
+      ]
+    },
+    {
+      "id": "SBJ020",
+      "code": "ProductOrigins",
+      "definition": "One stated country or region of origin, and on what basis.",
+      "kind": "subject",
+      "mastery": "ingested",
+      "domain_id": "DOM006",
+      "parent_id": "SBJ012",
+      "dda_action": "create",
+      "dda_id": null,
+      "data_requirement_ids": [
+        "DRQ009"
+      ]
+    },
+    {
+      "id": "SBJ021",
+      "code": "ProductShelfLives",
+      "definition": "How long a product lasts under stated storage conditions.",
+      "kind": "subject",
+      "mastery": "mastered",
+      "domain_id": "DOM006",
+      "parent_id": "SBJ012",
+      "dda_action": "create",
+      "dda_id": null,
+      "data_requirement_ids": [
+        "DRQ011"
+      ]
+    },
+    {
+      "id": "SBJ022",
+      "code": "ProductSubstitutions",
+      "definition": "One approved alternative for an input, and the conditions for using it.",
+      "kind": "subject",
+      "mastery": "mastered",
+      "domain_id": "DOM006",
+      "parent_id": "SBJ012",
+      "dda_action": "create",
+      "dda_id": null,
+      "data_requirement_ids": [
+        "DRQ005"
+      ]
+    },
+    {
+      "id": "SBJ023",
+      "code": "ProductDisclosures",
+      "definition": "One ingredient a product must disclose — its identity, how much there is, and whether it is withheld as confidential.",
+      "kind": "subject",
+      "mastery": "mastered",
+      "domain_id": "DOM006",
+      "parent_id": "SBJ012",
+      "dda_action": "create",
+      "dda_id": null,
+      "data_requirement_ids": [
+        "DRQ010"
+      ]
+    },
+    {
+      "id": "SBJ024",
+      "code": "ProductVariantAxes",
+      "definition": "One way the members of a family differ — size, format, pack count — and the values allowed.",
+      "kind": "subject",
+      "mastery": "mastered",
+      "domain_id": "DOM006",
+      "parent_id": "SBJ012",
+      "dda_action": "create",
+      "dda_id": null,
+      "data_requirement_ids": [
+        "DRQ014"
+      ]
+    },
+    {
+      "id": "SBJ025",
+      "code": "ProductCostings",
+      "definition": "The expected or actual cost of a product, by element, for a period.",
+      "kind": "subject",
+      "mastery": "derived",
+      "domain_id": "DOM006",
+      "parent_id": "SBJ012",
+      "dda_action": "create",
+      "dda_id": null,
+      "data_requirement_ids": [
+        "DRQ036"
+      ]
+    },
+    {
+      "id": "SBJ026",
+      "code": "ProductIdentityChanges",
+      "definition": "One change to a product, and whether it made a new product or a new version, and why.",
+      "kind": "occurrence",
+      "mastery": "mastered",
+      "domain_id": "DOM006",
+      "parent_id": "SBJ012",
+      "dda_action": "create",
+      "dda_id": null,
+      "data_requirement_ids": [
+        "DRQ014"
+      ]
+    },
+    {
+      "id": "SBJ027",
+      "code": "Instance",
+      "definition": "One individually identified physical thing — a serialised pack or a machine — made to a product definition.",
+      "kind": "subject",
+      "mastery": "mastered",
+      "domain_id": "DOM007",
+      "parent_id": null,
+      "dda_action": "create",
+      "dda_id": null,
+      "data_requirement_ids": [
+        "DRQ016",
+        "DRQ020"
+      ]
+    },
+    {
+      "id": "SBJ028",
+      "code": "InstanceIdentifiers",
+      "definition": "One identifier by which a unit is individually known — a serial number, an asset number.",
+      "kind": "subject",
+      "mastery": "mastered",
+      "domain_id": "DOM007",
+      "parent_id": "SBJ027",
+      "dda_action": "create",
+      "dda_id": null,
+      "data_requirement_ids": [
+        "DRQ016"
+      ]
+    },
+    {
+      "id": "SBJ029",
+      "code": "InstanceConditions",
+      "definition": "One reading of a unit's state — hours run, cycles, wear, calibration.",
+      "kind": "occurrence",
+      "mastery": "ingested",
+      "domain_id": "DOM007",
+      "parent_id": "SBJ027",
+      "dda_action": "create",
+      "dda_id": null,
+      "data_requirement_ids": [
+        "DRQ021"
+      ]
+    },
+    {
+      "id": "SBJ030",
+      "code": "InstanceFailureModes",
+      "definition": "One way a machine characteristically fails, and what that failure causes.",
+      "kind": "subject",
+      "mastery": "mastered",
+      "domain_id": "DOM007",
+      "parent_id": "SBJ027",
+      "dda_action": "create",
+      "dda_id": null,
+      "data_requirement_ids": [
+        "DRQ021"
+      ]
+    },
+    {
+      "id": "SBJ031",
+      "code": "InstanceCriticalities",
+      "definition": "How much a machine matters — to output, to safety, and whether there is a spare.",
+      "kind": "subject",
+      "mastery": "mastered",
+      "domain_id": "DOM007",
+      "parent_id": "SBJ027",
+      "dda_action": "create",
+      "dda_id": null,
+      "data_requirement_ids": [
+        "DRQ021"
+      ]
+    },
+    {
+      "id": "SBJ032",
+      "code": "EquipmentPosition",
+      "definition": "One place in the plant where work happens — an area, a line, a cell, a unit.",
+      "kind": "subject",
+      "mastery": "mastered",
+      "domain_id": "DOM008",
+      "parent_id": null,
+      "dda_action": "create",
+      "dda_id": null,
+      "data_requirement_ids": [
+        "DRQ020"
+      ]
+    },
+    {
+      "id": "SBJ033",
+      "code": "EquipmentCapabilities",
+      "definition": "One thing a place in the plant is able to do, and how much of it.",
+      "kind": "subject",
+      "mastery": "mastered",
+      "domain_id": "DOM008",
+      "parent_id": "SBJ032",
+      "dda_action": "create",
+      "dda_id": null,
+      "data_requirement_ids": [
+        "DRQ017"
+      ]
+    },
+    {
+      "id": "SBJ034",
+      "code": "EquipmentSequencingRules",
+      "definition": "One rule about what may run after what at a place, and why.",
+      "kind": "subject",
+      "mastery": "mastered",
+      "domain_id": "DOM008",
+      "parent_id": "SBJ032",
+      "dda_action": "create",
+      "dda_id": null,
+      "data_requirement_ids": [
+        "DRQ019"
+      ]
+    },
+    {
+      "id": "SBJ035",
+      "code": "EquipmentMaintenancePlans",
+      "definition": "One planned maintenance regime, and what triggers it.",
+      "kind": "subject",
+      "mastery": "mastered",
+      "domain_id": "DOM008",
+      "parent_id": "SBJ032",
+      "dda_action": "create",
+      "dda_id": null,
+      "data_requirement_ids": [
+        "DRQ021"
+      ]
+    },
+    {
+      "id": "SBJ036",
+      "code": "ProcessSegment",
+      "definition": "One step of work, defined independently of any product — mixing, pasteurising, filling.",
+      "kind": "subject",
+      "mastery": "mastered",
+      "domain_id": "DOM009",
+      "parent_id": null,
+      "dda_action": "create",
+      "dda_id": null,
+      "data_requirement_ids": [
+        "DRQ017"
+      ]
+    },
+    {
+      "id": "SBJ037",
+      "code": "ProcessSegmentRequirements",
+      "definition": "One thing a step needs to run — a capability, a qualification, a kind of material.",
+      "kind": "subject",
+      "mastery": "mastered",
+      "domain_id": "DOM009",
+      "parent_id": "SBJ036",
+      "dda_action": "create",
+      "dda_id": null,
+      "data_requirement_ids": [
+        "DRQ017"
+      ]
+    },
+    {
+      "id": "SBJ038",
+      "code": "ProcessParameters",
+      "definition": "One setting a step can be run at, with its allowed range.",
+      "kind": "subject",
+      "mastery": "mastered",
+      "domain_id": "DOM009",
+      "parent_id": "SBJ036",
+      "dda_action": "create",
+      "dda_id": null,
+      "data_requirement_ids": [
+        "DRQ017"
+      ]
+    },
+    {
+      "id": "SBJ039",
+      "code": "ProcessRoutings",
+      "definition": "The steps, in order, that turn a product's inputs into the product.",
+      "kind": "subject",
+      "mastery": "mastered",
+      "domain_id": "DOM009",
+      "parent_id": "SBJ036",
+      "dda_action": "create",
+      "dda_id": null,
+      "data_requirement_ids": [
+        "DRQ017"
+      ]
+    },
+    {
+      "id": "SBJ040",
+      "code": "ProcessRecipeLevels",
+      "definition": "One statement of a method at one level — general, site, master or the instructions for one batch.",
+      "kind": "subject",
+      "mastery": "mastered",
+      "domain_id": "DOM009",
+      "parent_id": "SBJ039",
+      "dda_action": "create",
+      "dda_id": null,
+      "data_requirement_ids": [
+        "DRQ018"
+      ]
+    },
+    {
+      "id": "SBJ041",
+      "code": "ProcessParameterValues",
+      "definition": "One value set for a setting at one level, for one product at one place.",
+      "kind": "subject",
+      "mastery": "mastered",
+      "domain_id": "DOM009",
+      "parent_id": "SBJ040",
+      "dda_action": "create",
+      "dda_id": null,
+      "data_requirement_ids": [
+        "DRQ017",
+        "DRQ018"
+      ]
+    },
+    {
+      "id": "SBJ042",
+      "code": "ProcessSamplingPlans",
+      "definition": "One rule saying what is sampled, when, how much, and against which specification.",
+      "kind": "subject",
+      "mastery": "mastered",
+      "domain_id": "DOM009",
+      "parent_id": "SBJ036",
+      "dda_action": "create",
+      "dda_id": null,
+      "data_requirement_ids": [
+        "DRQ025"
+      ]
+    },
+    {
+      "id": "SBJ043",
+      "code": "Location",
+      "definition": "One place — a site, a plant, a warehouse, a storage position.",
+      "kind": "subject",
+      "mastery": "mastered",
+      "domain_id": "DOM010",
+      "parent_id": null,
+      "dda_action": "create",
+      "dda_id": null,
+      "data_requirement_ids": [
+        "DRQ024"
+      ]
+    },
+    {
+      "id": "SBJ044",
+      "code": "LocationIdentifiers",
+      "definition": "One identifier by which a place is known, and who issued it.",
+      "kind": "subject",
+      "mastery": "mastered",
+      "domain_id": "DOM010",
+      "parent_id": "SBJ043",
+      "dda_action": "create",
+      "dda_id": null,
+      "data_requirement_ids": [
+        "DRQ035"
+      ]
+    },
+    {
+      "id": "SBJ045",
+      "code": "LocationStorageConditions",
+      "definition": "One condition a place must keep — temperature, humidity — and its limits.",
+      "kind": "subject",
+      "mastery": "mastered",
+      "domain_id": "DOM010",
+      "parent_id": "SBJ043",
+      "dda_action": "create",
+      "dda_id": null,
+      "data_requirement_ids": [
+        "DRQ034"
+      ]
+    },
+    {
+      "id": "SBJ047",
+      "code": "Transaction",
+      "definition": "One exchange of goods, of a stated kind — a purchase, a receipt, an issue to production, a transfer, a despatch.",
+      "kind": "occurrence",
+      "mastery": "ingested",
+      "domain_id": "DOM005",
+      "parent_id": null,
+      "dda_action": "create",
+      "dda_id": null,
+      "data_requirement_ids": [
+        "DRQ024",
+        "DRQ033"
+      ]
+    },
+    {
+      "id": "SBJ048",
+      "code": "TransactionLines",
+      "definition": "One line of an exchange: one product, one quantity.",
+      "kind": "occurrence",
+      "mastery": "ingested",
+      "domain_id": "DOM005",
+      "parent_id": "SBJ047",
+      "dda_action": "create",
+      "dda_id": null,
+      "data_requirement_ids": [
+        "DRQ024"
+      ]
+    },
+    {
+      "id": "SBJ049",
+      "code": "TransactionInventoryPositions",
+      "definition": "One quantity of a product, in one condition, at one place, at one time.",
+      "kind": "subject",
+      "mastery": "ingested",
+      "domain_id": "DOM005",
+      "parent_id": "SBJ047",
+      "dda_action": "create",
+      "dda_id": null,
+      "data_requirement_ids": [
+        "DRQ013"
+      ]
+    },
+    {
+      "id": "SBJ050",
+      "code": "Event",
+      "definition": "One thing that happened in the operation, at a time and a place.",
+      "kind": "occurrence",
+      "mastery": "ingested",
+      "domain_id": "DOM004",
+      "parent_id": null,
+      "dda_action": "create",
+      "dda_id": null,
+      "data_requirement_ids": [
+        "DRQ023"
+      ]
+    },
+    {
+      "id": "SBJ051",
+      "code": "EventProductionOrders",
+      "definition": "One instruction to make a quantity of a product.",
+      "kind": "occurrence",
+      "mastery": "ingested",
+      "domain_id": "DOM004",
+      "parent_id": "SBJ050",
+      "dda_action": "create",
+      "dda_id": null,
+      "data_requirement_ids": [
+        "DRQ023"
+      ]
+    },
+    {
+      "id": "SBJ052",
+      "code": "EventProductionRuns",
+      "definition": "One batch actually made — what it was told to do, what it did, and what it produced.",
+      "kind": "occurrence",
+      "mastery": "ingested",
+      "domain_id": "DOM004",
+      "parent_id": "SBJ050",
+      "dda_action": "create",
+      "dda_id": null,
+      "data_requirement_ids": [
+        "DRQ004",
+        "DRQ023"
+      ]
+    },
+    {
+      "id": "SBJ053",
+      "code": "EventMaterialConsumptions",
+      "definition": "One quantity of one input batch used in one run, filling one place in the recipe.",
+      "kind": "occurrence",
+      "mastery": "ingested",
+      "domain_id": "DOM004",
+      "parent_id": "SBJ050",
+      "dda_action": "create",
+      "dda_id": null,
+      "data_requirement_ids": [
+        "DRQ004",
+        "DRQ005"
+      ]
+    },
+    {
+      "id": "SBJ054",
+      "code": "EventLotSplits",
+      "definition": "One batch split into parts, or several batches combined into one.",
+      "kind": "occurrence",
+      "mastery": "ingested",
+      "domain_id": "DOM004",
+      "parent_id": "SBJ050",
+      "dda_action": "create",
+      "dda_id": null,
+      "data_requirement_ids": [
+        "DRQ012"
+      ]
+    },
+    {
+      "id": "SBJ055",
+      "code": "EventChangeovers",
+      "definition": "One change of a line from one product to another, including any clean.",
+      "kind": "occurrence",
+      "mastery": "ingested",
+      "domain_id": "DOM004",
+      "parent_id": "SBJ050",
+      "dda_action": "create",
+      "dda_id": null,
+      "data_requirement_ids": [
+        "DRQ019"
+      ]
+    },
+    {
+      "id": "SBJ056",
+      "code": "EventStoppages",
+      "definition": "One stop in production — start, end, and why.",
+      "kind": "occurrence",
+      "mastery": "ingested",
+      "domain_id": "DOM004",
+      "parent_id": "SBJ050",
+      "dda_action": "create",
+      "dda_id": null,
+      "data_requirement_ids": [
+        "DRQ022"
+      ]
+    },
+    {
+      "id": "SBJ057",
+      "code": "EventMaintenanceWork",
+      "definition": "One piece of maintenance work — what prompted it, what was found, what was done.",
+      "kind": "occurrence",
+      "mastery": "ingested",
+      "domain_id": "DOM004",
+      "parent_id": "SBJ050",
+      "dda_action": "create",
+      "dda_id": null,
+      "data_requirement_ids": [
+        "DRQ021",
+        "DRQ022"
+      ]
+    },
+    {
+      "id": "SBJ058",
+      "code": "EventTests",
+      "definition": "One test against a specification — its method, sample and result.",
+      "kind": "occurrence",
+      "mastery": "ingested",
+      "domain_id": "DOM004",
+      "parent_id": "SBJ050",
+      "dda_action": "create",
+      "dda_id": null,
+      "data_requirement_ids": [
+        "DRQ025"
+      ]
+    },
+    {
+      "id": "SBJ059",
+      "code": "EventDeviations",
+      "definition": "One departure from a defined procedure during a run.",
+      "kind": "occurrence",
+      "mastery": "mastered",
+      "domain_id": "DOM004",
+      "parent_id": "SBJ050",
+      "dda_action": "create",
+      "dda_id": null,
+      "data_requirement_ids": [
+        "DRQ026"
+      ]
+    },
+    {
+      "id": "SBJ060",
+      "code": "EventNonConformances",
+      "definition": "One failure of a batch or material against its specification.",
+      "kind": "occurrence",
+      "mastery": "mastered",
+      "domain_id": "DOM004",
+      "parent_id": "SBJ050",
+      "dda_action": "create",
+      "dda_id": null,
+      "data_requirement_ids": [
+        "DRQ026"
+      ]
+    },
+    {
+      "id": "SBJ061",
+      "code": "EventDispositions",
+      "definition": "One decision about failed material — use as is, rework, scrap or return — with its reason and approver.",
+      "kind": "occurrence",
+      "mastery": "mastered",
+      "domain_id": "DOM004",
+      "parent_id": "SBJ050",
+      "dda_action": "create",
+      "dda_id": null,
+      "data_requirement_ids": [
+        "DRQ027"
+      ]
+    },
+    {
+      "id": "SBJ062",
+      "code": "EventCorrectiveActions",
+      "definition": "One response to a problem — its cause, what was done, the check it worked, and its closure.",
+      "kind": "occurrence",
+      "mastery": "mastered",
+      "domain_id": "DOM004",
+      "parent_id": "SBJ050",
+      "dda_action": "create",
+      "dda_id": null,
+      "data_requirement_ids": [
+        "DRQ028"
+      ]
+    },
+    {
+      "id": "SBJ063",
+      "code": "EventReleases",
+      "definition": "One act of making output available — by whom, on what basis, for what.",
+      "kind": "occurrence",
+      "mastery": "mastered",
+      "domain_id": "DOM004",
+      "parent_id": "SBJ050",
+      "dda_action": "create",
+      "dda_id": null,
+      "data_requirement_ids": [
+        "DRQ029"
+      ]
+    },
+    {
+      "id": "SBJ064",
+      "code": "EventRecalls",
+      "definition": "One safety or quality incident, its scope and its resolution.",
+      "kind": "occurrence",
+      "mastery": "mastered",
+      "domain_id": "DOM004",
+      "parent_id": "SBJ050",
+      "dda_action": "create",
+      "dda_id": null,
+      "data_requirement_ids": [
+        "DRQ030"
+      ]
+    },
+    {
+      "id": "SBJ065",
+      "code": "EventComplaints",
+      "definition": "One report from outside the organisation about a product.",
+      "kind": "occurrence",
+      "mastery": "ingested",
+      "domain_id": "DOM004",
+      "parent_id": "SBJ050",
+      "dda_action": "create",
+      "dda_id": null,
+      "data_requirement_ids": [
+        "DRQ031"
+      ]
+    },
+    {
+      "id": "SBJ066",
+      "code": "EventCorrections",
+      "definition": "One correction to something already recorded, replacing it without erasing it.",
+      "kind": "occurrence",
+      "mastery": "mastered",
+      "domain_id": "DOM004",
+      "parent_id": "SBJ050",
+      "dda_action": "create",
+      "dda_id": null,
+      "data_requirement_ids": [
+        "DRQ032"
+      ]
+    },
+    {
+      "id": "SBJ067",
+      "code": "EventStorageBreaches",
+      "definition": "One time a place failed to keep its required conditions.",
+      "kind": "occurrence",
+      "mastery": "ingested",
+      "domain_id": "DOM004",
+      "parent_id": "SBJ050",
+      "dda_action": "create",
+      "dda_id": null,
+      "data_requirement_ids": [
+        "DRQ034"
+      ]
+    }
+  ],
+  "roles": [
+    {
+      "id": "ROL001",
+      "name": "Supplier",
+      "of": "LegalEntities",
+      "stated_in": [
+        "REQ008",
+        "REQ058"
+      ],
+      "generated_by": "REL003"
+    },
+    {
+      "id": "ROL002",
+      "name": "Outside Manufacturer",
+      "of": "LegalEntities",
+      "stated_in": [
+        "REQ060"
+      ],
+      "generated_by": "REL005"
+    },
+    {
+      "id": "ROL003",
+      "name": "Certifying Body",
+      "of": "LegalEntities",
+      "stated_in": [
+        "REQ011"
+      ],
+      "generated_by": "REL004"
+    },
+    {
+      "id": "ROL004",
+      "name": "Employee",
+      "of": "People",
+      "stated_in": [
+        "REQ041"
+      ],
+      "generated_by": "REL019"
+    },
+    {
+      "id": "ROL005",
+      "name": "Qualified Person",
+      "of": "People",
+      "stated_in": [
+        "REQ064"
+      ],
+      "generated_by": "REL020"
+    },
+    {
+      "id": "ROL006",
+      "name": "Performer — operator, approver, releaser, second checker",
+      "of": "People",
+      "stated_in": [
+        "REQ041",
+        "REQ047",
+        "REQ050",
+        "REQ057"
+      ],
+      "generated_by": "REL027"
+    },
+    {
+      "id": "ROL007",
+      "name": "Input Material",
+      "of": "Products",
+      "stated_in": [
+        "REQ002",
+        "REQ005"
+      ],
+      "generated_by": "REL001"
+    },
+    {
+      "id": "ROL008",
+      "name": "Output Product",
+      "of": "Products",
+      "stated_in": [
+        "REQ002"
+      ],
+      "generated_by": "REL001"
+    },
+    {
+      "id": "ROL009",
+      "name": "Family",
+      "of": "Products",
+      "stated_in": [
+        "REQ019"
+      ],
+      "generated_by": "REL002"
+    },
+    {
+      "id": "ROL010",
+      "name": "Installed Machine",
+      "of": "Instances",
+      "stated_in": [
+        "REQ034"
+      ],
+      "generated_by": "REL011"
+    },
+    {
+      "id": "ROL011",
+      "name": "Trading Party",
+      "of": "LegalEntities",
+      "stated_in": [
+        "REQ061"
+      ],
+      "generated_by": "REL021"
+    },
+    {
+      "id": "ROL012",
+      "name": "Regulator",
+      "of": "LegalEntities",
+      "stated_in": [
+        "REQ067"
+      ],
+      "generated_by": null
+    }
+  ]
+}

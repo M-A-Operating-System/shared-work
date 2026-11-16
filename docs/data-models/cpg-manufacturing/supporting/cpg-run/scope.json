@@ -1,0 +1,140 @@
+{
+  "domain": "CPG Manufacturing Operations",
+  "business": "A manufacturer of consumer packaged goods. It buys materials, makes and tests product, and releases it for despatch, through its own factories and through outside manufacturers.",
+  "subgroups": [
+    {
+      "id": "SCG001",
+      "name": "Food and beverage",
+      "is_primary": false
+    },
+    {
+      "id": "SCG002",
+      "name": "Household and cleaning products",
+      "is_primary": false
+    },
+    {
+      "id": "SCG003",
+      "name": "Personal care and cosmetics",
+      "is_primary": false
+    },
+    {
+      "id": "SCG004",
+      "name": "Pet care",
+      "is_primary": false
+    },
+    {
+      "id": "SCG005",
+      "name": "Beauty",
+      "is_primary": false
+    }
+  ],
+  "in_scope": [
+    [
+      "SCI001",
+      "Buying materials, and deciding which suppliers may supply them"
+    ],
+    [
+      "SCI002",
+      "Defining products — what they are made from and what they must be"
+    ],
+    [
+      "SCI003",
+      "Defining how products are made — the steps, the settings and the recipes"
+    ],
+    [
+      "SCI004",
+      "The layout of each factory and the machines in it"
+    ],
+    [
+      "SCI005",
+      "Making product, and what each batch actually used and produced"
+    ],
+    [
+      "SCI006",
+      "Testing, recording problems, putting them right, and releasing product"
+    ],
+    [
+      "SCI007",
+      "Tracing any batch back to its ingredients and forward to where it went"
+    ],
+    [
+      "SCI008",
+      "Stock held at the organisation's own sites"
+    ],
+    [
+      "SCI009",
+      "Product made or packed by outside manufacturers"
+    ]
+  ],
+  "out_of_scope": [
+    [
+      "SCO001",
+      "Trade spending, promotions and pricing with retailers",
+      "The commercial model"
+    ],
+    [
+      "SCO002",
+      "What happens on the shelf in store",
+      "The commercial model"
+    ],
+    [
+      "SCO003",
+      "Market share and sales data bought from research firms",
+      "The commercial model"
+    ],
+    [
+      "SCO004",
+      "Marketing, campaigns and advertising",
+      "The digital marketing model"
+    ],
+    [
+      "SCO005",
+      "Accounts, ledgers and statutory reporting",
+      "The finance model"
+    ],
+    [
+      "SCO006",
+      "Research and development before a product is formally defined",
+      "Not modelled"
+    ]
+  ],
+  "shared": [
+    "People",
+    "Legal entities",
+    "Documents",
+    "Events",
+    "Transactions"
+  ],
+  "assumptions": [
+    [
+      "SCA001",
+      "The factory, laboratory, quality and maintenance systems already in place stay in place. This model holds what they record; it does not replace them."
+    ],
+    [
+      "SCA002",
+      "Material held by a supplier or outside manufacturer is theirs. It becomes the organisation's on receipt, and the organisation holds no stock at any party it does not operate."
+    ],
+    [
+      "SCA003",
+      "Something bought as an ingredient or part may be another company's finished product. What it is made from is theirs and may not be known here."
+    ],
+    [
+      "SCA004",
+      "This is research-only work. No business owner has reviewed the requirements."
+    ]
+  ],
+  "questions_unanswered": [
+    [
+      "SCQ001",
+      "Is finished output identified individually, or only by batch?",
+      "The model supports both, so nothing here assumes either — but whether individual units are tracked changes how much of it is used."
+    ],
+    [
+      "SCQ002",
+      "What proportion of output is made by outside manufacturers?",
+      "Where it is most of it, the organisation holds little production record of its own, and the model is mainly about what partners must supply."
+    ]
+  ],
+  "mode": "research-only",
+  "certifier": "none — research-only"
+}

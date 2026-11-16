@@ -1,0 +1,444 @@
+[
+  {
+    "id": "LKP001",
+    "code": "ProductKindType",
+    "definition": "What a product is to this organisation, deciding whether it may be bought, made, used or sold. A product may be more than one kind at once.",
+    "scope": "concept",
+    "values": [
+      {
+        "code": "RAWMATERIAL",
+        "name": "Raw material",
+        "definition": "An ingredient or substance that enters a formulation."
+      },
+      {
+        "code": "PACKCOMPONENT",
+        "name": "Packaging component",
+        "definition": "A container, closure, label, case or divider."
+      },
+      {
+        "code": "INDIRECT",
+        "name": "Indirect material",
+        "definition": "Used in production without entering the product."
+      },
+      {
+        "code": "INTERMEDIATE",
+        "name": "Part-made good",
+        "definition": "Made and used internally; neither bought nor sold."
+      },
+      {
+        "code": "CONSUMERUNIT",
+        "name": "Consumer unit",
+        "definition": "The unit a consumer buys."
+      },
+      {
+        "code": "CASE",
+        "name": "Case",
+        "definition": "The unit a customer orders."
+      },
+      {
+        "code": "PALLET",
+        "name": "Pallet",
+        "definition": "The unit that ships."
+      },
+      {
+        "code": "FAMILY",
+        "name": "Family",
+        "definition": "Not a physical thing: the group a set of variants belongs to."
+      }
+    ],
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "searched DDA lookup types for 'ProductKindType' and for a Universal equivalent",
+    "data_requirement_ids": [
+      "DRQ001",
+      "DRQ013"
+    ],
+    "evidence_source_ids": [
+      "SRC005",
+      "SRC030"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "LKP002",
+    "code": "ProductHazardType",
+    "definition": "The kind of hazard a product carries, and therefore which declaration regime applies to it.",
+    "scope": "concept",
+    "values": [
+      {
+        "code": "FOODALLERGEN",
+        "name": "Food allergen",
+        "definition": "One of the major food allergens, declared by the food it comes from."
+      },
+      {
+        "code": "SENSITISER",
+        "name": "Skin sensitiser",
+        "definition": "A substance that may cause a reaction on contact."
+      },
+      {
+        "code": "CLASSIFIEDCHEMICAL",
+        "name": "Classified chemical",
+        "definition": "A substance carrying a hazard classification requiring disclosure."
+      },
+      {
+        "code": "PHYSICAL",
+        "name": "Physical hazard",
+        "definition": "A foreign body or sharp-edge risk."
+      }
+    ],
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "searched DDA lookup types for 'ProductHazardType' and for a Universal equivalent",
+    "data_requirement_ids": [
+      "DRQ009"
+    ],
+    "evidence_source_ids": [
+      "SRC035",
+      "SRC025"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "LKP003",
+    "code": "ProductIdentifiersType",
+    "definition": "The scheme an identifier belongs to.",
+    "scope": "concept",
+    "values": [
+      {
+        "code": "GTIN",
+        "name": "Trade item number",
+        "definition": "The global trade item number allocated under GS1 rules."
+      },
+      {
+        "code": "MATERIALNUMBER",
+        "name": "Internal material number",
+        "definition": "The organisation's own number for the product."
+      },
+      {
+        "code": "SUPPLIERPART",
+        "name": "Supplier part number",
+        "definition": "The supplier's number for what it sells."
+      }
+    ],
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "searched DDA lookup types for 'ProductIdentifiersType' and for a Universal equivalent",
+    "data_requirement_ids": [
+      "DRQ014",
+      "DRQ035"
+    ],
+    "evidence_source_ids": [
+      "SRC030",
+      "SRC031"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "LKP004",
+    "code": "ProcessRecipeLevelsType",
+    "definition": "How specific a recipe is, following ISA-88.",
+    "scope": "concept",
+    "values": [
+      {
+        "code": "GENERAL",
+        "name": "General recipe",
+        "definition": "The formulation and method, naming no factory."
+      },
+      {
+        "code": "SITE",
+        "name": "Site recipe",
+        "definition": "Adapted to the materials and constraints of one site."
+      },
+      {
+        "code": "MASTER",
+        "name": "Master recipe",
+        "definition": "Bound to one work centre, with its settings."
+      },
+      {
+        "code": "CONTROL",
+        "name": "Control recipe",
+        "definition": "The instructions issued for one batch. This is what runs."
+      }
+    ],
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "searched DDA lookup types for 'ProcessRecipeLevelsType' and for a Universal equivalent",
+    "data_requirement_ids": [
+      "DRQ018"
+    ],
+    "evidence_source_ids": [
+      "SRC002",
+      "SRC003"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "LKP005",
+    "code": "EquipmentPositionLevelType",
+    "definition": "The level of a place in the plant structure, following ISA-95.",
+    "scope": "concept",
+    "values": [
+      {
+        "code": "SITE",
+        "name": "Site",
+        "definition": "One manufacturing location."
+      },
+      {
+        "code": "AREA",
+        "name": "Area",
+        "definition": "A part of a site — processing, packing, storage."
+      },
+      {
+        "code": "PROCESSCELL",
+        "name": "Process cell",
+        "definition": "A work centre for batch production."
+      },
+      {
+        "code": "PRODUCTIONLINE",
+        "name": "Production line",
+        "definition": "A work centre for repetitive production."
+      },
+      {
+        "code": "STORAGEZONE",
+        "name": "Storage zone",
+        "definition": "A work centre for holding material."
+      },
+      {
+        "code": "WORKUNIT",
+        "name": "Work unit",
+        "definition": "One part of a work centre performing one function."
+      },
+      {
+        "code": "EQUIPMENTMODULE",
+        "name": "Equipment module",
+        "definition": "One part of a unit performing one task."
+      }
+    ],
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "searched DDA lookup types for 'EquipmentPositionLevelType' and for a Universal equivalent",
+    "data_requirement_ids": [
+      "DRQ020"
+    ],
+    "evidence_source_ids": [
+      "SRC001"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "LKP006",
+    "code": "EventStoppagesReasonType",
+    "definition": "Why production stopped, from a governed list.",
+    "scope": "concept",
+    "values": [
+      {
+        "code": "CHANGEOVER",
+        "name": "Changeover",
+        "definition": "Moving the line between products."
+      },
+      {
+        "code": "CLEANING",
+        "name": "Cleaning",
+        "definition": "Scheduled cleaning or sanitation."
+      },
+      {
+        "code": "PLANNEDMAINT",
+        "name": "Planned maintenance",
+        "definition": "Work scheduled against a plan."
+      },
+      {
+        "code": "BREAKDOWN",
+        "name": "Breakdown",
+        "definition": "A machine ceased to perform its function."
+      },
+      {
+        "code": "MATERIALSHORT",
+        "name": "Material shortage",
+        "definition": "An input was unavailable."
+      },
+      {
+        "code": "QUALITYHOLD",
+        "name": "Quality hold",
+        "definition": "Stopped pending a quality decision."
+      },
+      {
+        "code": "UPSTREAM",
+        "name": "Upstream blockage",
+        "definition": "Starved by a preceding place."
+      },
+      {
+        "code": "DOWNSTREAM",
+        "name": "Downstream blockage",
+        "definition": "Blocked by a following place."
+      },
+      {
+        "code": "LABOUR",
+        "name": "Labour unavailable",
+        "definition": "No qualified operator available."
+      },
+      {
+        "code": "UTILITY",
+        "name": "Utility failure",
+        "definition": "Power, water, steam or air unavailable."
+      }
+    ],
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "searched DDA lookup types for 'EventStoppagesReasonType' and for a Universal equivalent",
+    "data_requirement_ids": [
+      "DRQ022"
+    ],
+    "evidence_source_ids": [
+      "SRC017",
+      "SRC018"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "LKP007",
+    "code": "EventDispositionsDecisionType",
+    "definition": "What is done with material that failed its specification.",
+    "scope": "concept",
+    "values": [
+      {
+        "code": "USEASIS",
+        "name": "Use as is",
+        "definition": "Accepted despite the failure, on a stated justification."
+      },
+      {
+        "code": "REWORK",
+        "name": "Rework",
+        "definition": "Returned to production to be brought into specification."
+      },
+      {
+        "code": "REGRADE",
+        "name": "Regrade",
+        "definition": "Accepted against a different specification."
+      },
+      {
+        "code": "SCRAP",
+        "name": "Scrap",
+        "definition": "Destroyed or disposed of."
+      },
+      {
+        "code": "RETURN",
+        "name": "Return to supplier",
+        "definition": "Sent back to the party that supplied it."
+      }
+    ],
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "searched DDA lookup types for 'EventDispositionsDecisionType' and for a Universal equivalent",
+    "data_requirement_ids": [
+      "DRQ027"
+    ],
+    "evidence_source_ids": [
+      "SRC014"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "LKP008",
+    "code": "TransactionKindType",
+    "definition": "What kind of exchange a transaction is.",
+    "scope": "concept",
+    "values": [
+      {
+        "code": "PURCHASE",
+        "name": "Purchase",
+        "definition": "An order placed with a supplier."
+      },
+      {
+        "code": "RECEIPT",
+        "name": "Receipt",
+        "definition": "Goods arriving and becoming the organisation's."
+      },
+      {
+        "code": "ISSUE",
+        "name": "Issue to production",
+        "definition": "Material released to a run."
+      },
+      {
+        "code": "TRANSFER",
+        "name": "Transfer",
+        "definition": "A move between the organisation's own places."
+      },
+      {
+        "code": "DESPATCH",
+        "name": "Despatch",
+        "definition": "Goods leaving for a customer."
+      }
+    ],
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "searched DDA lookup types for 'TransactionKindType' and for a Universal equivalent",
+    "data_requirement_ids": [
+      "DRQ024",
+      "DRQ033"
+    ],
+    "evidence_source_ids": [
+      "SRC040",
+      "SRC039"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "LKP009",
+    "code": "UniversalUnitOfMeasure",
+    "definition": "The unit a quantity is expressed in. Used wherever a quantity is recorded.",
+    "scope": "universal",
+    "values": [
+      {
+        "code": "KG",
+        "name": "Kilogram",
+        "definition": "Mass in kilograms."
+      },
+      {
+        "code": "G",
+        "name": "Gram",
+        "definition": "Mass in grams."
+      },
+      {
+        "code": "L",
+        "name": "Litre",
+        "definition": "Volume in litres."
+      },
+      {
+        "code": "ML",
+        "name": "Millilitre",
+        "definition": "Volume in millilitres."
+      },
+      {
+        "code": "EA",
+        "name": "Each",
+        "definition": "A count of units."
+      },
+      {
+        "code": "CASE",
+        "name": "Case",
+        "definition": "A count of cases."
+      }
+    ],
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "searched DDA lookup types for 'UniversalUnitOfMeasure' and for a Universal equivalent",
+    "data_requirement_ids": [
+      "DRQ001",
+      "DRQ004",
+      "DRQ013"
+    ],
+    "evidence_source_ids": [
+      "SRC005"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  }
+]

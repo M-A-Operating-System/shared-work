@@ -1,0 +1,1806 @@
+[
+  {
+    "id": "ROL001",
+    "name": "Input Material",
+    "plural": "Input Materials",
+    "definition": "A product is an Input Material while it is used in another product, which is its Output Product.",
+    "played_by_domain_ids": [
+      "DOM006"
+    ],
+    "counterpart_role_ids": [
+      "ROL002"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL001"
+    ],
+    "stated_in": [
+      "REQ002",
+      "REQ003",
+      "REQ005"
+    ],
+    "evidence_source_ids": [
+      "SRC005"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL002",
+    "name": "Output Product",
+    "plural": "Output Products",
+    "definition": "A product is an Output Product while it is made from another product, which is its Input Material.",
+    "played_by_domain_ids": [
+      "DOM006"
+    ],
+    "counterpart_role_ids": [
+      "ROL001"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL001"
+    ],
+    "stated_in": [
+      "REQ002",
+      "REQ004"
+    ],
+    "evidence_source_ids": [
+      "SRC005"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL003",
+    "name": "Variant",
+    "plural": "Variants",
+    "definition": "A product is a Variant while it is a variant within a family product, which is its Family.",
+    "played_by_domain_ids": [
+      "DOM006"
+    ],
+    "counterpart_role_ids": [
+      "ROL004"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL002"
+    ],
+    "stated_in": [
+      "REQ019"
+    ],
+    "evidence_source_ids": [
+      "SRC030"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL004",
+    "name": "Family",
+    "plural": "Families",
+    "definition": "A product is a Family while it has variant products, which are its Variants.",
+    "played_by_domain_ids": [
+      "DOM006"
+    ],
+    "counterpart_role_ids": [
+      "ROL003"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL002"
+    ],
+    "stated_in": [
+      "REQ019"
+    ],
+    "evidence_source_ids": [
+      "SRC031"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL005",
+    "name": "Sourced Material",
+    "plural": "Sourced Materials",
+    "definition": "A product is a Sourced Material while it may be sourced from an organisation, which is its Approved Supplier.",
+    "played_by_domain_ids": [
+      "DOM006"
+    ],
+    "counterpart_role_ids": [
+      "ROL006"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL003"
+    ],
+    "stated_in": [
+      "REQ008"
+    ],
+    "evidence_source_ids": [
+      "SRC020"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL006",
+    "name": "Approved Supplier",
+    "plural": "Approved Suppliers",
+    "definition": "An organisation is an Approved Supplier while it may supply a product, which is its Sourced Material.",
+    "played_by_domain_ids": [
+      "DOM002"
+    ],
+    "counterpart_role_ids": [
+      "ROL005"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL003"
+    ],
+    "stated_in": [
+      "REQ008",
+      "REQ058"
+    ],
+    "evidence_source_ids": [
+      "SRC020",
+      "SRC029"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL007",
+    "name": "Certified Product",
+    "plural": "Certified Products",
+    "definition": "A product is a Certified Product while it is certified by an organisation, which is its Certifying Body.",
+    "played_by_domain_ids": [
+      "DOM006"
+    ],
+    "counterpart_role_ids": [
+      "ROL009"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL004"
+    ],
+    "stated_in": [
+      "REQ011"
+    ],
+    "evidence_source_ids": [
+      "SRC030"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL008",
+    "name": "Certified Site",
+    "plural": "Certified Sites",
+    "definition": "A place is a Certified Site while it is certified by an organisation, which is its Certifying Body.",
+    "played_by_domain_ids": [
+      "DOM010"
+    ],
+    "counterpart_role_ids": [
+      "ROL009"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL017"
+    ],
+    "stated_in": [
+      "REQ011"
+    ],
+    "evidence_source_ids": [
+      "SRC022"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL009",
+    "name": "Certifying Body",
+    "plural": "Certifying Bodies",
+    "definition": "An organisation is a Certifying Body while it certifies a product or a place, which is its Certified Product or Certified Site.",
+    "played_by_domain_ids": [
+      "DOM002"
+    ],
+    "counterpart_role_ids": [
+      "ROL007",
+      "ROL008"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL004",
+      "REL017"
+    ],
+    "stated_in": [
+      "REQ011"
+    ],
+    "evidence_source_ids": [
+      "SRC030",
+      "SRC022"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL010",
+    "name": "Contracted Product",
+    "plural": "Contracted Products",
+    "definition": "A product is a Contracted Product while it is manufactured by an organisation, which is its Outside Manufacturer.",
+    "played_by_domain_ids": [
+      "DOM006"
+    ],
+    "counterpart_role_ids": [
+      "ROL011"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL005"
+    ],
+    "stated_in": [
+      "REQ060"
+    ],
+    "evidence_source_ids": [
+      "SRC024"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL011",
+    "name": "Outside Manufacturer",
+    "plural": "Outside Manufacturers",
+    "definition": "An organisation is an Outside Manufacturer while it manufactures a product for this organisation, which is its Contracted Product.",
+    "played_by_domain_ids": [
+      "DOM002"
+    ],
+    "counterpart_role_ids": [
+      "ROL010"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL005"
+    ],
+    "stated_in": [
+      "REQ060",
+      "REQ062"
+    ],
+    "evidence_source_ids": [
+      "SRC023",
+      "SRC024"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL012",
+    "name": "Routed Product",
+    "plural": "Routed Products",
+    "definition": "A product is a Routed Product while it is made by a method, which is its Making Method.",
+    "played_by_domain_ids": [
+      "DOM006"
+    ],
+    "counterpart_role_ids": [
+      "ROL013"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL006"
+    ],
+    "stated_in": [
+      "REQ025"
+    ],
+    "evidence_source_ids": [
+      "SRC002"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL013",
+    "name": "Making Method",
+    "plural": "Making Methods",
+    "definition": "A method is a Making Method while it makes a product, which is its Routed Product.",
+    "played_by_domain_ids": [
+      "DOM009"
+    ],
+    "counterpart_role_ids": [
+      "ROL012"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL006"
+    ],
+    "stated_in": [
+      "REQ025",
+      "REQ027"
+    ],
+    "evidence_source_ids": [
+      "SRC002",
+      "SRC004"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL014",
+    "name": "Later Step",
+    "plural": "Later Steps",
+    "definition": "A step is a Later Step while it follows another step, which is its Earlier Step.",
+    "played_by_domain_ids": [
+      "DOM009"
+    ],
+    "counterpart_role_ids": [
+      "ROL015"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL007"
+    ],
+    "stated_in": [
+      "REQ025"
+    ],
+    "evidence_source_ids": [
+      "SRC002"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL015",
+    "name": "Earlier Step",
+    "plural": "Earlier Steps",
+    "definition": "A step is an Earlier Step while it precedes another step, which is its Later Step.",
+    "played_by_domain_ids": [
+      "DOM009"
+    ],
+    "counterpart_role_ids": [
+      "ROL014"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL007"
+    ],
+    "stated_in": [
+      "REQ025"
+    ],
+    "evidence_source_ids": [
+      "SRC002"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL016",
+    "name": "Approved Step",
+    "plural": "Approved Steps",
+    "definition": "A step is an Approved Step while it is approved at a place in the plant, which is its Approved Position.",
+    "played_by_domain_ids": [
+      "DOM009"
+    ],
+    "counterpart_role_ids": [
+      "ROL017"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL008"
+    ],
+    "stated_in": [
+      "REQ026",
+      "REQ029"
+    ],
+    "evidence_source_ids": [
+      "SRC003"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL017",
+    "name": "Approved Position",
+    "plural": "Approved Positions",
+    "definition": "A place in the plant is an Approved Position while it is approved for a step, which is its Approved Step.",
+    "played_by_domain_ids": [
+      "DOM008"
+    ],
+    "counterpart_role_ids": [
+      "ROL016"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL008"
+    ],
+    "stated_in": [
+      "REQ026",
+      "REQ029"
+    ],
+    "evidence_source_ids": [
+      "SRC003",
+      "SRC004"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL018",
+    "name": "Derived Recipe",
+    "plural": "Derived Recipes",
+    "definition": "A recipe is a Derived Recipe while it is derived from another recipe, which is its Source Recipe.",
+    "played_by_domain_ids": [
+      "DOM009"
+    ],
+    "counterpart_role_ids": [
+      "ROL019"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL009"
+    ],
+    "stated_in": [
+      "REQ029",
+      "REQ030"
+    ],
+    "evidence_source_ids": [
+      "SRC002"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL019",
+    "name": "Source Recipe",
+    "plural": "Source Recipes",
+    "definition": "A recipe is a Source Recipe while it is the source of another recipe, which is its Derived Recipe.",
+    "played_by_domain_ids": [
+      "DOM009"
+    ],
+    "counterpart_role_ids": [
+      "ROL018"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL009"
+    ],
+    "stated_in": [
+      "REQ029"
+    ],
+    "evidence_source_ids": [
+      "SRC002",
+      "SRC003"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL020",
+    "name": "Contained Position",
+    "plural": "Contained Positions",
+    "definition": "A place in the plant is a Contained Position while it is within another, which is its Containing Position.",
+    "played_by_domain_ids": [
+      "DOM008"
+    ],
+    "counterpart_role_ids": [
+      "ROL021"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL010"
+    ],
+    "stated_in": [
+      "REQ033"
+    ],
+    "evidence_source_ids": [
+      "SRC001"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL021",
+    "name": "Containing Position",
+    "plural": "Containing Positions",
+    "definition": "A place in the plant is a Containing Position while it contains another, which is its Contained Position.",
+    "played_by_domain_ids": [
+      "DOM008"
+    ],
+    "counterpart_role_ids": [
+      "ROL020"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL010"
+    ],
+    "stated_in": [
+      "REQ033"
+    ],
+    "evidence_source_ids": [
+      "SRC001"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL022",
+    "name": "Occupied Position",
+    "plural": "Occupied Positions",
+    "definition": "A place in the plant is an Occupied Position while it is occupied by a machine, which is its Installed Machine.",
+    "played_by_domain_ids": [
+      "DOM008"
+    ],
+    "counterpart_role_ids": [
+      "ROL023"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL011"
+    ],
+    "stated_in": [
+      "REQ034"
+    ],
+    "evidence_source_ids": [
+      "SRC001"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL023",
+    "name": "Installed Machine",
+    "plural": "Installed Machines",
+    "definition": "A machine is an Installed Machine while it occupies a place in the plant, which is its Occupied Position.",
+    "played_by_domain_ids": [
+      "DOM007"
+    ],
+    "counterpart_role_ids": [
+      "ROL022"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL011"
+    ],
+    "stated_in": [
+      "REQ034",
+      "REQ035"
+    ],
+    "evidence_source_ids": [
+      "SRC004",
+      "SRC018"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL024",
+    "name": "Sited Position",
+    "plural": "Sited Positions",
+    "definition": "A place in the plant is a Sited Position while it is sited at a place, which is its Housing Site.",
+    "played_by_domain_ids": [
+      "DOM008"
+    ],
+    "counterpart_role_ids": [
+      "ROL025"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL012"
+    ],
+    "stated_in": [
+      "REQ033",
+      "REQ065"
+    ],
+    "evidence_source_ids": [
+      "SRC001"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL025",
+    "name": "Housing Site",
+    "plural": "Housing Sites",
+    "definition": "A place is a Housing Site while it houses a place in the plant, which is its Sited Position.",
+    "played_by_domain_ids": [
+      "DOM010"
+    ],
+    "counterpart_role_ids": [
+      "ROL024"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL012"
+    ],
+    "stated_in": [
+      "REQ065"
+    ],
+    "evidence_source_ids": [
+      "SRC001"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL026",
+    "name": "Individual Unit",
+    "plural": "Individual Units",
+    "definition": "A unit is an Individual Unit while it is a unit of a product, which is its Defining Product.",
+    "played_by_domain_ids": [
+      "DOM007"
+    ],
+    "counterpart_role_ids": [
+      "ROL027"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL013"
+    ],
+    "stated_in": [
+      "REQ023",
+      "REQ024"
+    ],
+    "evidence_source_ids": [
+      "SRC007",
+      "SRC037"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL027",
+    "name": "Defining Product",
+    "plural": "Defining Products",
+    "definition": "A product is a Defining Product while individually identified units are made to it, which are its Individual Units.",
+    "played_by_domain_ids": [
+      "DOM006"
+    ],
+    "counterpart_role_ids": [
+      "ROL026"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL013"
+    ],
+    "stated_in": [
+      "REQ023"
+    ],
+    "evidence_source_ids": [
+      "SRC037"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL028",
+    "name": "Assembled Unit",
+    "plural": "Assembled Units",
+    "definition": "A unit is an Assembled Unit while it is built from another unit or incorporates a batch, which are its Fitted Unit and Incorporated Batch.",
+    "played_by_domain_ids": [
+      "DOM007"
+    ],
+    "counterpart_role_ids": [
+      "ROL029",
+      "ROL030"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL014",
+      "REL015"
+    ],
+    "stated_in": [
+      "REQ023"
+    ],
+    "evidence_source_ids": [
+      "SRC007"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL029",
+    "name": "Fitted Unit",
+    "plural": "Fitted Units",
+    "definition": "A unit is a Fitted Unit while it is built into another unit, which is its Assembled Unit.",
+    "played_by_domain_ids": [
+      "DOM007"
+    ],
+    "counterpart_role_ids": [
+      "ROL028"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL014"
+    ],
+    "stated_in": [
+      "REQ023"
+    ],
+    "evidence_source_ids": [
+      "SRC007"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL030",
+    "name": "Incorporated Batch",
+    "plural": "Incorporated Batches",
+    "definition": "A product batch is an Incorporated Batch while it is incorporated into a unit, which is its Assembled Unit.",
+    "played_by_domain_ids": [
+      "DOM006"
+    ],
+    "counterpart_role_ids": [
+      "ROL028"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL015"
+    ],
+    "stated_in": [
+      "REQ023"
+    ],
+    "evidence_source_ids": [
+      "SRC007"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL031",
+    "name": "Contained Place",
+    "plural": "Contained Places",
+    "definition": "A place is a Contained Place while it is within another place, which is its Containing Place.",
+    "played_by_domain_ids": [
+      "DOM010"
+    ],
+    "counterpart_role_ids": [
+      "ROL032"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL016"
+    ],
+    "stated_in": [
+      "REQ065"
+    ],
+    "evidence_source_ids": [
+      "SRC039"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL032",
+    "name": "Containing Place",
+    "plural": "Containing Places",
+    "definition": "A place is a Containing Place while it contains another place, which is its Contained Place.",
+    "played_by_domain_ids": [
+      "DOM010"
+    ],
+    "counterpart_role_ids": [
+      "ROL031"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL016"
+    ],
+    "stated_in": [
+      "REQ065"
+    ],
+    "evidence_source_ids": [
+      "SRC039"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL033",
+    "name": "Site Operator",
+    "plural": "Site Operators",
+    "definition": "An organisation is a Site Operator while it operates a place, which is its Operated Site.",
+    "played_by_domain_ids": [
+      "DOM002"
+    ],
+    "counterpart_role_ids": [
+      "ROL034"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL019"
+    ],
+    "stated_in": [
+      "REQ060",
+      "REQ062"
+    ],
+    "evidence_source_ids": [
+      "SRC022"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL034",
+    "name": "Operated Site",
+    "plural": "Operated Sites",
+    "definition": "A place is an Operated Site while it is operated by an organisation, which is its Site Operator.",
+    "played_by_domain_ids": [
+      "DOM010"
+    ],
+    "counterpart_role_ids": [
+      "ROL033"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL019"
+    ],
+    "stated_in": [
+      "REQ062"
+    ],
+    "evidence_source_ids": [
+      "SRC022"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL035",
+    "name": "Registered Place",
+    "plural": "Registered Places",
+    "definition": "A place is a Registered Place while it is registered with an organisation, which is its Registering Authority.",
+    "played_by_domain_ids": [
+      "DOM010"
+    ],
+    "counterpart_role_ids": [
+      "ROL036"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL018"
+    ],
+    "stated_in": [
+      "REQ067"
+    ],
+    "evidence_source_ids": [
+      "SRC011"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL036",
+    "name": "Registering Authority",
+    "plural": "Registering Authorities",
+    "definition": "An organisation is a Registering Authority while it registers a place, which is its Registered Place.",
+    "played_by_domain_ids": [
+      "DOM002"
+    ],
+    "counterpart_role_ids": [
+      "ROL035"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL018"
+    ],
+    "stated_in": [
+      "REQ067"
+    ],
+    "evidence_source_ids": [
+      "SRC011"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL037",
+    "name": "Employee",
+    "plural": "Employees",
+    "definition": "A person is an Employee while they work for an organisation, which is their Employer.",
+    "played_by_domain_ids": [
+      "DOM001"
+    ],
+    "counterpart_role_ids": [
+      "ROL038"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL020"
+    ],
+    "stated_in": [
+      "REQ041"
+    ],
+    "evidence_source_ids": [
+      "SRC033"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL038",
+    "name": "Employer",
+    "plural": "Employers",
+    "definition": "An organisation is an Employer while a person works for it, who is its Employee.",
+    "played_by_domain_ids": [
+      "DOM002"
+    ],
+    "counterpart_role_ids": [
+      "ROL037"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL020"
+    ],
+    "stated_in": [
+      "REQ041"
+    ],
+    "evidence_source_ids": [
+      "SRC033"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL039",
+    "name": "Qualified Person",
+    "plural": "Qualified People",
+    "definition": "A person is a Qualified Person while they are qualified for a step of work, which is their Qualified Work.",
+    "played_by_domain_ids": [
+      "DOM001"
+    ],
+    "counterpart_role_ids": [
+      "ROL040"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL021"
+    ],
+    "stated_in": [
+      "REQ064",
+      "REQ041"
+    ],
+    "evidence_source_ids": [
+      "SRC001",
+      "SRC022"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL040",
+    "name": "Qualified Work",
+    "plural": "Qualified Works",
+    "definition": "A step is Qualified Work while it may be performed by a person, who is its Qualified Person.",
+    "played_by_domain_ids": [
+      "DOM009"
+    ],
+    "counterpart_role_ids": [
+      "ROL039"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL021"
+    ],
+    "stated_in": [
+      "REQ064"
+    ],
+    "evidence_source_ids": [
+      "SRC001"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL041",
+    "name": "Recorded Exchange",
+    "plural": "Recorded Exchanges",
+    "definition": "An exchange is a Recorded Exchange while it is transacted with an organisation, in a place, or concerns a product — its Trading Party, Despatching or Receiving Place, and Traded Product.",
+    "played_by_domain_ids": [
+      "DOM005"
+    ],
+    "counterpart_role_ids": [
+      "ROL042",
+      "ROL043",
+      "ROL044",
+      "ROL045"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL022",
+      "REL023",
+      "REL024",
+      "REL025"
+    ],
+    "stated_in": [
+      "REQ042",
+      "REQ061"
+    ],
+    "evidence_source_ids": [
+      "SRC040"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL042",
+    "name": "Trading Party",
+    "plural": "Trading Parties",
+    "definition": "An organisation is a Trading Party while an exchange is transacted with it, which is its Recorded Exchange.",
+    "played_by_domain_ids": [
+      "DOM002"
+    ],
+    "counterpart_role_ids": [
+      "ROL041"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL022"
+    ],
+    "stated_in": [
+      "REQ061"
+    ],
+    "evidence_source_ids": [
+      "SRC023"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL043",
+    "name": "Traded Product",
+    "plural": "Traded Products",
+    "definition": "A product is a Traded Product while an exchange concerns it, which is its Recorded Exchange.",
+    "played_by_domain_ids": [
+      "DOM006"
+    ],
+    "counterpart_role_ids": [
+      "ROL041"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL023"
+    ],
+    "stated_in": [
+      "REQ042"
+    ],
+    "evidence_source_ids": [
+      "SRC039"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL044",
+    "name": "Despatching Place",
+    "plural": "Despatching Places",
+    "definition": "A place is a Despatching Place while an exchange ships from it, which is its Recorded Exchange.",
+    "played_by_domain_ids": [
+      "DOM010"
+    ],
+    "counterpart_role_ids": [
+      "ROL041"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL024"
+    ],
+    "stated_in": [
+      "REQ042"
+    ],
+    "evidence_source_ids": [
+      "SRC009"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL045",
+    "name": "Receiving Place",
+    "plural": "Receiving Places",
+    "definition": "A place is a Receiving Place while an exchange is delivered to it, which is its Recorded Exchange.",
+    "played_by_domain_ids": [
+      "DOM010"
+    ],
+    "counterpart_role_ids": [
+      "ROL041"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL025"
+    ],
+    "stated_in": [
+      "REQ042"
+    ],
+    "evidence_source_ids": [
+      "SRC009"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL046",
+    "name": "Production Run",
+    "plural": "Production Runs",
+    "definition": "An occurrence is a Production Run while it ran at a place in the plant and under a recipe, which are its Running Position and Issued Instructions.",
+    "played_by_domain_ids": [
+      "DOM004"
+    ],
+    "counterpart_role_ids": [
+      "ROL047",
+      "ROL048"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL026",
+      "REL027"
+    ],
+    "stated_in": [
+      "REQ040"
+    ],
+    "evidence_source_ids": [
+      "SRC033"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL047",
+    "name": "Running Position",
+    "plural": "Running Positions",
+    "definition": "A place in the plant is a Running Position while a run ran at it, which is its Production Run.",
+    "played_by_domain_ids": [
+      "DOM008"
+    ],
+    "counterpart_role_ids": [
+      "ROL046"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL026"
+    ],
+    "stated_in": [
+      "REQ040",
+      "REQ034"
+    ],
+    "evidence_source_ids": [
+      "SRC016"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL048",
+    "name": "Issued Instructions",
+    "plural": "Issued Instructions",
+    "definition": "A recipe is Issued Instructions while a run ran under it, which is its Production Run.",
+    "played_by_domain_ids": [
+      "DOM009"
+    ],
+    "counterpart_role_ids": [
+      "ROL046"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL027"
+    ],
+    "stated_in": [
+      "REQ030"
+    ],
+    "evidence_source_ids": [
+      "SRC003"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL049",
+    "name": "Performed Work",
+    "plural": "Performed Works",
+    "definition": "An occurrence is Performed Work while it was performed by a person, who is its Performer.",
+    "played_by_domain_ids": [
+      "DOM004"
+    ],
+    "counterpart_role_ids": [
+      "ROL050"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL028"
+    ],
+    "stated_in": [
+      "REQ041",
+      "REQ047",
+      "REQ050",
+      "REQ057"
+    ],
+    "evidence_source_ids": [
+      "SRC033"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL050",
+    "name": "Performer",
+    "plural": "Performers",
+    "definition": "A person is a Performer while they performed an occurrence, which is their Performed Work.",
+    "played_by_domain_ids": [
+      "DOM001"
+    ],
+    "counterpart_role_ids": [
+      "ROL049"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL028"
+    ],
+    "stated_in": [
+      "REQ041",
+      "REQ047",
+      "REQ050"
+    ],
+    "evidence_source_ids": [
+      "SRC033",
+      "SRC006"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL051",
+    "name": "Consuming Run",
+    "plural": "Consuming Runs",
+    "definition": "An occurrence is a Consuming Run while it consumed a product batch, which is its Input Batch.",
+    "played_by_domain_ids": [
+      "DOM004"
+    ],
+    "counterpart_role_ids": [
+      "ROL052"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL029"
+    ],
+    "stated_in": [
+      "REQ006",
+      "REQ022"
+    ],
+    "evidence_source_ids": [
+      "SRC005"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL052",
+    "name": "Input Batch",
+    "plural": "Input Batches",
+    "definition": "A product batch is an Input Batch while a run consumed it, which is its Consuming Run.",
+    "played_by_domain_ids": [
+      "DOM006"
+    ],
+    "counterpart_role_ids": [
+      "ROL051"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL029"
+    ],
+    "stated_in": [
+      "REQ022",
+      "REQ051"
+    ],
+    "evidence_source_ids": [
+      "SRC005",
+      "SRC009"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL053",
+    "name": "Producing Run",
+    "plural": "Producing Runs",
+    "definition": "An occurrence is a Producing Run while it produced a product batch, which is its Output Batch.",
+    "played_by_domain_ids": [
+      "DOM004"
+    ],
+    "counterpart_role_ids": [
+      "ROL054"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL030"
+    ],
+    "stated_in": [
+      "REQ022"
+    ],
+    "evidence_source_ids": [
+      "SRC005"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL054",
+    "name": "Output Batch",
+    "plural": "Output Batches",
+    "definition": "A product batch is an Output Batch while a run produced it, which is its Producing Run.",
+    "played_by_domain_ids": [
+      "DOM006"
+    ],
+    "counterpart_role_ids": [
+      "ROL053"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL030"
+    ],
+    "stated_in": [
+      "REQ022",
+      "REQ053"
+    ],
+    "evidence_source_ids": [
+      "SRC011"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL055",
+    "name": "Stoppage",
+    "plural": "Stoppages",
+    "definition": "An occurrence is a Stoppage while it stopped a machine, which is its Stopped Machine.",
+    "played_by_domain_ids": [
+      "DOM004"
+    ],
+    "counterpart_role_ids": [
+      "ROL056"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL031"
+    ],
+    "stated_in": [
+      "REQ037",
+      "REQ038"
+    ],
+    "evidence_source_ids": [
+      "SRC016"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL056",
+    "name": "Stopped Machine",
+    "plural": "Stopped Machines",
+    "definition": "A machine is a Stopped Machine while a stoppage stopped it, which is its Stoppage.",
+    "played_by_domain_ids": [
+      "DOM007"
+    ],
+    "counterpart_role_ids": [
+      "ROL055"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL031"
+    ],
+    "stated_in": [
+      "REQ035",
+      "REQ037"
+    ],
+    "evidence_source_ids": [
+      "SRC016",
+      "SRC018"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL057",
+    "name": "Finding",
+    "plural": "Findings",
+    "definition": "An occurrence is a Finding while it is raised against a product batch, which is its Affected Batch.",
+    "played_by_domain_ids": [
+      "DOM004"
+    ],
+    "counterpart_role_ids": [
+      "ROL058"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL032"
+    ],
+    "stated_in": [
+      "REQ046",
+      "REQ047"
+    ],
+    "evidence_source_ids": [
+      "SRC012",
+      "SRC014"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL058",
+    "name": "Affected Batch",
+    "plural": "Affected Batches",
+    "definition": "A product batch is an Affected Batch while a finding is raised against it, which is its Finding.",
+    "played_by_domain_ids": [
+      "DOM006"
+    ],
+    "counterpart_role_ids": [
+      "ROL057"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL032"
+    ],
+    "stated_in": [
+      "REQ046"
+    ],
+    "evidence_source_ids": [
+      "SRC014"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL059",
+    "name": "Complaint",
+    "plural": "Complaints",
+    "definition": "An occurrence is a Complaint while it reports a problem with a product batch, which is its Complained-of Batch.",
+    "played_by_domain_ids": [
+      "DOM004"
+    ],
+    "counterpart_role_ids": [
+      "ROL060"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL033"
+    ],
+    "stated_in": [
+      "REQ054"
+    ],
+    "evidence_source_ids": [
+      "SRC022"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL060",
+    "name": "Complained-of Batch",
+    "plural": "Complained-of Batches",
+    "definition": "A product batch is a Complained-of Batch while a complaint reports a problem with it, which is its Complaint.",
+    "played_by_domain_ids": [
+      "DOM006"
+    ],
+    "counterpart_role_ids": [
+      "ROL059"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL033"
+    ],
+    "stated_in": [
+      "REQ054"
+    ],
+    "evidence_source_ids": [
+      "SRC022"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL061",
+    "name": "Response",
+    "plural": "Responses",
+    "definition": "An occurrence is a Response while it responds to another occurrence, which is its Trigger.",
+    "played_by_domain_ids": [
+      "DOM004"
+    ],
+    "counterpart_role_ids": [
+      "ROL062"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL034"
+    ],
+    "stated_in": [
+      "REQ049"
+    ],
+    "evidence_source_ids": [
+      "SRC013"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL062",
+    "name": "Trigger",
+    "plural": "Triggers",
+    "definition": "An occurrence is a Trigger while it prompted another occurrence, which is its Response.",
+    "played_by_domain_ids": [
+      "DOM004"
+    ],
+    "counterpart_role_ids": [
+      "ROL061"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL034"
+    ],
+    "stated_in": [
+      "REQ049"
+    ],
+    "evidence_source_ids": [
+      "SRC013"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL063",
+    "name": "Correction",
+    "plural": "Corrections",
+    "definition": "An occurrence is a Correction while it corrects a record, which is its Corrected Record.",
+    "played_by_domain_ids": [
+      "DOM004"
+    ],
+    "counterpart_role_ids": [
+      "ROL064"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL035"
+    ],
+    "stated_in": [
+      "REQ056"
+    ],
+    "evidence_source_ids": [
+      "SRC032"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL064",
+    "name": "Corrected Record",
+    "plural": "Corrected Records",
+    "definition": "An occurrence is a Corrected Record while a correction corrects it, which is its Correction.",
+    "played_by_domain_ids": [
+      "DOM004"
+    ],
+    "counterpart_role_ids": [
+      "ROL063"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL035"
+    ],
+    "stated_in": [
+      "REQ056"
+    ],
+    "evidence_source_ids": [
+      "SRC032"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL065",
+    "name": "Supplier Finding",
+    "plural": "Supplier Findings",
+    "definition": "An occurrence is a Supplier Finding while it is raised with an organisation, which is its Responsible Supplier.",
+    "played_by_domain_ids": [
+      "DOM004"
+    ],
+    "counterpart_role_ids": [
+      "ROL066"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL036"
+    ],
+    "stated_in": [
+      "REQ059"
+    ],
+    "evidence_source_ids": [
+      "SRC014"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL066",
+    "name": "Responsible Supplier",
+    "plural": "Responsible Suppliers",
+    "definition": "An organisation is a Responsible Supplier while a finding is raised with it, which is its Supplier Finding.",
+    "played_by_domain_ids": [
+      "DOM002"
+    ],
+    "counterpart_role_ids": [
+      "ROL065"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL036"
+    ],
+    "stated_in": [
+      "REQ059"
+    ],
+    "evidence_source_ids": [
+      "SRC014",
+      "SRC020"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL067",
+    "name": "Declaring Document",
+    "plural": "Declaring Documents",
+    "definition": "A document is a Declaring Document while it declares properties of a product batch, which is its Declared Batch.",
+    "played_by_domain_ids": [
+      "DOM003"
+    ],
+    "counterpart_role_ids": [
+      "ROL068"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL037"
+    ],
+    "stated_in": [
+      "REQ009",
+      "REQ010"
+    ],
+    "evidence_source_ids": [
+      "SRC039"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL068",
+    "name": "Declared Batch",
+    "plural": "Declared Batches",
+    "definition": "A product batch is a Declared Batch while a document declares its properties, which is its Declaring Document.",
+    "played_by_domain_ids": [
+      "DOM006"
+    ],
+    "counterpart_role_ids": [
+      "ROL067"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL037"
+    ],
+    "stated_in": [
+      "REQ009"
+    ],
+    "evidence_source_ids": [
+      "SRC020"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL069",
+    "name": "Storage Breach",
+    "plural": "Storage Breaches",
+    "definition": "An occurrence is a Storage Breach while it exposed a product batch, which is its Exposed Batch.",
+    "played_by_domain_ids": [
+      "DOM004"
+    ],
+    "counterpart_role_ids": [
+      "ROL070"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL038"
+    ],
+    "stated_in": [
+      "REQ066"
+    ],
+    "evidence_source_ids": [
+      "SRC020"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL070",
+    "name": "Exposed Batch",
+    "plural": "Exposed Batches",
+    "definition": "A product batch is an Exposed Batch while a storage breach exposed it, which is its Storage Breach.",
+    "played_by_domain_ids": [
+      "DOM006"
+    ],
+    "counterpart_role_ids": [
+      "ROL069"
+    ],
+    "is_symmetric": false,
+    "aliases": [],
+    "established_by": [
+      "REL038"
+    ],
+    "stated_in": [
+      "REQ066"
+    ],
+    "evidence_source_ids": [
+      "SRC020"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  }
+]
