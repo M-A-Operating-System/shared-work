@@ -13,9 +13,9 @@ Working folder for the Private Equity data model. The design document is the **t
 | Area | Target design | DDA today |
 |---|---|---|
 | Transaction parties | One role and one relationship (`LegalEntityTransactionParty`), with the side (paid or received), amount, purpose and units on each party | Relationship DMR000000037 exists, but its description says the amount belongs to the transaction (open decision DEC004) |
-| Valuations | One `Valuation` concept with a measure list (net asset value, equity value, enterprise value) linked by `ValuationLegalEntityValued` | `LegalEntityValuations` (DMC000000112) still exists and is to be retired; DMR000000039 exists |
+| Valuations | One `Valuation` concept with a measure list (net asset value, equity value, enterprise value), linked to the fund valued (`ValuationPrivateEquityFundValued`) and to the portfolio company valued (`ValuationPrivateEquityPortCoValued`) | Matches. DMR000000039 now links to the fund and DMR000000050 to the portfolio company; `LegalEntityValuations` (DMC000000112) and the general valued-entity role (DMO000000019) are still to be retired |
 | Instrument traded | `TransactionInstrumentTraded` | Not yet created |
-| Account booking | Not in this design; open question SCQ001 | `AccountTransactionBooking` (DMR000000038) exists in DDA |
+| Accounts | Not in this design; open question SCQ001 (needs an agreed requirement, owner and source) | The Private Equity model includes `AccountTransactionBooking` (DMR000000038) and `PrivateEquityFundAccountBeneficialOwnership` (DMR000000051) |
 
 Open design decisions are in section 10 of the document (DEC001 to DEC005).
 

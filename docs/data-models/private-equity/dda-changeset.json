@@ -1046,14 +1046,14 @@
       "local_id": "REL008",
       "dda_id": "DMR000000039",
       "fields": {
-        "relationship_code": "ValuationLegalEntityValued",
-        "relationship_description": "A valuation judges the worth of one legal entity on a date and on a named measure, such as a fund's net assets or a portfolio company's equity or enterprise value. A legal entity is valued many times, once for each date and measure, and each valuation is about one legal entity. The date, amount, measure and currency belong to the valuation. It does not cover the value of an instrument, which is held with the instrument's price, and it is not a transaction, because nothing is paid or received.",
+        "relationship_code": "ValuationPrivateEquityFundValued",
+        "relationship_description": "A valuation judges the worth of one fund on a date and on a named measure, such as its net asset value. A fund is valued many times, once for each date and measure, and each valuation is about one fund. The date, amount, measure and currency belong to the valuation. It does not cover the value of a company the fund holds, which is linked to that company, nor the value of an instrument, which is held with the instrument's price, and it is not a transaction, because nothing is paid or received.",
         "relationship_forward_verb": "Values",
         "relationship_inverse_verb": "Is Valued By",
         "relationship_source_role": "Valuation",
-        "relationship_target_role": "Valued Legal Entity",
+        "relationship_target_role": "Fund",
         "relationship_source_role_plural": "Valuations",
-        "relationship_target_role_plural": "Valued Legal Entities",
+        "relationship_target_role_plural": "Funds",
         "relationship_cardinality": "MANY_TO_ONE",
         "relationship_dates": false,
         "relationship_domain": "DMD000000022",
@@ -1063,6 +1063,28 @@
     },
     {
       "seq": 67,
+      "op": "update",
+      "entity": "relationships",
+      "local_id": "REL009",
+      "dda_id": "DMR000000050",
+      "fields": {
+        "relationship_code": "ValuationPrivateEquityPortCoValued",
+        "relationship_description": "A valuation judges the worth of one portfolio company on a date and on a named measure, such as its equity value or enterprise value. A company is valued many times, once for each date and measure, and each valuation is about one company. The date, amount, measure and currency belong to the valuation. It does not cover the value of a fund, which is linked to the fund, nor the value of an instrument, which is held with the instrument's price, and it is not a transaction, because nothing is paid or received.",
+        "relationship_forward_verb": "Values",
+        "relationship_inverse_verb": "Is Valued By",
+        "relationship_source_role": "Valuation",
+        "relationship_target_role": "PortCo",
+        "relationship_source_role_plural": "Valuations",
+        "relationship_target_role_plural": "PortCos",
+        "relationship_cardinality": "MANY_TO_ONE",
+        "relationship_dates": false,
+        "relationship_domain": "DMD000000022",
+        "relationship_destination_domain": "DMD000000012"
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 68,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR001",
@@ -1080,7 +1102,7 @@
       ]
     },
     {
-      "seq": 68,
+      "seq": 69,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR002",
@@ -1099,7 +1121,7 @@
       ]
     },
     {
-      "seq": 69,
+      "seq": 70,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR003",
@@ -1117,7 +1139,7 @@
       ]
     },
     {
-      "seq": 70,
+      "seq": 71,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR004",
@@ -1135,7 +1157,7 @@
       ]
     },
     {
-      "seq": 71,
+      "seq": 72,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR005",
@@ -1153,7 +1175,7 @@
       ]
     },
     {
-      "seq": 72,
+      "seq": 73,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR006",
@@ -1171,7 +1193,7 @@
       ]
     },
     {
-      "seq": 73,
+      "seq": 74,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR007",
@@ -1189,7 +1211,7 @@
       ]
     },
     {
-      "seq": 74,
+      "seq": 75,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR008",
@@ -1208,7 +1230,7 @@
       ]
     },
     {
-      "seq": 75,
+      "seq": 76,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR009",
@@ -1226,7 +1248,7 @@
       ]
     },
     {
-      "seq": 76,
+      "seq": 77,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR010",
@@ -1244,7 +1266,7 @@
       ]
     },
     {
-      "seq": 77,
+      "seq": 78,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR014",
@@ -1263,7 +1285,7 @@
       ]
     },
     {
-      "seq": 78,
+      "seq": 79,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR015",
@@ -1281,7 +1303,7 @@
       ]
     },
     {
-      "seq": 79,
+      "seq": 80,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR016",
@@ -1300,7 +1322,7 @@
       ]
     },
     {
-      "seq": 80,
+      "seq": 81,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR017",
@@ -1318,7 +1340,7 @@
       ]
     },
     {
-      "seq": 81,
+      "seq": 82,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR021",
@@ -1337,7 +1359,7 @@
       ]
     },
     {
-      "seq": 82,
+      "seq": 83,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR022",
@@ -1355,7 +1377,7 @@
       ]
     },
     {
-      "seq": 83,
+      "seq": 84,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR023",
@@ -1373,7 +1395,7 @@
       ]
     },
     {
-      "seq": 84,
+      "seq": 85,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR024",
@@ -1391,7 +1413,7 @@
       ]
     },
     {
-      "seq": 85,
+      "seq": 86,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR025",
@@ -1409,7 +1431,7 @@
       ]
     },
     {
-      "seq": 86,
+      "seq": 87,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR026",
@@ -1427,7 +1449,7 @@
       ]
     },
     {
-      "seq": 87,
+      "seq": 88,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR027",
@@ -1445,7 +1467,7 @@
       ]
     },
     {
-      "seq": 88,
+      "seq": 89,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR028",
@@ -1464,7 +1486,7 @@
       ]
     },
     {
-      "seq": 89,
+      "seq": 90,
       "op": "update",
       "entity": "attributes",
       "local_id": "ATR029",
@@ -1483,7 +1505,7 @@
       ]
     },
     {
-      "seq": 90,
+      "seq": 91,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR036",
@@ -1502,7 +1524,7 @@
       ]
     },
     {
-      "seq": 91,
+      "seq": 92,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR037",
@@ -1520,7 +1542,7 @@
       ]
     },
     {
-      "seq": 92,
+      "seq": 93,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR038",
@@ -1538,7 +1560,7 @@
       ]
     },
     {
-      "seq": 93,
+      "seq": 94,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR039",
@@ -1556,7 +1578,7 @@
       ]
     },
     {
-      "seq": 94,
+      "seq": 95,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR041",
@@ -1575,7 +1597,7 @@
       ]
     },
     {
-      "seq": 95,
+      "seq": 96,
       "op": "retire",
       "entity": "concepts",
       "local_id": "RETIRE.DMC000000112",
@@ -1587,7 +1609,19 @@
       "depends_on": []
     },
     {
-      "seq": 96,
+      "seq": 97,
+      "op": "retire",
+      "entity": "roles",
+      "local_id": "RETIRE.DMO000000019",
+      "dda_id": "DMO000000019",
+      "fields": {
+        "reason": "the general valued-entity role replaced by the Fund and PortCo roles",
+        "confirm_before_applying": true
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 98,
       "op": "retire",
       "entity": "attributes",
       "local_id": "RETIRE.DMA000000698",
@@ -1599,7 +1633,7 @@
       "depends_on": []
     },
     {
-      "seq": 97,
+      "seq": 99,
       "op": "retire",
       "entity": "attributes",
       "local_id": "RETIRE.DMA000000697",
@@ -1611,7 +1645,7 @@
       "depends_on": []
     },
     {
-      "seq": 98,
+      "seq": 100,
       "op": "retire",
       "entity": "attributes",
       "local_id": "RETIRE.DMA000000699",
@@ -1623,7 +1657,7 @@
       "depends_on": []
     },
     {
-      "seq": 99,
+      "seq": 101,
       "op": "retire",
       "entity": "attributes",
       "local_id": "RETIRE.DMA000000696",

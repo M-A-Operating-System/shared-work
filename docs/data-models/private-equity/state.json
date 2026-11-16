@@ -479,7 +479,7 @@
       "as_at": "as-at",
       "path": [
         "SBJ001",
-        "REL008",
+        "REL009",
         "SBJ009",
         "ATR036",
         "ATR037",
@@ -516,8 +516,8 @@
       "pass": 1,
       "counts": {
         "domains": 3,
-        "roles": 11,
-        "relationships": 7,
+        "roles": 10,
+        "relationships": 8,
         "concepts": 8,
         "attributes": 38,
         "lookups": 15
@@ -544,8 +544,8 @@
       "pass": 2,
       "counts": {
         "domains": 3,
-        "roles": 11,
-        "relationships": 7,
+        "roles": 10,
+        "relationships": 8,
         "concepts": 8,
         "attributes": 38,
         "lookups": 15
@@ -558,8 +558,8 @@
       "pass": 3,
       "counts": {
         "domains": 3,
-        "roles": 11,
-        "relationships": 7,
+        "roles": 10,
+        "relationships": 8,
         "concepts": 8,
         "attributes": 38,
         "lookups": 15
@@ -698,7 +698,7 @@
     {
       "standard": "DMS000000169",
       "applies": true,
-      "how_satisfied": "Principles applied: each enduring subject is represented once and roles are derived from relationships (REL001 to REL005, REL007 and REL008); relationships carry both verbs and both roles; observed and derived facts are separated (holdings, unfunded commitment, look-through ownership and fair value of a holding are worked out, never stored); dates are business dates; no audit fields appear.",
+      "how_satisfied": "Principles applied: each enduring subject is represented once and roles are derived from relationships (REL001 to REL005, REL007, REL008 and REL009); relationships carry both verbs and both roles; observed and derived facts are separated (holdings, unfunded commitment, look-through ownership and fair value of a holding are worked out, never stored); dates are business dates; no audit fields appear.",
       "artefact_ids": [
         "REL001",
         "REL002",
@@ -706,7 +706,8 @@
         "REL004",
         "REL005",
         "REL007",
-        "REL008"
+        "REL008",
+        "REL009"
       ],
       "exception_id": null,
       "read_hash": "feca57fe2bd77a2d",

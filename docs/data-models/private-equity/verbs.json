@@ -218,22 +218,22 @@
   },
   {
     "id": "REL008",
-    "code": "ValuationLegalEntityValued",
+    "code": "ValuationPrivateEquityFundValued",
     "source_domain_id": "DOM003",
     "destination_domain_id": "DOM001",
     "forward_verb": "Values",
     "inverse_verb": "Is Valued By",
     "source_role_id": "ROL011",
-    "target_role_id": "ROL012",
+    "target_role_id": "ROL001",
     "cardinality": "MANY_TO_ONE",
     "dates": false,
     "is_symmetric": false,
     "is_composition": false,
     "quantified": false,
-    "name_override": "ValuationLegalEntity",
+    "name_override": "ValuationPrivateEquityFund",
     "dda_action": "extend",
     "dda_id": "DMR000000039",
-    "reuse_search": "Searched DDA relationships: DMR000000039 already links a valuation to the legal entity it values; the legal entity valuation concept it was added beside is retired in favour of Valuation.",
+    "reuse_search": "Searched DDA relationships: DMR000000039 linked a valuation to any legal entity; it now links a valuation to the fund valued, and the general valued-entity role is retired.",
     "data_requirement_ids": [
       "DRQ008"
     ],
@@ -244,7 +244,38 @@
     ],
     "status": "active",
     "withdrawn_reason": null,
-    "definition": "A valuation judges the worth of one legal entity on a date and on a named measure, such as a fund's net assets or a portfolio company's equity or enterprise value. A legal entity is valued many times, once for each date and measure, and each valuation is about one legal entity. The date, amount, measure and currency belong to the valuation. It does not cover the value of an instrument, which is held with the instrument's price, and it is not a transaction, because nothing is paid or received.",
-    "mirror_override": "LegalEntityValuations"
+    "definition": "A valuation judges the worth of one fund on a date and on a named measure, such as its net asset value. A fund is valued many times, once for each date and measure, and each valuation is about one fund. The date, amount, measure and currency belong to the valuation. It does not cover the value of a company the fund holds, which is linked to that company, nor the value of an instrument, which is held with the instrument's price, and it is not a transaction, because nothing is paid or received.",
+    "mirror_override": "PrivateEquityFundValuations"
+  },
+  {
+    "id": "REL009",
+    "code": "ValuationPrivateEquityPortCoValued",
+    "source_domain_id": "DOM003",
+    "destination_domain_id": "DOM001",
+    "forward_verb": "Values",
+    "inverse_verb": "Is Valued By",
+    "source_role_id": "ROL011",
+    "target_role_id": "ROL005",
+    "cardinality": "MANY_TO_ONE",
+    "dates": false,
+    "is_symmetric": false,
+    "is_composition": false,
+    "quantified": false,
+    "name_override": "ValuationPrivateEquityPortCo",
+    "dda_action": "extend",
+    "dda_id": "DMR000000050",
+    "reuse_search": "Searched DDA relationships: DMR000000050 links a valuation to the portfolio company valued.",
+    "data_requirement_ids": [
+      "DRQ008"
+    ],
+    "evidence_source_ids": [
+      "SRC005",
+      "SRC006",
+      "SRC007"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "definition": "A valuation judges the worth of one portfolio company on a date and on a named measure, such as its equity value or enterprise value. A company is valued many times, once for each date and measure, and each valuation is about one company. The date, amount, measure and currency belong to the valuation. It does not cover the value of a fund, which is linked to the fund, nor the value of an instrument, which is held with the instrument's price, and it is not a transaction, because nothing is paid or received.",
+    "mirror_override": "PrivateEquityPortCoValuations"
   }
 ]

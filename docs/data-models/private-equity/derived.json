@@ -5,8 +5,8 @@
     "business_requirements": 13,
     "data_requirements": 8,
     "domains": 3,
-    "roles": 11,
-    "relationships": 7,
+    "roles": 10,
+    "relationships": 8,
     "concepts": 8,
     "attributes": 38,
     "lookups": 15,
@@ -305,8 +305,8 @@
       "SBJ007",
       "SBJ009",
       "ROL011",
-      "ROL012",
       "REL008",
+      "REL009",
       "ATR026",
       "ATR027",
       "ATR029",
@@ -324,8 +324,8 @@
       "SBJ007",
       "SBJ009",
       "ROL011",
-      "ROL012",
       "REL008",
+      "REL009",
       "ATR026",
       "ATR028",
       "ATR029",
@@ -340,8 +340,8 @@
       "SBJ007",
       "SBJ009",
       "ROL011",
-      "ROL012",
-      "REL008"
+      "REL008",
+      "REL009"
     ]
   },
   "views": {
@@ -370,8 +370,12 @@
       "mirror": "InstrumentTransactions"
     },
     "REL008": {
-      "forward": "ValuationLegalEntity",
-      "mirror": "LegalEntityValuations"
+      "forward": "ValuationPrivateEquityFund",
+      "mirror": "PrivateEquityFundValuations"
+    },
+    "REL009": {
+      "forward": "ValuationPrivateEquityPortCo",
+      "mirror": "PrivateEquityPortCoValuations"
     }
   }
 }

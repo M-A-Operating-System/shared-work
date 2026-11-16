@@ -327,7 +327,7 @@
       "SRC006",
       "SRC007"
     ],
-    "status": "active",
-    "withdrawn_reason": null
+    "status": "withdrawn",
+    "withdrawn_reason": "Replaced by the Fund (ROL001) and PortCo (ROL005) roles, so that a valuation joins the fund structure."
   }
 ]

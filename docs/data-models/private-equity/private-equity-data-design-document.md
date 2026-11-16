@@ -138,8 +138,8 @@ The design represents a private equity sponsor's funds, vehicles, investors, por
 | Business requirements | 13 |
 | Data requirements | 8 |
 | Subject domains | 3 |
-| Canonical roles | 11 |
-| Relationships | 7 |
+| Canonical roles | 10 |
+| Relationships | 8 |
 | Concepts | 8 |
 | Attributes | 38 |
 | Lookups | 15 |
@@ -289,7 +289,7 @@ The model uses three existing DDA domains. Everything after this table is said i
 | Domain ID | Domain | DDA | Anchor concept | Definition | Shared | Roles | Concepts |
 |---|---|---|---|---|---|---|---|
 | <a id="dom002"></a>DOM002 | Instruments | [DMD000000015](https://datadesign.maoperatingsystem.com/models/domains/DMD000000015) | Instrument | The Instruments (aka Securities, Investable Assets) Domain contains records describing tradable asset such as an Equity, Debt/Credit, Warrant, Right, Option, Index, Fund, Spot Rate, a Point on an interest rate curve, Loan or FX/Currencies etc.  Often issued by a Government or Company Entity. An instrument can be listed on an exchange or privately traded between two or more entities. | Yes | [1](#s5-2) | [3](#s5-4) |
-| <a id="dom001"></a>DOM001 | LegalEntities | [DMD000000012](https://datadesign.maoperatingsystem.com/models/domains/DMD000000012) | LegalEntity | Legal Entities — organisations, funds, and counterparties relevant to M&A and investment activity, including their financial statements, registrations, and compliance status. | Yes | [8](#s5-2) | [3](#s5-4) |
+| <a id="dom001"></a>DOM001 | LegalEntities | [DMD000000012](https://datadesign.maoperatingsystem.com/models/domains/DMD000000012) | LegalEntity | Legal Entities — organisations, funds, and counterparties relevant to M&A and investment activity, including their financial statements, registrations, and compliance status. | Yes | [7](#s5-2) | [3](#s5-4) |
 | <a id="dom003"></a>DOM003 | Transactions | [DMD000000022](https://datadesign.maoperatingsystem.com/models/domains/DMD000000022) | Transaction | Transactions are records of an individual trade/transaction which represents a transfer of ownership or investment usually in return for capital (cash) in a specific security or entity or asset. Generally, transactions result in the change of a position or balance within a record keeping account | Yes | [2](#s5-2) | [2](#s5-4) |
 
 
@@ -309,7 +309,6 @@ A role is what a subject is to another while an arrangement between them holds. 
 | LegalEntities | <a id="rol006"></a>ROL006 | Parallel Vehicle (Parallel Vehicles) | A legal entity is a Parallel Vehicle while it invests alongside another fund. It says the body takes part in the same investments as a fund, which is not the same as being that fund's investor. | Side Vehicle, Co-invest Vehicle, Alternative Investment Vehicle | [REQ003](#req003) |
 | LegalEntities | <a id="rol005"></a>ROL005 | PortCo (PortCos) | A legal entity is a PortCo while another legal entity invests in it. It covers an operating company and also a holding vehicle set up to hold one, and says something is held in it, which is not the same as being a Fund, a body that is managed for investors. | Portfolio Company, Investee | [REQ006](#req006), [REQ007](#req007), [REQ011](#req011) |
 | LegalEntities | <a id="rol008"></a>ROL008 | Transaction Party (Transaction Parties) | A legal entity is a Transaction Party while it takes part in a transaction as a payer, a payee, a buyer, a seller or an issuer. It says who the money or holdings moved from or to, which is not the same as owning an account the movement passed through. | Payer, Payee, Buyer, Seller, Counterparty | [REQ005](#req005), [REQ008](#req008) |
-| LegalEntities | <a id="rol012"></a>ROL012 | Valued Legal Entity (Valued Legal Entities) | A legal entity is a Valued Legal Entity while a valuation judges its worth, such as a portfolio company's equity or a fund's net assets. It says the body is the thing valued, which is not the same as the party that holds it. | Valued Entity | [REQ009](#req009) |
 | Transactions | <a id="rol007"></a>ROL007 | Transaction (Transactions) | A transaction is a Transaction in a relationship while it is the movement of money, holdings or ownership that the other subject took part in or was recorded against. It is the same role wherever a transaction meets another subject, which is how those subjects join up around it. It is the movement itself, not the parties to it. | Event, Transfer | [REQ005](#req005), [REQ008](#req008) |
 | Transactions | <a id="rol011"></a>ROL011 | Valuation (Valuations) | A valuation is a Valuation in a relationship while it is a judgement of the worth of something on a date, as seen from the thing that was valued. It says the figure is a view taken on a date and not a movement of money, so it is not a transaction. A new valuation does not replace an earlier one; each is kept for its own date. | Appraisal | [REQ009](#req009) |
 
@@ -328,7 +327,8 @@ Each row reads as a sentence: the source domain, as the source role, performs th
 | <a id="rel003"></a>REL003 LegalEntityPEInvestor | [DRQ006](#drq006) | LegalEntities | [ROL005](#rol005) PortCo | Receives Investment From | [ROL004](#rol004) Investor | LegalEntities | Invests In | LegalEntityInvestors | LegalEntityPortCos | Many to Many | Yes | [DMR000000002](https://datadesign.maoperatingsystem.com/models/relationships/DMR000000002) |
 | <a id="rel005"></a>REL005 LegalEntityTransactionParty | [DRQ005](#drq005), [DRQ007](#drq007) | LegalEntities | [ROL008](#rol008) Transaction Party | Is Party To | [ROL007](#rol007) Transaction | Transactions | Has Party | LegalEntityTransactions | TransactionLegalEntityParties | Many to Many | No | [DMR000000037](https://datadesign.maoperatingsystem.com/models/relationships/DMR000000037) |
 | <a id="rel007"></a>REL007 TransactionInstrumentTraded | [DRQ007](#drq007) | Transactions | [ROL007](#rol007) Transaction | Transfers | [ROL010](#rol010) Traded Instrument | Instruments | Is Transferred By | TransactionTradedInstruments | InstrumentTransactions | Many to One | No | NEW |
-| <a id="rel008"></a>REL008 ValuationLegalEntityValued | [DRQ008](#drq008) | Transactions | [ROL011](#rol011) Valuation | Values | [ROL012](#rol012) Valued Legal Entity | LegalEntities | Is Valued By | ValuationLegalEntity | LegalEntityValuations | Many to One | No | [DMR000000039](https://datadesign.maoperatingsystem.com/models/relationships/DMR000000039) |
+| <a id="rel008"></a>REL008 ValuationPrivateEquityFundValued | [DRQ008](#drq008) | Transactions | [ROL011](#rol011) Valuation | Values | [ROL001](#rol001) Fund | LegalEntities | Is Valued By | ValuationPrivateEquityFund | PrivateEquityFundValuations | Many to One | No | [DMR000000039](https://datadesign.maoperatingsystem.com/models/relationships/DMR000000039) |
+| <a id="rel009"></a>REL009 ValuationPrivateEquityPortCoValued | [DRQ008](#drq008) | Transactions | [ROL011](#rol011) Valuation | Values | [ROL005](#rol005) PortCo | LegalEntities | Is Valued By | ValuationPrivateEquityPortCo | PrivateEquityPortCoValuations | Many to One | No | [DMR000000050](https://datadesign.maoperatingsystem.com/models/relationships/DMR000000050) |
 
 
 What each relationship means:
@@ -341,7 +341,8 @@ What each relationship means:
 | REL004 LegalEntityFundParallels | Two funds or vehicles invest side by side, for example a main fund and its parallel fund, an alternative investment vehicle or a co-investment vehicle, for as long as they do. The kind of vehicle belongs to the link. It is not an investor's commitment to a fund. |
 | REL005 LegalEntityTransactionParty | A legal entity takes part in a transaction as a party to it, whether it pays or receives: the limited partner paying into a capital call, the fund receiving it, the fund paying for an acquisition, or the seller receiving the price. A transaction has several parties and a legal entity takes part in many transactions. Each party's record says whether it paid or received, the amount for each stated purpose and, where an instrument changed hands, the number of units. The date and currency belong to the transaction. It does not say which account the money passed through. |
 | REL007 TransactionInstrumentTraded | A transaction concerns one instrument, and many transactions may concern the same instrument. It names what was bought or sold. A capital call or distribution concerns no instrument. |
-| REL008 ValuationLegalEntityValued | A valuation judges the worth of one legal entity on a date and on a named measure, such as a fund's net assets or a portfolio company's equity or enterprise value. A legal entity is valued many times, once for each date and measure, and each valuation is about one legal entity. The date, amount, measure and currency belong to the valuation. It does not cover the value of an instrument, which is held with the instrument's price, and it is not a transaction, because nothing is paid or received. |
+| REL008 ValuationPrivateEquityFundValued | A valuation judges the worth of one fund on a date and on a named measure, such as its net asset value. A fund is valued many times, once for each date and measure, and each valuation is about one fund. The date, amount, measure and currency belong to the valuation. It does not cover the value of a company the fund holds, which is linked to that company, nor the value of an instrument, which is held with the instrument's price, and it is not a transaction, because nothing is paid or received. |
+| REL009 ValuationPrivateEquityPortCoValued | A valuation judges the worth of one portfolio company on a date and on a named measure, such as its equity value or enterprise value. A company is valued many times, once for each date and measure, and each valuation is about one company. The date, amount, measure and currency belong to the valuation. It does not cover the value of a fund, which is linked to the fund, nor the value of an instrument, which is held with the instrument's price, and it is not a transaction, because nothing is paid or received. |
 
 
 <a id="s5-4"></a>
@@ -1052,7 +1053,8 @@ flowchart LR
   DOM001 -->|"Parallel Vehicle → invests alongside → Parallel Vehicle"| DOM001
   DOM001 -->|"Transaction Party → is party to → Transaction"| DOM003
   DOM003 -->|"Transaction → transfers → Traded Instrument"| DOM002
-  DOM003 -->|"Valuation → values → Valued Legal Entity"| DOM001
+  DOM003 -->|"Valuation → values → Fund"| DOM001
+  DOM003 -->|"Valuation → values → PortCo"| DOM001
 ```
 
 
@@ -1074,14 +1076,14 @@ flowchart LR
   ROL008("Transaction Party<br>LEGALENTITIES")
   ROL010("Traded Instrument<br>INSTRUMENTS")
   ROL011("Valuation<br>TRANSACTIONS")
-  ROL012("Valued Legal Entity<br>LEGALENTITIES")
   ROL001 -->|"is managed by"| ROL002
   ROL003 -->|"commits to"| ROL001
   ROL005 -->|"receives investment from"| ROL004
   ROL006 -->|"invests alongside"| ROL006
   ROL008 -->|"is party to"| ROL007
   ROL007 -->|"transfers"| ROL010
-  ROL011 -->|"values"| ROL012
+  ROL011 -->|"values"| ROL001
+  ROL011 -->|"values"| ROL005
 ```
 
 
@@ -1148,9 +1150,9 @@ These design questions are open.
 | SRC002 | [ILPA Updates Capital Call and Distribution Template: Implications for GPs and LPs](https://katten.com/ilpa-updates-capital-call-distribution-template-implications-for-gps-and-lps) | Katten Muchin Rosenman | practitioner | How the current template splits a call by purpose (investments, fees, expenses) and a distribution by component (return of capital, gains, income, recallable amounts). | LKP004, LKP005, LKP015, REL005, REQ005, ROL007, ROL008, SBJ008 |
 | SRC003 | [ILPA Reporting and New Performance Template](https://www.citco.com/insights/ilpa-reporting-and-new-performance-template) | Citco | practitioner | The ILPA reporting and performance templates ask for fund cash flows, net asset value and investment-level cost and value. | LKP005, LKP008, LKP015, REL005, REL007, REQ002, REQ008, REQ009, ROL007, ROL010, SBJ005, SBJ006, SBJ008 |
 | SRC004 | [ILPA Principles 3.0](https://ilpa.org/wp-content/uploads/2019/06/ILPA-Principles-3.0_2019.pdf) | Institutional Limited Partners Association | standard | Investor expectations for fund governance and transparency, including how commitments, follow-on investments by successor funds and cross-fund investments are disclosed. | REL001, REL002, REQ001, REQ004, REQ007, REQ008, ROL001, ROL002, ROL003, SBJ001 |
-| SRC005 | [IPEV Valuation Guidelines](https://www.bvca.co.uk/Policy/Key-Policy-Areas/Accounting/IPEV-Valuation-Guidelines) | British Private Equity and Venture Capital Association | standard | Industry guidelines for fair value measurement of private capital investments at a reporting date. The page establishes the guidelines' existence and scope only. | LKP006, LKP007, LKP008, REL008, REQ009, ROL011, ROL012, SBJ007, SBJ009 |
-| SRC006 | [ASC 820 and private equity valuation](https://www.redwoodvaluation.com/blog/asc-820-private-equity) | Redwood Valuation | practitioner | ASC 820 requires fair value to be classified in a three-level hierarchy according to the observability of its inputs. | LKP006, LKP007, LKP008, REL008, REQ009, ROL011, ROL012, SBJ007, SBJ009 |
-| SRC007 | [A First Look at the CFA Institute's Final 2020 GIPS Standards](https://www.klgates.com/thought-leadership/A-First-Look-at-the-CFA-Institutes-Final-2020-GIPS-Standards-07-01-2019) | K&L Gates | practitioner | The 2020 GIPS standards apply to private market fund performance and rest on dated cash flows and valuations. | REL008, REQ009, ROL011, ROL012, SBJ007, SBJ009 |
+| SRC005 | [IPEV Valuation Guidelines](https://www.bvca.co.uk/Policy/Key-Policy-Areas/Accounting/IPEV-Valuation-Guidelines) | British Private Equity and Venture Capital Association | standard | Industry guidelines for fair value measurement of private capital investments at a reporting date. The page establishes the guidelines' existence and scope only. | LKP006, LKP007, LKP008, REL008, REL009, REQ009, ROL011, SBJ007, SBJ009 |
+| SRC006 | [ASC 820 and private equity valuation](https://www.redwoodvaluation.com/blog/asc-820-private-equity) | Redwood Valuation | practitioner | ASC 820 requires fair value to be classified in a three-level hierarchy according to the observability of its inputs. | LKP006, LKP007, LKP008, REL008, REL009, REQ009, ROL011, SBJ007, SBJ009 |
+| SRC007 | [A First Look at the CFA Institute's Final 2020 GIPS Standards](https://www.klgates.com/thought-leadership/A-First-Look-at-the-CFA-Institutes-Final-2020-GIPS-Standards-07-01-2019) | K&L Gates | practitioner | The 2020 GIPS standards apply to private market fund performance and rest on dated cash flows and valuations. | REL008, REL009, REQ009, ROL011, SBJ007, SBJ009 |
 | SRC008 | [Guidelines on reporting obligations under Articles 3(3)(d) and 24(1), (2) and (4) of the AIFMD](https://www.esma.europa.eu/sites/default/files/library/2015/11/2014-869.pdf) | European Securities and Markets Authority | regulatory | Alternative investment fund managers report to their regulator on each fund they manage, including master-feeder structures, domicile and principal exposures. | LKP001, LKP012, REL001, REQ001, REQ002, REQ006, REQ010, SBJ002 |
 | SRC009 | [SEC Adopts Private Fund Risk Reporting (Form PF)](https://www.proskauer.com/alert/sec-adopts-private-fund-risk-reporting) | Proskauer Rose | regulatory | Private fund advisers report fund-level information to the SEC, including how funds are structured and invest through parallel and feeder funds. | LKP001, LKP003, LKP014, REL004, REQ002, REQ003, REQ010, ROL006, SBJ002 |
 | SRC010 | [Level 2 data: who owns whom](https://gleif.org/en/lei-data/access-and-use-lei-data/level-2-data-who-owns-whom/roc-policy-on-level-2-data) | Global Legal Entity Identifier Foundation | standard | Level 2 data records the direct and ultimate accounting-consolidation parents of a legal entity identified by a legal entity identifier. | LKP002, LKP014, REL003, REQ006, REQ007, REQ010, REQ013, ROL004, ROL005, SBJ001, SBJ002, SBJ006 |
@@ -1206,9 +1208,9 @@ Each case is a question the model must answer, with the route through the model 
 | [REQ008](#req008) | SCN020 | How many units of instrument I does fund F hold as at a date? | Designed | As at a date | [Instrument](#sbj005) → [TransactionInstrumentTraded](#rel007) → [Transaction](#sbj008) → TransactionDate → [LegalEntityTransactionParty](#rel005) → LegalEntityTransactionPartySide → LegalEntityTransactionPartyQuantity | Pass | Worked out as units received less units given up across the transactions to the date, using the side on each party; no figure is stored. |
 | [REQ008](#req008) | SCN021 | Which transfer moved portfolio company P from fund F to a continuation vehicle? | Awkward | Current | [Transaction](#sbj008) → TransactionType → [LegalEntityTransactionParty](#rel005) → [LegalEntity](#sbj001) → LegalEntityTransactionPartySide → LegalEntityTransactionPartyQuantity | Pass | The continuation vehicle is a party that paid and fund F a party that received, in one transaction. |
 | [REQ009](#req009) | SCN022 | What was the fair value per unit of instrument I as at a date, and at which hierarchy level? | Designed | As at a date | [Instrument](#sbj005) → [InstrumentPrice](#sbj007) → InstrumentPriceDate → InstrumentPriceValue → InstrumentPriceFairValueLevel | Pass |  |
-| [REQ009](#req009) | SCN023 | What was fund F's net asset value as at a date? | Designed | As at a date | [LegalEntity](#sbj001) → [ValuationLegalEntityValued](#rel008) → [Valuation](#sbj009) → ValuationMeasure → ValuationDate → ValuationAmount | Pass |  |
+| [REQ009](#req009) | SCN023 | What was fund F's net asset value as at a date? | Designed | As at a date | [LegalEntity](#sbj001) → [ValuationPrivateEquityFundValued](#rel008) → [Valuation](#sbj009) → ValuationMeasure → ValuationDate → ValuationAmount | Pass |  |
 | [REQ009](#req009) | SCN024 | What is the fair value of fund F's holding in portfolio company P as at a date? | Awkward | As at a date | [Instrument](#sbj005) → [InstrumentPrice](#sbj007) → InstrumentPriceValue → InstrumentPriceDate → [TransactionInstrumentTraded](#rel007) → [Transaction](#sbj008) → [LegalEntityTransactionParty](#rel005) → LegalEntityTransactionPartySide → LegalEntityTransactionPartyQuantity | Pass | Units held, worked out from transactions, multiplied by the price per unit as at the date. |
-| [REQ009](#req009) | SCN027 | What was portfolio company P's enterprise value as at a date? | Designed | As at a date | [LegalEntity](#sbj001) → [ValuationLegalEntityValued](#rel008) → [Valuation](#sbj009) → ValuationMeasure → ValuationDate → ValuationAmount | Pass |  |
+| [REQ009](#req009) | SCN027 | What was portfolio company P's enterprise value as at a date? | Designed | As at a date | [LegalEntity](#sbj001) → [ValuationPrivateEquityPortCoValued](#rel009) → [Valuation](#sbj009) → ValuationMeasure → ValuationDate → ValuationAmount | Pass |  |
 | [REQ010](#req010) | SCN004 | Which vehicles in the structure are tax blockers? | Designed | Current | [LegalEntity](#sbj001) → [LegalEntityClassifications](#sbj003) → LegalEntityClassificationsType | Pass |  |
 | [REQ010](#req010) | SCN005 | What is the legal entity identifier of entity E? | Designed | Current | [LegalEntity](#sbj001) → [LegalEntityIdentifiers](#sbj002) → LegalEntityIdentifiersType → LegalEntityIdentifiersValue | Pass |  |
 | [REQ011](#req011) | SCN004 | Which vehicles in the structure are tax blockers? | Designed | Current | [LegalEntity](#sbj001) → [LegalEntityClassifications](#sbj003) → LegalEntityClassificationsType | Pass |  |
