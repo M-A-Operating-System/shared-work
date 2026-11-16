@@ -1,0 +1,213 @@
+{
+  "defect_count": 23,
+  "blocking": 1,
+  "material": 0,
+  "advisory": 22,
+  "defects": [
+    {
+      "check": "RN03",
+      "severity": "blocking",
+      "routes_to": "9",
+      "artefact_ids": [],
+      "detail": "change vocabulary 'changed' appears in the document"
+    },
+    {
+      "check": "DF04",
+      "severity": "advisory",
+      "routes_to": "5-8",
+      "artefact_ids": [
+        "ATR031"
+      ],
+      "detail": "attribute definition uses entity - keep it only if the business field itself uses that word (legal entity, per-occurrence limit); otherwise say what the thing actually is"
+    },
+    {
+      "check": "DF04",
+      "severity": "advisory",
+      "routes_to": "5-8",
+      "artefact_ids": [
+        "ATR032"
+      ],
+      "detail": "attribute definition uses entity - keep it only if the business field itself uses that word (legal entity, per-occurrence limit); otherwise say what the thing actually is"
+    },
+    {
+      "check": "DF04",
+      "severity": "advisory",
+      "routes_to": "5-8",
+      "artefact_ids": [
+        "ATR033"
+      ],
+      "detail": "attribute definition uses entity - keep it only if the business field itself uses that word (legal entity, per-occurrence limit); otherwise say what the thing actually is"
+    },
+    {
+      "check": "DF04",
+      "severity": "advisory",
+      "routes_to": "5-8",
+      "artefact_ids": [
+        "ATR037"
+      ],
+      "detail": "attribute definition uses entity - keep it only if the business field itself uses that word (legal entity, per-occurrence limit); otherwise say what the thing actually is"
+    },
+    {
+      "check": "DF04",
+      "severity": "advisory",
+      "routes_to": "5-8",
+      "artefact_ids": [
+        "ATR038"
+      ],
+      "detail": "attribute definition uses entity - keep it only if the business field itself uses that word (legal entity, per-occurrence limit); otherwise say what the thing actually is"
+    },
+    {
+      "check": "DF04",
+      "severity": "advisory",
+      "routes_to": "5-8",
+      "artefact_ids": [
+        "ATR039"
+      ],
+      "detail": "attribute definition uses entity - keep it only if the business field itself uses that word (legal entity, per-occurrence limit); otherwise say what the thing actually is"
+    },
+    {
+      "check": "DF04",
+      "severity": "advisory",
+      "routes_to": "5-8",
+      "artefact_ids": [
+        "ATR040"
+      ],
+      "detail": "attribute definition uses entity - keep it only if the business field itself uses that word (legal entity, per-occurrence limit); otherwise say what the thing actually is"
+    },
+    {
+      "check": "DF04",
+      "severity": "advisory",
+      "routes_to": "5-8",
+      "artefact_ids": [
+        "LKP008"
+      ],
+      "detail": "lookup definition uses entity - keep it only if the business field itself uses that word (legal entity, per-occurrence limit); otherwise say what the thing actually is"
+    },
+    {
+      "check": "DF04",
+      "severity": "advisory",
+      "routes_to": "5-8",
+      "artefact_ids": [
+        "LKP009"
+      ],
+      "detail": "lookup definition uses entity - keep it only if the business field itself uses that word (legal entity, per-occurrence limit); otherwise say what the thing actually is"
+    },
+    {
+      "check": "DF04",
+      "severity": "advisory",
+      "routes_to": "5-8",
+      "artefact_ids": [
+        "LKP014"
+      ],
+      "detail": "lookup definition uses entity - keep it only if the business field itself uses that word (legal entity, per-occurrence limit); otherwise say what the thing actually is"
+    },
+    {
+      "check": "DF04",
+      "severity": "advisory",
+      "routes_to": "5-8",
+      "artefact_ids": [
+        "ROL001"
+      ],
+      "detail": "role definition uses entity - keep it only if the business field itself uses that word (legal entity, per-occurrence limit); otherwise say what the thing actually is"
+    },
+    {
+      "check": "DF04",
+      "severity": "advisory",
+      "routes_to": "5-8",
+      "artefact_ids": [
+        "ROL002"
+      ],
+      "detail": "role definition uses entity - keep it only if the business field itself uses that word (legal entity, per-occurrence limit); otherwise say what the thing actually is"
+    },
+    {
+      "check": "DF04",
+      "severity": "advisory",
+      "routes_to": "5-8",
+      "artefact_ids": [
+        "ROL003"
+      ],
+      "detail": "role definition uses entity - keep it only if the business field itself uses that word (legal entity, per-occurrence limit); otherwise say what the thing actually is"
+    },
+    {
+      "check": "DF04",
+      "severity": "advisory",
+      "routes_to": "5-8",
+      "artefact_ids": [
+        "ROL004"
+      ],
+      "detail": "role definition uses entity - keep it only if the business field itself uses that word (legal entity, per-occurrence limit); otherwise say what the thing actually is"
+    },
+    {
+      "check": "DF04",
+      "severity": "advisory",
+      "routes_to": "5-8",
+      "artefact_ids": [
+        "ROL005"
+      ],
+      "detail": "role definition uses entity - keep it only if the business field itself uses that word (legal entity, per-occurrence limit); otherwise say what the thing actually is"
+    },
+    {
+      "check": "DF04",
+      "severity": "advisory",
+      "routes_to": "5-8",
+      "artefact_ids": [
+        "ROL006"
+      ],
+      "detail": "role definition uses entity - keep it only if the business field itself uses that word (legal entity, per-occurrence limit); otherwise say what the thing actually is"
+    },
+    {
+      "check": "DF04",
+      "severity": "advisory",
+      "routes_to": "5-8",
+      "artefact_ids": [
+        "ROL008"
+      ],
+      "detail": "role definition uses entity - keep it only if the business field itself uses that word (legal entity, per-occurrence limit); otherwise say what the thing actually is"
+    },
+    {
+      "check": "DF04",
+      "severity": "advisory",
+      "routes_to": "5-8",
+      "artefact_ids": [
+        "ROL009"
+      ],
+      "detail": "role definition uses entity - keep it only if the business field itself uses that word (legal entity, per-occurrence limit); otherwise say what the thing actually is"
+    },
+    {
+      "check": "DF04",
+      "severity": "advisory",
+      "routes_to": "5-8",
+      "artefact_ids": [
+        "SBJ002"
+      ],
+      "detail": "concept definition uses entity - keep it only if the business field itself uses that word (legal entity, per-occurrence limit); otherwise say what the thing actually is"
+    },
+    {
+      "check": "DF04",
+      "severity": "advisory",
+      "routes_to": "5-8",
+      "artefact_ids": [
+        "SBJ003"
+      ],
+      "detail": "concept definition uses entity - keep it only if the business field itself uses that word (legal entity, per-occurrence limit); otherwise say what the thing actually is"
+    },
+    {
+      "check": "DF04",
+      "severity": "advisory",
+      "routes_to": "5-8",
+      "artefact_ids": [
+        "SBJ004"
+      ],
+      "detail": "concept definition uses entity - keep it only if the business field itself uses that word (legal entity, per-occurrence limit); otherwise say what the thing actually is"
+    },
+    {
+      "check": "DF04",
+      "severity": "advisory",
+      "routes_to": "5-8",
+      "artefact_ids": [
+        "SBJ006"
+      ],
+      "detail": "concept definition uses entity - keep it only if the business field itself uses that word (legal entity, per-occurrence limit); otherwise say what the thing actually is"
+    }
+  ]
+}

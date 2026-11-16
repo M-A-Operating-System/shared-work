@@ -1,0 +1,1111 @@
+[
+  {
+    "id": "ATR001",
+    "subject_id": null,
+    "relationship_id": "REL001",
+    "code": "LegalEntityFundManagedByVintageYear",
+    "definition": "The year in which the fund first took in investors' money. It is the year investors compare funds by, and it does not change after the first close.",
+    "datatype": "INTEGER",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "current",
+    "mandatory": true,
+    "critical": false,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA attributes on the concept or relationship: no attribute holds this fact.",
+    "data_requirement_ids": [
+      "DRQ001"
+    ],
+    "evidence_source_ids": [
+      "SRC003",
+      "SRC008"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR002",
+    "subject_id": null,
+    "relationship_id": "REL001",
+    "code": "LegalEntityFundManagedByStrategyType",
+    "definition": "The investment strategy the fund follows, taken from the agreed list. It says what kind of investing the fund does, not which industries it targets.",
+    "datatype": "LOOKUP",
+    "lookup_id": "LKP001",
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "current",
+    "mandatory": true,
+    "critical": false,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA attributes on the concept or relationship: no attribute holds this fact.",
+    "data_requirement_ids": [
+      "DRQ001"
+    ],
+    "evidence_source_ids": [
+      "SRC008",
+      "SRC009"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR003",
+    "subject_id": null,
+    "relationship_id": "REL001",
+    "code": "LegalEntityFundManagedByCurrency",
+    "definition": "The currency in which the fund keeps its books and reports to investors.",
+    "datatype": "LOOKUP",
+    "lookup_id": "LKP011",
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "current",
+    "mandatory": true,
+    "critical": false,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA attributes on the concept or relationship: no attribute holds this fact.",
+    "data_requirement_ids": [
+      "DRQ001"
+    ],
+    "evidence_source_ids": [
+      "SRC003",
+      "SRC008"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR004",
+    "subject_id": null,
+    "relationship_id": "REL001",
+    "code": "LegalEntityFundManagedByDomicile",
+    "definition": "The country in which the fund is established. Regulators ask for it, and it is not the country of the manager.",
+    "datatype": "LOOKUP",
+    "lookup_id": "LKP012",
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "current",
+    "mandatory": false,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA attributes on the concept or relationship: no attribute holds this fact.",
+    "data_requirement_ids": [
+      "DRQ001"
+    ],
+    "evidence_source_ids": [
+      "SRC008",
+      "SRC009"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR005",
+    "subject_id": null,
+    "relationship_id": "REL001",
+    "code": "LegalEntityFundManagedByTargetSize",
+    "definition": "The amount of commitments the manager set out to raise for the fund, in the fund's reporting currency. It is not the commitments actually received.",
+    "datatype": "CURRENCY",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "current",
+    "mandatory": false,
+    "critical": false,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA attributes on the concept or relationship: no attribute holds this fact.",
+    "data_requirement_ids": [
+      "DRQ001"
+    ],
+    "evidence_source_ids": [
+      "SRC003"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR006",
+    "subject_id": null,
+    "relationship_id": "REL001",
+    "code": "LegalEntityFundManagedByFinalCloseDate",
+    "definition": "The date on which the fund stopped accepting new investors. Investors who joined at earlier closes are measured from their own commitment dates.",
+    "datatype": "DATE",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "current",
+    "mandatory": false,
+    "critical": false,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA attributes on the concept or relationship: no attribute holds this fact.",
+    "data_requirement_ids": [
+      "DRQ001"
+    ],
+    "evidence_source_ids": [
+      "SRC004",
+      "SRC001"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR007",
+    "subject_id": null,
+    "relationship_id": "REL001",
+    "code": "LegalEntityFundManagedByInvestmentPeriodEndDate",
+    "definition": "The date on which the fund stops making new investments under its terms. Follow-on investments may continue after it.",
+    "datatype": "DATE",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "current",
+    "mandatory": false,
+    "critical": false,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA attributes on the concept or relationship: no attribute holds this fact.",
+    "data_requirement_ids": [
+      "DRQ001"
+    ],
+    "evidence_source_ids": [
+      "SRC004"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR008",
+    "subject_id": null,
+    "relationship_id": "REL003",
+    "code": "LegalEntityPEInvestorControlType",
+    "definition": "How the holder relates to the company it has a stake in: control, joint control, significant influence or minority, taken from the agreed list.",
+    "datatype": "LOOKUP",
+    "lookup_id": "LKP002",
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA attributes on the concept or relationship: no attribute holds this fact.",
+    "data_requirement_ids": [
+      "DRQ006"
+    ],
+    "evidence_source_ids": [
+      "SRC010",
+      "SRC011"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR009",
+    "subject_id": null,
+    "relationship_id": "REL003",
+    "code": "LegalEntityPEInvestorOwnershipPercentage",
+    "definition": "The share of the company's economic value that the holder owns, as a percentage, for the period the stake was held. It is the percentage reported for the stake, not a figure added up over the chain.",
+    "datatype": "FLOAT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA attributes on the concept or relationship: no attribute holds this fact.",
+    "data_requirement_ids": [
+      "DRQ006"
+    ],
+    "evidence_source_ids": [
+      "SRC010",
+      "SRC011"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR010",
+    "subject_id": null,
+    "relationship_id": "REL003",
+    "code": "LegalEntityPEInvestorVotingPercentage",
+    "definition": "The share of the company's votes the holder controls, as a percentage, where it differs from the economic share.",
+    "datatype": "FLOAT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": false,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA attributes on the concept or relationship: no attribute holds this fact.",
+    "data_requirement_ids": [
+      "DRQ006"
+    ],
+    "evidence_source_ids": [
+      "SRC010"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR011",
+    "subject_id": null,
+    "relationship_id": "REL002",
+    "code": "LegalEntityFundLPCommitmentAmount",
+    "definition": "The total capital the limited partner has promised to the fund, in the fund's currency. It is the most the investor can be asked to pay and not the money paid so far.",
+    "datatype": "CURRENCY",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": "CUSTOMER",
+    "dda_action": "reuse",
+    "dda_id": "DMA000000829",
+    "reuse_search": "Searched DDA attributes on the concept or relationship: found DMA000000829.",
+    "data_requirement_ids": [
+      "DRQ004"
+    ],
+    "evidence_source_ids": [
+      "SRC001",
+      "SRC016"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR012",
+    "subject_id": null,
+    "relationship_id": "REL002",
+    "code": "LegalEntityFundLPCommitmentTypes",
+    "definition": "The kind of commitment, such as primary, secondary or general partner commitment, taken from the agreed list.",
+    "datatype": "LOOKUP",
+    "lookup_id": "LKP010",
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": false,
+    "classification": "CUSTOMER",
+    "dda_action": "reuse",
+    "dda_id": "DMA000000833",
+    "reuse_search": "Searched DDA attributes on the concept or relationship: found DMA000000833.",
+    "data_requirement_ids": [
+      "DRQ004"
+    ],
+    "evidence_source_ids": [
+      "SRC001",
+      "SRC016",
+      "SRC015"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR013",
+    "subject_id": null,
+    "relationship_id": "REL002",
+    "code": "LegalEntityFundLPCommitmentStatus",
+    "definition": "Whether the commitment is active and in good standing, still being agreed, or has ended. It tells the register of limited partners which commitments to count.",
+    "datatype": "LOOKUP",
+    "lookup_id": "LKP013",
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": false,
+    "critical": false,
+    "classification": "CUSTOMER",
+    "dda_action": "reuse",
+    "dda_id": "DMA000000832",
+    "reuse_search": "Searched DDA attributes on the concept or relationship: found DMA000000832.",
+    "data_requirement_ids": [
+      "DRQ004"
+    ],
+    "evidence_source_ids": [
+      "SRC001"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR014",
+    "subject_id": null,
+    "relationship_id": "REL004",
+    "code": "LegalEntityFundParallelsType",
+    "definition": "The kind of the side vehicle in the link: a parallel fund, an alternative investment vehicle or a co-investment vehicle. Where the link joins two funds of equal standing, it is a parallel fund.",
+    "datatype": "LOOKUP",
+    "lookup_id": "LKP003",
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": false,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA attributes on the concept or relationship: no attribute holds this fact.",
+    "data_requirement_ids": [
+      "DRQ003"
+    ],
+    "evidence_source_ids": [
+      "SRC013",
+      "SRC009"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR015",
+    "subject_id": null,
+    "relationship_id": "REL005",
+    "code": "LegalEntityTransactionPartyAmount",
+    "definition": "The money this party paid or received in the transaction for the stated purpose, in the transaction's currency. A party taking part for several purposes has one amount for each. The side says whether it was paid or received.",
+    "datatype": "CURRENCY",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "current",
+    "mandatory": true,
+    "critical": true,
+    "classification": "CUSTOMER",
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA attributes on the concept or relationship: no attribute holds this fact.",
+    "data_requirement_ids": [
+      "DRQ005",
+      "DRQ007"
+    ],
+    "evidence_source_ids": [
+      "SRC001",
+      "SRC002",
+      "SRC003"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR016",
+    "subject_id": null,
+    "relationship_id": "REL005",
+    "code": "LegalEntityTransactionPartyComponent",
+    "definition": "The purpose for which this party paid or received, such as investment, management fee, fund expense, return of capital, realised gain or income, taken from the agreed list.",
+    "datatype": "LOOKUP",
+    "lookup_id": "LKP005",
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "current",
+    "mandatory": true,
+    "critical": false,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA attributes on the concept or relationship: no attribute holds this fact.",
+    "data_requirement_ids": [
+      "DRQ005",
+      "DRQ007"
+    ],
+    "evidence_source_ids": [
+      "SRC001",
+      "SRC002"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR017",
+    "subject_id": null,
+    "relationship_id": "REL005",
+    "code": "LegalEntityTransactionPartyQuantity",
+    "definition": "The number of units of the instrument this party received for its payment, or gave up for its receipt. It is blank for a capital call or a distribution.",
+    "datatype": "FLOAT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "current",
+    "mandatory": false,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA attributes on the concept or relationship: no attribute holds this fact.",
+    "data_requirement_ids": [
+      "DRQ007"
+    ],
+    "evidence_source_ids": [
+      "SRC003",
+      "SRC015"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR018",
+    "subject_id": null,
+    "relationship_id": "REL005",
+    "code": "LegalEntityTransactionPartyPayeeAmountRetired",
+    "definition": "Withdrawn: merged into LegalEntityTransactionPartyAmount.",
+    "datatype": "CURRENCY",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "current",
+    "mandatory": false,
+    "critical": false,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA attributes on the concept or relationship: no attribute holds this fact.",
+    "data_requirement_ids": [
+      "DRQ005",
+      "DRQ007"
+    ],
+    "evidence_source_ids": [
+      "SRC001"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Merged into the single party attributes on LegalEntityTransactionParty."
+  },
+  {
+    "id": "ATR019",
+    "subject_id": null,
+    "relationship_id": "REL005",
+    "code": "LegalEntityTransactionPartyPayeeComponentRetired",
+    "definition": "Withdrawn: merged into LegalEntityTransactionPartyComponent.",
+    "datatype": "LOOKUP",
+    "lookup_id": "LKP005",
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "current",
+    "mandatory": false,
+    "critical": false,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA attributes on the concept or relationship: no attribute holds this fact.",
+    "data_requirement_ids": [
+      "DRQ005",
+      "DRQ007"
+    ],
+    "evidence_source_ids": [
+      "SRC001"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Merged into the single party attributes on LegalEntityTransactionParty."
+  },
+  {
+    "id": "ATR020",
+    "subject_id": null,
+    "relationship_id": "REL005",
+    "code": "LegalEntityTransactionPartyPayeeQuantityRetired",
+    "definition": "Withdrawn: merged into LegalEntityTransactionPartyQuantity.",
+    "datatype": "FLOAT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "current",
+    "mandatory": false,
+    "critical": false,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA attributes on the concept or relationship: no attribute holds this fact.",
+    "data_requirement_ids": [
+      "DRQ007"
+    ],
+    "evidence_source_ids": [
+      "SRC003"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Merged into the single party attributes on LegalEntityTransactionParty."
+  },
+  {
+    "id": "ATR021",
+    "subject_id": "SBJ008",
+    "relationship_id": null,
+    "code": "TransactionType",
+    "definition": "What kind of event this was, such as a capital call, a distribution or an acquisition, taken from the agreed list.",
+    "datatype": "LOOKUP",
+    "lookup_id": "LKP004",
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "current",
+    "mandatory": true,
+    "critical": false,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA attributes on the concept or relationship: no attribute holds this fact.",
+    "data_requirement_ids": [
+      "DRQ005",
+      "DRQ007"
+    ],
+    "evidence_source_ids": [
+      "SRC001",
+      "SRC002",
+      "SRC015"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR022",
+    "subject_id": "SBJ008",
+    "relationship_id": null,
+    "code": "TransactionDate",
+    "definition": "The date on which the event took effect. Questions about what a fund held on a date use this date.",
+    "datatype": "DATE",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA attributes on the concept or relationship: no attribute holds this fact.",
+    "data_requirement_ids": [
+      "DRQ005",
+      "DRQ007"
+    ],
+    "evidence_source_ids": [
+      "SRC001",
+      "SRC002",
+      "SRC003"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR023",
+    "subject_id": "SBJ008",
+    "relationship_id": null,
+    "code": "TransactionSettlementDate",
+    "definition": "The date on which the money actually moved, where it differs from the date the event took effect.",
+    "datatype": "DATE",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "current",
+    "mandatory": false,
+    "critical": false,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA attributes on the concept or relationship: no attribute holds this fact.",
+    "data_requirement_ids": [
+      "DRQ005"
+    ],
+    "evidence_source_ids": [
+      "SRC001",
+      "SRC002"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR024",
+    "subject_id": "SBJ008",
+    "relationship_id": null,
+    "code": "TransactionCurrency",
+    "definition": "The currency in which every amount on the transaction is stated, so that amounts paid and received by different parties can be added together.",
+    "datatype": "LOOKUP",
+    "lookup_id": "LKP011",
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "current",
+    "mandatory": true,
+    "critical": false,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA attributes on the concept or relationship: no attribute holds this fact.",
+    "data_requirement_ids": [
+      "DRQ005",
+      "DRQ007"
+    ],
+    "evidence_source_ids": [
+      "SRC001",
+      "SRC002"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR025",
+    "subject_id": "SBJ008",
+    "relationship_id": null,
+    "code": "TransactionStatus",
+    "definition": "Whether the transaction is active, still being drafted or no longer in force.",
+    "datatype": "LOOKUP",
+    "lookup_id": "LKP013",
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "current",
+    "mandatory": false,
+    "critical": false,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA attributes on the concept or relationship: no attribute holds this fact.",
+    "data_requirement_ids": [
+      "DRQ005",
+      "DRQ007"
+    ],
+    "evidence_source_ids": [
+      "SRC001"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR026",
+    "subject_id": "SBJ007",
+    "relationship_id": null,
+    "code": "InstrumentPriceDate",
+    "definition": "The date as at which the price applies. A price has no meaning without it.",
+    "datatype": "DATE",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA attributes on the concept or relationship: no attribute holds this fact.",
+    "data_requirement_ids": [
+      "DRQ008"
+    ],
+    "evidence_source_ids": [
+      "SRC005",
+      "SRC006"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR027",
+    "subject_id": "SBJ007",
+    "relationship_id": null,
+    "code": "InstrumentPriceCurrency",
+    "definition": "The currency in which the price per unit of the instrument is stated, so that a price can be multiplied by a number of units without conversion.",
+    "datatype": "LOOKUP",
+    "lookup_id": "LKP011",
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": false,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA attributes on the concept or relationship: no attribute holds this fact.",
+    "data_requirement_ids": [
+      "DRQ008"
+    ],
+    "evidence_source_ids": [
+      "SRC005"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR028",
+    "subject_id": "SBJ007",
+    "relationship_id": null,
+    "code": "InstrumentPriceFairValueLevel",
+    "definition": "The level of the fair value hierarchy the price falls in: Level 1, 2 or 3, according to how observable its inputs are.",
+    "datatype": "LOOKUP",
+    "lookup_id": "LKP006",
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": false,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA attributes on the concept or relationship: no attribute holds this fact.",
+    "data_requirement_ids": [
+      "DRQ008"
+    ],
+    "evidence_source_ids": [
+      "SRC006"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR029",
+    "subject_id": "SBJ007",
+    "relationship_id": null,
+    "code": "InstrumentPriceType",
+    "definition": "The kind of price: a closing price or a fair value assessed at a reporting date.",
+    "datatype": "LOOKUP",
+    "lookup_id": "LKP007",
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": false,
+    "classification": null,
+    "dda_action": "extend",
+    "dda_id": "DMA000000650",
+    "reuse_search": "Searched DDA attributes on the concept or relationship: found DMA000000650.",
+    "data_requirement_ids": [
+      "DRQ008"
+    ],
+    "evidence_source_ids": [
+      "SRC005",
+      "SRC006"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR030",
+    "subject_id": "SBJ007",
+    "relationship_id": null,
+    "code": "InstrumentPriceValue",
+    "definition": "The price of one unit of the instrument on the price date, in the price currency.",
+    "datatype": "FLOAT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "reuse",
+    "dda_id": "DMA000000651",
+    "reuse_search": "Searched DDA attributes on the concept or relationship: found DMA000000651.",
+    "data_requirement_ids": [
+      "DRQ008"
+    ],
+    "evidence_source_ids": [
+      "SRC005",
+      "SRC006"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR031",
+    "subject_id": "SBJ002",
+    "relationship_id": null,
+    "code": "LegalEntityIdentifiersType",
+    "definition": "The scheme under which the identifier was issued, such as the legal entity identifier or a company registration number.",
+    "datatype": "LOOKUP",
+    "lookup_id": "LKP014",
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "current",
+    "mandatory": true,
+    "critical": true,
+    "classification": "CUSTOMER",
+    "dda_action": "reuse",
+    "dda_id": "DMA000000811",
+    "reuse_search": "Searched DDA attributes on the concept or relationship: found DMA000000811.",
+    "data_requirement_ids": [
+      "DRQ002"
+    ],
+    "evidence_source_ids": [
+      "SRC010",
+      "SRC009"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR032",
+    "subject_id": "SBJ002",
+    "relationship_id": null,
+    "code": "LegalEntityIdentifiersValue",
+    "definition": "The identifier itself, as issued under the scheme. It is what is used to match the legal entity to filings and to published ownership data.",
+    "datatype": "TEXT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "current",
+    "mandatory": true,
+    "critical": true,
+    "classification": "CUSTOMER",
+    "dda_action": "reuse",
+    "dda_id": "DMA000000815",
+    "reuse_search": "Searched DDA attributes on the concept or relationship: found DMA000000815.",
+    "data_requirement_ids": [
+      "DRQ002"
+    ],
+    "evidence_source_ids": [
+      "SRC010",
+      "SRC009"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR033",
+    "subject_id": "SBJ002",
+    "relationship_id": null,
+    "code": "LegalEntityIdentifiersStartDate",
+    "definition": "The date from which the identifier is valid for the legal entity.",
+    "datatype": "DATE",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": false,
+    "critical": false,
+    "classification": "CUSTOMER",
+    "dda_action": "reuse",
+    "dda_id": "DMA000000813",
+    "reuse_search": "Searched DDA attributes on the concept or relationship: found DMA000000813.",
+    "data_requirement_ids": [
+      "DRQ002"
+    ],
+    "evidence_source_ids": [
+      "SRC010"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR034",
+    "subject_id": "SBJ002",
+    "relationship_id": null,
+    "code": "LegalEntityIdentifiersEndDate",
+    "definition": "The date on which the identifier stopped being valid. Blank means it still is.",
+    "datatype": "DATE",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": false,
+    "critical": false,
+    "classification": "CUSTOMER",
+    "dda_action": "reuse",
+    "dda_id": "DMA000000814",
+    "reuse_search": "Searched DDA attributes on the concept or relationship: found DMA000000814.",
+    "data_requirement_ids": [
+      "DRQ002"
+    ],
+    "evidence_source_ids": [
+      "SRC010"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR035",
+    "subject_id": "SBJ003",
+    "relationship_id": null,
+    "code": "LegalEntityClassificationsType",
+    "definition": "What the vehicle is for, such as management company, holding company or tax blocker, taken from the agreed list.",
+    "datatype": "LOOKUP",
+    "lookup_id": "LKP009",
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "current",
+    "mandatory": true,
+    "critical": false,
+    "classification": "CUSTOMER",
+    "dda_action": "reuse",
+    "dda_id": "DMA000000671",
+    "reuse_search": "Searched DDA attributes on the concept or relationship: found DMA000000671.",
+    "data_requirement_ids": [
+      "DRQ002"
+    ],
+    "evidence_source_ids": [
+      "SRC012",
+      "SRC014"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR036",
+    "subject_id": "SBJ009",
+    "relationship_id": null,
+    "code": "ValuationMeasure",
+    "definition": "The measure on which the value was struck, such as net asset value, equity value or enterprise value, taken from the agreed list. Two values on different measures are never compared as like for like.",
+    "datatype": "LOOKUP",
+    "lookup_id": "LKP008",
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA attributes on the concept or relationship: no attribute holds this fact.",
+    "data_requirement_ids": [
+      "DRQ008"
+    ],
+    "evidence_source_ids": [
+      "SRC005",
+      "SRC003",
+      "SRC006"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR037",
+    "subject_id": "SBJ009",
+    "relationship_id": null,
+    "code": "ValuationDate",
+    "definition": "The date as at which the valuation applies. A value has no meaning without the date it was struck, and later valuations do not replace earlier ones.",
+    "datatype": "DATE",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA attributes on the concept or relationship: no attribute holds this fact.",
+    "data_requirement_ids": [
+      "DRQ008"
+    ],
+    "evidence_source_ids": [
+      "SRC005",
+      "SRC003"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR038",
+    "subject_id": "SBJ009",
+    "relationship_id": null,
+    "code": "ValuationAmount",
+    "definition": "The value placed on the legal entity on the valuation date and measure, in the valuation currency.",
+    "datatype": "FLOAT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA attributes on the concept or relationship: no attribute holds this fact.",
+    "data_requirement_ids": [
+      "DRQ008"
+    ],
+    "evidence_source_ids": [
+      "SRC005",
+      "SRC003"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR039",
+    "subject_id": "SBJ009",
+    "relationship_id": null,
+    "code": "ValuationCurrency",
+    "definition": "The currency in which the valuation is stated, so that values struck at different dates can be compared.",
+    "datatype": "LOOKUP",
+    "lookup_id": "LKP011",
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": false,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA attributes on the concept or relationship: no attribute holds this fact.",
+    "data_requirement_ids": [
+      "DRQ008"
+    ],
+    "evidence_source_ids": [
+      "SRC005"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR040",
+    "subject_id": "SBJ006",
+    "relationship_id": null,
+    "code": "InstrumentIssuerMasterID",
+    "definition": "The identifier of the legal entity that issued the instrument. If you need to know which portfolio company or vehicle an instrument is a claim on, this is what you go by.",
+    "datatype": "MASTERID",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "current",
+    "mandatory": true,
+    "critical": false,
+    "classification": null,
+    "dda_action": "reuse",
+    "dda_id": "DMA000000644",
+    "reuse_search": "Searched DDA attributes on the concept or relationship: found DMA000000644.",
+    "data_requirement_ids": [
+      "DRQ007"
+    ],
+    "evidence_source_ids": [
+      "SRC010",
+      "SRC003"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR041",
+    "subject_id": null,
+    "relationship_id": "REL005",
+    "code": "LegalEntityTransactionPartySide",
+    "definition": "Whether this party paid or received in the transaction, taken from the agreed list. It is what lets one relationship serve both sides of the movement.",
+    "datatype": "LOOKUP",
+    "lookup_id": "LKP015",
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "current",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA attributes on the concept or relationship: no attribute holds this fact.",
+    "data_requirement_ids": [
+      "DRQ005",
+      "DRQ007"
+    ],
+    "evidence_source_ids": [
+      "SRC001",
+      "SRC002",
+      "SRC003"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  }
+]

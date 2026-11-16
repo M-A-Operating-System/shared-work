@@ -1,0 +1,196 @@
+[
+  {
+    "id": "REQ001",
+    "category": "Fund family",
+    "statement": "The business must know which general partner or manager runs each fund, and for what period, so that the funds of one sponsor can be listed and a change of manager is not lost.",
+    "owner": "Chief Financial Officer of the funds",
+    "subgroup_id": "SCG001",
+    "satisfied_by": "model",
+    "source_ids": [
+      "SRC012",
+      "SRC004",
+      "SRC008"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "REQ002",
+    "category": "Fund family",
+    "statement": "The business must hold the descriptive facts of each fund: its vintage year, strategy, reporting currency, country of domicile, target size, final close date and the end of its investment period.",
+    "owner": "Chief Financial Officer of the funds",
+    "subgroup_id": "SCG001",
+    "satisfied_by": "model",
+    "source_ids": [
+      "SRC003",
+      "SRC008",
+      "SRC009"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "REQ003",
+    "category": "Fund family",
+    "statement": "The business must link each fund to the parallel, alternative-investment and co-investment vehicles that invest alongside it, and say which kind each is.",
+    "owner": "General Counsel (fund formation)",
+    "subgroup_id": "SCG001",
+    "satisfied_by": "model",
+    "source_ids": [
+      "SRC013",
+      "SRC009",
+      "SRC014"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "REQ004",
+    "category": "Investors and commitments",
+    "statement": "The business must record the capital each limited partner, including the general partner itself, commits to each fund, its type, its status and the period it runs, so the register of limited partners and each limited partner's share of a fund can be stated for any date.",
+    "owner": "Head of Investor Relations",
+    "subgroup_id": "SCG002",
+    "satisfied_by": "model",
+    "source_ids": [
+      "SRC001",
+      "SRC004",
+      "SRC016",
+      "SRC015"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "REQ005",
+    "category": "Investors and commitments",
+    "statement": "The business must record every capital call and every distribution, with the amount each investor paid or received split by purpose, so each notice can be reproduced and each limited partner's unfunded commitment worked out.",
+    "owner": "Chief Financial Officer of the funds",
+    "subgroup_id": "SCG002",
+    "satisfied_by": "model",
+    "source_ids": [
+      "SRC001",
+      "SRC002"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "REQ006",
+    "category": "Holding structure",
+    "statement": "The business must record the stake each fund or vehicle holds in each company or vehicle below it, with the economic share, the voting share and whether it controls, for the period the stake was held, so the route from a fund to a portfolio company can be followed.",
+    "owner": "Head of Portfolio Management",
+    "subgroup_id": "SCG003",
+    "satisfied_by": "model",
+    "source_ids": [
+      "SRC010",
+      "SRC011",
+      "SRC012",
+      "SRC008"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "REQ007",
+    "category": "Holding structure",
+    "statement": "The business must show a portfolio company held by more than one fund with each fund's share, and must be able to work out what the whole sponsor holds in it by following the chain of holding vehicles.",
+    "owner": "Head of Compliance",
+    "subgroup_id": "SCG003",
+    "satisfied_by": "model",
+    "source_ids": [
+      "SRC004",
+      "SRC010",
+      "SRC014"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "REQ008",
+    "category": "Investments",
+    "statement": "The business must record each acquisition, follow-on investment and full or partial exit: its date, the instrument involved, and the amount and number of units paid or received by each fund or counterparty.",
+    "owner": "Chief Financial Officer of the funds",
+    "subgroup_id": "SCG003",
+    "satisfied_by": "model",
+    "source_ids": [
+      "SRC003",
+      "SRC015",
+      "SRC004"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "REQ009",
+    "category": "Valuation",
+    "statement": "The business must record the fair value per unit of each instrument held, as at each reporting date, with its level in the fair value hierarchy, and the value of each fund and portfolio company as at a date, stated on a named measure such as net asset value, equity value or enterprise value.",
+    "owner": "Head of Portfolio Valuation",
+    "subgroup_id": "SCG002",
+    "satisfied_by": "model",
+    "source_ids": [
+      "SRC005",
+      "SRC006",
+      "SRC007",
+      "SRC003"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "REQ010",
+    "category": "Identification",
+    "statement": "The business must identify every fund, vehicle and portfolio company by its legal entity identifier and other recognised identifiers, so the structure ties to regulatory filings and to published ownership data.",
+    "owner": "Head of Compliance",
+    "subgroup_id": "SCG003",
+    "satisfied_by": "model",
+    "source_ids": [
+      "SRC010",
+      "SRC011",
+      "SRC009",
+      "SRC008"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "REQ011",
+    "category": "Holding structure",
+    "statement": "The business must say what each vehicle in the structure is for - management company, holding company, special purpose vehicle, tax blocker, fund vehicle or operating company.",
+    "owner": "General Counsel (fund formation)",
+    "subgroup_id": "SCG003",
+    "satisfied_by": "model",
+    "source_ids": [
+      "SRC012",
+      "SRC014"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "REQ012",
+    "category": "Investments",
+    "statement": "The business must record a transfer of a holding from one fund to a continuation vehicle of the same sponsor as one event with both funds on it, and show the limited partners' commitments to the continuation vehicle as such.",
+    "owner": "General Counsel (fund formation)",
+    "subgroup_id": "SCG003",
+    "satisfied_by": "model",
+    "source_ids": [
+      "SRC015"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "REQ013",
+    "category": "Identification",
+    "statement": "A company that is a limited partner in one fund and a portfolio company of another must be held once, with each position derived from what it does, not from a second record.",
+    "owner": "Chief Data Officer",
+    "subgroup_id": "SCG003",
+    "satisfied_by": "model",
+    "source_ids": [
+      "SRC010",
+      "SRC012"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  }
+]

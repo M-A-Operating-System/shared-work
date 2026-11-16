@@ -1,0 +1,118 @@
+{
+  "domains": [
+    {
+      "id": "DOM001",
+      "dda_id": "DMD000000012",
+      "dda_action": "reuse",
+      "code": null,
+      "prefix": null,
+      "definition": null,
+      "definition_update": null,
+      "anchor_subject_id": "SBJ001",
+      "shared": true,
+      "subject_ids": [
+        "SBJ001",
+        "SBJ002",
+        "SBJ003"
+      ]
+    },
+    {
+      "id": "DOM002",
+      "dda_id": "DMD000000015",
+      "dda_action": "reuse",
+      "code": null,
+      "prefix": null,
+      "definition": null,
+      "definition_update": null,
+      "anchor_subject_id": "SBJ005",
+      "shared": true,
+      "subject_ids": [
+        "SBJ005",
+        "SBJ006",
+        "SBJ007"
+      ]
+    },
+    {
+      "id": "DOM003",
+      "dda_id": "DMD000000022",
+      "dda_action": "reuse",
+      "code": null,
+      "prefix": null,
+      "definition": null,
+      "definition_update": null,
+      "anchor_subject_id": "SBJ008",
+      "shared": true,
+      "subject_ids": [
+        "SBJ008",
+        "SBJ009"
+      ]
+    }
+  ],
+  "rejected_candidates": [
+    {
+      "name": "Funds",
+      "failed_tests": [
+        "DT2",
+        "DT3"
+      ],
+      "reason": "A fund is a legal entity that another legal entity manages; it cannot be described without naming its manager, so it is a role, and every fund is also a legal entity.",
+      "placed_in_domain_id": "DOM001",
+      "prompted_by_subject_ids": [],
+      "rejected_by": "agent"
+    },
+    {
+      "name": "Portfolio Companies",
+      "failed_tests": [
+        "DT2",
+        "DT3"
+      ],
+      "reason": "A portfolio company is a company in which a fund holds a stake; it is a role of a legal entity.",
+      "placed_in_domain_id": "DOM001",
+      "prompted_by_subject_ids": [],
+      "rejected_by": "agent"
+    },
+    {
+      "name": "Investors",
+      "failed_tests": [
+        "DT2",
+        "DT3"
+      ],
+      "reason": "An investor is a legal entity while it commits capital or holds a stake. It is a role.",
+      "placed_in_domain_id": "DOM001",
+      "prompted_by_subject_ids": [],
+      "rejected_by": "agent"
+    },
+    {
+      "name": "Holdings",
+      "failed_tests": [
+        "DT1",
+        "DT5"
+      ],
+      "reason": "A holding is the net of acquisitions and exits as at a date. It is worked out from transactions and is never stored.",
+      "placed_in_domain_id": "DOM003",
+      "prompted_by_subject_ids": [],
+      "rejected_by": "agent"
+    },
+    {
+      "name": "Capital Calls and Distributions",
+      "failed_tests": [
+        "DT3",
+        "DT10"
+      ],
+      "reason": "Each is a transaction in which money moves between a fund and its investors, and Transactions already covers it.",
+      "placed_in_domain_id": "DOM003",
+      "prompted_by_subject_ids": [],
+      "rejected_by": "agent"
+    },
+    {
+      "name": "Valuations",
+      "failed_tests": [
+        "DT1"
+      ],
+      "reason": "Valuations are not a domain of their own. An instrument's price is held with the instrument, and the value of a legal entity is held as a Valuation concept in the Transactions domain, linked to the legal entity valued.",
+      "placed_in_domain_id": "DOM003",
+      "prompted_by_subject_ids": [],
+      "rejected_by": "agent"
+    }
+  ]
+}

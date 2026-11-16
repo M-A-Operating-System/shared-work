@@ -1,0 +1,2714 @@
+[
+  {
+    "id": "LKP001",
+    "code": "LegalEntityFundStrategyTypes",
+    "definition": "The list of investment strategies a fund can follow, as the sponsor's investors and regulators describe them. The chief financial officer of the funds decides what goes on it. It is not a classification of industries.",
+    "scope": "concept",
+    "values": [
+      {
+        "code": "BUYOUT",
+        "name": "Buyout",
+        "definition": "Acquires control of established companies."
+      },
+      {
+        "code": "GROWTH",
+        "name": "Growth",
+        "definition": "Takes minority or control stakes in growing companies."
+      },
+      {
+        "code": "VENTURE",
+        "name": "Venture",
+        "definition": "Invests in early-stage companies."
+      },
+      {
+        "code": "CREDIT",
+        "name": "Private Credit",
+        "definition": "Lends to companies."
+      },
+      {
+        "code": "INFRASTRUCTURE",
+        "name": "Infrastructure",
+        "definition": "Invests in infrastructure assets."
+      },
+      {
+        "code": "REAL_ESTATE",
+        "name": "Real Estate",
+        "definition": "Invests in property assets."
+      },
+      {
+        "code": "SECONDARIES",
+        "name": "Secondaries",
+        "definition": "Buys existing interests in funds or assets."
+      },
+      {
+        "code": "FUND_OF_FUNDS",
+        "name": "Fund of Funds",
+        "definition": "Invests in other funds."
+      }
+    ],
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA lookup types (72): none lists fund strategies. Instrument and industry lists describe other things.",
+    "data_requirement_ids": [
+      "DRQ001"
+    ],
+    "evidence_source_ids": [
+      "SRC008",
+      "SRC009"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "LKP002",
+    "code": "LegalEntityPEInvestorControlTypes",
+    "definition": "The list of ways a holder relates to a company in which it has a stake: control, joint control, significant influence or a minority holding. The head of portfolio management decides what goes on it. It sits alongside the list LegalEntityRelationshipTypes and does not repeat it.",
+    "scope": "concept",
+    "values": [
+      {
+        "code": "CONTROL",
+        "name": "Control",
+        "definition": "The holder directs the company on its own."
+      },
+      {
+        "code": "JOINT_CONTROL",
+        "name": "Joint Control",
+        "definition": "The holder directs the company together with others."
+      },
+      {
+        "code": "SIGNIFICANT_INFLUENCE",
+        "name": "Significant Influence",
+        "definition": "The holder influences the company without directing it."
+      },
+      {
+        "code": "MINORITY",
+        "name": "Minority",
+        "definition": "A passive holding with no influence."
+      }
+    ],
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA lookup types: LegalEntityRelationshipTypes DLT000000061 holds Parent and Minority but states it is superseded by relationship records.",
+    "data_requirement_ids": [
+      "DRQ006"
+    ],
+    "evidence_source_ids": [
+      "SRC010",
+      "SRC011"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "LKP003",
+    "code": "LegalEntityFundParallelTypes",
+    "definition": "The list of kinds of vehicle that invest alongside a fund: a parallel fund, an alternative investment vehicle and a co-investment vehicle. The general counsel decides what goes on it.",
+    "scope": "concept",
+    "values": [
+      {
+        "code": "PARALLEL",
+        "name": "Parallel Fund",
+        "definition": "Invests side by side with the main fund on the same terms."
+      },
+      {
+        "code": "AIV",
+        "name": "Alternative Investment Vehicle",
+        "definition": "Takes an investment the main fund cannot hold directly."
+      },
+      {
+        "code": "CO_INVEST",
+        "name": "Co-investment Vehicle",
+        "definition": "Lets selected investors take a further share of one investment."
+      }
+    ],
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA lookup types: none lists side-by-side vehicle kinds.",
+    "data_requirement_ids": [
+      "DRQ003"
+    ],
+    "evidence_source_ids": [
+      "SRC013",
+      "SRC009"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "LKP004",
+    "code": "TransactionTypes",
+    "definition": "The list of kinds of transaction in the fund structure: capital call, distribution, acquisition, follow-on investment, partial exit, full exit and transfer to a continuation vehicle. The chief financial officer of the funds decides what goes on it.",
+    "scope": "concept",
+    "values": [
+      {
+        "code": "CAPITAL_CALL",
+        "name": "Capital Call",
+        "definition": "Investors pay money into a fund."
+      },
+      {
+        "code": "DISTRIBUTION",
+        "name": "Distribution",
+        "definition": "A fund pays money to its investors."
+      },
+      {
+        "code": "ACQUISITION",
+        "name": "Acquisition",
+        "definition": "A fund buys its first holding in a company."
+      },
+      {
+        "code": "FOLLOW_ON",
+        "name": "Follow-on Investment",
+        "definition": "A fund adds to an existing holding."
+      },
+      {
+        "code": "PARTIAL_EXIT",
+        "name": "Partial Exit",
+        "definition": "A fund sells part of a holding."
+      },
+      {
+        "code": "FULL_EXIT",
+        "name": "Full Exit",
+        "definition": "A fund sells all of a holding."
+      },
+      {
+        "code": "CONTINUATION_TRANSFER",
+        "name": "Continuation Transfer",
+        "definition": "A holding moves from one fund to a continuation vehicle."
+      }
+    ],
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA lookup types: only instrument date and trading status lists exist; none lists transaction kinds.",
+    "data_requirement_ids": [
+      "DRQ007"
+    ],
+    "evidence_source_ids": [
+      "SRC001",
+      "SRC002",
+      "SRC015"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "LKP005",
+    "code": "UniversalTransactionComponentTypes",
+    "definition": "The list of purposes for which an amount is paid or received in a transaction: investment, management fee, fund expense, return of capital, realised gain, income, and recallable amount. The chief financial officer of the funds decides what goes on it.",
+    "scope": "universal",
+    "values": [
+      {
+        "code": "INVESTMENT",
+        "name": "Investment",
+        "definition": "Money used to buy a holding."
+      },
+      {
+        "code": "MANAGEMENT_FEE",
+        "name": "Management Fee",
+        "definition": "Money used to pay the manager."
+      },
+      {
+        "code": "FUND_EXPENSE",
+        "name": "Fund Expense",
+        "definition": "Money used to pay the fund's costs."
+      },
+      {
+        "code": "RETURN_OF_CAPITAL",
+        "name": "Return of Capital",
+        "definition": "Money returning invested capital."
+      },
+      {
+        "code": "REALISED_GAIN",
+        "name": "Realised Gain",
+        "definition": "Money that is a gain on a sale."
+      },
+      {
+        "code": "INCOME",
+        "name": "Income",
+        "definition": "Money received as dividends or interest."
+      },
+      {
+        "code": "RECALLABLE",
+        "name": "Recallable Amount",
+        "definition": "Money that the fund may call again."
+      }
+    ],
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA lookup types: none lists purposes of a payment.",
+    "data_requirement_ids": [
+      "DRQ005",
+      "DRQ007"
+    ],
+    "evidence_source_ids": [
+      "SRC001",
+      "SRC002",
+      "SRC003"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "LKP006",
+    "code": "InstrumentPriceFairValueLevels",
+    "definition": "The three levels of the fair value hierarchy: Level 1 uses quoted prices, Level 2 uses other observable inputs, Level 3 uses unobservable inputs. The head of portfolio valuation decides what goes on it.",
+    "scope": "concept",
+    "values": [
+      {
+        "code": "L1",
+        "name": "Level 1",
+        "definition": "Quoted prices in active markets for the same instrument."
+      },
+      {
+        "code": "L2",
+        "name": "Level 2",
+        "definition": "Other inputs observable for the instrument."
+      },
+      {
+        "code": "L3",
+        "name": "Level 3",
+        "definition": "Inputs that cannot be observed."
+      }
+    ],
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA lookup types: none holds a fair value hierarchy.",
+    "data_requirement_ids": [
+      "DRQ008"
+    ],
+    "evidence_source_ids": [
+      "SRC006",
+      "SRC005"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "LKP007",
+    "code": "InstrumentPriceTypes",
+    "definition": "The list of kinds of price held for an instrument: a closing price and a fair value assessed at a reporting date. The head of portfolio valuation decides what goes on it.",
+    "scope": "concept",
+    "values": [
+      {
+        "code": "CLOSING",
+        "name": "Closing Price",
+        "definition": "The last price of a trading day."
+      },
+      {
+        "code": "FAIR_VALUE",
+        "name": "Fair Value",
+        "definition": "The value assessed at a reporting date."
+      }
+    ],
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA lookup types: InstrumentPriceType has no lookup bound to it.",
+    "data_requirement_ids": [
+      "DRQ008"
+    ],
+    "evidence_source_ids": [
+      "SRC005",
+      "SRC006"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "LKP008",
+    "code": "ValuationMeasures",
+    "definition": "The list of measures on which a legal entity is valued: net asset value, equity value and enterprise value. The head of portfolio valuation decides what goes on it.",
+    "scope": "concept",
+    "values": [
+      {
+        "code": "NET_ASSET_VALUE",
+        "name": "Net Asset Value",
+        "definition": "The value of a fund's assets less its liabilities."
+      },
+      {
+        "code": "EQUITY_VALUE",
+        "name": "Equity Value",
+        "definition": "The value of the owners' interest in a company or vehicle."
+      },
+      {
+        "code": "ENTERPRISE_VALUE",
+        "name": "Enterprise Value",
+        "definition": "The value of the whole business, being the owners' interest plus net debt."
+      }
+    ],
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA lookup types: DLT000000063 holds market-value variants only; a list naming the measure of value is created for Valuation and DLT000000063 is left as it is.",
+    "data_requirement_ids": [
+      "DRQ008"
+    ],
+    "evidence_source_ids": [
+      "SRC005",
+      "SRC003",
+      "SRC006"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "LKP009",
+    "code": "LegalEntityClassificationTypes3",
+    "definition": "The most detailed level of the list of classifications applied to a legal entity. Here it carries what a vehicle is for. The general counsel decides the vehicle purposes on it.",
+    "scope": "concept",
+    "values": [
+      {
+        "code": "MANAGEMENT_COMPANY",
+        "name": "Management Company",
+        "definition": "Employs the people who manage the funds."
+      },
+      {
+        "code": "HOLDING_COMPANY",
+        "name": "Holding Company",
+        "definition": "Holds the sponsor's interests."
+      },
+      {
+        "code": "SPV",
+        "name": "Special Purpose Vehicle",
+        "definition": "Set up to hold one investment."
+      },
+      {
+        "code": "TAX_BLOCKER",
+        "name": "Tax Blocker",
+        "definition": "A corporate vehicle through which an investor holds an investment."
+      },
+      {
+        "code": "FUND_VEHICLE",
+        "name": "Fund Vehicle",
+        "definition": "A pooled vehicle managed for investors."
+      },
+      {
+        "code": "OPERATING_COMPANY",
+        "name": "Operating Company",
+        "definition": "A company that trades."
+      }
+    ],
+    "dda_action": "extend",
+    "dda_id": "DLT000000054",
+    "reuse_search": "Searched DDA lookup types: DLT000000052 to DLT000000054 hold no values; vehicle purposes are added at the most detailed level.",
+    "data_requirement_ids": [
+      "DRQ002"
+    ],
+    "evidence_source_ids": [
+      "SRC012",
+      "SRC014"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "LKP010",
+    "code": "LegalEntityFundLPCommitmentTypes",
+    "definition": "The list of kinds of commitment an investor makes to a fund, such as primary, secondary, general partner commitment and continuation vehicle. The head of investor relations decides what goes on it.",
+    "scope": "concept",
+    "values": [
+      {
+        "code": "PRIMARY",
+        "name": "Primary",
+        "definition": "A commitment made directly to the fund."
+      },
+      {
+        "code": "SECONDARY",
+        "name": "Secondary",
+        "definition": "A commitment from buying an existing investor's interest."
+      },
+      {
+        "code": "GP_COMMITMENT",
+        "name": "GP Commitment",
+        "definition": "Capital committed by the general partner or its principals."
+      },
+      {
+        "code": "CO_INVESTMENT",
+        "name": "Co-Investment",
+        "definition": "Capital committed alongside the fund."
+      },
+      {
+        "code": "RECYCLED",
+        "name": "Recycled",
+        "definition": "Returned capital recalled by the fund."
+      },
+      {
+        "code": "STAPLED",
+        "name": "Stapled",
+        "definition": "A commitment required for access to another fund."
+      },
+      {
+        "code": "CONTINUATION_VEHICLE",
+        "name": "Continuation Vehicle",
+        "definition": "A commitment to a continuation fund."
+      }
+    ],
+    "dda_action": "reuse",
+    "dda_id": "DLT000000102",
+    "reuse_search": "Searched DDA lookup types: DLT000000102 already lists commitment kinds.",
+    "data_requirement_ids": [
+      "DRQ004"
+    ],
+    "evidence_source_ids": [
+      "SRC001",
+      "SRC016",
+      "SRC015"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "LKP011",
+    "code": "UniversalCurrencyCodes",
+    "definition": "The standard list of currencies used across all models. The data standards owner decides what goes on it.",
+    "scope": "universal",
+    "values": [
+      {
+        "code": "AFN",
+        "name": "Afghani",
+        "definition": "Afghani"
+      },
+      {
+        "code": "EUR",
+        "name": "Euro",
+        "definition": "Euro"
+      },
+      {
+        "code": "ALL",
+        "name": "Lek",
+        "definition": "Lek"
+      },
+      {
+        "code": "DZD",
+        "name": "Algerian Dinar",
+        "definition": "Algerian Dinar"
+      },
+      {
+        "code": "USD",
+        "name": "US Dollar",
+        "definition": "US Dollar"
+      },
+      {
+        "code": "AOA",
+        "name": "Kwanza",
+        "definition": "Kwanza"
+      },
+      {
+        "code": "XCD",
+        "name": "East Caribbean Dollar",
+        "definition": "East Caribbean Dollar"
+      },
+      {
+        "code": "XAD",
+        "name": "Arab Accounting Dinar",
+        "definition": "Arab Accounting Dinar"
+      },
+      {
+        "code": "ARS",
+        "name": "Argentine Peso",
+        "definition": "Argentine Peso"
+      },
+      {
+        "code": "AMD",
+        "name": "Armenian Dram",
+        "definition": "Armenian Dram"
+      },
+      {
+        "code": "AWG",
+        "name": "Aruban Florin",
+        "definition": "Aruban Florin"
+      },
+      {
+        "code": "AUD",
+        "name": "Australian Dollar",
+        "definition": "Australian Dollar"
+      },
+      {
+        "code": "AZN",
+        "name": "Azerbaijan Manat",
+        "definition": "Azerbaijan Manat"
+      },
+      {
+        "code": "BSD",
+        "name": "Bahamian Dollar",
+        "definition": "Bahamian Dollar"
+      },
+      {
+        "code": "BHD",
+        "name": "Bahraini Dinar",
+        "definition": "Bahraini Dinar"
+      },
+      {
+        "code": "BDT",
+        "name": "Taka",
+        "definition": "Taka"
+      },
+      {
+        "code": "BBD",
+        "name": "Barbados Dollar",
+        "definition": "Barbados Dollar"
+      },
+      {
+        "code": "BYN",
+        "name": "Belarusian Ruble",
+        "definition": "Belarusian Ruble"
+      },
+      {
+        "code": "BZD",
+        "name": "Belize Dollar",
+        "definition": "Belize Dollar"
+      },
+      {
+        "code": "XOF",
+        "name": "CFA Franc BCEAO",
+        "definition": "CFA Franc BCEAO"
+      },
+      {
+        "code": "BMD",
+        "name": "Bermudian Dollar",
+        "definition": "Bermudian Dollar"
+      },
+      {
+        "code": "INR",
+        "name": "Indian Rupee",
+        "definition": "Indian Rupee"
+      },
+      {
+        "code": "BTN",
+        "name": "Ngultrum",
+        "definition": "Ngultrum"
+      },
+      {
+        "code": "BOB",
+        "name": "Boliviano",
+        "definition": "Boliviano"
+      },
+      {
+        "code": "BOV",
+        "name": "Mvdol",
+        "definition": "Mvdol"
+      },
+      {
+        "code": "BAM",
+        "name": "Convertible Mark",
+        "definition": "Convertible Mark"
+      },
+      {
+        "code": "BWP",
+        "name": "Pula",
+        "definition": "Pula"
+      },
+      {
+        "code": "NOK",
+        "name": "Norwegian Krone",
+        "definition": "Norwegian Krone"
+      },
+      {
+        "code": "BRL",
+        "name": "Brazilian Real",
+        "definition": "Brazilian Real"
+      },
+      {
+        "code": "BND",
+        "name": "Brunei Dollar",
+        "definition": "Brunei Dollar"
+      },
+      {
+        "code": "BGN",
+        "name": "Bulgarian Lev",
+        "definition": "Bulgarian Lev"
+      },
+      {
+        "code": "BIF",
+        "name": "Burundi Franc",
+        "definition": "Burundi Franc"
+      },
+      {
+        "code": "CVE",
+        "name": "Cabo Verde Escudo",
+        "definition": "Cabo Verde Escudo"
+      },
+      {
+        "code": "KHR",
+        "name": "Riel",
+        "definition": "Riel"
+      },
+      {
+        "code": "XAF",
+        "name": "CFA Franc BEAC",
+        "definition": "CFA Franc BEAC"
+      },
+      {
+        "code": "CAD",
+        "name": "Canadian Dollar",
+        "definition": "Canadian Dollar"
+      },
+      {
+        "code": "KYD",
+        "name": "Cayman Islands Dollar",
+        "definition": "Cayman Islands Dollar"
+      },
+      {
+        "code": "CLP",
+        "name": "Chilean Peso",
+        "definition": "Chilean Peso"
+      },
+      {
+        "code": "CLF",
+        "name": "Unidad de Fomento",
+        "definition": "Unidad de Fomento"
+      },
+      {
+        "code": "CNY",
+        "name": "Yuan Renminbi",
+        "definition": "Yuan Renminbi"
+      },
+      {
+        "code": "COP",
+        "name": "Colombian Peso",
+        "definition": "Colombian Peso"
+      },
+      {
+        "code": "COU",
+        "name": "Unidad de Valor Real",
+        "definition": "Unidad de Valor Real"
+      },
+      {
+        "code": "KMF",
+        "name": "Comorian Franc ",
+        "definition": "Comorian Franc "
+      },
+      {
+        "code": "CDF",
+        "name": "Congolese Franc",
+        "definition": "Congolese Franc"
+      },
+      {
+        "code": "NZD",
+        "name": "New Zealand Dollar",
+        "definition": "New Zealand Dollar"
+      },
+      {
+        "code": "CRC",
+        "name": "Costa Rican Colon",
+        "definition": "Costa Rican Colon"
+      },
+      {
+        "code": "CUP",
+        "name": "Cuban Peso",
+        "definition": "Cuban Peso"
+      },
+      {
+        "code": "XCG",
+        "name": "Caribbean Guilder",
+        "definition": "Caribbean Guilder"
+      },
+      {
+        "code": "CZK",
+        "name": "Czech Koruna",
+        "definition": "Czech Koruna"
+      },
+      {
+        "code": "DKK",
+        "name": "Danish Krone",
+        "definition": "Danish Krone"
+      },
+      {
+        "code": "DJF",
+        "name": "Djibouti Franc",
+        "definition": "Djibouti Franc"
+      },
+      {
+        "code": "DOP",
+        "name": "Dominican Peso",
+        "definition": "Dominican Peso"
+      },
+      {
+        "code": "EGP",
+        "name": "Egyptian Pound",
+        "definition": "Egyptian Pound"
+      },
+      {
+        "code": "SVC",
+        "name": "El Salvador Colon",
+        "definition": "El Salvador Colon"
+      },
+      {
+        "code": "ERN",
+        "name": "Nakfa",
+        "definition": "Nakfa"
+      },
+      {
+        "code": "SZL",
+        "name": "Lilangeni",
+        "definition": "Lilangeni"
+      },
+      {
+        "code": "ETB",
+        "name": "Ethiopian Birr",
+        "definition": "Ethiopian Birr"
+      },
+      {
+        "code": "FKP",
+        "name": "Falkland Islands Pound",
+        "definition": "Falkland Islands Pound"
+      },
+      {
+        "code": "FJD",
+        "name": "Fiji Dollar",
+        "definition": "Fiji Dollar"
+      },
+      {
+        "code": "XPF",
+        "name": "CFP Franc",
+        "definition": "CFP Franc"
+      },
+      {
+        "code": "GMD",
+        "name": "Dalasi",
+        "definition": "Dalasi"
+      },
+      {
+        "code": "GEL",
+        "name": "Lari",
+        "definition": "Lari"
+      },
+      {
+        "code": "GHS",
+        "name": "Ghana Cedi",
+        "definition": "Ghana Cedi"
+      },
+      {
+        "code": "GIP",
+        "name": "Gibraltar Pound",
+        "definition": "Gibraltar Pound"
+      },
+      {
+        "code": "GTQ",
+        "name": "Quetzal",
+        "definition": "Quetzal"
+      },
+      {
+        "code": "GBP",
+        "name": "Pound Sterling",
+        "definition": "Pound Sterling"
+      },
+      {
+        "code": "GNF",
+        "name": "Guinean Franc",
+        "definition": "Guinean Franc"
+      },
+      {
+        "code": "GYD",
+        "name": "Guyana Dollar",
+        "definition": "Guyana Dollar"
+      },
+      {
+        "code": "HTG",
+        "name": "Gourde",
+        "definition": "Gourde"
+      },
+      {
+        "code": "HNL",
+        "name": "Lempira",
+        "definition": "Lempira"
+      },
+      {
+        "code": "HKD",
+        "name": "Hong Kong Dollar",
+        "definition": "Hong Kong Dollar"
+      },
+      {
+        "code": "HUF",
+        "name": "Forint",
+        "definition": "Forint"
+      },
+      {
+        "code": "ISK",
+        "name": "Iceland Krona",
+        "definition": "Iceland Krona"
+      },
+      {
+        "code": "IDR",
+        "name": "Rupiah",
+        "definition": "Rupiah"
+      },
+      {
+        "code": "XDR",
+        "name": "SDR (Special Drawing Right)",
+        "definition": "SDR (Special Drawing Right)"
+      },
+      {
+        "code": "IRR",
+        "name": "Iranian Rial",
+        "definition": "Iranian Rial"
+      },
+      {
+        "code": "IQD",
+        "name": "Iraqi Dinar",
+        "definition": "Iraqi Dinar"
+      },
+      {
+        "code": "ILS",
+        "name": "New Israeli Sheqel",
+        "definition": "New Israeli Sheqel"
+      },
+      {
+        "code": "JMD",
+        "name": "Jamaican Dollar",
+        "definition": "Jamaican Dollar"
+      },
+      {
+        "code": "JPY",
+        "name": "Yen",
+        "definition": "Yen"
+      },
+      {
+        "code": "JOD",
+        "name": "Jordanian Dinar",
+        "definition": "Jordanian Dinar"
+      },
+      {
+        "code": "KZT",
+        "name": "Tenge",
+        "definition": "Tenge"
+      },
+      {
+        "code": "KES",
+        "name": "Kenyan Shilling",
+        "definition": "Kenyan Shilling"
+      },
+      {
+        "code": "KPW",
+        "name": "North Korean Won",
+        "definition": "North Korean Won"
+      },
+      {
+        "code": "KRW",
+        "name": "Won",
+        "definition": "Won"
+      },
+      {
+        "code": "KWD",
+        "name": "Kuwaiti Dinar",
+        "definition": "Kuwaiti Dinar"
+      },
+      {
+        "code": "KGS",
+        "name": "Som",
+        "definition": "Som"
+      },
+      {
+        "code": "LAK",
+        "name": "Lao Kip",
+        "definition": "Lao Kip"
+      },
+      {
+        "code": "LBP",
+        "name": "Lebanese Pound",
+        "definition": "Lebanese Pound"
+      },
+      {
+        "code": "LSL",
+        "name": "Loti",
+        "definition": "Loti"
+      },
+      {
+        "code": "ZAR",
+        "name": "Rand",
+        "definition": "Rand"
+      },
+      {
+        "code": "LRD",
+        "name": "Liberian Dollar",
+        "definition": "Liberian Dollar"
+      },
+      {
+        "code": "LYD",
+        "name": "Libyan Dinar",
+        "definition": "Libyan Dinar"
+      },
+      {
+        "code": "CHF",
+        "name": "Swiss Franc",
+        "definition": "Swiss Franc"
+      },
+      {
+        "code": "MOP",
+        "name": "Pataca",
+        "definition": "Pataca"
+      },
+      {
+        "code": "MGA",
+        "name": "Malagasy Ariary",
+        "definition": "Malagasy Ariary"
+      },
+      {
+        "code": "MWK",
+        "name": "Malawi Kwacha",
+        "definition": "Malawi Kwacha"
+      },
+      {
+        "code": "MYR",
+        "name": "Malaysian Ringgit",
+        "definition": "Malaysian Ringgit"
+      },
+      {
+        "code": "MVR",
+        "name": "Rufiyaa",
+        "definition": "Rufiyaa"
+      },
+      {
+        "code": "MRU",
+        "name": "Ouguiya",
+        "definition": "Ouguiya"
+      },
+      {
+        "code": "MUR",
+        "name": "Mauritius Rupee",
+        "definition": "Mauritius Rupee"
+      },
+      {
+        "code": "XUA",
+        "name": "ADB Unit of Account",
+        "definition": "ADB Unit of Account"
+      },
+      {
+        "code": "MXN",
+        "name": "Mexican Peso",
+        "definition": "Mexican Peso"
+      },
+      {
+        "code": "MXV",
+        "name": "Mexican Unidad de Inversion (UDI)",
+        "definition": "Mexican Unidad de Inversion (UDI)"
+      },
+      {
+        "code": "MDL",
+        "name": "Moldovan Leu",
+        "definition": "Moldovan Leu"
+      },
+      {
+        "code": "MNT",
+        "name": "Tugrik",
+        "definition": "Tugrik"
+      },
+      {
+        "code": "MAD",
+        "name": "Moroccan Dirham",
+        "definition": "Moroccan Dirham"
+      },
+      {
+        "code": "MZN",
+        "name": "Mozambique Metical",
+        "definition": "Mozambique Metical"
+      },
+      {
+        "code": "MMK",
+        "name": "Kyat",
+        "definition": "Kyat"
+      },
+      {
+        "code": "NAD",
+        "name": "Namibia Dollar",
+        "definition": "Namibia Dollar"
+      },
+      {
+        "code": "NPR",
+        "name": "Nepalese Rupee",
+        "definition": "Nepalese Rupee"
+      },
+      {
+        "code": "NIO",
+        "name": "Cordoba Oro",
+        "definition": "Cordoba Oro"
+      },
+      {
+        "code": "NGN",
+        "name": "Naira",
+        "definition": "Naira"
+      },
+      {
+        "code": "MKD",
+        "name": "Denar",
+        "definition": "Denar"
+      },
+      {
+        "code": "OMR",
+        "name": "Rial Omani",
+        "definition": "Rial Omani"
+      },
+      {
+        "code": "PKR",
+        "name": "Pakistan Rupee",
+        "definition": "Pakistan Rupee"
+      },
+      {
+        "code": "PAB",
+        "name": "Balboa",
+        "definition": "Balboa"
+      },
+      {
+        "code": "PGK",
+        "name": "Kina",
+        "definition": "Kina"
+      },
+      {
+        "code": "PEN",
+        "name": "Sol",
+        "definition": "Sol"
+      },
+      {
+        "code": "PHP",
+        "name": "Philippine Peso",
+        "definition": "Philippine Peso"
+      },
+      {
+        "code": "PLN",
+        "name": "Zloty",
+        "definition": "Zloty"
+      },
+      {
+        "code": "QAR",
+        "name": "Qatari Rial",
+        "definition": "Qatari Rial"
+      },
+      {
+        "code": "RUB",
+        "name": "Russian Ruble",
+        "definition": "Russian Ruble"
+      },
+      {
+        "code": "RWF",
+        "name": "Rwanda Franc",
+        "definition": "Rwanda Franc"
+      },
+      {
+        "code": "SHP",
+        "name": "Saint Helena Pound",
+        "definition": "Saint Helena Pound"
+      },
+      {
+        "code": "WST",
+        "name": "Tala",
+        "definition": "Tala"
+      },
+      {
+        "code": "STN",
+        "name": "Dobra",
+        "definition": "Dobra"
+      },
+      {
+        "code": "SAR",
+        "name": "Saudi Riyal",
+        "definition": "Saudi Riyal"
+      },
+      {
+        "code": "RSD",
+        "name": "Serbian Dinar",
+        "definition": "Serbian Dinar"
+      },
+      {
+        "code": "SCR",
+        "name": "Seychelles Rupee",
+        "definition": "Seychelles Rupee"
+      },
+      {
+        "code": "SLE",
+        "name": "Leone",
+        "definition": "Leone"
+      },
+      {
+        "code": "SGD",
+        "name": "Singapore Dollar",
+        "definition": "Singapore Dollar"
+      },
+      {
+        "code": "XSU",
+        "name": "Sucre",
+        "definition": "Sucre"
+      },
+      {
+        "code": "SBD",
+        "name": "Solomon Islands Dollar",
+        "definition": "Solomon Islands Dollar"
+      },
+      {
+        "code": "SOS",
+        "name": "Somali Shilling",
+        "definition": "Somali Shilling"
+      },
+      {
+        "code": "SSP",
+        "name": "South Sudanese Pound",
+        "definition": "South Sudanese Pound"
+      },
+      {
+        "code": "LKR",
+        "name": "Sri Lanka Rupee",
+        "definition": "Sri Lanka Rupee"
+      },
+      {
+        "code": "SDG",
+        "name": "Sudanese Pound",
+        "definition": "Sudanese Pound"
+      },
+      {
+        "code": "SRD",
+        "name": "Surinam Dollar",
+        "definition": "Surinam Dollar"
+      },
+      {
+        "code": "SEK",
+        "name": "Swedish Krona",
+        "definition": "Swedish Krona"
+      },
+      {
+        "code": "CHE",
+        "name": "WIR Euro",
+        "definition": "WIR Euro"
+      },
+      {
+        "code": "CHW",
+        "name": "WIR Franc",
+        "definition": "WIR Franc"
+      },
+      {
+        "code": "SYP",
+        "name": "Syrian Pound",
+        "definition": "Syrian Pound"
+      },
+      {
+        "code": "TWD",
+        "name": "New Taiwan Dollar",
+        "definition": "New Taiwan Dollar"
+      },
+      {
+        "code": "TJS",
+        "name": "Somoni",
+        "definition": "Somoni"
+      },
+      {
+        "code": "TZS",
+        "name": "Tanzanian Shilling",
+        "definition": "Tanzanian Shilling"
+      },
+      {
+        "code": "THB",
+        "name": "Baht",
+        "definition": "Baht"
+      },
+      {
+        "code": "TOP",
+        "name": "Pa�anga",
+        "definition": "Pa�anga"
+      },
+      {
+        "code": "TTD",
+        "name": "Trinidad and Tobago Dollar",
+        "definition": "Trinidad and Tobago Dollar"
+      },
+      {
+        "code": "TND",
+        "name": "Tunisian Dinar",
+        "definition": "Tunisian Dinar"
+      },
+      {
+        "code": "TRY",
+        "name": "Turkish Lira",
+        "definition": "Turkish Lira"
+      },
+      {
+        "code": "TMT",
+        "name": "Turkmenistan New Manat",
+        "definition": "Turkmenistan New Manat"
+      },
+      {
+        "code": "UGX",
+        "name": "Uganda Shilling",
+        "definition": "Uganda Shilling"
+      },
+      {
+        "code": "UAH",
+        "name": "Hryvnia",
+        "definition": "Hryvnia"
+      },
+      {
+        "code": "AED",
+        "name": "UAE Dirham",
+        "definition": "UAE Dirham"
+      },
+      {
+        "code": "USN",
+        "name": "US Dollar (Next day)",
+        "definition": "US Dollar (Next day)"
+      },
+      {
+        "code": "UYU",
+        "name": "Peso Uruguayo",
+        "definition": "Peso Uruguayo"
+      },
+      {
+        "code": "UYI",
+        "name": "Uruguay Peso en Unidades Indexadas (UI)",
+        "definition": "Uruguay Peso en Unidades Indexadas (UI)"
+      },
+      {
+        "code": "UYW",
+        "name": "Unidad Previsional",
+        "definition": "Unidad Previsional"
+      },
+      {
+        "code": "UZS",
+        "name": "Uzbekistan Sum",
+        "definition": "Uzbekistan Sum"
+      },
+      {
+        "code": "VUV",
+        "name": "Vatu",
+        "definition": "Vatu"
+      },
+      {
+        "code": "VES",
+        "name": "Bol�var Soberano",
+        "definition": "Bol�var Soberano"
+      },
+      {
+        "code": "VED",
+        "name": "Bol�var Soberano",
+        "definition": "Bol�var Soberano"
+      },
+      {
+        "code": "VND",
+        "name": "Dong",
+        "definition": "Dong"
+      },
+      {
+        "code": "YER",
+        "name": "Yemeni Rial",
+        "definition": "Yemeni Rial"
+      },
+      {
+        "code": "ZMW",
+        "name": "Zambian Kwacha",
+        "definition": "Zambian Kwacha"
+      },
+      {
+        "code": "ZWG",
+        "name": "Zimbabwe Gold",
+        "definition": "Zimbabwe Gold"
+      },
+      {
+        "code": "RON",
+        "name": "Romanian Leu",
+        "definition": "Romanian Leu"
+      },
+      {
+        "code": "PYG",
+        "name": "Guarani",
+        "definition": "Guarani"
+      }
+    ],
+    "dda_action": "reuse",
+    "dda_id": "DLT000000072",
+    "reuse_search": "Searched DDA lookup types: DLT000000072 is the Universal currency list.",
+    "data_requirement_ids": [
+      "DRQ005",
+      "DRQ007",
+      "DRQ008"
+    ],
+    "evidence_source_ids": [
+      "SRC001"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "LKP012",
+    "code": "UniversalCountryCodes",
+    "definition": "The standard list of countries used across all models. The data standards owner decides what goes on it.",
+    "scope": "universal",
+    "values": [
+      {
+        "code": "ALB",
+        "name": "Albania",
+        "definition": "Albania(ALB)"
+      },
+      {
+        "code": "DZA",
+        "name": "Algeria",
+        "definition": "Algeria(DZA)"
+      },
+      {
+        "code": "ASM",
+        "name": "American Samoa",
+        "definition": "American Samoa(ASM)"
+      },
+      {
+        "code": "AND",
+        "name": "Andorra",
+        "definition": "Andorra(AND)"
+      },
+      {
+        "code": "AGO",
+        "name": "Angola",
+        "definition": "Angola(AGO)"
+      },
+      {
+        "code": "AIA",
+        "name": "Anguilla",
+        "definition": "Anguilla(AIA)"
+      },
+      {
+        "code": "ATA",
+        "name": "Antarctica",
+        "definition": "Antarctica(ATA)"
+      },
+      {
+        "code": "ATG",
+        "name": "Antigua and Barbuda",
+        "definition": "Antigua and Barbuda(ATG)"
+      },
+      {
+        "code": "ARG",
+        "name": "Argentina",
+        "definition": "Argentina(ARG)"
+      },
+      {
+        "code": "ARM",
+        "name": "Armenia",
+        "definition": "Armenia(ARM)"
+      },
+      {
+        "code": "ABW",
+        "name": "Aruba",
+        "definition": "Aruba(ABW)"
+      },
+      {
+        "code": "AUS",
+        "name": "Australia",
+        "definition": "Australia(AUS)"
+      },
+      {
+        "code": "AUT",
+        "name": "Austria",
+        "definition": "Austria(AUT)"
+      },
+      {
+        "code": "AZE",
+        "name": "Azerbaijan",
+        "definition": "Azerbaijan(AZE)"
+      },
+      {
+        "code": "BHS",
+        "name": "Bahamas (the)",
+        "definition": "Bahamas (the)(BHS)"
+      },
+      {
+        "code": "BHR",
+        "name": "Bahrain",
+        "definition": "Bahrain(BHR)"
+      },
+      {
+        "code": "BGD",
+        "name": "Bangladesh",
+        "definition": "Bangladesh(BGD)"
+      },
+      {
+        "code": "BRB",
+        "name": "Barbados",
+        "definition": "Barbados(BRB)"
+      },
+      {
+        "code": "BLR",
+        "name": "Belarus",
+        "definition": "Belarus(BLR)"
+      },
+      {
+        "code": "BEL",
+        "name": "Belgium",
+        "definition": "Belgium(BEL)"
+      },
+      {
+        "code": "BLZ",
+        "name": "Belize",
+        "definition": "Belize(BLZ)"
+      },
+      {
+        "code": "BEN",
+        "name": "Benin",
+        "definition": "Benin(BEN)"
+      },
+      {
+        "code": "BMU",
+        "name": "Bermuda",
+        "definition": "Bermuda(BMU)"
+      },
+      {
+        "code": "BTN",
+        "name": "Bhutan",
+        "definition": "Bhutan(BTN)"
+      },
+      {
+        "code": "BOL",
+        "name": "Bolivia (Plurinational State of)",
+        "definition": "Bolivia (Plurinational State of)(BOL)"
+      },
+      {
+        "code": "BES",
+        "name": "Bonaire, Sint Eustatius and Saba",
+        "definition": "Bonaire, Sint Eustatius and Saba(BES)"
+      },
+      {
+        "code": "BIH",
+        "name": "Bosnia and Herzegovina",
+        "definition": "Bosnia and Herzegovina(BIH)"
+      },
+      {
+        "code": "BWA",
+        "name": "Botswana",
+        "definition": "Botswana(BWA)"
+      },
+      {
+        "code": "BVT",
+        "name": "Bouvet Island",
+        "definition": "Bouvet Island(BVT)"
+      },
+      {
+        "code": "BRA",
+        "name": "Brazil",
+        "definition": "Brazil(BRA)"
+      },
+      {
+        "code": "IOT",
+        "name": "British Indian Ocean Territory (the)",
+        "definition": "British Indian Ocean Territory (the)(IOT)"
+      },
+      {
+        "code": "BRN",
+        "name": "Brunei Darussalam",
+        "definition": "Brunei Darussalam(BRN)"
+      },
+      {
+        "code": "BGR",
+        "name": "Bulgaria",
+        "definition": "Bulgaria(BGR)"
+      },
+      {
+        "code": "BFA",
+        "name": "Burkina Faso",
+        "definition": "Burkina Faso(BFA)"
+      },
+      {
+        "code": "BDI",
+        "name": "Burundi",
+        "definition": "Burundi(BDI)"
+      },
+      {
+        "code": "CPV",
+        "name": "Cabo Verde",
+        "definition": "Cabo Verde(CPV)"
+      },
+      {
+        "code": "KHM",
+        "name": "Cambodia",
+        "definition": "Cambodia(KHM)"
+      },
+      {
+        "code": "CMR",
+        "name": "Cameroon",
+        "definition": "Cameroon(CMR)"
+      },
+      {
+        "code": "CAN",
+        "name": "Canada",
+        "definition": "Canada(CAN)"
+      },
+      {
+        "code": "CYM",
+        "name": "Cayman Islands (the)",
+        "definition": "Cayman Islands (the)(CYM)"
+      },
+      {
+        "code": "CAF",
+        "name": "Central African Republic (the)",
+        "definition": "Central African Republic (the)(CAF)"
+      },
+      {
+        "code": "TCD",
+        "name": "Chad",
+        "definition": "Chad(TCD)"
+      },
+      {
+        "code": "CHL",
+        "name": "Chile",
+        "definition": "Chile(CHL)"
+      },
+      {
+        "code": "CHN",
+        "name": "China",
+        "definition": "China(CHN)"
+      },
+      {
+        "code": "CXR",
+        "name": "Christmas Island",
+        "definition": "Christmas Island(CXR)"
+      },
+      {
+        "code": "CCK",
+        "name": "Cocos (Keeling) Islands (the)",
+        "definition": "Cocos (Keeling) Islands (the)(CCK)"
+      },
+      {
+        "code": "COL",
+        "name": "Colombia",
+        "definition": "Colombia(COL)"
+      },
+      {
+        "code": "COM",
+        "name": "Comoros (the)",
+        "definition": "Comoros (the)(COM)"
+      },
+      {
+        "code": "COD",
+        "name": "Congo (the Democratic Republic of the)",
+        "definition": "Congo (the Democratic Republic of the)(COD)"
+      },
+      {
+        "code": "COG",
+        "name": "Congo (the)",
+        "definition": "Congo (the)(COG)"
+      },
+      {
+        "code": "COK",
+        "name": "Cook Islands (the)",
+        "definition": "Cook Islands (the)(COK)"
+      },
+      {
+        "code": "CRI",
+        "name": "Costa Rica",
+        "definition": "Costa Rica(CRI)"
+      },
+      {
+        "code": "HRV",
+        "name": "Croatia",
+        "definition": "Croatia(HRV)"
+      },
+      {
+        "code": "CUB",
+        "name": "Cuba",
+        "definition": "Cuba(CUB)"
+      },
+      {
+        "code": "CUW",
+        "name": "Curaçao",
+        "definition": "Curaçao(CUW)"
+      },
+      {
+        "code": "CYP",
+        "name": "Cyprus",
+        "definition": "Cyprus(CYP)"
+      },
+      {
+        "code": "CZE",
+        "name": "Czechia",
+        "definition": "Czechia(CZE)"
+      },
+      {
+        "code": "CIV",
+        "name": "Côte d'Ivoire",
+        "definition": "Côte d'Ivoire(CIV)"
+      },
+      {
+        "code": "DNK",
+        "name": "Denmark",
+        "definition": "Denmark(DNK)"
+      },
+      {
+        "code": "DJI",
+        "name": "Djibouti",
+        "definition": "Djibouti(DJI)"
+      },
+      {
+        "code": "DMA",
+        "name": "Dominica",
+        "definition": "Dominica(DMA)"
+      },
+      {
+        "code": "DOM",
+        "name": "Dominican Republic (the)",
+        "definition": "Dominican Republic (the)(DOM)"
+      },
+      {
+        "code": "ECU",
+        "name": "Ecuador",
+        "definition": "Ecuador(ECU)"
+      },
+      {
+        "code": "EGY",
+        "name": "Egypt",
+        "definition": "Egypt(EGY)"
+      },
+      {
+        "code": "SLV",
+        "name": "El Salvador",
+        "definition": "El Salvador(SLV)"
+      },
+      {
+        "code": "GNQ",
+        "name": "Equatorial Guinea",
+        "definition": "Equatorial Guinea(GNQ)"
+      },
+      {
+        "code": "ERI",
+        "name": "Eritrea",
+        "definition": "Eritrea(ERI)"
+      },
+      {
+        "code": "EST",
+        "name": "Estonia",
+        "definition": "Estonia(EST)"
+      },
+      {
+        "code": "SWZ",
+        "name": "Eswatini",
+        "definition": "Eswatini(SWZ)"
+      },
+      {
+        "code": "ETH",
+        "name": "Ethiopia",
+        "definition": "Ethiopia(ETH)"
+      },
+      {
+        "code": "FLK",
+        "name": "Falkland Islands (the) [Malvinas]",
+        "definition": "Falkland Islands (the) [Malvinas](FLK)"
+      },
+      {
+        "code": "FRO",
+        "name": "Faroe Islands (the)",
+        "definition": "Faroe Islands (the)(FRO)"
+      },
+      {
+        "code": "FJI",
+        "name": "Fiji",
+        "definition": "Fiji(FJI)"
+      },
+      {
+        "code": "FIN",
+        "name": "Finland",
+        "definition": "Finland(FIN)"
+      },
+      {
+        "code": "FRA",
+        "name": "France",
+        "definition": "France(FRA)"
+      },
+      {
+        "code": "GUF",
+        "name": "French Guiana",
+        "definition": "French Guiana(GUF)"
+      },
+      {
+        "code": "PYF",
+        "name": "French Polynesia",
+        "definition": "French Polynesia(PYF)"
+      },
+      {
+        "code": "ATF",
+        "name": "French Southern Territories (the)",
+        "definition": "French Southern Territories (the)(ATF)"
+      },
+      {
+        "code": "GAB",
+        "name": "Gabon",
+        "definition": "Gabon(GAB)"
+      },
+      {
+        "code": "GMB",
+        "name": "Gambia (the)",
+        "definition": "Gambia (the)(GMB)"
+      },
+      {
+        "code": "GEO",
+        "name": "Georgia",
+        "definition": "Georgia(GEO)"
+      },
+      {
+        "code": "DEU",
+        "name": "Germany",
+        "definition": "Germany(DEU)"
+      },
+      {
+        "code": "GHA",
+        "name": "Ghana",
+        "definition": "Ghana(GHA)"
+      },
+      {
+        "code": "GIB",
+        "name": "Gibraltar",
+        "definition": "Gibraltar(GIB)"
+      },
+      {
+        "code": "GRC",
+        "name": "Greece",
+        "definition": "Greece(GRC)"
+      },
+      {
+        "code": "GRL",
+        "name": "Greenland",
+        "definition": "Greenland(GRL)"
+      },
+      {
+        "code": "GRD",
+        "name": "Grenada",
+        "definition": "Grenada(GRD)"
+      },
+      {
+        "code": "GLP",
+        "name": "Guadeloupe",
+        "definition": "Guadeloupe(GLP)"
+      },
+      {
+        "code": "GUM",
+        "name": "Guam",
+        "definition": "Guam(GUM)"
+      },
+      {
+        "code": "GTM",
+        "name": "Guatemala",
+        "definition": "Guatemala(GTM)"
+      },
+      {
+        "code": "GGY",
+        "name": "Guernsey",
+        "definition": "Guernsey(GGY)"
+      },
+      {
+        "code": "GIN",
+        "name": "Guinea",
+        "definition": "Guinea(GIN)"
+      },
+      {
+        "code": "GNB",
+        "name": "Guinea-Bissau",
+        "definition": "Guinea-Bissau(GNB)"
+      },
+      {
+        "code": "GUY",
+        "name": "Guyana",
+        "definition": "Guyana(GUY)"
+      },
+      {
+        "code": "HMD",
+        "name": "Heard Island and McDonald Islands",
+        "definition": "Heard Island and McDonald Islands(HMD)"
+      },
+      {
+        "code": "VAT",
+        "name": "Holy See (the)",
+        "definition": "Holy See (the)(VAT)"
+      },
+      {
+        "code": "HND",
+        "name": "Honduras",
+        "definition": "Honduras(HND)"
+      },
+      {
+        "code": "HKG",
+        "name": "Hong Kong",
+        "definition": "Hong Kong(HKG)"
+      },
+      {
+        "code": "HUN",
+        "name": "Hungary",
+        "definition": "Hungary(HUN)"
+      },
+      {
+        "code": "ISL",
+        "name": "Iceland",
+        "definition": "Iceland(ISL)"
+      },
+      {
+        "code": "IND",
+        "name": "India",
+        "definition": "India(IND)"
+      },
+      {
+        "code": "IDN",
+        "name": "Indonesia",
+        "definition": "Indonesia(IDN)"
+      },
+      {
+        "code": "IRN",
+        "name": "Iran (Islamic Republic of)",
+        "definition": "Iran (Islamic Republic of)(IRN)"
+      },
+      {
+        "code": "IRQ",
+        "name": "Iraq",
+        "definition": "Iraq(IRQ)"
+      },
+      {
+        "code": "IRL",
+        "name": "Ireland",
+        "definition": "Ireland(IRL)"
+      },
+      {
+        "code": "IMN",
+        "name": "Isle of Man",
+        "definition": "Isle of Man(IMN)"
+      },
+      {
+        "code": "ISR",
+        "name": "Israel",
+        "definition": "Israel(ISR)"
+      },
+      {
+        "code": "ITA",
+        "name": "Italy",
+        "definition": "Italy(ITA)"
+      },
+      {
+        "code": "JAM",
+        "name": "Jamaica",
+        "definition": "Jamaica(JAM)"
+      },
+      {
+        "code": "JPN",
+        "name": "Japan",
+        "definition": "Japan(JPN)"
+      },
+      {
+        "code": "JEY",
+        "name": "Jersey",
+        "definition": "Jersey(JEY)"
+      },
+      {
+        "code": "JOR",
+        "name": "Jordan",
+        "definition": "Jordan(JOR)"
+      },
+      {
+        "code": "KAZ",
+        "name": "Kazakhstan",
+        "definition": "Kazakhstan(KAZ)"
+      },
+      {
+        "code": "KEN",
+        "name": "Kenya",
+        "definition": "Kenya(KEN)"
+      },
+      {
+        "code": "KIR",
+        "name": "Kiribati",
+        "definition": "Kiribati(KIR)"
+      },
+      {
+        "code": "PRK",
+        "name": "Korea (the Democratic People's Republic of)",
+        "definition": "Korea (the Democratic People's Republic of)(PRK)"
+      },
+      {
+        "code": "KOR",
+        "name": "Korea (the Republic of)",
+        "definition": "Korea (the Republic of)(KOR)"
+      },
+      {
+        "code": "KWT",
+        "name": "Kuwait",
+        "definition": "Kuwait(KWT)"
+      },
+      {
+        "code": "KGZ",
+        "name": "Kyrgyzstan",
+        "definition": "Kyrgyzstan(KGZ)"
+      },
+      {
+        "code": "LAO",
+        "name": "Lao People's Democratic Republic (the)",
+        "definition": "Lao People's Democratic Republic (the)(LAO)"
+      },
+      {
+        "code": "LVA",
+        "name": "Latvia",
+        "definition": "Latvia(LVA)"
+      },
+      {
+        "code": "LBN",
+        "name": "Lebanon",
+        "definition": "Lebanon(LBN)"
+      },
+      {
+        "code": "LSO",
+        "name": "Lesotho",
+        "definition": "Lesotho(LSO)"
+      },
+      {
+        "code": "LBR",
+        "name": "Liberia",
+        "definition": "Liberia(LBR)"
+      },
+      {
+        "code": "LBY",
+        "name": "Libya",
+        "definition": "Libya(LBY)"
+      },
+      {
+        "code": "LIE",
+        "name": "Liechtenstein",
+        "definition": "Liechtenstein(LIE)"
+      },
+      {
+        "code": "LTU",
+        "name": "Lithuania",
+        "definition": "Lithuania(LTU)"
+      },
+      {
+        "code": "LUX",
+        "name": "Luxembourg",
+        "definition": "Luxembourg(LUX)"
+      },
+      {
+        "code": "MAC",
+        "name": "Macao",
+        "definition": "Macao(MAC)"
+      },
+      {
+        "code": "MDG",
+        "name": "Madagascar",
+        "definition": "Madagascar(MDG)"
+      },
+      {
+        "code": "MWI",
+        "name": "Malawi",
+        "definition": "Malawi(MWI)"
+      },
+      {
+        "code": "MYS",
+        "name": "Malaysia",
+        "definition": "Malaysia(MYS)"
+      },
+      {
+        "code": "MDV",
+        "name": "Maldives",
+        "definition": "Maldives(MDV)"
+      },
+      {
+        "code": "MLI",
+        "name": "Mali",
+        "definition": "Mali(MLI)"
+      },
+      {
+        "code": "MLT",
+        "name": "Malta",
+        "definition": "Malta(MLT)"
+      },
+      {
+        "code": "MHL",
+        "name": "Marshall Islands (the)",
+        "definition": "Marshall Islands (the)(MHL)"
+      },
+      {
+        "code": "MTQ",
+        "name": "Martinique",
+        "definition": "Martinique(MTQ)"
+      },
+      {
+        "code": "MRT",
+        "name": "Mauritania",
+        "definition": "Mauritania(MRT)"
+      },
+      {
+        "code": "MUS",
+        "name": "Mauritius",
+        "definition": "Mauritius(MUS)"
+      },
+      {
+        "code": "MYT",
+        "name": "Mayotte",
+        "definition": "Mayotte(MYT)"
+      },
+      {
+        "code": "MEX",
+        "name": "Mexico",
+        "definition": "Mexico(MEX)"
+      },
+      {
+        "code": "FSM",
+        "name": "Micronesia (Federated States of)",
+        "definition": "Micronesia (Federated States of)(FSM)"
+      },
+      {
+        "code": "MDA",
+        "name": "Moldova (the Republic of)",
+        "definition": "Moldova (the Republic of)(MDA)"
+      },
+      {
+        "code": "MCO",
+        "name": "Monaco",
+        "definition": "Monaco(MCO)"
+      },
+      {
+        "code": "MNG",
+        "name": "Mongolia",
+        "definition": "Mongolia(MNG)"
+      },
+      {
+        "code": "MNE",
+        "name": "Montenegro",
+        "definition": "Montenegro(MNE)"
+      },
+      {
+        "code": "MSR",
+        "name": "Montserrat",
+        "definition": "Montserrat(MSR)"
+      },
+      {
+        "code": "MAR",
+        "name": "Morocco",
+        "definition": "Morocco(MAR)"
+      },
+      {
+        "code": "MOZ",
+        "name": "Mozambique",
+        "definition": "Mozambique(MOZ)"
+      },
+      {
+        "code": "MMR",
+        "name": "Myanmar",
+        "definition": "Myanmar(MMR)"
+      },
+      {
+        "code": "NAM",
+        "name": "Namibia",
+        "definition": "Namibia(NAM)"
+      },
+      {
+        "code": "NRU",
+        "name": "Nauru",
+        "definition": "Nauru(NRU)"
+      },
+      {
+        "code": "NPL",
+        "name": "Nepal",
+        "definition": "Nepal(NPL)"
+      },
+      {
+        "code": "NLD",
+        "name": "Netherlands (the)",
+        "definition": "Netherlands (the)(NLD)"
+      },
+      {
+        "code": "NCL",
+        "name": "New Caledonia",
+        "definition": "New Caledonia(NCL)"
+      },
+      {
+        "code": "NZL",
+        "name": "New Zealand",
+        "definition": "New Zealand(NZL)"
+      },
+      {
+        "code": "NIC",
+        "name": "Nicaragua",
+        "definition": "Nicaragua(NIC)"
+      },
+      {
+        "code": "NER",
+        "name": "Niger (the)",
+        "definition": "Niger (the)(NER)"
+      },
+      {
+        "code": "NGA",
+        "name": "Nigeria",
+        "definition": "Nigeria(NGA)"
+      },
+      {
+        "code": "BLM",
+        "name": "Saint Barthélemy",
+        "definition": "Saint Barthélemy(BLM)"
+      },
+      {
+        "code": "SHN",
+        "name": "Saint Helena, Ascension and Tristan da Cunha",
+        "definition": "Saint Helena, Ascension and Tristan da Cunha(SHN)"
+      },
+      {
+        "code": "KNA",
+        "name": "Saint Kitts and Nevis",
+        "definition": "Saint Kitts and Nevis(KNA)"
+      },
+      {
+        "code": "LCA",
+        "name": "Saint Lucia",
+        "definition": "Saint Lucia(LCA)"
+      },
+      {
+        "code": "MAF",
+        "name": "Saint Martin (French part)",
+        "definition": "Saint Martin (French part)(MAF)"
+      },
+      {
+        "code": "SPM",
+        "name": "Saint Pierre and Miquelon",
+        "definition": "Saint Pierre and Miquelon(SPM)"
+      },
+      {
+        "code": "VCT",
+        "name": "Saint Vincent and the Grenadines",
+        "definition": "Saint Vincent and the Grenadines(VCT)"
+      },
+      {
+        "code": "WSM",
+        "name": "Samoa",
+        "definition": "Samoa(WSM)"
+      },
+      {
+        "code": "SMR",
+        "name": "San Marino",
+        "definition": "San Marino(SMR)"
+      },
+      {
+        "code": "STP",
+        "name": "Sao Tome and Principe",
+        "definition": "Sao Tome and Principe(STP)"
+      },
+      {
+        "code": "SAU",
+        "name": "Saudi Arabia",
+        "definition": "Saudi Arabia(SAU)"
+      },
+      {
+        "code": "SEN",
+        "name": "Senegal",
+        "definition": "Senegal(SEN)"
+      },
+      {
+        "code": "SRB",
+        "name": "Serbia",
+        "definition": "Serbia(SRB)"
+      },
+      {
+        "code": "SYC",
+        "name": "Seychelles",
+        "definition": "Seychelles(SYC)"
+      },
+      {
+        "code": "SLE",
+        "name": "Sierra Leone",
+        "definition": "Sierra Leone(SLE)"
+      },
+      {
+        "code": "SGP",
+        "name": "Singapore",
+        "definition": "Singapore(SGP)"
+      },
+      {
+        "code": "SVN",
+        "name": "Slovenia",
+        "definition": "Slovenia(SVN)"
+      },
+      {
+        "code": "SLB",
+        "name": "Solomon Islands",
+        "definition": "Solomon Islands(SLB)"
+      },
+      {
+        "code": "SOM",
+        "name": "Somalia",
+        "definition": "Somalia(SOM)"
+      },
+      {
+        "code": "ZAF",
+        "name": "South Africa",
+        "definition": "South Africa(ZAF)"
+      },
+      {
+        "code": "SGS",
+        "name": "South Georgia and the South Sandwich Islands",
+        "definition": "South Georgia and the South Sandwich Islands(SGS)"
+      },
+      {
+        "code": "SSD",
+        "name": "South Sudan",
+        "definition": "South Sudan(SSD)"
+      },
+      {
+        "code": "ESP",
+        "name": "Spain",
+        "definition": "Spain(ESP)"
+      },
+      {
+        "code": "LKA",
+        "name": "Sri Lanka",
+        "definition": "Sri Lanka(LKA)"
+      },
+      {
+        "code": "SDN",
+        "name": "Sudan (the)",
+        "definition": "Sudan (the)(SDN)"
+      },
+      {
+        "code": "SUR",
+        "name": "Suriname",
+        "definition": "Suriname(SUR)"
+      },
+      {
+        "code": "SJM",
+        "name": "Svalbard and Jan Mayen",
+        "definition": "Svalbard and Jan Mayen(SJM)"
+      },
+      {
+        "code": "SWE",
+        "name": "Sweden",
+        "definition": "Sweden(SWE)"
+      },
+      {
+        "code": "CHE",
+        "name": "Switzerland",
+        "definition": "Switzerland(CHE)"
+      },
+      {
+        "code": "SYR",
+        "name": "Syrian Arab Republic",
+        "definition": "Syrian Arab Republic(SYR)"
+      },
+      {
+        "code": "TWN",
+        "name": "Taiwan (Province of China)",
+        "definition": "Taiwan (Province of China)(TWN)"
+      },
+      {
+        "code": "TJK",
+        "name": "Tajikistan",
+        "definition": "Tajikistan(TJK)"
+      },
+      {
+        "code": "TZA",
+        "name": "Tanzania, United Republic of",
+        "definition": "Tanzania, United Republic of(TZA)"
+      },
+      {
+        "code": "THA",
+        "name": "Thailand",
+        "definition": "Thailand(THA)"
+      },
+      {
+        "code": "TLS",
+        "name": "Timor-Leste",
+        "definition": "Timor-Leste(TLS)"
+      },
+      {
+        "code": "TGO",
+        "name": "Togo",
+        "definition": "Togo(TGO)"
+      },
+      {
+        "code": "TKL",
+        "name": "Tokelau",
+        "definition": "Tokelau(TKL)"
+      },
+      {
+        "code": "TON",
+        "name": "Tonga",
+        "definition": "Tonga(TON)"
+      },
+      {
+        "code": "TTO",
+        "name": "Trinidad and Tobago",
+        "definition": "Trinidad and Tobago(TTO)"
+      },
+      {
+        "code": "TUN",
+        "name": "Tunisia",
+        "definition": "Tunisia(TUN)"
+      },
+      {
+        "code": "TUR",
+        "name": "Turkey",
+        "definition": "Turkey(TUR)"
+      },
+      {
+        "code": "TKM",
+        "name": "Turkmenistan",
+        "definition": "Turkmenistan(TKM)"
+      },
+      {
+        "code": "TCA",
+        "name": "Turks and Caicos Islands (the)",
+        "definition": "Turks and Caicos Islands (the)(TCA)"
+      },
+      {
+        "code": "TUV",
+        "name": "Tuvalu",
+        "definition": "Tuvalu(TUV)"
+      },
+      {
+        "code": "UGA",
+        "name": "Uganda",
+        "definition": "Uganda(UGA)"
+      },
+      {
+        "code": "UKR",
+        "name": "Ukraine",
+        "definition": "Ukraine(UKR)"
+      },
+      {
+        "code": "ARE",
+        "name": "United Arab Emirates (the)",
+        "definition": "United Arab Emirates (the)(ARE)"
+      },
+      {
+        "code": "GBR",
+        "name": "United Kingdom of Great Britain and Northern Ireland (the)",
+        "definition": "United Kingdom of Great Britain and Northern Ireland (the)(GBR)"
+      },
+      {
+        "code": "UMI",
+        "name": "United States Minor Outlying Islands (the)",
+        "definition": "United States Minor Outlying Islands (the)(UMI)"
+      },
+      {
+        "code": "USA",
+        "name": "United States of America (the)",
+        "definition": "United States of America (the)(USA)"
+      },
+      {
+        "code": "URY",
+        "name": "Uruguay",
+        "definition": "Uruguay(URY)"
+      },
+      {
+        "code": "UZB",
+        "name": "Uzbekistan",
+        "definition": "Uzbekistan(UZB)"
+      },
+      {
+        "code": "VUT",
+        "name": "Vanuatu",
+        "definition": "Vanuatu(VUT)"
+      },
+      {
+        "code": "VEN",
+        "name": "Venezuela (Bolivarian Republic of)",
+        "definition": "Venezuela (Bolivarian Republic of)(VEN)"
+      },
+      {
+        "code": "VNM",
+        "name": "Viet Nam",
+        "definition": "Viet Nam(VNM)"
+      },
+      {
+        "code": "VGB",
+        "name": "Virgin Islands (British)",
+        "definition": "Virgin Islands (British)(VGB)"
+      },
+      {
+        "code": "VIR",
+        "name": "Virgin Islands (U.S.)",
+        "definition": "Virgin Islands (U.S.)(VIR)"
+      },
+      {
+        "code": "WLF",
+        "name": "Wallis and Futuna",
+        "definition": "Wallis and Futuna(WLF)"
+      },
+      {
+        "code": "ESH",
+        "name": "Western Sahara",
+        "definition": "Western Sahara(ESH)"
+      },
+      {
+        "code": "YEM",
+        "name": "Yemen",
+        "definition": "Yemen(YEM)"
+      },
+      {
+        "code": "ZMB",
+        "name": "Zambia",
+        "definition": "Zambia(ZMB)"
+      },
+      {
+        "code": "ZWE",
+        "name": "Zimbabwe",
+        "definition": "Zimbabwe(ZWE)"
+      },
+      {
+        "code": "ALA",
+        "name": "Åland Islands",
+        "definition": "Åland Islands(ALA)"
+      },
+      {
+        "code": "AFG",
+        "name": "Afghanistan",
+        "definition": "Afghanistan(AFG)"
+      },
+      {
+        "code": "NIU",
+        "name": "Niue",
+        "definition": "Niue(NIU)"
+      },
+      {
+        "code": "NFK",
+        "name": "Norfolk Island",
+        "definition": "Norfolk Island(NFK)"
+      },
+      {
+        "code": "MNP",
+        "name": "Northern Mariana Islands (the)",
+        "definition": "Northern Mariana Islands (the)(MNP)"
+      },
+      {
+        "code": "NOR",
+        "name": "Norway",
+        "definition": "Norway(NOR)"
+      },
+      {
+        "code": "OMN",
+        "name": "Oman",
+        "definition": "Oman(OMN)"
+      },
+      {
+        "code": "PAK",
+        "name": "Pakistan",
+        "definition": "Pakistan(PAK)"
+      },
+      {
+        "code": "PLW",
+        "name": "Palau",
+        "definition": "Palau(PLW)"
+      },
+      {
+        "code": "PSE",
+        "name": "Palestine, State of",
+        "definition": "Palestine, State of(PSE)"
+      },
+      {
+        "code": "PAN",
+        "name": "Panama",
+        "definition": "Panama(PAN)"
+      },
+      {
+        "code": "PNG",
+        "name": "Papua New Guinea",
+        "definition": "Papua New Guinea(PNG)"
+      },
+      {
+        "code": "PRY",
+        "name": "Paraguay",
+        "definition": "Paraguay(PRY)"
+      },
+      {
+        "code": "PER",
+        "name": "Peru",
+        "definition": "Peru(PER)"
+      },
+      {
+        "code": "PHL",
+        "name": "Philippines (the)",
+        "definition": "Philippines (the)(PHL)"
+      },
+      {
+        "code": "PCN",
+        "name": "Pitcairn",
+        "definition": "Pitcairn(PCN)"
+      },
+      {
+        "code": "POL",
+        "name": "Poland",
+        "definition": "Poland(POL)"
+      },
+      {
+        "code": "PRT",
+        "name": "Portugal",
+        "definition": "Portugal(PRT)"
+      },
+      {
+        "code": "PRI",
+        "name": "Puerto Rico",
+        "definition": "Puerto Rico(PRI)"
+      },
+      {
+        "code": "QAT",
+        "name": "Qatar",
+        "definition": "Qatar(QAT)"
+      },
+      {
+        "code": "MKD",
+        "name": "Republic of North Macedonia",
+        "definition": "Republic of North Macedonia(MKD)"
+      },
+      {
+        "code": "ROU",
+        "name": "Romania",
+        "definition": "Romania(ROU)"
+      },
+      {
+        "code": "RUS",
+        "name": "Russian Federation (the)",
+        "definition": "Russian Federation (the)(RUS)"
+      },
+      {
+        "code": "RWA",
+        "name": "Rwanda",
+        "definition": "Rwanda(RWA)"
+      },
+      {
+        "code": "REU",
+        "name": "Réunion",
+        "definition": "Réunion(REU)"
+      },
+      {
+        "code": "SXM",
+        "name": "Sint Maarten (Dutch part)",
+        "definition": "Sint Maarten (Dutch part)(SXM)"
+      },
+      {
+        "code": "SVK",
+        "name": "Slovakia",
+        "definition": "Slovakia(SVK)"
+      },
+      {
+        "code": "HTI",
+        "name": "Haiti",
+        "definition": "Haiti(HTI)"
+      }
+    ],
+    "dda_action": "reuse",
+    "dda_id": "DLT000000071",
+    "reuse_search": "Searched DDA lookup types: DLT000000071 is the Universal country list.",
+    "data_requirement_ids": [
+      "DRQ001"
+    ],
+    "evidence_source_ids": [
+      "SRC008"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "LKP013",
+    "code": "MasterStatusTypes",
+    "definition": "The standard life-cycle states of a record: active, draft and inactive. The data standards owner decides what goes on it.",
+    "scope": "universal",
+    "values": [
+      {
+        "code": "ACTIVE",
+        "name": "Active",
+        "definition": "In force and in good standing."
+      },
+      {
+        "code": "DRAFT",
+        "name": "Draft",
+        "definition": "Still being agreed and not yet in force."
+      },
+      {
+        "code": "INACTIVE",
+        "name": "Inactive",
+        "definition": "Ended and not in force."
+      }
+    ],
+    "dda_action": "reuse",
+    "dda_id": "DLT000000067",
+    "reuse_search": "Searched DDA lookup types: DLT000000067 holds the standard states.",
+    "data_requirement_ids": [
+      "DRQ004",
+      "DRQ007"
+    ],
+    "evidence_source_ids": [
+      "SRC001"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "LKP014",
+    "code": "LegalEntityIdentifierTypes",
+    "definition": "The list of schemes and authorities under which a legal entity is identified, such as the legal entity identifier, a company registration number or a tax number. The head of compliance decides what goes on it.",
+    "scope": "concept",
+    "values": [
+      {
+        "code": "LEI",
+        "name": "LEI",
+        "definition": "The legal entity identifier issued under ISO 17442 through the Global LEI Foundation."
+      },
+      {
+        "code": "CIK",
+        "name": "CIK",
+        "definition": "The Central Index Key kept by the SEC."
+      },
+      {
+        "code": "DUNS",
+        "name": "DUNS",
+        "definition": "The Dun and Bradstreet identifier."
+      },
+      {
+        "code": "EIN",
+        "name": "EIN",
+        "definition": "The employer identification number used for US tax."
+      },
+      {
+        "code": "UKCH",
+        "name": "UKCH",
+        "definition": "The Companies House number in the United Kingdom."
+      },
+      {
+        "code": "BIC",
+        "name": "BIC",
+        "definition": "The bank identifier code kept by SWIFT."
+      },
+      {
+        "code": "PREQUIN",
+        "name": "PREQUIN",
+        "definition": "The identifier used by Preqin."
+      },
+      {
+        "code": "TICKER",
+        "name": "TICKER",
+        "definition": "An exchange symbol."
+      }
+    ],
+    "dda_action": "reuse",
+    "dda_id": "DLT000000064",
+    "reuse_search": "Searched DDA lookup types: DLT000000064 already lists identifier schemes.",
+    "data_requirement_ids": [
+      "DRQ002"
+    ],
+    "evidence_source_ids": [
+      "SRC010",
+      "SRC009"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "LKP015",
+    "code": "LegalEntityTransactionPartySides",
+    "definition": "The list saying which side of a transaction a party was on: it paid or it received. The chief financial officer of the funds decides what goes on it.",
+    "scope": "concept",
+    "values": [
+      {
+        "code": "PAID",
+        "name": "Paid",
+        "definition": "The party gave money, and received the holding if there was one."
+      },
+      {
+        "code": "RECEIVED",
+        "name": "Received",
+        "definition": "The party took money, and gave up the holding if there was one."
+      }
+    ],
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA lookup types: none lists the side of a party to a transaction.",
+    "data_requirement_ids": [
+      "DRQ005",
+      "DRQ007"
+    ],
+    "evidence_source_ids": [
+      "SRC001",
+      "SRC002",
+      "SRC003"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  }
+]

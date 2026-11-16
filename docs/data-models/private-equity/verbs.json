@@ -1,0 +1,281 @@
+[
+  {
+    "id": "REL001",
+    "code": "LegalEntityFundManagedBy",
+    "source_domain_id": "DOM001",
+    "destination_domain_id": "DOM001",
+    "forward_verb": "Is Managed By",
+    "inverse_verb": "Manages",
+    "source_role_id": "ROL001",
+    "target_role_id": "ROL002",
+    "cardinality": "MANY_TO_ONE",
+    "dates": true,
+    "is_symmetric": false,
+    "is_composition": false,
+    "quantified": false,
+    "name_override": null,
+    "dda_action": "extend",
+    "dda_id": "DMR000000001",
+    "reuse_search": "Searched DDA relationships: DMR000000001 already links a fund to its manager; its inverse verb is wrong and is corrected, and the fund's fixed facts are added.",
+    "data_requirement_ids": [
+      "DRQ001"
+    ],
+    "evidence_source_ids": [
+      "SRC012",
+      "SRC004",
+      "SRC008"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "definition": "A fund is managed by a general partner or manager for as long as the arrangement lasts, and a fund has one manager at a time, so the periods of its managers do not overlap. It holds the facts about the fund that belong to neither body alone: its vintage year, strategy, reporting currency, domicile, target size, final close date and the end of its investment period. If the manager of a fund is replaced, these facts are repeated on the new arrangement. It is not the fund's limited partners, who are linked by commitments.",
+    "mirror_override": null
+  },
+  {
+    "id": "REL002",
+    "code": "LegalEntityFundLPCommitment",
+    "source_domain_id": "DOM001",
+    "destination_domain_id": "DOM001",
+    "forward_verb": "Commits To",
+    "inverse_verb": "Receives Commitment From",
+    "source_role_id": "ROL003",
+    "target_role_id": "ROL001",
+    "cardinality": "MANY_TO_MANY",
+    "dates": true,
+    "is_symmetric": false,
+    "is_composition": false,
+    "quantified": false,
+    "name_override": "LegalEntityLPFundCommitments",
+    "dda_action": "extend",
+    "dda_id": "DMR000000004",
+    "reuse_search": "Searched DDA relationships: DMR000000004 already records an investor's commitment to a fund; the inverse verb and the cardinality are corrected.",
+    "data_requirement_ids": [
+      "DRQ004"
+    ],
+    "evidence_source_ids": [
+      "SRC001",
+      "SRC004",
+      "SRC016"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "definition": "A limited partner has committed capital to a fund for as long as the commitment runs. A limited partner may commit to several funds and a fund has many limited partners, and a second purchase of an existing interest is a further commitment of its own type. The amount, type and status belong to the commitment. It is not the money called or paid out, which is recorded as transactions.",
+    "mirror_override": null
+  },
+  {
+    "id": "REL003",
+    "code": "LegalEntityPEInvestor",
+    "source_domain_id": "DOM001",
+    "destination_domain_id": "DOM001",
+    "forward_verb": "Receives Investment From",
+    "inverse_verb": "Invests In",
+    "source_role_id": "ROL005",
+    "target_role_id": "ROL004",
+    "cardinality": "MANY_TO_MANY",
+    "dates": true,
+    "is_symmetric": false,
+    "is_composition": false,
+    "quantified": false,
+    "name_override": null,
+    "dda_action": "extend",
+    "dda_id": "DMR000000002",
+    "reuse_search": "Searched DDA relationships: DMR000000002 already links a portfolio company to its investor; the forward verb is corrected and the stake data is added.",
+    "data_requirement_ids": [
+      "DRQ006"
+    ],
+    "evidence_source_ids": [
+      "SRC010",
+      "SRC011",
+      "SRC012"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "definition": "A fund or vehicle holds a stake in a portfolio company or a holding vehicle for as long as it holds it. Several investors may hold one company and one investor may hold several. The economic share, voting share and control type belong to the stake. It is not what was paid for the stake, which is recorded as transactions.",
+    "mirror_override": null
+  },
+  {
+    "id": "REL004",
+    "code": "LegalEntityFundParallels",
+    "source_domain_id": "DOM001",
+    "destination_domain_id": "DOM001",
+    "forward_verb": "Invests Alongside",
+    "inverse_verb": "Invests Alongside",
+    "source_role_id": "ROL006",
+    "target_role_id": "ROL006",
+    "cardinality": "MANY_TO_MANY",
+    "dates": true,
+    "is_symmetric": true,
+    "is_composition": false,
+    "quantified": false,
+    "name_override": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA relationships (all four) and this model: none links two funds or vehicles that invest side by side.",
+    "data_requirement_ids": [
+      "DRQ003"
+    ],
+    "evidence_source_ids": [
+      "SRC013",
+      "SRC009"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "definition": "Two funds or vehicles invest side by side, for example a main fund and its parallel fund, an alternative investment vehicle or a co-investment vehicle, for as long as they do. The kind of vehicle belongs to the link. It is not an investor's commitment to a fund.",
+    "mirror_override": null
+  },
+  {
+    "id": "REL005",
+    "code": "LegalEntityTransactionParty",
+    "source_domain_id": "DOM001",
+    "destination_domain_id": "DOM003",
+    "forward_verb": "Is Party To",
+    "inverse_verb": "Has Party",
+    "source_role_id": "ROL008",
+    "target_role_id": "ROL007",
+    "cardinality": "MANY_TO_MANY",
+    "dates": false,
+    "is_symmetric": false,
+    "is_composition": false,
+    "quantified": false,
+    "name_override": null,
+    "dda_action": "extend",
+    "dda_id": "DMR000000037",
+    "reuse_search": "Searched DDA relationships: DMR000000037 already links a legal entity to a transaction as a party; the amount, purpose, units and direction of each party are added to it.",
+    "data_requirement_ids": [
+      "DRQ005",
+      "DRQ007"
+    ],
+    "evidence_source_ids": [
+      "SRC001",
+      "SRC002",
+      "SRC003"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "definition": "A legal entity takes part in a transaction as a party to it, whether it pays or receives: the limited partner paying into a capital call, the fund receiving it, the fund paying for an acquisition, or the seller receiving the price. A transaction has several parties and a legal entity takes part in many transactions. Each party's record says whether it paid or received, the amount for each stated purpose and, where an instrument changed hands, the number of units. The date and currency belong to the transaction. It does not say which account the money passed through.",
+    "mirror_override": "TransactionLegalEntityParties"
+  },
+  {
+    "id": "REL006",
+    "code": "TransactionLegalEntityPayees",
+    "source_domain_id": "DOM003",
+    "destination_domain_id": "DOM001",
+    "forward_verb": "Is Received By",
+    "inverse_verb": "Receives From",
+    "source_role_id": "ROL007",
+    "target_role_id": "ROL009",
+    "cardinality": "MANY_TO_MANY",
+    "dates": false,
+    "is_symmetric": false,
+    "is_composition": false,
+    "quantified": false,
+    "name_override": "TransactionPayees",
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Withdrawn: merged into LegalEntityTransactionParty.",
+    "data_requirement_ids": [
+      "DRQ005",
+      "DRQ007"
+    ],
+    "evidence_source_ids": [
+      "SRC001",
+      "SRC002",
+      "SRC003"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Merged into LegalEntityTransactionParty (REL005): one relationship for both sides, with the direction held on each party.",
+    "definition": "Withdrawn: merged into REL005.",
+    "mirror_override": null
+  },
+  {
+    "id": "REL007",
+    "code": "TransactionInstrumentTraded",
+    "source_domain_id": "DOM003",
+    "destination_domain_id": "DOM002",
+    "forward_verb": "Transfers",
+    "inverse_verb": "Is Transferred By",
+    "source_role_id": "ROL007",
+    "target_role_id": "ROL010",
+    "cardinality": "MANY_TO_ONE",
+    "dates": false,
+    "is_symmetric": false,
+    "is_composition": false,
+    "quantified": false,
+    "name_override": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA relationships and this model: none links a transaction to the instrument it concerns.",
+    "data_requirement_ids": [
+      "DRQ007"
+    ],
+    "evidence_source_ids": [
+      "SRC003",
+      "SRC015"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "definition": "A transaction concerns one instrument, and many transactions may concern the same instrument. It names what was bought or sold. A capital call or distribution concerns no instrument.",
+    "mirror_override": null
+  },
+  {
+    "id": "REL008",
+    "code": "ValuationPrivateEquityFundValued",
+    "source_domain_id": "DOM003",
+    "destination_domain_id": "DOM001",
+    "forward_verb": "Values",
+    "inverse_verb": "Is Valued By",
+    "source_role_id": "ROL011",
+    "target_role_id": "ROL001",
+    "cardinality": "MANY_TO_ONE",
+    "dates": false,
+    "is_symmetric": false,
+    "is_composition": false,
+    "quantified": false,
+    "name_override": "ValuationPrivateEquityFund",
+    "dda_action": "extend",
+    "dda_id": "DMR000000039",
+    "reuse_search": "Searched DDA relationships: DMR000000039 linked a valuation to any legal entity; it now links a valuation to the fund valued, and the general valued-entity role is retired.",
+    "data_requirement_ids": [
+      "DRQ008"
+    ],
+    "evidence_source_ids": [
+      "SRC005",
+      "SRC006",
+      "SRC007"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "definition": "A valuation judges the worth of one fund on a date and on a named measure, such as its net asset value. A fund is valued many times, once for each date and measure, and each valuation is about one fund. The date, amount, measure and currency belong to the valuation. It does not cover the value of a company the fund holds, which is linked to that company, nor the value of an instrument, which is held with the instrument's price, and it is not a transaction, because nothing is paid or received.",
+    "mirror_override": "PrivateEquityFundValuations"
+  },
+  {
+    "id": "REL009",
+    "code": "ValuationPrivateEquityPortCoValued",
+    "source_domain_id": "DOM003",
+    "destination_domain_id": "DOM001",
+    "forward_verb": "Values",
+    "inverse_verb": "Is Valued By",
+    "source_role_id": "ROL011",
+    "target_role_id": "ROL005",
+    "cardinality": "MANY_TO_ONE",
+    "dates": false,
+    "is_symmetric": false,
+    "is_composition": false,
+    "quantified": false,
+    "name_override": "ValuationPrivateEquityPortCo",
+    "dda_action": "extend",
+    "dda_id": "DMR000000050",
+    "reuse_search": "Searched DDA relationships: DMR000000050 links a valuation to the portfolio company valued.",
+    "data_requirement_ids": [
+      "DRQ008"
+    ],
+    "evidence_source_ids": [
+      "SRC005",
+      "SRC006",
+      "SRC007"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "definition": "A valuation judges the worth of one portfolio company on a date and on a named measure, such as its equity value or enterprise value. A company is valued many times, once for each date and measure, and each valuation is about one company. The date, amount, measure and currency belong to the valuation. It does not cover the value of a fund, which is linked to the fund, nor the value of an instrument, which is held with the instrument's price, and it is not a transaction, because nothing is paid or received.",
+    "mirror_override": "PrivateEquityPortCoValuations"
+  }
+]

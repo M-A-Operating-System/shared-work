@@ -1,0 +1,333 @@
+[
+  {
+    "id": "ROL001",
+    "name": "Fund",
+    "plural": "Funds",
+    "definition": "A legal entity is a Fund while it is managed by another legal entity as a pool of investor capital. It says the body is run by a manager for its investors, which is not the same as being a PortCo, a body in which others hold a stake.",
+    "played_by_domain_ids": [
+      "DOM001"
+    ],
+    "distinct_need": "Names the pooled-capital vehicle that a manager runs; no other role says a body is managed for investors.",
+    "aliases": [
+      "Partnership"
+    ],
+    "established_by": [
+      "REL001",
+      "REL002"
+    ],
+    "stated_in": [
+      "REQ001",
+      "REQ002",
+      "REQ004"
+    ],
+    "evidence_source_ids": [
+      "SRC012",
+      "SRC004"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL002",
+    "name": "GP",
+    "plural": "GPs",
+    "definition": "A legal entity is a GP while it manages a fund. It says the body runs the fund and answers for it, which is not the same as being an Investor, a body that holds a stake in something.",
+    "played_by_domain_ids": [
+      "DOM001"
+    ],
+    "distinct_need": "Names the party that runs a fund; no other role says a body manages a pool of capital.",
+    "aliases": [
+      "General Partner",
+      "Manager"
+    ],
+    "established_by": [
+      "REL001"
+    ],
+    "stated_in": [
+      "REQ001",
+      "REQ004"
+    ],
+    "evidence_source_ids": [
+      "SRC012",
+      "SRC004"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL003",
+    "name": "LP",
+    "plural": "LPs",
+    "definition": "A legal entity is an LP while it commits capital to a fund. It says the body has promised money to a fund and shares in its returns, which is not the same as being an Investor in a company, a body that holds a stake in a company.",
+    "played_by_domain_ids": [
+      "DOM001"
+    ],
+    "distinct_need": "Names the party that supplies a fund's capital; no other role says a body has promised capital to a fund.",
+    "aliases": [
+      "Limited Partner",
+      "Fund Investor"
+    ],
+    "established_by": [
+      "REL002"
+    ],
+    "stated_in": [
+      "REQ004",
+      "REQ005"
+    ],
+    "evidence_source_ids": [
+      "SRC001",
+      "SRC004",
+      "SRC016"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL004",
+    "name": "Investor",
+    "plural": "Investors",
+    "definition": "A legal entity is an Investor while it invests in another legal entity. It says the body owns part of something below it in the structure, which is not the same as being an LP, which has only promised capital to a fund.",
+    "played_by_domain_ids": [
+      "DOM001"
+    ],
+    "distinct_need": "Names the holder of a stake in a company or vehicle; no other role says a body owns part of another.",
+    "aliases": [
+      "Owner",
+      "Shareholder"
+    ],
+    "established_by": [
+      "REL003"
+    ],
+    "stated_in": [
+      "REQ006",
+      "REQ007",
+      "REQ013"
+    ],
+    "evidence_source_ids": [
+      "SRC010",
+      "SRC011",
+      "SRC012"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL005",
+    "name": "PortCo",
+    "plural": "PortCos",
+    "definition": "A legal entity is a PortCo while another legal entity invests in it. It covers an operating company and also a holding vehicle set up to hold one, and says something is held in it, which is not the same as being a Fund, a body that is managed for investors.",
+    "played_by_domain_ids": [
+      "DOM001"
+    ],
+    "distinct_need": "Names the legal entity in which a stake is held; no other role says a body has an owner below a fund.",
+    "aliases": [
+      "Portfolio Company",
+      "Investee"
+    ],
+    "established_by": [
+      "REL003"
+    ],
+    "stated_in": [
+      "REQ006",
+      "REQ007",
+      "REQ011"
+    ],
+    "evidence_source_ids": [
+      "SRC010",
+      "SRC012",
+      "SRC014"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL006",
+    "name": "Parallel Vehicle",
+    "plural": "Parallel Vehicles",
+    "definition": "A legal entity is a Parallel Vehicle while it invests alongside another fund. It says the body takes part in the same investments as a fund, which is not the same as being that fund's investor.",
+    "played_by_domain_ids": [
+      "DOM001"
+    ],
+    "distinct_need": "Names a vehicle that shares a fund's investments without holding an interest in the fund.",
+    "aliases": [
+      "Side Vehicle",
+      "Co-invest Vehicle",
+      "Alternative Investment Vehicle"
+    ],
+    "established_by": [
+      "REL004"
+    ],
+    "stated_in": [
+      "REQ003"
+    ],
+    "evidence_source_ids": [
+      "SRC013",
+      "SRC009"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL007",
+    "name": "Transaction",
+    "plural": "Transactions",
+    "definition": "A transaction is a Transaction in a relationship while it is the movement of money, holdings or ownership that the other subject took part in or was recorded against. It is the same role wherever a transaction meets another subject, which is how those subjects join up around it. It is the movement itself, not the parties to it.",
+    "played_by_domain_ids": [
+      "DOM003"
+    ],
+    "distinct_need": "Names the event in which money or a holding moves; no other role says a movement has parties or an instrument.",
+    "aliases": [
+      "Event",
+      "Transfer"
+    ],
+    "established_by": [
+      "REL005",
+      "REL007"
+    ],
+    "stated_in": [
+      "REQ005",
+      "REQ008"
+    ],
+    "evidence_source_ids": [
+      "SRC001",
+      "SRC002",
+      "SRC003"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL008",
+    "name": "Transaction Party",
+    "plural": "Transaction Parties",
+    "definition": "A legal entity is a Transaction Party while it takes part in a transaction as a payer, a payee, a buyer, a seller or an issuer. It says who the money or holdings moved from or to, which is not the same as owning an account the movement passed through.",
+    "played_by_domain_ids": [
+      "DOM001"
+    ],
+    "distinct_need": "Names the party that takes part in a transaction on either side; no other role says a body took part in a movement of money or holdings.",
+    "aliases": [
+      "Payer",
+      "Payee",
+      "Buyer",
+      "Seller",
+      "Counterparty"
+    ],
+    "established_by": [
+      "REL005"
+    ],
+    "stated_in": [
+      "REQ005",
+      "REQ008"
+    ],
+    "evidence_source_ids": [
+      "SRC001",
+      "SRC002"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL009",
+    "name": "Payee",
+    "plural": "Payees",
+    "definition": "A legal entity is a Payee while it receives from a transaction. It says the body took money and gave up the holding if there was one, which is not the same as the Payer.",
+    "played_by_domain_ids": [
+      "DOM001"
+    ],
+    "distinct_need": "Names the party that receives in a transaction; no other role says which side of a transaction was paid.",
+    "aliases": [
+      "Recipient",
+      "Seller"
+    ],
+    "established_by": [
+      "REL006"
+    ],
+    "stated_in": [
+      "REQ005",
+      "REQ008"
+    ],
+    "evidence_source_ids": [
+      "SRC001",
+      "SRC002"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Merged into Transaction Party (ROL008): the payer and the payee are one role, and whether the party paid or received is held on its record."
+  },
+  {
+    "id": "ROL010",
+    "name": "Traded Instrument",
+    "plural": "Traded Instruments",
+    "definition": "An instrument is a Traded Instrument while a transaction transfers it. It says the instrument was the subject of an event, which is not the same as the instrument's issuer.",
+    "played_by_domain_ids": [
+      "DOM002"
+    ],
+    "distinct_need": "Names the instrument that a transaction concerns; no other role links an instrument to an event.",
+    "aliases": [
+      "Security Traded"
+    ],
+    "established_by": [
+      "REL007"
+    ],
+    "stated_in": [
+      "REQ008"
+    ],
+    "evidence_source_ids": [
+      "SRC003",
+      "SRC015"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL011",
+    "name": "Valuation",
+    "plural": "Valuations",
+    "definition": "A valuation is a Valuation in a relationship while it is a judgement of the worth of something on a date, as seen from the thing that was valued. It says the figure is a view taken on a date and not a movement of money, so it is not a transaction. A new valuation does not replace an earlier one; each is kept for its own date.",
+    "played_by_domain_ids": [
+      "DOM003"
+    ],
+    "distinct_need": "Names the record of a judged worth on a date; no other role says a figure is a view and not a movement of money.",
+    "aliases": [
+      "Appraisal"
+    ],
+    "established_by": [
+      "REL008"
+    ],
+    "stated_in": [
+      "REQ009"
+    ],
+    "evidence_source_ids": [
+      "SRC005",
+      "SRC006",
+      "SRC007"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL012",
+    "name": "Valued Legal Entity",
+    "plural": "Valued Legal Entities",
+    "definition": "A legal entity is a Valued Legal Entity while a valuation judges its worth, such as a portfolio company's equity or a fund's net assets. It says the body is the thing valued, which is not the same as the party that holds it.",
+    "played_by_domain_ids": [
+      "DOM001"
+    ],
+    "distinct_need": "Names the legal entity a valuation is about; no other role says a body was valued.",
+    "aliases": [
+      "Valued Entity"
+    ],
+    "established_by": [
+      "REL008"
+    ],
+    "stated_in": [
+      "REQ009"
+    ],
+    "evidence_source_ids": [
+      "SRC005",
+      "SRC006",
+      "SRC007"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Replaced by the Fund (ROL001) and PortCo (ROL005) roles, so that a valuation joins the fund structure."
+  }
+]

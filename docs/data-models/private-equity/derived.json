@@ -1,0 +1,381 @@
+{
+  "document_date": "2026-11-14",
+  "package_ref": "PE-STRUCT-20261114-01",
+  "summary_counts": {
+    "business_requirements": 13,
+    "data_requirements": 8,
+    "domains": 3,
+    "roles": 10,
+    "relationships": 8,
+    "concepts": 8,
+    "attributes": 38,
+    "lookups": 15,
+    "test_cases": 27,
+    "sources": 16
+  },
+  "case_index": {
+    "REQ001": [
+      "SCN001",
+      "SCN002",
+      "SCN003",
+      "SCN025"
+    ],
+    "REQ002": [
+      "SCN001",
+      "SCN002",
+      "SCN003",
+      "SCN025"
+    ],
+    "REQ010": [
+      "SCN004",
+      "SCN005"
+    ],
+    "REQ011": [
+      "SCN004",
+      "SCN005"
+    ],
+    "REQ013": [
+      "SCN004",
+      "SCN005",
+      "SCN013",
+      "SCN014",
+      "SCN015",
+      "SCN016",
+      "SCN026"
+    ],
+    "REQ003": [
+      "SCN006"
+    ],
+    "REQ004": [
+      "SCN007",
+      "SCN008",
+      "SCN009"
+    ],
+    "REQ012": [
+      "SCN007",
+      "SCN008",
+      "SCN009",
+      "SCN017",
+      "SCN018",
+      "SCN019",
+      "SCN020",
+      "SCN021"
+    ],
+    "REQ005": [
+      "SCN010",
+      "SCN011",
+      "SCN012"
+    ],
+    "REQ006": [
+      "SCN013",
+      "SCN014",
+      "SCN015",
+      "SCN016",
+      "SCN026"
+    ],
+    "REQ007": [
+      "SCN013",
+      "SCN014",
+      "SCN015",
+      "SCN016",
+      "SCN017",
+      "SCN018",
+      "SCN019",
+      "SCN020",
+      "SCN021",
+      "SCN026"
+    ],
+    "REQ008": [
+      "SCN017",
+      "SCN018",
+      "SCN019",
+      "SCN020",
+      "SCN021"
+    ],
+    "REQ009": [
+      "SCN022",
+      "SCN023",
+      "SCN024",
+      "SCN027"
+    ]
+  },
+  "source_index": {
+    "SRC012": [
+      "REQ001",
+      "REQ006",
+      "REQ011",
+      "REQ013",
+      "SBJ001",
+      "SBJ003",
+      "ROL001",
+      "ROL002",
+      "ROL004",
+      "ROL005",
+      "REL001",
+      "REL003",
+      "ATR035",
+      "LKP009"
+    ],
+    "SRC004": [
+      "REQ001",
+      "REQ004",
+      "REQ007",
+      "REQ008",
+      "SBJ001",
+      "ROL001",
+      "ROL002",
+      "ROL003",
+      "REL001",
+      "REL002",
+      "ATR006",
+      "ATR007"
+    ],
+    "SRC008": [
+      "REQ001",
+      "REQ002",
+      "REQ006",
+      "REQ010",
+      "SBJ002",
+      "REL001",
+      "ATR001",
+      "ATR002",
+      "ATR003",
+      "ATR004",
+      "LKP001",
+      "LKP012"
+    ],
+    "SRC003": [
+      "REQ002",
+      "REQ008",
+      "REQ009",
+      "SBJ005",
+      "SBJ006",
+      "SBJ008",
+      "ROL007",
+      "ROL010",
+      "REL005",
+      "REL007",
+      "ATR001",
+      "ATR003",
+      "ATR005",
+      "ATR015",
+      "ATR017",
+      "ATR022",
+      "ATR036",
+      "ATR037",
+      "ATR038",
+      "ATR040",
+      "ATR041",
+      "LKP005",
+      "LKP008",
+      "LKP015"
+    ],
+    "SRC009": [
+      "REQ002",
+      "REQ003",
+      "REQ010",
+      "SBJ002",
+      "ROL006",
+      "REL004",
+      "ATR002",
+      "ATR004",
+      "ATR014",
+      "ATR031",
+      "ATR032",
+      "LKP001",
+      "LKP003",
+      "LKP014"
+    ],
+    "SRC013": [
+      "REQ003",
+      "ROL006",
+      "REL004",
+      "ATR014",
+      "LKP003"
+    ],
+    "SRC014": [
+      "REQ003",
+      "REQ007",
+      "REQ011",
+      "SBJ003",
+      "ROL005",
+      "ATR035",
+      "LKP009"
+    ],
+    "SRC001": [
+      "REQ004",
+      "REQ005",
+      "SBJ008",
+      "ROL003",
+      "ROL007",
+      "ROL008",
+      "REL002",
+      "REL005",
+      "ATR006",
+      "ATR011",
+      "ATR012",
+      "ATR013",
+      "ATR015",
+      "ATR016",
+      "ATR021",
+      "ATR022",
+      "ATR023",
+      "ATR024",
+      "ATR025",
+      "ATR041",
+      "LKP004",
+      "LKP005",
+      "LKP010",
+      "LKP011",
+      "LKP013",
+      "LKP015"
+    ],
+    "SRC016": [
+      "REQ004",
+      "ROL003",
+      "REL002",
+      "ATR011",
+      "ATR012",
+      "LKP010"
+    ],
+    "SRC015": [
+      "REQ004",
+      "REQ008",
+      "REQ012",
+      "SBJ005",
+      "SBJ008",
+      "ROL010",
+      "REL007",
+      "ATR012",
+      "ATR017",
+      "ATR021",
+      "LKP004",
+      "LKP010"
+    ],
+    "SRC002": [
+      "REQ005",
+      "SBJ008",
+      "ROL007",
+      "ROL008",
+      "REL005",
+      "ATR015",
+      "ATR016",
+      "ATR021",
+      "ATR022",
+      "ATR023",
+      "ATR024",
+      "ATR041",
+      "LKP004",
+      "LKP005",
+      "LKP015"
+    ],
+    "SRC010": [
+      "REQ006",
+      "REQ007",
+      "REQ010",
+      "REQ013",
+      "SBJ001",
+      "SBJ002",
+      "SBJ006",
+      "ROL004",
+      "ROL005",
+      "REL003",
+      "ATR008",
+      "ATR009",
+      "ATR010",
+      "ATR031",
+      "ATR032",
+      "ATR033",
+      "ATR034",
+      "ATR040",
+      "LKP002",
+      "LKP014"
+    ],
+    "SRC011": [
+      "REQ006",
+      "REQ010",
+      "ROL004",
+      "REL003",
+      "ATR008",
+      "ATR009",
+      "LKP002"
+    ],
+    "SRC005": [
+      "REQ009",
+      "SBJ007",
+      "SBJ009",
+      "ROL011",
+      "REL008",
+      "REL009",
+      "ATR026",
+      "ATR027",
+      "ATR029",
+      "ATR030",
+      "ATR036",
+      "ATR037",
+      "ATR038",
+      "ATR039",
+      "LKP006",
+      "LKP007",
+      "LKP008"
+    ],
+    "SRC006": [
+      "REQ009",
+      "SBJ007",
+      "SBJ009",
+      "ROL011",
+      "REL008",
+      "REL009",
+      "ATR026",
+      "ATR028",
+      "ATR029",
+      "ATR030",
+      "ATR036",
+      "LKP006",
+      "LKP007",
+      "LKP008"
+    ],
+    "SRC007": [
+      "REQ009",
+      "SBJ007",
+      "SBJ009",
+      "ROL011",
+      "REL008",
+      "REL009"
+    ]
+  },
+  "views": {
+    "REL001": {
+      "forward": "LegalEntityGPs",
+      "mirror": "LegalEntityFunds"
+    },
+    "REL002": {
+      "forward": "LegalEntityLPFundCommitments",
+      "mirror": "LegalEntityLPs"
+    },
+    "REL003": {
+      "forward": "LegalEntityInvestors",
+      "mirror": "LegalEntityPortCos"
+    },
+    "REL004": {
+      "forward": "LegalEntityParallelVehicles",
+      "mirror": "LegalEntityParallelVehicles"
+    },
+    "REL005": {
+      "forward": "LegalEntityTransactions",
+      "mirror": "TransactionLegalEntityParties"
+    },
+    "REL007": {
+      "forward": "TransactionTradedInstruments",
+      "mirror": "InstrumentTransactions"
+    },
+    "REL008": {
+      "forward": "ValuationPrivateEquityFund",
+      "mirror": "PrivateEquityFundValuations"
+    },
+    "REL009": {
+      "forward": "ValuationPrivateEquityPortCo",
+      "mirror": "PrivateEquityPortCoValuations"
+    }
+  }
+}
