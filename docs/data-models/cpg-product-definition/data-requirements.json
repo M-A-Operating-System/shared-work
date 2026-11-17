@@ -1,0 +1,808 @@
+[
+  {
+    "id": "DRQ001",
+    "business_requirement_ids": [
+      "REQ001",
+      "REQ002",
+      "REQ003",
+      "REQ005"
+    ],
+    "must_record": [
+      "Every line of a product's formulation: the product, the ingredient or packaging item, and how much of it is used",
+      "Which version of the formulation each line belongs to"
+    ],
+    "must_answer": [
+      "What goes into this product, and what is inside each of those ingredients?"
+    ],
+    "temporality": "both",
+    "must_prevent": [
+      "A product that ends up containing itself, however many steps away",
+      "A formulation put together from lines that belong to two different versions"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "prevent_how": [
+      "A product cannot be listed as an ingredient of itself, directly or through other products.",
+      "Every line of a formulation must say which version it belongs to."
+    ],
+    "prevent_resolution": [
+      {
+        "must_prevent_index": 0,
+        "expressed_by": "composition",
+        "artefact_id": "REL001"
+      },
+      {
+        "must_prevent_index": 1,
+        "expressed_by": "mandatory-attribute",
+        "artefact_id": "ATR003"
+      }
+    ]
+  },
+  {
+    "id": "DRQ002",
+    "business_requirement_ids": [
+      "REQ005"
+    ],
+    "must_record": [
+      "The same information, read starting from an ingredient"
+    ],
+    "must_answer": [
+      "Which products contain this ingredient, by any route?"
+    ],
+    "temporality": "current",
+    "must_prevent": [],
+    "status": "active",
+    "withdrawn_reason": null,
+    "prevent_how": [],
+    "prevent_resolution": []
+  },
+  {
+    "id": "DRQ003",
+    "business_requirement_ids": [
+      "REQ004"
+    ],
+    "must_record": [
+      "How much of each ingredient is used, and whether it may go at the end of the list"
+    ],
+    "must_answer": [
+      "In what order must this product's ingredients be declared, and which may go at the end?"
+    ],
+    "temporality": "as-at",
+    "must_prevent": [],
+    "status": "active",
+    "withdrawn_reason": null,
+    "prevent_how": [],
+    "prevent_resolution": []
+  },
+  {
+    "id": "DRQ004",
+    "business_requirement_ids": [
+      "REQ006"
+    ],
+    "must_record": [
+      "Which alternatives may stand in for an ingredient, the conditions for using each, and what using it changes on the label"
+    ],
+    "must_answer": [
+      "Which alternatives are permitted for this ingredient, and what does using one change on the label?"
+    ],
+    "temporality": "as-at",
+    "must_prevent": [
+      "An alternative recorded without saying what it changes on the label"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "prevent_how": [
+      "Every permitted alternative must state what using it changes on the label."
+    ],
+    "prevent_resolution": [
+      {
+        "must_prevent_index": 0,
+        "expressed_by": "mandatory-attribute",
+        "artefact_id": "ATR007"
+      }
+    ]
+  },
+  {
+    "id": "DRQ005",
+    "business_requirement_ids": [
+      "REQ007"
+    ],
+    "must_record": [
+      "Where an ingredient is bought in already made, who supplies it and what the supplier says is inside it"
+    ],
+    "must_answer": [
+      "Which of our products rest on an ingredient whose contents only the supplier can declare?"
+    ],
+    "temporality": "current",
+    "must_prevent": [],
+    "status": "active",
+    "withdrawn_reason": null,
+    "prevent_how": [],
+    "prevent_resolution": []
+  },
+  {
+    "id": "DRQ006",
+    "business_requirement_ids": [
+      "REQ008",
+      "REQ009",
+      "REQ010",
+      "REQ035"
+    ],
+    "must_record": [
+      "Each size and pack as its own product, linked to its family, with what makes it differ",
+      "Each change to a product, whether it made a different product or a new version, and why"
+    ],
+    "must_answer": [
+      "Which packs of this product exist, and did this change make a different product?"
+    ],
+    "temporality": "as-at",
+    "must_prevent": [],
+    "status": "active",
+    "withdrawn_reason": null,
+    "prevent_how": [],
+    "prevent_resolution": []
+  },
+  {
+    "id": "DRQ007",
+    "business_requirement_ids": [
+      "REQ012",
+      "REQ020",
+      "REQ041",
+      "REQ042"
+    ],
+    "must_record": [
+      "Every item that must appear on pack for a product in a market, and what it says",
+      "The business named on the pack as answerable for the product"
+    ],
+    "must_answer": [
+      "Is everything this market requires on this pack present, and what does each item say?"
+    ],
+    "temporality": "as-at",
+    "must_prevent": [
+      "A pack item recorded for a market the product is not sold in"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "prevent_how": [
+      "Every pack item belongs to a market the product is sold in."
+    ],
+    "prevent_resolution": [
+      {
+        "must_prevent_index": 0,
+        "expressed_by": "parent-cardinality",
+        "artefact_id": "SBJ007"
+      }
+    ]
+  },
+  {
+    "id": "DRQ008",
+    "business_requirement_ids": [
+      "REQ013"
+    ],
+    "must_record": [
+      "Each allergen an ingredient carries, named by the food it comes from and by the market whose list it belongs to"
+    ],
+    "must_answer": [
+      "Which allergens must this product declare, and which ingredient brings each one?"
+    ],
+    "temporality": "both",
+    "must_prevent": [
+      "A product declared free of an allergen one of its ingredients carries"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "prevent_how": [
+      "A product's allergens are worked out from everything in its formulation, so an allergen that an ingredient carries cannot be left off."
+    ],
+    "prevent_resolution": [
+      {
+        "must_prevent_index": 0,
+        "expressed_by": "composition",
+        "artefact_id": "REL001"
+      }
+    ]
+  },
+  {
+    "id": "DRQ009",
+    "business_requirement_ids": [
+      "REQ014",
+      "REQ015",
+      "REQ016"
+    ],
+    "must_record": [
+      "Each nutrition value shown on pack, how it was arrived at, and how far it may vary",
+      "For a calculated value, the allowance made for the edible part, for weight change in preparation and for nutrient loss"
+    ],
+    "must_answer": [
+      "What are this product's nutrition values, how was each arrived at, and how far may each vary?"
+    ],
+    "temporality": "as-at",
+    "must_prevent": [
+      "A nutrition value shown without saying how it was arrived at"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "prevent_how": [
+      "Every nutrition value must say how it was arrived at."
+    ],
+    "prevent_resolution": [
+      {
+        "must_prevent_index": 0,
+        "expressed_by": "mandatory-attribute",
+        "artefact_id": "ATR039"
+      }
+    ]
+  },
+  {
+    "id": "DRQ010",
+    "business_requirement_ids": [
+      "REQ017",
+      "REQ018",
+      "REQ019"
+    ],
+    "must_record": [
+      "Each claim made, the market it is made in, the condition it rests on, and the product it is compared with where it compares"
+    ],
+    "must_answer": [
+      "Which claims does this pack make, and does each still meet its condition?"
+    ],
+    "temporality": "as-at",
+    "must_prevent": [
+      "A claim kept after its condition stops being met"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "prevent_how": [
+      "Whether a claim's condition is still met is worked out from the current values, so a claim cannot outlive its condition unnoticed."
+    ],
+    "prevent_resolution": [
+      {
+        "must_prevent_index": 0,
+        "expressed_by": "mandatory-attribute",
+        "artefact_id": "ATR052"
+      }
+    ]
+  },
+  {
+    "id": "DRQ011",
+    "business_requirement_ids": [
+      "REQ022"
+    ],
+    "must_record": [
+      "Each version of what a product or ingredient must be, with its limits"
+    ],
+    "must_answer": [
+      "What must this ingredient be, and what did it have to be on a past date?"
+    ],
+    "temporality": "as-at",
+    "must_prevent": [],
+    "status": "active",
+    "withdrawn_reason": null,
+    "prevent_how": [],
+    "prevent_resolution": []
+  },
+  {
+    "id": "DRQ012",
+    "business_requirement_ids": [
+      "REQ023",
+      "REQ031",
+      "REQ032"
+    ],
+    "must_record": [
+      "What a supplier's document says about what it supplied, who issued it and when, and whether the organisation checked it"
+    ],
+    "must_answer": [
+      "Which of this ingredient's stated properties did we check, and which did we take on the supplier's word?",
+      "Which supplier documents about an ingredient are newer than the formulation of a product that uses it?"
+    ],
+    "temporality": "as-at",
+    "must_prevent": [
+      "A supplier's statement shown as though the organisation had checked it"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "prevent_how": [
+      "Every supplier statement must say whether the organisation checked it."
+    ],
+    "prevent_resolution": [
+      {
+        "must_prevent_index": 0,
+        "expressed_by": "mandatory-attribute",
+        "artefact_id": "ATR014"
+      }
+    ]
+  },
+  {
+    "id": "DRQ013",
+    "business_requirement_ids": [
+      "REQ024",
+      "REQ025",
+      "REQ026"
+    ],
+    "must_record": [
+      "How long a product, ingredient or part-made good lasts under each storage condition, and which date mark it carries"
+    ],
+    "must_answer": [
+      "How long does this last under each storage condition, and which date mark does it carry?"
+    ],
+    "temporality": "as-at",
+    "must_prevent": [],
+    "status": "active",
+    "withdrawn_reason": null,
+    "prevent_how": [],
+    "prevent_resolution": []
+  },
+  {
+    "id": "DRQ014",
+    "business_requirement_ids": [
+      "REQ027",
+      "REQ028"
+    ],
+    "must_record": [
+      "Each supplier authorised for each ingredient or packaging item, under which programme, and for what period"
+    ],
+    "must_answer": [
+      "Which suppliers may supply this ingredient today, and which could on a past date?",
+      "Which ingredients and packaging items have no authorised supplier?"
+    ],
+    "temporality": "as-at",
+    "must_prevent": [
+      "An authorisation treated as current after it has lapsed"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "prevent_how": [
+      "Every supplier authorisation has a start and an end date, so a lapsed authorisation is never treated as current."
+    ],
+    "prevent_resolution": [
+      {
+        "must_prevent_index": 0,
+        "expressed_by": "dates",
+        "artefact_id": "REL005"
+      }
+    ]
+  },
+  {
+    "id": "DRQ015",
+    "business_requirement_ids": [
+      "REQ029",
+      "REQ030"
+    ],
+    "must_record": [
+      "Each ingredient's fraud-risk assessment, what it found, and the extra checks it calls for"
+    ],
+    "must_answer": [
+      "Which ingredients are most at risk of fraud, and what is in place for them?"
+    ],
+    "temporality": "as-at",
+    "must_prevent": [],
+    "status": "active",
+    "withdrawn_reason": null,
+    "prevent_how": [],
+    "prevent_resolution": []
+  },
+  {
+    "id": "DRQ016",
+    "business_requirement_ids": [
+      "REQ033"
+    ],
+    "must_record": [
+      "Each certification a product holds, who granted it, and the period it is valid for"
+    ],
+    "must_answer": [
+      "Which certifications does this product hold, from whom, and are they still valid?"
+    ],
+    "temporality": "both",
+    "must_prevent": [
+      "A certification shown as current after it has lapsed"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "prevent_how": [
+      "Every certification has a start and an end date, so a lapsed certification is never shown as current."
+    ],
+    "prevent_resolution": [
+      {
+        "must_prevent_index": 0,
+        "expressed_by": "dates",
+        "artefact_id": "REL006"
+      }
+    ]
+  },
+  {
+    "id": "DRQ017",
+    "business_requirement_ids": [
+      "REQ011"
+    ],
+    "must_record": [
+      "The identifiers a product carries, who issued each, and the period each was in use"
+    ],
+    "must_answer": [
+      "Which product is this, whatever identifier the retailer or supplier used?"
+    ],
+    "temporality": "current",
+    "must_prevent": [],
+    "status": "active",
+    "withdrawn_reason": null,
+    "prevent_how": [],
+    "prevent_resolution": []
+  },
+  {
+    "id": "DRQ018",
+    "business_requirement_ids": [
+      "REQ021"
+    ],
+    "must_record": [
+      "Where a country of origin is declared, which country and what it rests on"
+    ],
+    "must_answer": [
+      "Where does this ingredient or product come from, as declared?"
+    ],
+    "temporality": "as-at",
+    "must_prevent": [],
+    "status": "active",
+    "withdrawn_reason": null,
+    "prevent_how": [],
+    "prevent_resolution": []
+  },
+  {
+    "id": "DRQ019",
+    "business_requirement_ids": [
+      "REQ035",
+      "REQ008"
+    ],
+    "must_record": [
+      "Which products are the sizes, formats and pack counts of one product definition",
+      "Whether a product is only a grouping and is never made, bought or sold"
+    ],
+    "must_answer": [
+      "Which products are sold as versions of this product definition, and how does each differ?"
+    ],
+    "temporality": "current",
+    "must_prevent": [
+      "A product that belongs to two product definitions"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "prevent_how": [
+      "A product belongs to at most one product definition."
+    ],
+    "prevent_resolution": [
+      {
+        "must_prevent_index": 0,
+        "expressed_by": "relationship-cardinality",
+        "artefact_id": "REL002"
+      }
+    ]
+  },
+  {
+    "id": "DRQ020",
+    "business_requirement_ids": [
+      "REQ036"
+    ],
+    "must_record": [
+      "Every factory and supplier site: its name, its address and country, and its global location number where it has one",
+      "Which company runs each site, and from when"
+    ],
+    "must_answer": [
+      "Which company runs this site, and which sites does this company run?"
+    ],
+    "temporality": "as-at",
+    "must_prevent": [
+      "A site run by two companies at the same time"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Moved to the manufacturing model: factories, the places inside them down to the shop floor, supplier sites, batches and supply chain detail belong there. This model holds a supplier only as a company.",
+    "prevent_how": [
+      "A site has one operating company at a time. A change of company starts a new period."
+    ],
+    "prevent_resolution": [
+      {
+        "must_prevent_index": 0,
+        "expressed_by": "relationship-cardinality",
+        "artefact_id": "REL010"
+      }
+    ]
+  },
+  {
+    "id": "DRQ021",
+    "business_requirement_ids": [
+      "REQ037"
+    ],
+    "must_record": [
+      "Which version of a product's recipe each factory uses, and from when"
+    ],
+    "must_answer": [
+      "Which recipe version is this factory using for this product, and which was it using on a given date?"
+    ],
+    "temporality": "as-at",
+    "must_prevent": [
+      "A product made at a factory with no recipe version named"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Moved to the manufacturing model: factories, the places inside them down to the shop floor, supplier sites, batches and supply chain detail belong there. This model holds a supplier only as a company.",
+    "prevent_how": [
+      "Every factory a product is made at names the recipe version it uses."
+    ],
+    "prevent_resolution": [
+      {
+        "must_prevent_index": 0,
+        "expressed_by": "mandatory-attribute",
+        "artefact_id": "ATR075"
+      }
+    ]
+  },
+  {
+    "id": "DRQ022",
+    "business_requirement_ids": [
+      "REQ038"
+    ],
+    "must_record": [
+      "Which site each bought material comes from",
+      "The certification each site holds: scheme, certificate number, what it covers, who granted it and for what period"
+    ],
+    "must_answer": [
+      "Which sites holding a certificate supply this ingredient, and what does each certificate cover?"
+    ],
+    "temporality": "as-at",
+    "must_prevent": [
+      "A site certification that does not say what it covers"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Moved to the manufacturing model: factories, the places inside them down to the shop floor, supplier sites, batches and supply chain detail belong there. This model holds a supplier only as a company.",
+    "prevent_how": [
+      "Every site certification states what it covers."
+    ],
+    "prevent_resolution": [
+      {
+        "must_prevent_index": 0,
+        "expressed_by": "mandatory-attribute",
+        "artefact_id": "ATR078"
+      }
+    ]
+  },
+  {
+    "id": "DRQ023",
+    "business_requirement_ids": [
+      "REQ039"
+    ],
+    "must_record": [
+      "Each market a product is intended for, named by country or by a wider region, and the dates it is sold there",
+      "The sales channels a product is sold through in each market, and the dates"
+    ],
+    "must_answer": [
+      "Where, and through which channels, is this product sold today?"
+    ],
+    "temporality": "as-at",
+    "must_prevent": [
+      "A market named by neither a country nor a region, or by both",
+      "The same product listed twice in the same market for overlapping dates"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "prevent_how": [
+      "Every market names a country or a region, and not both.",
+      "A product has one listing for each market and period."
+    ],
+    "prevent_resolution": [
+      {
+        "must_prevent_index": 0,
+        "expressed_by": "platform",
+        "artefact_id": "SBJ019"
+      },
+      {
+        "must_prevent_index": 1,
+        "expressed_by": "parent-cardinality",
+        "artefact_id": "SBJ019"
+      }
+    ]
+  },
+  {
+    "id": "DRQ024",
+    "business_requirement_ids": [
+      "REQ040"
+    ],
+    "must_record": [
+      "Which of the fourteen allergens listed for Great Britain a product declares"
+    ],
+    "must_answer": [
+      "Which allergens must this pack declare in Great Britain?"
+    ],
+    "temporality": "current",
+    "must_prevent": [],
+    "status": "active",
+    "withdrawn_reason": null,
+    "prevent_how": [],
+    "prevent_resolution": []
+  },
+  {
+    "id": "DRQ025",
+    "business_requirement_ids": [
+      "REQ041"
+    ],
+    "must_record": [
+      "The language each label item is printed in"
+    ],
+    "must_answer": [
+      "In which language is each mandatory item printed for each market?"
+    ],
+    "temporality": "as-at",
+    "must_prevent": [
+      "A label item with no language stated"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "prevent_how": [
+      "Every label item states its language."
+    ],
+    "prevent_resolution": [
+      {
+        "must_prevent_index": 0,
+        "expressed_by": "mandatory-attribute",
+        "artefact_id": "ATR090"
+      }
+    ]
+  },
+  {
+    "id": "DRQ026",
+    "business_requirement_ids": [
+      "REQ042"
+    ],
+    "must_record": [
+      "Which business a pack names as responsible in each market, and from when"
+    ],
+    "must_answer": [
+      "Which business does this pack name as responsible in this market?"
+    ],
+    "temporality": "as-at",
+    "must_prevent": [
+      "Two businesses named as responsible for the same product in the same market at the same time"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "prevent_how": [
+      "A product names one responsible business for each market and period."
+    ],
+    "prevent_resolution": [
+      {
+        "must_prevent_index": 0,
+        "expressed_by": "platform",
+        "artefact_id": "REL007"
+      }
+    ]
+  },
+  {
+    "id": "DRQ027",
+    "business_requirement_ids": [
+      "REQ043"
+    ],
+    "must_record": [
+      "Each picture of a product: which side it shows, where the file is held, its file type and the date from which it is current"
+    ],
+    "must_answer": [
+      "Which pictures show this product, and which is the current front view?"
+    ],
+    "temporality": "as-at",
+    "must_prevent": [
+      "Two current pictures of the same side of one product"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "prevent_how": [
+      "A product has one picture of each side for each period."
+    ],
+    "prevent_resolution": [
+      {
+        "must_prevent_index": 0,
+        "expressed_by": "parent-cardinality",
+        "artefact_id": "SBJ021"
+      }
+    ]
+  },
+  {
+    "id": "DRQ028",
+    "business_requirement_ids": [
+      "REQ044"
+    ],
+    "must_record": [
+      "The continents, the regions within each continent, and the region each country sits in"
+    ],
+    "must_answer": [
+      "Which countries are in this region?"
+    ],
+    "temporality": "current",
+    "must_prevent": [
+      "A country that sits in two regions"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "The placing of each country in a region of the world belongs to the universal core data model. This design names a market by country or by the European Union, and the three markets are samples.",
+    "prevent_how": [
+      "Each country names one region."
+    ],
+    "prevent_resolution": [
+      {
+        "must_prevent_index": 0,
+        "expressed_by": "lookup",
+        "artefact_id": "LKP012"
+      }
+    ]
+  },
+  {
+    "id": "DRQ029",
+    "business_requirement_ids": [
+      "REQ045"
+    ],
+    "must_record": [
+      "For each allergen a product declares in a market, whether the product contains it or it may be present",
+      "How the allergen came to be associated with the product, in plain words"
+    ],
+    "must_answer": [
+      "Which allergens does this product contain, and which may it contain, in this market?",
+      "Why does this product carry this allergen?"
+    ],
+    "temporality": "current",
+    "must_prevent": [
+      "The same allergen shown as both contained and possibly present for one product in one market"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "prevent_how": [
+      "A product has one entry for each allergen in a market, and each entry has one status."
+    ],
+    "prevent_resolution": [
+      {
+        "must_prevent_index": 0,
+        "expressed_by": "parent-cardinality",
+        "artefact_id": "SBJ005"
+      }
+    ]
+  },
+  {
+    "id": "DRQ030",
+    "business_requirement_ids": [
+      "REQ046"
+    ],
+    "must_record": [
+      "The lowest and highest temperature a product may be kept at under each storage condition"
+    ],
+    "must_answer": [
+      "At what temperature must this product be kept?"
+    ],
+    "temporality": "current",
+    "must_prevent": [],
+    "status": "active",
+    "withdrawn_reason": null,
+    "prevent_how": [],
+    "prevent_resolution": []
+  },
+  {
+    "id": "DRQ031",
+    "business_requirement_ids": [
+      "REQ047"
+    ],
+    "must_record": [
+      "Each food that causes allergies, held once for all markets",
+      "For each allergen in a market's list, the food it is, or the group of foods it names"
+    ],
+    "must_answer": [
+      "Is the celery declared in one market the same food as the celery declared in another?",
+      "Which allergens in the markets' lists are this food?"
+    ],
+    "temporality": "current",
+    "must_prevent": [
+      "A market allergen that is two foods at once"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "prevent_how": [
+      "Each market allergen names one food, and where a market groups several foods it names the group."
+    ],
+    "prevent_resolution": [
+      {
+        "must_prevent_index": 0,
+        "expressed_by": "lookup",
+        "artefact_id": "LKP001"
+      }
+    ]
+  }
+]

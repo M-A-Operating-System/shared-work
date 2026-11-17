@@ -1,0 +1,759 @@
+[
+  {
+    "id": "SRC001",
+    "title": "The GTIN management handbook",
+    "organisation": "GS1 UK",
+    "url": "https://www.gs1uk.org/sites/default/files/The_GTIN_management_handbook.pdf",
+    "retrieved": "2026-09-24",
+    "scope_ids": [
+      "SCI001"
+    ],
+    "type": "standard",
+    "establishes": "A change to the declared ingredients, the net content, a certification mark or the pack quantity needs a new product number at every packing level. Adding nuts, which brings in an allergen, is the example given.",
+    "why_included": "The external rule for when a change makes a different product rather than a new version of the same one.",
+    "status": "active",
+    "withdrawn_reason": null,
+    "applies": "Global GS1 rules, as applied in the United Kingdom"
+  },
+  {
+    "id": "SRC002",
+    "title": "GTIN allocation rules",
+    "organisation": "GS1 New Zealand",
+    "url": "https://www.gs1nz.org/assets/Resources/Services/GS1NZ_Fact-sheet-gtin-allocation-rules.-V2.pdf",
+    "retrieved": "2026-09-24",
+    "scope_ids": [
+      "SCI001",
+      "SCI002"
+    ],
+    "type": "standard",
+    "establishes": "Formulation is the list of ingredients or components used to create a trade item, and any change to declared net content requires a new product number.",
+    "why_included": "Defines formulation in the identity rules, tying what a product is made from to what it is.",
+    "status": "active",
+    "withdrawn_reason": null,
+    "applies": "Global GS1 rules, as applied in New Zealand"
+  },
+  {
+    "id": "SRC003",
+    "title": "Labelling requirements for packaged food products: the ingredients list",
+    "organisation": "London Borough of Bromley Trading Standards",
+    "url": "https://www.bromley.gov.uk/leaflet/323910/3/733/d",
+    "retrieved": "2026-09-24",
+    "scope_ids": [
+      "SCI002",
+      "SCI004"
+    ],
+    "type": "regulatory",
+    "establishes": "Ingredients are listed heaviest first, by the weight used. Ingredients under 2%, and spice mixes where none stands out, may go at the end. An ingredient made of other ingredients must show its own parts in brackets straight after it, also heaviest first.",
+    "why_included": "The clearest statement that an ingredient made of other ingredients must still show what is inside it. It is the labelling rule that makes composition a structural requirement rather than a convenience.",
+    "status": "active",
+    "withdrawn_reason": null,
+    "applies": "United Kingdom"
+  },
+  {
+    "id": "SRC004",
+    "title": "Labeling Requirements — ingredients",
+    "organisation": "Regask",
+    "url": "https://library.regask.com/docs/4-labeling-requirements-78",
+    "retrieved": "2026-09-24",
+    "scope_ids": [
+      "SCI002",
+      "SCI004"
+    ],
+    "type": "regulatory",
+    "establishes": "The ingredient list covers all ingredients in descending order of weight as recorded at the time of their use in manufacture, each designated by its specific name.",
+    "why_included": "Fixes the basis of the order — weight at the time of use, not weight in the finished product.",
+    "status": "active",
+    "withdrawn_reason": null,
+    "applies": "Not stated in the source"
+  },
+  {
+    "id": "SRC005",
+    "title": "Labeling Requirements — nutrition declaration",
+    "organisation": "Regask",
+    "url": "https://library.regask.com/docs/4-labeling-requirements-49",
+    "retrieved": "2026-09-24",
+    "scope_ids": [
+      "SCI004"
+    ],
+    "type": "regulatory",
+    "establishes": "A nutrition declaration must show energy, fat, saturates, carbohydrate, sugars, protein and salt, and may show more. The values are for the food as sold, or as prepared where preparation instructions are given.",
+    "why_included": "Names exactly which values must be declared, and on what basis.",
+    "status": "active",
+    "withdrawn_reason": null,
+    "applies": "Not stated in the source"
+  },
+  {
+    "id": "SRC006",
+    "title": "Pre-packaged food labels",
+    "organisation": "Teagasc",
+    "url": "https://teagasc.ie/wp-content/uploads/media/website/rural-economy/rural-development/diversification/5-Pre-Packaged-Food-Labels.pdf",
+    "retrieved": "2026-09-24",
+    "scope_ids": [
+      "SCI004",
+      "SCI007"
+    ],
+    "type": "regulatory",
+    "establishes": "A pre-packed food label must show the name of the food, its ingredients and the allergens among them. It must show the quantity of certain ingredients, the net quantity and a date mark. It must also show storage and use conditions, the responsible business and its address, and the country of origin.",
+    "why_included": "The full set of what must appear on pack, which is the set the model must be able to produce.",
+    "status": "active",
+    "withdrawn_reason": null,
+    "applies": "European Union, as applied in Ireland"
+  },
+  {
+    "id": "SRC007",
+    "title": "Food labelling",
+    "organisation": "Luxembourg Ministry of Health (GIMB)",
+    "url": "https://gimb.public.lu/en/gesond-iessen/bien-manger/etiquettage-nutritionnel.html",
+    "retrieved": "2026-09-24",
+    "scope_ids": [
+      "SCI004"
+    ],
+    "type": "regulatory",
+    "establishes": "The same set of information applies across the European Union, with the batch number a national rule. A label must not mislead the buyer or suggest the food has medicinal properties.",
+    "why_included": "Establishes that what may not be said is as governed as what must be, and that some requirements vary by market.",
+    "status": "active",
+    "withdrawn_reason": null,
+    "applies": "European Union"
+  },
+  {
+    "id": "SRC008",
+    "title": "FDA Releases Draft Compliance Policy Guide for Major Food Allergen Labeling and Cross-contact",
+    "organisation": "Hogan Lovells",
+    "url": "https://www.hoganlovells.com/en/publications/fda-releases-draft-compliance-policy-guide-for-major-food-allergen-labeling-and-cross-contact",
+    "retrieved": "2026-09-24",
+    "scope_ids": [
+      "SCI004"
+    ],
+    "type": "regulatory",
+    "establishes": "Nine major food allergens must be declared by the food they come from — whey is declared as milk.",
+    "why_included": "Establishes that an allergen is declared by its source food, including where it arrives inside another ingredient.",
+    "status": "active",
+    "withdrawn_reason": null,
+    "applies": "United States"
+  },
+  {
+    "id": "SRC009",
+    "title": "CPG Sec. 555.250 Labeling and Preventing Cross-contact of Common Food Allergens",
+    "organisation": "US Food and Drug Administration",
+    "url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/cpg-sec-555250-statement-policy-labeling-and-preventing-cross-contact-common-food-allergens",
+    "retrieved": "2026-09-24",
+    "scope_ids": [
+      "SCI004"
+    ],
+    "type": "regulatory",
+    "establishes": "Allergens present in a food must be declared on its label.",
+    "why_included": "The US regulator's own statement of the allergen declaration duty.",
+    "status": "active",
+    "withdrawn_reason": null,
+    "applies": "United States"
+  },
+  {
+    "id": "SRC010",
+    "title": "The Fundamentals of Food Product Labeling and Packaging",
+    "organisation": "Food Label Maker",
+    "url": "https://foodlabelmaker.com/gb/regulatory-hub/fda/food-labeling-packaging/",
+    "retrieved": "2026-09-24",
+    "scope_ids": [
+      "SCI004"
+    ],
+    "type": "practitioner",
+    "establishes": "The FDA requires ingredients to be listed in descending order by weight, with the nutrition panel placed where it is visible and legible.",
+    "why_included": "Confirms the same ordering rule applies in the United States, so the model's structure is not tied to one market.",
+    "status": "active",
+    "withdrawn_reason": null,
+    "applies": "United States"
+  },
+  {
+    "id": "SRC011",
+    "title": "EuroFIR recipe calculation guideline",
+    "organisation": "European Food Information Resource Association",
+    "url": "https://www.eurofir.org/wp-admin/wp-content/uploads/2015/12/EUROFIR-RECIPE-GUIDELINE_FINAL.pdf",
+    "retrieved": "2026-09-24",
+    "scope_ids": [
+      "SCI004"
+    ],
+    "type": "standard",
+    "establishes": "Declared nutrition values are averages. They may come from testing the food, from calculating from the ingredients used, or from accepted published data. Calculation is a legally accepted alternative to testing, and values may vary within set tolerances.",
+    "why_included": "The source for nutrition having three possible bases rather than one, and for declared values being averages within tolerance.",
+    "status": "active",
+    "withdrawn_reason": null,
+    "applies": "European Union"
+  },
+  {
+    "id": "SRC012",
+    "title": "Indirect nutrient analysis",
+    "organisation": "Centre for Food Safety, Hong Kong",
+    "url": "https://www.cfs.gov.hk/english/food_leg/files/wsm4_indirect_nutrient_analysis_e.pdf",
+    "retrieved": "2026-09-24",
+    "scope_ids": [
+      "SCI004"
+    ],
+    "type": "standard",
+    "establishes": "To calculate nutrition from a recipe, weigh each ingredient and allow for the edible part. Then allow for yield and nutrient loss in preparation, add the values up, and divide by what the recipe produced.",
+    "why_included": "Sets out the steps, and therefore what the model must hold for the calculation to be repeatable.",
+    "status": "active",
+    "withdrawn_reason": null,
+    "applies": "Hong Kong"
+  },
+  {
+    "id": "SRC013",
+    "title": "Food Standards Code — nutrition content claims",
+    "organisation": "Australian Food and Grocery Council",
+    "url": "https://afgc.org.au/wp-content/uploads/2025/08/2025-Webinar-3-Food-Standards-Code-AFGC.pdf",
+    "retrieved": "2026-09-24",
+    "scope_ids": [
+      "SCI004"
+    ],
+    "type": "regulatory",
+    "establishes": "A nutrition content claim may be made only where stated conditions are met. A source of a vitamin needs at least 10% of the reference daily intake in a serving, and a good source at least 25%. The claim obliges the label to carry the figure.",
+    "why_included": "Shows a claim is conditional on a declared value, so claims cannot be held apart from the values they rest on.",
+    "status": "active",
+    "withdrawn_reason": null,
+    "applies": "Australia and New Zealand"
+  },
+  {
+    "id": "SRC014",
+    "title": "Nutrient comparative claims",
+    "organisation": "Food and Environmental Hygiene Department, Hong Kong",
+    "url": "https://www.eeb.gov.hk/food/download/press_and_publications/otherinfo/050826_labelling/tech_meeting4_comparative.pdf",
+    "retrieved": "2026-09-24",
+    "scope_ids": [
+      "SCI004"
+    ],
+    "type": "regulatory",
+    "establishes": "A comparative claim requires a comparison against similar products. The difference must be at least 25% in energy or a macronutrient. The claim must name its comparator, such as the average of leading brands or a food composition database.",
+    "why_included": "The only source establishing that a claim may depend on another product, which the model must be able to name.",
+    "status": "active",
+    "withdrawn_reason": null,
+    "applies": "Hong Kong"
+  },
+  {
+    "id": "SRC015",
+    "title": "Supplier management and food safety",
+    "organisation": "BSI",
+    "url": "https://www.bsigroup.com/globalassets/localfiles/vi-vn/news/CE%20Marking/bsi_supplier_management_food_assessment_a4_brochure_en_in_092019_web.pdf",
+    "retrieved": "2026-09-24",
+    "scope_ids": [
+      "SCI003",
+      "SCI005"
+    ],
+    "type": "standard",
+    "establishes": "Certification to a recognised food safety standard requires a documented supplier authorisation programme covering the raw materials and packaging that go into the finished product.",
+    "why_included": "Establishes that supplier authorisation is per material rather than per supplier, and that packaging counts.",
+    "status": "active",
+    "withdrawn_reason": null,
+    "applies": "International (UK-based body)"
+  },
+  {
+    "id": "SRC016",
+    "title": "Vulnerability Assessment for Food Fraud",
+    "organisation": "NSF",
+    "url": "https://www.nsf.org/za/en/training/series/brcgs-vulnerability-assessment-for-food-fraud",
+    "retrieved": "2026-09-24",
+    "scope_ids": [
+      "SCI005"
+    ],
+    "type": "standard",
+    "establishes": "A vulnerability assessment identifies the raw materials most vulnerable to adulteration or substitution in the supply chain, and is a requirement of the BRCGS Global Standards.",
+    "why_included": "The obligation to assess each ingredient for fraud, which the model must hold per ingredient rather than per supplier.",
+    "status": "active",
+    "withdrawn_reason": null,
+    "applies": "International (BRCGS)"
+  },
+  {
+    "id": "SRC017",
+    "title": "Food Fraud: Vulnerability Assessment Checklist",
+    "organisation": "High Speed Training",
+    "url": "https://www.highspeedtraining.co.uk/hub/food-vulnerability-assessment-checklist/",
+    "retrieved": "2026-09-24",
+    "scope_ids": [
+      "SCI005"
+    ],
+    "type": "practitioner",
+    "establishes": "Each ingredient is considered for its vulnerability to fraud, and the assessment sets the preventive actions needed to control it.",
+    "why_included": "Confirms the assessment is per ingredient and produces controls, not just a score.",
+    "status": "active",
+    "withdrawn_reason": null,
+    "applies": "United Kingdom"
+  },
+  {
+    "id": "SRC018",
+    "title": "Traceability for BRC and acceptance of SALSA (quoting BRCGS Issue 9, clause 3.5.1.2)",
+    "organisation": "SALSA (a UK food safety scheme)",
+    "url": "https://www.salsafood.co.uk/news/add0d885-6016-4280-9ce9-820cc152bc39-354",
+    "retrieved": "2026-09-28",
+    "scope_ids": [
+      "SCI005"
+    ],
+    "type": "standard",
+    "establishes": "The BRCGS food safety standard requires a documented supplier authorisation procedure, so that every supplier of raw materials, including primary packaging, manages risks to quality and safety and runs effective traceability. Authorisation rests on certification, on supplier audits, or on both.",
+    "why_included": "The food industry standard's own wording on authorising suppliers. It shows that authorisation covers packaging as well as ingredients and rests on evidence.",
+    "status": "active",
+    "withdrawn_reason": null,
+    "applies": "International (BRCGS)"
+  },
+  {
+    "id": "SRC019",
+    "title": "Guide to batch tracking",
+    "organisation": "Cleverence",
+    "url": "https://www.cleverence.com/amp/articles/business-blogs/guide-batch-tracking-5829/",
+    "retrieved": "2026-09-24",
+    "scope_ids": [
+      "SCI006",
+      "SCI007"
+    ],
+    "type": "practitioner",
+    "establishes": "What arrives is captured with the supplier's lot, its expiry and the reference of its certificate of analysis.",
+    "why_included": "Establishes that a supplier's statement about what it supplied is a document the organisation holds and can point to.",
+    "status": "active",
+    "withdrawn_reason": null,
+    "applies": "Not specific to a country"
+  },
+  {
+    "id": "SRC020",
+    "title": "Supplier Change Control Failures During Food Substitutions",
+    "organisation": "Human Focus",
+    "url": "https://humanfocus.co.uk/blog/supplier-change-control-failures-during-food-substitutions/",
+    "retrieved": "2026-09-28",
+    "scope_ids": [
+      "SCI002",
+      "SCI005"
+    ],
+    "type": "practitioner",
+    "establishes": "When an ingredient is substituted, the change has to carry through the specification, the recipe, the product data and the label. Most allergy alerts trace to mislabelling and weak version control inside the business rather than to the supplier.",
+    "why_included": "Shows that a substitute ingredient is a change to several linked records at once, which is why the design keeps what an alternative changes on the label.",
+    "status": "active",
+    "withdrawn_reason": null,
+    "applies": "United Kingdom"
+  },
+  {
+    "id": "SRC021",
+    "title": "SQF 2.3.2.4 supplier notification of product composition changes",
+    "organisation": "IFSQN (Institute of Food Safety and Quality Network) forum",
+    "url": "https://www.ifsqn.com/forum/index.php/topic/50089-sqf-2324-supplier-notification-of-product-composition-changes/",
+    "retrieved": "2026-09-28",
+    "scope_ids": [
+      "SCI005",
+      "SCI006"
+    ],
+    "type": "practitioner",
+    "establishes": "A supplier must tell the buyer in writing of changes that could affect safety, quality, shelf life, the ingredient statement, the allergen profile or nutrition labelling. Such changes include materials, formula, raw materials, production line, site or process. The supplier must also say if one of its sites loses its certification.",
+    "why_included": "Quotes the supplier-notification clause of an audit standard. It is a forum post, so it carries less weight than the standard itself, which was not read. It is the only source found on what a supplier must tell the buyer.",
+    "status": "active",
+    "withdrawn_reason": null,
+    "applies": "International (SQF)"
+  },
+  {
+    "id": "SRC022",
+    "title": "Shelf life: best before and use by dates",
+    "organisation": "Food Safety Authority of Ireland",
+    "url": "https://www.fsai.ie/Business-Advice/Running-a-Food-Business/Food-Safety-and-Hygiene/Shelf-life/Shelf-life-Best-before-and-Use-by-Dates",
+    "retrieved": "2026-09-28",
+    "scope_ids": [
+      "SCI004",
+      "SCI007"
+    ],
+    "type": "regulatory",
+    "establishes": "A best-before date says until when a food keeps its quality. A use-by date replaces it for foods that could soon become unsafe, and after it the food cannot be sold. The business that puts its name on the label decides which is needed.",
+    "why_included": "The regulator's own account of the two kinds of date mark and who chooses between them.",
+    "status": "active",
+    "withdrawn_reason": null,
+    "applies": "Ireland and the European Union"
+  },
+  {
+    "id": "SRC023",
+    "title": "Guidance on date marking and related food information: part 1 (date marking)",
+    "organisation": "European Food Safety Authority",
+    "url": "https://efsa.europa.eu/en/efsajournal/pub/6306",
+    "retrieved": "2026-09-28",
+    "scope_ids": [
+      "SCI007"
+    ],
+    "type": "regulatory",
+    "establishes": "The choice of date mark is made product by product, considering the hazards, the product's characteristics and how it is processed and stored. Storage conditions influence how long it lasts.",
+    "why_included": "Establishes that a shelf life depends on storage conditions and is decided for each product.",
+    "status": "active",
+    "withdrawn_reason": null,
+    "applies": "European Union"
+  },
+  {
+    "id": "SRC024",
+    "title": "Industry Guidance on Setting Product Shelf-Life",
+    "organisation": "Food and Drink Federation Scotland",
+    "url": "https://www.fdfscotland.org.uk/globalassets/resources/publications/guidance/shelf-life-guidance.pdf",
+    "retrieved": "2026-09-28",
+    "scope_ids": [
+      "SCI007",
+      "SCI002"
+    ],
+    "type": "practitioner",
+    "establishes": "A shelf life is assigned to ingredients and work in progress as well as to finished products. The kind of date mark has to be taken into account when it is set.",
+    "why_included": "The only source saying a shelf life belongs to ingredients and part-made goods, not only to what is sold.",
+    "status": "active",
+    "withdrawn_reason": null,
+    "applies": "United Kingdom"
+  },
+  {
+    "id": "SRC025",
+    "title": "Determining shelf life",
+    "organisation": "Eurofins Food Testing UK",
+    "url": "https://cdnmedia.eurofins.com/european-west/media/jtgbfkxv/eurofins-determining-shelf-life-ftuki102.pdf",
+    "retrieved": "2026-09-28",
+    "scope_ids": [
+      "SCI007"
+    ],
+    "type": "practitioner",
+    "establishes": "Both the safe life and the quality life of a food are considered, and its shelf life is limited by whichever is shorter.",
+    "why_included": "States what limits a shelf life. It does not say that an ingredient's own life limits the product's, and the design does not assume it does.",
+    "status": "active",
+    "withdrawn_reason": null,
+    "applies": "United Kingdom"
+  },
+  {
+    "id": "SRC026",
+    "title": "BRCGS Issue 9 implementation guide: UK retail",
+    "organisation": "ASC Food Safety",
+    "url": "https://ascfoodsafety.com/?p=39508",
+    "retrieved": "2026-09-28",
+    "scope_ids": [
+      "SCI003",
+      "SCI005",
+      "SCI006"
+    ],
+    "type": "practitioner",
+    "establishes": "A documented, risk-based supplier authorisation programme is required. Every supplier of raw materials and packaging must be authorised before use, with specifications, certificates of analysis and controls against food fraud in place.",
+    "why_included": "The one source read that ties supplier authorisation to specifications, certificates of analysis and authenticity controls together. It is a consultancy's summary of the standard, not the standard itself.",
+    "status": "active",
+    "withdrawn_reason": null,
+    "applies": "International (BRCGS)"
+  },
+  {
+    "id": "SRC027",
+    "title": "Regulation (EU) No 1169/2011, Annex II: substances or products causing allergies or intolerances",
+    "organisation": "legislation.gov.uk (UK-published text of the EU Regulation)",
+    "url": "https://www.legislation.gov.uk/eur/2011/1169/annex/II",
+    "retrieved": "2026-09-28",
+    "scope_ids": [
+      "SCI004"
+    ],
+    "type": "regulatory",
+    "establishes": "Fourteen foods must always be declared when present: cereals containing gluten, crustaceans, eggs, fish, peanuts, soybeans, milk, nuts, celery, mustard, sesame seeds, sulphur dioxide and sulphites, lupin and molluscs.",
+    "why_included": "The European allergen list, which the design carries beside the United States list.",
+    "status": "active",
+    "withdrawn_reason": null,
+    "applies": "European Union (the UK's published text carries the same list)"
+  },
+  {
+    "id": "SRC028",
+    "title": "Frequently asked questions: food allergen labeling guidance for industry",
+    "organisation": "US Food and Drug Administration",
+    "url": "https://www.fda.gov/food/food-allergensgluten-free-guidance-documents-regulatory-information/frequently-asked-questions-food-allergen-labeling-guidance-industry",
+    "retrieved": "2026-09-28",
+    "scope_ids": [
+      "SCI004"
+    ],
+    "type": "regulatory",
+    "establishes": "In its January 2025 edition FDA removes coconut, chestnut, hickory and several other nuts from its list of tree nuts that count as major food allergens. An advisory statement such as \"may contain wheat\" describes the possibility of unintended presence through cross-contact. It is not used for an allergen that is also the subject of a \"contains\" statement or an allergen-free claim.",
+    "why_included": "The current United States position on which tree nuts must be declared, which differs from the European list of nuts.",
+    "status": "active",
+    "withdrawn_reason": null,
+    "applies": "United States"
+  },
+  {
+    "id": "SRC029",
+    "title": "The FASTER Act: sesame as a major food allergen",
+    "organisation": "Michigan State University Extension",
+    "url": "https://www.canr.msu.edu/news/the-faster-act-sesame-as-major-food-allergen",
+    "retrieved": "2026-09-28",
+    "scope_ids": [
+      "SCI004"
+    ],
+    "type": "practitioner",
+    "establishes": "The FASTER Act makes sesame the ninth major food allergen in the United States, effective 1 January 2023, after peanuts, tree nuts, fish, crustacean shellfish, soy, milk, eggs and wheat.",
+    "why_included": "Fixes the United States list at nine allergens and the date sesame joined it.",
+    "status": "active",
+    "withdrawn_reason": null,
+    "applies": "United States"
+  },
+  {
+    "id": "SRC030",
+    "title": "ProductGroup",
+    "organisation": "Schema.org",
+    "url": "https://schema.org/ProductGroup",
+    "retrieved": "2026-11-10",
+    "scope_ids": [
+      "SCI001"
+    ],
+    "type": "reference-model",
+    "establishes": "A group of products that vary only in certain well-described ways, whose members are the products that are actually sold.",
+    "why_included": "The published model for a grouping of sizes and formats above the products that are sold.",
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SRC031",
+    "title": "F931: Guideline for designing certification scope (BRCGS Global Standard Food Safety, Issue 9, version 2, 22 July 2025)",
+    "organisation": "BRCGS",
+    "url": "https://www.brcgs.com/media/anrlbqtd/f931-guideline-for-designing-certification-scope-v2-22-07-2025.pdf",
+    "retrieved": "2026-11-10",
+    "scope_ids": [
+      "SCI005"
+    ],
+    "type": "standard",
+    "establishes": "Certification is specific to a site: the certificate states the manufacturing company and the address of the facility and the scope it covers, and it is withdrawn if the site moves.",
+    "why_included": "The external rule that food safety certification belongs to a place, not to a company.",
+    "status": "withdrawn",
+    "withdrawn_reason": "Moved to the manufacturing model: factories, the places inside them down to the shop floor, supplier sites, batches and supply chain detail belong there. This model holds a supplier only as a company."
+  },
+  {
+    "id": "SRC032",
+    "title": "GLN Allocation Rules, Release 1",
+    "organisation": "GS1",
+    "url": "https://ref.gs1.org/standards/gln-allocation/1.0.0/",
+    "retrieved": "2026-11-10",
+    "scope_ids": [],
+    "type": "standard",
+    "establishes": "A legal entity and a physical location are identified separately, a location needs a new identifier when its address changes significantly, and a location can be linked to the legal entity responsible for it.",
+    "why_included": "The external rule for holding a place apart from the company that runs it.",
+    "status": "withdrawn",
+    "withdrawn_reason": "Moved to the manufacturing model: factories, the places inside them down to the shop floor, supplier sites, batches and supply chain detail belong there. This model holds a supplier only as a company."
+  },
+  {
+    "id": "SRC033",
+    "title": "Formulas and formula versions",
+    "organisation": "Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/dynamics365/supply-chain/production-control/formulas-versions",
+    "retrieved": "2026-11-10",
+    "scope_ids": [
+      "SCI002"
+    ],
+    "type": "reference-model",
+    "establishes": "A formula lists the ingredients and quantities for a stated quantity, every formula has at least one version, versions are approved before use, and several versions can be active only where their date ranges do not overlap.",
+    "why_included": "A published account of recipe versions, their release for use and their dates in process manufacturing.",
+    "status": "withdrawn",
+    "withdrawn_reason": "Moved to the manufacturing model: factories, the places inside them down to the shop floor, supplier sites, batches and supply chain detail belong there. This model holds a supplier only as a company."
+  },
+  {
+    "id": "SRC034",
+    "title": "Oracle Process Manufacturing Product Development User's Guide: Formulas",
+    "organisation": "Oracle",
+    "url": "https://docs.oracle.com/cd/E18727_01/doc.121/e13091/T320995T321000.htm",
+    "retrieved": "2026-11-10",
+    "scope_ids": [],
+    "type": "reference-model",
+    "establishes": "A formula can be controlled centrally while individual manufacturing plants keep their own version to meet local needs, and each formula has an owning organisation and an approval cycle before general use.",
+    "why_included": "A published account of a central recipe with plant-specific versions.",
+    "status": "withdrawn",
+    "withdrawn_reason": "Moved to the manufacturing model: factories, the places inside them down to the shop floor, supplier sites, batches and supply chain detail belong there. This model holds a supplier only as a company."
+  },
+  {
+    "id": "SRC035",
+    "title": "EU Trade Item Implementation Guideline, Release 1.5",
+    "organisation": "GS1 in Europe",
+    "url": "https://gs1.eu/wp-content/uploads/2024/11/GS1inEU_Trade_Item_Implementation_Guideline_v1.5.pdf",
+    "retrieved": "2026-11-10",
+    "scope_ids": [
+      "SCI009"
+    ],
+    "type": "standard",
+    "establishes": "A trade item's target market is at country level or a wider geographic area and is where the item is intended to be sold.",
+    "why_included": "The external rule for naming a market by country or by a wider area.",
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SRC036",
+    "title": "T4452 Trade item trade channel code",
+    "organisation": "GS1 Sweden",
+    "url": "https://gs1.se/en/guides/documentation/code-lists/t4452-trade-item-trade-channel-code/",
+    "retrieved": "2026-11-10",
+    "scope_ids": [
+      "SCI009"
+    ],
+    "type": "standard",
+    "establishes": "Trade channels are a published list of 25 values, among them grocery, convenience, food service, cash and carry, mass merchandising, specialty retail, online, vending, duty free and institutional.",
+    "why_included": "The published list of the kinds of trade a product is sold through.",
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SRC037",
+    "title": "tradeItemTradeChannelCode (BMS ID 65)",
+    "organisation": "GS1 Germany",
+    "url": "https://gdsn.gs1-germany.de/BMSattribute?id=65",
+    "retrieved": "2026-11-10",
+    "scope_ids": [
+      "SCI009"
+    ],
+    "type": "standard",
+    "establishes": "A trade item is classified by trade channel, a grouping of customers by common business model, and the attribute may be given more than once.",
+    "why_included": "Shows that one product may be sold through several channels.",
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SRC038",
+    "title": "GS1 Product Image Specification Standard",
+    "organisation": "GS1",
+    "url": "https://ref.gs1.org/standards/product-image-specification/",
+    "retrieved": "2026-11-10",
+    "scope_ids": [
+      "SCI010"
+    ],
+    "type": "standard",
+    "establishes": "A product image is tied to its product by the trade item number, shows one of the sides front, left, top, back, right or bottom, and is shared as JPEG or PNG and stored as TIFF.",
+    "why_included": "The external rule for what identifies a picture of a product.",
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SRC039",
+    "title": "Allergen labelling for food manufacturers",
+    "organisation": "UK Government, Food Standards Agency",
+    "url": "https://www.gov.uk/government/publications/allergen-labelling-for-food-manufacturers/allergen-labelling-for-food-manufacturers",
+    "retrieved": "2026-11-10",
+    "scope_ids": [
+      "SCI004"
+    ],
+    "type": "regulatory",
+    "establishes": "In Great Britain pre-packed food must declare any of fourteen allergens used as an ingredient or processing aid: celery, cereals containing gluten, crustaceans, eggs, fish, lupin, milk, molluscs, mustard, tree nuts, peanuts, sesame, soybeans, and sulphur dioxide and sulphites above ten parts per million.",
+    "why_included": "The United Kingdom's own allergen list, held apart from the European Union's.",
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SRC040",
+    "title": "Standard country or area codes for statistical use (M49)",
+    "organisation": "United Nations Statistics Division",
+    "url": "https://unstats.un.org/unsd/methodology/m49",
+    "retrieved": "2026-11-10",
+    "scope_ids": [
+      "SCI009"
+    ],
+    "type": "standard",
+    "establishes": "The world is divided into continental regions and sub-regions, and each country or area is assigned to one sub-region for statistical convenience, which implies nothing about political affiliation.",
+    "why_included": "The published grouping of countries into regions and continents.",
+    "status": "withdrawn",
+    "withdrawn_reason": "The placing of each country in a region of the world belongs to the universal core data model. This design names a market by country or by the European Union, and the three markets are samples."
+  },
+  {
+    "id": "SRC041",
+    "title": "Language and presentation of food information",
+    "organisation": "European Commission",
+    "url": "https://food.ec.europa.eu/food-safety/labelling-and-nutrition/food-information-consumers-legislation/language-and-presentation-food-information_en",
+    "retrieved": "2026-11-10",
+    "scope_ids": [
+      "SCI004"
+    ],
+    "type": "regulatory",
+    "establishes": "Mandatory food information must be in a language easily understood by consumers in the member state where the food is sold, and each member state decides which language or languages.",
+    "why_included": "Why the language of each label item depends on the country it is sold in.",
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SRC042",
+    "title": "Regulation (EU) No 1169/2011, Article 8",
+    "organisation": "UK Government (legislation.gov.uk)",
+    "url": "https://www.legislation.gov.uk/eur/2011/1169/article/8/data.htm",
+    "retrieved": "2026-11-10",
+    "scope_ids": [
+      "SCI004"
+    ],
+    "type": "regulatory",
+    "establishes": "The business responsible for the food information is the one under whose name the food is marketed or, where that business is not established in the market concerned, the importer.",
+    "why_included": "Why the business named on a pack depends on the market.",
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SRC043",
+    "title": "Food Allergies",
+    "organisation": "US Food and Drug Administration",
+    "url": "https://www.fda.gov/food/food-labeling-nutrition/food-allergies",
+    "retrieved": "2026-11-11",
+    "scope_ids": [
+      "SCI004"
+    ],
+    "type": "regulatory",
+    "establishes": "Advisory statements such as \"may contain\" are not required by law and can address unavoidable cross-contact. They must be truthful and are not a substitute for good manufacturing practice.",
+    "why_included": "The US rule that an allergen may be declared as possibly present, and that doing so is voluntary.",
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SRC044",
+    "title": "Precautionary allergen labelling",
+    "organisation": "UK Government, Food Standards Agency",
+    "url": "https://www.gov.uk/government/publications/precautionary-allergen-labelling/precautionary-allergen-labelling",
+    "retrieved": "2026-11-11",
+    "scope_ids": [
+      "SCI004"
+    ],
+    "type": "regulatory",
+    "establishes": "A business may voluntarily state the unintentional presence of an allergen, but only where a risk assessment finds a real risk of cross-contact. The statement is not used for an allergen that carries a free-from claim.",
+    "why_included": "The UK rule for a statement that an allergen may be present.",
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SRC045",
+    "title": "No more going nuts on food allergen labelling",
+    "organisation": "Food and Agriculture Organization of the United Nations",
+    "url": "https://www.fao.org/newsroom/story/no-more-going-nuts-on-food-allergen-labelling/en",
+    "retrieved": "2026-11-11",
+    "scope_ids": [
+      "SCI004"
+    ],
+    "type": "standard",
+    "establishes": "Codex Alimentarius Commission guidelines limit precautionary allergen labels to cases where cross-contact cannot be prevented or controlled and the exposure is above stated thresholds.",
+    "why_included": "The international rule for when an allergen is stated as possibly present.",
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SRC046",
+    "title": "Regulation (EU) No 1169/2011, Article 9: list of mandatory particulars",
+    "organisation": "legislation.gov.uk (UK-published text of the EU Regulation)",
+    "url": "https://www.legislation.gov.uk/eur/2011/1169/chapter/IV/adopted",
+    "retrieved": "2026-11-11",
+    "scope_ids": [
+      "SCI007"
+    ],
+    "type": "regulatory",
+    "establishes": "Any special storage conditions and conditions of use are among the particulars that must appear on the label of a pre-packed food.",
+    "why_included": "The European rule that storage conditions are printed on the pack.",
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SRC047",
+    "title": "Questions and answers on the application of Regulation (EU) No 1169/2011",
+    "organisation": "European Commission, Health and Consumer Directorate-General",
+    "url": "https://www.fsai.ie/getmedia/21d61e0e-f402-4ce5-a683-0d42b8044529/Information-regulation-Commission-qanda.pdf",
+    "retrieved": "2026-11-11",
+    "scope_ids": [
+      "SCI007"
+    ],
+    "type": "regulatory",
+    "establishes": "Special storage conditions and conditions of use are mandatory particulars, and must still appear on the outer packaging of a multipack sold on to a wholesaler or retailer.",
+    "why_included": "How the European storage-condition rule applies to the pack.",
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SRC048",
+    "title": "Guidance for industry: labeling of foods that need refrigeration by consumers",
+    "organisation": "US Food and Drug Administration",
+    "url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/guidance-labeling-foods-need-refrigeration-consumers",
+    "retrieved": "2026-11-11",
+    "scope_ids": [
+      "SCI007"
+    ],
+    "type": "regulatory",
+    "establishes": "FDA sets out its policy on safe handling instructions for foods that consumers must keep refrigerated to maintain safety or quality.",
+    "why_included": "The US rule that a food needing refrigeration says so on its pack.",
+    "status": "active",
+    "withdrawn_reason": null
+  }
+]

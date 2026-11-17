@@ -1,0 +1,506 @@
+{
+  "document_date": "2026-09-28",
+  "package_ref": "fnb-bdd",
+  "views": {
+    "REL001": {
+      "forward": "ProductIngredients",
+      "mirror": "ProductMadeProducts"
+    },
+    "REL002": {
+      "forward": "ProductFamilies",
+      "mirror": "ProductVariants"
+    },
+    "REL003": {
+      "forward": "ProductPermittedAlternatives",
+      "mirror": "ProductReplaceableIngredients"
+    },
+    "REL004": {
+      "forward": "ProductComparators",
+      "mirror": "ProductClaimingProducts"
+    },
+    "REL005": {
+      "forward": "ProductAuthorisedSuppliers",
+      "mirror": "LegalEntityBoughtMaterials"
+    },
+    "REL006": {
+      "forward": "ProductCertifyingBodies",
+      "mirror": "LegalEntityCertificationHolders"
+    },
+    "REL007": {
+      "forward": "ProductResponsibleBusinesses",
+      "mirror": "LegalEntityLabelledProducts"
+    },
+    "REL008": {
+      "forward": "DocumentDeclaredProducts",
+      "mirror": "ProductDeclaringDocuments"
+    },
+    "REL009": {
+      "forward": "DocumentIssuingOrganisations",
+      "mirror": "LegalEntityIssuedDocuments"
+    }
+  },
+  "source_index": {
+    "SRC001": [
+      "REQ008",
+      "REQ009",
+      "REQ010",
+      "REQ011",
+      "REQ033",
+      "SBJ002",
+      "SBJ012",
+      "REL002",
+      "REL006",
+      "ATR012",
+      "ATR015",
+      "ATR016",
+      "ATR019",
+      "ATR020",
+      "ATR021",
+      "ATR022",
+      "ATR023",
+      "ATR024",
+      "ATR025",
+      "ATR026",
+      "ATR062",
+      "ATR063",
+      "LKP007",
+      "LKP011",
+      "ROL003",
+      "ROL004",
+      "ROL011",
+      "ROL012"
+    ],
+    "SRC002": [
+      "REQ001",
+      "REQ002",
+      "REQ005",
+      "REQ008",
+      "REQ009",
+      "REQ011",
+      "SBJ001",
+      "SBJ002",
+      "SBJ003",
+      "SBJ012",
+      "REL002",
+      "ATR003",
+      "ATR016",
+      "ATR017",
+      "ATR021",
+      "ATR022",
+      "ATR025",
+      "ATR027",
+      "ATR028",
+      "ATR063",
+      "ATR064",
+      "LKP007",
+      "LKP011",
+      "ROL001",
+      "ROL002",
+      "ROL003",
+      "ROL004"
+    ],
+    "SRC003": [
+      "REQ003",
+      "REQ004",
+      "REQ005",
+      "REQ007",
+      "REL001",
+      "ATR001",
+      "ATR004",
+      "ATR005",
+      "ATR035",
+      "ATR036",
+      "ROL001",
+      "ROL002",
+      "ROL009"
+    ],
+    "SRC004": [
+      "REQ002",
+      "REQ004",
+      "SBJ003",
+      "REL001",
+      "ATR001",
+      "ATR002",
+      "ATR004",
+      "LKP009",
+      "ROL001",
+      "ROL002"
+    ],
+    "SRC005": [
+      "REQ014",
+      "SBJ006",
+      "ATR037",
+      "ATR038",
+      "ATR044",
+      "LKP003",
+      "LKP009"
+    ],
+    "SRC006": [
+      "REQ012",
+      "REQ021",
+      "REQ026",
+      "SBJ007",
+      "SBJ010",
+      "SBJ015",
+      "REL007",
+      "ATR018",
+      "ATR019",
+      "ATR045",
+      "ATR047",
+      "ATR056",
+      "ATR057",
+      "LKP004",
+      "LKP010",
+      "ROL013",
+      "ROL014"
+    ],
+    "SRC007": [
+      "REQ012",
+      "REQ019",
+      "REQ020",
+      "SBJ007",
+      "SBJ008",
+      "ATR029",
+      "ATR046",
+      "ATR049",
+      "LKP004",
+      "ROL013",
+      "ROL014"
+    ],
+    "SRC008": [
+      "REQ013",
+      "SBJ005",
+      "ATR034",
+      "ATR035",
+      "LKP001"
+    ],
+    "SRC009": [
+      "REQ013",
+      "SBJ005",
+      "ATR034",
+      "LKP001"
+    ],
+    "SRC010": [
+      "REQ004",
+      "REQ020"
+    ],
+    "SRC011": [
+      "REQ014",
+      "REQ015",
+      "REQ016",
+      "SBJ006",
+      "ATR039",
+      "ATR040",
+      "LKP002"
+    ],
+    "SRC012": [
+      "REQ015",
+      "SBJ006",
+      "ATR041",
+      "ATR042",
+      "ATR043",
+      "LKP002"
+    ],
+    "SRC013": [
+      "REQ017",
+      "SBJ008",
+      "ATR048",
+      "ATR049",
+      "ATR050",
+      "ATR051",
+      "ATR052",
+      "LKP006"
+    ],
+    "SRC014": [
+      "REQ018",
+      "SBJ008",
+      "REL004",
+      "ATR008",
+      "ATR009",
+      "ATR048",
+      "ATR051",
+      "LKP006",
+      "ROL007",
+      "ROL008"
+    ],
+    "SRC015": [
+      "REQ001",
+      "REQ022",
+      "REQ027",
+      "REQ028",
+      "REQ033",
+      "SBJ001",
+      "SBJ004",
+      "SBJ013",
+      "SBJ014",
+      "REL005",
+      "REL006",
+      "ATR010",
+      "ATR011",
+      "ATR012",
+      "ATR013",
+      "ROL009",
+      "ROL010",
+      "ROL011",
+      "ROL012"
+    ],
+    "SRC016": [
+      "REQ023",
+      "REQ029",
+      "REQ030",
+      "SBJ011",
+      "ATR058",
+      "ATR059",
+      "ATR061",
+      "ROL015",
+      "ROL016"
+    ],
+    "SRC017": [
+      "REQ029",
+      "REQ030",
+      "SBJ011",
+      "ATR058",
+      "ATR059",
+      "ATR060",
+      "ATR061"
+    ],
+    "SRC018": [
+      "REQ027",
+      "REL005",
+      "ATR011",
+      "ROL009",
+      "ROL010",
+      "ROL015",
+      "ROL016",
+      "ROL017",
+      "ROL018"
+    ],
+    "SRC019": [
+      "REQ007",
+      "REQ031",
+      "SBJ016",
+      "SBJ017",
+      "REL008",
+      "REL009",
+      "ATR014",
+      "ATR036",
+      "ATR065",
+      "ATR066",
+      "ATR067",
+      "ATR068",
+      "ATR069",
+      "LKP008",
+      "ROL009",
+      "ROL015",
+      "ROL016",
+      "ROL017",
+      "ROL018"
+    ],
+    "SRC020": [
+      "REQ006",
+      "REQ032",
+      "REL003",
+      "ATR006",
+      "ATR007",
+      "ROL005",
+      "ROL006"
+    ],
+    "SRC021": [
+      "REQ032",
+      "SBJ017",
+      "REL009",
+      "ATR066",
+      "ATR067",
+      "LKP008"
+    ],
+    "SRC022": [
+      "REQ026",
+      "SBJ009",
+      "ATR055",
+      "LKP005"
+    ],
+    "SRC023": [
+      "REQ024",
+      "SBJ009",
+      "ATR053",
+      "ATR054"
+    ],
+    "SRC024": [
+      "REQ025",
+      "SBJ009",
+      "ATR053"
+    ],
+    "SRC025": [
+      "REQ024",
+      "SBJ009",
+      "ATR054"
+    ],
+    "SRC026": [
+      "REQ022",
+      "REQ023",
+      "REQ031",
+      "SBJ004",
+      "SBJ017",
+      "REL008",
+      "ATR014",
+      "ATR030",
+      "ATR031",
+      "ATR032",
+      "ATR033",
+      "ATR068",
+      "ATR069",
+      "LKP008"
+    ],
+    "SRC027": [
+      "REQ013",
+      "REQ020",
+      "SBJ005",
+      "ATR034",
+      "LKP001"
+    ],
+    "SRC028": [
+      "REQ013",
+      "REQ020",
+      "SBJ005",
+      "ATR034",
+      "LKP001"
+    ],
+    "SRC029": [
+      "SBJ005",
+      "ATR034",
+      "LKP001"
+    ]
+  },
+  "case_index": {
+    "REQ001": [
+      "SCN001"
+    ],
+    "REQ002": [
+      "SCN001"
+    ],
+    "REQ003": [
+      "SCN001"
+    ],
+    "REQ005": [
+      "SCN001",
+      "SCN002",
+      "SCN022",
+      "SCN025"
+    ],
+    "REQ004": [
+      "SCN003"
+    ],
+    "REQ006": [
+      "SCN004"
+    ],
+    "REQ007": [
+      "SCN005",
+      "SCN021"
+    ],
+    "REQ008": [
+      "SCN006"
+    ],
+    "REQ009": [
+      "SCN006"
+    ],
+    "REQ010": [
+      "SCN006"
+    ],
+    "REQ012": [
+      "SCN007",
+      "SCN022"
+    ],
+    "REQ020": [
+      "SCN007",
+      "SCN022"
+    ],
+    "REQ013": [
+      "SCN008"
+    ],
+    "REQ014": [
+      "SCN009",
+      "SCN023"
+    ],
+    "REQ015": [
+      "SCN009",
+      "SCN023"
+    ],
+    "REQ016": [
+      "SCN009",
+      "SCN023"
+    ],
+    "REQ017": [
+      "SCN010",
+      "SCN023"
+    ],
+    "REQ018": [
+      "SCN010",
+      "SCN023"
+    ],
+    "REQ019": [
+      "SCN010",
+      "SCN023"
+    ],
+    "REQ022": [
+      "SCN011"
+    ],
+    "REQ023": [
+      "SCN012",
+      "SCN013"
+    ],
+    "REQ031": [
+      "SCN012",
+      "SCN013"
+    ],
+    "REQ032": [
+      "SCN012",
+      "SCN013"
+    ],
+    "REQ024": [
+      "SCN014",
+      "SCN024"
+    ],
+    "REQ025": [
+      "SCN014",
+      "SCN024"
+    ],
+    "REQ026": [
+      "SCN014",
+      "SCN024"
+    ],
+    "REQ027": [
+      "SCN015",
+      "SCN016"
+    ],
+    "REQ028": [
+      "SCN015",
+      "SCN016"
+    ],
+    "REQ029": [
+      "SCN017"
+    ],
+    "REQ030": [
+      "SCN017"
+    ],
+    "REQ033": [
+      "SCN018"
+    ],
+    "REQ011": [
+      "SCN019"
+    ],
+    "REQ021": [
+      "SCN020"
+    ]
+  },
+  "summary_counts": {
+    "business_requirements": 33,
+    "data_requirements": 18,
+    "domains": 3,
+    "roles": 18,
+    "relationships": 9,
+    "concepts": 17,
+    "lookups": 11,
+    "test_cases": 25,
+    "sources": 29
+  }
+}

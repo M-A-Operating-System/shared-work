@@ -1,0 +1,61 @@
+{
+  "defect_count": 7,
+  "blocking": 5,
+  "material": 0,
+  "advisory": 2,
+  "defects": [
+    {
+      "check": "ER02",
+      "severity": "blocking",
+      "routes_to": "11",
+      "artefact_ids": [],
+      "detail": "the document differs from the one that was reviewed; the recorded review does not apply to it"
+    },
+    {
+      "check": "RN03",
+      "severity": "blocking",
+      "routes_to": "9",
+      "artefact_ids": [],
+      "detail": "change vocabulary 'changed' appears in the document"
+    },
+    {
+      "check": "RN06",
+      "severity": "blocking",
+      "routes_to": "10",
+      "artefact_ids": [],
+      "detail": "lite document carries sections reserved for the full edition"
+    },
+    {
+      "check": "RN06",
+      "severity": "blocking",
+      "routes_to": "10",
+      "artefact_ids": [],
+      "detail": "lite document does not name the sections the full edition adds"
+    },
+    {
+      "check": "RN07",
+      "severity": "blocking",
+      "routes_to": "10",
+      "artefact_ids": [],
+      "detail": "process vocabulary 'review' appears in the document (1x)"
+    },
+    {
+      "check": "DF04a",
+      "severity": "advisory",
+      "routes_to": "5\u20138",
+      "artefact_ids": [
+        "LKP011"
+      ],
+      "detail": "lookup definition uses 'entities'; keep it only where the field uses the word itself"
+    },
+    {
+      "check": "DF04a",
+      "severity": "advisory",
+      "routes_to": "5\u20138",
+      "artefact_ids": [
+        "SBJ002"
+      ],
+      "detail": "concept definition uses 'entity'; keep it only where the field uses the word itself"
+    }
+  ]
+}

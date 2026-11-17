@@ -1,0 +1,482 @@
+[
+  {
+    "id": "ROL001",
+    "name": "Made Product",
+    "plural": "Made Products",
+    "definition": "A product is a Made Product while the organisation makes it. This is how the parts of a finished product are found,. It is not a Variant, which is only another size or pack of the same product. A product the organisation stops making stops being a Made Product, and its earlier formulation remains on record.",
+    "played_by_domain_ids": [
+      "DOM001"
+    ],
+    "distinct_need": "The capacity of being built from other products, which no other role names.",
+    "aliases": [],
+    "established_by": [
+      "REL001"
+    ],
+    "stated_in": [
+      "REQ002",
+      "REQ003"
+    ],
+    "evidence_source_ids": [
+      "SRC002",
+      "SRC003",
+      "SRC004"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL002",
+    "name": "Ingredient",
+    "plural": "Ingredients",
+    "definition": "A product is an Ingredient while it goes into another product. This is how every product an ingredient ends up in is found. It is not a Bought Material, which says an item is bought in and nothing about where it goes. A product that goes into no other product stops being an Ingredient, and its earlier uses remain on record.",
+    "played_by_domain_ids": [
+      "DOM001"
+    ],
+    "distinct_need": "The capacity of going into another product, which no other role names.",
+    "aliases": [],
+    "established_by": [
+      "REL001"
+    ],
+    "stated_in": [
+      "REQ002",
+      "REQ005"
+    ],
+    "evidence_source_ids": [
+      "SRC002",
+      "SRC003",
+      "SRC004"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL003",
+    "name": "Variant",
+    "plural": "Variants",
+    "definition": "A product is a Variant while it belongs to a Logical Product that groups related sizes and packs, such as the 200g pack of a biscuit. It is sold and counted on its own. It is not a Made Product, which is defined by what goes into it and not by the group it belongs to. A product that leaves its group stops being a Variant, and its earlier membership remains on record.",
+    "played_by_domain_ids": [
+      "DOM001"
+    ],
+    "distinct_need": "The capacity of being one size or pack of a wider product.",
+    "aliases": [],
+    "established_by": [
+      "REL002"
+    ],
+    "stated_in": [
+      "REQ008"
+    ],
+    "evidence_source_ids": [
+      "SRC001",
+      "SRC002"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL004",
+    "name": "Logical Product",
+    "plural": "Logical Products",
+    "definition": "A product is a Logical Product while it stands for a group of related sizes, formats and pack counts, each of which is a product in its own right. It holds what the versions share and is never itself made, bought or sold. It is not an Ingredient, which is defined by where a product goes and not by what it groups. A product definition with no sizes or packs left stops being a Logical Product, and its history remains on record.",
+    "played_by_domain_ids": [
+      "DOM001"
+    ],
+    "distinct_need": "The capacity of grouping a set of variants.",
+    "aliases": [
+      "Family"
+    ],
+    "established_by": [
+      "REL002"
+    ],
+    "stated_in": [
+      "REQ008",
+      "REQ035"
+    ],
+    "evidence_source_ids": [
+      "SRC001",
+      "SRC002",
+      "SRC030"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL005",
+    "name": "Replaceable Ingredient",
+    "plural": "Replaceable Ingredients",
+    "definition": "A product is a Replaceable Ingredient while it may be replaced by another product. It shows which ingredients have a cleared substitute, so the effect of a swap on the label can be looked up. It is not an Ingredient, which says only that an item goes into something. An ingredient whose cleared replacements have all ended stops being a Replaceable Ingredient, and the earlier replacements remain on record.",
+    "played_by_domain_ids": [
+      "DOM001"
+    ],
+    "distinct_need": "The capacity of having a permitted alternative.",
+    "aliases": [],
+    "established_by": [
+      "REL003"
+    ],
+    "stated_in": [
+      "REQ006"
+    ],
+    "evidence_source_ids": [
+      "SRC020"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL006",
+    "name": "Permitted Alternative",
+    "plural": "Permitted Alternatives",
+    "definition": "A product is a Permitted Alternative while it may stand in for another product, under stated conditions. It is not a Bought Material, which is about who supplies an item and not about whether it may replace another. A product whose clearance ends stops being a Permitted Alternative, and the earlier clearance remains on record.",
+    "played_by_domain_ids": [
+      "DOM001"
+    ],
+    "distinct_need": "The capacity of being allowed as a substitute for another product.",
+    "aliases": [],
+    "established_by": [
+      "REL003"
+    ],
+    "stated_in": [
+      "REQ006"
+    ],
+    "evidence_source_ids": [
+      "SRC020"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL007",
+    "name": "Claiming Product",
+    "plural": "Claiming Products",
+    "definition": "A product is a Claiming Product while it is compared with another product in a claim on its pack, such as lower in sugar than another. It is not a Labelled Product, which is defined by naming a responsible business and not by making a comparison. A product that stops making the claim stops being a Claiming Product, and the earlier comparison remains on record.",
+    "played_by_domain_ids": [
+      "DOM001"
+    ],
+    "distinct_need": "The capacity of making a comparison claim.",
+    "aliases": [],
+    "established_by": [
+      "REL004"
+    ],
+    "stated_in": [
+      "REQ018"
+    ],
+    "evidence_source_ids": [
+      "SRC014"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL008",
+    "name": "Comparator",
+    "plural": "Comparators",
+    "definition": "A product is a Comparator while it is used to compare another product in a claim on that product's pack. It is the reference the claim is measured against, whether a named product or an average of leading brands. It is not a Permitted Alternative, which stands in for an ingredient and is not measured against. A product that ceases to be used as a reference stops being a Comparator, and the earlier comparison remains on record.",
+    "played_by_domain_ids": [
+      "DOM001"
+    ],
+    "distinct_need": "The capacity of being the reference in a comparison claim.",
+    "aliases": [],
+    "established_by": [
+      "REL004"
+    ],
+    "stated_in": [
+      "REQ018"
+    ],
+    "evidence_source_ids": [
+      "SRC014"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL009",
+    "name": "Bought Material",
+    "plural": "Bought Materials",
+    "definition": "A product is a Bought Material while it may be sourced from an outside organisation. It shows which ingredients rely on an outside organisation. It is not an Ingredient, which is about where an item goes and not where it comes from. An ingredient the organisation stops buying in stops being a Bought Material, and its earlier sources remain on record.",
+    "played_by_domain_ids": [
+      "DOM001"
+    ],
+    "distinct_need": "The capacity of being bought in from a supplier.",
+    "aliases": [],
+    "established_by": [
+      "REL005"
+    ],
+    "stated_in": [
+      "REQ007",
+      "REQ027",
+      "REQ028"
+    ],
+    "evidence_source_ids": [
+      "SRC003",
+      "SRC015",
+      "SRC018",
+      "SRC019"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL010",
+    "name": "Authorised Supplier",
+    "plural": "Authorised Suppliers",
+    "definition": "An organisation is an Authorised Supplier while it may supply a product, for a stated period. It is cleared to supply a particular ingredient or packaging item. It is not a Certifying Body, which grants certifications and does not supply anything. An organisation whose clearance ends stops being an Authorised Supplier, and its earlier clearance remains on record.",
+    "played_by_domain_ids": [
+      "DOM002"
+    ],
+    "distinct_need": "The capacity of being cleared to supply a product for a period.",
+    "aliases": [],
+    "established_by": [
+      "REL005"
+    ],
+    "stated_in": [
+      "REQ027",
+      "REQ028"
+    ],
+    "evidence_source_ids": [
+      "SRC015",
+      "SRC018"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL011",
+    "name": "Certification Holder",
+    "plural": "Certification Holders",
+    "definition": "A product is a Certification Holder while it holds a certification from another party. The certification can be revoked. It is not a Labelled Product, which is about who is named as answerable on the pack and not about a certification held. A product whose certification is revoked or lapses stops being a Certification Holder for it, and the earlier certification remains on record.",
+    "played_by_domain_ids": [
+      "DOM001"
+    ],
+    "distinct_need": "The capacity of holding a certification that can be withdrawn.",
+    "aliases": [],
+    "established_by": [
+      "REL006"
+    ],
+    "stated_in": [
+      "REQ033"
+    ],
+    "evidence_source_ids": [
+      "SRC001",
+      "SRC015"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL012",
+    "name": "Certifying Body",
+    "plural": "Certifying Bodies",
+    "definition": "An organisation is a Certifying Body while it grants a certification to another party, for a stated period. It stands behind that certification. It is not an Authorised Supplier, which supplies goods and does not grant anything. A body whose certification ends stops being a Certifying Body for it, and the earlier certification remains on record.",
+    "played_by_domain_ids": [
+      "DOM002"
+    ],
+    "distinct_need": "The capacity of granting a certification for a period.",
+    "aliases": [],
+    "established_by": [
+      "REL006"
+    ],
+    "stated_in": [
+      "REQ033"
+    ],
+    "evidence_source_ids": [
+      "SRC001",
+      "SRC015"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL013",
+    "name": "Labelled Product",
+    "plural": "Labelled Products",
+    "definition": "A product is a Labelled Product while it is marketed by another party named on its pack. The pack names who is answerable for it. It is not a Certification Holder, which holds a certification and does not name a party. A product that stops carrying another party's name on its pack stops being a Labelled Product for that party, and the earlier naming remains on record.",
+    "played_by_domain_ids": [
+      "DOM001"
+    ],
+    "distinct_need": "The capacity of having a named responsible business on its pack.",
+    "aliases": [],
+    "established_by": [
+      "REL007"
+    ],
+    "stated_in": [
+      "REQ012"
+    ],
+    "evidence_source_ids": [
+      "SRC006",
+      "SRC007"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL014",
+    "name": "Responsible Business",
+    "plural": "Responsible Businesses",
+    "definition": "An organisation is a Responsible Business while it markets a product under its own name and address. It is the business the pack names as answerable. It is not an Authorised Supplier, which supplies an ingredient to a manufacturer and does not answer for a finished pack. A business that the pack stops naming stops being its Responsible Business, and its earlier responsibility remains on record.",
+    "played_by_domain_ids": [
+      "DOM002"
+    ],
+    "distinct_need": "The capacity of being the business a pack names as answerable.",
+    "aliases": [],
+    "established_by": [
+      "REL007"
+    ],
+    "stated_in": [
+      "REQ012"
+    ],
+    "evidence_source_ids": [
+      "SRC006",
+      "SRC007"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL015",
+    "name": "Declared Product",
+    "plural": "Declared Products",
+    "definition": "A product is a Declared Product while another party declares properties of it, for example in a supplier's certificate of analysis. It shows which facts about a product come from outside. It is not a Bought Material, which is about where an item is sourced and not about what is said of it. A product with no document declaring its properties stops being a Declared Product, and the earlier declarations remain on record.",
+    "played_by_domain_ids": [
+      "DOM001"
+    ],
+    "distinct_need": "The capacity of having facts stated about it by a document.",
+    "aliases": [],
+    "established_by": [
+      "REL008"
+    ],
+    "stated_in": [
+      "REQ031",
+      "REQ023"
+    ],
+    "evidence_source_ids": [
+      "SRC016",
+      "SRC018",
+      "SRC019"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL016",
+    "name": "Declaring Document",
+    "plural": "Declaring Documents",
+    "definition": "A document is a Declaring Document while it declares properties of something else. It is the evidence for what a supplier says it supplied. It is not an Issued Document, which is about who produced a document and not about what it states. A document that is replaced stops being relied on as a Declaring Document, and it remains on record.",
+    "played_by_domain_ids": [
+      "DOM003"
+    ],
+    "distinct_need": "The capacity of being the evidence for what is said about a product.",
+    "aliases": [],
+    "established_by": [
+      "REL008"
+    ],
+    "stated_in": [
+      "REQ031",
+      "REQ023"
+    ],
+    "evidence_source_ids": [
+      "SRC016",
+      "SRC018",
+      "SRC019"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL017",
+    "name": "Issued Document",
+    "plural": "Issued Documents",
+    "definition": "A document is an Issued Document while it is issued by another party. It lets a statement be traced to whoever made it. It is not a Declaring Document, which is about what a document states about a product. A document stays an Issued Document for good, because who issued it does not change.",
+    "played_by_domain_ids": [
+      "DOM003"
+    ],
+    "distinct_need": "The capacity of having an identified issuer.",
+    "aliases": [],
+    "established_by": [
+      "REL009"
+    ],
+    "stated_in": [
+      "REQ031"
+    ],
+    "evidence_source_ids": [
+      "SRC018",
+      "SRC019"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL018",
+    "name": "Issuing Organisation",
+    "plural": "Issuing Organisations",
+    "definition": "An organisation is an Issuing Organisation while it issues something to another party. It stands behind the statements in what it issues. It is not a Responsible Business, which answers for a finished pack and not for a document. An organisation that issues nothing further stops being an Issuing Organisation, and what it issued remains on record.",
+    "played_by_domain_ids": [
+      "DOM002"
+    ],
+    "distinct_need": "The capacity of standing behind the statements in a document.",
+    "aliases": [],
+    "established_by": [
+      "REL009"
+    ],
+    "stated_in": [
+      "REQ031"
+    ],
+    "evidence_source_ids": [
+      "SRC018",
+      "SRC019"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ROL019",
+    "name": "Site",
+    "plural": "Sites",
+    "definition": "A location is a Site while a company runs it and products are made at it, supplied from it or covered by a certificate there. It is where a factory's or a supplier's production is carried out. It is not an Operating Business, which is the company that runs the place and not the place. A place that closes or stops producing stops being a Site, and its earlier products, supply and certificates remain on record.",
+    "played_by_domain_ids": [
+      "DOM004"
+    ],
+    "distinct_need": "The capacity of being a place where products are made, supplied from or certified, which no other role names.",
+    "aliases": [
+      "Factory",
+      "Supplier site"
+    ],
+    "established_by": [
+      "REL010",
+      "REL011",
+      "REL012",
+      "REL013"
+    ],
+    "stated_in": [
+      "REQ036",
+      "REQ037",
+      "REQ038"
+    ],
+    "evidence_source_ids": [
+      "SRC031",
+      "SRC032"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Moved to the manufacturing model: factories, the places inside them down to the shop floor, supplier sites, batches and supply chain detail belong there. This model holds a supplier only as a company."
+  },
+  {
+    "id": "ROL020",
+    "name": "Operating Business",
+    "plural": "Operating Businesses",
+    "definition": "An organisation is an Operating Business while it runs a site. It is the company answerable for what happens there. It is not a Responsible Business, which is the business a pack names, and not a Certifying Body, which grants certifications. A company that stops running a site stops being its Operating Business, and its earlier operation remains on record.",
+    "played_by_domain_ids": [
+      "DOM002"
+    ],
+    "distinct_need": "The capacity of running a place, which no other role names.",
+    "aliases": [],
+    "established_by": [
+      "REL010"
+    ],
+    "stated_in": [
+      "REQ036"
+    ],
+    "evidence_source_ids": [
+      "SRC032"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Moved to the manufacturing model: factories, the places inside them down to the shop floor, supplier sites, batches and supply chain detail belong there. This model holds a supplier only as a company."
+  }
+]
