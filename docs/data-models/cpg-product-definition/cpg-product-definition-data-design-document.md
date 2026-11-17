@@ -7,7 +7,7 @@ This **Data Model Design Document** by **M&A Operating System** provides a singl
 |  |  |
 |---|---|
 | Domain | CPG - Product Definition |
-| Document date | 11 November 2026 |
+| Document date | 17 November 2026 |
 | Package reference (the working files this document is produced from) | fnb-bdd |
 | Method version | 31.5 |
 
@@ -121,7 +121,7 @@ Each component remains traceable to the requirement that established its need. T
 
 This design covers what a food or beverage product is, what goes into it, where it is sold, what it must be, how long it lasts, who may supply its ingredients and what may be said about it on pack. The formulation, meaning the list of what goes into a product and how much, is at its heart. The order ingredients are listed in, the allergens, the nutrition values and the claims on a pack all follow from the formulation, so a change to it shows which labels and claims it reaches. Where an ingredient is bought in already made, the design relies on what the supplier declares is inside it, and records who declared it and whether it was checked.
 
-Products are held in two layers. Each size, pack and recipe is a product in its own right, with its own identifiers, formulation, allergens and label. A product definition above them groups the versions that belong together and is never made, bought or sold itself. A product is listed in markets, each named by a country or by a wider region, and the items on its pack, the claims it makes and the sales channels it uses hang from that listing. The design is shown with three markets: the United States, the European Union and the United Kingdom.
+Products are held in two layers. Each size, pack and recipe is a product in its own right, with its own identifiers, formulation, allergens and label. A product definition above them groups the versions that belong together and is never made, bought or sold itself. A product is listed in markets, each named by a country or by a wider region, and the items on its pack, the claims it makes and the sales channels it uses hang from that listing. The design covers three markets, the United States, the European Union and the United Kingdom, and no others. It holds a market as a value in its lists, so it extends to any other country or wider region without a change of structure, but none is included here by choice.
 
 The design has three stated limits. It cannot say what is inside a bought-in ingredient beyond what the supplier declares. It finds every product that uses a recalled ingredient but not which batches. Batches, factories and the places inside them down to the shop floor, supplier sites and supply chain detail belong to the proposed CPG Manufacturing and Supply Chain model. It keeps a shelf life for each product and does not work one out from the shelf lives of its ingredients, because none of the sources describe a rule for doing so.
 
@@ -166,6 +166,7 @@ Consumer packaged goods are products that a company makes and sells in packs to 
 | SCI007 | How long a product lasts, and under what storage conditions |
 | SCI009 | Where each product is sold — the markets, the sales channels and the dates |
 | SCI010 | The pictures that show each product |
+| SCI011 | The markets covered: the United States, the European Union and the United Kingdom. For each, what a product must declare on pack, which allergens it must name, the language of the pack and who is named on it as responsible, and the dates and channels it is sold through there |
 
 ### 2.3 Out of scope
 
@@ -184,6 +185,7 @@ What this design leaves out, and the model that is intended to own it. The CPG M
 | SCO010 | Packing, and the levels a product is packed in for handling, such as case and pallet. | CPG Manufacturing and Supply Chain model |
 | SCO011 | A named successor: which product takes over from another when it is discontinued. This is a general capability for any record and not product information. It is held on the general Master record as a Successor field (DMA000000910), which must be given when a record has been merged into another or replaced by one. | Master data (general) |
 | SCO012 | Placing each country in a region of the world, and each region on a continent. | Universal core data model |
+| SCO013 | Every market other than the United States, the European Union and the United Kingdom, and the labelling rules of those markets. The design holds a country or a wider region as a value in its lists, so it extends to another market without a change of structure, but none is included here by choice. | Not owned by another model. Left for a later extension |
 
 ### 2.4 Shared with other models
 
@@ -206,7 +208,7 @@ These are used as DDA already holds them.
 | SCA005 | What changes over time is kept with dates: formulations, specifications, supplier authorisations, certifications and shelf lives. The design does not follow a product from launch to discontinuation as a single lifecycle. |
 | SCA006 | The CPG Manufacturing and Supply Chain, commercial and digital marketing models named in section 2.3 are the intended owners of what this design leaves out. The first is proposed and is not yet in DDA. Whether the others exist is not known. |
 | SCA007 | A manufacturing bill of materials is read as the formulation held here: what goes into a product, including packaging, and how much. How, where and in what order the product is made is not held. |
-| SCA008 | A market is a country, or a wider region of the world, in which a product is intended to be sold. The design is shown with three markets: the United States, the European Union and the United Kingdom. These three are samples chosen for this design. Any country, or any wider region, is held the same way, by adding a value to the lists, so the design extends to as many markets as are needed. |
+| SCA008 | The markets covered are the United States, the European Union and the United Kingdom, and no others. A market is a country, or a wider region of the world, in which a product is intended to be sold. Requirements, allergen lists and label rules are provided for these three markets only. The design holds a market as a value in its lists, so it extends to any other country or wider region without a change of structure. No other market is included here by choice. |
 | SCA009 | A sales channel is the kind of trade a product is sold through in a market, such as grocery, food service or online. It is not a named customer. |
 | SCA010 | Each version of a product is a product in its own right. The product definition above them only groups them and is never made, bought or sold. |
 | SCA012 | The European Union is treated as one market. A product sold in the Union is listed once for the Union and not once for each member country, and the member countries are not mapped to it. |

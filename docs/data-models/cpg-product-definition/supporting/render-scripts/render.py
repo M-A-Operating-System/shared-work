@@ -229,7 +229,7 @@ def render(pkg: Path, prev: Path, changeset: dict[str, Any]) -> str:
     # ---- cover, version, contents, introduction (static, with the dated rows replaced)
     start_13 = lines.index("### 1.3 Summary of Findings")
     head = "\n".join(lines[:start_13])
-    head = head.replace("| Document date | 28 September 2026 |", "| Document date | 11 November 2026 |")
+    head = head.replace("| Document date | 28 September 2026 |", "| Document date | 17 November 2026 |")
     head = head.replace("what goes into it, what it must be, how long it lasts, who may supply its ingredients and what may be said about it on pack. The full",
                         "what goes into it, where it is sold, what it must be, how long it lasts, who may supply its ingredients and what may be said about it on pack. The full")
     w(head.rstrip("\n"))
@@ -253,7 +253,7 @@ def render(pkg: Path, prev: Path, changeset: dict[str, Any]) -> str:
     w("Products are held in two layers. Each size, pack and recipe is a product in its own right, with its own identifiers, formulation, allergens and label. "
       "A product definition above them groups the versions that belong together and is never made, bought or sold itself. "
       "A product is listed in markets, each named by a country or by a wider region, and the items on its pack, the claims it makes and the sales channels it uses hang from that listing. "
-      "The design is shown with three markets: the United States, the European Union and the United Kingdom.")
+      "The design covers three markets, the United States, the European Union and the United Kingdom, and no others. It holds a market as a value in its lists, so it extends to any other country or wider region without a change of structure, but none is included here by choice.")
     w("")
     w("The design has three stated limits. It cannot say what is inside a bought-in ingredient beyond what the supplier declares. It finds every product that uses a recalled ingredient but not which batches. Batches, factories and the places inside them down to the shop floor, supplier sites and supply chain detail belong to the proposed CPG Manufacturing and Supply Chain model. "
       "It keeps a shelf life for each product and does not work one out from the shelf lives of its ingredients, because none of the sources describe a rule for doing so.")

@@ -434,7 +434,8 @@
     "url": "https://www.legislation.gov.uk/eur/2011/1169/annex/II",
     "retrieved": "2026-09-28",
     "scope_ids": [
-      "SCI004"
+      "SCI004",
+      "SCI011"
     ],
     "type": "regulatory",
     "establishes": "Fourteen foods must always be declared when present: cereals containing gluten, crustaceans, eggs, fish, peanuts, soybeans, milk, nuts, celery, mustard, sesame seeds, sulphur dioxide and sulphites, lupin and molluscs.",
@@ -450,7 +451,8 @@
     "url": "https://www.fda.gov/food/food-allergensgluten-free-guidance-documents-regulatory-information/frequently-asked-questions-food-allergen-labeling-guidance-industry",
     "retrieved": "2026-09-28",
     "scope_ids": [
-      "SCI004"
+      "SCI004",
+      "SCI011"
     ],
     "type": "regulatory",
     "establishes": "In its January 2025 edition FDA removes coconut, chestnut, hickory and several other nuts from its list of tree nuts that count as major food allergens. An advisory statement such as \"may contain wheat\" describes the possibility of unintended presence through cross-contact. It is not used for an allergen that is also the subject of a \"contains\" statement or an allergen-free claim.",
@@ -613,7 +615,8 @@
     "url": "https://www.gov.uk/government/publications/allergen-labelling-for-food-manufacturers/allergen-labelling-for-food-manufacturers",
     "retrieved": "2026-11-10",
     "scope_ids": [
-      "SCI004"
+      "SCI004",
+      "SCI011"
     ],
     "type": "regulatory",
     "establishes": "In Great Britain pre-packed food must declare any of fourteen allergens used as an ingredient or processing aid: celery, cereals containing gluten, crustaceans, eggs, fish, lupin, milk, molluscs, mustard, tree nuts, peanuts, sesame, soybeans, and sulphur dioxide and sulphites above ten parts per million.",
@@ -634,7 +637,7 @@
     "establishes": "The world is divided into continental regions and sub-regions, and each country or area is assigned to one sub-region for statistical convenience, which implies nothing about political affiliation.",
     "why_included": "The published grouping of countries into regions and continents.",
     "status": "withdrawn",
-    "withdrawn_reason": "The placing of each country in a region of the world belongs to the universal core data model. This design names a market by country or by the European Union, and the three markets are samples."
+    "withdrawn_reason": "The placing of each country in a region of the world belongs to the universal core data model. This design names a market by country or by the European Union, and the design covers three markets."
   },
   {
     "id": "SRC041",

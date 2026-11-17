@@ -7,10 +7,13 @@ Package for the **CPG - Product Definition** data model (Food and Beverage; DDA 
 | `*.json` (16 files) | The package: scope, sources, requirements, data requirements, domains, subjects, roles, verbs, attributes, lookups, country regions, state, baseline, validation, derived and the DDA change package |
 | `cpg-product-definition-data-design-document.md` | The Data Design Document, lite edition, projected from the package. Regenerate it, never edit it. The PDF is built from it by the repository's own workflow |
 | `supporting/previous-document/` | The earlier document (28 September 2026), markdown and PDF, moved here from `docs/data-models/`. **Out of date** |
+| `supporting/cpg-product-definition-design-review.md` | Architect review of the 17 November 2026 document, findings ranked by severity, with decisions needed |
 | `supporting/editorial-review.md` | The same-agent reading of the 10 November 2026 version. It applies to that version only |
 | `supporting/render-scripts/` | `render.py <package> <static-source.md> <out.md>` and the static source it copies the cover and sections 1.1 and 1.2 from |
 
-## Status (2026-11-16)
+## Status (2026-11-17)
+
+- **Scope (17 November 2026):** the markets covered are the United States, the United Kingdom and the European Union, and no others. The design extends to other markets by adding list values; none is included by choice (SCI011, SCO013, SCA008).
 
 - Validator v31.5 (`validate.py <package>`): **0 blocking, 0 material, 2 advisory** (the word *entity* in one concept and one list definition, the field's own word).
 - Run with `--document`, the document reports the same hits the template carries (Appendix B and the full-edition section names, "review" in the supplied cover paragraph, "changed" in section 1.1) and one more, ER02: the document has one more decision row (DEC004) than the version the editorial review read.

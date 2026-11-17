@@ -7,7 +7,7 @@ This **Data Model Design Document** by **M&A Operating System** provides a singl
 |  |  |
 |---|---|
 | Domain | CPG - Product Definition |
-| Document date | 11 November 2026 |
+| Document date | 17 November 2026 |
 | Package reference (the working files this document is produced from) | fnb-bdd |
 | Method version | 31.5 |
 
@@ -121,7 +121,7 @@ Each component remains traceable to the requirement that established its need. T
 
 This design covers what a food or beverage product is, what goes into it, where it is sold, what it must be, how long it lasts, who may supply its ingredients and what may be said about it on pack. The formulation, meaning the list of what goes into a product and how much, is at its heart. The order ingredients are listed in, the allergens, the nutrition values and the claims on a pack all follow from the formulation, so a change to it shows which labels and claims it reaches. Where an ingredient is bought in already made, the design relies on what the supplier declares is inside it, and records who declared it and whether it was checked.
 
-Products are held in two layers. Each size, pack and recipe is a product in its own right, with its own identifiers, formulation, allergens and label. A product definition above them groups the versions that belong together and is never made, bought or sold itself. Factories and suppliers' sites are places, and every place belongs to the company that runs it. A product is listed in markets, each named by a country or by a wider region, and the items on its pack, the claims it makes and the sales channels it uses hang from that listing. The design is shown with three markets: the United States, the European Union and the United Kingdom.
+Products are held in two layers. Each size, pack and recipe is a product in its own right, with its own identifiers, formulation, allergens and label. A product definition above them groups the versions that belong together and is never made, bought or sold itself. Factories and suppliers' sites are places, and every place belongs to the company that runs it. A product is listed in markets, each named by a country or by a wider region, and the items on its pack, the claims it makes and the sales channels it uses hang from that listing. The design covers three markets, the United States, the European Union and the United Kingdom, and no others. It can hold any other country or wider region by adding values to its lists, but none is included here by choice.
 
 The design has three stated limits. It cannot say what is inside a bought-in ingredient beyond what the supplier declares. It finds every product that uses a recalled ingredient but not which batches, which belongs to the manufacturing model. It keeps a shelf life for each product and does not work one out from the shelf lives of its ingredients, because none of the sources describe a rule for doing so.
 

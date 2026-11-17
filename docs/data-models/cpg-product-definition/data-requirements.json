@@ -715,7 +715,7 @@
       "A country that sits in two regions"
     ],
     "status": "withdrawn",
-    "withdrawn_reason": "The placing of each country in a region of the world belongs to the universal core data model. This design names a market by country or by the European Union, and the three markets are samples.",
+    "withdrawn_reason": "The placing of each country in a region of the world belongs to the universal core data model. This design names a market by country or by the European Union, and the design covers three markets.",
     "prevent_how": [
       "Each country names one region."
     ],
