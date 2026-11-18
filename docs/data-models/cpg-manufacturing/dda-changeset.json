@@ -2,7 +2,13 @@
   "spec_version": "1.0",
   "package_ref": "cpg-manufacturing",
   "apply_mode": "web-ui",
-  "preconditions": [],
+  "preconditions": [
+    {
+      "requires": "CPG - Product Definition change package applied first",
+      "provides": "Product",
+      "concept": "SBJ012"
+    }
+  ],
   "preconditions_note": "State transitions could not be read from the platform; see DEC007.",
   "operations": [
     {
@@ -48,20 +54,6 @@
       "seq": 4,
       "op": "create",
       "entity": "lookupTypes",
-      "local_id": "LKP001",
-      "dda_id": null,
-      "fields": {
-        "lookup_type_code": "ProductKindType",
-        "lookup_type_name": "ProductKindType",
-        "lookup_type_description": "What a product is to this organisation, deciding whether it may be bought, made, used or sold. A product may be more than one kind at once.",
-        "values": 5
-      },
-      "depends_on": []
-    },
-    {
-      "seq": 5,
-      "op": "create",
-      "entity": "lookupTypes",
       "local_id": "LKP004",
       "dda_id": null,
       "fields": {
@@ -73,7 +65,7 @@
       "depends_on": []
     },
     {
-      "seq": 6,
+      "seq": 5,
       "op": "create",
       "entity": "lookupTypes",
       "local_id": "LKP005",
@@ -87,7 +79,7 @@
       "depends_on": []
     },
     {
-      "seq": 7,
+      "seq": 6,
       "op": "create",
       "entity": "lookupTypes",
       "local_id": "LKP006",
@@ -101,7 +93,7 @@
       "depends_on": []
     },
     {
-      "seq": 8,
+      "seq": 7,
       "op": "create",
       "entity": "lookupTypes",
       "local_id": "LKP007",
@@ -115,7 +107,7 @@
       "depends_on": []
     },
     {
-      "seq": 9,
+      "seq": 8,
       "op": "create",
       "entity": "lookupTypes",
       "local_id": "LKP008",
@@ -129,7 +121,7 @@
       "depends_on": []
     },
     {
-      "seq": 10,
+      "seq": 9,
       "op": "update",
       "entity": "lookupTypes",
       "local_id": "LKP009",
@@ -176,7 +168,7 @@
       "depends_on": []
     },
     {
-      "seq": 11,
+      "seq": 10,
       "op": "create",
       "entity": "lookupTypes",
       "local_id": "LKP010",
@@ -190,7 +182,7 @@
       "depends_on": []
     },
     {
-      "seq": 12,
+      "seq": 11,
       "op": "create",
       "entity": "lookupTypes",
       "local_id": "LKP011",
@@ -204,7 +196,7 @@
       "depends_on": []
     },
     {
-      "seq": 13,
+      "seq": 12,
       "op": "create",
       "entity": "lookupTypes",
       "local_id": "LKP012",
@@ -218,7 +210,7 @@
       "depends_on": []
     },
     {
-      "seq": 14,
+      "seq": 13,
       "op": "create",
       "entity": "roles",
       "local_id": "ROL010",
@@ -234,7 +226,7 @@
       "depends_on": []
     },
     {
-      "seq": 15,
+      "seq": 14,
       "op": "create",
       "entity": "roles",
       "local_id": "ROL011",
@@ -250,7 +242,7 @@
       "depends_on": []
     },
     {
-      "seq": 16,
+      "seq": 15,
       "op": "create",
       "entity": "roles",
       "local_id": "ROL012",
@@ -266,7 +258,7 @@
       "depends_on": []
     },
     {
-      "seq": 17,
+      "seq": 16,
       "op": "create",
       "entity": "roles",
       "local_id": "ROL013",
@@ -284,7 +276,7 @@
       ]
     },
     {
-      "seq": 18,
+      "seq": 17,
       "op": "create",
       "entity": "roles",
       "local_id": "ROL014",
@@ -302,7 +294,7 @@
       ]
     },
     {
-      "seq": 19,
+      "seq": 18,
       "op": "create",
       "entity": "roles",
       "local_id": "ROL015",
@@ -320,7 +312,7 @@
       ]
     },
     {
-      "seq": 20,
+      "seq": 19,
       "op": "create",
       "entity": "roles",
       "local_id": "ROL016",
@@ -338,7 +330,7 @@
       ]
     },
     {
-      "seq": 21,
+      "seq": 20,
       "op": "create",
       "entity": "roles",
       "local_id": "ROL017",
@@ -356,7 +348,7 @@
       ]
     },
     {
-      "seq": 22,
+      "seq": 21,
       "op": "create",
       "entity": "roles",
       "local_id": "ROL018",
@@ -374,7 +366,7 @@
       ]
     },
     {
-      "seq": 23,
+      "seq": 22,
       "op": "create",
       "entity": "roles",
       "local_id": "ROL019",
@@ -392,7 +384,7 @@
       ]
     },
     {
-      "seq": 24,
+      "seq": 23,
       "op": "create",
       "entity": "roles",
       "local_id": "ROL022",
@@ -410,7 +402,7 @@
       ]
     },
     {
-      "seq": 25,
+      "seq": 24,
       "op": "create",
       "entity": "roles",
       "local_id": "ROL023",
@@ -428,7 +420,7 @@
       ]
     },
     {
-      "seq": 26,
+      "seq": 25,
       "op": "create",
       "entity": "roles",
       "local_id": "ROL026",
@@ -446,7 +438,7 @@
       ]
     },
     {
-      "seq": 27,
+      "seq": 26,
       "op": "create",
       "entity": "roles",
       "local_id": "ROL027",
@@ -462,7 +454,7 @@
       "depends_on": []
     },
     {
-      "seq": 28,
+      "seq": 27,
       "op": "create",
       "entity": "roles",
       "local_id": "ROL028",
@@ -480,7 +472,7 @@
       ]
     },
     {
-      "seq": 29,
+      "seq": 28,
       "op": "create",
       "entity": "roles",
       "local_id": "ROL029",
@@ -498,7 +490,7 @@
       ]
     },
     {
-      "seq": 30,
+      "seq": 29,
       "op": "create",
       "entity": "roles",
       "local_id": "ROL031",
@@ -516,7 +508,7 @@
       ]
     },
     {
-      "seq": 31,
+      "seq": 30,
       "op": "create",
       "entity": "roles",
       "local_id": "ROL032",
@@ -534,7 +526,7 @@
       ]
     },
     {
-      "seq": 32,
+      "seq": 31,
       "op": "create",
       "entity": "roles",
       "local_id": "ROL033",
@@ -550,7 +542,7 @@
       "depends_on": []
     },
     {
-      "seq": 33,
+      "seq": 32,
       "op": "create",
       "entity": "roles",
       "local_id": "ROL034",
@@ -568,7 +560,7 @@
       ]
     },
     {
-      "seq": 34,
+      "seq": 33,
       "op": "create",
       "entity": "roles",
       "local_id": "ROL035",
@@ -586,7 +578,7 @@
       ]
     },
     {
-      "seq": 35,
+      "seq": 34,
       "op": "create",
       "entity": "roles",
       "local_id": "ROL036",
@@ -602,7 +594,7 @@
       "depends_on": []
     },
     {
-      "seq": 36,
+      "seq": 35,
       "op": "create",
       "entity": "roles",
       "local_id": "ROL039",
@@ -618,7 +610,7 @@
       "depends_on": []
     },
     {
-      "seq": 37,
+      "seq": 36,
       "op": "create",
       "entity": "roles",
       "local_id": "ROL040",
@@ -636,7 +628,7 @@
       ]
     },
     {
-      "seq": 38,
+      "seq": 37,
       "op": "create",
       "entity": "roles",
       "local_id": "ROL043",
@@ -652,7 +644,7 @@
       "depends_on": []
     },
     {
-      "seq": 39,
+      "seq": 38,
       "op": "create",
       "entity": "roles",
       "local_id": "ROL044",
@@ -670,7 +662,7 @@
       ]
     },
     {
-      "seq": 40,
+      "seq": 39,
       "op": "create",
       "entity": "roles",
       "local_id": "ROL045",
@@ -688,7 +680,7 @@
       ]
     },
     {
-      "seq": 41,
+      "seq": 40,
       "op": "create",
       "entity": "roles",
       "local_id": "ROL046",
@@ -704,7 +696,7 @@
       "depends_on": []
     },
     {
-      "seq": 42,
+      "seq": 41,
       "op": "create",
       "entity": "roles",
       "local_id": "ROL047",
@@ -722,7 +714,7 @@
       ]
     },
     {
-      "seq": 43,
+      "seq": 42,
       "op": "create",
       "entity": "roles",
       "local_id": "ROL048",
@@ -740,7 +732,7 @@
       ]
     },
     {
-      "seq": 44,
+      "seq": 43,
       "op": "create",
       "entity": "roles",
       "local_id": "ROL049",
@@ -756,7 +748,7 @@
       "depends_on": []
     },
     {
-      "seq": 45,
+      "seq": 44,
       "op": "create",
       "entity": "roles",
       "local_id": "ROL050",
@@ -772,7 +764,7 @@
       "depends_on": []
     },
     {
-      "seq": 46,
+      "seq": 45,
       "op": "create",
       "entity": "roles",
       "local_id": "ROL055",
@@ -788,7 +780,7 @@
       "depends_on": []
     },
     {
-      "seq": 47,
+      "seq": 46,
       "op": "create",
       "entity": "roles",
       "local_id": "ROL056",
@@ -806,7 +798,7 @@
       ]
     },
     {
-      "seq": 48,
+      "seq": 47,
       "op": "create",
       "entity": "roles",
       "local_id": "ROL057",
@@ -822,7 +814,7 @@
       "depends_on": []
     },
     {
-      "seq": 49,
+      "seq": 48,
       "op": "create",
       "entity": "roles",
       "local_id": "ROL059",
@@ -838,7 +830,7 @@
       "depends_on": []
     },
     {
-      "seq": 50,
+      "seq": 49,
       "op": "create",
       "entity": "roles",
       "local_id": "ROL061",
@@ -854,7 +846,7 @@
       "depends_on": []
     },
     {
-      "seq": 51,
+      "seq": 50,
       "op": "create",
       "entity": "roles",
       "local_id": "ROL062",
@@ -870,7 +862,7 @@
       "depends_on": []
     },
     {
-      "seq": 52,
+      "seq": 51,
       "op": "create",
       "entity": "roles",
       "local_id": "ROL063",
@@ -886,7 +878,7 @@
       "depends_on": []
     },
     {
-      "seq": 53,
+      "seq": 52,
       "op": "create",
       "entity": "roles",
       "local_id": "ROL064",
@@ -902,7 +894,7 @@
       "depends_on": []
     },
     {
-      "seq": 54,
+      "seq": 53,
       "op": "create",
       "entity": "roles",
       "local_id": "ROL066",
@@ -918,7 +910,7 @@
       "depends_on": []
     },
     {
-      "seq": 55,
+      "seq": 54,
       "op": "create",
       "entity": "roles",
       "local_id": "ROL067",
@@ -934,7 +926,7 @@
       "depends_on": []
     },
     {
-      "seq": 56,
+      "seq": 55,
       "op": "create",
       "entity": "roles",
       "local_id": "ROL069",
@@ -950,7 +942,7 @@
       "depends_on": []
     },
     {
-      "seq": 57,
+      "seq": 56,
       "op": "create",
       "entity": "roles",
       "local_id": "ROL071",
@@ -966,7 +958,7 @@
       "depends_on": []
     },
     {
-      "seq": 58,
+      "seq": 57,
       "op": "create",
       "entity": "concepts",
       "local_id": "SBJ002",
@@ -983,7 +975,7 @@
       "depends_on": []
     },
     {
-      "seq": 59,
+      "seq": 58,
       "op": "create",
       "entity": "concepts",
       "local_id": "SBJ003",
@@ -1000,7 +992,7 @@
       "depends_on": []
     },
     {
-      "seq": 60,
+      "seq": 59,
       "op": "create",
       "entity": "concepts",
       "local_id": "SBJ004",
@@ -1017,7 +1009,7 @@
       "depends_on": []
     },
     {
-      "seq": 61,
+      "seq": 60,
       "op": "create",
       "entity": "concepts",
       "local_id": "SBJ008",
@@ -1034,7 +1026,7 @@
       "depends_on": []
     },
     {
-      "seq": 62,
+      "seq": 61,
       "op": "create",
       "entity": "concepts",
       "local_id": "SBJ009",
@@ -1051,7 +1043,7 @@
       "depends_on": []
     },
     {
-      "seq": 63,
+      "seq": 62,
       "op": "create",
       "entity": "concepts",
       "local_id": "SBJ011",
@@ -1068,24 +1060,7 @@
       "depends_on": []
     },
     {
-      "seq": 64,
-      "op": "create",
-      "entity": "concepts",
-      "local_id": "SBJ012",
-      "dda_id": null,
-      "fields": {
-        "concept_code": "Product",
-        "concept_name": "Product",
-        "concept_description": "There is one of these for each product the organisation makes, buys or sells that is a physical thing, such as a raw material, a pack component, an intermediate or a finished product. If you need to know which product a batch is of, and whether it is bought in or made, this is what you go by. What the product is made from, what it must be and what its pack says are held by CPG - Product Definition.",
-        "concept_domain": "DMD000000032",
-        "concept_is_domain": "DOM006",
-        "concept_parent": "Master",
-        "concept_parent_rel": null
-      },
-      "depends_on": []
-    },
-    {
-      "seq": 65,
+      "seq": 63,
       "op": "create",
       "entity": "concepts",
       "local_id": "SBJ016",
@@ -1096,15 +1071,13 @@
         "concept_description": "There is one of these for each batch of a product that was made, packed or received, known by the lot code given when it was first packed or transformed. If you need to know when it was made, how much there was and what to call it at every later movement, this is what you go by. What went into it and where it went are held on the links between production runs and batches.",
         "concept_domain": "DMD000000032",
         "concept_is_domain": null,
-        "concept_parent": "SBJ012",
+        "concept_parent": "Product",
         "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
       },
-      "depends_on": [
-        64
-      ]
+      "depends_on": []
     },
     {
-      "seq": 66,
+      "seq": 64,
       "op": "create",
       "entity": "concepts",
       "local_id": "SBJ017",
@@ -1119,11 +1092,11 @@
         "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
       },
       "depends_on": [
-        65
+        63
       ]
     },
     {
-      "seq": 67,
+      "seq": 65,
       "op": "create",
       "entity": "concepts",
       "local_id": "SBJ026",
@@ -1142,7 +1115,7 @@
       ]
     },
     {
-      "seq": 68,
+      "seq": 66,
       "op": "create",
       "entity": "concepts",
       "local_id": "SBJ027",
@@ -1158,11 +1131,11 @@
       },
       "depends_on": [
         1,
-        67
+        65
       ]
     },
     {
-      "seq": 69,
+      "seq": 67,
       "op": "create",
       "entity": "concepts",
       "local_id": "SBJ028",
@@ -1178,11 +1151,11 @@
       },
       "depends_on": [
         1,
-        67
+        65
       ]
     },
     {
-      "seq": 70,
+      "seq": 68,
       "op": "create",
       "entity": "concepts",
       "local_id": "SBJ029",
@@ -1198,11 +1171,11 @@
       },
       "depends_on": [
         1,
-        67
+        65
       ]
     },
     {
-      "seq": 71,
+      "seq": 69,
       "op": "create",
       "entity": "concepts",
       "local_id": "SBJ036",
@@ -1221,7 +1194,7 @@
       ]
     },
     {
-      "seq": 72,
+      "seq": 70,
       "op": "create",
       "entity": "concepts",
       "local_id": "SBJ037",
@@ -1237,11 +1210,11 @@
       },
       "depends_on": [
         2,
-        71
+        69
       ]
     },
     {
-      "seq": 73,
+      "seq": 71,
       "op": "create",
       "entity": "concepts",
       "local_id": "SBJ038",
@@ -1257,11 +1230,11 @@
       },
       "depends_on": [
         2,
-        71
+        69
       ]
     },
     {
-      "seq": 74,
+      "seq": 72,
       "op": "create",
       "entity": "concepts",
       "local_id": "SBJ039",
@@ -1277,11 +1250,11 @@
       },
       "depends_on": [
         2,
-        71
+        69
       ]
     },
     {
-      "seq": 75,
+      "seq": 73,
       "op": "create",
       "entity": "concepts",
       "local_id": "SBJ040",
@@ -1297,11 +1270,11 @@
       },
       "depends_on": [
         2,
-        71
+        69
       ]
     },
     {
-      "seq": 76,
+      "seq": 74,
       "op": "create",
       "entity": "concepts",
       "local_id": "SBJ041",
@@ -1317,11 +1290,11 @@
       },
       "depends_on": [
         2,
-        75
+        73
       ]
     },
     {
-      "seq": 77,
+      "seq": 75,
       "op": "create",
       "entity": "concepts",
       "local_id": "SBJ042",
@@ -1337,11 +1310,11 @@
       },
       "depends_on": [
         2,
-        76
+        74
       ]
     },
     {
-      "seq": 78,
+      "seq": 76,
       "op": "create",
       "entity": "concepts",
       "local_id": "SBJ043",
@@ -1360,7 +1333,7 @@
       ]
     },
     {
-      "seq": 79,
+      "seq": 77,
       "op": "create",
       "entity": "concepts",
       "local_id": "SBJ044",
@@ -1376,11 +1349,11 @@
       },
       "depends_on": [
         3,
-        78
+        76
       ]
     },
     {
-      "seq": 80,
+      "seq": 78,
       "op": "create",
       "entity": "concepts",
       "local_id": "SBJ045",
@@ -1396,11 +1369,11 @@
       },
       "depends_on": [
         3,
-        78
+        76
       ]
     },
     {
-      "seq": 81,
+      "seq": 79,
       "op": "create",
       "entity": "concepts",
       "local_id": "SBJ048",
@@ -1417,7 +1390,7 @@
       "depends_on": []
     },
     {
-      "seq": 82,
+      "seq": 80,
       "op": "create",
       "entity": "concepts",
       "local_id": "SBJ049",
@@ -1434,7 +1407,7 @@
       "depends_on": []
     },
     {
-      "seq": 83,
+      "seq": 81,
       "op": "create",
       "entity": "concepts",
       "local_id": "SBJ051",
@@ -1449,11 +1422,11 @@
         "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
       },
       "depends_on": [
-        82
+        80
       ]
     },
     {
-      "seq": 84,
+      "seq": 82,
       "op": "create",
       "entity": "concepts",
       "local_id": "SBJ053",
@@ -1468,11 +1441,11 @@
         "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
       },
       "depends_on": [
-        82
+        80
       ]
     },
     {
-      "seq": 85,
+      "seq": 83,
       "op": "create",
       "entity": "concepts",
       "local_id": "SBJ054",
@@ -1487,11 +1460,11 @@
         "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
       },
       "depends_on": [
-        82
+        80
       ]
     },
     {
-      "seq": 86,
+      "seq": 84,
       "op": "create",
       "entity": "concepts",
       "local_id": "SBJ055",
@@ -1506,11 +1479,11 @@
         "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
       },
       "depends_on": [
-        82
+        80
       ]
     },
     {
-      "seq": 87,
+      "seq": 85,
       "op": "create",
       "entity": "concepts",
       "local_id": "SBJ056",
@@ -1525,11 +1498,11 @@
         "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
       },
       "depends_on": [
-        82
+        80
       ]
     },
     {
-      "seq": 88,
+      "seq": 86,
       "op": "create",
       "entity": "concepts",
       "local_id": "SBJ057",
@@ -1544,11 +1517,11 @@
         "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
       },
       "depends_on": [
-        82
+        80
       ]
     },
     {
-      "seq": 89,
+      "seq": 87,
       "op": "create",
       "entity": "concepts",
       "local_id": "SBJ058",
@@ -1563,11 +1536,11 @@
         "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
       },
       "depends_on": [
-        82
+        80
       ]
     },
     {
-      "seq": 90,
+      "seq": 88,
       "op": "create",
       "entity": "concepts",
       "local_id": "SBJ060",
@@ -1582,11 +1555,11 @@
         "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
       },
       "depends_on": [
-        82
+        80
       ]
     },
     {
-      "seq": 91,
+      "seq": 89,
       "op": "create",
       "entity": "concepts",
       "local_id": "SBJ061",
@@ -1601,11 +1574,11 @@
         "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
       },
       "depends_on": [
-        82
+        80
       ]
     },
     {
-      "seq": 92,
+      "seq": 90,
       "op": "create",
       "entity": "concepts",
       "local_id": "SBJ062",
@@ -1620,11 +1593,11 @@
         "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
       },
       "depends_on": [
-        82
+        80
       ]
     },
     {
-      "seq": 93,
+      "seq": 91,
       "op": "create",
       "entity": "concepts",
       "local_id": "SBJ063",
@@ -1639,11 +1612,11 @@
         "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
       },
       "depends_on": [
-        82
+        80
       ]
     },
     {
-      "seq": 94,
+      "seq": 92,
       "op": "create",
       "entity": "concepts",
       "local_id": "SBJ064",
@@ -1658,11 +1631,11 @@
         "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
       },
       "depends_on": [
-        82
+        80
       ]
     },
     {
-      "seq": 95,
+      "seq": 93,
       "op": "create",
       "entity": "concepts",
       "local_id": "SBJ065",
@@ -1677,11 +1650,11 @@
         "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
       },
       "depends_on": [
-        82
+        80
       ]
     },
     {
-      "seq": 96,
+      "seq": 94,
       "op": "create",
       "entity": "concepts",
       "local_id": "SBJ066",
@@ -1696,11 +1669,11 @@
         "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
       },
       "depends_on": [
-        82
+        80
       ]
     },
     {
-      "seq": 97,
+      "seq": 95,
       "op": "create",
       "entity": "concepts",
       "local_id": "SBJ067",
@@ -1711,15 +1684,13 @@
         "concept_description": "There is one of these for each level a product is packed in, such as a single unit, a case or a pallet, with how many of the level below it holds. If you need to know how many units are in a case and how many cases are on a pallet, this is what you go by. What is in the pack and the wording on it are held by CPG - Product Definition.",
         "concept_domain": "DMD000000032",
         "concept_is_domain": null,
-        "concept_parent": "SBJ012",
+        "concept_parent": "Product",
         "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
       },
-      "depends_on": [
-        64
-      ]
+      "depends_on": []
     },
     {
-      "seq": 98,
+      "seq": 96,
       "op": "create",
       "entity": "concepts",
       "local_id": "SBJ068",
@@ -1736,7 +1707,7 @@
       "depends_on": []
     },
     {
-      "seq": 99,
+      "seq": 97,
       "op": "create",
       "entity": "concepts",
       "local_id": "SBJ034",
@@ -1752,11 +1723,11 @@
       },
       "depends_on": [
         3,
-        78
+        76
       ]
     },
     {
-      "seq": 100,
+      "seq": 98,
       "op": "create",
       "entity": "concepts",
       "local_id": "SBJ047",
@@ -1771,11 +1742,11 @@
         "concept_parent_rel": "ONE_TO_MANY_MANDATORY"
       },
       "depends_on": [
-        98
+        96
       ]
     },
     {
-      "seq": 101,
+      "seq": 99,
       "op": "create",
       "entity": "relationships",
       "local_id": "REL005",
@@ -1796,13 +1767,12 @@
         "relationship_mirror_view": "LegalEntityContractedProducts"
       },
       "depends_on": [
-        14,
-        15,
-        64
+        13,
+        14
       ]
     },
     {
-      "seq": 102,
+      "seq": 100,
       "op": "create",
       "entity": "relationships",
       "local_id": "REL006",
@@ -1823,14 +1793,13 @@
         "relationship_mirror_view": "ProcessSegmentRoutedProducts"
       },
       "depends_on": [
+        15,
         16,
-        17,
-        64,
-        71
+        69
       ]
     },
     {
-      "seq": 103,
+      "seq": 101,
       "op": "create",
       "entity": "relationships",
       "local_id": "REL007",
@@ -1851,13 +1820,13 @@
         "relationship_mirror_view": "ProcessSegmentLaterSteps"
       },
       "depends_on": [
+        17,
         18,
-        19,
-        71
+        69
       ]
     },
     {
-      "seq": 104,
+      "seq": 102,
       "op": "create",
       "entity": "relationships",
       "local_id": "REL008",
@@ -1878,14 +1847,14 @@
         "relationship_mirror_view": "LocationPermittedSteps"
       },
       "depends_on": [
+        19,
         20,
-        21,
-        71,
-        78
+        69,
+        76
       ]
     },
     {
-      "seq": 105,
+      "seq": 103,
       "op": "create",
       "entity": "relationships",
       "local_id": "REL009",
@@ -1906,13 +1875,13 @@
         "relationship_mirror_view": "ProcessSegmentDerivedRecipes"
       },
       "depends_on": [
+        21,
         22,
-        23,
-        71
+        69
       ]
     },
     {
-      "seq": 106,
+      "seq": 104,
       "op": "create",
       "entity": "relationships",
       "local_id": "REL011",
@@ -1933,14 +1902,14 @@
         "relationship_mirror_view": "InstanceOccupiedPlaces"
       },
       "depends_on": [
+        23,
         24,
-        25,
-        67,
-        78
+        65,
+        76
       ]
     },
     {
-      "seq": 107,
+      "seq": 105,
       "op": "create",
       "entity": "relationships",
       "local_id": "REL013",
@@ -1961,14 +1930,13 @@
         "relationship_mirror_view": "ProductIndividualUnits"
       },
       "depends_on": [
+        25,
         26,
-        27,
-        64,
-        67
+        65
       ]
     },
     {
-      "seq": 108,
+      "seq": 106,
       "op": "create",
       "entity": "relationships",
       "local_id": "REL014",
@@ -1989,13 +1957,13 @@
         "relationship_mirror_view": "InstanceAssembledUnits"
       },
       "depends_on": [
+        27,
         28,
-        29,
-        67
+        65
       ]
     },
     {
-      "seq": 109,
+      "seq": 107,
       "op": "create",
       "entity": "relationships",
       "local_id": "REL015",
@@ -2016,14 +1984,13 @@
         "relationship_mirror_view": "ProductAssembledUnits"
       },
       "depends_on": [
-        28,
-        57,
-        64,
-        67
+        27,
+        56,
+        65
       ]
     },
     {
-      "seq": 110,
+      "seq": 108,
       "op": "create",
       "entity": "relationships",
       "local_id": "REL016",
@@ -2044,13 +2011,13 @@
         "relationship_mirror_view": "LocationContainedPlaces"
       },
       "depends_on": [
+        29,
         30,
-        31,
-        78
+        76
       ]
     },
     {
-      "seq": 111,
+      "seq": 109,
       "op": "create",
       "entity": "relationships",
       "local_id": "REL018",
@@ -2071,13 +2038,13 @@
         "relationship_mirror_view": "LegalEntityRegisteredPlaces"
       },
       "depends_on": [
+        33,
         34,
-        35,
-        78
+        76
       ]
     },
     {
-      "seq": 112,
+      "seq": 110,
       "op": "create",
       "entity": "relationships",
       "local_id": "REL019",
@@ -2098,13 +2065,13 @@
         "relationship_mirror_view": "LocationSiteOperators"
       },
       "depends_on": [
+        31,
         32,
-        33,
-        78
+        76
       ]
     },
     {
-      "seq": 113,
+      "seq": 111,
       "op": "create",
       "entity": "relationships",
       "local_id": "REL021",
@@ -2125,13 +2092,13 @@
         "relationship_mirror_view": "ProcessSegmentQualifiedPeople"
       },
       "depends_on": [
+        35,
         36,
-        37,
-        71
+        69
       ]
     },
     {
-      "seq": 114,
+      "seq": 112,
       "op": "create",
       "entity": "relationships",
       "local_id": "REL023",
@@ -2152,12 +2119,11 @@
         "relationship_mirror_view": "ProductTransactions"
       },
       "depends_on": [
-        38,
-        64
+        37
       ]
     },
     {
-      "seq": 115,
+      "seq": 113,
       "op": "create",
       "entity": "relationships",
       "local_id": "REL024",
@@ -2178,12 +2144,12 @@
         "relationship_mirror_view": "LocationTransactions"
       },
       "depends_on": [
-        39,
-        78
+        38,
+        76
       ]
     },
     {
-      "seq": 116,
+      "seq": 114,
       "op": "create",
       "entity": "relationships",
       "local_id": "REL025",
@@ -2204,12 +2170,12 @@
         "relationship_mirror_view": "TransactionReceivingPlacesOf"
       },
       "depends_on": [
-        40,
-        78
+        39,
+        76
       ]
     },
     {
-      "seq": 117,
+      "seq": 115,
       "op": "create",
       "entity": "relationships",
       "local_id": "REL026",
@@ -2230,14 +2196,14 @@
         "relationship_mirror_view": "LocationProductionRuns"
       },
       "depends_on": [
+        40,
         41,
-        42,
-        78,
-        82
+        76,
+        80
       ]
     },
     {
-      "seq": 118,
+      "seq": 116,
       "op": "create",
       "entity": "relationships",
       "local_id": "REL027",
@@ -2258,14 +2224,14 @@
         "relationship_mirror_view": "ProcessSegmentProductionRuns"
       },
       "depends_on": [
-        41,
-        43,
-        71,
-        82
+        40,
+        42,
+        69,
+        80
       ]
     },
     {
-      "seq": 119,
+      "seq": 117,
       "op": "create",
       "entity": "relationships",
       "local_id": "REL028",
@@ -2286,13 +2252,13 @@
         "relationship_mirror_view": "PersonPerformedWorks"
       },
       "depends_on": [
+        43,
         44,
-        45,
-        82
+        80
       ]
     },
     {
-      "seq": 120,
+      "seq": 118,
       "op": "create",
       "entity": "relationships",
       "local_id": "REL029",
@@ -2313,14 +2279,13 @@
         "relationship_mirror_view": "EventBatchesConsumedOf"
       },
       "depends_on": [
-        41,
-        57,
-        64,
-        82
+        40,
+        56,
+        80
       ]
     },
     {
-      "seq": 121,
+      "seq": 119,
       "op": "create",
       "entity": "relationships",
       "local_id": "REL030",
@@ -2341,14 +2306,13 @@
         "relationship_mirror_view": "EventBatchesProducedOf"
       },
       "depends_on": [
-        41,
-        57,
-        64,
-        82
+        40,
+        56,
+        80
       ]
     },
     {
-      "seq": 122,
+      "seq": 120,
       "op": "create",
       "entity": "relationships",
       "local_id": "REL031",
@@ -2369,14 +2333,14 @@
         "relationship_mirror_view": "InstanceStoppages"
       },
       "depends_on": [
+        45,
         46,
-        47,
-        67,
-        82
+        65,
+        80
       ]
     },
     {
-      "seq": 123,
+      "seq": 121,
       "op": "create",
       "entity": "relationships",
       "local_id": "REL032",
@@ -2397,14 +2361,13 @@
         "relationship_mirror_view": "EventBatchesFoundAgainstOf"
       },
       "depends_on": [
-        48,
-        57,
-        64,
-        82
+        47,
+        56,
+        80
       ]
     },
     {
-      "seq": 124,
+      "seq": 122,
       "op": "create",
       "entity": "relationships",
       "local_id": "REL033",
@@ -2425,14 +2388,13 @@
         "relationship_mirror_view": "EventBatchesComplainedOfOf"
       },
       "depends_on": [
-        49,
-        57,
-        64,
-        82
+        48,
+        56,
+        80
       ]
     },
     {
-      "seq": 125,
+      "seq": 123,
       "op": "create",
       "entity": "relationships",
       "local_id": "REL034",
@@ -2453,13 +2415,13 @@
         "relationship_mirror_view": "EventResponses"
       },
       "depends_on": [
+        49,
         50,
-        51,
-        82
+        80
       ]
     },
     {
-      "seq": 126,
+      "seq": 124,
       "op": "create",
       "entity": "relationships",
       "local_id": "REL035",
@@ -2480,13 +2442,13 @@
         "relationship_mirror_view": "EventCorrections"
       },
       "depends_on": [
+        51,
         52,
-        53,
-        82
+        80
       ]
     },
     {
-      "seq": 127,
+      "seq": 125,
       "op": "create",
       "entity": "relationships",
       "local_id": "REL036",
@@ -2507,13 +2469,13 @@
         "relationship_mirror_view": "LegalEntityFindings"
       },
       "depends_on": [
-        48,
-        54,
-        82
+        47,
+        53,
+        80
       ]
     },
     {
-      "seq": 128,
+      "seq": 126,
       "op": "create",
       "entity": "relationships",
       "local_id": "REL037",
@@ -2534,13 +2496,12 @@
         "relationship_mirror_view": "ProductDeclaringDocuments"
       },
       "depends_on": [
-        55,
-        57,
-        64
+        54,
+        56
       ]
     },
     {
-      "seq": 129,
+      "seq": 127,
       "op": "create",
       "entity": "relationships",
       "local_id": "REL038",
@@ -2561,14 +2522,13 @@
         "relationship_mirror_view": "EventBatchesExposedOf"
       },
       "depends_on": [
+        55,
         56,
-        57,
-        64,
-        82
+        80
       ]
     },
     {
-      "seq": 130,
+      "seq": 128,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR002",
@@ -2584,12 +2544,12 @@
         "attribute_classification": null
       },
       "depends_on": [
-        10,
-        120
+        9,
+        118
       ]
     },
     {
-      "seq": 131,
+      "seq": 129,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR006",
@@ -2605,11 +2565,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        109
+        107
       ]
     },
     {
-      "seq": 132,
+      "seq": 130,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR008",
@@ -2625,11 +2585,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        101
+        99
       ]
     },
     {
-      "seq": 133,
+      "seq": 131,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR009",
@@ -2645,11 +2605,11 @@
         "attribute_classification": "INTERNAL"
       },
       "depends_on": [
-        106
+        104
       ]
     },
     {
-      "seq": 134,
+      "seq": 132,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR010",
@@ -2665,11 +2625,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        119
+        117
       ]
     },
     {
-      "seq": 135,
+      "seq": 133,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR011",
@@ -2685,11 +2645,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        120
+        118
       ]
     },
     {
-      "seq": 136,
+      "seq": 134,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR012",
@@ -2705,11 +2665,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        121
+        119
       ]
     },
     {
-      "seq": 137,
+      "seq": 135,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR013",
@@ -2725,11 +2685,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        122
+        120
       ]
     },
     {
-      "seq": 138,
+      "seq": 136,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR014",
@@ -2745,11 +2705,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        128
+        126
       ]
     },
     {
-      "seq": 139,
+      "seq": 137,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR015",
@@ -2765,52 +2725,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        129
+        127
       ]
     },
     {
-      "seq": 140,
-      "op": "create",
-      "entity": "attributes",
-      "local_id": "ATR017",
-      "dda_id": null,
-      "fields": {
-        "attribute_code": "ProductKind",
-        "attribute_name": "ProductKind",
-        "attribute_fqn_name": "ProductKind",
-        "attribute_description": "What a product is to the organisation, such as a raw material, a pack component or a finished unit. It decides whether the product may be bought, made, used in other products or sold.",
-        "attribute_type": "LOOKUP",
-        "attribute_lookup_type": "LKP001",
-        "attribute_concept": "SBJ012",
-        "attribute_classification": null
-      },
-      "depends_on": [
-        4,
-        64
-      ]
-    },
-    {
-      "seq": 141,
-      "op": "create",
-      "entity": "attributes",
-      "local_id": "ATR018",
-      "dda_id": null,
-      "fields": {
-        "attribute_code": "ProductIsPurchased",
-        "attribute_name": "ProductIsPurchased",
-        "attribute_fqn_name": "ProductIsPurchased",
-        "attribute_description": "Whether the organisation buys the product in finished, so that what is inside it is known only from the supplier's declaration.",
-        "attribute_type": "BOOLEAN",
-        "attribute_lookup_type": null,
-        "attribute_concept": "SBJ012",
-        "attribute_classification": null
-      },
-      "depends_on": [
-        64
-      ]
-    },
-    {
-      "seq": 142,
+      "seq": 138,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR029",
@@ -2826,11 +2745,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        65
+        63
       ]
     },
     {
-      "seq": 143,
+      "seq": 139,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR030",
@@ -2846,11 +2765,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        65
+        63
       ]
     },
     {
-      "seq": 144,
+      "seq": 140,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR032",
@@ -2866,11 +2785,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        65
+        63
       ]
     },
     {
-      "seq": 145,
+      "seq": 141,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR033",
@@ -2886,11 +2805,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        66
+        64
       ]
     },
     {
-      "seq": 146,
+      "seq": 142,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR048",
@@ -2906,11 +2825,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        67
+        65
       ]
     },
     {
-      "seq": 147,
+      "seq": 143,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR049",
@@ -2926,11 +2845,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        68
+        66
       ]
     },
     {
-      "seq": 148,
+      "seq": 144,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR050",
@@ -2946,11 +2865,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        69
+        67
       ]
     },
     {
-      "seq": 149,
+      "seq": 145,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR051",
@@ -2966,11 +2885,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        69
+        67
       ]
     },
     {
-      "seq": 150,
+      "seq": 146,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR052",
@@ -2986,11 +2905,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        70
+        68
       ]
     },
     {
-      "seq": 151,
+      "seq": 147,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR053",
@@ -3006,11 +2925,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        67
+        65
       ]
     },
     {
-      "seq": 152,
+      "seq": 148,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR054",
@@ -3026,12 +2945,12 @@
         "attribute_classification": null
       },
       "depends_on": [
-        6,
-        78
+        5,
+        76
       ]
     },
     {
-      "seq": 153,
+      "seq": 149,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR057",
@@ -3047,11 +2966,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        99
+        97
       ]
     },
     {
-      "seq": 154,
+      "seq": 150,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR058",
@@ -3067,11 +2986,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        99
+        97
       ]
     },
     {
-      "seq": 155,
+      "seq": 151,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR060",
@@ -3087,11 +3006,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        71
+        69
       ]
     },
     {
-      "seq": 156,
+      "seq": 152,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR061",
@@ -3107,11 +3026,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        72
+        70
       ]
     },
     {
-      "seq": 157,
+      "seq": 153,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR062",
@@ -3127,11 +3046,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        73
+        71
       ]
     },
     {
-      "seq": 158,
+      "seq": 154,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR063",
@@ -3147,11 +3066,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        73
+        71
       ]
     },
     {
-      "seq": 159,
+      "seq": 155,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR064",
@@ -3167,11 +3086,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        77
+        75
       ]
     },
     {
-      "seq": 160,
+      "seq": 156,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR065",
@@ -3187,12 +3106,12 @@
         "attribute_classification": null
       },
       "depends_on": [
-        5,
-        76
+        4,
+        74
       ]
     },
     {
-      "seq": 161,
+      "seq": 157,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR066",
@@ -3208,11 +3127,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        76
+        74
       ]
     },
     {
-      "seq": 162,
+      "seq": 158,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR067",
@@ -3228,11 +3147,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        74
+        72
       ]
     },
     {
-      "seq": 163,
+      "seq": 159,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR068",
@@ -3248,11 +3167,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        75
+        73
       ]
     },
     {
-      "seq": 164,
+      "seq": 160,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR069",
@@ -3268,11 +3187,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        78
+        76
       ]
     },
     {
-      "seq": 165,
+      "seq": 161,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR070",
@@ -3288,11 +3207,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        79
+        77
       ]
     },
     {
-      "seq": 166,
+      "seq": 162,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR071",
@@ -3308,11 +3227,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        79
+        77
       ]
     },
     {
-      "seq": 167,
+      "seq": 163,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR072",
@@ -3328,11 +3247,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        80
+        78
       ]
     },
     {
-      "seq": 168,
+      "seq": 164,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR073",
@@ -3348,11 +3267,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        80
+        78
       ]
     },
     {
-      "seq": 169,
+      "seq": 165,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR074",
@@ -3368,11 +3287,11 @@
         "attribute_classification": "INTERNAL_PII"
       },
       "depends_on": [
-        58
+        57
       ]
     },
     {
-      "seq": 170,
+      "seq": 166,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR075",
@@ -3388,11 +3307,11 @@
         "attribute_classification": "INTERNAL_PII"
       },
       "depends_on": [
-        58
+        57
       ]
     },
     {
-      "seq": 171,
+      "seq": 167,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR076",
@@ -3408,11 +3327,11 @@
         "attribute_classification": "INTERNAL_PII"
       },
       "depends_on": [
-        59
+        58
       ]
     },
     {
-      "seq": 172,
+      "seq": 168,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR077",
@@ -3428,11 +3347,11 @@
         "attribute_classification": "INTERNAL_PII"
       },
       "depends_on": [
-        60
+        59
       ]
     },
     {
-      "seq": 173,
+      "seq": 169,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR078",
@@ -3448,11 +3367,11 @@
         "attribute_classification": "INTERNAL_PII"
       },
       "depends_on": [
-        60
+        59
       ]
     },
     {
-      "seq": 174,
+      "seq": 170,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR079",
@@ -3468,11 +3387,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        60
+        59
       ]
     },
     {
-      "seq": 175,
+      "seq": 171,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR080",
@@ -3488,11 +3407,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        61
+        60
       ]
     },
     {
-      "seq": 176,
+      "seq": 172,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR081",
@@ -3508,11 +3427,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        61
+        60
       ]
     },
     {
-      "seq": 177,
+      "seq": 173,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR082",
@@ -3528,11 +3447,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        62
+        61
       ]
     },
     {
-      "seq": 178,
+      "seq": 174,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR083",
@@ -3548,11 +3467,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        63
+        62
       ]
     },
     {
-      "seq": 179,
+      "seq": 175,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR084",
@@ -3568,11 +3487,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        63
+        62
       ]
     },
     {
-      "seq": 180,
+      "seq": 176,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR085",
@@ -3588,12 +3507,12 @@
         "attribute_classification": null
       },
       "depends_on": [
-        9,
-        98
+        8,
+        96
       ]
     },
     {
-      "seq": 181,
+      "seq": 177,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR086",
@@ -3609,11 +3528,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        98
+        96
       ]
     },
     {
-      "seq": 182,
+      "seq": 178,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR087",
@@ -3629,11 +3548,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        98
+        96
       ]
     },
     {
-      "seq": 183,
+      "seq": 179,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR088",
@@ -3649,11 +3568,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        100
+        98
       ]
     },
     {
-      "seq": 184,
+      "seq": 180,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR089",
@@ -3669,11 +3588,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        81
+        79
       ]
     },
     {
-      "seq": 185,
+      "seq": 181,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR090",
@@ -3689,11 +3608,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        81
+        79
       ]
     },
     {
-      "seq": 186,
+      "seq": 182,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR091",
@@ -3709,11 +3628,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        81
+        79
       ]
     },
     {
-      "seq": 187,
+      "seq": 183,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR092",
@@ -3729,11 +3648,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        82
+        80
       ]
     },
     {
-      "seq": 188,
+      "seq": 184,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR093",
@@ -3749,11 +3668,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        83
+        81
       ]
     },
     {
-      "seq": 189,
+      "seq": 185,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR094",
@@ -3769,11 +3688,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        83
+        81
       ]
     },
     {
-      "seq": 190,
+      "seq": 186,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR095",
@@ -3789,11 +3708,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        83
+        81
       ]
     },
     {
-      "seq": 191,
+      "seq": 187,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR096",
@@ -3809,11 +3728,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        84
+        82
       ]
     },
     {
-      "seq": 192,
+      "seq": 188,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR097",
@@ -3829,11 +3748,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        85
+        83
       ]
     },
     {
-      "seq": 193,
+      "seq": 189,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR098",
@@ -3849,11 +3768,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        85
+        83
       ]
     },
     {
-      "seq": 194,
+      "seq": 190,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR099",
@@ -3869,12 +3788,12 @@
         "attribute_classification": null
       },
       "depends_on": [
-        7,
-        86
+        6,
+        84
       ]
     },
     {
-      "seq": 195,
+      "seq": 191,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR100",
@@ -3890,11 +3809,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        86
+        84
       ]
     },
     {
-      "seq": 196,
+      "seq": 192,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR101",
@@ -3910,11 +3829,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        86
+        84
       ]
     },
     {
-      "seq": 197,
+      "seq": 193,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR103",
@@ -3930,11 +3849,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        88
+        86
       ]
     },
     {
-      "seq": 198,
+      "seq": 194,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR104",
@@ -3950,11 +3869,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        88
+        86
       ]
     },
     {
-      "seq": 199,
+      "seq": 195,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR105",
@@ -3970,11 +3889,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        88
+        86
       ]
     },
     {
-      "seq": 200,
+      "seq": 196,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR106",
@@ -3990,11 +3909,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        89
+        87
       ]
     },
     {
-      "seq": 201,
+      "seq": 197,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR107",
@@ -4010,11 +3929,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        89
+        87
       ]
     },
     {
-      "seq": 202,
+      "seq": 198,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR110",
@@ -4030,12 +3949,12 @@
         "attribute_classification": null
       },
       "depends_on": [
-        8,
-        90
+        7,
+        88
       ]
     },
     {
-      "seq": 203,
+      "seq": 199,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR111",
@@ -4051,11 +3970,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        90
+        88
       ]
     },
     {
-      "seq": 204,
+      "seq": 200,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR112",
@@ -4071,11 +3990,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        91
+        89
       ]
     },
     {
-      "seq": 205,
+      "seq": 201,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR113",
@@ -4091,11 +4010,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        91
+        89
       ]
     },
     {
-      "seq": 206,
+      "seq": 202,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR114",
@@ -4111,11 +4030,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        91
+        89
       ]
     },
     {
-      "seq": 207,
+      "seq": 203,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR115",
@@ -4131,11 +4050,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        92
+        90
       ]
     },
     {
-      "seq": 208,
+      "seq": 204,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR116",
@@ -4151,11 +4070,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        92
+        90
       ]
     },
     {
-      "seq": 209,
+      "seq": 205,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR117",
@@ -4171,11 +4090,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        93
+        91
       ]
     },
     {
-      "seq": 210,
+      "seq": 206,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR118",
@@ -4191,11 +4110,11 @@
         "attribute_classification": "CUSTOMER"
       },
       "depends_on": [
-        94
+        92
       ]
     },
     {
-      "seq": 211,
+      "seq": 207,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR119",
@@ -4211,11 +4130,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        95
+        93
       ]
     },
     {
-      "seq": 212,
+      "seq": 208,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR120",
@@ -4231,11 +4150,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        96
+        94
       ]
     },
     {
-      "seq": 213,
+      "seq": 209,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR121",
@@ -4251,11 +4170,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        120
+        118
       ]
     },
     {
-      "seq": 214,
+      "seq": 210,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR122",
@@ -4271,11 +4190,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        120
+        118
       ]
     },
     {
-      "seq": 215,
+      "seq": 211,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR123",
@@ -4291,12 +4210,12 @@
         "attribute_classification": null
       },
       "depends_on": [
-        12,
-        97
+        11,
+        95
       ]
     },
     {
-      "seq": 216,
+      "seq": 212,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR124",
@@ -4312,11 +4231,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        97
+        95
       ]
     },
     {
-      "seq": 217,
+      "seq": 213,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR125",
@@ -4332,11 +4251,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        97
+        95
       ]
     },
     {
-      "seq": 218,
+      "seq": 214,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR126",
@@ -4352,11 +4271,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        87
+        85
       ]
     },
     {
-      "seq": 219,
+      "seq": 215,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR127",
@@ -4372,12 +4291,12 @@
         "attribute_classification": null
       },
       "depends_on": [
-        13,
-        67
+        12,
+        65
       ]
     },
     {
-      "seq": 220,
+      "seq": 216,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR128",
@@ -4393,11 +4312,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        88
+        86
       ]
     },
     {
-      "seq": 221,
+      "seq": 217,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR129",
@@ -4413,12 +4332,12 @@
         "attribute_classification": null
       },
       "depends_on": [
-        11,
-        89
+        10,
+        87
       ]
     },
     {
-      "seq": 222,
+      "seq": 218,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR130",
@@ -4434,11 +4353,11 @@
         "attribute_classification": null
       },
       "depends_on": [
-        70
+        68
       ]
     },
     {
-      "seq": 223,
+      "seq": 219,
       "op": "create",
       "entity": "models",
       "local_id": "MODEL001",
@@ -4532,6 +4451,7 @@
         ]
       },
       "depends_on": [
+        13,
         14,
         15,
         16,
@@ -4575,7 +4495,8 @@
         54,
         55,
         56,
-        57,
+        99,
+        100,
         101,
         102,
         103,
@@ -4602,9 +4523,7 @@
         124,
         125,
         126,
-        127,
-        128,
-        129
+        127
       ]
     }
   ]

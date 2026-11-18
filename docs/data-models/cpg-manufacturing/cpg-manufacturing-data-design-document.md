@@ -7,7 +7,7 @@ This **Data Model Design Document** by **M&A Operating System** provides a singl
 |  |  |
 |---|---|
 | Domain | CPG Manufacturing and Supply Chain |
-| Document date | 16 November 2026 |
+| Document date | 18 November 2026 |
 | Package reference (the working files this document is produced from) | cpg-manufacturing |
 | Method version | 31.5 |
 | Edition | Lite |
@@ -140,7 +140,7 @@ The design has stated limits. The chain of what goes into what stops at anything
 - Was this batch ever stored outside its permitted conditions?
 - How many units are in a case of this product, and how many cases on a pallet?
 
-This design creates 43 concepts, 48 roles, 29 relationships and nine lists of values in DDA, extends one existing domain (Locations) with the structure of a factory, adds seven values to one existing list, and reuses six existing domains and six existing concepts. It proposes two new domains.
+This design creates 42 concepts, 48 roles, 29 relationships and eight lists of values in DDA, extends one existing domain (Locations) with the structure of a factory, adds seven values to one existing list, and reuses six existing domains and six existing concepts. It refers to one concept, Product, that CPG - Product Definition creates and owns. It proposes two new domains.
 
 |  | Count |
 |---|---|
@@ -150,7 +150,7 @@ This design creates 43 concepts, 48 roles, 29 relationships and nine lists of va
 | Roles, meaning the part something plays in a relationship | 48 |
 | Relationships between roles | 31 |
 | Concepts, meaning groups of related facts | 49 |
-| Lists of allowed values | 10 |
+| Lists of allowed values | 9 |
 | Business test cases | 30 pass · 2 with a limit accepted |
 | Sources | 38 |
 
@@ -158,7 +158,7 @@ This design creates 43 concepts, 48 roles, 29 relationships and nine lists of va
 
 ### 2.1 The business
 
-A manufacturer of food and beverage products. It receives materials, makes, packs and tests product, and releases it for despatch, through its own factories and through outside manufacturers.
+A manufacturer of food and beverage products. It receives materials, makes, packs and tests product, and releases it for despatch, through its own factories and through outside manufacturers. What a product is and what goes into it is held by CPG - Product Definition; this model holds the logistics of making finished products from those ingredients.
 
 The subgroup in scope is food and beverage.
 
@@ -176,6 +176,7 @@ The subgroup in scope is food and beverage.
 | SCI009 | Product made or packed by outside manufacturers |
 | SCI010 | Packing, and the levels a product is packed in for handling — unit, case and pallet |
 | SCI011 | The sites that suppliers and outside manufacturers make and ship from |
+| SCI012 | Turning ingredients into finished products: the logistics of receiving, making, packing and moving them, built on the product and the hierarchy of products and ingredients held by CPG - Product Definition |
 
 ### 2.3 Out of scope
 
@@ -780,7 +781,7 @@ Every concept the design uses, whether DDA already has it or the design adds it.
 | Transactions | <a id="sbj047"></a>SBJ047<br>**Transaction Goods Movement Lines**<br>TransactionGoodsMovementLines | New | There is one of these for each item and quantity on a movement of goods. If you need to know how much of what moved, this is what you go by. The parties and places of the movement are held on the movement itself. | Transaction Goods Movement | For each transaction goods movement: one or many | [DRQ024](#drq024) |
 | Transactions | <a id="sbj048"></a>SBJ048<br>**Transaction Inventory Positions**<br>TransactionInventoryPositions | New | There is one of these for each count of an item held at a place, in a stated condition, at a time. If you need to know how much is available, on hold or rejected right now, this is what you go by. A decision to hold material is recorded as a disposition. | Transaction | For each transaction: many, or none | [DRQ013](#drq013) |
 | Transactions | <a id="sbj068"></a>SBJ068<br>**Transaction Goods Movement**<br>TransactionGoodsMovement | New | There is one of these for each time goods are received, issued, moved, bought or despatched, with the time it happened. If you need to know where goods went and when, this is what you go by. How much of an item is held at a point in time is held as stock positions. It is a movement of goods; a movement of money or of a holding is the transaction it sits beneath. | Transaction | For each transaction: one, or none | [DRQ024](#drq024) · [DRQ033](#drq033) |
-| Products | <a id="sbj012"></a>SBJ012<br>**Product**<br>Product | New | There is one of these for each product the organisation makes, buys or sells that is a physical thing, such as a raw material, a pack component, an intermediate or a finished product. If you need to know which product a batch is of, and whether it is bought in or made, this is what you go by. What the product is made from, what it must be and what its pack says are held by CPG - Product Definition. | — | — | [DRQ008](#drq008) · [DRQ013](#drq013) |
+| Products | <a id="sbj012"></a>SBJ012<br>**Product**<br>Product | Created by CPG - Product Definition | One product, whether it is bought in, made or sold, as CPG - Product Definition defines it. This design uses it for the product a batch is of, the product a pack level is for and the product a production run makes. | — | — | [DRQ008](#drq008) · [DRQ013](#drq013) |
 | Products | <a id="sbj016"></a>SBJ016<br>**Product Batches**<br>ProductBatches | New | There is one of these for each batch of a product that was made, packed or received, known by the lot code given when it was first packed or transformed. If you need to know when it was made, how much there was and what to call it at every later movement, this is what you go by. What went into it and where it went are held on the links between production runs and batches. | Product | For each product: many, or none | [DRQ012](#drq012) · [DRQ030](#drq030) |
 | Products | <a id="sbj017"></a>SBJ017<br>**Product Sub Batches**<br>ProductSubBatches | New | There is one of these for each part a batch is divided into, with the quantity of that part. If you need to know which batch a quantity came from, this is what you go by. A batch combined from others is shown by the links between production runs and batches, not here. | Product Batches | For each product batches: many, or none | [DRQ012](#drq012) |
 | Products | <a id="sbj067"></a>SBJ067<br>**Product Pack Levels**<br>ProductPackLevels | New | There is one of these for each level a product is packed in, such as a single unit, a case or a pallet, with how many of the level below it holds. If you need to know how many units are in a case and how many cases are on a pallet, this is what you go by. What is in the pack and the wording on it are held by CPG - Product Definition. | Product | For each product: many, or none | [DRQ037](#drq037) |
@@ -920,22 +921,6 @@ How specific a recipe is, from the general recipe the company holds to the instr
 | **Master recipe**<br>MASTER | Bound to one work centre, with its settings. |
 | **Control recipe**<br>CONTROL | The instructions issued for one batch. This is what runs. |
 
-#### Product Kind Type
-
-What a product is to this organisation, deciding whether it may be bought, made, used or sold. A product may be more than one kind at once.
-
-| List | In DDA | Used for |
-|---|---|---|
-| <a id="lkp001"></a>LKP001 ProductKindType | New | Product |
-
-| Value | Meaning |
-|---|---|
-| **Raw material**<br>RAWMATERIAL | An ingredient or substance that enters a formulation. |
-| **Packaging component**<br>PACKCOMPONENT | A container, closure, label, case or divider. |
-| **Indirect material**<br>INDIRECT | Used in production without entering the product. |
-| **Part-made good**<br>INTERMEDIATE | Made and used internally; neither bought nor sold. |
-| **Consumer unit**<br>CONSUMERUNIT | The unit a consumer buys. |
-
 #### Product Pack Levels Level Type
 
 The levels a product is packed in, from the single unit up to the pallet. It names the level and does not say how many the level holds.
@@ -981,7 +966,6 @@ Design choices that remain open.
 | DEC005 | Is finished output identified individually, or only by batch? (SCQ001) | individually · batch only · both |
 | DEC007 | State transitions could not be read from DDA, so the change package carries no preconditions. | retry before applying · apply without preconditions |
 | DEC008 | The Events and Transactions domain definitions in DDA are written for financial services. Broaden them to cover making and moving goods. | broaden · leave as is |
-| DEC009 | Product is proposed both here and by CPG - Product Definition, because DDA's Products domain still holds no concept (read on 16 November 2026). Which model creates it, and which refers to it? | CPG - Product Definition creates it · this model creates it |
 | DEC011 | Two years is the retention period given for traceability records. The rule's own text could not be read, so the period is unconfirmed. | keep two years · use the period in the rule |
 | DEC013 | DDA's Transaction is a movement of money or of a holding between two parties, with legs that balance, and says balances are never stored on it. Goods movements sit beneath it as the more specific kind it anticipates, and stock positions sit beneath it as counts. Keep both beneath Transaction, or propose a separate home for goods. | keep beneath Transaction · separate home for goods |
 
@@ -1049,9 +1033,9 @@ Each case is a question the business must be able to ask, with the path through 
 | SCN005 | Which batches used an alternative input, and for which ingredient? | Designed | as-at | [REQ007](#req007) | Event Production Runs → Event Batch Inputs → Event Batch Inputs Is Alternative → Event Batch Inputs Quantity Used | Pass | — |
 | SCN006 | Did this supplier hold a valid assessment on the day a delivery was received? | Designed | as-at | [REQ058](#req058) | Legal Entity → Legal Entity Assessments → Legal Entity Assessments Scope → Legal Entity Assessments Valid Until | Pass | — |
 | SCN007 | Which of this batch's stated properties were tested here, and which were taken on the supplier's word? | Designed | current | [REQ009](#req009) | Document → Document Declarations → Document Batch Declarations → Document Batch Declarations Verified → Document Declarations Property | Pass | — |
-| SCN008 | Which products depend on a bought-in ingredient whose contents we rely on the supplier to declare? | Designed | current | [REQ010](#req010) · [REQ063](#req063) | Product → Product Is Purchased → Document Declarations → Document Declarations Property | Pass | — |
+| SCN008 | Which products depend on a bought-in ingredient whose contents we rely on the supplier to declare? | Designed | current | [REQ010](#req010) · [REQ063](#req063) | Product → Document Declarations → Document Declarations Property | Pass | — |
 | SCN012 | Which batches came from this one, and which batches made up this combined one? | Designed | current | [REQ016](#req016) | Product Batches → Product Sub Batches → Product Batches Made On → Product Batches Quantity Made | Pass | — |
-| SCN013 | How much of this material is available, on hold, or rejected at each site right now? | Designed | as-at | [REQ001](#req001) · [REQ017](#req017) · [REQ018](#req018) | Transaction Inventory Positions Condition → Product → Transaction Inventory Positions → Product Kind → Transaction Inventory Positions Quantity | Pass | — |
+| SCN013 | How much of this material is available, on hold, or rejected at each site right now? | Designed | as-at | [REQ001](#req001) · [REQ017](#req017) · [REQ018](#req018) | Transaction Inventory Positions Condition → Product → Transaction Inventory Positions → Transaction Inventory Positions Quantity | Pass | — |
 | SCN016 | What exactly is inside this individual unit, and which batch did each part come from? | Designed | as-at | [REQ023](#req023) · [REQ024](#req024) | Instance Composition → Instance → Instance Identifiers → Instance Definitions → Instance Batch Composition → Instance Batch Composition Quantity | Pass | — |
 | SCN017 | What steps, equipment, qualifications and settings does making this product need on this line? | Designed | current | [REQ025](#req025) · [REQ026](#req026) · [REQ027](#req027) · [REQ028](#req028) | Process Segment → Process Segment Requirements → Product Routings → Process Segment Sequences → Process Segment Name → Process Segment Requirements Kind → Process Parameters Lower Limit | Pass | — |
 | SCN018 | Which instructions were issued for this batch, and which formulation did they come from? | Designed | as-at | [REQ029](#req029) · [REQ030](#req030) | Process Recipe Derivations → Process Recipe Levels → Process Parameter Values → Event Run Recipes → Process Parameter Values Value → Process Recipe Levels Level | Pass | — |
@@ -1072,7 +1056,7 @@ Each case is a question the business must be able to ask, with the path through 
 | SCN033 | Which of our finished batches were made by an outside manufacturer, to which specification, and when did they become ours? | Designed | as-at | [REQ060](#req060) · [REQ061](#req061) · [REQ062](#req062) | Product Contract Manufacture → Legal Entity → Transaction → Legal Entity Site Operations → Legal Entity Transaction Party → Product Contract Manufacture Scope | Pass | — |
 | SCN034 | Was this batch ever stored outside its permitted conditions? | Designed | as-at | [REQ066](#req066) | Event Storage Exposures Duration → Location Storage Conditions → Event Storage Breaches → Event Storage Exposures → Location Storage Conditions Lower Limit → Location Storage Conditions Upper Limit | Pass | — |
 | SCN035 | Which place or machine is this, whatever identifier the supplier or regulator used? | Designed | current | [REQ067](#req067) · [REQ069](#req069) | Location Identifiers → Location Identifiers Value → Location Identifiers Issuer → Location Registrations → Instance Identifiers → Instance Identifiers Value | Pass | — |
-| SCN037 | What is inside the chocolate coating we buy in finished? | Awkward | as-at | [REQ010](#req010) · [REQ063](#req063) | Product Is Purchased → Document Declarations → Document Declarations Property → Document Declarations Value | Limit accepted | The chain of what goes into what stops at anything bought in. Only what the supplier has declared is known here, and that is recorded with who declared it and whether it was checked. |
+| SCN037 | What is inside the chocolate coating we buy in finished? | Awkward | as-at | [REQ010](#req010) · [REQ063](#req063) | Document Declarations → Document Declarations Property → Document Declarations Value | Limit accepted | The chain of what goes into what stops at anything bought in. Only what the supplier has declared is known here, and that is recorded with who declared it and whether it was checked. |
 | SCN038 | A supplier recalls a sugar batch used inside a coating they sold us. Which of our batches are affected? | Awkward | as-at | [REQ010](#req010) · [REQ051](#req051) · [REQ052](#req052) · [REQ053](#req053) · [REQ063](#req063) · [REQ073](#req073) | Event Batch Outputs Quantity Produced → Product Batches → Event Recalls → Event Batch Inputs → Event Batch Outputs → Product Batches Lot Code | Limit accepted | Our record reaches the coating batch we received. Whether that batch contains the recalled sugar is in the supplier's records, so the twenty-four-hour answer depends on them. |
 | SCN040 | Two products are recorded as running at the same moment on a line and on a unit inside it. Which was it? | Awkward | as-at | [REQ040](#req040) · [REQ041](#req041) · [REQ064](#req064) | Legal Entity Employment → Person → Person Qualification Records → Person Work Qualifications → Event Run Places → Event Performers Capacity | Pass | Both runs are held with their places and times, and the place hierarchy says one is inside the other. Whether they may overlap is a value-level rule, authored against the model in DDA. |
 | SCN041 | An operator ran a step the day after their qualification expired. | Awkward | as-at | [REQ040](#req040) · [REQ041](#req041) · [REQ064](#req064) | Legal Entity Employment → Person → Person Qualification Records → Person Work Qualifications → Event Run Places → Event Performers Capacity | Pass | Recorded as it happened. The qualification's dates show it had expired, so the run is answerable rather than blocked after the event. |

@@ -91,7 +91,7 @@ while pending:
         if s["is_anchor"]:
             pref = "Master"
         elif sd[parent]["dda_action"] == "reuse":
-            pref = sd[parent]["dda_id"]
+            pref = sd[parent]["dda_id"] or sd[parent]["code"]   # a concept proposed by another package is named by its code
         else:
             pref = parent
         add("concepts", s["id"], {"concept_code": s["code"], "concept_name": s["code"], "concept_description": s["definition"],
@@ -132,7 +132,9 @@ add("models", "MODEL001", {"model_code": "CPGManufacturingAndSupplyChain", "mode
                            "model_roles": model_roles, "model_relationships": model_rels},
     [r["id"] for r in roles if not r.get("dda_id")] + [v["id"] for v in verbs if v["dda_action"] != "reuse"])
 
-changeset = {"spec_version": "1.0", "package_ref": "cpg-manufacturing", "apply_mode": "web-ui", "preconditions": [],
+pending = [s for s in subjects if s["dda_action"] == "reuse" and not s.get("dda_id")]
+changeset = {"spec_version": "1.0", "package_ref": "cpg-manufacturing", "apply_mode": "web-ui",
+             "preconditions": [{"requires": f"{s['proposed_by']} change package applied first", "provides": s["code"], "concept": s["id"]} for s in pending],
              "preconditions_note": "State transitions could not be read from the platform; see DEC007.", "operations": ops}
 save("dda-changeset", changeset)
 print("built:", len(ops), "operations;", derived["counts"])

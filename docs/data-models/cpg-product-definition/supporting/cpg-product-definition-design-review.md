@@ -17,10 +17,10 @@
 2. **The "worked out, never stored" statement is contradicted by the design.** Four derived values are stored as fields (M02).
 3. **Claims and comparison rules rest on Australian and Hong Kong sources**, while the covered markets are the United States, the United Kingdom and the European Union. The governing EU/GB regulation and 21 CFR 101 are not cited (E01).
 4. **A statement about Northern Ireland is unsupported and probably wrong** (S02). It matters now that the United Kingdom is explicitly in scope.
-5. **Product is created by both CPG models** (X01). Decided on 18 November: Product Definition creates it; Manufacturing's side is still to be reworked.
+5. **Product is created by both CPG models** (X01). Decided on 18 November: Product Definition creates it and Manufacturing refers to it. Both packages are updated (X01).
 6. **The document names a DDA model that DDA names differently**, and I could not re-check it today (D01).
 
-None needs a redesign. Findings M01 to M04 can be fixed in the package and the document regenerated; E01 to E03 need source work; D01 needs a read of DDA, and X01 needs the Manufacturing rework below.
+None needs a redesign. Findings M01 to M04 can be fixed in the package and the document regenerated; E01 to E03 need source work; D01 needs a read of DDA.
 
 ## 2 Scope decision applied in this pass
 
@@ -86,7 +86,7 @@ A client-ready final design states the design and nothing about how it was produ
 
 | ID | Severity | Finding | Evidence | Recommendation |
 |---|---|---|---|---|
-| X01 | Blocking | **Both CPG models create the `Product` concept** with different attributes, so the two change packages collide in DDA. **Decided 18 November 2026 (Andrew): Product Definition owns the core product and the hierarchy of products and ingredients, and other models refer to them.** Done here: DEC004 is closed and scope item SCI012 states the ownership. Not yet done in `../cpg-manufacturing/`. | Manufacturing still creates Product (SBJ012) with batches, sub-batches and pack levels beneath it, and DEC009 is open. Its recipe levels and process-step material requirements are manufacturing's own and are not the ingredient hierarchy. | Rework Manufacturing so Product is a reference to this model's concept, close DEC009, and regenerate its document. Open point: the package schema has no way to name a concept proposed by another package that DDA does not yet hold, so its batches need a stated parent. |
+| X01 | Resolved | **Both CPG models created the `Product` concept.** Decided 18 November 2026 (Andrew): Product Definition owns the core product and the hierarchy of products and ingredients; Manufacturing builds on it and holds the logistics of making finished products from ingredients. | Done in both packages: DEC004 and DEC009 are decided; Manufacturing's Product is now a reference with a precondition that this model's change package is applied first; its `ProductKind` and `ProductIsPurchased` attributes and the product-kind list are withdrawn. Manufacturing now has 0 blocking and 0 material validator findings. | None. Apply this model's change package first. Manufacturing's batches stay beneath Product. |
 | X02 | Major | **The join between a batch and a formulation version is not stated.** SCN025 (batches containing a recalled ingredient) is an accepted limit that depends on it. Manufacturing holds recipe quantities, and SCA007 reads a bill of materials as the formulation held here, so the two hold the same quantities twice. | `../cpg-manufacturing/` recipe concepts. | Name the point of contact in §2.4 (a batch refers to a product and its formulation version) and remove the duplicated quantities from one side. |
 
 ### 4.5 Presentation
@@ -121,7 +121,7 @@ A client-ready final design states the design and nothing about how it was produ
 1. **Decide** D-2 to D-5 below (D-1 is decided).
 2. **Fix in the package and regenerate:** M01–M04, M09, P02, P03, S03, P06.
 3. **Re-source:** E01–E05, with S02 once the Northern Ireland position is read.
-4. **Settle the seam with Manufacturing:** rework X01 and X02 in `../cpg-manufacturing/` and close DEC009 (DEC004 is closed).
+4. **Settle the seam with Manufacturing:** state the batch-to-formulation join (X02); X01 and DEC004/DEC009 are closed.
 5. **Reconnect DDA**, read DMM000000005, and close D01.
 6. **Re-run the validator, then take an independent reading** of the regenerated document (D02).
 

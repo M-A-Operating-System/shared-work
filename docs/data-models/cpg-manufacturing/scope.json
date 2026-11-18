@@ -1,6 +1,6 @@
 {
   "domain": "CPG Manufacturing and Supply Chain",
-  "business": "A manufacturer of food and beverage products. It receives materials, makes, packs and tests product, and releases it for despatch, through its own factories and through outside manufacturers.",
+  "business": "A manufacturer of food and beverage products. It receives materials, makes, packs and tests product, and releases it for despatch, through its own factories and through outside manufacturers. What a product is and what goes into it is held by CPG - Product Definition; this model holds the logistics of making finished products from those ingredients.",
   "subgroups": [
     {
       "id": "SCG001",
@@ -48,6 +48,10 @@
     {
       "id": "SCI011",
       "statement": "The sites that suppliers and outside manufacturers make and ship from"
+    },
+    {
+      "id": "SCI012",
+      "statement": "Turning ingredients into finished products: the logistics of receiving, making, packing and moving them, built on the product and the hierarchy of products and ingredients held by CPG - Product Definition"
     }
   ],
   "out_of_scope": [

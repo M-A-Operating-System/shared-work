@@ -27,7 +27,7 @@ SRC_TYPE = {"standard": "Industry standard", "regulatory": "Regulator or law", "
 WORDS = {1: "one", 2: "two", 3: "three", 4: "four", 5: "five", 6: "six", 7: "seven", 8: "eight", 9: "nine", 10: "ten",
          11: "eleven", 12: "twelve", 13: "thirteen", 14: "fourteen", 15: "fifteen", 16: "sixteen", 17: "seventeen",
          18: "eighteen", 19: "nineteen", 20: "twenty"}
-TODAY = "16 November 2026"
+TODAY = "18 November 2026"
 WHEN = {"current": "Today", "as-at": "On any past date", "both": "Today and on any past date"}
 RESULT = {"pass": "Pass", "accepted-limit": "Limit accepted"}
 TITLE = "CPG Manufacturing and Supply Chain"
@@ -115,7 +115,8 @@ def render(pkg: Path, static: Path) -> tuple[str, int]:
 
     # ---------------------------------------------------------------- counts
     n_concept_new = sum(1 for s in subjects if s["dda_action"] == "create")
-    n_concept_re = sum(1 for s in subjects if s["dda_action"] == "reuse")
+    n_concept_re = sum(1 for s in subjects if s["dda_action"] == "reuse" and s["dda_id"])
+    n_concept_ref = sum(1 for s in subjects if s["dda_action"] == "reuse" and not s["dda_id"])
     n_rel_new = sum(1 for r in verbs if r["dda_action"] == "create")
     n_lk_new = sum(1 for l in lookups if l["dda_action"] == "create")
     n_lk_ext = sum(1 for l in lookups if l["dda_action"] == "extend")
@@ -209,6 +210,7 @@ def render(pkg: Path, static: Path) -> tuple[str, int]:
     w("")
     w(f"This design creates {words(n_concept_new)} concepts, {words(len(roles))} roles, {words(n_rel_new)} relationships and {words(n_lk_new)} lists of values in DDA, "
       f"extends {words(n_dom_ext)} existing domain (Locations) with the structure of a factory, adds {words(ext_vals)} values to {words(n_lk_ext)} existing list, and reuses {words(n_dom_re)} existing domains and {words(n_concept_re)} existing concepts. "
+      f"It refers to {words(n_concept_ref)} concept, Product, that CPG - Product Definition creates and owns. "
       f"It proposes {words(n_dom_new)} new domains.")
     w("")
     w("|  | Count |")
@@ -449,7 +451,7 @@ def render(pkg: Path, static: Path) -> tuple[str, int]:
                 under, how = plain(p["code"]), f"For each {plain(p['code']).lower()}: {CARD_ROW[s['parent_cardinality']]}"
             else:
                 under, how = "—", "—"
-            w(f"| {dname(d['id'])} | {anchor(s['id'])}{s['id']}<br>**{plain(s['code'])}**<br>{s['code']} | {dda_link('concepts', s['dda_id'])} | {s['definition']} | {under} | {how} | {drq_links(s['data_requirement_ids'])} |")
+            w(f"| {dname(d['id'])} | {anchor(s['id'])}{s['id']}<br>**{plain(s['code'])}**<br>{s['code']} | {dda_link('concepts', s['dda_id']) if s['dda_id'] or not s.get('proposed_by') else 'Created by ' + s['proposed_by']} | {s['definition']} | {under} | {how} | {drq_links(s['data_requirement_ids'])} |")
     w("")
 
     # 5.6 lookups

@@ -99,7 +99,6 @@
       "as_at": "current",
       "path": [
         "SBJ012",
-        "ATR018",
         "SBJ011",
         "ATR083"
       ],
@@ -135,7 +134,6 @@
         "ATR089",
         "SBJ012",
         "SBJ048",
-        "ATR017",
         "ATR090"
       ],
       "result": "pass",
@@ -524,7 +522,6 @@
       "kind": "awkward",
       "as_at": "as-at",
       "path": [
-        "ATR018",
         "SBJ011",
         "ATR083",
         "ATR084"
@@ -685,7 +682,7 @@
     {
       "standard": "DMS000000149",
       "applies": true,
-      "how_satisfied": "Each concept sits in one domain and each domain has one anchor concept. Products holds no concept in DDA, so its anchor, Product, is proposed here as well as by CPG - Product Definition.",
+      "how_satisfied": "Each concept sits in one domain and each domain has one anchor concept. Products holds no concept in DDA, so its anchor, Product, is created by CPG - Product Definition, which owns it, and this design refers to it.",
       "artefact_ids": [],
       "exception_id": null,
       "read_hash": "b0cd368cc549ebf2ac721a8a56e549bcd35e9376ab35661742c11a4ca64ffeb3",
@@ -928,10 +925,10 @@
         "this model creates it"
       ],
       "raised_at_pass": 2,
-      "status": "open",
-      "decision": "",
-      "by": "",
-      "date": ""
+      "status": "decided",
+      "decision": "CPG - Product Definition creates Product and holds the hierarchy of products and ingredients. This model builds on it and holds the logistics of making finished products from ingredients.",
+      "by": "Andrew Bush",
+      "date": "2026-11-18"
     },
     {
       "id": "DEC010",

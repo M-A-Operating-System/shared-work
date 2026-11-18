@@ -7,7 +7,7 @@ from typing import Any
 
 Json = Any
 PKG = Path("/tmp/claude-0/-home-claude/4770b2d2-f54e-5ec8-aa89-f4fc7cefb22c/scratchpad/mfgwork")
-TODAY = "2026-11-16"
+TODAY = "2026-11-18"
 
 
 def load(name: str) -> Json:

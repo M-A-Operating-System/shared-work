@@ -68,7 +68,8 @@
     "retrieved": "2026-09-22",
     "scope_ids": [
       "SCI005",
-      "SCI007"
+      "SCI007",
+      "SCI012"
     ],
     "type": "practitioner",
     "establishes": "Genealogy links every raw-material lot, intermediate, step, test, packaging operation and shipping unit; the bill of materials defines expected links and the batch record the links that actually occurred, including splits and merges.",

@@ -42,8 +42,8 @@
       "SRC005",
       "SRC030"
     ],
-    "status": "active",
-    "withdrawn_reason": null
+    "status": "withdrawn",
+    "withdrawn_reason": "Held by CPG - Product Definition, which owns the core product and the hierarchy of products and ingredients. This model refers to that Product."
   },
   {
     "id": "LKP002",

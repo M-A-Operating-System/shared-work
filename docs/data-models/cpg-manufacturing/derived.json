@@ -1,5 +1,5 @@
 {
-  "document_date": "2026-11-16",
+  "document_date": "2026-11-18",
   "package_ref": "cpg-manufacturing",
   "views": {
     "REL005": {
@@ -133,8 +133,8 @@
     "roles": 48,
     "verbs": 31,
     "subjects": 49,
-    "attributes": 93,
-    "lookups": 10,
+    "attributes": 91,
+    "lookups": 9,
     "sources": 38
   },
   "source_index": {
@@ -199,7 +199,6 @@
       "ATR002",
       "ATR011",
       "ATR012",
-      "ATR017",
       "ATR032",
       "ATR033",
       "ATR095",
@@ -207,7 +206,6 @@
       "ATR115",
       "ATR121",
       "ATR122",
-      "LKP001",
       "LKP009",
       "REL029",
       "REL030",
@@ -436,7 +434,6 @@
     ],
     "SRC024": [
       "ATR008",
-      "ATR018",
       "REL005",
       "REQ010",
       "REQ060",
@@ -455,7 +452,6 @@
       "ATR123",
       "ATR124",
       "ATR125",
-      "LKP001",
       "LKP011",
       "REQ069",
       "REQ072",

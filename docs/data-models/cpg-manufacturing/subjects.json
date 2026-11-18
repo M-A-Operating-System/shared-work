@@ -279,7 +279,7 @@
   {
     "id": "SBJ012",
     "code": "Product",
-    "definition": "There is one of these for each product the organisation makes, buys or sells that is a physical thing, such as a raw material, a pack component, an intermediate or a finished product. If you need to know which product a batch is of, and whether it is bought in or made, this is what you go by. What the product is made from, what it must be and what its pack says are held by CPG - Product Definition.",
+    "definition": "One product, whether it is bought in, made or sold, as CPG - Product Definition defines it. This design uses it for the product a batch is of, the product a pack level is for and the product a production run makes.",
     "kind": "subject",
     "mastery": "mastered",
     "domain_id": "DOM006",
@@ -288,9 +288,9 @@
     "parent_cardinality": null,
     "singled_out_by": null,
     "template_dda_id": null,
-    "dda_action": "create",
+    "dda_action": "reuse",
     "dda_id": null,
-    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named Product in DDA's Products domain; the domain holds no concepts. Searched this model's own concepts for the same need; none holds it.",
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named Product in DDA's Products domain; the domain holds no concepts. CPG - Product Definition owns Product and the hierarchy of products and ingredients, and its change package creates the concept first. This design refers to it and holds no concept of its own for it.",
     "data_requirement_ids": [
       "DRQ008",
       "DRQ013"
@@ -301,7 +301,7 @@
     ],
     "status": "active",
     "withdrawn_reason": null,
-    "distinct_need": "Anchors the products the manufacturing records refer to; what a product is, is held by CPG - Product Definition."
+    "proposed_by": "CPG - Product Definition"
   },
   {
     "id": "SBJ013",
