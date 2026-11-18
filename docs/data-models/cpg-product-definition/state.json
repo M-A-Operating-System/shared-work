@@ -1734,10 +1734,10 @@
         "CPG Manufacturing and Supply Chain creates it"
       ],
       "raised_at_pass": 54,
-      "status": "open",
-      "decision": "",
-      "by": "",
-      "date": ""
+      "status": "decided",
+      "decision": "This model creates Product and holds the hierarchy of products and ingredients. CPG Manufacturing and Supply Chain refers to them.",
+      "by": "Andrew Bush",
+      "date": "2026-11-18"
     }
   ],
   "converged": false,

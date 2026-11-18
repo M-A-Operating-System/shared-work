@@ -23,7 +23,8 @@
     "retrieved": "2026-09-24",
     "scope_ids": [
       "SCI001",
-      "SCI002"
+      "SCI002",
+      "SCI012"
     ],
     "type": "standard",
     "establishes": "Formulation is the list of ingredients or components used to create a trade item, and any change to declared net content requires a new product number.",
@@ -40,7 +41,8 @@
     "retrieved": "2026-09-24",
     "scope_ids": [
       "SCI002",
-      "SCI004"
+      "SCI004",
+      "SCI012"
     ],
     "type": "regulatory",
     "establishes": "Ingredients are listed heaviest first, by the weight used. Ingredients under 2%, and spice mixes where none stands out, may go at the end. An ingredient made of other ingredients must show its own parts in brackets straight after it, also heaviest first.",

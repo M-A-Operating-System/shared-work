@@ -24,7 +24,7 @@ Package for the **CPG - Product Definition** data model (Food and Beverage; DDA 
 
 - **DEC002** (open): what to record when a supplier says what is inside its ingredient now differs from what was specified.
 - **DEC003** (decided): the unit-of-measure list is shared with CPG Manufacturing and Supply Chain.
-- **DEC004** (open): Product is proposed here and by Manufacturing because DDA's Products domain holds no concept. Which model creates it, and which refers to it. Matches DEC009 in `../cpg-manufacturing/`.
+- **DEC004** (decided 18 November 2026): this model creates Product and holds the hierarchy of products and ingredients; CPG Manufacturing and Supply Chain refers to them. Manufacturing still creates Product and must be reworked (DEC009 there is open).
 
 ## Still open
 

@@ -167,6 +167,7 @@ Consumer packaged goods are products that a company makes and sells in packs to 
 | SCI009 | Where each product is sold — the markets, the sales channels and the dates |
 | SCI010 | The pictures that show each product |
 | SCI011 | The markets covered: the United States, the European Union and the United Kingdom. For each, what a product must declare on pack, which allergens it must name, the language of the pack and who is named on it as responsible, and the dates and channels it is sold through there |
+| SCI012 | The core product, and the hierarchy of what goes into what: which products and ingredients make up each product, to any depth. This design holds both, and other models, including CPG Manufacturing and Supply Chain, refer to them and do not hold their own |
 
 ### 2.3 Out of scope
 
@@ -847,7 +848,6 @@ Design choices that remain open.
 | ID | Decision | Options |
 |---|---|---|
 | DEC002 | When a supplier tells the organisation that what is inside its ingredient now differs from what was specified, should acting on that notice be part of this design? The design keeps the notice and what it says, and does not keep the action taken. | Keep the action in this design · Leave the action to supplier management |
-| DEC004 | Product is proposed both here and by CPG Manufacturing and Supply Chain, because DDA's Products domain holds no concept (read on 16 November 2026). Which model creates it, and which refers to it? | this model creates it · CPG Manufacturing and Supply Chain creates it |
 
 ## Appendix A — Sources
 
