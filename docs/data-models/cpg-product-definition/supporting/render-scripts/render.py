@@ -7,6 +7,7 @@ every figure and every table is projected from the package.
 """
 from __future__ import annotations
 
+import datetime
 import hashlib
 import json
 import re
@@ -229,7 +230,8 @@ def render(pkg: Path, prev: Path, changeset: dict[str, Any]) -> str:
     # ---- cover, version, contents, introduction (static, with the dated rows replaced)
     start_13 = lines.index("### 1.3 Summary of Findings")
     head = "\n".join(lines[:start_13])
-    head = head.replace("| Document date | 28 September 2026 |", "| Document date | 17 November 2026 |")
+    today = datetime.date.today()
+    head = re.sub(r"\| Document date \| [^|]+ \|", f"| Document date | {today.day} {today.strftime('%B %Y')} |", head)
     head = head.replace("what goes into it, what it must be, how long it lasts, who may supply its ingredients and what may be said about it on pack. The full",
                         "what goes into it, where it is sold, what it must be, how long it lasts, who may supply its ingredients and what may be said about it on pack. The full")
     w(head.rstrip("\n"))

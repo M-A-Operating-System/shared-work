@@ -7,7 +7,7 @@ This **Data Model Design Document** by **M&A Operating System** provides a singl
 |  |  |
 |---|---|
 | Domain | CPG - Product Definition |
-| Document date | 17 November 2026 |
+| Document date | 18 November 2026 |
 | Package reference (the working files this document is produced from) | fnb-bdd |
 | Method version | 31.5 |
 
