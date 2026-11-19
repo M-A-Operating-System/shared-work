@@ -1,0 +1,1106 @@
+[
+  {
+    "id": "LKP017",
+    "code": "UniversalAllergens",
+    "definition": "The foods that cause allergies, held once for all markets, with a group above the foods that some markets name together. You can rely on it to say that the food in one market's allergen list is the same food as in another's. It is not a list of what a market requires to be declared, which is each market's own list.",
+    "scope": "universal",
+    "values": [
+      {
+        "code": "MILK",
+        "name": "Milk",
+        "definition": "Milk, and foods made from it such as whey and casein.",
+        "parent_code": null
+      },
+      {
+        "code": "EGG",
+        "name": "Egg",
+        "definition": "Egg, and foods made from it.",
+        "parent_code": null
+      },
+      {
+        "code": "FISH",
+        "name": "Fish",
+        "definition": "Fish, and foods made from it.",
+        "parent_code": null
+      },
+      {
+        "code": "CRUSTACEAN",
+        "name": "Crustaceans",
+        "definition": "Crustaceans such as prawns, crab and lobster, and foods made from them.",
+        "parent_code": null
+      },
+      {
+        "code": "MOLLUSC",
+        "name": "Molluscs",
+        "definition": "Molluscs such as mussels, oysters and squid, and foods made from them.",
+        "parent_code": null
+      },
+      {
+        "code": "PEANUT",
+        "name": "Peanuts",
+        "definition": "Peanuts, and foods made from them. A peanut is a legume and is not a tree nut.",
+        "parent_code": null
+      },
+      {
+        "code": "SOY",
+        "name": "Soybeans",
+        "definition": "Soybeans, and foods made from them.",
+        "parent_code": null
+      },
+      {
+        "code": "SESAME",
+        "name": "Sesame",
+        "definition": "Sesame seeds, and foods made from them.",
+        "parent_code": null
+      },
+      {
+        "code": "CELERY",
+        "name": "Celery",
+        "definition": "Celery, including celeriac, and foods made from them.",
+        "parent_code": null
+      },
+      {
+        "code": "MUSTARD",
+        "name": "Mustard",
+        "definition": "Mustard, and foods made from it.",
+        "parent_code": null
+      },
+      {
+        "code": "LUPIN",
+        "name": "Lupin",
+        "definition": "Lupin, and foods made from it.",
+        "parent_code": null
+      },
+      {
+        "code": "SULPHITES",
+        "name": "Sulphur dioxide and sulphites",
+        "definition": "Sulphur dioxide and sulphites, used to preserve food.",
+        "parent_code": null
+      },
+      {
+        "code": "TREENUTS",
+        "name": "Tree nuts",
+        "definition": "Group. The nuts that grow on trees. Markets differ on which nuts count, so each market's own entry says which.",
+        "parent_code": null
+      },
+      {
+        "code": "GLUTENCEREALS",
+        "name": "Cereals containing gluten",
+        "definition": "Group. Wheat, rye, barley and oats, which contain gluten. A market may name the whole group or a single cereal.",
+        "parent_code": null
+      },
+      {
+        "code": "WHEAT",
+        "name": "Wheat",
+        "definition": "Wheat, including spelt and khorasan wheat, and foods made from it.",
+        "parent_code": "GLUTENCEREALS"
+      },
+      {
+        "code": "RYE",
+        "name": "Rye",
+        "definition": "Rye, and foods made from it.",
+        "parent_code": "GLUTENCEREALS"
+      },
+      {
+        "code": "BARLEY",
+        "name": "Barley",
+        "definition": "Barley, and foods made from it.",
+        "parent_code": "GLUTENCEREALS"
+      },
+      {
+        "code": "OATS",
+        "name": "Oats",
+        "definition": "Oats, and foods made from them.",
+        "parent_code": "GLUTENCEREALS"
+      }
+    ],
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Read the 83 lookup types in DDA; none lists the foods that cause allergies, and no other list in this model does.",
+    "used_here": "Names the food each market's allergen is, so the same food is recognised in every market.",
+    "data_requirement_ids": [
+      "DRQ031"
+    ],
+    "evidence_source_ids": [
+      "SRC027",
+      "SRC028",
+      "SRC039"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "LKP001",
+    "code": "ProductFoodBevAllergens",
+    "definition": "The food allergens a product must declare, listed for each market that requires them. Every value carries its market as a prefix, US for the United States, EU for the European Union and GB for Great Britain, so the same food appears once for each market. Each value is one of the foods in the universal list of allergens, or the group of foods the market names together, so the same food is recognised in every market. The United States list has nine allergens, the European Union list fourteen and the Great Britain list fourteen.",
+    "scope": "concept",
+    "values": [
+      {
+        "code": "US-MILK",
+        "name": "Milk (US)",
+        "definition": "United States. Declared as milk, including where it arrives as whey or casein.",
+        "parent_lookup": "LKP017",
+        "parent_code": "MILK"
+      },
+      {
+        "code": "US-EGG",
+        "name": "Egg (US)",
+        "definition": "United States. Declared as egg.",
+        "parent_lookup": "LKP017",
+        "parent_code": "EGG"
+      },
+      {
+        "code": "US-FISH",
+        "name": "Fish (US)",
+        "definition": "United States. Declared as fish.",
+        "parent_lookup": "LKP017",
+        "parent_code": "FISH"
+      },
+      {
+        "code": "US-CRUSTACEAN",
+        "name": "Crustacean shellfish (US)",
+        "definition": "United States. Declared as crustacean shellfish.",
+        "parent_lookup": "LKP017",
+        "parent_code": "CRUSTACEAN"
+      },
+      {
+        "code": "US-TREENUT",
+        "name": "Tree nuts (US)",
+        "definition": "United States. Declared by the nut. FDA's list of tree nuts does not include coconut.",
+        "parent_lookup": "LKP017",
+        "parent_code": "TREENUTS"
+      },
+      {
+        "code": "US-PEANUT",
+        "name": "Peanuts (US)",
+        "definition": "United States. Declared as peanuts.",
+        "parent_lookup": "LKP017",
+        "parent_code": "PEANUT"
+      },
+      {
+        "code": "US-WHEAT",
+        "name": "Wheat (US)",
+        "definition": "United States. Declared as wheat.",
+        "parent_lookup": "LKP017",
+        "parent_code": "WHEAT"
+      },
+      {
+        "code": "US-SOY",
+        "name": "Soybeans (US)",
+        "definition": "United States. Declared as soy.",
+        "parent_lookup": "LKP017",
+        "parent_code": "SOY"
+      },
+      {
+        "code": "US-SESAME",
+        "name": "Sesame (US)",
+        "definition": "United States. Declared as sesame. Required since 1 January 2023.",
+        "parent_lookup": "LKP017",
+        "parent_code": "SESAME"
+      },
+      {
+        "code": "EU-GLUTEN",
+        "name": "Cereals containing gluten (EU)",
+        "definition": "European Union. Wheat, including spelt and khorasan, rye, barley and oats, and their hybrids.",
+        "parent_lookup": "LKP017",
+        "parent_code": "GLUTENCEREALS"
+      },
+      {
+        "code": "EU-CRUSTACEAN",
+        "name": "Crustaceans (EU)",
+        "definition": "European Union. Declared as crustaceans.",
+        "parent_lookup": "LKP017",
+        "parent_code": "CRUSTACEAN"
+      },
+      {
+        "code": "EU-EGG",
+        "name": "Egg (EU)",
+        "definition": "European Union. Declared as egg.",
+        "parent_lookup": "LKP017",
+        "parent_code": "EGG"
+      },
+      {
+        "code": "EU-FISH",
+        "name": "Fish (EU)",
+        "definition": "European Union. Declared as fish.",
+        "parent_lookup": "LKP017",
+        "parent_code": "FISH"
+      },
+      {
+        "code": "EU-PEANUT",
+        "name": "Peanuts (EU)",
+        "definition": "European Union. Declared as peanuts.",
+        "parent_lookup": "LKP017",
+        "parent_code": "PEANUT"
+      },
+      {
+        "code": "EU-SOY",
+        "name": "Soybeans (EU)",
+        "definition": "European Union. Declared as soybeans.",
+        "parent_lookup": "LKP017",
+        "parent_code": "SOY"
+      },
+      {
+        "code": "EU-MILK",
+        "name": "Milk (EU)",
+        "definition": "European Union. Declared as milk, including lactose.",
+        "parent_lookup": "LKP017",
+        "parent_code": "MILK"
+      },
+      {
+        "code": "EU-TREENUT",
+        "name": "Nuts (EU)",
+        "definition": "European Union. Almond, hazelnut, walnut, cashew, pecan, Brazil nut, pistachio and macadamia (Queensland nut).",
+        "parent_lookup": "LKP017",
+        "parent_code": "TREENUTS"
+      },
+      {
+        "code": "EU-CELERY",
+        "name": "Celery (EU)",
+        "definition": "European Union. Declared as celery.",
+        "parent_lookup": "LKP017",
+        "parent_code": "CELERY"
+      },
+      {
+        "code": "EU-MUSTARD",
+        "name": "Mustard (EU)",
+        "definition": "European Union. Declared as mustard.",
+        "parent_lookup": "LKP017",
+        "parent_code": "MUSTARD"
+      },
+      {
+        "code": "EU-SESAME",
+        "name": "Sesame seeds (EU)",
+        "definition": "European Union. Declared as sesame seeds.",
+        "parent_lookup": "LKP017",
+        "parent_code": "SESAME"
+      },
+      {
+        "code": "EU-SULPHITES",
+        "name": "Sulphur dioxide and sulphites (EU)",
+        "definition": "European Union. Declared when present at more than 10 mg/kg or 10 mg/L.",
+        "parent_lookup": "LKP017",
+        "parent_code": "SULPHITES"
+      },
+      {
+        "code": "EU-LUPIN",
+        "name": "Lupin (EU)",
+        "definition": "European Union. Declared as lupin.",
+        "parent_lookup": "LKP017",
+        "parent_code": "LUPIN"
+      },
+      {
+        "code": "EU-MOLLUSC",
+        "name": "Molluscs (EU)",
+        "definition": "European Union. Declared as molluscs.",
+        "parent_lookup": "LKP017",
+        "parent_code": "MOLLUSC"
+      },
+      {
+        "code": "GB-CELERY",
+        "name": "Celery (GB)",
+        "definition": "Great Britain. Declared as celery.",
+        "parent_lookup": "LKP017",
+        "parent_code": "CELERY"
+      },
+      {
+        "code": "GB-GLUTEN",
+        "name": "Cereals containing gluten (GB)",
+        "definition": "Great Britain. Declared by the cereal: wheat, including spelt and Khorasan, rye, barley and oats.",
+        "parent_lookup": "LKP017",
+        "parent_code": "GLUTENCEREALS"
+      },
+      {
+        "code": "GB-CRUSTACEAN",
+        "name": "Crustaceans (GB)",
+        "definition": "Great Britain. Declared as crustaceans.",
+        "parent_lookup": "LKP017",
+        "parent_code": "CRUSTACEAN"
+      },
+      {
+        "code": "GB-EGG",
+        "name": "Eggs (GB)",
+        "definition": "Great Britain. Declared as egg.",
+        "parent_lookup": "LKP017",
+        "parent_code": "EGG"
+      },
+      {
+        "code": "GB-FISH",
+        "name": "Fish (GB)",
+        "definition": "Great Britain. Declared as fish.",
+        "parent_lookup": "LKP017",
+        "parent_code": "FISH"
+      },
+      {
+        "code": "GB-LUPIN",
+        "name": "Lupin (GB)",
+        "definition": "Great Britain. Declared as lupin.",
+        "parent_lookup": "LKP017",
+        "parent_code": "LUPIN"
+      },
+      {
+        "code": "GB-MILK",
+        "name": "Milk (GB)",
+        "definition": "Great Britain. Declared as milk.",
+        "parent_lookup": "LKP017",
+        "parent_code": "MILK"
+      },
+      {
+        "code": "GB-MOLLUSC",
+        "name": "Molluscs (GB)",
+        "definition": "Great Britain. Declared as molluscs.",
+        "parent_lookup": "LKP017",
+        "parent_code": "MOLLUSC"
+      },
+      {
+        "code": "GB-MUSTARD",
+        "name": "Mustard (GB)",
+        "definition": "Great Britain. Declared as mustard.",
+        "parent_lookup": "LKP017",
+        "parent_code": "MUSTARD"
+      },
+      {
+        "code": "GB-TREENUT",
+        "name": "Tree nuts (GB)",
+        "definition": "Great Britain. Declared by the nut: almonds, hazelnuts, walnuts, Brazil nuts, cashews, pecans, pistachios and macadamia nuts.",
+        "parent_lookup": "LKP017",
+        "parent_code": "TREENUTS"
+      },
+      {
+        "code": "GB-PEANUT",
+        "name": "Peanuts (GB)",
+        "definition": "Great Britain. Declared as peanuts.",
+        "parent_lookup": "LKP017",
+        "parent_code": "PEANUT"
+      },
+      {
+        "code": "GB-SESAME",
+        "name": "Sesame seeds (GB)",
+        "definition": "Great Britain. Declared as sesame.",
+        "parent_lookup": "LKP017",
+        "parent_code": "SESAME"
+      },
+      {
+        "code": "GB-SOY",
+        "name": "Soybeans (GB)",
+        "definition": "Great Britain. Declared as soybeans.",
+        "parent_lookup": "LKP017",
+        "parent_code": "SOY"
+      },
+      {
+        "code": "GB-SULPHITES",
+        "name": "Sulphur dioxide and sulphites (GB)",
+        "definition": "Great Britain. Declared where above ten parts per million.",
+        "parent_lookup": "LKP017",
+        "parent_code": "SULPHITES"
+      }
+    ],
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Read all 67 lookup types in DDA; none governs food allergens. No other list in this model does.",
+    "used_here": null,
+    "data_requirement_ids": [
+      "DRQ008",
+      "DRQ024",
+      "DRQ031"
+    ],
+    "evidence_source_ids": [
+      "SRC008",
+      "SRC009",
+      "SRC027",
+      "SRC028",
+      "SRC029",
+      "SRC039",
+      "SRC043"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "LKP002",
+    "code": "ProductNutritionValuesBasisTypes",
+    "definition": "How a declared nutrition value was arrived at: by testing the finished food, by calculating from its ingredients, or from accepted published data. Every value must say which way it used.",
+    "scope": "concept",
+    "values": [
+      {
+        "code": "ANALYSIS",
+        "name": "Analysis of the food",
+        "definition": "Measured in the finished product."
+      },
+      {
+        "code": "CALCULATION",
+        "name": "Calculation from ingredients",
+        "definition": "Worked out from the known values of the ingredients used, allowing for edible portion, yield and nutrient loss."
+      },
+      {
+        "code": "PUBLISHED",
+        "name": "Accepted published data",
+        "definition": "Taken from generally established and accepted data."
+      }
+    ],
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Read all 67 lookup types in DDA; none governs how a nutrition value was arrived at. No other list in this model does.",
+    "used_here": null,
+    "data_requirement_ids": [
+      "DRQ009"
+    ],
+    "evidence_source_ids": [
+      "SRC011",
+      "SRC012"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "LKP003",
+    "code": "ProductNutritionValuesNutrientTypes",
+    "definition": "The nutrients and energy that a nutrition declaration must show: energy, fat, saturates, carbohydrate, sugars, protein and salt. Others may be shown as well.",
+    "scope": "concept",
+    "values": [
+      {
+        "code": "ENERGY",
+        "name": "Energy",
+        "definition": "The energy value of the food."
+      },
+      {
+        "code": "FAT",
+        "name": "Fat",
+        "definition": "Total fat."
+      },
+      {
+        "code": "SATURATES",
+        "name": "Saturates",
+        "definition": "Saturated fat."
+      },
+      {
+        "code": "CARBOHYDRATE",
+        "name": "Carbohydrate",
+        "definition": "Total carbohydrate."
+      },
+      {
+        "code": "SUGARS",
+        "name": "Sugars",
+        "definition": "Sugars within the carbohydrate."
+      },
+      {
+        "code": "PROTEIN",
+        "name": "Protein",
+        "definition": "Total protein."
+      },
+      {
+        "code": "SALT",
+        "name": "Salt",
+        "definition": "Salt, or the sodium it is worked out from."
+      }
+    ],
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Read all 67 lookup types in DDA; none governs nutrients. No other list in this model does.",
+    "used_here": null,
+    "data_requirement_ids": [
+      "DRQ009",
+      "DRQ010"
+    ],
+    "evidence_source_ids": [
+      "SRC005"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "LKP004",
+    "code": "ProductLabelItemsTypes",
+    "definition": "The items that a pre-packed food label must show, such as the name of the food, its ingredients, allergens, net quantity, date mark and the business responsible for it.",
+    "scope": "concept",
+    "values": [
+      {
+        "code": "NAME",
+        "name": "Name of the food",
+        "definition": "The name the food is sold under."
+      },
+      {
+        "code": "INGREDIENTS",
+        "name": "Ingredient list",
+        "definition": "Every ingredient, heaviest first."
+      },
+      {
+        "code": "ALLERGENS",
+        "name": "Allergen information",
+        "definition": "Allergens, named by the food they come from."
+      },
+      {
+        "code": "QUID",
+        "name": "Quantity of certain ingredients",
+        "definition": "The amount of an ingredient that the name or pack stresses."
+      },
+      {
+        "code": "NETQUANTITY",
+        "name": "Net quantity",
+        "definition": "How much food is in the pack."
+      },
+      {
+        "code": "DATEMARK",
+        "name": "Date mark",
+        "definition": "The use-by or best-before date."
+      },
+      {
+        "code": "STORAGE",
+        "name": "Storage and use conditions",
+        "definition": "How to store and use the food."
+      },
+      {
+        "code": "OPERATOR",
+        "name": "Responsible business",
+        "definition": "The business answerable for the food, and its address."
+      },
+      {
+        "code": "ORIGIN",
+        "name": "Country of origin",
+        "definition": "Where the food, or its main ingredient, comes from."
+      },
+      {
+        "code": "NUTRITION",
+        "name": "Nutrition declaration",
+        "definition": "Energy and the main nutrients."
+      },
+      {
+        "code": "BATCH",
+        "name": "Batch number",
+        "definition": "Required in some markets only."
+      }
+    ],
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Read all 67 lookup types in DDA; none governs label items. No other list in this model does.",
+    "used_here": null,
+    "data_requirement_ids": [
+      "DRQ007"
+    ],
+    "evidence_source_ids": [
+      "SRC006",
+      "SRC007"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "LKP005",
+    "code": "ProductShelfLivesDateMarkTypes",
+    "definition": "The two kinds of date mark a food can carry: use-by for foods that could soon become unsafe, and best-before for foods that only lose quality.",
+    "scope": "concept",
+    "values": [
+      {
+        "code": "USEBY",
+        "name": "Use by",
+        "definition": "For foods that could soon become unsafe. After the date the food cannot be sold."
+      },
+      {
+        "code": "BESTBEFORE",
+        "name": "Best before",
+        "definition": "For foods that only lose quality. Past the date the food may still be safe."
+      }
+    ],
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Read all 67 lookup types in DDA; none governs date marks. No other list in this model does.",
+    "used_here": null,
+    "data_requirement_ids": [
+      "DRQ013"
+    ],
+    "evidence_source_ids": [
+      "SRC022"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "LKP006",
+    "code": "ProductClaimsTypes",
+    "definition": "The two kinds of claim a pack can make, which decide the conditions it must meet: a claim about what the food contains, and a claim that compares it with another product.",
+    "scope": "concept",
+    "values": [
+      {
+        "code": "CONTENT",
+        "name": "Nutrition content claim",
+        "definition": "Rests on a declared value meeting a fixed condition, such as a source of a vitamin."
+      },
+      {
+        "code": "COMPARATIVE",
+        "name": "Comparative claim",
+        "definition": "Rests on a stated difference against a named comparator."
+      }
+    ],
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Read all 67 lookup types in DDA; none governs claims. No other list in this model does.",
+    "used_here": null,
+    "data_requirement_ids": [
+      "DRQ010"
+    ],
+    "evidence_source_ids": [
+      "SRC013",
+      "SRC014"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "LKP007",
+    "code": "ProductVariantsAxisTypes",
+    "definition": "The ways the members of a family of products can differ from one another: in size, in the kind of pack, or in how many units the pack holds.",
+    "scope": "concept",
+    "values": [
+      {
+        "code": "SIZE",
+        "name": "Size",
+        "definition": "Differs in how much food the pack holds."
+      },
+      {
+        "code": "FORMAT",
+        "name": "Format",
+        "definition": "Differs in the shape or kind of pack."
+      },
+      {
+        "code": "PACKCOUNT",
+        "name": "Pack count",
+        "definition": "Differs in how many units are in the pack."
+      }
+    ],
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Read all 67 lookup types in DDA; none governs how variants differ. No other list in this model does.",
+    "used_here": null,
+    "data_requirement_ids": [
+      "DRQ006"
+    ],
+    "evidence_source_ids": [
+      "SRC001",
+      "SRC002"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "LKP008",
+    "code": "DocumentTypes",
+    "definition": "The kinds of document that state facts about a product or an ingredient: a certificate of analysis, a change notice, a certification document or a specification sheet.",
+    "scope": "concept",
+    "values": [
+      {
+        "code": "COA",
+        "name": "Certificate of analysis",
+        "definition": "A supplier's statement of what a delivery contains and how it was tested."
+      },
+      {
+        "code": "CHANGENOTICE",
+        "name": "Change notice",
+        "definition": "A supplier's notice of a change that could affect an ingredient."
+      },
+      {
+        "code": "CERTIFICATION",
+        "name": "Certification document",
+        "definition": "A certificate showing that a body has granted a certification."
+      },
+      {
+        "code": "SPECSHEET",
+        "name": "Specification sheet",
+        "definition": "A statement of what an ingredient or product must be."
+      }
+    ],
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Read all 67 lookup types in DDA; none governs document types. No other list in this model does.",
+    "used_here": null,
+    "data_requirement_ids": [
+      "DRQ012"
+    ],
+    "evidence_source_ids": [
+      "SRC019",
+      "SRC021",
+      "SRC026"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "LKP009",
+    "code": "UniversalUnitOfMeasureCodes",
+    "definition": "The unit a quantity is stated in, used wherever a quantity of food, an ingredient, packaging or product is recorded, so that kilograms are never mixed up with litres.",
+    "scope": "universal",
+    "values": [
+      {
+        "code": "KG",
+        "name": "Kilogram",
+        "definition": "Mass in kilograms."
+      },
+      {
+        "code": "G",
+        "name": "Gram",
+        "definition": "Mass in grams."
+      },
+      {
+        "code": "L",
+        "name": "Litre",
+        "definition": "Volume in litres."
+      },
+      {
+        "code": "ML",
+        "name": "Millilitre",
+        "definition": "Volume in millilitres."
+      },
+      {
+        "code": "EA",
+        "name": "Each",
+        "definition": "A count of items."
+      },
+      {
+        "code": "PCT",
+        "name": "Per cent",
+        "definition": "A share of the whole, in per cent."
+      },
+      {
+        "code": "CASE",
+        "name": "Case",
+        "definition": "A count of cases."
+      }
+    ],
+    "dda_action": "extend",
+    "dda_id": "DLT000000156",
+    "reuse_search": "Searched DDA on 16 November 2026 for a list of units of measure among its 85 lookup types; none existed. The lookup type UniversalUnitOfMeasureCodes was created in DDA (DLT000000156) with no values, and is shared with the other CPG model, which uses the same list. This design contributes the values.",
+    "used_here": null,
+    "data_requirement_ids": [
+      "DRQ001",
+      "DRQ009"
+    ],
+    "evidence_source_ids": [
+      "SRC004",
+      "SRC005"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "LKP010",
+    "code": "UniversalCountryCodes",
+    "definition": null,
+    "scope": "universal",
+    "values": [],
+    "dda_action": "reuse",
+    "dda_id": "DLT000000071",
+    "reuse_search": "Read in DDA: the list already governs country codes and is bound to LegalEntityAddressCountry.",
+    "used_here": "The country a market names and the country a business is responsible in, as well as a declared country of origin.",
+    "data_requirement_ids": [
+      "DRQ018",
+      "DRQ023"
+    ],
+    "evidence_source_ids": [
+      "SRC006"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "LKP011",
+    "code": "MasterCrossRefTypes",
+    "definition": "Adds three identifier types for products, the trade item number, the organisation's own material number and a supplier's part number, to the existing list of identifier types, which already covers identifiers of legal entities.",
+    "scope": "concept",
+    "values": [
+      {
+        "code": "GTIN",
+        "name": "Trade item number",
+        "definition": "The global trade item number allocated to a product under GS1 rules."
+      },
+      {
+        "code": "MATERIALNUMBER",
+        "name": "Internal material number",
+        "definition": "The organisation's own number for a product."
+      },
+      {
+        "code": "SUPPLIERPART",
+        "name": "Supplier part number",
+        "definition": "The supplier's own number for what it sells."
+      }
+    ],
+    "dda_action": "extend",
+    "dda_id": "DLT000000064",
+    "reuse_search": "Read in DDA: the list governs identifier types and is bound to LegalEntityIdentifiersType, so the product identifier types are added to it rather than to a new list.",
+    "used_here": "DDA's existing list of identifier types, which this design adds three product identifier types to.",
+    "data_requirement_ids": [
+      "DRQ017"
+    ],
+    "evidence_source_ids": [
+      "SRC001",
+      "SRC002"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "LKP012",
+    "code": "UniversalRegions",
+    "definition": "The wider areas of the world that food rules treat as one market. In this design it holds the European Union. You can rely on it to name a market that is wider than one country. It does not place countries in regions, which the universal core data model does, and it holds no country.",
+    "scope": "universal",
+    "values": [
+      {
+        "code": "EU",
+        "name": "European Union",
+        "definition": "A group of countries that sets food rules as one market. Held as one market and not as the list of its member countries.",
+        "parent_code": null
+      }
+    ],
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Read the 83 lookup types in DDA. None lists wider areas treated as one market. No other list in this model does.",
+    "used_here": "Names a market wider than one country.",
+    "data_requirement_ids": [
+      "DRQ023"
+    ],
+    "evidence_source_ids": [
+      "SRC035"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "LKP013",
+    "code": "ProductChannelsTypes",
+    "definition": "The kinds of trade a food product is sold through, taken from the published trade channel list and limited to those a food business sells through. Every sales channel must name one.",
+    "scope": "concept",
+    "values": [
+      {
+        "code": "GROCERY",
+        "name": "Grocery",
+        "definition": "Retailers of a broad range of food products."
+      },
+      {
+        "code": "CONVENIENCE",
+        "name": "Convenience",
+        "definition": "Small-format stores, often at or next to fuel stations."
+      },
+      {
+        "code": "FOODSERVICE",
+        "name": "Food service",
+        "definition": "Sales of prepared food to restaurants, hotels and clubs."
+      },
+      {
+        "code": "CASHANDCARRY",
+        "name": "Cash and carry",
+        "definition": "Self-service wholesale warehouse trade, sometimes called club."
+      },
+      {
+        "code": "MASSMERCHANDISING",
+        "name": "Mass merchandising",
+        "definition": "Large department-organised stores offering wide product categories under one roof."
+      },
+      {
+        "code": "SPECIALTYRETAIL",
+        "name": "Specialty retail",
+        "definition": "Retailers focused on one merchandise line with a deep range for a selective customer base."
+      },
+      {
+        "code": "ONLINE",
+        "name": "Online",
+        "definition": "Items sold online and shipped to consumers or pickup locations."
+      },
+      {
+        "code": "VENDING",
+        "name": "Vending",
+        "definition": "Sales through vending machines."
+      },
+      {
+        "code": "DUTYFREE",
+        "name": "Duty free",
+        "definition": "Tax-exempt retail outlets for travellers leaving the country."
+      },
+      {
+        "code": "INSTITUTIONAL",
+        "name": "Institutional",
+        "definition": "Sales to schools, universities and research centres."
+      }
+    ],
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Read the 83 lookup types in DDA. None lists sales channels. No other list in this model does.",
+    "data_requirement_ids": [
+      "DRQ023"
+    ],
+    "evidence_source_ids": [
+      "SRC036",
+      "SRC037"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "LKP014",
+    "code": "ProductImagesSides",
+    "definition": "The side of a product that a picture shows, such as the front or the back, taken from the published picture standard. You can rely on it for which side a picture is of. It is not the kind of file the picture is held as. Every product picture must name one.",
+    "scope": "concept",
+    "values": [
+      {
+        "code": "FRONT",
+        "name": "Front",
+        "definition": "The front of the product as set by GS1."
+      },
+      {
+        "code": "BACK",
+        "name": "Back",
+        "definition": "The back of the product."
+      },
+      {
+        "code": "LEFT",
+        "name": "Left",
+        "definition": "The left side of the product."
+      },
+      {
+        "code": "RIGHT",
+        "name": "Right",
+        "definition": "The right side of the product."
+      },
+      {
+        "code": "TOP",
+        "name": "Top",
+        "definition": "The top of the product."
+      },
+      {
+        "code": "BOTTOM",
+        "name": "Bottom",
+        "definition": "The bottom of the product."
+      }
+    ],
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Read the 83 lookup types in DDA. None lists the sides of a product. No other list in this model does.",
+    "data_requirement_ids": [
+      "DRQ027"
+    ],
+    "evidence_source_ids": [
+      "SRC038"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "LKP015",
+    "code": "ProductImagesFileTypes",
+    "definition": "The kinds of file a product picture is held as. Every product picture must name one.",
+    "scope": "concept",
+    "values": [
+      {
+        "code": "JPEG",
+        "name": "JPEG",
+        "definition": "A compressed picture file used for sharing."
+      },
+      {
+        "code": "PNG",
+        "name": "PNG",
+        "definition": "A picture file used for sharing."
+      },
+      {
+        "code": "TIFF",
+        "name": "TIFF",
+        "definition": "A picture file used for keeping the master copy."
+      }
+    ],
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Read the 83 lookup types in DDA. None lists picture file types. No other list in this model does.",
+    "data_requirement_ids": [
+      "DRQ027"
+    ],
+    "evidence_source_ids": [
+      "SRC038"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "LKP016",
+    "code": "UniversalLanguageCodes",
+    "definition": null,
+    "scope": "universal",
+    "values": [],
+    "dda_action": "reuse",
+    "dda_id": "DLT000000082",
+    "reuse_search": "Read in DDA: the list already governs language codes under ISO 639.",
+    "used_here": "The language a label item is printed in.",
+    "data_requirement_ids": [
+      "DRQ025"
+    ],
+    "evidence_source_ids": [
+      "SRC041"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "LKP018",
+    "code": "ProductAllergensPresenceTypes",
+    "definition": "Whether a product contains an allergen or only may be present through cross-contact. You can rely on it to separate an allergen the food is made with from an allergen that could be present without being an ingredient. It is not the reason, which is the explanation held with the allergen.",
+    "scope": "concept",
+    "values": [
+      {
+        "code": "CONTAINS",
+        "name": "Contains",
+        "definition": "The allergen is in the product by design: it comes from an ingredient, and is declared by the food it comes from.",
+        "parent_code": null
+      },
+      {
+        "code": "MAY-CONTAIN",
+        "name": "May contain",
+        "definition": "The allergen is not an ingredient but could be present through cross-contact that cannot be avoided. The explanation held with it says how.",
+        "parent_code": null
+      }
+    ],
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Read the 83 lookup types in DDA; none lists whether an allergen is contained or possibly present, and no other list in this model does.",
+    "used_here": null,
+    "data_requirement_ids": [
+      "DRQ029"
+    ],
+    "evidence_source_ids": [
+      "SRC028",
+      "SRC043",
+      "SRC044",
+      "SRC045"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "LKP019",
+    "code": "ProductCPGDefinitionCPGProductTypes",
+    "definition": "The two kinds of consumer goods product that set a product apart by what it is: a grouping of related sizes and packs, and a version that can be sold. You can rely on it to say which of the two a product is. It is not whether the product is an ingredient, which is found from the formulations it appears in, nor the link from a version to its grouping, which is kept separately between products.",
+    "scope": "concept",
+    "values": [
+      {
+        "code": "LOGICAL",
+        "name": "Logical",
+        "definition": "A product that stands for a group of related sizes, formats and pack counts, each of which is a product in its own right. It holds what the versions share and is never made, bought or sold.",
+        "parent_code": null
+      },
+      {
+        "code": "LOCAL",
+        "name": "Local",
+        "definition": "A version of a logical product that can be sold, such as one size, format or pack count of it. It is sold and counted on its own.",
+        "parent_code": null
+      }
+    ],
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Read the 83 lookup types in DDA; none lists whether a product is a grouping or a version that can be sold, and no other list in this model does.",
+    "used_here": null,
+    "data_requirement_ids": [
+      "DRQ032",
+      "DRQ019"
+    ],
+    "evidence_source_ids": [
+      "SRC030",
+      "SRC001"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  }
+]

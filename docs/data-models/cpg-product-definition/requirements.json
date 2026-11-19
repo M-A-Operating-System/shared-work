@@ -1,0 +1,659 @@
+[
+  {
+    "id": "REQ001",
+    "category": "Product",
+    "statement": "A product is either something the organisation sells, or an ingredient or packaging item it buys in order to make one.",
+    "owner": "Technical lead",
+    "subgroup_id": null,
+    "satisfied_by": "model",
+    "source_ids": [
+      "SRC002",
+      "SRC015"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "REQ002",
+    "category": "Product",
+    "statement": "A product is made from a defined set of ingredients and packaging items in defined quantities, and that definition changes over time.",
+    "owner": "Technical lead",
+    "subgroup_id": null,
+    "satisfied_by": "model",
+    "source_ids": [
+      "SRC002",
+      "SRC004"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "REQ003",
+    "category": "Product",
+    "statement": "An ingredient may itself be made from other ingredients. The parts of such an ingredient must still be declared on the pack of the product that uses it.",
+    "owner": "Regulatory lead",
+    "subgroup_id": null,
+    "satisfied_by": "model",
+    "source_ids": [
+      "SRC003"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "REQ004",
+    "category": "Product",
+    "statement": "Ingredients are declared heaviest first, by the weight used. Ingredients under 2%, and spice mixes where no single spice stands out, may go last.",
+    "owner": "Regulatory lead",
+    "subgroup_id": null,
+    "satisfied_by": "model",
+    "source_ids": [
+      "SRC003",
+      "SRC004",
+      "SRC010"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "REQ005",
+    "category": "Product",
+    "statement": "The same ingredient goes into many products, and a product may be sold as it is and also used inside another.",
+    "owner": "Technical lead",
+    "subgroup_id": null,
+    "satisfied_by": "model",
+    "source_ids": [
+      "SRC002",
+      "SRC003"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "REQ006",
+    "category": "Product",
+    "statement": "When an alternative ingredient is used in place of a specified one, the change must carry through the specification, the recipe, the product information and the label.",
+    "owner": "Technical lead",
+    "subgroup_id": null,
+    "satisfied_by": "model",
+    "source_ids": [
+      "SRC020"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "REQ007",
+    "category": "Product",
+    "statement": "Where an ingredient is itself a made product, what is inside it must still be known well enough to declare it, and where the organisation did not make it, that knowledge comes from the supplier.",
+    "owner": "Technical lead",
+    "subgroup_id": null,
+    "satisfied_by": "model",
+    "source_ids": [
+      "SRC003",
+      "SRC019"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "REQ008",
+    "category": "Identity",
+    "statement": "The same product is sold in several sizes and pack formats, related to each other but identified and counted separately.",
+    "owner": "Commercial lead",
+    "subgroup_id": null,
+    "satisfied_by": "model",
+    "source_ids": [
+      "SRC001",
+      "SRC002",
+      "SRC030"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "REQ009",
+    "category": "Identity",
+    "statement": "A change to the declared ingredients, the net quantity, a certification mark or the pack count makes a different product. Other changes do not.",
+    "owner": "Regulatory lead",
+    "subgroup_id": null,
+    "satisfied_by": "model",
+    "source_ids": [
+      "SRC001",
+      "SRC002"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "REQ010",
+    "category": "Identity",
+    "statement": "What goes into a product changes over time while it remains the same product.",
+    "owner": "Technical lead",
+    "subgroup_id": null,
+    "satisfied_by": "model",
+    "source_ids": [
+      "SRC001"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "REQ011",
+    "category": "Identity",
+    "statement": "An identifier issued by an outside authority, such as a trade item number, is the strongest evidence of which product something is.",
+    "owner": "Data steward",
+    "subgroup_id": null,
+    "satisfied_by": "model",
+    "source_ids": [
+      "SRC001",
+      "SRC002"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "REQ012",
+    "category": "Declaration",
+    "statement": "Every pre-packed product must carry a defined set of information: its name, its ingredients, the allergens among them, the quantity of certain ingredients, the net quantity, a date mark, storage and use conditions, the responsible business and its address, and the country of origin.",
+    "owner": "Regulatory lead",
+    "subgroup_id": null,
+    "satisfied_by": "model",
+    "source_ids": [
+      "SRC006",
+      "SRC007"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "REQ013",
+    "category": "Declaration",
+    "statement": "An allergen is declared by the food it comes from, including when it arrives inside another ingredient.",
+    "owner": "Quality manager",
+    "subgroup_id": null,
+    "satisfied_by": "model",
+    "source_ids": [
+      "SRC008",
+      "SRC009",
+      "SRC027",
+      "SRC028",
+      "SRC029"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "REQ014",
+    "category": "Declaration",
+    "statement": "Nutrition must be declared, and the values may come from analysis of the product, from calculation from the ingredients used, or from accepted published data.",
+    "owner": "Regulatory lead",
+    "subgroup_id": null,
+    "satisfied_by": "model",
+    "source_ids": [
+      "SRC005",
+      "SRC011"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "REQ015",
+    "category": "Declaration",
+    "statement": "Working nutrition out from the ingredients has to allow for the edible part of each, for weight change in preparation and for nutrients lost or gained.",
+    "owner": "Technical lead",
+    "subgroup_id": null,
+    "satisfied_by": "model",
+    "source_ids": [
+      "SRC012",
+      "SRC011"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "REQ016",
+    "category": "Declaration",
+    "statement": "Declared values are averages and are allowed to vary within stated tolerances.",
+    "owner": "Regulatory lead",
+    "subgroup_id": null,
+    "satisfied_by": "model",
+    "source_ids": [
+      "SRC011"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "REQ017",
+    "category": "Declaration",
+    "statement": "A claim about a product may only be made where stated conditions are met, and making it obliges the label to carry the figure behind it.",
+    "owner": "Regulatory lead",
+    "subgroup_id": null,
+    "satisfied_by": "model",
+    "source_ids": [
+      "SRC013"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "REQ018",
+    "category": "Declaration",
+    "statement": "A claim that compares a product with others requires a named comparator and a defined difference.",
+    "owner": "Regulatory lead",
+    "subgroup_id": null,
+    "satisfied_by": "model",
+    "source_ids": [
+      "SRC014"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "REQ019",
+    "category": "Declaration",
+    "statement": "A product must not carry information that misleads the buyer or suggests it has medicinal properties.",
+    "owner": "Regulatory lead",
+    "subgroup_id": null,
+    "satisfied_by": "model",
+    "source_ids": [
+      "SRC007"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "REQ020",
+    "category": "Declaration",
+    "statement": "Which rules a product must follow depends on the market it is sold in.",
+    "owner": "Regulatory lead",
+    "subgroup_id": null,
+    "satisfied_by": "model",
+    "source_ids": [
+      "SRC007",
+      "SRC010",
+      "SRC027",
+      "SRC028",
+      "SRC039"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "REQ021",
+    "category": "Declaration",
+    "statement": "Where a country of origin is declared on pack, the organisation must be able to show where the ingredient or product comes from.",
+    "owner": "Regulatory lead",
+    "subgroup_id": null,
+    "satisfied_by": "model",
+    "source_ids": [
+      "SRC006"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "REQ022",
+    "category": "Specification",
+    "statement": "An ingredient or product must meet a stated specification, and what it must be changes over time.",
+    "owner": "Quality manager",
+    "subgroup_id": null,
+    "satisfied_by": "model",
+    "source_ids": [
+      "SRC026",
+      "SRC015"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "REQ023",
+    "category": "Specification",
+    "statement": "What a supplier says an ingredient is must be comparable with what the organisation specified, including whether it is what it claims to be.",
+    "owner": "Quality manager",
+    "subgroup_id": null,
+    "satisfied_by": "model",
+    "source_ids": [
+      "SRC026",
+      "SRC016"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "REQ024",
+    "category": "Shelf life",
+    "statement": "How long a product lasts depends on how it is stored, and is limited by whichever is shorter of its safe life and its quality life.",
+    "owner": "Quality manager",
+    "subgroup_id": null,
+    "satisfied_by": "model",
+    "source_ids": [
+      "SRC023",
+      "SRC025"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "REQ025",
+    "category": "Shelf life",
+    "statement": "A shelf life is set for ingredients and part-made goods as well as for finished products.",
+    "owner": "Quality manager",
+    "subgroup_id": null,
+    "satisfied_by": "model",
+    "source_ids": [
+      "SRC024"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "REQ026",
+    "category": "Shelf life",
+    "statement": "A product carries a date mark — use-by where the food could soon become unsafe, best-before where it only loses quality — and the business labelling it decides which.",
+    "owner": "Regulatory lead",
+    "subgroup_id": null,
+    "satisfied_by": "model",
+    "source_ids": [
+      "SRC022",
+      "SRC006"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "REQ027",
+    "category": "Sourcing",
+    "statement": "An ingredient may be bought from several authorised suppliers, and an authorisation may lapse or be suspended.",
+    "owner": "Procurement lead",
+    "subgroup_id": null,
+    "satisfied_by": "model",
+    "source_ids": [
+      "SRC015",
+      "SRC018"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "REQ028",
+    "category": "Sourcing",
+    "statement": "A documented programme of authorising suppliers must cover every ingredient and every packaging item that goes into a finished product.",
+    "owner": "Procurement lead",
+    "subgroup_id": null,
+    "satisfied_by": "model",
+    "source_ids": [
+      "SRC015"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "REQ029",
+    "category": "Sourcing",
+    "statement": "Every ingredient must be assessed for how likely it is to be tampered with or swapped for something cheaper.",
+    "owner": "Quality manager",
+    "subgroup_id": null,
+    "satisfied_by": "model",
+    "source_ids": [
+      "SRC016",
+      "SRC017"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "REQ030",
+    "category": "Sourcing",
+    "statement": "Where an ingredient is found to be at particular risk, extra checks must be put in place for it.",
+    "owner": "Quality manager",
+    "subgroup_id": null,
+    "satisfied_by": "model",
+    "source_ids": [
+      "SRC017",
+      "SRC016"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "REQ031",
+    "category": "Sourcing",
+    "statement": "A supplier states what it has supplied, and the organisation may or may not check that statement.",
+    "owner": "Quality manager",
+    "subgroup_id": null,
+    "satisfied_by": "model",
+    "source_ids": [
+      "SRC019",
+      "SRC026"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "REQ032",
+    "category": "Sourcing",
+    "statement": "A supplier must tell the organisation of changes that could affect an ingredient's safety, quality, shelf life, declared contents, allergens or nutrition, and of any loss of a site's certification.",
+    "owner": "Procurement lead",
+    "subgroup_id": null,
+    "satisfied_by": "model",
+    "source_ids": [
+      "SRC021",
+      "SRC020"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "REQ033",
+    "category": "Sourcing",
+    "statement": "A product's certification comes from a named body, is valid for a set period, and can be revoked.",
+    "owner": "Quality manager",
+    "subgroup_id": null,
+    "satisfied_by": "model",
+    "source_ids": [
+      "SRC001",
+      "SRC015"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "REQ034",
+    "category": "Governance",
+    "statement": "A specification, a declaration and a claim are authorised by a named person before they are used.",
+    "owner": "Regulatory lead",
+    "subgroup_id": null,
+    "satisfied_by": "model",
+    "source_ids": [],
+    "status": "withdrawn",
+    "withdrawn_reason": "No source found says who must sign off a specification, a declaration or a claim. Recorded as an unsourced area rather than kept on reasoning."
+  },
+  {
+    "id": "REQ035",
+    "category": "Identity",
+    "statement": "Versions of one product that differ only in size, format or pack count are grouped under a single product definition that is never sold itself. Each version is identified, formulated and labelled in its own right.",
+    "owner": "Commercial lead",
+    "subgroup_id": null,
+    "satisfied_by": "model",
+    "source_ids": [
+      "SRC030",
+      "SRC001",
+      "SRC002"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "REQ036",
+    "category": "Sourcing",
+    "statement": "A factory or a supplier's site is a physical place with an address, and it is run by a named company.",
+    "owner": "Procurement lead",
+    "subgroup_id": null,
+    "satisfied_by": "model",
+    "source_ids": [
+      "SRC032",
+      "SRC031"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Moved to the manufacturing model: factories, the places inside them down to the shop floor, supplier sites, batches and supply chain detail belong there. This model holds a supplier only as a company."
+  },
+  {
+    "id": "REQ037",
+    "category": "Product",
+    "statement": "A recipe is kept once for the organisation and a factory may hold its own version to meet local needs. A recipe version is released for use before it is used and applies for a stated period.",
+    "owner": "Technical lead",
+    "subgroup_id": null,
+    "satisfied_by": "model",
+    "source_ids": [
+      "SRC034",
+      "SRC033"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Moved to the manufacturing model: factories, the places inside them down to the shop floor, supplier sites, batches and supply chain detail belong there. This model holds a supplier only as a company."
+  },
+  {
+    "id": "REQ038",
+    "category": "Sourcing",
+    "statement": "Food safety certification is issued to a named site, not to a company. The certificate states the site's name and address and what it covers, so which site an ingredient comes from decides which certificate covers it.",
+    "owner": "Quality manager",
+    "subgroup_id": null,
+    "satisfied_by": "model",
+    "source_ids": [
+      "SRC031"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Moved to the manufacturing model: factories, the places inside them down to the shop floor, supplier sites, batches and supply chain detail belong there. This model holds a supplier only as a company."
+  },
+  {
+    "id": "REQ039",
+    "category": "Identity",
+    "statement": "A product is intended for sale in stated markets, each a country or a wider region, from and until stated dates, and through stated trade channels such as grocery, food service or online.",
+    "owner": "Commercial lead",
+    "subgroup_id": null,
+    "satisfied_by": "model",
+    "source_ids": [
+      "SRC035",
+      "SRC036",
+      "SRC037"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "REQ040",
+    "category": "Declaration",
+    "statement": "In Great Britain pre-packed food must declare the same fourteen allergens as the European Union, under rules of its own. A product sold in several markets declares the allergens of each.",
+    "owner": "Regulatory lead",
+    "subgroup_id": null,
+    "satisfied_by": "model",
+    "source_ids": [
+      "SRC039",
+      "SRC027",
+      "SRC028"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "REQ041",
+    "category": "Declaration",
+    "statement": "The language of the mandatory label information is decided by the country in which the food is sold.",
+    "owner": "Regulatory lead",
+    "subgroup_id": null,
+    "satisfied_by": "model",
+    "source_ids": [
+      "SRC041"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "REQ042",
+    "category": "Declaration",
+    "statement": "The business named on a pack as responsible is the one the food is marketed under or, where that business is not established in the market, the importer, so it can differ from one market to another.",
+    "owner": "Regulatory lead",
+    "subgroup_id": null,
+    "satisfied_by": "model",
+    "source_ids": [
+      "SRC042"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "REQ043",
+    "category": "Identity",
+    "statement": "A product is shown by pictures that are tied to it by its trade item number, each taken from one stated side.",
+    "owner": "Commercial lead",
+    "subgroup_id": null,
+    "satisfied_by": "model",
+    "source_ids": [
+      "SRC038",
+      "SRC001"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "REQ044",
+    "category": "Identity",
+    "statement": "Each country belongs to one region of the world and each region to one continent, so a market named by region covers the countries within it.",
+    "owner": "Data steward",
+    "subgroup_id": null,
+    "satisfied_by": "model",
+    "source_ids": [
+      "SRC040",
+      "SRC035"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "The placing of each country in a region of the world belongs to the universal core data model. This design names a market by country or by the European Union, and the design covers three markets."
+  },
+  {
+    "id": "REQ045",
+    "category": "Declaration",
+    "statement": "An allergen may be declared in two ways: as an allergen the food contains, or as an allergen that may be present through cross-contact that cannot be avoided. A statement that an allergen may be present is voluntary, is used only where the risk cannot be controlled, and is not used for an allergen that is also declared as contained or claimed as absent.",
+    "owner": "Regulatory lead",
+    "subgroup_id": null,
+    "satisfied_by": "model",
+    "source_ids": [
+      "SRC028",
+      "SRC043",
+      "SRC044",
+      "SRC045"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "REQ046",
+    "category": "Shelf life",
+    "statement": "Where a food needs special storage conditions, such as being kept refrigerated or within a stated range of temperature, the pack states them.",
+    "owner": "Regulatory lead",
+    "subgroup_id": null,
+    "satisfied_by": "model",
+    "source_ids": [
+      "SRC046",
+      "SRC047",
+      "SRC048"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "REQ047",
+    "category": "Declaration",
+    "statement": "The lists of allergens differ from market to market and group foods differently: the European Union names cereals containing gluten where the United States names wheat, and names celery, mustard, lupin, molluscs and sulphites that the United States list does not. A food named in two markets must still be recognisable as the same food.",
+    "owner": "Regulatory lead",
+    "subgroup_id": null,
+    "satisfied_by": "model",
+    "source_ids": [
+      "SRC027",
+      "SRC028",
+      "SRC039"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  }
+]

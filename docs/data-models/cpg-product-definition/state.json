@@ -1,0 +1,1918 @@
+{
+  "spec_version": "31.5",
+  "spec_uri": "dda://skills/domain-discovery",
+  "mechanics": "manual",
+  "pass": 55,
+  "next_action": {
+    "step": 9,
+    "reason": "validate the elaborated model and run the new test cases"
+  },
+  "pass_limit": 6,
+  "stable_pass_count": 0,
+  "material_changes_last_pass": [],
+  "work_queue": [],
+  "escalated": [],
+  "scenarios": [
+    {
+      "id": "SCN001",
+      "question": "What goes into this product, and what is inside each of those ingredients?",
+      "data_requirement_ids": [
+        "DRQ001"
+      ],
+      "kind": "designed",
+      "as_at": "as-at",
+      "path": [
+        "REL001",
+        "SBJ001",
+        "SBJ003",
+        "ATR001",
+        "ATR002"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN002",
+      "question": "Which products contain this ingredient, by any route?",
+      "data_requirement_ids": [
+        "DRQ002"
+      ],
+      "kind": "designed",
+      "as_at": "current",
+      "path": [
+        "SBJ001",
+        "REL001"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN003",
+      "question": "In what order must this product's ingredients be declared, and which may go at the end?",
+      "data_requirement_ids": [
+        "DRQ003"
+      ],
+      "kind": "designed",
+      "as_at": "as-at",
+      "path": [
+        "REL001",
+        "ATR001",
+        "ATR004"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN004",
+      "question": "Which alternatives are permitted for this ingredient, and what does using one change on the label?",
+      "data_requirement_ids": [
+        "DRQ004"
+      ],
+      "kind": "designed",
+      "as_at": "as-at",
+      "path": [
+        "REL003",
+        "ATR006",
+        "ATR007"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN005",
+      "question": "Which of our products rest on an ingredient whose contents only the supplier can declare?",
+      "data_requirement_ids": [
+        "DRQ005"
+      ],
+      "kind": "designed",
+      "as_at": "current",
+      "path": [
+        "SBJ001",
+        "REL001",
+        "REL005",
+        "ATR036"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN006",
+      "question": "Which packs of this product exist, and did this change make a different product?",
+      "data_requirement_ids": [
+        "DRQ006"
+      ],
+      "kind": "designed",
+      "as_at": "as-at",
+      "path": [
+        "REL002",
+        "SBJ003",
+        "SBJ012",
+        "ATR015",
+        "ATR016"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN007",
+      "question": "Is everything this market requires on this pack present, and what does each item say?",
+      "data_requirement_ids": [
+        "DRQ007"
+      ],
+      "kind": "designed",
+      "as_at": "as-at",
+      "path": [
+        "REL007",
+        "SBJ007",
+        "SBJ022",
+        "ATR018",
+        "ATR019"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN008",
+      "question": "Which allergens must this product declare, and which ingredient brings each one?",
+      "data_requirement_ids": [
+        "DRQ008"
+      ],
+      "kind": "designed",
+      "as_at": "as-at",
+      "path": [
+        "REL001",
+        "SBJ005",
+        "ATR034",
+        "ATR035"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN009",
+      "question": "What are this product's nutrition values, how was each arrived at, and how far may each vary?",
+      "data_requirement_ids": [
+        "DRQ009"
+      ],
+      "kind": "designed",
+      "as_at": "as-at",
+      "path": [
+        "REL001",
+        "SBJ006",
+        "ATR001",
+        "ATR037"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN010",
+      "question": "Which claims does this pack make, and what does each rest on?",
+      "data_requirement_ids": [
+        "DRQ010"
+      ],
+      "kind": "designed",
+      "as_at": "as-at",
+      "path": [
+        "REL004",
+        "SBJ008",
+        "ATR008",
+        "ATR009"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN011",
+      "question": "What must this ingredient be, and what did it have to be on a past date?",
+      "data_requirement_ids": [
+        "DRQ011"
+      ],
+      "kind": "designed",
+      "as_at": "as-at",
+      "path": [
+        "ATR030",
+        "SBJ004",
+        "ATR031",
+        "ATR032"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN012",
+      "question": "Which of this ingredient's stated properties did we check, and which did we take on the supplier's word?",
+      "data_requirement_ids": [
+        "DRQ012"
+      ],
+      "kind": "designed",
+      "as_at": "as-at",
+      "path": [
+        "ATR014",
+        "SBJ004",
+        "SBJ017",
+        "REL008",
+        "REL009",
+        "ATR065"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN013",
+      "question": "Which supplier documents about an ingredient are newer than the formulation of a product that uses it?",
+      "data_requirement_ids": [
+        "DRQ012"
+      ],
+      "kind": "designed",
+      "as_at": "as-at",
+      "path": [
+        "REL008",
+        "ATR067",
+        "REL001",
+        "ATR028"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN014",
+      "question": "How long does this last under each storage condition, and which date mark does it carry?",
+      "data_requirement_ids": [
+        "DRQ013"
+      ],
+      "kind": "designed",
+      "as_at": "as-at",
+      "path": [
+        "ATR053",
+        "SBJ009",
+        "ATR054",
+        "ATR055"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN015",
+      "question": "Which suppliers may supply this ingredient today, and which could on a past date?",
+      "data_requirement_ids": [
+        "DRQ014"
+      ],
+      "kind": "designed",
+      "as_at": "as-at",
+      "path": [
+        "REL005",
+        "ATR010",
+        "ATR011"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN016",
+      "question": "Which ingredients and packaging items have no authorised supplier?",
+      "data_requirement_ids": [
+        "DRQ014"
+      ],
+      "kind": "designed",
+      "as_at": "as-at",
+      "path": [
+        "REL005",
+        "ATR010",
+        "ATR011"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN017",
+      "question": "Which ingredients are most at risk of fraud, and what is in place for them?",
+      "data_requirement_ids": [
+        "DRQ015"
+      ],
+      "kind": "designed",
+      "as_at": "as-at",
+      "path": [
+        "ATR058",
+        "SBJ011",
+        "ATR059",
+        "ATR060"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN018",
+      "question": "Which certifications does this product hold, from whom, and are they still valid?",
+      "data_requirement_ids": [
+        "DRQ016"
+      ],
+      "kind": "designed",
+      "as_at": "as-at",
+      "path": [
+        "REL006",
+        "ATR012",
+        "ATR013"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN019",
+      "question": "Which product is this, whatever identifier the retailer or supplier used?",
+      "data_requirement_ids": [
+        "DRQ017"
+      ],
+      "kind": "designed",
+      "as_at": "current",
+      "path": [
+        "SBJ002",
+        "ATR021",
+        "ATR022"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN020",
+      "question": "Where does this ingredient or product come from, as declared?",
+      "data_requirement_ids": [
+        "DRQ018"
+      ],
+      "kind": "designed",
+      "as_at": "as-at",
+      "path": [
+        "ATR056",
+        "SBJ010",
+        "ATR057"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN021",
+      "question": "What is inside the chocolate coating we buy in finished?",
+      "data_requirement_ids": [
+        "DRQ005"
+      ],
+      "kind": "awkward",
+      "as_at": "as-at",
+      "path": [
+        "REL005",
+        "REL008",
+        "SBJ017",
+        "ATR014"
+      ],
+      "result": "accepted-limit",
+      "reason": "The formulation stops at anything bought in finished. What it contains is what the supplier declares, recorded with who declared it and whether the organisation checked it."
+    },
+    {
+      "id": "SCN022",
+      "question": "A supplier changes what is inside an ingredient. Which of our labels does that reach?",
+      "data_requirement_ids": [
+        "DRQ002",
+        "DRQ007"
+      ],
+      "kind": "awkward",
+      "as_at": "as-at",
+      "path": [
+        "REL008",
+        "REL001",
+        "SBJ007",
+        "ATR047"
+      ],
+      "result": "pass",
+      "reason": "The supplier's change notice is a document dated after the formulation now in force, so the ingredient is found from the notice, every product using it is found through the composition, and each pack's printed items are recorded for each product."
+    },
+    {
+      "id": "SCN023",
+      "question": "We reformulate to cut sugar by 30%. Which claims and labels does that reach?",
+      "data_requirement_ids": [
+        "DRQ010",
+        "DRQ009"
+      ],
+      "kind": "awkward",
+      "as_at": "as-at",
+      "path": [
+        "REL001",
+        "SBJ006",
+        "SBJ008",
+        "ATR097"
+      ],
+      "result": "pass",
+      "reason": "The sugars value, the claims resting on sugars and the label items of the product are found directly, and so are the products that use it as an ingredient. Whether a claim still meets its condition after the change is judged by the person responsible, because the condition is held as wording."
+    },
+    {
+      "id": "SCN024",
+      "question": "Which product's date mark is set by its shortest-lived ingredient?",
+      "data_requirement_ids": [
+        "DRQ013"
+      ],
+      "kind": "awkward",
+      "as_at": "as-at",
+      "path": [
+        "SBJ009",
+        "ATR053"
+      ],
+      "result": "accepted-limit",
+      "reason": "The sources say a shelf life is limited by the shorter of a food's safe life and its quality life. None says an ingredient's own life sets the product's, so the design keeps a shelf life for each product and does not work one out from its ingredients."
+    },
+    {
+      "id": "SCN025",
+      "question": "Which batches contain the recalled ingredient?",
+      "data_requirement_ids": [
+        "DRQ002"
+      ],
+      "kind": "awkward",
+      "as_at": "as-at",
+      "path": [
+        "REL001"
+      ],
+      "result": "accepted-limit",
+      "reason": "Every product using the ingredient can be found through the formulation. Which batches of those products contain the affected material is a manufacturing question and out of scope."
+    },
+    {
+      "id": "SCN026",
+      "question": "Which products are sold as versions of this product definition, and how does each differ?",
+      "data_requirement_ids": [
+        "DRQ019"
+      ],
+      "kind": "designed",
+      "as_at": "current",
+      "path": [
+        "SBJ001",
+        "REL002",
+        "ATR015",
+        "ATR016"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN030",
+      "question": "Where, and through which channels, is this product sold today?",
+      "data_requirement_ids": [
+        "DRQ023"
+      ],
+      "kind": "designed",
+      "as_at": "as-at",
+      "path": [
+        "SBJ001",
+        "SBJ019",
+        "ATR080",
+        "SBJ020",
+        "ATR083"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN031",
+      "question": "Which allergens must this pack declare in Great Britain?",
+      "data_requirement_ids": [
+        "DRQ024"
+      ],
+      "kind": "designed",
+      "as_at": "as-at",
+      "path": [
+        "SBJ001",
+        "SBJ005",
+        "ATR034"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN032",
+      "question": "In which language is each mandatory item printed for each market?",
+      "data_requirement_ids": [
+        "DRQ025"
+      ],
+      "kind": "designed",
+      "as_at": "as-at",
+      "path": [
+        "SBJ001",
+        "SBJ019",
+        "SBJ007",
+        "ATR090"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN033",
+      "question": "Which business does this pack name as responsible in this market?",
+      "data_requirement_ids": [
+        "DRQ026"
+      ],
+      "kind": "designed",
+      "as_at": "as-at",
+      "path": [
+        "SBJ001",
+        "REL007",
+        "SBJ013",
+        "ATR092"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN034",
+      "question": "Which pictures show this product, and which is the current front view?",
+      "data_requirement_ids": [
+        "DRQ027"
+      ],
+      "kind": "designed",
+      "as_at": "as-at",
+      "path": [
+        "SBJ001",
+        "SBJ021",
+        "ATR086",
+        "ATR089"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN036",
+      "question": "A product is sold in the European Union as a whole in one period and in a single member country in another. Can both be shown?",
+      "data_requirement_ids": [
+        "DRQ023"
+      ],
+      "kind": "awkward",
+      "as_at": "as-at",
+      "path": [
+        "SBJ019",
+        "ATR079",
+        "ATR080"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN037",
+      "question": "Which allergens does this product contain, and which may it contain, in this market?",
+      "data_requirement_ids": [
+        "DRQ029"
+      ],
+      "kind": "designed",
+      "as_at": "current",
+      "path": [
+        "SBJ001",
+        "SBJ005",
+        "ATR034",
+        "ATR093"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN038",
+      "question": "Why does this product carry this allergen?",
+      "data_requirement_ids": [
+        "DRQ029"
+      ],
+      "kind": "designed",
+      "as_at": "current",
+      "path": [
+        "SBJ005",
+        "ATR094",
+        "ATR035",
+        "ATR036"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN039",
+      "question": "A line is shared with a nut product. Can the product say it may contain nuts without saying it contains them?",
+      "data_requirement_ids": [
+        "DRQ029"
+      ],
+      "kind": "awkward",
+      "as_at": "current",
+      "path": [
+        "SBJ005",
+        "ATR093"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN040",
+      "question": "At what temperature must this product be kept?",
+      "data_requirement_ids": [
+        "DRQ030"
+      ],
+      "kind": "designed",
+      "as_at": "current",
+      "path": [
+        "SBJ009",
+        "ATR054",
+        "ATR095",
+        "ATR096"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN041",
+      "question": "Is the celery declared in one market the same food as the celery declared in another?",
+      "data_requirement_ids": [
+        "DRQ031"
+      ],
+      "kind": "designed",
+      "as_at": "current",
+      "path": [
+        "SBJ005",
+        "ATR034"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN042",
+      "question": "The European Union names cereals containing gluten and the United States names wheat. Can both be shown against one food?",
+      "data_requirement_ids": [
+        "DRQ031"
+      ],
+      "kind": "awkward",
+      "as_at": "current",
+      "path": [
+        "SBJ005",
+        "ATR034"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN043",
+      "question": "Which products are groupings, and which are the versions that can be sold?",
+      "data_requirement_ids": [
+        "DRQ032"
+      ],
+      "kind": "designed",
+      "as_at": "as-at",
+      "path": [
+        "SBJ001",
+        "SBJ022",
+        "ATR098",
+        "REL002"
+      ],
+      "result": "pass",
+      "reason": ""
+    }
+  ],
+  "document": {
+    "edition": "lite",
+    "requested_by": "Andrew Bush",
+    "rendered": "2026-09-28"
+  },
+  "minimality": [
+    {
+      "pass": 1,
+      "counts": {
+        "domains": 3,
+        "roles": 18,
+        "relationships": 9,
+        "concepts": 17,
+        "attributes": 69,
+        "lookups": 11
+      },
+      "merged": [],
+      "withdrawn": [],
+      "growth_justified_by": [
+        "DRQ001"
+      ]
+    },
+    {
+      "pass": 2,
+      "counts": {
+        "domains": 3,
+        "roles": 18,
+        "relationships": 9,
+        "concepts": 17,
+        "attributes": 69,
+        "lookups": 11
+      },
+      "merged": [],
+      "withdrawn": [],
+      "growth_justified_by": []
+    },
+    {
+      "pass": 3,
+      "counts": {
+        "domains": 3,
+        "roles": 18,
+        "relationships": 9,
+        "concepts": 17,
+        "attributes": 69,
+        "lookups": 11
+      },
+      "merged": [],
+      "withdrawn": [],
+      "growth_justified_by": []
+    },
+    {
+      "pass": 4,
+      "counts": {
+        "domains": 3,
+        "roles": 18,
+        "relationships": 9,
+        "concepts": 17,
+        "attributes": 69,
+        "lookups": 11
+      },
+      "merged": [],
+      "withdrawn": [],
+      "growth_justified_by": []
+    },
+    {
+      "pass": 5,
+      "counts": {
+        "domains": 3,
+        "roles": 18,
+        "relationships": 9,
+        "concepts": 17,
+        "attributes": 69,
+        "lookups": 11
+      },
+      "merged": [],
+      "withdrawn": [],
+      "growth_justified_by": []
+    },
+    {
+      "pass": 6,
+      "counts": {
+        "domains": 3,
+        "roles": 18,
+        "relationships": 9,
+        "concepts": 17,
+        "attributes": 69,
+        "lookups": 11
+      },
+      "merged": [],
+      "withdrawn": [],
+      "growth_justified_by": []
+    },
+    {
+      "pass": 7,
+      "counts": {
+        "domains": 3,
+        "roles": 18,
+        "relationships": 9,
+        "concepts": 17,
+        "attributes": 69,
+        "lookups": 11
+      },
+      "merged": [],
+      "withdrawn": [],
+      "growth_justified_by": []
+    },
+    {
+      "pass": 8,
+      "counts": {
+        "domains": 3,
+        "roles": 18,
+        "relationships": 9,
+        "concepts": 17,
+        "attributes": 69,
+        "lookups": 11
+      },
+      "merged": [],
+      "withdrawn": [],
+      "growth_justified_by": []
+    },
+    {
+      "pass": 9,
+      "counts": {
+        "domains": 3,
+        "roles": 18,
+        "relationships": 9,
+        "concepts": 17,
+        "attributes": 69,
+        "lookups": 11
+      },
+      "merged": [],
+      "withdrawn": [],
+      "growth_justified_by": []
+    },
+    {
+      "pass": 10,
+      "counts": {
+        "domains": 3,
+        "roles": 18,
+        "relationships": 9,
+        "concepts": 17,
+        "attributes": 69,
+        "lookups": 11
+      },
+      "merged": [],
+      "withdrawn": [],
+      "growth_justified_by": []
+    },
+    {
+      "pass": 11,
+      "counts": {
+        "domains": 3,
+        "roles": 18,
+        "relationships": 9,
+        "concepts": 17,
+        "attributes": 69,
+        "lookups": 11
+      },
+      "merged": [],
+      "withdrawn": [],
+      "growth_justified_by": []
+    },
+    {
+      "pass": 12,
+      "counts": {
+        "domains": 3,
+        "roles": 18,
+        "relationships": 9,
+        "concepts": 17,
+        "attributes": 69,
+        "lookups": 11
+      },
+      "merged": [],
+      "withdrawn": [],
+      "growth_justified_by": []
+    },
+    {
+      "pass": 13,
+      "counts": {
+        "domains": 3,
+        "roles": 18,
+        "relationships": 9,
+        "concepts": 17,
+        "attributes": 69,
+        "lookups": 11
+      },
+      "merged": [],
+      "withdrawn": [],
+      "growth_justified_by": []
+    },
+    {
+      "pass": 14,
+      "counts": {
+        "domains": 3,
+        "roles": 18,
+        "relationships": 9,
+        "concepts": 17,
+        "attributes": 69,
+        "lookups": 11
+      },
+      "merged": [],
+      "withdrawn": [],
+      "growth_justified_by": []
+    },
+    {
+      "pass": 15,
+      "counts": {
+        "domains": 3,
+        "roles": 18,
+        "relationships": 9,
+        "concepts": 17,
+        "attributes": 69,
+        "lookups": 11
+      },
+      "merged": [],
+      "withdrawn": [],
+      "growth_justified_by": []
+    },
+    {
+      "pass": 16,
+      "counts": {
+        "domains": 3,
+        "roles": 18,
+        "relationships": 9,
+        "concepts": 17,
+        "attributes": 69,
+        "lookups": 11
+      },
+      "merged": [],
+      "withdrawn": [],
+      "growth_justified_by": []
+    },
+    {
+      "pass": 17,
+      "counts": {
+        "domains": 3,
+        "roles": 18,
+        "relationships": 9,
+        "concepts": 17,
+        "attributes": 69,
+        "lookups": 11
+      },
+      "merged": [],
+      "withdrawn": [],
+      "growth_justified_by": []
+    },
+    {
+      "pass": 18,
+      "counts": {
+        "domains": 3,
+        "roles": 18,
+        "relationships": 9,
+        "concepts": 17,
+        "attributes": 69,
+        "lookups": 11
+      },
+      "merged": [],
+      "withdrawn": [],
+      "growth_justified_by": []
+    },
+    {
+      "pass": 19,
+      "counts": {
+        "domains": 3,
+        "roles": 18,
+        "relationships": 9,
+        "concepts": 17,
+        "attributes": 69,
+        "lookups": 11
+      },
+      "merged": [],
+      "withdrawn": [],
+      "growth_justified_by": []
+    },
+    {
+      "pass": 20,
+      "counts": {
+        "domains": 3,
+        "roles": 18,
+        "relationships": 9,
+        "concepts": 17,
+        "attributes": 69,
+        "lookups": 11
+      },
+      "merged": [],
+      "withdrawn": [],
+      "growth_justified_by": []
+    },
+    {
+      "pass": 21,
+      "counts": {
+        "domains": 3,
+        "roles": 18,
+        "relationships": 9,
+        "concepts": 17,
+        "attributes": 69,
+        "lookups": 11
+      },
+      "merged": [],
+      "withdrawn": [],
+      "growth_justified_by": []
+    },
+    {
+      "pass": 22,
+      "counts": {
+        "domains": 3,
+        "roles": 18,
+        "relationships": 9,
+        "concepts": 17,
+        "attributes": 69,
+        "lookups": 11
+      },
+      "merged": [],
+      "withdrawn": [],
+      "growth_justified_by": []
+    },
+    {
+      "pass": 23,
+      "counts": {
+        "domains": 3,
+        "roles": 18,
+        "relationships": 9,
+        "concepts": 17,
+        "attributes": 69,
+        "lookups": 11
+      },
+      "merged": [],
+      "withdrawn": [],
+      "growth_justified_by": []
+    },
+    {
+      "pass": 24,
+      "counts": {
+        "domains": 3,
+        "roles": 18,
+        "relationships": 9,
+        "concepts": 17,
+        "attributes": 69,
+        "lookups": 11
+      },
+      "merged": [],
+      "withdrawn": [],
+      "growth_justified_by": []
+    },
+    {
+      "pass": 25,
+      "counts": {
+        "domains": 3,
+        "roles": 18,
+        "relationships": 9,
+        "concepts": 17,
+        "attributes": 69,
+        "lookups": 11
+      },
+      "merged": [],
+      "withdrawn": [],
+      "growth_justified_by": []
+    },
+    {
+      "pass": 26,
+      "counts": {
+        "domains": 3,
+        "roles": 18,
+        "relationships": 9,
+        "concepts": 17,
+        "attributes": 69,
+        "lookups": 11
+      },
+      "merged": [],
+      "withdrawn": [],
+      "growth_justified_by": []
+    },
+    {
+      "pass": 27,
+      "counts": {
+        "domains": 3,
+        "roles": 18,
+        "relationships": 9,
+        "concepts": 17,
+        "attributes": 69,
+        "lookups": 11
+      },
+      "merged": [],
+      "withdrawn": [],
+      "growth_justified_by": []
+    },
+    {
+      "pass": 28,
+      "counts": {
+        "domains": 3,
+        "roles": 18,
+        "relationships": 9,
+        "concepts": 17,
+        "attributes": 69,
+        "lookups": 11
+      },
+      "merged": [],
+      "withdrawn": [],
+      "growth_justified_by": []
+    },
+    {
+      "pass": 29,
+      "counts": {
+        "domains": 3,
+        "roles": 18,
+        "relationships": 9,
+        "concepts": 17,
+        "attributes": 69,
+        "lookups": 11
+      },
+      "merged": [],
+      "withdrawn": [],
+      "growth_justified_by": []
+    },
+    {
+      "pass": 30,
+      "counts": {
+        "domains": 3,
+        "roles": 18,
+        "relationships": 9,
+        "concepts": 17,
+        "attributes": 69,
+        "lookups": 11
+      },
+      "merged": [],
+      "withdrawn": [],
+      "growth_justified_by": []
+    },
+    {
+      "pass": 31,
+      "counts": {
+        "domains": 3,
+        "roles": 18,
+        "relationships": 9,
+        "concepts": 17,
+        "attributes": 69,
+        "lookups": 11
+      },
+      "merged": [],
+      "withdrawn": [],
+      "growth_justified_by": []
+    },
+    {
+      "pass": 32,
+      "counts": {
+        "domains": 3,
+        "roles": 18,
+        "relationships": 9,
+        "concepts": 17,
+        "attributes": 69,
+        "lookups": 11
+      },
+      "merged": [],
+      "withdrawn": [],
+      "growth_justified_by": []
+    },
+    {
+      "pass": 33,
+      "counts": {
+        "domains": 3,
+        "roles": 18,
+        "relationships": 9,
+        "concepts": 17,
+        "attributes": 69,
+        "lookups": 11
+      },
+      "merged": [],
+      "withdrawn": [],
+      "growth_justified_by": []
+    },
+    {
+      "pass": 34,
+      "counts": {
+        "domains": 3,
+        "roles": 18,
+        "relationships": 9,
+        "concepts": 17,
+        "attributes": 69,
+        "lookups": 11
+      },
+      "merged": [],
+      "withdrawn": [],
+      "growth_justified_by": []
+    },
+    {
+      "pass": 35,
+      "counts": {
+        "domains": 3,
+        "roles": 18,
+        "relationships": 9,
+        "concepts": 17,
+        "attributes": 69,
+        "lookups": 11
+      },
+      "merged": [],
+      "withdrawn": [],
+      "growth_justified_by": []
+    },
+    {
+      "pass": 36,
+      "counts": {
+        "domains": 3,
+        "roles": 18,
+        "relationships": 9,
+        "concepts": 17,
+        "attributes": 69,
+        "lookups": 11
+      },
+      "merged": [],
+      "withdrawn": [],
+      "growth_justified_by": []
+    },
+    {
+      "pass": 37,
+      "counts": {
+        "domains": 3,
+        "roles": 18,
+        "relationships": 9,
+        "concepts": 17,
+        "attributes": 69,
+        "lookups": 11
+      },
+      "merged": [],
+      "withdrawn": [],
+      "growth_justified_by": []
+    },
+    {
+      "pass": 38,
+      "counts": {
+        "domains": 3,
+        "roles": 18,
+        "relationships": 9,
+        "concepts": 17,
+        "attributes": 69,
+        "lookups": 11
+      },
+      "merged": [],
+      "withdrawn": [],
+      "growth_justified_by": []
+    },
+    {
+      "pass": 39,
+      "counts": {
+        "domains": 3,
+        "roles": 18,
+        "relationships": 9,
+        "concepts": 17,
+        "attributes": 69,
+        "lookups": 11
+      },
+      "merged": [],
+      "withdrawn": [],
+      "growth_justified_by": []
+    },
+    {
+      "pass": 40,
+      "counts": {
+        "domains": 3,
+        "roles": 18,
+        "relationships": 9,
+        "concepts": 17,
+        "attributes": 69,
+        "lookups": 11
+      },
+      "merged": [],
+      "withdrawn": [],
+      "growth_justified_by": []
+    },
+    {
+      "pass": 41,
+      "counts": {
+        "domains": 3,
+        "roles": 18,
+        "relationships": 9,
+        "concepts": 17,
+        "attributes": 69,
+        "lookups": 11
+      },
+      "merged": [],
+      "withdrawn": [],
+      "growth_justified_by": []
+    },
+    {
+      "pass": 42,
+      "counts": {
+        "domains": 3,
+        "roles": 18,
+        "relationships": 9,
+        "concepts": 17,
+        "attributes": 69,
+        "lookups": 11
+      },
+      "merged": [],
+      "withdrawn": [],
+      "growth_justified_by": []
+    },
+    {
+      "pass": 43,
+      "counts": {
+        "domains": 3,
+        "roles": 18,
+        "relationships": 9,
+        "concepts": 17,
+        "attributes": 69,
+        "lookups": 11
+      },
+      "merged": [],
+      "withdrawn": [],
+      "growth_justified_by": []
+    },
+    {
+      "pass": 44,
+      "counts": {
+        "domains": 3,
+        "roles": 18,
+        "relationships": 9,
+        "concepts": 17,
+        "attributes": 69,
+        "lookups": 11
+      },
+      "merged": [],
+      "withdrawn": [],
+      "growth_justified_by": []
+    },
+    {
+      "pass": 45,
+      "counts": {
+        "domains": 3,
+        "roles": 18,
+        "relationships": 9,
+        "concepts": 17,
+        "attributes": 69,
+        "lookups": 11
+      },
+      "merged": [],
+      "withdrawn": [],
+      "growth_justified_by": []
+    },
+    {
+      "pass": 46,
+      "counts": {
+        "domains": 3,
+        "roles": 18,
+        "relationships": 9,
+        "concepts": 17,
+        "attributes": 69,
+        "lookups": 11
+      },
+      "merged": [],
+      "withdrawn": [],
+      "growth_justified_by": []
+    },
+    {
+      "pass": 47,
+      "counts": {
+        "domains": 3,
+        "roles": 18,
+        "relationships": 9,
+        "concepts": 17,
+        "attributes": 69,
+        "lookups": 11
+      },
+      "merged": [],
+      "withdrawn": [],
+      "growth_justified_by": []
+    },
+    {
+      "pass": 48,
+      "counts": {
+        "domains": 3,
+        "roles": 18,
+        "relationships": 9,
+        "concepts": 17,
+        "attributes": 69,
+        "lookups": 11
+      },
+      "merged": [],
+      "withdrawn": [],
+      "growth_justified_by": []
+    },
+    {
+      "pass": 49,
+      "counts": {
+        "domains": 3,
+        "roles": 18,
+        "relationships": 9,
+        "concepts": 17,
+        "attributes": 69,
+        "lookups": 11
+      },
+      "merged": [],
+      "withdrawn": [],
+      "growth_justified_by": []
+    },
+    {
+      "pass": 50,
+      "counts": {
+        "domains": 3,
+        "roles": 18,
+        "relationships": 9,
+        "concepts": 17,
+        "attributes": 69,
+        "lookups": 11
+      },
+      "merged": [],
+      "withdrawn": [],
+      "growth_justified_by": []
+    },
+    {
+      "pass": 51,
+      "counts": {
+        "domains": 3,
+        "roles": 18,
+        "relationships": 9,
+        "concepts": 17,
+        "attributes": 69,
+        "lookups": 11
+      },
+      "merged": [],
+      "withdrawn": [],
+      "growth_justified_by": []
+    },
+    {
+      "pass": 52,
+      "counts": {
+        "domains": 3,
+        "roles": 18,
+        "relationships": 9,
+        "concepts": 17,
+        "attributes": 69,
+        "lookups": 11
+      },
+      "merged": [],
+      "withdrawn": [],
+      "growth_justified_by": []
+    },
+    {
+      "pass": 53,
+      "counts": {
+        "domains": 3,
+        "roles": 18,
+        "relationships": 9,
+        "concepts": 17,
+        "attributes": 69,
+        "lookups": 11
+      },
+      "merged": [],
+      "withdrawn": [],
+      "growth_justified_by": []
+    },
+    {
+      "pass": 54,
+      "counts": {
+        "domains": 3,
+        "roles": 18,
+        "relationships": 9,
+        "concepts": 20,
+        "attributes": 85,
+        "lookups": 18
+      },
+      "merged": [
+        "ROL004 Family renamed Logical Product; ROL001 Made Product reused for where a product is made; ROL009 Bought Material reused for where it is supplied from; ROL012 Certifying Body reused for site certification"
+      ],
+      "withdrawn": [
+        "ATR029",
+        "ATR046",
+        "ATR049"
+      ],
+      "growth_justified_by": [
+        "DRQ019",
+        "DRQ020",
+        "DRQ021",
+        "DRQ022",
+        "DRQ023",
+        "DRQ024",
+        "DRQ025",
+        "DRQ026",
+        "DRQ027",
+        "DRQ029",
+        "DRQ030",
+        "DRQ031"
+      ]
+    },
+    {
+      "pass": 55,
+      "counts": {
+        "domains": 3,
+        "roles": 18,
+        "relationships": 9,
+        "concepts": 21,
+        "attributes": 86,
+        "lookups": 19
+      },
+      "merged": [],
+      "withdrawn": [],
+      "growth_justified_by": [
+        "DRQ032"
+      ]
+    }
+  ],
+  "standards_conformance": [
+    {
+      "standard": "DMS000000141",
+      "applies": true,
+      "how_satisfied": "All three domains are reused as DDA holds them, so nothing here is owned by a single department.",
+      "artefact_ids": [],
+      "exception_id": null,
+      "read_hash": "534058049e904721b3d287990805b89c10cf07eb6343f71dc2d22981c20fe531",
+      "covers": []
+    },
+    {
+      "standard": "DMS000000142",
+      "applies": true,
+      "how_satisfied": "Each requirement names an accountable role, and what could not be checked is raised as an open decision or a finding rather than worked around.",
+      "artefact_ids": [],
+      "exception_id": null,
+      "read_hash": "c6eaeae60dd0baa363dfb2e5b805878cab57705b2d0d83f3c03aaf1ef17da1fb",
+      "covers": []
+    },
+    {
+      "standard": "DMS000000143",
+      "applies": false,
+      "how_satisfied": "Policy ownership. Nothing in this design changes who owns the policy.",
+      "artefact_ids": [],
+      "exception_id": null,
+      "read_hash": "eac0b8da26e3051f068b7434a8b8a29372eba9b193817d1ee75947f7b2525dc3",
+      "covers": []
+    },
+    {
+      "standard": "DMS000000144",
+      "applies": false,
+      "how_satisfied": "Policy precedence. No conflict with a more specific policy arises in this design.",
+      "artefact_ids": [],
+      "exception_id": null,
+      "read_hash": "8d17da8d9ab484fa2d18b52a77e141546d51177f5ca509746925cb7542ec8a19",
+      "covers": []
+    },
+    {
+      "standard": "DMS000000145",
+      "applies": false,
+      "how_satisfied": "Policy scope. This design does not decide which data the policy applies to.",
+      "artefact_ids": [],
+      "exception_id": null,
+      "read_hash": "7895ab06b93287f187f7a24775fac248a7c67f01dea6cfbac47e4c2124c87559",
+      "covers": []
+    },
+    {
+      "standard": "DMS000000146",
+      "applies": false,
+      "how_satisfied": "No new domain is proposed. Products was added to DDA as DMD000000032 and is reused as it stands.",
+      "artefact_ids": [],
+      "exception_id": null,
+      "read_hash": "c34244772aa3433329d0de49e6da450889be7b7e8d9c4048277a2ba1f0a46b0e",
+      "covers": []
+    },
+    {
+      "standard": "DMS000000147",
+      "applies": true,
+      "how_satisfied": "Every domain is named for a subject. Six activity- or role-shaped candidates were tested and are recorded with the test each failed and where their subjects sit.",
+      "artefact_ids": [],
+      "exception_id": null,
+      "read_hash": "efc3c383f91f685d0f987e58681342639082810e8e535e9487750912a95edc4e",
+      "covers": []
+    },
+    {
+      "standard": "DMS000000148",
+      "applies": false,
+      "how_satisfied": "Stewardship and custodian roles are assigned outside a model design.",
+      "artefact_ids": [],
+      "exception_id": null,
+      "read_hash": "0d52947b52fa0c9e7a270745e87c85f62cfcd0d6593eb923e138e751e96ac430",
+      "covers": []
+    },
+    {
+      "standard": "DMS000000149",
+      "applies": true,
+      "how_satisfied": "Each concept sits in exactly one domain and each domain has one anchor concept. Products had no concepts in DDA, so its anchor concept, Product, is proposed here.",
+      "artefact_ids": [],
+      "exception_id": null,
+      "read_hash": "b0cd368cc549ebf2ac721a8a56e549bcd35e9376ab35661742c11a4ca64ffeb3",
+      "covers": []
+    },
+    {
+      "standard": "DMS000000150",
+      "applies": false,
+      "how_satisfied": "Authoritative repositories are named per domain outside a model design.",
+      "artefact_ids": [],
+      "exception_id": null,
+      "read_hash": "264a51aa8b0e4db1d2b2238f42c063f6dac004797102673d2d4fef04821e6865",
+      "covers": []
+    },
+    {
+      "standard": "DMS000000168",
+      "applies": true,
+      "how_satisfied": "Lineage is held by the platform and is not modelled.",
+      "artefact_ids": [],
+      "exception_id": null,
+      "read_hash": "ce58a031ecb15695c2712890139e04b33ab004ba86ec237fe14a57e3e36af92d",
+      "covers": []
+    },
+    {
+      "standard": "DMS000000151",
+      "applies": true,
+      "how_satisfied": "Products carry an identifiers concept with the trade item number and internal numbers as further keys, each with its issuer and dates.",
+      "artefact_ids": [
+        "SBJ002"
+      ],
+      "exception_id": null,
+      "read_hash": "9ba0c063c441df0647ba763fe424c9ed1fcdda1373ca11f8d5c114b728a7cbc7",
+      "covers": []
+    },
+    {
+      "standard": "DMS000000152",
+      "applies": true,
+      "how_satisfied": "Attributes that carry a regulatory duty — allergens, nutrition basis, claim conditions, date marks, formulation versions and specification limits — are marked critical.",
+      "artefact_ids": [
+        "ATR001",
+        "ATR003",
+        "ATR004",
+        "ATR007",
+        "ATR009",
+        "ATR012",
+        "ATR014",
+        "ATR018",
+        "ATR019",
+        "ATR021",
+        "ATR022",
+        "ATR027",
+        "ATR028",
+        "ATR030",
+        "ATR031",
+        "ATR032",
+        "ATR033",
+        "ATR034",
+        "ATR035",
+        "ATR036",
+        "ATR037",
+        "ATR038",
+        "ATR039",
+        "ATR045",
+        "ATR046",
+        "ATR047",
+        "ATR048",
+        "ATR050",
+        "ATR051",
+        "ATR052",
+        "ATR053",
+        "ATR054",
+        "ATR055",
+        "ATR056",
+        "ATR059",
+        "ATR061",
+        "ATR063",
+        "ATR066",
+        "ATR067",
+        "ATR068",
+        "ATR069"
+      ],
+      "exception_id": null,
+      "read_hash": "a5761a371b10ecd52b56c32d8715dad5c5df94fdf4f437e3d0dd23946ad42919",
+      "covers": []
+    },
+    {
+      "standard": "DMS000000153",
+      "applies": false,
+      "how_satisfied": "Issue management is a programme, not a model artefact.",
+      "artefact_ids": [],
+      "exception_id": null,
+      "read_hash": "fec8c75bcfa384ede87cf175dabc85663df3e6ec8042e5bce6c5ea05b3bd769e",
+      "covers": []
+    },
+    {
+      "standard": "DMS000000154",
+      "applies": false,
+      "how_satisfied": "Change control of the policy itself is outside a model design.",
+      "artefact_ids": [],
+      "exception_id": null,
+      "read_hash": "7cb5a498edde29480f3c1d7643573ccf00e8a20a6799908cfa0326cf834564a7",
+      "covers": []
+    },
+    {
+      "standard": "DMS000000169",
+      "applies": true,
+      "how_satisfied": "Each of the fourteen principles is addressed in turn. Three do not apply and one applies in part, because this design defines no reports, data products or publication. Three are not fully met and are set out as exceptions, each with its consequence and what would resolve it.",
+      "artefact_ids": [],
+      "exception_id": "EXC001, EXC002, EXC003",
+      "read_hash": "fc56357c5a3643fe44ef9b66237f61d9b593e0b92d3be833780f7782d02c5d11",
+      "covers": [],
+      "by_principle": {
+        "1": "A product is defined once, as the Product concept. What a product is to another party, such as an ingredient, a variant or a bought-in material, is a role that comes from a relationship, not a field on the product. Suppliers, certifying bodies and the business named on a pack are Legal Entities playing roles in the same way. One exception applies: some changes make a different product under an external identity rule (see below).",
+        "2": "The requirements in section 3 and the data requirements in section 4 set out the business meaning first, in business words, each with a source. The requirements draw on published sources alone (assumption SCA004). No tool, pipeline or physical structure is chosen.",
+        "3": "The design starts from {sources} published sources, listed in Appendix A with the reason each is included. It brings in no source data. A supplier's statements are kept with who made them and whether the organisation checked them.",
+        "4": "A product is identified by the identifiers it carries, such as a trade item number, an internal material number or a supplier's part number, each with its issuer and dates. Suppliers and documents use the identity DDA already has. Nothing depends on a report or a data product.",
+        "5": "Does not apply. This design defines no reports.",
+        "6": "Applies in part. The product definition is written once so that other models can refer to it (section 5.2). No data product is designed here.",
+        "7": "There are nine relationships (section 5.4). Each has a verb that reads naturally in both directions, the role at each end, how many can link, and whether dates are kept. None is reduced to a field on either side.",
+        "8": "The list of changes to make in DDA is generated from the model ({operations} steps in dependency order), and this document is produced from the same working files. One exception applies: DDA's Products definition disagrees with a requirement (see below).",
+        "9": "Definitions are written in the business's own words. Each concept shows a plain name beside its DDA name, and the requirements use the vocabulary of the field.",
+        "10": "No concept, list of values or relationship refers to an application, a report or a project.",
+        "11": "Does not apply. This design defines no data products.",
+        "12": "Does not apply. This design defines no publication of information.",
+        "13": "Sensitivity is set on {classified} of the facts the design keeps, where it applies, and {critical} are marked critical because they support a legal or safety duty. Retention and provenance are looked after by the platform and are not modelled here. Stewardship and retention are not defined, which is an exception (see below).",
+        "14": "The model uses the things the business itself talks about, products, ingredients, suppliers and certificates, and the arrangements between them, as the requirements describe them."
+      }
+    },
+    {
+      "standard": "DMS000000156",
+      "applies": true,
+      "how_satisfied": "The glossary standards define domain, model, concept, attribute, producer, consumer, custodian, operational data store, master data management, warehouse, lake and critical data element. The design uses each term as defined.",
+      "artefact_ids": [],
+      "exception_id": null,
+      "read_hash": "29ee3de96a1d3913b816658b70ce7f32f5bf72de99b6e27a27fc981703c00d97",
+      "covers": [
+        "DMS000000157",
+        "DMS000000158",
+        "DMS000000159",
+        "DMS000000160",
+        "DMS000000161",
+        "DMS000000162",
+        "DMS000000163",
+        "DMS000000164",
+        "DMS000000165",
+        "DMS000000166",
+        "DMS000000167"
+      ]
+    }
+  ],
+  "exceptions": [
+    {
+      "id": "EXC001",
+      "standard": "DMS000000169",
+      "principle": 1,
+      "kind": "conflict",
+      "artefact_ids": [
+        "REQ009",
+        "SBJ012",
+        "REL002"
+      ],
+      "justification": "An external identity rule makes a change to the declared ingredients, the net quantity, a certification mark or the pack count a different product (requirement REQ009). Principle 1 asks that identity survive changes over time. For these changes it does not. In this conflict the design follows the requirement.",
+      "consequence": "A question about one product over time has to follow a link from the old product to the new one, and cannot rely on a single identity. Anyone counting products before and after such a change will count two.",
+      "owner": "Regulatory lead",
+      "route_back": "Restating REQ009 so that such a change is a new version keeps one identity. The identity-changes concept would then be replaced by formulation versions."
+    },
+    {
+      "id": "EXC002",
+      "standard": "DMS000000169",
+      "principle": 8,
+      "kind": "conflict",
+      "artefact_ids": [
+        "REQ005",
+        "REL001"
+      ],
+      "justification": "DDA's Products definition says each product points up to one immediate parent product. Requirement REQ005 says the same ingredient goes into many products, so a product can have many parents and the composition relationship is many to many. In this conflict the design follows the requirement.",
+      "consequence": "If the DDA definition is followed as written, an ingredient could be recorded under only one product. The DDA definition and this design disagree, and an implementation generated from the definition would not meet the requirement.",
+      "owner": "Data Design Authority owner",
+      "route_back": "Rewording the Products definition in DDA so that a product may be used in more than one product removes the conflict. Keeping the wording means restating REQ005 and changing the composition relationship."
+    },
+    {
+      "id": "EXC003",
+      "standard": "DMS000000169",
+      "principle": 13,
+      "kind": "not_met",
+      "artefact_ids": [],
+      "justification": "Principle 13 asks for stewardship, retention and provenance to be defined as part of the design. This design names no steward for any concept, sets no retention period for the dated history it keeps, and leaves provenance to the platform.",
+      "consequence": "Nobody is named as accountable for the definition of a concept, list of values or relationship, and nothing says how long formulation, specification or declaration history is kept.",
+      "owner": "Data Design Authority owner",
+      "route_back": "Naming a steward for each domain and setting a retention period for the dated history resolves it."
+    }
+  ],
+  "decisions": [
+    {
+      "id": "DEC002",
+      "question": "When a supplier tells the organisation that what is inside its ingredient now differs from what was specified, should acting on that notice be part of this design? The design keeps the notice and what it says, and does not keep the action taken.",
+      "options": [
+        "Keep the action in this design",
+        "Leave the action to supplier management"
+      ],
+      "raised_at_pass": 1,
+      "status": "open",
+      "decision": "",
+      "by": "",
+      "date": ""
+    },
+    {
+      "id": "DEC003",
+      "question": "The list of units of measure, UniversalUnitOfMeasureCodes, is used by this model and by CPG Manufacturing and Supply Chain, with the same seven values. DDA does not yet hold it. Create it once in DDA ahead of both change packages, or let the first package applied create it and the second skip it.",
+      "options": [
+        "create it in DDA now",
+        "first change package applied creates it"
+      ],
+      "raised_at_pass": 2,
+      "status": "decided",
+      "decision": "Both CPG models use one list, UniversalUnitOfMeasureCodes, with the same seven values. It was created in DDA as lookup type DLT000000156 on 16 November 2026; each design contributes the values.",
+      "by": "Andrew Bush",
+      "date": "2026-11-16"
+    },
+    {
+      "id": "DEC004",
+      "question": "Product is proposed both here and by CPG Manufacturing and Supply Chain, because DDA's Products domain holds no concept (read on 16 November 2026). Which model creates it, and which refers to it?",
+      "options": [
+        "this model creates it",
+        "CPG Manufacturing and Supply Chain creates it"
+      ],
+      "raised_at_pass": 54,
+      "status": "decided",
+      "decision": "This model creates Product and holds the hierarchy of products and ingredients. CPG Manufacturing and Supply Chain refers to them.",
+      "by": "Andrew Bush",
+      "date": "2026-11-18"
+    },
+    {
+      "id": "DEC006",
+      "question": "A Local product is a version of a logical product that can be sold. A product that is sold in a single size and format has no logical product above it. Should every sold product have a logical product above it, even where there is only one version, or may a sold product stand alone?",
+      "options": [
+        "Every sold product has a logical product above it",
+        "A sold product may stand alone, and is then Local without a logical product"
+      ],
+      "raised_at_pass": 55,
+      "status": "open",
+      "decision": "",
+      "by": "",
+      "date": ""
+    }
+  ],
+  "converged": false,
+  "gate_decision": null,
+  "summary": "This design covers what a food or beverage product is, what goes into it, what it must be, how long it lasts, who may supply its ingredients and what may be said about it on pack. The formulation, meaning the list of what goes into a product and how much, is at its heart. The order ingredients are listed in, the allergens, the nutrition values and the claims on a pack all follow from the formulation, so a change to it shows which labels and claims it reaches. Where an ingredient is bought in already made, the design relies on what the supplier declares is inside it, and records who declared it and whether it was checked.\n\nThe design has three stated limits. It cannot say what is inside a bought-in ingredient beyond what the supplier declares. It finds every product that uses a recalled ingredient but not which batches, which belongs to the manufacturing model. It keeps a shelf life for each product and does not work one out from the shelf lives of its ingredients, because none of the sources describe a rule for doing so.",
+  "editorial": {
+    "document_sha256": "7fcf212b7f35233e4b1385fdf5e4fa6a0a762731a66b9f79d2330e56bb288291",
+    "reviewed_on": "2026-09-28",
+    "reviewer": "same-agent-clean-read",
+    "findings_count": {
+      "factual": 1,
+      "clarity": 1,
+      "language": 1,
+      "structure": 2,
+      "substance": 2
+    }
+  },
+  "withdrawn_scenarios": [
+    {
+      "id": "SCN027",
+      "question": "Which company runs this site, and which sites does this company run?",
+      "data_requirement_ids": [
+        "DRQ020"
+      ],
+      "kind": "designed",
+      "as_at": "as-at",
+      "path": [
+        "SBJ018",
+        "REL010",
+        "SBJ013",
+        "ATR071"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN028",
+      "question": "Which recipe version is this factory using for this product, and which was it using on a given date?",
+      "data_requirement_ids": [
+        "DRQ021"
+      ],
+      "kind": "designed",
+      "as_at": "as-at",
+      "path": [
+        "SBJ001",
+        "REL011",
+        "SBJ018",
+        "ATR075"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN029",
+      "question": "Which sites holding a certificate supply this ingredient, and what does each certificate cover?",
+      "data_requirement_ids": [
+        "DRQ022"
+      ],
+      "kind": "designed",
+      "as_at": "as-at",
+      "path": [
+        "SBJ001",
+        "REL012",
+        "SBJ018",
+        "REL013",
+        "ATR078"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN035",
+      "question": "Which countries are in this region?",
+      "data_requirement_ids": [
+        "DRQ028"
+      ],
+      "kind": "designed",
+      "as_at": "current",
+      "path": [
+        "SBJ019",
+        "ATR079",
+        "ATR080"
+      ],
+      "result": "pass",
+      "reason": ""
+    }
+  ],
+  "withdrawn_decisions": [
+    {
+      "id": "DEC003",
+      "question": "The Locations domain in DDA describes markets and regions as places in a hierarchy of locations. This design takes markets from the country and region lists instead. Which should the Locations domain follow?",
+      "options": [
+        "Markets and regions come from the governed country and region lists",
+        "Markets and regions are locations in a hierarchy"
+      ],
+      "raised_at_pass": 54,
+      "status": "open",
+      "decision": "",
+      "by": "",
+      "date": ""
+    },
+    {
+      "id": "DEC001",
+      "question": "Which allergen list should the design carry: the nine the United States names, the longer European list, or both by market? The answer depends on which markets the products are sold in (question SCQ001). It carries the nine today, because no source read sets out the European list.",
+      "options": [
+        "The nine the United States names",
+        "The European list as well",
+        "Both, depending on the market"
+      ],
+      "raised_at_pass": 1,
+      "status": "withdrawn",
+      "decision": "The design carries one list of allergens, ProductFoodBevAllergens, with each value prefixed by its market, for example US-MILK and EU-MILK. The United States nine and the European Union fourteen are both listed, and a product declares those of the markets it is sold in.",
+      "by": "Andrew Bush",
+      "date": "2026-09-28",
+      "withdrawn_reason": "Settled: the design holds a universal list of allergen foods and a list for each market, each market allergen naming the food it is."
+    },
+    {
+      "id": "DEC005",
+      "question": "The kind of a product is one value: Logical, Local or Ingredient. A product that is both sold in its own right and used as an ingredient in another product, such as sugar sold to shoppers and used in a biscuit, has to be recorded as one of them. Should the kind hold one value, or more than one?",
+      "options": [
+        "One value, the kind the product is mainly managed as",
+        "More than one value"
+      ],
+      "raised_at_pass": 55,
+      "status": "withdrawn",
+      "decision": "",
+      "by": "",
+      "date": "",
+      "withdrawn_reason": "Ingredient is a role a product plays in the formulation relationship, so it is no longer a kind. A product sold and used as an ingredient is a Local product and is an ingredient by its formulations."
+    }
+  ]
+}

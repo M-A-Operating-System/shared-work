@@ -1,0 +1,3366 @@
+[
+  {
+    "id": "ATR001",
+    "subject_id": null,
+    "relationship_id": "REL001",
+    "code": "ProductBillOfMaterialsSpecifiedQuantity",
+    "definition": "How much of the input goes into one of the output product.",
+    "datatype": "FLOAT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "searched DDA attributes on the parent concept for 'ProductBillOfMaterialsSpecifiedQuantity'",
+    "data_requirement_ids": [
+      "DRQ004"
+    ],
+    "evidence_source_ids": [
+      "SRC005"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
+  },
+  {
+    "id": "ATR002",
+    "subject_id": null,
+    "relationship_id": "REL029",
+    "code": "EventBatchInputsUnitOfMeasure",
+    "definition": "The unit, such as kilograms or litres, in which the quantities on this link between a production run and a batch it used are stated. It applies to the quantity the recipe called for and to the quantity actually used.",
+    "datatype": "LOOKUP",
+    "lookup_id": "LKP009",
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": false,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventBatchInputsUnitOfMeasure, or holding the same fact on EventBatchInputs; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ004"
+    ],
+    "evidence_source_ids": [
+      "SRC005"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR003",
+    "subject_id": null,
+    "relationship_id": "REL001",
+    "code": "ProductBillOfMaterialsPosition",
+    "definition": "The place in the recipe this input fills.",
+    "datatype": "TEXT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": false,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "searched DDA attributes on the parent concept for 'ProductBillOfMaterialsPosition'",
+    "data_requirement_ids": [
+      "DRQ005"
+    ],
+    "evidence_source_ids": [
+      "SRC005"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
+  },
+  {
+    "id": "ATR004",
+    "subject_id": null,
+    "relationship_id": "REL001",
+    "code": "ProductBillOfMaterialsStructureVersion",
+    "definition": "The version of the recipe this line belongs to.",
+    "datatype": "TEXT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "searched DDA attributes on the parent concept for 'ProductBillOfMaterialsStructureVersion'",
+    "data_requirement_ids": [],
+    "evidence_source_ids": [
+      "SRC002"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
+  },
+  {
+    "id": "ATR005",
+    "subject_id": null,
+    "relationship_id": "REL001",
+    "code": "ProductBillOfMaterialsIsSubstitutable",
+    "definition": "Whether an approved alternative may fill this place.",
+    "datatype": "BOOLEAN",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": false,
+    "critical": false,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "searched DDA attributes on the parent concept for 'ProductBillOfMaterialsIsSubstitutable'",
+    "data_requirement_ids": [
+      "DRQ005"
+    ],
+    "evidence_source_ids": [
+      "SRC005"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
+  },
+  {
+    "id": "ATR006",
+    "subject_id": null,
+    "relationship_id": "REL015",
+    "code": "InstanceBatchCompositionQuantity",
+    "definition": "How much of a batch was built into a unit, in the unit of measure stated for that batch. It is the only place that quantity is kept.",
+    "datatype": "FLOAT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": false,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named InstanceBatchCompositionQuantity, or holding the same fact on InstanceBatchComposition; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ016"
+    ],
+    "evidence_source_ids": [
+      "SRC007"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR007",
+    "subject_id": null,
+    "relationship_id": "REL003",
+    "code": "ProductApprovedSourcesApprovalState",
+    "definition": "Whether the approval is in force, suspended or lapsed.",
+    "datatype": "TEXT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "searched DDA attributes on the parent concept for 'ProductApprovedSourcesApprovalState'",
+    "data_requirement_ids": [
+      "DRQ006"
+    ],
+    "evidence_source_ids": [
+      "SRC020"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
+  },
+  {
+    "id": "ATR008",
+    "subject_id": null,
+    "relationship_id": "REL005",
+    "code": "ProductContractManufactureScope",
+    "definition": "What the outside manufacturer is contracted to do for a product, such as making it, packing it or both, and under which specification it works.",
+    "datatype": "TEXT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": false,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named ProductContractManufactureScope, or holding the same fact on ProductContractManufacture; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ033"
+    ],
+    "evidence_source_ids": [
+      "SRC024"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR009",
+    "subject_id": null,
+    "relationship_id": "REL011",
+    "code": "LocationInstallationsInstalledBy",
+    "definition": "The person who fitted the machine into the place. It says who to ask about how the machine was installed on the day it went in.",
+    "datatype": "USER",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": false,
+    "critical": false,
+    "classification": "INTERNAL",
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named LocationInstallationsInstalledBy, or holding the same fact on LocationInstallations; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ020"
+    ],
+    "evidence_source_ids": [
+      "SRC016"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR010",
+    "subject_id": null,
+    "relationship_id": "REL028",
+    "code": "EventPerformersCapacity",
+    "definition": "The capacity in which the person took part in the recorded event, such as operator, checker, decider or releaser. It is what shows, for a decision or a release, who made it.",
+    "datatype": "TEXT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventPerformersCapacity, or holding the same fact on EventPerformers; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ023",
+      "DRQ027",
+      "DRQ029"
+    ],
+    "evidence_source_ids": [
+      "SRC033"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR011",
+    "subject_id": null,
+    "relationship_id": "REL029",
+    "code": "EventBatchInputsQuantityUsed",
+    "definition": "How much of the batch the production run actually used, in the unit of measure stated on the link. Set against the quantity the recipe called for, it shows how far the run departed from the recipe.",
+    "datatype": "FLOAT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventBatchInputsQuantityUsed, or holding the same fact on EventBatchInputs; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ004"
+    ],
+    "evidence_source_ids": [
+      "SRC005"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR012",
+    "subject_id": null,
+    "relationship_id": "REL030",
+    "code": "EventBatchOutputsQuantityProduced",
+    "definition": "How much of the batch the production run actually produced, in the unit of measure stated for it. It is the quantity the batch is followed by when it is split or sent on.",
+    "datatype": "FLOAT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventBatchOutputsQuantityProduced, or holding the same fact on EventBatchOutputs; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ004",
+      "DRQ030"
+    ],
+    "evidence_source_ids": [
+      "SRC005"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR013",
+    "subject_id": null,
+    "relationship_id": "REL031",
+    "code": "EventStoppageMachinesFailureMode",
+    "definition": "How the machine failed when it stopped, in words. It is empty when the stoppage was planned and the machine did not fail.",
+    "datatype": "TEXT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": false,
+    "critical": false,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventStoppageMachinesFailureMode, or holding the same fact on EventStoppageMachines; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ021",
+      "DRQ022"
+    ],
+    "evidence_source_ids": [
+      "SRC018"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR014",
+    "subject_id": null,
+    "relationship_id": "REL037",
+    "code": "DocumentBatchDeclarationsVerified",
+    "definition": "Whether the business checked what the supplier's document says about the batch by a test of its own. Where it is false, the claim is the supplier's and is not reported as the business's own result.",
+    "datatype": "BOOLEAN",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named DocumentBatchDeclarationsVerified, or holding the same fact on DocumentBatchDeclarations; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ007"
+    ],
+    "evidence_source_ids": [
+      "SRC020"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR015",
+    "subject_id": null,
+    "relationship_id": "REL038",
+    "code": "EventStorageExposuresDuration",
+    "definition": "How long the batch was exposed to conditions outside those its place must keep, counted in hours. It shows how serious the exposure was.",
+    "datatype": "FLOAT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": false,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventStorageExposuresDuration, or holding the same fact on EventStorageExposures; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ034"
+    ],
+    "evidence_source_ids": [
+      "SRC020"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR016",
+    "subject_id": "SBJ012",
+    "relationship_id": null,
+    "code": "ProductName",
+    "definition": "The name the product is known by.",
+    "datatype": "TEXT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "current",
+    "mandatory": true,
+    "critical": false,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "searched DDA attributes on the parent concept for 'ProductName'",
+    "data_requirement_ids": [],
+    "evidence_source_ids": [
+      "SRC030"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
+  },
+  {
+    "id": "ATR017",
+    "subject_id": "SBJ012",
+    "relationship_id": null,
+    "code": "ProductKind",
+    "definition": "What a product is to the organisation, such as a raw material, a pack component or a finished unit. It decides whether the product may be bought, made, used in other products or sold.",
+    "datatype": "LOOKUP",
+    "lookup_id": "LKP001",
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "current",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named ProductKind, or holding the same fact on Product; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ013"
+    ],
+    "evidence_source_ids": [
+      "SRC005"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Held by CPG - Product Definition, which owns the core product and the hierarchy of products and ingredients. This model refers to that Product."
+  },
+  {
+    "id": "ATR018",
+    "subject_id": "SBJ012",
+    "relationship_id": null,
+    "code": "ProductIsPurchased",
+    "definition": "Whether the organisation buys the product in finished, so that what is inside it is known only from the supplier's declaration.",
+    "datatype": "BOOLEAN",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "current",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named ProductIsPurchased, or holding the same fact on Product; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ008"
+    ],
+    "evidence_source_ids": [
+      "SRC024"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Held by CPG - Product Definition, which owns the core product and the hierarchy of products and ingredients. This model refers to that Product."
+  },
+  {
+    "id": "ATR019",
+    "subject_id": "SBJ013",
+    "relationship_id": null,
+    "code": "ProductIdentifiersType",
+    "definition": "The scheme the identifier belongs to.",
+    "datatype": "LOOKUP",
+    "lookup_id": "LKP003",
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": false,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "searched DDA attributes on the parent concept for 'ProductIdentifiersType'",
+    "data_requirement_ids": [
+      "DRQ035"
+    ],
+    "evidence_source_ids": [
+      "SRC030"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
+  },
+  {
+    "id": "ATR020",
+    "subject_id": "SBJ013",
+    "relationship_id": null,
+    "code": "ProductIdentifiersValue",
+    "definition": "The identifier itself.",
+    "datatype": "TEXT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "searched DDA attributes on the parent concept for 'ProductIdentifiersValue'",
+    "data_requirement_ids": [
+      "DRQ035"
+    ],
+    "evidence_source_ids": [
+      "SRC030"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
+  },
+  {
+    "id": "ATR021",
+    "subject_id": "SBJ013",
+    "relationship_id": null,
+    "code": "ProductIdentifiersStartDate",
+    "definition": "When the identifier came into use.",
+    "datatype": "DATE",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": false,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "searched DDA attributes on the parent concept for 'ProductIdentifiersStartDate'",
+    "data_requirement_ids": [
+      "DRQ035"
+    ],
+    "evidence_source_ids": [
+      "SRC030"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
+  },
+  {
+    "id": "ATR022",
+    "subject_id": "SBJ013",
+    "relationship_id": null,
+    "code": "ProductIdentifiersExpiryDate",
+    "definition": "When the identifier ceased to be used.",
+    "datatype": "DATE",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": false,
+    "critical": false,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "searched DDA attributes on the parent concept for 'ProductIdentifiersExpiryDate'",
+    "data_requirement_ids": [
+      "DRQ035"
+    ],
+    "evidence_source_ids": [
+      "SRC030"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
+  },
+  {
+    "id": "ATR023",
+    "subject_id": "SBJ014",
+    "relationship_id": null,
+    "code": "ProductSpecificationsVersion",
+    "definition": "Which version of the specification this is.",
+    "datatype": "TEXT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "searched DDA attributes on the parent concept for 'ProductSpecificationsVersion'",
+    "data_requirement_ids": [
+      "DRQ025"
+    ],
+    "evidence_source_ids": [
+      "SRC020"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
+  },
+  {
+    "id": "ATR024",
+    "subject_id": "SBJ014",
+    "relationship_id": null,
+    "code": "ProductSpecificationsEffectiveFrom",
+    "definition": "The date from which this version applies.",
+    "datatype": "DATE",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "searched DDA attributes on the parent concept for 'ProductSpecificationsEffectiveFrom'",
+    "data_requirement_ids": [
+      "DRQ025"
+    ],
+    "evidence_source_ids": [
+      "SRC020"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
+  },
+  {
+    "id": "ATR025",
+    "subject_id": "SBJ014",
+    "relationship_id": null,
+    "code": "ProductSpecificationsLimit",
+    "definition": "The limit a characteristic must fall within.",
+    "datatype": "TEXT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": false,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "searched DDA attributes on the parent concept for 'ProductSpecificationsLimit'",
+    "data_requirement_ids": [
+      "DRQ025"
+    ],
+    "evidence_source_ids": [
+      "SRC020"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
+  },
+  {
+    "id": "ATR026",
+    "subject_id": "SBJ015",
+    "relationship_id": null,
+    "code": "ProductStructureVersionsVersion",
+    "definition": "Which version of the recipe this is.",
+    "datatype": "TEXT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "searched DDA attributes on the parent concept for 'ProductStructureVersionsVersion'",
+    "data_requirement_ids": [],
+    "evidence_source_ids": [
+      "SRC002"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
+  },
+  {
+    "id": "ATR027",
+    "subject_id": "SBJ015",
+    "relationship_id": null,
+    "code": "ProductStructureVersionsEffectiveFrom",
+    "definition": "The date from which this version of the recipe applies.",
+    "datatype": "DATE",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "searched DDA attributes on the parent concept for 'ProductStructureVersionsEffectiveFrom'",
+    "data_requirement_ids": [],
+    "evidence_source_ids": [
+      "SRC002"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
+  },
+  {
+    "id": "ATR028",
+    "subject_id": "SBJ015",
+    "relationship_id": null,
+    "code": "ProductStructureVersionsScope",
+    "definition": "The site, market or period this version applies to.",
+    "datatype": "TEXT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": false,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "searched DDA attributes on the parent concept for 'ProductStructureVersionsScope'",
+    "data_requirement_ids": [],
+    "evidence_source_ids": [
+      "SRC002"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
+  },
+  {
+    "id": "ATR029",
+    "subject_id": "SBJ016",
+    "relationship_id": null,
+    "code": "ProductBatchesLotCode",
+    "definition": "The lot code given to the batch when it was first packed or transformed. It is carried unchanged at every later movement, so it is how the batch is followed back and forward.",
+    "datatype": "TEXT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named ProductBatchesLotCode, or holding the same fact on ProductBatches; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ030"
+    ],
+    "evidence_source_ids": [
+      "SRC011"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR030",
+    "subject_id": "SBJ016",
+    "relationship_id": null,
+    "code": "ProductBatchesMadeOn",
+    "definition": "The date the batch was made. For a batch that is split or combined, it is the date the new batch came into being.",
+    "datatype": "DATE",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named ProductBatchesMadeOn, or holding the same fact on ProductBatches; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ030",
+      "DRQ012"
+    ],
+    "evidence_source_ids": [
+      "SRC011"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR031",
+    "subject_id": "SBJ016",
+    "relationship_id": null,
+    "code": "ProductBatchesUsableUntil",
+    "definition": "The latest date the batch may be used, taken from its inputs and its shelf life.",
+    "datatype": "DATE",
+    "lookup_id": null,
+    "nature": "derived",
+    "derived_from": [
+      "ATR041",
+      "ATR030"
+    ],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "searched DDA attributes on the parent concept for 'ProductBatchesUsableUntil'",
+    "data_requirement_ids": [],
+    "evidence_source_ids": [
+      "SRC007"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be. The date a batch may be used until is worked out from the shelf life held there."
+  },
+  {
+    "id": "ATR032",
+    "subject_id": "SBJ016",
+    "relationship_id": null,
+    "code": "ProductBatchesQuantityMade",
+    "definition": "How much of the product the batch holds when it is made, in the product's unit of measure. Later splits are checked against it.",
+    "datatype": "FLOAT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": false,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named ProductBatchesQuantityMade, or holding the same fact on ProductBatches; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ012"
+    ],
+    "evidence_source_ids": [
+      "SRC005"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR033",
+    "subject_id": "SBJ017",
+    "relationship_id": null,
+    "code": "ProductSubBatchesQuantity",
+    "definition": "How much of the batch this part holds, in the same unit as the batch. The parts of a batch add up to what was divided.",
+    "datatype": "FLOAT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": false,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named ProductSubBatchesQuantity, or holding the same fact on ProductSubBatches; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ012"
+    ],
+    "evidence_source_ids": [
+      "SRC005"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR034",
+    "subject_id": "SBJ018",
+    "relationship_id": null,
+    "code": "ProductHazardsType",
+    "definition": "The kind of hazard, which decides the declaration regime.",
+    "datatype": "LOOKUP",
+    "lookup_id": "LKP002",
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "searched DDA attributes on the parent concept for 'ProductHazardsType'",
+    "data_requirement_ids": [],
+    "evidence_source_ids": [
+      "SRC035"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
+  },
+  {
+    "id": "ATR035",
+    "subject_id": "SBJ018",
+    "relationship_id": null,
+    "code": "ProductHazardsSubstance",
+    "definition": "The substance the hazard concerns, named as it must be declared.",
+    "datatype": "TEXT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "searched DDA attributes on the parent concept for 'ProductHazardsSubstance'",
+    "data_requirement_ids": [],
+    "evidence_source_ids": [
+      "SRC035"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
+  },
+  {
+    "id": "ATR036",
+    "subject_id": "SBJ018",
+    "relationship_id": null,
+    "code": "ProductHazardsIsDeclaredBySupplier",
+    "definition": "Whether the hazard is known only because a supplier declared it.",
+    "datatype": "BOOLEAN",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "searched DDA attributes on the parent concept for 'ProductHazardsIsDeclaredBySupplier'",
+    "data_requirement_ids": [
+      "DRQ008"
+    ],
+    "evidence_source_ids": [
+      "SRC024"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
+  },
+  {
+    "id": "ATR037",
+    "subject_id": "SBJ019",
+    "relationship_id": null,
+    "code": "ProductDisclosuresSubstance",
+    "definition": "The ingredient being disclosed.",
+    "datatype": "TEXT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "searched DDA attributes on the parent concept for 'ProductDisclosuresSubstance'",
+    "data_requirement_ids": [],
+    "evidence_source_ids": [
+      "SRC025"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
+  },
+  {
+    "id": "ATR038",
+    "subject_id": "SBJ019",
+    "relationship_id": null,
+    "code": "ProductDisclosuresWeightBand",
+    "definition": "How much of it there is, as the regime requires it to be stated.",
+    "datatype": "TEXT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": false,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "searched DDA attributes on the parent concept for 'ProductDisclosuresWeightBand'",
+    "data_requirement_ids": [],
+    "evidence_source_ids": [
+      "SRC026"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
+  },
+  {
+    "id": "ATR039",
+    "subject_id": "SBJ019",
+    "relationship_id": null,
+    "code": "ProductDisclosuresIsWithheld",
+    "definition": "Whether the identity is withheld as confidential business information.",
+    "datatype": "BOOLEAN",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": false,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "searched DDA attributes on the parent concept for 'ProductDisclosuresIsWithheld'",
+    "data_requirement_ids": [],
+    "evidence_source_ids": [
+      "SRC025"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
+  },
+  {
+    "id": "ATR040",
+    "subject_id": "SBJ020",
+    "relationship_id": null,
+    "code": "ProductOriginsCountry",
+    "definition": "The country or region of origin stated.",
+    "datatype": "TEXT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": false,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "searched DDA attributes on the parent concept for 'ProductOriginsCountry'",
+    "data_requirement_ids": [],
+    "evidence_source_ids": [
+      "SRC030"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
+  },
+  {
+    "id": "ATR041",
+    "subject_id": "SBJ021",
+    "relationship_id": null,
+    "code": "ProductShelfLivesDays",
+    "definition": "How many days the product lasts under the stated conditions.",
+    "datatype": "INTEGER",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "searched DDA attributes on the parent concept for 'ProductShelfLivesDays'",
+    "data_requirement_ids": [],
+    "evidence_source_ids": [
+      "SRC007"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
+  },
+  {
+    "id": "ATR042",
+    "subject_id": "SBJ022",
+    "relationship_id": null,
+    "code": "ProductSubstitutionsConditions",
+    "definition": "The conditions under which the alternative may be used.",
+    "datatype": "LONGTEXT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": false,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "searched DDA attributes on the parent concept for 'ProductSubstitutionsConditions'",
+    "data_requirement_ids": [
+      "DRQ005"
+    ],
+    "evidence_source_ids": [
+      "SRC005"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
+  },
+  {
+    "id": "ATR043",
+    "subject_id": "SBJ023",
+    "relationship_id": null,
+    "code": "ProductVariantAxesAxis",
+    "definition": "The dimension along which the family's members differ.",
+    "datatype": "TEXT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": false,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "searched DDA attributes on the parent concept for 'ProductVariantAxesAxis'",
+    "data_requirement_ids": [],
+    "evidence_source_ids": [
+      "SRC030"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
+  },
+  {
+    "id": "ATR044",
+    "subject_id": "SBJ024",
+    "relationship_id": null,
+    "code": "ProductCostingsStandardCost",
+    "definition": "What the product was expected to cost, by element.",
+    "datatype": "CURRENCY",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "searched DDA attributes on the parent concept for 'ProductCostingsStandardCost'",
+    "data_requirement_ids": [],
+    "evidence_source_ids": [
+      "SRC014"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Cost is not held in this model."
+  },
+  {
+    "id": "ATR045",
+    "subject_id": "SBJ024",
+    "relationship_id": null,
+    "code": "ProductCostingsActualCost",
+    "definition": "What the product actually cost, built from what went into it and what was done to it.",
+    "datatype": "CURRENCY",
+    "lookup_id": null,
+    "nature": "derived",
+    "derived_from": [
+      "ATR011",
+      "ATR044"
+    ],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "searched DDA attributes on the parent concept for 'ProductCostingsActualCost'",
+    "data_requirement_ids": [],
+    "evidence_source_ids": [
+      "SRC014"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Cost is not held in this model."
+  },
+  {
+    "id": "ATR046",
+    "subject_id": "SBJ025",
+    "relationship_id": null,
+    "code": "ProductIdentityChangesMadeNewProduct",
+    "definition": "Whether the change made a new product rather than a new version of what goes in.",
+    "datatype": "BOOLEAN",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "searched DDA attributes on the parent concept for 'ProductIdentityChangesMadeNewProduct'",
+    "data_requirement_ids": [],
+    "evidence_source_ids": [
+      "SRC030"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
+  },
+  {
+    "id": "ATR047",
+    "subject_id": "SBJ025",
+    "relationship_id": null,
+    "code": "ProductIdentityChangesReason",
+    "definition": "Why the change was made, and which rule decided it.",
+    "datatype": "LONGTEXT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": false,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "searched DDA attributes on the parent concept for 'ProductIdentityChangesReason'",
+    "data_requirement_ids": [],
+    "evidence_source_ids": [
+      "SRC031"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
+  },
+  {
+    "id": "ATR048",
+    "subject_id": "SBJ026",
+    "relationship_id": null,
+    "code": "InstanceBuiltOn",
+    "definition": "The date the machine was built or the unit was made. It shows how old the machine or unit is.",
+    "datatype": "DATE",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": false,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named InstanceBuiltOn, or holding the same fact on Instance; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ016"
+    ],
+    "evidence_source_ids": [
+      "SRC007"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR049",
+    "subject_id": "SBJ027",
+    "relationship_id": null,
+    "code": "InstanceIdentifiersValue",
+    "definition": "The identifier itself, such as a serial number or an asset number, exactly as the maker or the organisation wrote it. It is how a machine or unit is matched to outside records.",
+    "datatype": "TEXT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named InstanceIdentifiersValue, or holding the same fact on InstanceIdentifiers; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ016"
+    ],
+    "evidence_source_ids": [
+      "SRC037"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR050",
+    "subject_id": "SBJ028",
+    "relationship_id": null,
+    "code": "InstanceConditionsMeasure",
+    "definition": "What was measured when a reading was taken of the machine, such as its temperature or the hours it has run.",
+    "datatype": "TEXT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": false,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named InstanceConditionsMeasure, or holding the same fact on InstanceConditions; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ021"
+    ],
+    "evidence_source_ids": [
+      "SRC018"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR051",
+    "subject_id": "SBJ028",
+    "relationship_id": null,
+    "code": "InstanceConditionsValue",
+    "definition": "The number the reading gave, in the unit the measure is normally stated in. Read with the time of the reading, it shows how the machine was running.",
+    "datatype": "FLOAT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": false,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named InstanceConditionsValue, or holding the same fact on InstanceConditions; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ021"
+    ],
+    "evidence_source_ids": [
+      "SRC018"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR052",
+    "subject_id": "SBJ029",
+    "relationship_id": null,
+    "code": "InstanceFailureModesEffect",
+    "definition": "What happens when the machine fails in this way, such as lost output, spoiled product or a risk to safety. It helps judge how much the failure matters.",
+    "datatype": "LONGTEXT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": false,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named InstanceFailureModesEffect, or holding the same fact on InstanceFailureModes; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ021"
+    ],
+    "evidence_source_ids": [
+      "SRC018"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR053",
+    "subject_id": "SBJ026",
+    "relationship_id": null,
+    "code": "InstanceCriticalityScore",
+    "definition": "A whole number showing how much the machine matters to production and to safety, where a higher number means a failure matters more. It is empty for an individual unit of product.",
+    "datatype": "INTEGER",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": false,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named InstanceCriticalityScore, or holding the same fact on Instance; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ021"
+    ],
+    "evidence_source_ids": [
+      "SRC018"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR054",
+    "subject_id": "SBJ043",
+    "relationship_id": null,
+    "code": "LocationLevel",
+    "definition": "How far down the plant structure the place is, such as site, area, production line, storage zone or work unit. It tells a reader where in the hierarchy the place sits.",
+    "datatype": "LOOKUP",
+    "lookup_id": "LKP005",
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "current",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named LocationLevel, or holding the same fact on Location; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ020"
+    ],
+    "evidence_source_ids": [
+      "SRC001"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR055",
+    "subject_id": "SBJ031",
+    "relationship_id": null,
+    "code": "EquipmentPositionName",
+    "definition": "The name the place is known by on the floor.",
+    "datatype": "TEXT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "current",
+    "mandatory": true,
+    "critical": false,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "searched DDA attributes on the parent concept for 'EquipmentPositionName'",
+    "data_requirement_ids": [
+      "DRQ020"
+    ],
+    "evidence_source_ids": [
+      "SRC001"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Merged into LocationName."
+  },
+  {
+    "id": "ATR056",
+    "subject_id": "SBJ033",
+    "relationship_id": null,
+    "code": "EquipmentCapabilitiesCapacity",
+    "definition": "How much the place can handle, in its own unit.",
+    "datatype": "FLOAT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": false,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "searched DDA attributes on the parent concept for 'EquipmentCapabilitiesCapacity'",
+    "data_requirement_ids": [
+      "DRQ017"
+    ],
+    "evidence_source_ids": [
+      "SRC004"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "A rated capacity is not asked for by any data requirement that remains."
+  },
+  {
+    "id": "ATR057",
+    "subject_id": "SBJ034",
+    "relationship_id": null,
+    "code": "LocationSequencingRulesReason",
+    "definition": "Why one product may not follow another on the line, such as an allergen that must not carry over. It is the reason the rule exists.",
+    "datatype": "LONGTEXT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named LocationSequencingRulesReason, or holding the same fact on LocationSequencingRules; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ019"
+    ],
+    "evidence_source_ids": [
+      "SRC034"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR058",
+    "subject_id": "SBJ034",
+    "relationship_id": null,
+    "code": "LocationSequencingRulesRequiresClean",
+    "definition": "Whether a clean is needed on the line between the two products. Where it is true and no clean is recorded between the runs, the line was run against the rule.",
+    "datatype": "BOOLEAN",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named LocationSequencingRulesRequiresClean, or holding the same fact on LocationSequencingRules; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ019"
+    ],
+    "evidence_source_ids": [
+      "SRC034"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR059",
+    "subject_id": "SBJ035",
+    "relationship_id": null,
+    "code": "EquipmentMaintenancePlansTrigger",
+    "definition": "What prompts the work — a date, a count, a condition.",
+    "datatype": "TEXT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": false,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "searched DDA attributes on the parent concept for 'EquipmentMaintenancePlansTrigger'",
+    "data_requirement_ids": [
+      "DRQ021"
+    ],
+    "evidence_source_ids": [
+      "SRC018"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "The maintenance plan is not held."
+  },
+  {
+    "id": "ATR060",
+    "subject_id": "SBJ036",
+    "relationship_id": null,
+    "code": "ProcessSegmentName",
+    "definition": "What the step is called, in the words the factory uses, such as pasteurising or filling.",
+    "datatype": "TEXT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "current",
+    "mandatory": true,
+    "critical": false,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named ProcessSegmentName, or holding the same fact on ProcessSegment; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ017"
+    ],
+    "evidence_source_ids": [
+      "SRC002"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR061",
+    "subject_id": "SBJ037",
+    "relationship_id": null,
+    "code": "ProcessSegmentRequirementsKind",
+    "definition": "What sort of thing the step needs, such as a kind of machine, a qualified person or a material.",
+    "datatype": "TEXT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": false,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named ProcessSegmentRequirementsKind, or holding the same fact on ProcessSegmentRequirements; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ017"
+    ],
+    "evidence_source_ids": [
+      "SRC002"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR062",
+    "subject_id": "SBJ038",
+    "relationship_id": null,
+    "code": "ProcessParametersLowerLimit",
+    "definition": "The floor for a setting: the lowest value the step may be run at and stay in control. A reading below it means the step ran too low, and it is stated in the unit the setting is normally read in.",
+    "datatype": "FLOAT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named ProcessParametersLowerLimit, or holding the same fact on ProcessParameters; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ017"
+    ],
+    "evidence_source_ids": [
+      "SRC003"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR063",
+    "subject_id": "SBJ038",
+    "relationship_id": null,
+    "code": "ProcessParametersUpperLimit",
+    "definition": "The ceiling for a setting: the highest value the step may be run at and stay in control. A reading above it means the step ran too high, and it is stated in the same unit as the floor.",
+    "datatype": "FLOAT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named ProcessParametersUpperLimit, or holding the same fact on ProcessParameters; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ017"
+    ],
+    "evidence_source_ids": [
+      "SRC003"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR064",
+    "subject_id": "SBJ042",
+    "relationship_id": null,
+    "code": "ProcessParameterValuesValue",
+    "definition": "What the setting is set to at this level of the recipe. For the instructions issued to a batch, it is what the operator was told to set.",
+    "datatype": "FLOAT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named ProcessParameterValuesValue, or holding the same fact on ProcessParameterValues; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ017",
+      "DRQ018"
+    ],
+    "evidence_source_ids": [
+      "SRC004"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR065",
+    "subject_id": "SBJ041",
+    "relationship_id": null,
+    "code": "ProcessRecipeLevelsLevel",
+    "definition": "Which level the recipe is written at: the general recipe, the site recipe, the master recipe or the control recipe issued for one batch.",
+    "datatype": "LOOKUP",
+    "lookup_id": "LKP004",
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named ProcessRecipeLevelsLevel, or holding the same fact on ProcessRecipeLevels; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ018"
+    ],
+    "evidence_source_ids": [
+      "SRC002"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR066",
+    "subject_id": "SBJ041",
+    "relationship_id": null,
+    "code": "ProcessRecipeLevelsIssuedOn",
+    "definition": "The date the recipe at this level was issued. It shows which instructions were in force when a batch was made.",
+    "datatype": "DATE",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": false,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named ProcessRecipeLevelsIssuedOn, or holding the same fact on ProcessRecipeLevels; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ018"
+    ],
+    "evidence_source_ids": [
+      "SRC003"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR067",
+    "subject_id": "SBJ039",
+    "relationship_id": null,
+    "code": "ProcessSamplingPlansFrequency",
+    "definition": "How often a sample is taken at the step, such as every pallet or every hour.",
+    "datatype": "TEXT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": false,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named ProcessSamplingPlansFrequency, or holding the same fact on ProcessSamplingPlans; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ025"
+    ],
+    "evidence_source_ids": [
+      "SRC020"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR068",
+    "subject_id": "SBJ040",
+    "relationship_id": null,
+    "code": "ProcessRoutingsName",
+    "definition": "What the method is called in the factory, such as the usual way of making a product on a particular line.",
+    "datatype": "TEXT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": false,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named ProcessRoutingsName, or holding the same fact on ProcessRoutings; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ017"
+    ],
+    "evidence_source_ids": [
+      "SRC002"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR069",
+    "subject_id": "SBJ043",
+    "relationship_id": null,
+    "code": "LocationName",
+    "definition": "What the place is called, in the words the business uses for it, such as a plant name, a line number or a cold store.",
+    "datatype": "TEXT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "current",
+    "mandatory": true,
+    "critical": false,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named LocationName, or holding the same fact on Location; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ020",
+      "DRQ024"
+    ],
+    "evidence_source_ids": [
+      "SRC039"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR070",
+    "subject_id": "SBJ044",
+    "relationship_id": null,
+    "code": "LocationIdentifiersValue",
+    "definition": "The identifier itself, such as a site number or a registration number, as the issuer wrote it. It is how the place is matched to a supplier's or a regulator's records.",
+    "datatype": "TEXT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named LocationIdentifiersValue, or holding the same fact on LocationIdentifiers; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ035"
+    ],
+    "evidence_source_ids": [
+      "SRC011"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR071",
+    "subject_id": "SBJ044",
+    "relationship_id": null,
+    "code": "LocationIdentifiersIssuer",
+    "definition": "Who issued the identifier, such as a regulator, a customer or the organisation itself. The same number from two issuers can mean two different places.",
+    "datatype": "TEXT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": false,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named LocationIdentifiersIssuer, or holding the same fact on LocationIdentifiers; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ035"
+    ],
+    "evidence_source_ids": [
+      "SRC011"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR072",
+    "subject_id": "SBJ045",
+    "relationship_id": null,
+    "code": "LocationStorageConditionsLowerLimit",
+    "definition": "The lower limit for a place: the coldest or lowest reading at which stock is safe to keep there. If the place falls below it, the stock was held out of condition.",
+    "datatype": "FLOAT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named LocationStorageConditionsLowerLimit, or holding the same fact on LocationStorageConditions; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ034"
+    ],
+    "evidence_source_ids": [
+      "SRC020"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR073",
+    "subject_id": "SBJ045",
+    "relationship_id": null,
+    "code": "LocationStorageConditionsUpperLimit",
+    "definition": "The upper limit for a place: the warmest or highest reading at which stock is safe to keep there. If the place rises above it, the stock was held out of condition and a breach is recorded.",
+    "datatype": "FLOAT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named LocationStorageConditionsUpperLimit, or holding the same fact on LocationStorageConditions; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ034"
+    ],
+    "evidence_source_ids": [
+      "SRC020"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR074",
+    "subject_id": "SBJ002",
+    "relationship_id": null,
+    "code": "PersonQualificationRecordsAwardedOn",
+    "definition": "The date the person was awarded the qualification. Work done before this date was not done by a qualified person.",
+    "datatype": "DATE",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": "INTERNAL_PII",
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named PersonQualificationRecordsAwardedOn, or holding the same fact on PersonQualificationRecords; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ023"
+    ],
+    "evidence_source_ids": [
+      "SRC001"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR075",
+    "subject_id": "SBJ002",
+    "relationship_id": null,
+    "code": "PersonQualificationRecordsExpiresOn",
+    "definition": "The date the qualification stops being valid. Work done after this date, unless the qualification was renewed, was not done by a qualified person.",
+    "datatype": "DATE",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": "INTERNAL_PII",
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named PersonQualificationRecordsExpiresOn, or holding the same fact on PersonQualificationRecords; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ023"
+    ],
+    "evidence_source_ids": [
+      "SRC001"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR076",
+    "subject_id": "SBJ003",
+    "relationship_id": null,
+    "code": "PersonShiftAssignmentsStartedAt",
+    "definition": "The time the person's shift began. Together with the shift pattern, it shows who was on duty at any moment.",
+    "datatype": "DATETIME",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": false,
+    "classification": "INTERNAL_PII",
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named PersonShiftAssignmentsStartedAt, or holding the same fact on PersonShiftAssignments; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ023"
+    ],
+    "evidence_source_ids": [
+      "SRC033"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR077",
+    "subject_id": "SBJ004",
+    "relationship_id": null,
+    "code": "PersonSigningsMeaning",
+    "definition": "What the person meant by signing, such as that they did the work, checked it or released it. The same name on a record means different things for different meanings.",
+    "datatype": "TEXT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": "INTERNAL_PII",
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named PersonSigningsMeaning, or holding the same fact on PersonSignings; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ032"
+    ],
+    "evidence_source_ids": [
+      "SRC032"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR078",
+    "subject_id": "SBJ004",
+    "relationship_id": null,
+    "code": "PersonSigningsSignedAt",
+    "definition": "The time the person signed the record. It is the time of signing, which may be later than the time the work was done.",
+    "datatype": "DATETIME",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": "INTERNAL_PII",
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named PersonSigningsSignedAt, or holding the same fact on PersonSignings; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ032"
+    ],
+    "evidence_source_ids": [
+      "SRC032"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR079",
+    "subject_id": "SBJ004",
+    "relationship_id": null,
+    "code": "PersonSigningsIsSecondCheck",
+    "definition": "Whether the signing is the check of another person's work, as is required where a step must be verified by a second qualified person, rather than the work itself.",
+    "datatype": "BOOLEAN",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named PersonSigningsIsSecondCheck, or holding the same fact on PersonSignings; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ032"
+    ],
+    "evidence_source_ids": [
+      "SRC033"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR080",
+    "subject_id": "SBJ008",
+    "relationship_id": null,
+    "code": "LegalEntityAssessmentsScope",
+    "definition": "What the assessment covered, such as which materials or which site of the supplier or outside manufacturer.",
+    "datatype": "LONGTEXT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": false,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named LegalEntityAssessmentsScope, or holding the same fact on LegalEntityAssessments; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ006"
+    ],
+    "evidence_source_ids": [
+      "SRC020"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR081",
+    "subject_id": "SBJ008",
+    "relationship_id": null,
+    "code": "LegalEntityAssessmentsValidUntil",
+    "definition": "The date the assessment stops being valid. A delivery received after this date was not from a supplier holding a valid assessment.",
+    "datatype": "DATE",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named LegalEntityAssessmentsValidUntil, or holding the same fact on LegalEntityAssessments; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ006"
+    ],
+    "evidence_source_ids": [
+      "SRC020"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR082",
+    "subject_id": "SBJ009",
+    "relationship_id": null,
+    "code": "LegalEntitySupplierRequestsResponse",
+    "definition": "What the supplier answered when asked to put a problem right. It is empty until the supplier replies.",
+    "datatype": "LONGTEXT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": false,
+    "critical": false,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named LegalEntitySupplierRequestsResponse, or holding the same fact on LegalEntitySupplierRequests; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ028"
+    ],
+    "evidence_source_ids": [
+      "SRC014"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR083",
+    "subject_id": "SBJ011",
+    "relationship_id": null,
+    "code": "DocumentDeclarationsProperty",
+    "definition": "Which property of the batch the supplier's document states, such as its moisture level or whether it contains an allergen.",
+    "datatype": "TEXT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named DocumentDeclarationsProperty, or holding the same fact on DocumentDeclarations; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ007"
+    ],
+    "evidence_source_ids": [
+      "SRC039"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR084",
+    "subject_id": "SBJ011",
+    "relationship_id": null,
+    "code": "DocumentDeclarationsValue",
+    "definition": "What the document states the property to be. It is the supplier's claim, and it is read together with whether the business checked it.",
+    "datatype": "TEXT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named DocumentDeclarationsValue, or holding the same fact on DocumentDeclarations; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ007"
+    ],
+    "evidence_source_ids": [
+      "SRC039"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR085",
+    "subject_id": "SBJ068",
+    "relationship_id": null,
+    "code": "TransactionGoodsMovementKind",
+    "definition": "What kind of movement of goods it is: a purchase, a receipt, an issue to production, a transfer between places or a despatch.",
+    "datatype": "LOOKUP",
+    "lookup_id": "LKP008",
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named TransactionKind, or holding the same fact on Transaction; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ024",
+      "DRQ033"
+    ],
+    "evidence_source_ids": [
+      "SRC040"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR086",
+    "subject_id": "SBJ068",
+    "relationship_id": null,
+    "code": "TransactionGoodsMovementOccurredAt",
+    "definition": "The time the goods moved. For a movement that takes time, it is the time they left or arrived, as the kind of movement says.",
+    "datatype": "DATETIME",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named TransactionOccurredAt, or holding the same fact on Transaction; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ024"
+    ],
+    "evidence_source_ids": [
+      "SRC009"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR087",
+    "subject_id": "SBJ068",
+    "relationship_id": null,
+    "code": "TransactionGoodsMovementTitlePassesOnReceipt",
+    "definition": "Whether the goods become the organisation's when they are received, rather than when they are paid for or when they leave the supplier. It decides who owns goods that are in transit.",
+    "datatype": "BOOLEAN",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named TransactionTitlePassesOnReceipt, or holding the same fact on Transaction; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ033"
+    ],
+    "evidence_source_ids": [
+      "SRC023"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR088",
+    "subject_id": "SBJ047",
+    "relationship_id": null,
+    "code": "TransactionGoodsMovementLinesQuantity",
+    "definition": "How much of the item moved on the line, in the item's unit of measure.",
+    "datatype": "FLOAT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named TransactionLinesQuantity, or holding the same fact on TransactionLines; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ024"
+    ],
+    "evidence_source_ids": [
+      "SRC039"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR089",
+    "subject_id": "SBJ048",
+    "relationship_id": null,
+    "code": "TransactionInventoryPositionsCondition",
+    "definition": "The condition the held stock is in, such as available, on hold or rejected. Only stock that is available may be counted as available.",
+    "datatype": "TEXT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named TransactionInventoryPositionsCondition, or holding the same fact on TransactionInventoryPositions; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ013"
+    ],
+    "evidence_source_ids": [
+      "SRC040"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR090",
+    "subject_id": "SBJ048",
+    "relationship_id": null,
+    "code": "TransactionInventoryPositionsQuantity",
+    "definition": "How much of the item was held at the place in that condition when it was counted, in the item's unit of measure.",
+    "datatype": "FLOAT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named TransactionInventoryPositionsQuantity, or holding the same fact on TransactionInventoryPositions; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ013"
+    ],
+    "evidence_source_ids": [
+      "SRC039"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR091",
+    "subject_id": "SBJ048",
+    "relationship_id": null,
+    "code": "TransactionInventoryPositionsCountedAt",
+    "definition": "The time the stock was counted. A figure is true only as at this time.",
+    "datatype": "DATETIME",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": false,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named TransactionInventoryPositionsCountedAt, or holding the same fact on TransactionInventoryPositions; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ013"
+    ],
+    "evidence_source_ids": [
+      "SRC039"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR092",
+    "subject_id": "SBJ049",
+    "relationship_id": null,
+    "code": "EventOccurredAt",
+    "definition": "The time the event happened. For an event that lasts, it is the time it started.",
+    "datatype": "DATETIME",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventOccurredAt, or holding the same fact on Event; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ023"
+    ],
+    "evidence_source_ids": [
+      "SRC033"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR093",
+    "subject_id": "SBJ051",
+    "relationship_id": null,
+    "code": "EventProductionRunsStartedAt",
+    "definition": "The time the production run began on the line, which is when the first input was taken for it. Together with the time it ended, it gives how long the batch took to make.",
+    "datatype": "DATETIME",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventProductionRunsStartedAt, or holding the same fact on EventProductionRuns; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ023"
+    ],
+    "evidence_source_ids": [
+      "SRC033"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR094",
+    "subject_id": "SBJ051",
+    "relationship_id": null,
+    "code": "EventProductionRunsEndedAt",
+    "definition": "The time the production run ended on the line, which is when the last output was taken from it. It is empty while the run is still going on.",
+    "datatype": "DATETIME",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventProductionRunsEndedAt, or holding the same fact on EventProductionRuns; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ023"
+    ],
+    "evidence_source_ids": [
+      "SRC033"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR095",
+    "subject_id": "SBJ051",
+    "relationship_id": null,
+    "code": "EventProductionRunsYieldVariance",
+    "definition": "How much more or less of its inputs the run used than the recipe called for. It is worked out from the quantity specified and the quantity actually used for each input.",
+    "datatype": "FLOAT",
+    "lookup_id": null,
+    "nature": "derived",
+    "derived_from": [
+      "ATR011",
+      "ATR012"
+    ],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventProductionRunsYieldVariance, or holding the same fact on EventProductionRuns; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ004"
+    ],
+    "evidence_source_ids": [
+      "SRC005"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR096",
+    "subject_id": "SBJ053",
+    "relationship_id": null,
+    "code": "EventBatchSplitsReason",
+    "definition": "Why the batch was divided, such as to send part for rework, to fill different packs or to hold part back for testing.",
+    "datatype": "TEXT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": false,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventBatchSplitsReason, or holding the same fact on EventBatchSplits; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ012"
+    ],
+    "evidence_source_ids": [
+      "SRC005"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR097",
+    "subject_id": "SBJ054",
+    "relationship_id": null,
+    "code": "EventChangeoversDuration",
+    "definition": "How long the changeover took, counted in minutes from the end of one product to the start of the next.",
+    "datatype": "FLOAT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": false,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventChangeoversDuration, or holding the same fact on EventChangeovers; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ019"
+    ],
+    "evidence_source_ids": [
+      "SRC017"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR098",
+    "subject_id": "SBJ054",
+    "relationship_id": null,
+    "code": "EventChangeoversIncludedClean",
+    "definition": "Whether the changeover included cleaning the line. Where it is true, the line was cleaned between the two products.",
+    "datatype": "BOOLEAN",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventChangeoversIncludedClean, or holding the same fact on EventChangeovers; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ019"
+    ],
+    "evidence_source_ids": [
+      "SRC034"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR099",
+    "subject_id": "SBJ055",
+    "relationship_id": null,
+    "code": "EventStoppagesReason",
+    "definition": "Why production stopped, chosen from a governed list so that stoppages can be counted and compared by reason.",
+    "datatype": "LOOKUP",
+    "lookup_id": "LKP006",
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventStoppagesReason, or holding the same fact on EventStoppages; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ022"
+    ],
+    "evidence_source_ids": [
+      "SRC017"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR100",
+    "subject_id": "SBJ055",
+    "relationship_id": null,
+    "code": "EventStoppagesStartedAt",
+    "definition": "The time production stopped. Together with the time it started again, it gives how long the stoppage lasted.",
+    "datatype": "DATETIME",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventStoppagesStartedAt, or holding the same fact on EventStoppages; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ022"
+    ],
+    "evidence_source_ids": [
+      "SRC016"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR101",
+    "subject_id": "SBJ055",
+    "relationship_id": null,
+    "code": "EventStoppagesEndedAt",
+    "definition": "The time production started again. It is empty while the stoppage is still going on.",
+    "datatype": "DATETIME",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventStoppagesEndedAt, or holding the same fact on EventStoppages; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ022"
+    ],
+    "evidence_source_ids": [
+      "SRC016"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR102",
+    "subject_id": "SBJ056",
+    "relationship_id": null,
+    "code": "EventMaintenanceWorkStoppageReference",
+    "definition": "The stoppage this work responded to, so production loss and repair describe one event.",
+    "datatype": "TEXT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": false,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "searched DDA attributes on the parent concept for 'EventMaintenanceWorkStoppageReference'",
+    "data_requirement_ids": [
+      "DRQ022"
+    ],
+    "evidence_source_ids": [
+      "SRC016"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "A stoppage is tied to its repair through the link between the two, not through a typed reference."
+  },
+  {
+    "id": "ATR103",
+    "subject_id": "SBJ057",
+    "relationship_id": null,
+    "code": "EventTestsMethod",
+    "definition": "The method used to test the sample, as written in the specification or as the standard method named.",
+    "datatype": "TEXT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventTestsMethod, or holding the same fact on EventTests; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ025"
+    ],
+    "evidence_source_ids": [
+      "SRC020"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR104",
+    "subject_id": "SBJ057",
+    "relationship_id": null,
+    "code": "EventTestsResult",
+    "definition": "What the test found, as the person who did it recorded it, in the units the method gives. Whether it met the specification is held beside it.",
+    "datatype": "TEXT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventTestsResult, or holding the same fact on EventTests; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ025"
+    ],
+    "evidence_source_ids": [
+      "SRC020"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR105",
+    "subject_id": "SBJ057",
+    "relationship_id": null,
+    "code": "EventTestsConformed",
+    "definition": "Whether the result met the specification it was judged against. Where it is true, the result was within the limits.",
+    "datatype": "BOOLEAN",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventTestsConformed, or holding the same fact on EventTests; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ025"
+    ],
+    "evidence_source_ids": [
+      "SRC020"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR106",
+    "subject_id": "SBJ058",
+    "relationship_id": null,
+    "code": "EventFindingsClassification",
+    "definition": "How serious the finding is, such as critical, major or minor, as the quality system grades it.",
+    "datatype": "TEXT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventFindingsClassification, or holding the same fact on EventFindings; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ026"
+    ],
+    "evidence_source_ids": [
+      "SRC012"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR107",
+    "subject_id": "SBJ058",
+    "relationship_id": null,
+    "code": "EventFindingsContainedAt",
+    "definition": "The time the problem was contained so that no more affected product could go on. It is empty while the problem is still uncontained.",
+    "datatype": "DATETIME",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": false,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventFindingsContainedAt, or holding the same fact on EventFindings; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ026"
+    ],
+    "evidence_source_ids": [
+      "SRC014"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR108",
+    "subject_id": "SBJ059",
+    "relationship_id": null,
+    "code": "EventNonConformancesClassification",
+    "definition": "How serious the failure is.",
+    "datatype": "TEXT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "searched DDA attributes on the parent concept for 'EventNonConformancesClassification'",
+    "data_requirement_ids": [
+      "DRQ026"
+    ],
+    "evidence_source_ids": [
+      "SRC012"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Merged into EventFindingsClassification."
+  },
+  {
+    "id": "ATR109",
+    "subject_id": "SBJ059",
+    "relationship_id": null,
+    "code": "EventNonConformancesContainedAt",
+    "definition": "When the affected material was held back.",
+    "datatype": "DATETIME",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "searched DDA attributes on the parent concept for 'EventNonConformancesContainedAt'",
+    "data_requirement_ids": [
+      "DRQ026"
+    ],
+    "evidence_source_ids": [
+      "SRC014"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Merged into EventFindingsContainedAt."
+  },
+  {
+    "id": "ATR110",
+    "subject_id": "SBJ060",
+    "relationship_id": null,
+    "code": "EventDispositionsDecision",
+    "definition": "What was decided to do with the failed material: use it as it is, rework it, regrade it, scrap it or return it.",
+    "datatype": "LOOKUP",
+    "lookup_id": "LKP007",
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventDispositionsDecision, or holding the same fact on EventDispositions; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ027"
+    ],
+    "evidence_source_ids": [
+      "SRC014"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR111",
+    "subject_id": "SBJ060",
+    "relationship_id": null,
+    "code": "EventDispositionsJustification",
+    "definition": "Why that decision was taken, in the words of the person who took it. It is what a later reader relies on to understand why failed material was kept, reworked or scrapped.",
+    "datatype": "LONGTEXT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventDispositionsJustification, or holding the same fact on EventDispositions; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ027"
+    ],
+    "evidence_source_ids": [
+      "SRC014"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR112",
+    "subject_id": "SBJ061",
+    "relationship_id": null,
+    "code": "EventCorrectiveActionsRootCause",
+    "definition": "The cause found for the problem, which the action is meant to remove. It is the cause the action is judged against when its effect is checked.",
+    "datatype": "LONGTEXT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventCorrectiveActionsRootCause, or holding the same fact on EventCorrectiveActions; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ028"
+    ],
+    "evidence_source_ids": [
+      "SRC013"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR113",
+    "subject_id": "SBJ061",
+    "relationship_id": null,
+    "code": "EventCorrectiveActionsEffectivenessVerifiedAt",
+    "definition": "The date the business checked that the action worked. An action closed before this date was closed without a check.",
+    "datatype": "DATE",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": false,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventCorrectiveActionsEffectivenessVerifiedAt, or holding the same fact on EventCorrectiveActions; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ028"
+    ],
+    "evidence_source_ids": [
+      "SRC014"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR114",
+    "subject_id": "SBJ061",
+    "relationship_id": null,
+    "code": "EventCorrectiveActionsClosedAt",
+    "definition": "The date the action was closed. It is empty while the action is still open.",
+    "datatype": "DATE",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": false,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventCorrectiveActionsClosedAt, or holding the same fact on EventCorrectiveActions; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ028"
+    ],
+    "evidence_source_ids": [
+      "SRC014"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR115",
+    "subject_id": "SBJ062",
+    "relationship_id": null,
+    "code": "EventReleasesBasis",
+    "definition": "What the release was based on, such as the test results and records that were looked at before the batch was let go.",
+    "datatype": "LONGTEXT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventReleasesBasis, or holding the same fact on EventReleases; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ029"
+    ],
+    "evidence_source_ids": [
+      "SRC005"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR116",
+    "subject_id": "SBJ062",
+    "relationship_id": null,
+    "code": "EventReleasesReleasedAt",
+    "definition": "The time the batch was released. Before this time the batch is not available for use or sale.",
+    "datatype": "DATETIME",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventReleasesReleasedAt, or holding the same fact on EventReleases; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ029"
+    ],
+    "evidence_source_ids": [
+      "SRC003"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR117",
+    "subject_id": "SBJ063",
+    "relationship_id": null,
+    "code": "EventRecallsScope",
+    "definition": "Which batches and which markets the recall covered, as announced. The batches actually reached are found through the links between batches.",
+    "datatype": "LONGTEXT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventRecallsScope, or holding the same fact on EventRecalls; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ030"
+    ],
+    "evidence_source_ids": [
+      "SRC009"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR118",
+    "subject_id": "SBJ064",
+    "relationship_id": null,
+    "code": "EventComplaintsReport",
+    "definition": "What the person reported about the product, in their own words, exactly as they gave it. It is not altered by what the investigation later finds.",
+    "datatype": "LONGTEXT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": false,
+    "classification": "CUSTOMER",
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventComplaintsReport, or holding the same fact on EventComplaints; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ031"
+    ],
+    "evidence_source_ids": [
+      "SRC022"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR119",
+    "subject_id": "SBJ065",
+    "relationship_id": null,
+    "code": "EventCorrectionsReason",
+    "definition": "Why the earlier record was corrected, in the words of the person who made the correction. The earlier record itself is kept as it was.",
+    "datatype": "LONGTEXT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventCorrectionsReason, or holding the same fact on EventCorrections; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ032"
+    ],
+    "evidence_source_ids": [
+      "SRC032"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR120",
+    "subject_id": "SBJ066",
+    "relationship_id": null,
+    "code": "EventStorageBreachesStartedAt",
+    "definition": "The time the stock first went outside the conditions its place must keep. Together with the length of the exposure, it shows how serious the breach was.",
+    "datatype": "DATETIME",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventStorageBreachesStartedAt, or holding the same fact on EventStorageBreaches; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ034"
+    ],
+    "evidence_source_ids": [
+      "SRC020"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR121",
+    "subject_id": null,
+    "relationship_id": "REL029",
+    "code": "EventBatchInputsQuantitySpecified",
+    "definition": "How much of the input the recipe called for, as it stood when the batch was made. It is kept with the run so that a later recipe does not rewrite what was asked of this one.",
+    "datatype": "FLOAT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventBatchInputsQuantitySpecified, or holding the same fact on EventBatchInputs; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ004"
+    ],
+    "evidence_source_ids": [
+      "SRC005"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR122",
+    "subject_id": null,
+    "relationship_id": "REL029",
+    "code": "EventBatchInputsIsAlternative",
+    "definition": "Whether the run used an alternative to the input the recipe named. Where it is true, the run did not use the specified input.",
+    "datatype": "BOOLEAN",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventBatchInputsIsAlternative, or holding the same fact on EventBatchInputs; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ005"
+    ],
+    "evidence_source_ids": [
+      "SRC005"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR123",
+    "subject_id": "SBJ067",
+    "relationship_id": null,
+    "code": "ProductPackLevelsLevel",
+    "definition": "Which level of packing it is: a single unit, an inner pack, a case, a layer or a pallet.",
+    "datatype": "LOOKUP",
+    "lookup_id": "LKP011",
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "current",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named ProductPackLevelsLevel, or holding the same fact on ProductPackLevels; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ037"
+    ],
+    "evidence_source_ids": [
+      "SRC030"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR124",
+    "subject_id": "SBJ067",
+    "relationship_id": null,
+    "code": "ProductPackLevelsIdentifier",
+    "definition": "The number by which the level is identified when it is counted and moved, such as the number on a case label.",
+    "datatype": "TEXT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "current",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named ProductPackLevelsIdentifier, or holding the same fact on ProductPackLevels; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ037"
+    ],
+    "evidence_source_ids": [
+      "SRC030",
+      "SRC031"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR125",
+    "subject_id": "SBJ067",
+    "relationship_id": null,
+    "code": "ProductPackLevelsUnitsPerLevel",
+    "definition": "How many of the next level down one of this level holds, such as the number of units in a case. It is always above zero, and a level never holds itself.",
+    "datatype": "INTEGER",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "current",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named ProductPackLevelsUnitsPerLevel, or holding the same fact on ProductPackLevels; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ037"
+    ],
+    "evidence_source_ids": [
+      "SRC030"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR126",
+    "subject_id": "SBJ056",
+    "relationship_id": null,
+    "code": "EventMaintenanceWorkDescription",
+    "definition": "What was done to the machine, such as the part replaced or the adjustment made.",
+    "datatype": "LONGTEXT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": false,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventMaintenanceWorkDescription, or holding the same fact on EventMaintenanceWork; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ021",
+      "DRQ022"
+    ],
+    "evidence_source_ids": [
+      "SRC018"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR127",
+    "subject_id": "SBJ026",
+    "relationship_id": null,
+    "code": "InstanceKind",
+    "definition": "Whether the item is a machine standing in a place or an individually identified unit of product.",
+    "datatype": "LOOKUP",
+    "lookup_id": "LKP012",
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "current",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named InstanceKind, or holding the same fact on Instance; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ016",
+      "DRQ020"
+    ],
+    "evidence_source_ids": [
+      "SRC018"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR128",
+    "subject_id": "SBJ057",
+    "relationship_id": null,
+    "code": "EventTestsSpecificationVersion",
+    "definition": "Which version of the specification the result was judged against, so that the judgement stays true when the specification is later issued again.",
+    "datatype": "TEXT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventTestsSpecificationVersion, or holding the same fact on EventTests; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ025"
+    ],
+    "evidence_source_ids": [
+      "SRC016"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR129",
+    "subject_id": "SBJ058",
+    "relationship_id": null,
+    "code": "EventFindingsKind",
+    "definition": "Whether the finding is a departure from procedure or a failure against specification. The two are never recorded as one.",
+    "datatype": "LOOKUP",
+    "lookup_id": "LKP010",
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named EventFindingsKind, or holding the same fact on EventFindings; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ026"
+    ],
+    "evidence_source_ids": [
+      "SRC016"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR130",
+    "subject_id": "SBJ029",
+    "relationship_id": null,
+    "code": "InstanceFailureModesName",
+    "definition": "What the way of failing is called, such as a seized bearing or a leaking seal.",
+    "datatype": "TEXT",
+    "lookup_id": null,
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for an attribute named InstanceFailureModesName, or holding the same fact on InstanceFailureModes; none found. Searched this model's own attributes for the same fact; none holds it.",
+    "data_requirement_ids": [
+      "DRQ021"
+    ],
+    "evidence_source_ids": [
+      "SRC018"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  }
+]

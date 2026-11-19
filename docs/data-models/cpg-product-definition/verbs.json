@@ -1,0 +1,384 @@
+[
+  {
+    "id": "REL001",
+    "code": "ProductComposition",
+    "source_domain_id": "DOM001",
+    "destination_domain_id": "DOM001",
+    "forward_verb": "is made from",
+    "inverse_verb": "is used in",
+    "source_role_id": "ROL001",
+    "target_role_id": "ROL002",
+    "cardinality": "MANY_TO_MANY",
+    "dates": true,
+    "is_symmetric": false,
+    "is_composition": true,
+    "quantified": true,
+    "name_override": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Read the four relationships in DDA. All are between legal entities, or between people and legal entities, and none concerns products, documents or suppliers. No relationship in this model already holds this arrangement.",
+    "data_requirement_ids": [
+      "DRQ001",
+      "DRQ002",
+      "DRQ003",
+      "DRQ008",
+      "DRQ009",
+      "DRQ005"
+    ],
+    "evidence_source_ids": [
+      "SRC003",
+      "SRC004"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "definition": "A product is made from an ingredient for as long as that ingredient is in its formulation. This is the recipe line. While it holds, the ingredient goes into the product in a stated quantity, and the product's declared ingredient list, allergens and label follow from it. A product has many ingredients and an ingredient goes into many products; an ingredient may itself be made from other ingredients. The quantity used, its unit, the formulation version the line belongs to, its place in the declared list and whether it may be listed last belong to the line and are kept here. It does not say who supplies the ingredient, which is the authorised source, and it does not say where the product is made. To tell it apart from other arrangements between two products, ask whether one product physically goes into the other."
+  },
+  {
+    "id": "REL002",
+    "code": "ProductVariants",
+    "source_domain_id": "DOM001",
+    "destination_domain_id": "DOM001",
+    "forward_verb": "belongs to",
+    "inverse_verb": "groups",
+    "source_role_id": "ROL003",
+    "target_role_id": "ROL004",
+    "cardinality": "MANY_TO_ONE",
+    "dates": true,
+    "is_symmetric": false,
+    "is_composition": false,
+    "quantified": false,
+    "name_override": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Read the four relationships in DDA. All are between legal entities, or between people and legal entities, and none concerns products, documents or suppliers. No relationship in this model already holds this arrangement.",
+    "data_requirement_ids": [
+      "DRQ006",
+      "DRQ019"
+    ],
+    "evidence_source_ids": [
+      "SRC001",
+      "SRC002",
+      "SRC030"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "definition": "A product belongs to a product definition for as long as it is one of that definition's sizes, formats or pack counts. This is the grouping arrangement. While it holds, the product is sold and counted on its own, and what the versions share is held once on the definition. A definition groups many products and a product belongs to one definition at a time. The kind of difference, such as size, format or pack count, and its value belong to the arrangement and are kept here. It does not say what goes into a product, which is its formulation, and a product definition is never made, bought or sold. To tell it apart from other arrangements between two products, ask whether the one is only another size or pack of the same thing."
+  },
+  {
+    "id": "REL003",
+    "code": "ProductAlternatives",
+    "source_domain_id": "DOM001",
+    "destination_domain_id": "DOM001",
+    "forward_verb": "may be replaced by",
+    "inverse_verb": "may stand in for",
+    "source_role_id": "ROL005",
+    "target_role_id": "ROL006",
+    "cardinality": "MANY_TO_MANY",
+    "dates": true,
+    "is_symmetric": false,
+    "is_composition": false,
+    "quantified": false,
+    "name_override": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Read the four relationships in DDA. All are between legal entities, or between people and legal entities, and none concerns products, documents or suppliers. No relationship in this model already holds this arrangement.",
+    "data_requirement_ids": [
+      "DRQ004"
+    ],
+    "evidence_source_ids": [
+      "SRC020"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "definition": "A product may be replaced by another product for as long as the replacement is cleared. This is the substitution arrangement. While it holds, the alternative may stand in for the ingredient under stated conditions, and the label may change as a result. An ingredient may have several alternatives and an alternative may stand in for several ingredients. The conditions, and what using the alternative changes on the label, belong to the arrangement and are kept here. It does not say the ingredient is in use today, which is the formulation, and it does not say who supplies the alternative. To tell it apart from other arrangements between two products, ask whether the second is cleared to take the place of the first."
+  },
+  {
+    "id": "REL004",
+    "code": "ProductClaimComparators",
+    "source_domain_id": "DOM001",
+    "destination_domain_id": "DOM001",
+    "forward_verb": "is compared with",
+    "inverse_verb": "is used to compare",
+    "source_role_id": "ROL007",
+    "target_role_id": "ROL008",
+    "cardinality": "MANY_TO_MANY",
+    "dates": true,
+    "is_symmetric": false,
+    "is_composition": false,
+    "quantified": false,
+    "name_override": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Read the four relationships in DDA. All are between legal entities, or between people and legal entities, and none concerns products, documents or suppliers. No relationship in this model already holds this arrangement.",
+    "data_requirement_ids": [
+      "DRQ010"
+    ],
+    "evidence_source_ids": [
+      "SRC014"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "definition": "A product is compared with another for as long as a claim on its pack rests on that comparison, such as lower in sugar than another. This is the comparison behind a claim. While it holds, the other product, or an average of leading brands, is the reference the claim is measured against. A product may be compared with several references and a reference may be used by several products. What the claim is compared against and the difference between the two belong to the comparison and are kept here. It does not hold the wording of the claim or the values it rests on, which belong to the product. To tell it apart from other arrangements between two products, ask whether the claim would stop being true if the other product changed."
+  },
+  {
+    "id": "REL005",
+    "code": "ProductAuthorisedSources",
+    "source_domain_id": "DOM001",
+    "destination_domain_id": "DOM002",
+    "forward_verb": "may be sourced from",
+    "inverse_verb": "may supply",
+    "source_role_id": "ROL009",
+    "target_role_id": "ROL010",
+    "cardinality": "MANY_TO_MANY",
+    "dates": true,
+    "is_symmetric": false,
+    "is_composition": false,
+    "quantified": false,
+    "name_override": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Read the four relationships in DDA. All are between legal entities, or between people and legal entities, and none concerns products, documents or suppliers. No relationship in this model already holds this arrangement.",
+    "data_requirement_ids": [
+      "DRQ014",
+      "DRQ005"
+    ],
+    "evidence_source_ids": [
+      "SRC015",
+      "SRC018"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "definition": "An organisation may supply a bought-in ingredient or packaging item for as long as the manufacturer has cleared it to. This is the arrangement that says who may supply what. While it holds, the organisation may be used to buy that item, for a stated period. A material may have several authorised suppliers and a supplier may supply several materials. The programme it is cleared under, and the date it was suspended where it has been, belong to the arrangement and are kept here. It does not say which of the supplier's sites the supply comes from, which is the supplying site, and it does not say what the supplier declares is in the item. To tell it apart from other arrangements with an organisation, ask whether the manufacturer allows it to supply the item."
+  },
+  {
+    "id": "REL006",
+    "code": "ProductCertifications",
+    "source_domain_id": "DOM001",
+    "destination_domain_id": "DOM002",
+    "forward_verb": "holds a certification from",
+    "inverse_verb": "grants a certification to",
+    "source_role_id": "ROL011",
+    "target_role_id": "ROL012",
+    "cardinality": "MANY_TO_MANY",
+    "dates": true,
+    "is_symmetric": false,
+    "is_composition": false,
+    "quantified": false,
+    "name_override": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Read the four relationships in DDA. All are between legal entities, or between people and legal entities, and none concerns products, documents or suppliers. No relationship in this model already holds this arrangement.",
+    "data_requirement_ids": [
+      "DRQ016"
+    ],
+    "evidence_source_ids": [
+      "SRC001",
+      "SRC015"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "definition": "A product holds a certification from a certifying body for as long as the certification stands. This is the certification of the product itself. While it holds, the body stands behind what the certificate says, and it can be revoked. A product may hold several certifications and a body may certify many products. The scheme it is held under and the number the body gave belong to the certification and are kept here. It does not cover certification of a site, which is kept separately, and it does not say who supplies or markets the product. To tell it apart from other arrangements between a product and an organisation, ask whether a body has certified the product itself."
+  },
+  {
+    "id": "REL007",
+    "code": "ProductResponsibleBusinesses",
+    "source_domain_id": "DOM001",
+    "destination_domain_id": "DOM002",
+    "forward_verb": "is marketed by",
+    "inverse_verb": "markets",
+    "source_role_id": "ROL013",
+    "target_role_id": "ROL014",
+    "cardinality": "MANY_TO_MANY",
+    "dates": true,
+    "is_symmetric": false,
+    "is_composition": false,
+    "quantified": false,
+    "name_override": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Read the four relationships in DDA. All are between legal entities, or between people and legal entities, and none concerns products, documents or suppliers. No relationship in this model already holds this arrangement.",
+    "data_requirement_ids": [
+      "DRQ007",
+      "DRQ026"
+    ],
+    "evidence_source_ids": [
+      "SRC006",
+      "SRC042"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "definition": "A business is responsible for a product's pack for as long as the pack names it as answerable. This is the arrangement behind the name and address printed as marketing the product. While it holds, the business is the one a buyer or an authority is directed to, in the country or region the pack serves. A product may name different businesses in different places and a business may answer for many products. The region, or the country when the pack serves a single country, belongs to the arrangement and is kept here. It does not say who makes the product or who supplies its ingredients. To tell it apart from other arrangements between a product and an organisation, ask whether the pack names the business as answerable."
+  },
+  {
+    "id": "REL008",
+    "code": "DocumentProductDeclarations",
+    "source_domain_id": "DOM003",
+    "destination_domain_id": "DOM001",
+    "forward_verb": "declares properties of",
+    "inverse_verb": "is declared by",
+    "source_role_id": "ROL016",
+    "target_role_id": "ROL015",
+    "cardinality": "MANY_TO_MANY",
+    "dates": false,
+    "is_symmetric": false,
+    "is_composition": false,
+    "quantified": false,
+    "name_override": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Read the four relationships in DDA. All are between legal entities, or between people and legal entities, and none concerns products, documents or suppliers. No relationship in this model already holds this arrangement.",
+    "data_requirement_ids": [
+      "DRQ012"
+    ],
+    "evidence_source_ids": [
+      "SRC019",
+      "SRC026"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "definition": "A document declares properties of a product when it states them, as a supplier's certificate of analysis does. This is how a statement from outside is tied to the thing it describes. While it holds, the properties the document states count as declared by someone else. A document may declare properties of several products and a product may be declared by several documents. Whether the organisation checked what the document states belongs to the arrangement and is kept here. It carries no start and end dates of its own. It does not say who issued the document, which is the issuing arrangement, and it does not hold the properties themselves. To tell it apart from other arrangements between a document and something else, ask whether the document says something about the product."
+  },
+  {
+    "id": "REL009",
+    "code": "DocumentIssuers",
+    "source_domain_id": "DOM003",
+    "destination_domain_id": "DOM002",
+    "forward_verb": "is issued by",
+    "inverse_verb": "issues",
+    "source_role_id": "ROL017",
+    "target_role_id": "ROL018",
+    "cardinality": "MANY_TO_ONE",
+    "dates": false,
+    "is_symmetric": false,
+    "is_composition": false,
+    "quantified": false,
+    "name_override": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Read the four relationships in DDA. All are between legal entities, or between people and legal entities, and none concerns products, documents or suppliers. No relationship in this model already holds this arrangement.",
+    "data_requirement_ids": [
+      "DRQ012"
+    ],
+    "evidence_source_ids": [
+      "SRC019",
+      "SRC021"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "definition": "An organisation issues a document. This is how a statement is traced to whoever made it. A document has one issuing organisation and an organisation issues many documents. The arrangement carries no start and end dates of its own. It does not say what the document states about a product, which is the declaration. To tell it apart from other arrangements between a document and an organisation, ask whether the organisation produced the document."
+  },
+  {
+    "id": "REL010",
+    "code": "LocationOperators",
+    "source_domain_id": "DOM004",
+    "destination_domain_id": "DOM002",
+    "forward_verb": "is operated by",
+    "inverse_verb": "operates",
+    "source_role_id": "ROL019",
+    "target_role_id": "ROL020",
+    "cardinality": "MANY_TO_ONE",
+    "dates": true,
+    "is_symmetric": false,
+    "is_composition": false,
+    "quantified": false,
+    "name_override": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Read the four relationships in DDA. All are between legal entities, or between people and legal entities, and none concerns a place. No relationship in this model already holds this arrangement.",
+    "data_requirement_ids": [
+      "DRQ020"
+    ],
+    "evidence_source_ids": [
+      "SRC032",
+      "SRC031"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Moved to the manufacturing model: factories, the places inside them down to the shop floor, supplier sites, batches and supply chain detail belong there. This model holds a supplier only as a company.",
+    "definition": "A company operates a site for as long as it runs it. This is the arrangement that makes a company answerable for a place. While it holds, the company is accountable for what happens there. A site has one operating company at a time and a company may operate many sites. A site's earlier operators remain on record. It does not say what is made at the site, which is the manufacturing arrangement, and it does not say who has certified it. To tell it apart from other arrangements between a site and an organisation, ask whether the company runs the place."
+  },
+  {
+    "id": "REL011",
+    "code": "ProductManufacturingSites",
+    "source_domain_id": "DOM001",
+    "destination_domain_id": "DOM004",
+    "forward_verb": "is made at",
+    "inverse_verb": "makes",
+    "source_role_id": "ROL001",
+    "target_role_id": "ROL019",
+    "cardinality": "MANY_TO_MANY",
+    "dates": true,
+    "is_symmetric": false,
+    "is_composition": false,
+    "quantified": false,
+    "name_override": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Read the four relationships in DDA. All are between legal entities, or between people and legal entities, and none concerns a place. No relationship in this model already holds this arrangement.",
+    "data_requirement_ids": [
+      "DRQ021"
+    ],
+    "evidence_source_ids": [
+      "SRC034",
+      "SRC033"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Moved to the manufacturing model: factories, the places inside them down to the shop floor, supplier sites, batches and supply chain detail belong there. This model holds a supplier only as a company.",
+    "definition": "A product is made at a site for as long as that site produces it. This is the production arrangement. While it holds, the site makes the product from the version of the recipe stated here, which may differ from one site to another. A product may be made at several sites and a site makes many products. The version of the recipe the site uses belongs to the arrangement and is kept here. It does not cover batches, machines or floor operations, which belong to the manufacturing model, and it does not say who runs the site. To tell it apart from other arrangements between a product and a site, ask whether the product is actually produced at that place."
+  },
+  {
+    "id": "REL012",
+    "code": "ProductSupplyingSites",
+    "source_domain_id": "DOM001",
+    "destination_domain_id": "DOM004",
+    "forward_verb": "is supplied from",
+    "inverse_verb": "supplies",
+    "source_role_id": "ROL009",
+    "target_role_id": "ROL019",
+    "cardinality": "MANY_TO_MANY",
+    "dates": true,
+    "is_symmetric": false,
+    "is_composition": false,
+    "quantified": false,
+    "name_override": "ProductSupplyingSites",
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Read the four relationships in DDA. All are between legal entities, or between people and legal entities, and none concerns a place. No relationship in this model already holds this arrangement.",
+    "data_requirement_ids": [
+      "DRQ022"
+    ],
+    "evidence_source_ids": [
+      "SRC031"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Moved to the manufacturing model: factories, the places inside them down to the shop floor, supplier sites, batches and supply chain detail belong there. This model holds a supplier only as a company.",
+    "definition": "A bought-in material is supplied from a site for as long as that site is a source of it. This is the supply arrangement at the place the material comes from. While it holds, the material is sent from that site, and the certificates the site holds apply to it. A material may be supplied from several sites and a site may supply many materials. It does not say that the supplier is cleared to supply the material, which is the authorised source, and it does not say who runs the site. To tell it apart from other arrangements between a material and a site, ask whether the material leaves that place."
+  },
+  {
+    "id": "REL013",
+    "code": "LocationCertifications",
+    "source_domain_id": "DOM004",
+    "destination_domain_id": "DOM002",
+    "forward_verb": "holds a certification from",
+    "inverse_verb": "grants a certification to",
+    "source_role_id": "ROL019",
+    "target_role_id": "ROL012",
+    "cardinality": "MANY_TO_MANY",
+    "dates": true,
+    "is_symmetric": false,
+    "is_composition": false,
+    "quantified": false,
+    "name_override": "LocationCertifications",
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Read the four relationships in DDA. All are between legal entities, or between people and legal entities, and none concerns a place. No relationship in this model already holds this arrangement.",
+    "data_requirement_ids": [
+      "DRQ022"
+    ],
+    "evidence_source_ids": [
+      "SRC031"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Moved to the manufacturing model: factories, the places inside them down to the shop floor, supplier sites, batches and supply chain detail belong there. This model holds a supplier only as a company.",
+    "definition": "A site holds a certification from a certifying body for as long as the certification stands. This is the certification of a place and its processes. While it holds, the body stands behind what the certificate covers at that site. A site may hold several certifications and a body may certify many sites. The standard it was audited against, the certificate number and what the certificate covers belong to the certification and are kept here. It does not cover certification of a product, which is kept separately. To tell it apart from other arrangements between a site and an organisation, ask whether the certificate is about the place and its processes."
+  }
+]

@@ -1,0 +1,131 @@
+{
+  "domain": "CPG Manufacturing Operations",
+  "business": "A manufacturer of consumer packaged goods \u2014 sourcing materials, formulating, producing, testing and releasing finished product, through its own plants and through external manufacturing partners.",
+  "primary_subgroup": null,
+  "subgroups_in_scope": [
+    "Food and beverage",
+    "Household and cleaning products",
+    "Personal care and cosmetics",
+    "Pet care",
+    "Beauty"
+  ],
+  "in_scope": [
+    "Material sourcing and supplier governance",
+    "Product definition, composition and specification",
+    "Process definition, routing and recipe management",
+    "Equipment structure and physical asset management",
+    "Production execution and consumption",
+    "Quality: specification, testing, deviation, non-conformance, corrective action, release",
+    "Traceability and recall",
+    "Inventory across sites and external partners",
+    "External manufacturing and packing"
+  ],
+  "out_of_scope": [
+    {
+      "area": "Trade investment and promotion",
+      "owned_by": "Commercial operating model"
+    },
+    {
+      "area": "Retail execution and shelf compliance",
+      "owned_by": "Commercial operating model"
+    },
+    {
+      "area": "Market measurement and syndicated data",
+      "owned_by": "Commercial operating model"
+    },
+    {
+      "area": "Marketing, campaigns and attribution",
+      "owned_by": "Digital marketing model"
+    },
+    {
+      "area": "Financial ledgers and statutory reporting",
+      "owned_by": "Finance model"
+    },
+    {
+      "area": "Research and development",
+      "owned_by": "Not modelled \u2014 ISO 22716 excludes it from GMP scope"
+    }
+  ],
+  "shared_objects": [
+    "People",
+    "LegalEntities",
+    "Locations",
+    "Transactions",
+    "Events"
+  ],
+  "mode": "research-only",
+  "certifier": "none \u2014 the practice is its own business consumer",
+  "questions_unanswered": [
+    {
+      "id": "UNQ001",
+      "question": "Is finished output individually identified, or tracked by batch only?",
+      "consequence": "Decides whether the Instances domain carries product as well as physical assets. The model must accommodate both without assuming either, so no rule may require an instance to exist and no rule may assume a lot is the finest grain.",
+      "raised_at": "step 1"
+    },
+    {
+      "id": "UNQ003",
+      "question": "What proportion of output is externally manufactured?",
+      "consequence": "Where it approaches all of it, the organisation holds no production record of its own and the model is about what partners must supply rather than what plants produce.",
+      "raised_at": "step 2, from SRC029"
+    }
+  ],
+  "external_standards": [
+    {
+      "standard": "ISA-95 / IEC 62264",
+      "bears_on": "Enterprise-to-plant interface, equipment hierarchy, resource models"
+    },
+    {
+      "standard": "ISA-88",
+      "bears_on": "Recipe levels and procedural structure for batch production"
+    },
+    {
+      "standard": "ISO 22716",
+      "bears_on": "GMP for cosmetics \u2014 personnel, premises, equipment, materials, production, laboratory control, batch records"
+    },
+    {
+      "standard": "NSF/ANSI 455-3",
+      "bears_on": "GMP for cosmetics, US"
+    },
+    {
+      "standard": "FSMA 204",
+      "bears_on": "Food traceability \u2014 key data elements, critical tracking events, 24-hour production"
+    },
+    {
+      "standard": "GFSI schemes (BRCGS, SQF, FSSC 22000, ISO 22000)",
+      "bears_on": "Non-conformance investigation, corrective action, effectiveness verification"
+    },
+    {
+      "standard": "21 CFR Part 11 / EU GMP Annex 11",
+      "bears_on": "Electronic records, attributable entries, audit trails, electronic signatures"
+    },
+    {
+      "standard": "GS1",
+      "bears_on": "Trade item and location identification, two-dimensional barcodes carrying batch and serial"
+    }
+  ],
+  "platform_capabilities": [
+    "Entity resolution and duplicate detection",
+    "Audit history through change data capture",
+    "Origin and lineage tracing through the layers",
+    "Point-in-time reconstruction"
+  ],
+  "confirmed": true,
+  "confirmed_at_step": 1,
+  "resolved_questions": [
+    {
+      "id": "UNQ002",
+      "question": "For external manufacturing, is the arrangement tolling or turnkey?",
+      "answer": "Turnkey. Material held at an upstream supplier or external manufacturer is theirs. Title transfers to the organisation on receipt. The organisation holds no inventory at a party it does not operate.",
+      "resolved_at": "step 1, pass 2"
+    }
+  ],
+  "material_boundary": {
+    "principle": "The organisation masters its own composition and buys the rest.",
+    "statement": "A purchased input may be another organisation's finished consumer product. To that organisation it is saleable output; to this one it is an ingredient or a part. What it is made from is theirs and may not be known here.",
+    "consequences": [
+      "The composition graph terminates at every purchased input.",
+      "Below that terminus, hazards, certifications and origin are supplier-declared, not computed.",
+      "Recall scope below a purchased input depends on that supplier's own traceability, not on this model."
+    ]
+  }
+}

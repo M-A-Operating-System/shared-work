@@ -1,0 +1,1718 @@
+[
+  {
+    "id": "SBJ001",
+    "code": "Person",
+    "definition": "There is one of these for each person the business deals with, such as an operator, a technician or a supplier's contact. If you need to know who someone is, this is what you go by. What they do for the business is held beside it, and who employs them comes from the relationship with their employer.",
+    "kind": "subject",
+    "mastery": "mastered",
+    "domain_id": "DOM001",
+    "is_anchor": true,
+    "parent_id": null,
+    "parent_cardinality": null,
+    "singled_out_by": null,
+    "template_dda_id": null,
+    "dda_action": "reuse",
+    "dda_id": "DMC000000143",
+    "reuse_search": "searched DDA concepts for 'Person' and its siblings in DOM001",
+    "data_requirement_ids": [
+      "DRQ023"
+    ],
+    "evidence_source_ids": [
+      "SRC001"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SBJ002",
+    "code": "PersonQualificationRecords",
+    "definition": "There is one of these for each qualification a person holds to carry out particular work, such as running a filling line or taking a sample. If you need to know whether someone was qualified to do a job on a given day, this is what you go by. It does not record the work they actually did, which is recorded against the batch.",
+    "kind": "subject",
+    "mastery": "ingested",
+    "domain_id": "DOM001",
+    "is_anchor": false,
+    "parent_id": "SBJ001",
+    "parent_cardinality": "ONE_TO_MANY_OPTIONAL",
+    "singled_out_by": "dates and ATR074",
+    "template_dda_id": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named PersonQualificationRecords, or one holding the same facts under another name, in People and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "data_requirement_ids": [
+      "DRQ023"
+    ],
+    "evidence_source_ids": [
+      "SRC001",
+      "SRC022"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "distinct_need": "Holds what a person is qualified to do and for how long; nothing else says whether they were entitled to do a piece of work."
+  },
+  {
+    "id": "SBJ003",
+    "code": "PersonShiftAssignments",
+    "definition": "There is one of these for each shift a person is rostered to work. If you need to know who was on duty at a given time, this is what you go by. It does not say what they worked on, which is recorded against each production run, and it does not say whether they were qualified for it.",
+    "kind": "subject",
+    "mastery": "ingested",
+    "domain_id": "DOM001",
+    "is_anchor": false,
+    "parent_id": "SBJ001",
+    "parent_cardinality": "ONE_TO_MANY_OPTIONAL",
+    "singled_out_by": "dates",
+    "template_dda_id": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named PersonShiftAssignments, or one holding the same facts under another name, in People and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "data_requirement_ids": [
+      "DRQ023"
+    ],
+    "evidence_source_ids": [
+      "SRC033"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "distinct_need": "Holds who was on duty and when; no other record says who was present."
+  },
+  {
+    "id": "SBJ004",
+    "code": "PersonSignings",
+    "definition": "There is one of these for each time a person puts their name to a record, whether to say they did the work or to confirm another person's work as a second check. If you need to know who signed a record, when, and what the signing meant, this is what you go by. A correction to a record is a record of its own and is not a signing.",
+    "kind": "occurrence",
+    "mastery": "ingested",
+    "domain_id": "DOM001",
+    "is_anchor": false,
+    "parent_id": "SBJ001",
+    "parent_cardinality": "ONE_TO_MANY_OPTIONAL",
+    "singled_out_by": "dates",
+    "template_dda_id": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named PersonSignings, or one holding the same facts under another name, in People and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "data_requirement_ids": [
+      "DRQ032"
+    ],
+    "evidence_source_ids": [
+      "SRC032",
+      "SRC033"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "distinct_need": "Holds who signed what, when and with what meaning; nothing else shows the signing."
+  },
+  {
+    "id": "SBJ005",
+    "code": "LegalEntity",
+    "definition": "There is one of these for each company, partnership or other body that can hold rights and owe duties in its own name, such as a supplier, an outside manufacturer, a customer or a regulator. If you need to know who a body is, this is what you go by. What it is to the business comes from its relationships and is not stored here.",
+    "kind": "subject",
+    "mastery": "ingested",
+    "domain_id": "DOM002",
+    "is_anchor": true,
+    "parent_id": null,
+    "parent_cardinality": null,
+    "singled_out_by": null,
+    "template_dda_id": null,
+    "dda_action": "reuse",
+    "dda_id": "DMC000000106",
+    "reuse_search": "searched DDA concepts for 'LegalEntity' and its siblings in DOM002",
+    "data_requirement_ids": [
+      "DRQ006",
+      "DRQ033"
+    ],
+    "evidence_source_ids": [
+      "SRC020"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SBJ006",
+    "code": "LegalEntityIdentifiers",
+    "definition": "There is one of these for each identifier a legal entity is known by, such as a registration number, a tax number or a number a regulator issued. If you need to match a supplier or an outside manufacturer to a register, this is what you go by. It does not say which identifier is preferred.",
+    "kind": "subject",
+    "mastery": "ingested",
+    "domain_id": "DOM002",
+    "is_anchor": false,
+    "parent_id": "SBJ005",
+    "parent_cardinality": "ONE_TO_MANY_OPTIONAL",
+    "singled_out_by": "dates",
+    "template_dda_id": null,
+    "dda_action": "reuse",
+    "dda_id": "DMC000000023",
+    "reuse_search": "searched DDA concepts for 'LegalEntityIdentifiers' and its siblings in DOM002",
+    "data_requirement_ids": [
+      "DRQ035"
+    ],
+    "evidence_source_ids": [
+      "SRC011"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SBJ007",
+    "code": "LegalEntityAddress",
+    "definition": "There is one of these for each address a legal entity is known by, such as its registered office or the address it writes from. If you need to know where to write to a body, this is what you go by. It is not the place where the body makes or stores goods, which is a place held with Locations.",
+    "kind": "subject",
+    "mastery": "ingested",
+    "domain_id": "DOM002",
+    "is_anchor": false,
+    "parent_id": "SBJ005",
+    "parent_cardinality": "ONE_TO_MANY_OPTIONAL",
+    "singled_out_by": "dates",
+    "template_dda_id": null,
+    "dda_action": "reuse",
+    "dda_id": "DMC000000108",
+    "reuse_search": "searched DDA concepts for 'LegalEntityAddress' and its siblings in DOM002",
+    "data_requirement_ids": [
+      "DRQ006"
+    ],
+    "evidence_source_ids": [
+      "SRC020"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SBJ008",
+    "code": "LegalEntityAssessments",
+    "definition": "There is one of these for each time a supplier or an outside manufacturer is assessed, saying what the assessment covered and how long it is valid. If you need to know whether a supplier held a valid assessment on the day a delivery arrived, this is what you go by. The problems raised against the supplier are not held here; each is recorded as a finding.",
+    "kind": "subject",
+    "mastery": "mastered",
+    "domain_id": "DOM002",
+    "is_anchor": false,
+    "parent_id": "SBJ005",
+    "parent_cardinality": "ONE_TO_MANY_OPTIONAL",
+    "singled_out_by": "dates",
+    "template_dda_id": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named LegalEntityAssessments, or one holding the same facts under another name, in LegalEntities and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "data_requirement_ids": [
+      "DRQ006"
+    ],
+    "evidence_source_ids": [
+      "SRC020",
+      "SRC029"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "distinct_need": "Holds each assessment of a supplier and how long it lasts; no other record says whether a supplier was assessed."
+  },
+  {
+    "id": "SBJ009",
+    "code": "LegalEntitySupplierRequests",
+    "definition": "There is one of these for each request the business makes to a supplier to put a problem right, with the supplier's answer. If you need to know what a supplier was asked to do and how they replied, this is what you go by. The action the business takes itself is not held here; it is recorded as a corrective action.",
+    "kind": "occurrence",
+    "mastery": "mastered",
+    "domain_id": "DOM002",
+    "is_anchor": false,
+    "parent_id": "SBJ005",
+    "parent_cardinality": "ONE_TO_MANY_OPTIONAL",
+    "singled_out_by": "dates",
+    "template_dda_id": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named LegalEntitySupplierRequests, or one holding the same facts under another name, in LegalEntities and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "data_requirement_ids": [
+      "DRQ028"
+    ],
+    "evidence_source_ids": [
+      "SRC014",
+      "SRC020"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "distinct_need": "Holds what a supplier was asked and how they answered; the business's own actions are held as corrective actions."
+  },
+  {
+    "id": "SBJ010",
+    "code": "Document",
+    "definition": "There is one of these for each document the business keeps, such as a supplier's certificate, a test report or a method statement. If you need to find a document and know what kind it is, this is what you go by. What the document says about a batch is held as its declarations.",
+    "kind": "subject",
+    "mastery": "ingested",
+    "domain_id": "DOM003",
+    "is_anchor": true,
+    "parent_id": null,
+    "parent_cardinality": null,
+    "singled_out_by": null,
+    "template_dda_id": null,
+    "dda_action": "reuse",
+    "dda_id": "DMC000000142",
+    "reuse_search": "searched DDA concepts for 'Document' and its siblings in DOM003",
+    "data_requirement_ids": [
+      "DRQ007"
+    ],
+    "evidence_source_ids": [
+      "SRC039"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SBJ011",
+    "code": "DocumentDeclarations",
+    "definition": "There is one of these for each property a supplier's document states about a batch, such as a moisture level or the absence of an allergen. If you need to know what a supplier claims about a batch, and so what the business relies on without having tested it, this is what you go by. A test the business carried out itself is a test result and is not held here.",
+    "kind": "subject",
+    "mastery": "ingested",
+    "domain_id": "DOM003",
+    "is_anchor": false,
+    "parent_id": "SBJ010",
+    "parent_cardinality": "ONE_TO_MANY_OPTIONAL",
+    "singled_out_by": "ATR083",
+    "template_dda_id": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named DocumentDeclarations, or one holding the same facts under another name, in Documents and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "data_requirement_ids": [
+      "DRQ007",
+      "DRQ008"
+    ],
+    "evidence_source_ids": [
+      "SRC039",
+      "SRC020"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "distinct_need": "Holds what a supplier claims about a batch; no other record separates a claim from the business's own result."
+  },
+  {
+    "id": "SBJ012",
+    "code": "Product",
+    "definition": "One product, whether it is bought in, made or sold, as CPG - Product Definition defines it. This design uses it for the product a batch is of, the product a pack level is for and the product a production run makes.",
+    "kind": "subject",
+    "mastery": "mastered",
+    "domain_id": "DOM006",
+    "is_anchor": true,
+    "parent_id": null,
+    "parent_cardinality": null,
+    "singled_out_by": null,
+    "template_dda_id": null,
+    "dda_action": "reuse",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named Product in DDA's Products domain; the domain holds no concepts. CPG - Product Definition owns Product and the hierarchy of products and ingredients, and its change package creates the concept first. This design refers to it and holds no concept of its own for it.",
+    "data_requirement_ids": [
+      "DRQ008",
+      "DRQ013"
+    ],
+    "evidence_source_ids": [
+      "SRC005",
+      "SRC030"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "proposed_by": "CPG - Product Definition"
+  },
+  {
+    "id": "SBJ013",
+    "code": "ProductIdentifiers",
+    "definition": "One identifier by which a product is known, in one scheme.",
+    "kind": "subject",
+    "mastery": "mastered",
+    "domain_id": "DOM006",
+    "is_anchor": false,
+    "parent_id": "SBJ012",
+    "parent_cardinality": "ONE_TO_MANY_OPTIONAL",
+    "singled_out_by": "dates",
+    "template_dda_id": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "searched DDA concepts for 'ProductIdentifiers' and its siblings in DOM006",
+    "data_requirement_ids": [
+      "DRQ035"
+    ],
+    "evidence_source_ids": [
+      "SRC030",
+      "SRC031"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
+  },
+  {
+    "id": "SBJ014",
+    "code": "ProductSpecifications",
+    "definition": "One version of what a product must be, with its limits and how conformance is checked.",
+    "kind": "subject",
+    "mastery": "mastered",
+    "domain_id": "DOM006",
+    "is_anchor": false,
+    "parent_id": "SBJ012",
+    "parent_cardinality": "ONE_TO_MANY_OPTIONAL",
+    "singled_out_by": "dates",
+    "template_dda_id": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "searched DDA concepts for 'ProductSpecifications' and its siblings in DOM006",
+    "data_requirement_ids": [
+      "DRQ025"
+    ],
+    "evidence_source_ids": [
+      "SRC020",
+      "SRC012"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
+  },
+  {
+    "id": "SBJ015",
+    "code": "ProductStructureVersions",
+    "definition": "One complete statement of what goes into a product, for a site, market or period.",
+    "kind": "subject",
+    "mastery": "mastered",
+    "domain_id": "DOM006",
+    "is_anchor": false,
+    "parent_id": "SBJ012",
+    "parent_cardinality": "ONE_TO_MANY_OPTIONAL",
+    "singled_out_by": "dates",
+    "template_dda_id": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "searched DDA concepts for 'ProductStructureVersions' and its siblings in DOM006",
+    "data_requirement_ids": [],
+    "evidence_source_ids": [
+      "SRC005",
+      "SRC002"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
+  },
+  {
+    "id": "SBJ016",
+    "code": "ProductBatches",
+    "definition": "There is one of these for each batch of a product that was made, packed or received, known by the lot code given when it was first packed or transformed. If you need to know when it was made, how much there was and what to call it at every later movement, this is what you go by. What went into it and where it went are held on the links between production runs and batches.",
+    "kind": "subject",
+    "mastery": "ingested",
+    "domain_id": "DOM006",
+    "is_anchor": false,
+    "parent_id": "SBJ012",
+    "parent_cardinality": "ONE_TO_MANY_OPTIONAL",
+    "singled_out_by": "dates",
+    "template_dda_id": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named ProductBatches, or one holding the same facts under another name, in Products and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "data_requirement_ids": [
+      "DRQ012",
+      "DRQ030"
+    ],
+    "evidence_source_ids": [
+      "SRC011",
+      "SRC005"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "distinct_need": "Holds each batch and its lot code; nothing else identifies the quantity that traceability follows."
+  },
+  {
+    "id": "SBJ017",
+    "code": "ProductSubBatches",
+    "definition": "There is one of these for each part a batch is divided into, with the quantity of that part. If you need to know which batch a quantity came from, this is what you go by. A batch combined from others is shown by the links between production runs and batches, not here.",
+    "kind": "subject",
+    "mastery": "ingested",
+    "domain_id": "DOM006",
+    "is_anchor": false,
+    "parent_id": "SBJ016",
+    "parent_cardinality": "ONE_TO_MANY_OPTIONAL",
+    "singled_out_by": "dates",
+    "template_dda_id": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named ProductSubBatches, or one holding the same facts under another name, in Products and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "data_requirement_ids": [
+      "DRQ012"
+    ],
+    "evidence_source_ids": [
+      "SRC005",
+      "SRC007"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "distinct_need": "Holds each part a batch was divided into; without it a quantity can appear with no batch to come from."
+  },
+  {
+    "id": "SBJ018",
+    "code": "ProductHazards",
+    "definition": "One hazard a product carries — an allergen, an irritant, a classified chemical — with the basis of the declaration.",
+    "kind": "subject",
+    "mastery": "mastered",
+    "domain_id": "DOM006",
+    "is_anchor": false,
+    "parent_id": "SBJ012",
+    "parent_cardinality": "ONE_TO_MANY_OPTIONAL",
+    "singled_out_by": "dates",
+    "template_dda_id": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "searched DDA concepts for 'ProductHazards' and its siblings in DOM006",
+    "data_requirement_ids": [],
+    "evidence_source_ids": [
+      "SRC034",
+      "SRC035"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
+  },
+  {
+    "id": "SBJ019",
+    "code": "ProductDisclosures",
+    "definition": "One ingredient a product must disclose, how much of it there is, and whether it is withheld as confidential.",
+    "kind": "subject",
+    "mastery": "mastered",
+    "domain_id": "DOM006",
+    "is_anchor": false,
+    "parent_id": "SBJ012",
+    "parent_cardinality": "ONE_TO_MANY_OPTIONAL",
+    "singled_out_by": "dates",
+    "template_dda_id": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "searched DDA concepts for 'ProductDisclosures' and its siblings in DOM006",
+    "data_requirement_ids": [],
+    "evidence_source_ids": [
+      "SRC025",
+      "SRC026"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
+  },
+  {
+    "id": "SBJ020",
+    "code": "ProductOrigins",
+    "definition": "One stated country or region of origin, with the basis of the statement.",
+    "kind": "subject",
+    "mastery": "ingested",
+    "domain_id": "DOM006",
+    "is_anchor": false,
+    "parent_id": "SBJ012",
+    "parent_cardinality": "ONE_TO_MANY_OPTIONAL",
+    "singled_out_by": "dates",
+    "template_dda_id": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "searched DDA concepts for 'ProductOrigins' and its siblings in DOM006",
+    "data_requirement_ids": [],
+    "evidence_source_ids": [
+      "SRC030"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
+  },
+  {
+    "id": "SBJ021",
+    "code": "ProductShelfLives",
+    "definition": "How long a product lasts under one set of storage conditions.",
+    "kind": "subject",
+    "mastery": "mastered",
+    "domain_id": "DOM006",
+    "is_anchor": false,
+    "parent_id": "SBJ012",
+    "parent_cardinality": "ONE_TO_MANY_OPTIONAL",
+    "singled_out_by": "dates",
+    "template_dda_id": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "searched DDA concepts for 'ProductShelfLives' and its siblings in DOM006",
+    "data_requirement_ids": [],
+    "evidence_source_ids": [
+      "SRC007",
+      "SRC039"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
+  },
+  {
+    "id": "SBJ022",
+    "code": "ProductSubstitutions",
+    "definition": "One approved alternative for an input, with the conditions for using it.",
+    "kind": "subject",
+    "mastery": "mastered",
+    "domain_id": "DOM006",
+    "is_anchor": false,
+    "parent_id": "SBJ012",
+    "parent_cardinality": "ONE_TO_MANY_OPTIONAL",
+    "singled_out_by": "dates",
+    "template_dda_id": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "searched DDA concepts for 'ProductSubstitutions' and its siblings in DOM006",
+    "data_requirement_ids": [
+      "DRQ005"
+    ],
+    "evidence_source_ids": [
+      "SRC005",
+      "SRC033"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
+  },
+  {
+    "id": "SBJ023",
+    "code": "ProductVariantAxes",
+    "definition": "One way the members of a family differ — size, format, pack count — and the values allowed.",
+    "kind": "subject",
+    "mastery": "mastered",
+    "domain_id": "DOM006",
+    "is_anchor": false,
+    "parent_id": "SBJ012",
+    "parent_cardinality": "ONE_TO_MANY_OPTIONAL",
+    "singled_out_by": "dates",
+    "template_dda_id": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "searched DDA concepts for 'ProductVariantAxes' and its siblings in DOM006",
+    "data_requirement_ids": [],
+    "evidence_source_ids": [
+      "SRC030",
+      "SRC031"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
+  },
+  {
+    "id": "SBJ024",
+    "code": "ProductCostings",
+    "definition": "The expected or actual cost of a product, by element, for a period.",
+    "kind": "subject",
+    "mastery": "derived",
+    "domain_id": "DOM006",
+    "is_anchor": false,
+    "parent_id": "SBJ012",
+    "parent_cardinality": "ONE_TO_MANY_OPTIONAL",
+    "singled_out_by": "dates",
+    "template_dda_id": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "searched DDA concepts for 'ProductCostings' and its siblings in DOM006",
+    "data_requirement_ids": [],
+    "evidence_source_ids": [
+      "SRC014"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Cost is not held in this model."
+  },
+  {
+    "id": "SBJ025",
+    "code": "ProductIdentityChanges",
+    "definition": "One change to a product, and whether it made a new product or a new version of what goes in.",
+    "kind": "occurrence",
+    "mastery": "mastered",
+    "domain_id": "DOM006",
+    "is_anchor": false,
+    "parent_id": "SBJ012",
+    "parent_cardinality": "ONE_TO_MANY_OPTIONAL",
+    "singled_out_by": "dates",
+    "template_dda_id": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "searched DDA concepts for 'ProductIdentityChanges' and its siblings in DOM006",
+    "data_requirement_ids": [],
+    "evidence_source_ids": [
+      "SRC030",
+      "SRC031"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Held by the CPG - Product Definition model, which owns what a product is, what it is made from and what it must be."
+  },
+  {
+    "id": "SBJ026",
+    "code": "Instance",
+    "definition": "There is one of these for each machine, vessel or tool, and for each individually identified unit of product, that is tracked on its own. If you need to know which machine stood in a place or what is inside a unit, this is what you go by. A kind of machine, or a product, which many of them share, is not held here.",
+    "kind": "subject",
+    "mastery": "mastered",
+    "domain_id": "DOM007",
+    "is_anchor": true,
+    "parent_id": null,
+    "parent_cardinality": null,
+    "singled_out_by": null,
+    "template_dda_id": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named Instance, or one holding the same facts under another name, in Instances and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "data_requirement_ids": [
+      "DRQ016",
+      "DRQ020",
+      "DRQ021"
+    ],
+    "evidence_source_ids": [
+      "SRC007",
+      "SRC037"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "distinct_need": "Holds each machine and each individually identified unit as itself; products and batches hold what is shared."
+  },
+  {
+    "id": "SBJ027",
+    "code": "InstanceIdentifiers",
+    "definition": "There is one of these for each identifier a machine or unit is known by, such as a serial number or an asset number, with the dates it applied. If you need to match a machine to its maker's records, this is what you go by. It does not say which identifier is preferred.",
+    "kind": "subject",
+    "mastery": "mastered",
+    "domain_id": "DOM007",
+    "is_anchor": false,
+    "parent_id": "SBJ026",
+    "parent_cardinality": "ONE_TO_MANY_OPTIONAL",
+    "singled_out_by": "dates",
+    "template_dda_id": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named InstanceIdentifiers, or one holding the same facts under another name, in Instances and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "data_requirement_ids": [
+      "DRQ016"
+    ],
+    "evidence_source_ids": [
+      "SRC037"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "distinct_need": "Holds the identifiers a machine or unit is known by and who issued them; no other record holds an identifier of a machine."
+  },
+  {
+    "id": "SBJ028",
+    "code": "InstanceConditions",
+    "definition": "There is one of these for each reading taken of a machine's condition, such as a temperature or the hours it has run, with the time it was taken. If you need to know how a machine was running before it failed, this is what you go by. A failure itself is recorded as a stoppage.",
+    "kind": "occurrence",
+    "mastery": "ingested",
+    "domain_id": "DOM007",
+    "is_anchor": false,
+    "parent_id": "SBJ026",
+    "parent_cardinality": "ONE_TO_MANY_OPTIONAL",
+    "singled_out_by": "dates",
+    "template_dda_id": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named InstanceConditions, or one holding the same facts under another name, in Instances and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "data_requirement_ids": [
+      "DRQ021"
+    ],
+    "evidence_source_ids": [
+      "SRC018"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "distinct_need": "Holds the readings taken of a machine; nothing else shows its condition over time."
+  },
+  {
+    "id": "SBJ029",
+    "code": "InstanceFailureModes",
+    "definition": "There is one of these for each way a machine is known to fail, with what the failure does. If you need to know how a machine fails and what follows when it does, this is what you go by. A particular breakdown is recorded as a stoppage, not here.",
+    "kind": "subject",
+    "mastery": "mastered",
+    "domain_id": "DOM007",
+    "is_anchor": false,
+    "parent_id": "SBJ026",
+    "parent_cardinality": "ONE_TO_MANY_OPTIONAL",
+    "singled_out_by": "dates",
+    "template_dda_id": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named InstanceFailureModes, or one holding the same facts under another name, in Instances and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "data_requirement_ids": [
+      "DRQ021"
+    ],
+    "evidence_source_ids": [
+      "SRC018"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "distinct_need": "Holds each known way a machine fails; a breakdown that happened is held as a stoppage."
+  },
+  {
+    "id": "SBJ030",
+    "code": "InstanceCriticalities",
+    "definition": "One assessment of how much a machine matters — to output, to safety, and whether a spare exists.",
+    "kind": "subject",
+    "mastery": "mastered",
+    "domain_id": "DOM007",
+    "is_anchor": false,
+    "parent_id": "SBJ026",
+    "parent_cardinality": "ONE_TO_MANY_OPTIONAL",
+    "singled_out_by": "dates",
+    "template_dda_id": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "searched DDA concepts for 'InstanceCriticalities' and its siblings in DOM007",
+    "data_requirement_ids": [
+      "DRQ021"
+    ],
+    "evidence_source_ids": [
+      "SRC018"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Folded into Instance: how much a machine matters is one figure on the machine."
+  },
+  {
+    "id": "SBJ031",
+    "code": "EquipmentPosition",
+    "definition": "One place in a plant where work is performed — a site level, an area, a work centre, a work unit, an equipment module.",
+    "kind": "subject",
+    "mastery": "mastered",
+    "domain_id": "DOM008",
+    "is_anchor": true,
+    "parent_id": null,
+    "parent_cardinality": null,
+    "singled_out_by": null,
+    "template_dda_id": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "searched DDA concepts for 'EquipmentPosition' and its siblings in DOM008",
+    "data_requirement_ids": [
+      "DRQ020"
+    ],
+    "evidence_source_ids": [
+      "SRC001"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Merged into Location, which holds the places down to the shop floor. Plant structure is held in the Locations hierarchy, which runs down to the shop floor."
+  },
+  {
+    "id": "SBJ032",
+    "code": "EquipmentPositionIdentifiers",
+    "definition": "One identifier by which a place is known, in one scheme.",
+    "kind": "subject",
+    "mastery": "mastered",
+    "domain_id": "DOM008",
+    "is_anchor": false,
+    "parent_id": "SBJ031",
+    "parent_cardinality": "ONE_TO_MANY_OPTIONAL",
+    "singled_out_by": "dates",
+    "template_dda_id": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "searched DDA concepts for 'EquipmentPositionIdentifiers' and its siblings in DOM008",
+    "data_requirement_ids": [
+      "DRQ020"
+    ],
+    "evidence_source_ids": [
+      "SRC001"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Merged into LocationIdentifiers. Plant structure is held in the Locations hierarchy, which runs down to the shop floor."
+  },
+  {
+    "id": "SBJ033",
+    "code": "EquipmentCapabilities",
+    "definition": "One thing a place is able to do, and how much of it.",
+    "kind": "subject",
+    "mastery": "mastered",
+    "domain_id": "DOM008",
+    "is_anchor": false,
+    "parent_id": "SBJ031",
+    "parent_cardinality": "ONE_TO_MANY_OPTIONAL",
+    "singled_out_by": "dates",
+    "template_dda_id": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "searched DDA concepts for 'EquipmentCapabilities' and its siblings in DOM008",
+    "data_requirement_ids": [
+      "DRQ017"
+    ],
+    "evidence_source_ids": [
+      "SRC004",
+      "SRC001"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "A rated capacity is not asked for by any data requirement that remains."
+  },
+  {
+    "id": "SBJ034",
+    "code": "LocationSequencingRules",
+    "definition": "There is one of these for each rule about what may run on a line straight after what, with the reason and whether a clean is needed between. If you need to know whether one product may follow another on a line, this is what you go by. What actually ran, and whether the clean was done, is recorded as changeovers.",
+    "kind": "subject",
+    "mastery": "mastered",
+    "domain_id": "DOM010",
+    "is_anchor": false,
+    "parent_id": "SBJ043",
+    "parent_cardinality": "ONE_TO_MANY_OPTIONAL",
+    "singled_out_by": "dates",
+    "template_dda_id": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named LocationSequencingRules, or one holding the same facts under another name, in Locations and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "data_requirement_ids": [
+      "DRQ019"
+    ],
+    "evidence_source_ids": [
+      "SRC034"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "distinct_need": "Holds the rules for what may follow what on a line; what happened is held as changeovers."
+  },
+  {
+    "id": "SBJ035",
+    "code": "EquipmentMaintenancePlans",
+    "definition": "One planned maintenance regime for a place, and what triggers it.",
+    "kind": "subject",
+    "mastery": "mastered",
+    "domain_id": "DOM008",
+    "is_anchor": false,
+    "parent_id": "SBJ031",
+    "parent_cardinality": "ONE_TO_MANY_OPTIONAL",
+    "singled_out_by": "dates",
+    "template_dda_id": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "searched DDA concepts for 'EquipmentMaintenancePlans' and its siblings in DOM008",
+    "data_requirement_ids": [
+      "DRQ021"
+    ],
+    "evidence_source_ids": [
+      "SRC018",
+      "SRC016"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "No data requirement asks for maintenance plans; the repairs themselves are recorded as work done."
+  },
+  {
+    "id": "SBJ036",
+    "code": "ProcessSegment",
+    "definition": "There is one of these for each defined step of work in making a product, such as mixing, pasteurising or filling. If you need to know what a step is called and what it does, this is what you go by. The order steps run in belongs to the method, and the performing of a step is recorded against the batch.",
+    "kind": "subject",
+    "mastery": "mastered",
+    "domain_id": "DOM009",
+    "is_anchor": true,
+    "parent_id": null,
+    "parent_cardinality": null,
+    "singled_out_by": null,
+    "template_dda_id": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named ProcessSegment, or one holding the same facts under another name, in Processes and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "data_requirement_ids": [
+      "DRQ017"
+    ],
+    "evidence_source_ids": [
+      "SRC002",
+      "SRC004"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "distinct_need": "Holds each defined step of work; the method holds the order and the batch holds the performing."
+  },
+  {
+    "id": "SBJ037",
+    "code": "ProcessSegmentRequirements",
+    "definition": "There is one of these for each thing a step needs, whether a kind of machine, a qualified person or a material. If you need to know what must be in place before a step can run, this is what you go by. It does not say which machine or person was used on a given day, which is recorded against the production run.",
+    "kind": "subject",
+    "mastery": "mastered",
+    "domain_id": "DOM009",
+    "is_anchor": false,
+    "parent_id": "SBJ036",
+    "parent_cardinality": "ONE_TO_MANY_OPTIONAL",
+    "singled_out_by": "ATR061",
+    "template_dda_id": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named ProcessSegmentRequirements, or one holding the same facts under another name, in Processes and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "data_requirement_ids": [
+      "DRQ017"
+    ],
+    "evidence_source_ids": [
+      "SRC002",
+      "SRC001"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "distinct_need": "Holds what each step needs; no other record says what must be in place before a step runs."
+  },
+  {
+    "id": "SBJ038",
+    "code": "ProcessParameters",
+    "definition": "There is one of these for each setting a step is run at, such as a temperature or a speed, with the lowest and highest value allowed. If you need to know the limits a step must stay within, this is what you go by. The value used for a given batch is held with the recipe instructions.",
+    "kind": "subject",
+    "mastery": "mastered",
+    "domain_id": "DOM009",
+    "is_anchor": false,
+    "parent_id": "SBJ036",
+    "parent_cardinality": "ONE_TO_MANY_OPTIONAL",
+    "singled_out_by": "dates",
+    "template_dda_id": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named ProcessParameters, or one holding the same facts under another name, in Processes and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "data_requirement_ids": [
+      "DRQ017"
+    ],
+    "evidence_source_ids": [
+      "SRC003",
+      "SRC004"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "distinct_need": "Holds the limits for each setting of a step; the values used are held with the recipe."
+  },
+  {
+    "id": "SBJ039",
+    "code": "ProcessSamplingPlans",
+    "definition": "There is one of these for each plan for taking samples at a step, saying how often. If you need to know how often a step is sampled, this is what you go by. The sample actually taken and its result are recorded as a test.",
+    "kind": "subject",
+    "mastery": "mastered",
+    "domain_id": "DOM009",
+    "is_anchor": false,
+    "parent_id": "SBJ036",
+    "parent_cardinality": "ONE_TO_MANY_OPTIONAL",
+    "singled_out_by": "dates",
+    "template_dda_id": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named ProcessSamplingPlans, or one holding the same facts under another name, in Processes and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "data_requirement_ids": [
+      "DRQ025"
+    ],
+    "evidence_source_ids": [
+      "SRC020"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "distinct_need": "Holds how often each step is sampled; the samples taken are held as tests."
+  },
+  {
+    "id": "SBJ040",
+    "code": "ProcessRoutings",
+    "definition": "There is one of these for each method by which a product is made, as an ordered set of steps. If you need to know how a product is made and in what order, this is what you go by. The steps themselves are held separately, and the making of a batch is recorded as a production run.",
+    "kind": "subject",
+    "mastery": "mastered",
+    "domain_id": "DOM009",
+    "is_anchor": false,
+    "parent_id": "SBJ036",
+    "parent_cardinality": "ONE_TO_MANY_OPTIONAL",
+    "singled_out_by": "dates",
+    "template_dda_id": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named ProcessRoutings, or one holding the same facts under another name, in Processes and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "data_requirement_ids": [
+      "DRQ017"
+    ],
+    "evidence_source_ids": [
+      "SRC002",
+      "SRC003"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "distinct_need": "Holds each method of making a product; the steps and the runs are held separately."
+  },
+  {
+    "id": "SBJ041",
+    "code": "ProcessRecipeLevels",
+    "definition": "There is one of these for each level a recipe is written at, from the general recipe the company holds, through the site recipe and the master recipe, to the instructions issued for one batch. If you need to know which instructions a batch was made to and where they came from, this is what you go by. What the product is made from is held by CPG - Product Definition.",
+    "kind": "subject",
+    "mastery": "mastered",
+    "domain_id": "DOM009",
+    "is_anchor": false,
+    "parent_id": "SBJ040",
+    "parent_cardinality": "ONE_TO_MANY_MANDATORY",
+    "singled_out_by": "ATR065",
+    "template_dda_id": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named ProcessRecipeLevels, or one holding the same facts under another name, in Processes and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "data_requirement_ids": [
+      "DRQ018"
+    ],
+    "evidence_source_ids": [
+      "SRC002",
+      "SRC003"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "distinct_need": "Holds the four levels of each recipe and which each came from; nothing else says which instructions a batch was made to."
+  },
+  {
+    "id": "SBJ042",
+    "code": "ProcessParameterValues",
+    "definition": "There is one of these for each value a setting is given at a particular level of a recipe. If you need to know what a setting was set to for a batch, this is what you go by. The limits the setting must stay within are held with the setting itself.",
+    "kind": "subject",
+    "mastery": "mastered",
+    "domain_id": "DOM009",
+    "is_anchor": false,
+    "parent_id": "SBJ041",
+    "parent_cardinality": "ONE_TO_MANY_OPTIONAL",
+    "singled_out_by": "dates",
+    "template_dda_id": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named ProcessParameterValues, or one holding the same facts under another name, in Processes and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "data_requirement_ids": [
+      "DRQ017",
+      "DRQ018"
+    ],
+    "evidence_source_ids": [
+      "SRC003",
+      "SRC004"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "distinct_need": "Holds the value each setting took at each recipe level; the limits are held with the setting."
+  },
+  {
+    "id": "SBJ043",
+    "code": "Location",
+    "definition": "There is one of these for each place the organisation needs to identify, from a site down through its areas, lines, rooms and storage positions to the shop floor, and each site a supplier, an outside manufacturer or a customer works from. If you need to know where something was made, held or sent, this is what you go by. Who owns or runs the place comes from its relationship with a legal entity, and the machines standing in it are held with Instances.",
+    "kind": "subject",
+    "mastery": "mastered",
+    "domain_id": "DOM010",
+    "is_anchor": true,
+    "parent_id": null,
+    "parent_cardinality": null,
+    "singled_out_by": null,
+    "template_dda_id": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named Location or Place in DDA's Locations domain; the domain holds no concepts. Searched this model's own concepts: the places in the plant that were held separately are merged here.",
+    "data_requirement_ids": [
+      "DRQ020",
+      "DRQ024"
+    ],
+    "evidence_source_ids": [
+      "SRC011",
+      "SRC039"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "distinct_need": "Holds every place from the site to the shop floor in one hierarchy; no other concept names a place."
+  },
+  {
+    "id": "SBJ044",
+    "code": "LocationIdentifiers",
+    "definition": "There is one of these for each identifier a place is known by, such as a site number or a registration number a regulator issued, with who issued it. If you need to match a place to a supplier's or a regulator's record, this is what you go by. It does not say which identifier is preferred.",
+    "kind": "subject",
+    "mastery": "mastered",
+    "domain_id": "DOM010",
+    "is_anchor": false,
+    "parent_id": "SBJ043",
+    "parent_cardinality": "ONE_TO_MANY_OPTIONAL",
+    "singled_out_by": "dates",
+    "template_dda_id": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named LocationIdentifiers, or one holding the same facts under another name, in Locations and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "data_requirement_ids": [
+      "DRQ035"
+    ],
+    "evidence_source_ids": [
+      "SRC011"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "distinct_need": "Holds the identifiers of a place and who issued each; no other record holds them."
+  },
+  {
+    "id": "SBJ045",
+    "code": "LocationStorageConditions",
+    "definition": "There is one of these for each condition a place must keep stock in, such as a temperature range. If you need to know what a storage place must hold to, this is what you go by. A time the condition was broken is recorded as a storage breach.",
+    "kind": "subject",
+    "mastery": "mastered",
+    "domain_id": "DOM010",
+    "is_anchor": false,
+    "parent_id": "SBJ043",
+    "parent_cardinality": "ONE_TO_MANY_OPTIONAL",
+    "singled_out_by": "dates",
+    "template_dda_id": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named LocationStorageConditions, or one holding the same facts under another name, in Locations and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "data_requirement_ids": [
+      "DRQ034"
+    ],
+    "evidence_source_ids": [
+      "SRC020"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "distinct_need": "Holds the conditions each place must keep; breaches of them are held as events."
+  },
+  {
+    "id": "SBJ046",
+    "code": "Transaction",
+    "definition": "There is one of these for each movement of money or of a holding between two parties on a date. If you need to know what moved, between whom and when, this is what you go by. A holding's balance is worked out from these and is not kept here; the more specific kinds, such as movements of goods, are held beneath it.",
+    "kind": "occurrence",
+    "mastery": "ingested",
+    "domain_id": "DOM005",
+    "is_anchor": true,
+    "parent_id": null,
+    "parent_cardinality": null,
+    "singled_out_by": null,
+    "template_dda_id": null,
+    "dda_action": "reuse",
+    "dda_id": "DMC000000031",
+    "reuse_search": "Searched DDA as read on 16 November 2026: Transaction is held by DDA and is reused as it stands.",
+    "data_requirement_ids": [
+      "DRQ024"
+    ],
+    "evidence_source_ids": [
+      "SRC040",
+      "SRC039"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SBJ047",
+    "code": "TransactionGoodsMovementLines",
+    "definition": "There is one of these for each item and quantity on a movement of goods. If you need to know how much of what moved, this is what you go by. The parties and places of the movement are held on the movement itself.",
+    "kind": "occurrence",
+    "mastery": "ingested",
+    "domain_id": "DOM005",
+    "is_anchor": false,
+    "parent_id": "SBJ068",
+    "parent_cardinality": "ONE_TO_MANY_MANDATORY",
+    "singled_out_by": "dates",
+    "template_dda_id": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named TransactionLines, or one holding the same facts under another name, in Transactions and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "data_requirement_ids": [
+      "DRQ024"
+    ],
+    "evidence_source_ids": [
+      "SRC039"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "distinct_need": "Holds the quantity of each item on a movement; the movement holds the parties and places."
+  },
+  {
+    "id": "SBJ048",
+    "code": "TransactionInventoryPositions",
+    "definition": "There is one of these for each count of an item held at a place, in a stated condition, at a time. If you need to know how much is available, on hold or rejected right now, this is what you go by. A decision to hold material is recorded as a disposition.",
+    "kind": "subject",
+    "mastery": "ingested",
+    "domain_id": "DOM005",
+    "is_anchor": false,
+    "parent_id": "SBJ046",
+    "parent_cardinality": "ONE_TO_MANY_OPTIONAL",
+    "singled_out_by": "dates",
+    "template_dda_id": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named TransactionInventoryPositions, or one holding the same facts under another name, in Transactions and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "data_requirement_ids": [
+      "DRQ013"
+    ],
+    "evidence_source_ids": [
+      "SRC040",
+      "SRC039"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "distinct_need": "Holds how much is held, in what condition and where, as at a time; movements show how it got there."
+  },
+  {
+    "id": "SBJ049",
+    "code": "Event",
+    "definition": "There is one of these for each thing that happens in making or handling goods that the business needs to record, with the time it happened. If you need to know that something happened and when, this is what you go by. What kind of thing it was, and its details, are held by the concept for that kind.",
+    "kind": "occurrence",
+    "mastery": "ingested",
+    "domain_id": "DOM004",
+    "is_anchor": true,
+    "parent_id": null,
+    "parent_cardinality": null,
+    "singled_out_by": null,
+    "template_dda_id": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named Event in DDA's Events domain; the domain holds no concepts. Searched this model's own concepts for the same need; none holds it.",
+    "data_requirement_ids": [
+      "DRQ023"
+    ],
+    "evidence_source_ids": [
+      "SRC005"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "distinct_need": "Anchors everything that happens and when; each concept for a kind of event holds the details of that kind."
+  },
+  {
+    "id": "SBJ050",
+    "code": "EventProductionOrders",
+    "definition": "One instruction to make a quantity of a product.",
+    "kind": "occurrence",
+    "mastery": "ingested",
+    "domain_id": "DOM004",
+    "is_anchor": false,
+    "parent_id": "SBJ049",
+    "parent_cardinality": "ONE_TO_MANY_OPTIONAL",
+    "singled_out_by": "dates",
+    "template_dda_id": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "searched DDA concepts for 'EventProductionOrders' and its siblings in DOM004",
+    "data_requirement_ids": [
+      "DRQ023"
+    ],
+    "evidence_source_ids": [
+      "SRC033"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Holds nothing of its own; the production run records what was made."
+  },
+  {
+    "id": "SBJ051",
+    "code": "EventProductionRuns",
+    "definition": "There is one of these for each time a batch is made on a line, from its start to its end. If you need to know what was made, where, when and how much of each input was used, this is what you go by. The instructions it was made to are held as recipe levels, and the batch itself is held with the product.",
+    "kind": "occurrence",
+    "mastery": "ingested",
+    "domain_id": "DOM004",
+    "is_anchor": false,
+    "parent_id": "SBJ049",
+    "parent_cardinality": "ONE_TO_MANY_OPTIONAL",
+    "singled_out_by": "dates",
+    "template_dda_id": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named EventProductionRuns, or one holding the same facts under another name, in Events and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "data_requirement_ids": [
+      "DRQ004",
+      "DRQ023"
+    ],
+    "evidence_source_ids": [
+      "SRC033",
+      "SRC005"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "distinct_need": "Holds each making of a batch; the inputs used and the outputs produced are held on its links to batches."
+  },
+  {
+    "id": "SBJ052",
+    "code": "EventMaterialConsumptions",
+    "definition": "One quantity of one input batch used in one run, filling one place in the recipe.",
+    "kind": "occurrence",
+    "mastery": "ingested",
+    "domain_id": "DOM004",
+    "is_anchor": false,
+    "parent_id": "SBJ049",
+    "parent_cardinality": "ONE_TO_MANY_OPTIONAL",
+    "singled_out_by": "dates",
+    "template_dda_id": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "searched DDA concepts for 'EventMaterialConsumptions' and its siblings in DOM004",
+    "data_requirement_ids": [
+      "DRQ004",
+      "DRQ005"
+    ],
+    "evidence_source_ids": [
+      "SRC005",
+      "SRC033"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Merged into EventProductionRuns: how much each batch used is held on the link between run and batch."
+  },
+  {
+    "id": "SBJ053",
+    "code": "EventBatchSplits",
+    "definition": "There is one of these for each time a batch is divided into parts, with the reason. If you need to know why a batch was divided, this is what you go by. The parts and their quantities are held as sub-batches.",
+    "kind": "occurrence",
+    "mastery": "ingested",
+    "domain_id": "DOM004",
+    "is_anchor": false,
+    "parent_id": "SBJ049",
+    "parent_cardinality": "ONE_TO_MANY_OPTIONAL",
+    "singled_out_by": "dates",
+    "template_dda_id": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named EventBatchSplits, or one holding the same facts under another name, in Events and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "data_requirement_ids": [
+      "DRQ012"
+    ],
+    "evidence_source_ids": [
+      "SRC005",
+      "SRC007"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "distinct_need": "Holds why a batch was divided; the parts are held as sub-batches."
+  },
+  {
+    "id": "SBJ054",
+    "code": "EventChangeovers",
+    "definition": "There is one of these for each time a line is switched from one product to another, with how long it took and whether it included a clean. If you need to know whether a line was cleaned between two products, this is what you go by. The rule about what may follow what is held as a sequencing rule.",
+    "kind": "occurrence",
+    "mastery": "ingested",
+    "domain_id": "DOM004",
+    "is_anchor": false,
+    "parent_id": "SBJ049",
+    "parent_cardinality": "ONE_TO_MANY_OPTIONAL",
+    "singled_out_by": "dates",
+    "template_dda_id": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named EventChangeovers, or one holding the same facts under another name, in Events and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "data_requirement_ids": [
+      "DRQ019"
+    ],
+    "evidence_source_ids": [
+      "SRC034",
+      "SRC017"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "distinct_need": "Holds each changeover and whether it included a clean; the rule it was held to is a sequencing rule."
+  },
+  {
+    "id": "SBJ055",
+    "code": "EventStoppages",
+    "definition": "There is one of these for each time production stops, with when it started, when it ended and why. If you need to know how long a line stopped and for what reason, this is what you go by. The repair that followed is recorded as maintenance work.",
+    "kind": "occurrence",
+    "mastery": "ingested",
+    "domain_id": "DOM004",
+    "is_anchor": false,
+    "parent_id": "SBJ049",
+    "parent_cardinality": "ONE_TO_MANY_OPTIONAL",
+    "singled_out_by": "dates",
+    "template_dda_id": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named EventStoppages, or one holding the same facts under another name, in Events and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "data_requirement_ids": [
+      "DRQ022"
+    ],
+    "evidence_source_ids": [
+      "SRC016",
+      "SRC017"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "distinct_need": "Holds each stoppage once, with its reason; the repair is tied to it as maintenance work."
+  },
+  {
+    "id": "SBJ056",
+    "code": "EventMaintenanceWork",
+    "definition": "There is one of these for each piece of maintenance or repair work done on a machine, saying what was done. If you need to know what was done about a stoppage, this is what you go by. The stoppage itself is held as a stoppage, and the machine's wider history is held on the machine.",
+    "kind": "occurrence",
+    "mastery": "ingested",
+    "domain_id": "DOM004",
+    "is_anchor": false,
+    "parent_id": "SBJ049",
+    "parent_cardinality": "ONE_TO_MANY_OPTIONAL",
+    "singled_out_by": "dates",
+    "template_dda_id": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named EventMaintenanceWork, or one holding the same facts under another name, in Events and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "data_requirement_ids": [
+      "DRQ021",
+      "DRQ022"
+    ],
+    "evidence_source_ids": [
+      "SRC016",
+      "SRC018"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "distinct_need": "Holds the work done on a machine; the stoppage it answers is held separately."
+  },
+  {
+    "id": "SBJ057",
+    "code": "EventTests",
+    "definition": "There is one of these for each test of a sample, with the method, the result, whether it met the specification and which version of the specification it was judged against. If you need to know whether a batch met its specification and by what test, this is what you go by. The specification itself is held by CPG - Product Definition.",
+    "kind": "occurrence",
+    "mastery": "ingested",
+    "domain_id": "DOM004",
+    "is_anchor": false,
+    "parent_id": "SBJ049",
+    "parent_cardinality": "ONE_TO_MANY_OPTIONAL",
+    "singled_out_by": "dates",
+    "template_dda_id": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named EventTests, or one holding the same facts under another name, in Events and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "data_requirement_ids": [
+      "DRQ025"
+    ],
+    "evidence_source_ids": [
+      "SRC020",
+      "SRC022"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "distinct_need": "Holds each test and the version of the specification it was judged against; the specification is held by CPG - Product Definition."
+  },
+  {
+    "id": "SBJ058",
+    "code": "EventFindings",
+    "definition": "There is one of these for each departure from procedure or failure against specification that is found, saying which it is, how serious it is and how it was contained. If you need to know what went wrong on a batch, this is what you go by. What was decided about the affected material is recorded as a disposition.",
+    "kind": "occurrence",
+    "mastery": "mastered",
+    "domain_id": "DOM004",
+    "is_anchor": false,
+    "parent_id": "SBJ049",
+    "parent_cardinality": "ONE_TO_MANY_OPTIONAL",
+    "singled_out_by": "dates",
+    "template_dda_id": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named EventFindings, or one holding the same facts under another name, in Events and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "data_requirement_ids": [
+      "DRQ026"
+    ],
+    "evidence_source_ids": [
+      "SRC012",
+      "SRC013"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "distinct_need": "Holds each departure from procedure and each failure against specification, kept apart by kind; nothing else says what went wrong."
+  },
+  {
+    "id": "SBJ059",
+    "code": "EventNonConformances",
+    "definition": "One failure of a batch or material against its specification.",
+    "kind": "occurrence",
+    "mastery": "mastered",
+    "domain_id": "DOM004",
+    "is_anchor": false,
+    "parent_id": "SBJ049",
+    "parent_cardinality": "ONE_TO_MANY_OPTIONAL",
+    "singled_out_by": "dates",
+    "template_dda_id": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "searched DDA concepts for 'EventNonConformances' and its siblings in DOM004",
+    "data_requirement_ids": [
+      "DRQ026"
+    ],
+    "evidence_source_ids": [
+      "SRC012",
+      "SRC014"
+    ],
+    "status": "withdrawn",
+    "withdrawn_reason": "Merged into EventFindings, which holds both kinds of finding and says which each is."
+  },
+  {
+    "id": "SBJ060",
+    "code": "EventDispositions",
+    "definition": "There is one of these for each decision about what is done with material that failed, such as rework or scrap, with the reason. If you need to know what was decided about failed material and why, this is what you go by. The failure itself is recorded as a finding.",
+    "kind": "occurrence",
+    "mastery": "mastered",
+    "domain_id": "DOM004",
+    "is_anchor": false,
+    "parent_id": "SBJ049",
+    "parent_cardinality": "ONE_TO_MANY_OPTIONAL",
+    "singled_out_by": "dates",
+    "template_dda_id": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named EventDispositions, or one holding the same facts under another name, in Events and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "data_requirement_ids": [
+      "DRQ027"
+    ],
+    "evidence_source_ids": [
+      "SRC014"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "distinct_need": "Holds each decision about failed material and its reason; the failure is held as a finding."
+  },
+  {
+    "id": "SBJ061",
+    "code": "EventCorrectiveActions",
+    "definition": "There is one of these for each action taken to put right the cause of a problem, with the cause found, the check that the fix worked and when it was closed. If you need to know whether an action was closed before anyone checked it worked, this is what you go by. The problem itself is recorded as a finding.",
+    "kind": "occurrence",
+    "mastery": "mastered",
+    "domain_id": "DOM004",
+    "is_anchor": false,
+    "parent_id": "SBJ049",
+    "parent_cardinality": "ONE_TO_MANY_OPTIONAL",
+    "singled_out_by": "dates",
+    "template_dda_id": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named EventCorrectiveActions, or one holding the same facts under another name, in Events and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "data_requirement_ids": [
+      "DRQ028"
+    ],
+    "evidence_source_ids": [
+      "SRC014",
+      "SRC013"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "distinct_need": "Holds each corrective action, its cause and its check; no other record shows whether an action was verified."
+  },
+  {
+    "id": "SBJ062",
+    "code": "EventReleases",
+    "definition": "There is one of these for each time a batch is released for use or sale, with who released it, when and on what basis. If you need to know whether and why a batch was released, this is what you go by. A batch that has finished being made is not available until this exists.",
+    "kind": "occurrence",
+    "mastery": "mastered",
+    "domain_id": "DOM004",
+    "is_anchor": false,
+    "parent_id": "SBJ049",
+    "parent_cardinality": "ONE_TO_MANY_OPTIONAL",
+    "singled_out_by": "dates",
+    "template_dda_id": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named EventReleases, or one holding the same facts under another name, in Events and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "data_requirement_ids": [
+      "DRQ029"
+    ],
+    "evidence_source_ids": [
+      "SRC005",
+      "SRC003"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "distinct_need": "Holds each release of a batch and its basis; a batch that has finished is not released until this exists."
+  },
+  {
+    "id": "SBJ063",
+    "code": "EventRecalls",
+    "definition": "There is one of these for each recall of product already sent out, with what it covered. If you need to know what was recalled and why, this is what you go by. The batches a recall reached are found through the links between batches, not here.",
+    "kind": "occurrence",
+    "mastery": "mastered",
+    "domain_id": "DOM004",
+    "is_anchor": false,
+    "parent_id": "SBJ049",
+    "parent_cardinality": "ONE_TO_MANY_OPTIONAL",
+    "singled_out_by": "dates",
+    "template_dda_id": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named EventRecalls, or one holding the same facts under another name, in Events and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "data_requirement_ids": [
+      "DRQ030"
+    ],
+    "evidence_source_ids": [
+      "SRC009",
+      "SRC010"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "distinct_need": "Holds each recall and what it covered; the batches reached come from the traced links."
+  },
+  {
+    "id": "SBJ064",
+    "code": "EventComplaints",
+    "definition": "There is one of these for each complaint received about a product, with the report as it was given. If you need to know what a customer reported and which batch it was about, this is what you go by. The investigation that follows is recorded as findings and corrective actions.",
+    "kind": "occurrence",
+    "mastery": "ingested",
+    "domain_id": "DOM004",
+    "is_anchor": false,
+    "parent_id": "SBJ049",
+    "parent_cardinality": "ONE_TO_MANY_OPTIONAL",
+    "singled_out_by": "dates",
+    "template_dda_id": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named EventComplaints, or one holding the same facts under another name, in Events and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "data_requirement_ids": [
+      "DRQ031"
+    ],
+    "evidence_source_ids": [
+      "SRC022"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "distinct_need": "Holds each complaint as reported; the investigation is held as findings and actions."
+  },
+  {
+    "id": "SBJ065",
+    "code": "EventCorrections",
+    "definition": "There is one of these for each correction made to an earlier record, saying why. If you need to know that a record was altered and why, this is what you go by. The earlier record is kept as it was and is never overwritten.",
+    "kind": "occurrence",
+    "mastery": "mastered",
+    "domain_id": "DOM004",
+    "is_anchor": false,
+    "parent_id": "SBJ049",
+    "parent_cardinality": "ONE_TO_MANY_OPTIONAL",
+    "singled_out_by": "dates",
+    "template_dda_id": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named EventCorrections, or one holding the same facts under another name, in Events and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "data_requirement_ids": [
+      "DRQ032"
+    ],
+    "evidence_source_ids": [
+      "SRC032"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "distinct_need": "Holds each correction and its reason; without it an alteration could go unrecorded."
+  },
+  {
+    "id": "SBJ066",
+    "code": "EventStorageBreaches",
+    "definition": "There is one of these for each time stock was held outside the conditions its place must keep, with when it began. If you need to know whether a batch was ever stored out of condition, this is what you go by. The conditions themselves are held with the place.",
+    "kind": "occurrence",
+    "mastery": "ingested",
+    "domain_id": "DOM004",
+    "is_anchor": false,
+    "parent_id": "SBJ049",
+    "parent_cardinality": "ONE_TO_MANY_OPTIONAL",
+    "singled_out_by": "dates",
+    "template_dda_id": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named EventStorageBreaches, or one holding the same facts under another name, in Events and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "data_requirement_ids": [
+      "DRQ034"
+    ],
+    "evidence_source_ids": [
+      "SRC020"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "distinct_need": "Holds each time stock was held out of condition; the conditions are held with the place."
+  },
+  {
+    "id": "SBJ067",
+    "code": "ProductPackLevels",
+    "definition": "There is one of these for each level a product is packed in, such as a single unit, a case or a pallet, with how many of the level below it holds. If you need to know how many units are in a case and how many cases are on a pallet, this is what you go by. What is in the pack and the wording on it are held by CPG - Product Definition.",
+    "kind": "subject",
+    "mastery": "mastered",
+    "domain_id": "DOM006",
+    "is_anchor": false,
+    "parent_id": "SBJ012",
+    "parent_cardinality": "ONE_TO_MANY_OPTIONAL",
+    "singled_out_by": "ATR123",
+    "independence": null,
+    "distinct_need": "Holds the levels a product is packed in and how many of the level below each holds; nothing else in the model holds pack levels.",
+    "template_dda_id": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept named ProductPackLevels, or one holding the same facts under another name, in Products and the domains it could sit in; none found. Searched this model's own concepts for the same need; none holds it.",
+    "data_requirement_ids": [
+      "DRQ037"
+    ],
+    "evidence_source_ids": [
+      "SRC030",
+      "SRC031"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SBJ068",
+    "code": "TransactionGoodsMovement",
+    "definition": "There is one of these for each time goods are received, issued, moved, bought or despatched, with the time it happened. If you need to know where goods went and when, this is what you go by. How much of an item is held at a point in time is held as stock positions. It is a movement of goods; a movement of money or of a holding is the transaction it sits beneath.",
+    "kind": "occurrence",
+    "mastery": "ingested",
+    "domain_id": "DOM005",
+    "is_anchor": false,
+    "parent_id": "SBJ046",
+    "parent_cardinality": "ONE_TO_ONE_OPTIONAL",
+    "singled_out_by": null,
+    "template_dda_id": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Searched DDA as read on 16 November 2026 for a concept holding movements of goods. Transaction (DMC000000031) and TransactionLeg (DMC000000032) hold movements of money and holdings between two parties, with legs that balance, so goods movements are created beneath Transaction as the more specific kind its definition anticipates. Searched this model's own concepts for the same need; none holds it.",
+    "data_requirement_ids": [
+      "DRQ024",
+      "DRQ033"
+    ],
+    "evidence_source_ids": [
+      "SRC040",
+      "SRC039"
+    ],
+    "status": "active",
+    "withdrawn_reason": null,
+    "distinct_need": "Holds each movement of goods; DDA's transaction holds movements of money and holdings, and stock held is a separate count.",
+    "independence": "The movement lines, the places goods moved from and to, the products moved and the parties to the movement all refer to it, and DDA's transaction is for money and holdings, so these facts cannot sit on it."
+  }
+]

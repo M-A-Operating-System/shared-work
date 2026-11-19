@@ -1,0 +1,466 @@
+{
+  "domains": [
+    {
+      "id": "DOM001",
+      "dda_id": "DMD000000001",
+      "dda_action": "reuse",
+      "code": "People",
+      "prefix": "PER",
+      "definition": null,
+      "definition_update": null,
+      "anchor_subject_id": "SBJ001",
+      "shared": true,
+      "admission_gate": null,
+      "domain_tests": null,
+      "reuse_considered": [],
+      "subject_ids": [
+        "SBJ001",
+        "SBJ002",
+        "SBJ003",
+        "SBJ004"
+      ],
+      "used_here": "Holds each person the factory deals with, such as an operator, a technician or a supplier's contact, with their qualifications, the shifts they work and what they have signed."
+    },
+    {
+      "id": "DOM002",
+      "dda_id": "DMD000000012",
+      "dda_action": "reuse",
+      "code": "LegalEntities",
+      "prefix": "LEG",
+      "definition": null,
+      "definition_update": null,
+      "anchor_subject_id": "SBJ005",
+      "shared": true,
+      "admission_gate": null,
+      "domain_tests": null,
+      "reuse_considered": [],
+      "subject_ids": [
+        "SBJ005",
+        "SBJ006",
+        "SBJ007",
+        "SBJ008",
+        "SBJ009"
+      ],
+      "used_here": "Holds the companies the organisation deals with, such as suppliers, outside manufacturers, operators of sites and regulators, with their identifiers and addresses, the assessments made of suppliers and outside manufacturers, and the requests made of suppliers."
+    },
+    {
+      "id": "DOM003",
+      "dda_id": "DMD000000016",
+      "dda_action": "reuse",
+      "code": "Documents",
+      "prefix": "DOC",
+      "definition": null,
+      "definition_update": null,
+      "anchor_subject_id": "SBJ010",
+      "shared": true,
+      "admission_gate": null,
+      "domain_tests": null,
+      "reuse_considered": [],
+      "subject_ids": [
+        "SBJ010",
+        "SBJ011"
+      ],
+      "used_here": "Holds the documents that state facts about a batch, such as a supplier's certificate of analysis, with what each one declares and whether the organisation checked it."
+    },
+    {
+      "id": "DOM004",
+      "dda_id": "DMD000000020",
+      "dda_action": "reuse",
+      "code": "Events",
+      "prefix": "EVT",
+      "definition": null,
+      "definition_update": null,
+      "anchor_subject_id": "SBJ049",
+      "shared": true,
+      "admission_gate": null,
+      "domain_tests": null,
+      "reuse_considered": [],
+      "subject_ids": [
+        "SBJ049",
+        "SBJ051",
+        "SBJ053",
+        "SBJ054",
+        "SBJ055",
+        "SBJ056",
+        "SBJ057",
+        "SBJ058",
+        "SBJ060",
+        "SBJ061",
+        "SBJ062",
+        "SBJ063",
+        "SBJ064",
+        "SBJ065",
+        "SBJ066"
+      ],
+      "used_here": "Holds what happens in making and moving product: production runs, splits of batches, changeovers, stoppages, maintenance, tests, findings, decisions, corrective actions, releases, recalls, complaints, corrections and storage breaches."
+    },
+    {
+      "id": "DOM005",
+      "dda_id": "DMD000000022",
+      "dda_action": "reuse",
+      "code": "Transactions",
+      "prefix": "TRX",
+      "definition": null,
+      "definition_update": null,
+      "anchor_subject_id": "SBJ046",
+      "shared": true,
+      "admission_gate": null,
+      "domain_tests": null,
+      "reuse_considered": [],
+      "subject_ids": [
+        "SBJ046",
+        "SBJ068",
+        "SBJ047",
+        "SBJ048"
+      ],
+      "used_here": "Holds the exchanges of goods the organisation records, with their lines and the stock position each one leaves."
+    },
+    {
+      "id": "DOM006",
+      "dda_id": "DMD000000032",
+      "dda_action": "reuse",
+      "code": "Products",
+      "prefix": "PRD",
+      "definition": null,
+      "definition_update": null,
+      "anchor_subject_id": "SBJ012",
+      "shared": true,
+      "admission_gate": null,
+      "domain_tests": null,
+      "reuse_considered": [],
+      "subject_ids": [
+        "SBJ012",
+        "SBJ016",
+        "SBJ017",
+        "SBJ067"
+      ],
+      "used_here": "Holds each batch of a product, the batches split from or combined into it, and the levels a product is packed in: unit, case and pallet. What a product is made from and what it must be are held by CPG - Product Definition."
+    },
+    {
+      "id": "DOM007",
+      "dda_id": null,
+      "dda_action": "create",
+      "code": "Instances",
+      "prefix": "UNT",
+      "definition": "Instances are individually identified physical things — a serial-numbered pack, a machine, a vessel, a tool — each made to a product definition and traceable as itself for its whole life. Includes what is fitted into each and what condition it is in. Excludes the product definition it is made to, which is a Product, and the batch it belongs to where it is not individually identified, which is a concept of Products.",
+      "definition_update": null,
+      "anchor_subject_id": "SBJ026",
+      "shared": false,
+      "admission_gate": {
+        "independent": "A machine or a serialised pack exists independently of the organisation that made or owns it, and is bought, sold and moved between organisations.",
+        "survives": "Its record survives disposal as the history of what it was fitted to, how it failed and which recalls reached it.",
+        "named": "Maintenance leads, service engineers and recall coordinators name individual machines and units every day."
+      },
+      "domain_tests": {
+        "DT1": {
+          "answer": "An individual unit is a thing, not an activity. Maintaining and calibrating are activities held as occurrences in Events.",
+          "evidence_ids": [
+            "SRC018",
+            "SRC016"
+          ]
+        },
+        "DT2": {
+          "answer": "A machine can be described without naming a second party — its serial, its hours run, how it fails.",
+          "evidence_ids": [
+            "SRC018"
+          ]
+        },
+        "DT3": {
+          "answer": "Not every instance is a product definition: a product has no location, condition or service life, and one definition has many units.",
+          "evidence_ids": [
+            "SRC007"
+          ]
+        },
+        "DT4": {
+          "answer": "A serialised pack and a machine both exist independently of this organisation; the machine was made and identified by its own manufacturer.",
+          "evidence_ids": [
+            "SRC037",
+            "SRC018"
+          ]
+        },
+        "DT5": {
+          "answer": "After disposal, the unit's fittings, failures and the recalls that reached it remain answerable.",
+          "evidence_ids": [
+            "SRC018",
+            "SRC007"
+          ]
+        },
+        "DT6": {
+          "answer": "Maintenance and quality roles name individual machines and serialised units unprompted.",
+          "evidence_ids": [
+            "SRC018",
+            "SRC016"
+          ]
+        },
+        "DT7": {
+          "answer": "Instances carry their own identifier scheme — serial number, asset number, or the serialised trade item number carried in a 2D code.",
+          "evidence_ids": [
+            "SRC037"
+          ]
+        },
+        "DT8": {
+          "answer": "An individual unit carries obligations no other domain carries: calibration, service life, failure history and unit-level recall.",
+          "evidence_ids": [
+            "SRC018",
+            "SRC016"
+          ]
+        },
+        "DT9": {
+          "answer": "Maintenance, finance and safety processes all reference the same machine records.",
+          "evidence_ids": [
+            "SRC016",
+            "SRC018"
+          ]
+        },
+        "DT10": {
+          "answer": "No current domain covers an individually identified physical thing.",
+          "evidence_ids": [
+            "SRC007"
+          ]
+        }
+      },
+      "reuse_considered": [
+        {
+          "dda_id": null,
+          "why_not": "Instruments covers financial instruments, not physical units."
+        },
+        {
+          "dda_id": null,
+          "why_not": "Products was considered and rejected: a product is a definition, an instance is a physical thing with a place, a condition and a service life."
+        }
+      ],
+      "subject_ids": [
+        "SBJ026",
+        "SBJ027",
+        "SBJ028",
+        "SBJ029"
+      ],
+      "reuse_search": ""
+    },
+    {
+      "id": "DOM009",
+      "dda_id": null,
+      "dda_action": "create",
+      "code": "Processes",
+      "prefix": "PRC",
+      "definition": "Processes are the defined steps of work by which products are made — mixing, pasteurising, filling, labelling — the order they run in, the settings they run at, and the recipes that state them at each level of specificity from formulation to the instructions issued for one batch. Includes what each step requires of machines, people and materials. Excludes what a product is made from, which is Products, and the record of a step actually being performed, which is an Event.",
+      "definition_update": null,
+      "anchor_subject_id": "SBJ036",
+      "shared": false,
+      "admission_gate": {
+        "independent": "A step of work is defined once, independently of any product using it, and of the organisation performing it; ISA-88 defines it as portable across equipment and sites.",
+        "survives": "It survives the discontinuation of every product that used it, and a past batch is still judged against the recipe it ran to.",
+        "named": "Technical and plant roles name steps — pasteurising, filling, capping — every day."
+      },
+      "domain_tests": {
+        "DT1": {
+          "answer": "A step is a defined thing that exists whether or not it is running; its running is an occurrence held in Events. The distinction is ISA-88's own.",
+          "evidence_ids": [
+            "SRC002",
+            "SRC003"
+          ]
+        },
+        "DT2": {
+          "answer": "A step can be described without naming a second party — what it does, what it needs, what it is set to.",
+          "evidence_ids": [
+            "SRC002"
+          ]
+        },
+        "DT3": {
+          "answer": "A step is not a product, a place or an event. One step is used in making many products at many places.",
+          "evidence_ids": [
+            "SRC004",
+            "SRC003"
+          ]
+        },
+        "DT4": {
+          "answer": "ISA-88 defines recipes and procedures as portable between equipment and organisations, separate from the plant that runs them.",
+          "evidence_ids": [
+            "SRC002",
+            "SRC003"
+          ]
+        },
+        "DT5": {
+          "answer": "After a product is discontinued the recipe it was made to remains, and is required to judge batches already made.",
+          "evidence_ids": [
+            "SRC003",
+            "SRC033"
+          ]
+        },
+        "DT6": {
+          "answer": "Technical and plant roles name steps and recipes unprompted.",
+          "evidence_ids": [
+            "SRC004",
+            "SRC003"
+          ]
+        },
+        "DT7": {
+          "answer": "Recipes and steps carry their own identifier scheme in recipe management and execution systems.",
+          "evidence_ids": [
+            "SRC003"
+          ]
+        },
+        "DT8": {
+          "answer": "A recipe carries obligations no other domain carries: authorisation, version control, parameter limits and the instructions issued for one batch.",
+          "evidence_ids": [
+            "SRC003",
+            "SRC033"
+          ]
+        },
+        "DT9": {
+          "answer": "Planning, production, quality and regulatory processes all reference the same recipes.",
+          "evidence_ids": [
+            "SRC003",
+            "SRC021"
+          ]
+        },
+        "DT10": {
+          "answer": "No current domain covers a defined method of work.",
+          "evidence_ids": [
+            "SRC002"
+          ]
+        }
+      },
+      "reuse_considered": [
+        {
+          "dda_id": null,
+          "why_not": "Products was considered and rejected: the recipe says what goes in, the method says how — one step serves many products, so it cannot hang off any one of them."
+        },
+        {
+          "dda_id": "DMD000000020",
+          "why_not": "Events was considered and rejected: an event is a step being performed, which is not the step itself."
+        }
+      ],
+      "subject_ids": [
+        "SBJ036",
+        "SBJ037",
+        "SBJ038",
+        "SBJ039",
+        "SBJ040",
+        "SBJ041",
+        "SBJ042"
+      ],
+      "reuse_search": ""
+    },
+    {
+      "id": "DOM010",
+      "dda_id": "DMD000000034",
+      "dda_action": "extend",
+      "code": "Locations",
+      "prefix": "LOC",
+      "definition": "The Locations domain holds all physical points on earth that an organisation needs to identify, as DDA defines it. For this model it also holds the structure of each factory down to the shop floor: the site, its areas, production lines, rooms and storage positions, each place inside the one above it, with the conditions each place must keep and the identifiers each is known by. Machines standing in these places are held with Instances.",
+      "definition_update": "The Locations domain also holds the structure of each factory down to the shop floor: the site, its areas, production lines, rooms and storage positions, each place inside the one above it, with the conditions each place must keep and the identifiers each is known by. Machines that stand in these places are held with Instances.",
+      "anchor_subject_id": "SBJ043",
+      "shared": true,
+      "admission_gate": null,
+      "domain_tests": null,
+      "reuse_considered": [
+        {
+          "dda_id": "DMD000000034",
+          "why_not": "Reused as the home of every place. Extended so that the places inside a factory, below the site, are held in the same hierarchy as the site itself."
+        }
+      ],
+      "subject_ids": [
+        "SBJ034",
+        "SBJ043",
+        "SBJ044",
+        "SBJ045"
+      ]
+    }
+  ],
+  "rejected_candidates": [
+    {
+      "name": "Quality",
+      "failed_tests": [
+        "DT1"
+      ],
+      "reason": "Quality is what the organisation does to products, not a thing it deals in. Specifications belong to the product, tests and findings are occurrences, and the authority to decide is a role.",
+      "placed_in_domain_id": "DOM006",
+      "prompted_by_subject_ids": [],
+      "rejected_by": "agent"
+    },
+    {
+      "name": "Maintenance",
+      "failed_tests": [
+        "DT1"
+      ],
+      "reason": "Maintenance is an activity. The machine is an Instance, the place is a Location, and the work is an occurrence.",
+      "placed_in_domain_id": "DOM007",
+      "prompted_by_subject_ids": [],
+      "rejected_by": "agent"
+    },
+    {
+      "name": "Production",
+      "failed_tests": [
+        "DT1"
+      ],
+      "reason": "Production is an activity. What is made is a Product, where it is made is a Location, and the making is an occurrence.",
+      "placed_in_domain_id": "DOM004",
+      "prompted_by_subject_ids": [],
+      "rejected_by": "agent"
+    },
+    {
+      "name": "Inventory",
+      "failed_tests": [
+        "DT1"
+      ],
+      "reason": "Inventory is a position, not a subject: a quantity of a product, in a condition, at a place, at a time.",
+      "placed_in_domain_id": "DOM005",
+      "prompted_by_subject_ids": [],
+      "rejected_by": "agent"
+    },
+    {
+      "name": "Suppliers",
+      "failed_tests": [
+        "DT2"
+      ],
+      "reason": "A supplier is what an organisation is to a buyer. It is a role, established by the relationship that allows it to supply a material.",
+      "placed_in_domain_id": "DOM002",
+      "prompted_by_subject_ids": [],
+      "rejected_by": "agent"
+    },
+    {
+      "name": "Materials",
+      "failed_tests": [
+        "DT3"
+      ],
+      "reason": "Every material is a product — bought rather than sold, but the same shape. Separating them would break the chain from a finished case to a raw ingredient.",
+      "placed_in_domain_id": "DOM006",
+      "prompted_by_subject_ids": [],
+      "rejected_by": "agent"
+    },
+    {
+      "name": "Batches",
+      "failed_tests": [
+        "DT3"
+      ],
+      "reason": "Every batch is a batch of a product and has no existence apart from it.",
+      "placed_in_domain_id": "DOM006",
+      "prompted_by_subject_ids": [],
+      "rejected_by": "agent"
+    },
+    {
+      "name": "Recipes",
+      "failed_tests": [
+        "DT3"
+      ],
+      "reason": "A recipe is a method stated at a level of specificity, held in Processes with the steps it arranges.",
+      "placed_in_domain_id": "DOM009",
+      "prompted_by_subject_ids": [],
+      "rejected_by": "agent"
+    },
+    {
+      "name": "Equipment",
+      "failed_tests": [
+        "DT2",
+        "DT3"
+      ],
+      "reason": "A place in the plant is a Location, one level of the same hierarchy as the site, and a machine is an Instance. Neither needs a domain of its own.",
+      "placed_in_domain_id": "DOM010",
+      "prompted_by_subject_ids": [
+        "SBJ031"
+      ],
+      "rejected_by": "agent"
+    }
+  ]
+}

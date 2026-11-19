@@ -1,0 +1,212 @@
+{
+  "domain": "CPG Manufacturing and Supply Chain",
+  "business": "A manufacturer of food and beverage products. It receives materials, makes, packs and tests product, and releases it for despatch, through its own factories and through outside manufacturers. What a product is and what goes into it is held by CPG - Product Definition; this model holds the logistics of making finished products from those ingredients.",
+  "subgroups": [
+    {
+      "id": "SCG001",
+      "name": "Food and beverage",
+      "is_primary": true
+    }
+  ],
+  "in_scope": [
+    {
+      "id": "SCI001",
+      "statement": "Receiving materials from suppliers, and assessing the suppliers"
+    },
+    {
+      "id": "SCI003",
+      "statement": "Defining how products are made — the steps, the settings and the recipes"
+    },
+    {
+      "id": "SCI004",
+      "statement": "The places in each factory down to the shop floor, and the machines in them"
+    },
+    {
+      "id": "SCI005",
+      "statement": "Making product, and what each batch actually used and produced"
+    },
+    {
+      "id": "SCI006",
+      "statement": "Testing, recording problems, putting them right, and releasing product"
+    },
+    {
+      "id": "SCI007",
+      "statement": "Tracing any batch back to its ingredients and forward to where it went"
+    },
+    {
+      "id": "SCI008",
+      "statement": "Stock held at the organisation's own sites"
+    },
+    {
+      "id": "SCI009",
+      "statement": "Product made or packed by outside manufacturers"
+    },
+    {
+      "id": "SCI010",
+      "statement": "Packing, and the levels a product is packed in for handling — unit, case and pallet"
+    },
+    {
+      "id": "SCI011",
+      "statement": "The sites that suppliers and outside manufacturers make and ship from"
+    },
+    {
+      "id": "SCI012",
+      "statement": "Turning ingredients into finished products: the logistics of receiving, making, packing and moving them, built on the product and the hierarchy of products and ingredients held by CPG - Product Definition"
+    }
+  ],
+  "out_of_scope": [
+    {
+      "id": "SCO001",
+      "statement": "Trade spending, promotions and pricing with retailers",
+      "owned_by": "The commercial model"
+    },
+    {
+      "id": "SCO002",
+      "statement": "What happens on the shelf in store",
+      "owned_by": "The commercial model"
+    },
+    {
+      "id": "SCO003",
+      "statement": "Market share and sales data bought from research firms",
+      "owned_by": "The commercial model"
+    },
+    {
+      "id": "SCO004",
+      "statement": "Marketing, campaigns and advertising",
+      "owned_by": "The digital marketing model"
+    },
+    {
+      "id": "SCO005",
+      "statement": "Accounts, ledgers and statutory reporting",
+      "owned_by": "The finance model"
+    },
+    {
+      "id": "SCO006",
+      "statement": "Research and development before a product is formally defined",
+      "owned_by": "Not modelled"
+    },
+    {
+      "id": "SCO007",
+      "statement": "Defining products — what they are made from, what they must be, how long they last and what their packs say",
+      "owned_by": "The CPG - Product Definition model"
+    },
+    {
+      "id": "SCO008",
+      "statement": "The total cost of poor quality, and any other cost worked out by adding up what happened",
+      "owned_by": "The finance model"
+    },
+    {
+      "id": "SCO009",
+      "statement": "Household and cleaning products, personal care and cosmetics, pet care and beauty",
+      "owned_by": "A later extension of this model"
+    }
+  ],
+  "shared_objects": [
+    {
+      "id": "SCS001",
+      "name": "People",
+      "dda_id": "DMD000000001"
+    },
+    {
+      "id": "SCS002",
+      "name": "Legal entities",
+      "dda_id": "DMD000000012"
+    },
+    {
+      "id": "SCS003",
+      "name": "Documents",
+      "dda_id": "DMD000000016"
+    },
+    {
+      "id": "SCS004",
+      "name": "Events",
+      "dda_id": "DMD000000020"
+    },
+    {
+      "id": "SCS005",
+      "name": "Transactions",
+      "dda_id": "DMD000000022"
+    },
+    {
+      "id": "SCS006",
+      "name": "Products",
+      "dda_id": "DMD000000032"
+    },
+    {
+      "id": "SCS007",
+      "name": "Locations",
+      "dda_id": "DMD000000034"
+    }
+  ],
+  "assumptions": [
+    {
+      "id": "SCA001",
+      "statement": "The factory, laboratory, quality and maintenance systems already in place stay in place. This model holds what they record; it does not replace them."
+    },
+    {
+      "id": "SCA002",
+      "statement": "Material held by a supplier or outside manufacturer is theirs. It becomes the organisation's on receipt, and the organisation holds no stock at any party it does not operate."
+    },
+    {
+      "id": "SCA003",
+      "statement": "Something bought as an ingredient or part may be another company's finished product. What it is made from is theirs and may not be known here."
+    },
+    {
+      "id": "SCA004",
+      "statement": "The product definition — what a product is made from, what it must be, how long it lasts and what its pack says — is held by CPG - Product Definition. This model refers to a product and does not define it again."
+    },
+    {
+      "id": "SCA005",
+      "statement": "A manufacturing bill of materials is read as the formulation held in CPG - Product Definition. This model holds how a batch compares with it: what was used, and in what quantity."
+    },
+    {
+      "id": "SCA006",
+      "statement": "Food traceability duties differ by market. The United States, the United Kingdom and the European Union are the sample markets, and other markets come in as further requirements, not as a different design."
+    },
+    {
+      "id": "SCA007",
+      "statement": "Costs are not held. What each stoppage, failure, rework and complaint was is recorded; adding them up is a calculation outside this model."
+    }
+  ],
+  "questions_unanswered": [
+    {
+      "id": "SCQ001",
+      "question_no": 9,
+      "note": "Is finished output identified individually, or only by batch? The model supports both; how much of Instances is used depends on the answer."
+    },
+    {
+      "id": "SCQ002",
+      "question_no": 11,
+      "note": "What proportion of output is made by outside manufacturers? Where it is most of it, the organisation holds little production record of its own."
+    }
+  ],
+  "candidate_dda_domains": [
+    "DMD000000001",
+    "DMD000000012",
+    "DMD000000016",
+    "DMD000000020",
+    "DMD000000022",
+    "DMD000000032",
+    "DMD000000034"
+  ],
+  "source_cap_per_function": 6,
+  "external_standards": [
+    "ISA-95 / IEC 62264",
+    "ISA-88 / IEC 61512",
+    "ISO 22716",
+    "FSMA 204",
+    "21 CFR Part 11",
+    "21 CFR Part 507",
+    "GS1 GTIN Management Standard"
+  ],
+  "platform_capabilities": [
+    "Entity resolution and duplicate detection",
+    "Audit history",
+    "Origin and lineage",
+    "Point-in-time reconstruction"
+  ],
+  "confirmed": {
+    "by": "Andrew Bush",
+    "date": "2026-09-22"
+  }
+}

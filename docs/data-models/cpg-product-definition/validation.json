@@ -1,0 +1,26 @@
+{
+  "defect_count": 2,
+  "blocking": 0,
+  "material": 0,
+  "advisory": 2,
+  "defects": [
+    {
+      "check": "DF04a",
+      "severity": "advisory",
+      "routes_to": "5\u20138",
+      "artefact_ids": [
+        "LKP011"
+      ],
+      "detail": "lookup definition uses 'entities'; keep it only where the field uses the word itself"
+    },
+    {
+      "check": "DF04a",
+      "severity": "advisory",
+      "routes_to": "5\u20138",
+      "artefact_ids": [
+        "SBJ002"
+      ],
+      "detail": "concept definition uses 'entity'; keep it only where the field uses the word itself"
+    }
+  ]
+}

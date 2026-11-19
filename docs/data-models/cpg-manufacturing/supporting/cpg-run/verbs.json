@@ -1,0 +1,659 @@
+[
+  {
+    "id": "REL001",
+    "code": "ProductBillOfMaterials",
+    "source_domain_id": "DOM006",
+    "destination_domain_id": "DOM006",
+    "forward_verb": "is made from",
+    "inverse_verb": "is used in",
+    "source_role": "Output Product",
+    "target_role": "Input Material",
+    "cardinality": "MANY_TO_MANY",
+    "dates": true,
+    "attributes": [
+      "StructureVersion",
+      "SpecifiedQuantity",
+      "UnitOfMeasure",
+      "ExpectedYieldLoss",
+      "Position",
+      "IsSubstitutable"
+    ],
+    "data_requirement_ids": [
+      "DRQ001",
+      "DRQ002",
+      "DRQ003"
+    ]
+  },
+  {
+    "id": "REL002",
+    "code": "ProductVariants",
+    "source_domain_id": "DOM006",
+    "destination_domain_id": "DOM006",
+    "forward_verb": "is a variant within",
+    "inverse_verb": "has variant",
+    "source_role": "Variant",
+    "target_role": "Family",
+    "cardinality": "MANY_TO_ONE",
+    "dates": true,
+    "attributes": [
+      "AxisValues"
+    ],
+    "data_requirement_ids": [
+      "DRQ014"
+    ]
+  },
+  {
+    "id": "REL003",
+    "code": "ProductApprovedSources",
+    "source_domain_id": "DOM006",
+    "destination_domain_id": "DOM002",
+    "forward_verb": "may be sourced from",
+    "inverse_verb": "may supply",
+    "source_role": "Sourced Material",
+    "target_role": "Approved Supplier",
+    "cardinality": "MANY_TO_MANY",
+    "dates": true,
+    "attributes": [
+      "ApprovalState",
+      "AssessmentReference"
+    ],
+    "data_requirement_ids": [
+      "DRQ006"
+    ]
+  },
+  {
+    "id": "REL004",
+    "code": "ProductCertifiers",
+    "source_domain_id": "DOM006",
+    "destination_domain_id": "DOM002",
+    "forward_verb": "is certified by",
+    "inverse_verb": "certifies",
+    "source_role": "Certified Product",
+    "target_role": "Certifying Body",
+    "cardinality": "MANY_TO_MANY",
+    "dates": true,
+    "attributes": [
+      "Scheme",
+      "CertificateNumber"
+    ],
+    "data_requirement_ids": [
+      "DRQ009"
+    ]
+  },
+  {
+    "id": "REL005",
+    "code": "ProductOutsideManufacture",
+    "source_domain_id": "DOM006",
+    "destination_domain_id": "DOM002",
+    "forward_verb": "is manufactured by",
+    "inverse_verb": "manufactures",
+    "source_role": "Contracted Product",
+    "target_role": "Outside Manufacturer",
+    "cardinality": "MANY_TO_MANY",
+    "dates": true,
+    "attributes": [
+      "Scope",
+      "SpecificationVersion"
+    ],
+    "data_requirement_ids": [
+      "DRQ033"
+    ]
+  },
+  {
+    "id": "REL006",
+    "code": "ProductRoutings",
+    "source_domain_id": "DOM006",
+    "destination_domain_id": "DOM009",
+    "forward_verb": "is made by",
+    "inverse_verb": "makes",
+    "source_role": "Routed Product",
+    "target_role": "Making Method",
+    "cardinality": "MANY_TO_ONE",
+    "dates": true,
+    "attributes": [
+      "RecipeLevel"
+    ],
+    "data_requirement_ids": [
+      "DRQ017"
+    ]
+  },
+  {
+    "id": "REL007",
+    "code": "ProcessSegmentSequences",
+    "source_domain_id": "DOM009",
+    "destination_domain_id": "DOM009",
+    "forward_verb": "follows",
+    "inverse_verb": "precedes",
+    "source_role": "Later Step",
+    "target_role": "Earlier Step",
+    "cardinality": "MANY_TO_MANY",
+    "dates": false,
+    "attributes": [
+      "Order",
+      "IsParallel"
+    ],
+    "data_requirement_ids": [
+      "DRQ017"
+    ]
+  },
+  {
+    "id": "REL008",
+    "code": "ProcessSegmentPositions",
+    "source_domain_id": "DOM009",
+    "destination_domain_id": "DOM008",
+    "forward_verb": "is approved at",
+    "inverse_verb": "is approved for",
+    "source_role": "Approved Step",
+    "target_role": "Approved Position",
+    "cardinality": "MANY_TO_MANY",
+    "dates": true,
+    "attributes": [
+      "ApprovedOn"
+    ],
+    "data_requirement_ids": [
+      "DRQ017"
+    ]
+  },
+  {
+    "id": "REL009",
+    "code": "ProcessRecipeDerivations",
+    "source_domain_id": "DOM009",
+    "destination_domain_id": "DOM009",
+    "forward_verb": "is derived from",
+    "inverse_verb": "is the source of",
+    "source_role": "Derived Recipe",
+    "target_role": "Source Recipe",
+    "cardinality": "MANY_TO_ONE",
+    "dates": true,
+    "attributes": [],
+    "data_requirement_ids": [
+      "DRQ018"
+    ]
+  },
+  {
+    "id": "REL010",
+    "code": "EquipmentPositionStructures",
+    "source_domain_id": "DOM008",
+    "destination_domain_id": "DOM008",
+    "forward_verb": "is within",
+    "inverse_verb": "contains",
+    "source_role": "Contained Position",
+    "target_role": "Containing Position",
+    "cardinality": "MANY_TO_ONE",
+    "dates": false,
+    "attributes": [],
+    "data_requirement_ids": [
+      "DRQ020"
+    ]
+  },
+  {
+    "id": "REL011",
+    "code": "EquipmentInstallations",
+    "source_domain_id": "DOM008",
+    "destination_domain_id": "DOM007",
+    "forward_verb": "is occupied by",
+    "inverse_verb": "occupies",
+    "source_role": "Occupied Position",
+    "target_role": "Installed Machine",
+    "cardinality": "MANY_TO_MANY",
+    "dates": true,
+    "attributes": [
+      "InstalledBy"
+    ],
+    "data_requirement_ids": [
+      "DRQ020"
+    ]
+  },
+  {
+    "id": "REL012",
+    "code": "EquipmentSitings",
+    "source_domain_id": "DOM008",
+    "destination_domain_id": "DOM010",
+    "forward_verb": "is sited at",
+    "inverse_verb": "houses",
+    "source_role": "Sited Position",
+    "target_role": "Housing Site",
+    "cardinality": "MANY_TO_ONE",
+    "dates": false,
+    "attributes": [],
+    "data_requirement_ids": [
+      "DRQ020"
+    ]
+  },
+  {
+    "id": "REL013",
+    "code": "InstanceDefinitions",
+    "source_domain_id": "DOM007",
+    "destination_domain_id": "DOM006",
+    "forward_verb": "is a unit of",
+    "inverse_verb": "is made as",
+    "source_role": "Individual Unit",
+    "target_role": "Defining Product",
+    "cardinality": "MANY_TO_ONE",
+    "dates": false,
+    "attributes": [],
+    "data_requirement_ids": [
+      "DRQ016"
+    ]
+  },
+  {
+    "id": "REL014",
+    "code": "InstanceComposition",
+    "source_domain_id": "DOM007",
+    "destination_domain_id": "DOM007",
+    "forward_verb": "is built from",
+    "inverse_verb": "is built into",
+    "source_role": "Assembled Unit",
+    "target_role": "Fitted Unit",
+    "cardinality": "MANY_TO_MANY",
+    "dates": true,
+    "attributes": [
+      "Position",
+      "ReasonFitted"
+    ],
+    "data_requirement_ids": [
+      "DRQ016"
+    ]
+  },
+  {
+    "id": "REL015",
+    "code": "InstanceLotComposition",
+    "source_domain_id": "DOM007",
+    "destination_domain_id": "DOM006",
+    "forward_verb": "incorporates batch",
+    "inverse_verb": "is incorporated into",
+    "source_role": "Assembled Unit",
+    "target_role": "Incorporated Batch",
+    "cardinality": "MANY_TO_MANY",
+    "dates": false,
+    "attributes": [
+      "Position",
+      "Quantity"
+    ],
+    "data_requirement_ids": [
+      "DRQ016"
+    ]
+  },
+  {
+    "id": "REL016",
+    "code": "LocationHierarchies",
+    "source_domain_id": "DOM010",
+    "destination_domain_id": "DOM010",
+    "forward_verb": "is within",
+    "inverse_verb": "contains",
+    "source_role": "Contained Place",
+    "target_role": "Containing Place",
+    "cardinality": "MANY_TO_ONE",
+    "dates": false,
+    "attributes": [],
+    "data_requirement_ids": [
+      "DRQ024"
+    ]
+  },
+  {
+    "id": "REL017",
+    "code": "LocationCertifiers",
+    "source_domain_id": "DOM010",
+    "destination_domain_id": "DOM002",
+    "forward_verb": "is certified by",
+    "inverse_verb": "certifies",
+    "source_role": "Certified Site",
+    "target_role": "Certifying Body",
+    "cardinality": "MANY_TO_MANY",
+    "dates": true,
+    "attributes": [
+      "Scheme"
+    ],
+    "data_requirement_ids": [
+      "DRQ006"
+    ]
+  },
+  {
+    "id": "REL018",
+    "code": "LegalEntityOperatedLocations",
+    "source_domain_id": "DOM002",
+    "destination_domain_id": "DOM010",
+    "forward_verb": "operates",
+    "inverse_verb": "is operated by",
+    "source_role": "Site Operator",
+    "target_role": "Operated Site",
+    "cardinality": "MANY_TO_MANY",
+    "dates": true,
+    "attributes": [],
+    "data_requirement_ids": [
+      "DRQ033"
+    ]
+  },
+  {
+    "id": "REL019",
+    "code": "PersonEntityAssociations",
+    "source_domain_id": "DOM001",
+    "destination_domain_id": "DOM002",
+    "forward_verb": "works for",
+    "inverse_verb": "employs",
+    "source_role": "Employee",
+    "target_role": "Employer",
+    "cardinality": "MANY_TO_MANY",
+    "dates": true,
+    "attributes": [
+      "Capacity"
+    ],
+    "data_requirement_ids": [
+      "DRQ023"
+    ]
+  },
+  {
+    "id": "REL020",
+    "code": "PersonSegmentQualifications",
+    "source_domain_id": "DOM001",
+    "destination_domain_id": "DOM009",
+    "forward_verb": "is qualified for",
+    "inverse_verb": "may be performed by",
+    "source_role": "Qualified Person",
+    "target_role": "Qualified Work",
+    "cardinality": "MANY_TO_MANY",
+    "dates": true,
+    "attributes": [
+      "AwardBasis"
+    ],
+    "data_requirement_ids": [
+      "DRQ023"
+    ]
+  },
+  {
+    "id": "REL021",
+    "code": "TransactionParties",
+    "source_domain_id": "DOM005",
+    "destination_domain_id": "DOM002",
+    "forward_verb": "is transacted with",
+    "inverse_verb": "transacts",
+    "source_role": "Party Transaction",
+    "target_role": "Trading Party",
+    "cardinality": "MANY_TO_MANY",
+    "dates": false,
+    "attributes": [
+      "Capacity"
+    ],
+    "data_requirement_ids": [
+      "DRQ033"
+    ]
+  },
+  {
+    "id": "REL022",
+    "code": "TransactionSubjects",
+    "source_domain_id": "DOM005",
+    "destination_domain_id": "DOM006",
+    "forward_verb": "concerns",
+    "inverse_verb": "is traded in",
+    "source_role": "Concerning Transaction",
+    "target_role": "Traded Product",
+    "cardinality": "MANY_TO_MANY",
+    "dates": false,
+    "attributes": [
+      "Quantity",
+      "Batch"
+    ],
+    "data_requirement_ids": [
+      "DRQ024"
+    ]
+  },
+  {
+    "id": "REL023",
+    "code": "TransactionOrigins",
+    "source_domain_id": "DOM005",
+    "destination_domain_id": "DOM010",
+    "forward_verb": "ships from",
+    "inverse_verb": "despatches",
+    "source_role": "Outbound Movement",
+    "target_role": "Despatching Place",
+    "cardinality": "MANY_TO_ONE",
+    "dates": false,
+    "attributes": [],
+    "data_requirement_ids": [
+      "DRQ024"
+    ]
+  },
+  {
+    "id": "REL024",
+    "code": "TransactionDestinations",
+    "source_domain_id": "DOM005",
+    "destination_domain_id": "DOM010",
+    "forward_verb": "is delivered to",
+    "inverse_verb": "receives",
+    "source_role": "Inbound Movement",
+    "target_role": "Receiving Place",
+    "cardinality": "MANY_TO_ONE",
+    "dates": false,
+    "attributes": [],
+    "data_requirement_ids": [
+      "DRQ024"
+    ]
+  },
+  {
+    "id": "REL025",
+    "code": "EventRunPositions",
+    "source_domain_id": "DOM004",
+    "destination_domain_id": "DOM008",
+    "forward_verb": "ran at",
+    "inverse_verb": "ran",
+    "source_role": "Production Run",
+    "target_role": "Running Position",
+    "cardinality": "MANY_TO_ONE",
+    "dates": false,
+    "attributes": [],
+    "data_requirement_ids": [
+      "DRQ020",
+      "DRQ023"
+    ]
+  },
+  {
+    "id": "REL026",
+    "code": "EventRunRecipes",
+    "source_domain_id": "DOM004",
+    "destination_domain_id": "DOM009",
+    "forward_verb": "ran under",
+    "inverse_verb": "governed",
+    "source_role": "Production Run",
+    "target_role": "Issued Instructions",
+    "cardinality": "MANY_TO_ONE",
+    "dates": false,
+    "attributes": [],
+    "data_requirement_ids": [
+      "DRQ018"
+    ]
+  },
+  {
+    "id": "REL027",
+    "code": "EventPerformers",
+    "source_domain_id": "DOM004",
+    "destination_domain_id": "DOM001",
+    "forward_verb": "was performed by",
+    "inverse_verb": "performed",
+    "source_role": "Performed Work",
+    "target_role": "Performer",
+    "cardinality": "MANY_TO_MANY",
+    "dates": true,
+    "attributes": [
+      "Capacity"
+    ],
+    "data_requirement_ids": [
+      "DRQ023",
+      "DRQ027",
+      "DRQ029"
+    ]
+  },
+  {
+    "id": "REL028",
+    "code": "EventBatchInputs",
+    "source_domain_id": "DOM004",
+    "destination_domain_id": "DOM006",
+    "forward_verb": "consumed",
+    "inverse_verb": "was consumed by",
+    "source_role": "Consuming Run",
+    "target_role": "Input Batch",
+    "cardinality": "MANY_TO_MANY",
+    "dates": false,
+    "attributes": [
+      "QuantityUsed",
+      "FilledPosition"
+    ],
+    "data_requirement_ids": [
+      "DRQ004",
+      "DRQ030"
+    ]
+  },
+  {
+    "id": "REL029",
+    "code": "EventBatchOutputs",
+    "source_domain_id": "DOM004",
+    "destination_domain_id": "DOM006",
+    "forward_verb": "produced",
+    "inverse_verb": "was produced by",
+    "source_role": "Producing Run",
+    "target_role": "Output Batch",
+    "cardinality": "MANY_TO_MANY",
+    "dates": false,
+    "attributes": [
+      "QuantityProduced"
+    ],
+    "data_requirement_ids": [
+      "DRQ030"
+    ]
+  },
+  {
+    "id": "REL030",
+    "code": "EventStoppageMachines",
+    "source_domain_id": "DOM004",
+    "destination_domain_id": "DOM007",
+    "forward_verb": "stopped",
+    "inverse_verb": "was stopped in",
+    "source_role": "Stoppage",
+    "target_role": "Stopped Machine",
+    "cardinality": "MANY_TO_ONE",
+    "dates": false,
+    "attributes": [
+      "FailureMode"
+    ],
+    "data_requirement_ids": [
+      "DRQ021",
+      "DRQ022"
+    ]
+  },
+  {
+    "id": "REL031",
+    "code": "EventFindingBatches",
+    "source_domain_id": "DOM004",
+    "destination_domain_id": "DOM006",
+    "forward_verb": "is raised against",
+    "inverse_verb": "is subject of",
+    "source_role": "Finding",
+    "target_role": "Affected Batch",
+    "cardinality": "MANY_TO_MANY",
+    "dates": false,
+    "attributes": [],
+    "data_requirement_ids": [
+      "DRQ026",
+      "DRQ027"
+    ]
+  },
+  {
+    "id": "REL032",
+    "code": "EventComplaintBatches",
+    "source_domain_id": "DOM004",
+    "destination_domain_id": "DOM006",
+    "forward_verb": "reports a problem with",
+    "inverse_verb": "is complained about in",
+    "source_role": "Complaint",
+    "target_role": "Complained-of Batch",
+    "cardinality": "MANY_TO_ONE",
+    "dates": false,
+    "attributes": [],
+    "data_requirement_ids": [
+      "DRQ031"
+    ]
+  },
+  {
+    "id": "REL033",
+    "code": "EventActionTriggers",
+    "source_domain_id": "DOM004",
+    "destination_domain_id": "DOM004",
+    "forward_verb": "responds to",
+    "inverse_verb": "prompted",
+    "source_role": "Response",
+    "target_role": "Trigger",
+    "cardinality": "MANY_TO_MANY",
+    "dates": false,
+    "attributes": [],
+    "data_requirement_ids": [
+      "DRQ028"
+    ]
+  },
+  {
+    "id": "REL034",
+    "code": "EventCorrectionTargets",
+    "source_domain_id": "DOM004",
+    "destination_domain_id": "DOM004",
+    "forward_verb": "corrects",
+    "inverse_verb": "is corrected by",
+    "source_role": "Correction",
+    "target_role": "Corrected Record",
+    "cardinality": "MANY_TO_ONE",
+    "dates": false,
+    "attributes": [],
+    "data_requirement_ids": [
+      "DRQ032"
+    ]
+  },
+  {
+    "id": "REL035",
+    "code": "EventSupplierFindings",
+    "source_domain_id": "DOM004",
+    "destination_domain_id": "DOM002",
+    "forward_verb": "is raised with",
+    "inverse_verb": "received",
+    "source_role": "Supplier Finding",
+    "target_role": "Responsible Supplier",
+    "cardinality": "MANY_TO_ONE",
+    "dates": true,
+    "attributes": [],
+    "data_requirement_ids": [
+      "DRQ028"
+    ]
+  },
+  {
+    "id": "REL036",
+    "code": "DocumentBatchDeclarations",
+    "source_domain_id": "DOM003",
+    "destination_domain_id": "DOM006",
+    "forward_verb": "declares properties of",
+    "inverse_verb": "is declared by",
+    "source_role": "Declaring Document",
+    "target_role": "Declared Batch",
+    "cardinality": "MANY_TO_MANY",
+    "dates": false,
+    "attributes": [
+      "Verified"
+    ],
+    "data_requirement_ids": [
+      "DRQ007"
+    ]
+  },
+  {
+    "id": "REL037",
+    "code": "EventBreachBatches",
+    "source_domain_id": "DOM004",
+    "destination_domain_id": "DOM006",
+    "forward_verb": "exposed",
+    "inverse_verb": "was exposed in",
+    "source_role": "Storage Breach",
+    "target_role": "Exposed Batch",
+    "cardinality": "MANY_TO_MANY",
+    "dates": false,
+    "attributes": [
+      "Duration"
+    ],
+    "data_requirement_ids": [
+      "DRQ034"
+    ]
+  }
+]

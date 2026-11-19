@@ -1,0 +1,287 @@
+{
+  "domain": "CPG - Product Definition",
+  "business": "Consumer packaged goods are products that a company makes and sells in packs to consumers through shops and online, and this design covers food and beverage products. The design records what each product is: the product definition, its variants (the sizes, packs and recipes that are sold) and the ingredients that go into it. Around that it records what a product must be, who may supply its ingredients, what may be said about it on pack, and where it is sold and how it is pictured. It does not cover how a product is made: factories, production lines, machines, batches and the steps of manufacture belong to the proposed CPG Manufacturing and Supply Chain model.",
+  "subgroups": [
+    {
+      "id": "SCG001",
+      "name": "Food and beverage",
+      "is_primary": true
+    }
+  ],
+  "in_scope": [
+    {
+      "id": "SCI001",
+      "statement": "What a product is — how it is identified, how its variants (sizes, packs and recipes) relate to each other, and how they are grouped under one product definition that is not itself sold"
+    },
+    {
+      "id": "SCI002",
+      "statement": "What a product is made from — its ingredients and packaging, and how much of each. This is the formulation, not the steps of making the product"
+    },
+    {
+      "id": "SCI003",
+      "statement": "What a product and its ingredients must be — specifications and their limits"
+    },
+    {
+      "id": "SCI004",
+      "statement": "What must be declared on pack — ingredients, allergens, nutrition, origin, date marks and claims"
+    },
+    {
+      "id": "SCI005",
+      "statement": "Which suppliers may supply each ingredient, and on what evidence"
+    },
+    {
+      "id": "SCI006",
+      "statement": "What a supplier states about what it supplies, and whether it was checked"
+    },
+    {
+      "id": "SCI007",
+      "statement": "How long a product lasts, and under what storage conditions"
+    },
+    {
+      "id": "SCI009",
+      "statement": "Where each product is sold — the markets, the sales channels and the dates"
+    },
+    {
+      "id": "SCI010",
+      "statement": "The pictures that show each product"
+    },
+    {
+      "id": "SCI011",
+      "statement": "The markets covered: the United States, the European Union and the United Kingdom. For each, what a product must declare on pack, which allergens it must name, the language of the pack and who is named on it as responsible, and the dates and channels it is sold through there"
+    },
+    {
+      "id": "SCI012",
+      "statement": "The core product, and the hierarchy of what goes into what: which products and ingredients make up each product, to any depth. This design holds both, and other models, including CPG Manufacturing and Supply Chain, refer to them and do not hold their own"
+    }
+  ],
+  "out_of_scope": [
+    {
+      "id": "SCO001",
+      "statement": "How a product is made — steps, settings and the instructions issued for a batch",
+      "owned_by": "CPG Manufacturing and Supply Chain model"
+    },
+    {
+      "id": "SCO002",
+      "statement": "Factories, the places inside them down to the shop floor, production lines and the machines in them, and which factory makes a product and which recipe version it uses there.",
+      "owned_by": "CPG Manufacturing and Supply Chain model"
+    },
+    {
+      "id": "SCO003",
+      "statement": "Batches made, what they used, yields and stoppages",
+      "owned_by": "CPG Manufacturing and Supply Chain model"
+    },
+    {
+      "id": "SCO004",
+      "statement": "Supply chain detail: the sites suppliers make and ship from, movements, storage, stock and despatch. A supplier is held here as a company only.",
+      "owned_by": "CPG Manufacturing and Supply Chain model"
+    },
+    {
+      "id": "SCO005",
+      "statement": "Batch-level traceability and recall scoping",
+      "owned_by": "CPG Manufacturing and Supply Chain model"
+    },
+    {
+      "id": "SCO006",
+      "statement": "Testing each delivery of an ingredient. Whether the organisation checked a supplier's document is in scope; testing each delivery is not.",
+      "owned_by": "CPG Manufacturing and Supply Chain model"
+    },
+    {
+      "id": "SCO007",
+      "statement": "Trade spending, pricing and retail execution. Where and through which channel a product is sold is in scope; what it sells for is not.",
+      "owned_by": "Commercial model"
+    },
+    {
+      "id": "SCO008",
+      "statement": "Marketing and campaigns. The pictures that show a product are in scope; how a campaign uses them is not.",
+      "owned_by": "Digital marketing model"
+    },
+    {
+      "id": "SCO010",
+      "statement": "Packing, and the levels a product is packed in for handling, such as case and pallet.",
+      "owned_by": "CPG Manufacturing and Supply Chain model"
+    },
+    {
+      "id": "SCO011",
+      "statement": "A named successor: which product takes over from another when it is discontinued. This is a general capability for any record and not product information. It is held on the general Master record as a Successor field (DMA000000910), which must be given when a record has been merged into another or replaced by one.",
+      "owned_by": "Master data (general)"
+    },
+    {
+      "id": "SCO012",
+      "statement": "Placing each country in a region of the world, and each region on a continent.",
+      "owned_by": "Universal core data model"
+    },
+    {
+      "id": "SCO013",
+      "statement": "Every market other than the United States, the European Union and the United Kingdom, and the labelling rules of those markets. The design holds a country or a wider region as a value in its lists, so it extends to another market without a change of structure, but none is included here by choice.",
+      "owned_by": "Not owned by another model. Left for a later extension"
+    }
+  ],
+  "shared_objects": [
+    {
+      "id": "SCS001",
+      "name": "Legal entities",
+      "dda_id": "DMD000000012"
+    },
+    {
+      "id": "SCS002",
+      "name": "Documents",
+      "dda_id": "DMD000000016"
+    },
+    {
+      "id": "SCS003",
+      "name": "Products",
+      "dda_id": "DMD000000032"
+    }
+  ],
+  "assumptions": [
+    {
+      "id": "SCA001",
+      "statement": "Material held by a supplier is the supplier's. This design is about definitions and declarations, not stock."
+    },
+    {
+      "id": "SCA002",
+      "statement": "Something bought as an ingredient may be another company's finished product, and what is inside it may not be known here."
+    },
+    {
+      "id": "SCA003",
+      "statement": "Where a declaration is worked out from what goes in, the design keeps the inputs and the declared value. It does not keep the calculation."
+    },
+    {
+      "id": "SCA004",
+      "statement": "This design is built from published sources alone. The owner named for each requirement is proposed from those sources."
+    },
+    {
+      "id": "SCA005",
+      "statement": "What changes over time is kept with dates: formulations, specifications, supplier authorisations, certifications and shelf lives. The design does not follow a product from launch to discontinuation as a single lifecycle."
+    },
+    {
+      "id": "SCA006",
+      "statement": "The CPG Manufacturing and Supply Chain, commercial and digital marketing models named in section 2.3 are the intended owners of what this design leaves out. The first is proposed and is not yet in DDA. Whether the others exist is not known."
+    },
+    {
+      "id": "SCA007",
+      "statement": "A manufacturing bill of materials is read as the formulation held here: what goes into a product, including packaging, and how much. How, where and in what order the product is made is not held."
+    },
+    {
+      "id": "SCA008",
+      "statement": "The markets covered are the United States, the European Union and the United Kingdom, and no others. A market is a country, or a wider region of the world, in which a product is intended to be sold. Requirements, allergen lists and label rules are provided for these three markets only. The design holds a market as a value in its lists, so it extends to any other country or wider region without a change of structure. No other market is included here by choice."
+    },
+    {
+      "id": "SCA009",
+      "statement": "A sales channel is the kind of trade a product is sold through in a market, such as grocery, food service or online. It is not a named customer."
+    },
+    {
+      "id": "SCA010",
+      "statement": "Each version of a product is a product in its own right. The product definition above them only groups them and is never made, bought or sold."
+    },
+    {
+      "id": "SCA012",
+      "statement": "The European Union is treated as one market. A product sold in the Union is listed once for the Union and not once for each member country, and the member countries are not mapped to it."
+    },
+    {
+      "id": "SCA013",
+      "statement": "A supplier is held as a company, a Legal Entity playing a role. The places a supplier works from, the places inside a factory down to the shop floor and batches are held in the CPG Manufacturing and Supply Chain model."
+    },
+    {
+      "id": "SCA014",
+      "statement": "The United Kingdom keeps one allergen list, the list for Great Britain. Northern Ireland has no list of its own."
+    },
+    {
+      "id": "SCA015",
+      "statement": "Nutrition values belong to the product itself, whether it is playing the part of an ingredient, a variant or a finished product. Each value names how it was arrived at from a governed list, so any number of ways can be supported by adding values to the list."
+    },
+    {
+      "id": "SCA016",
+      "statement": "All allergen information about a product is held in one concept. A universal list holds each food once, and each market's list names the food each of its allergens is. A market allergen has one food, or one group of foods, above it. How an allergen came to be associated with a product is held as plain text."
+    },
+    {
+      "id": "SCA017",
+      "statement": "Whether a claim still meets its condition is judged by the person responsible for the claim, from the nutrition values the claim names. The condition is held as wording, and the design does not evaluate it."
+    },
+    {
+      "id": "SCA018",
+      "statement": "Product is used by every industry, so the facts only a consumer goods product has are held in its consumer goods definition. The kind recorded there, Logical or Local, says what the product is in the business. The roles Logical Product and Variant come from how products are arranged with one another, and the two are expected to agree; the design does not enforce it. That a product is an Ingredient is a role found from the formulations it appears in, and is not recorded as a kind."
+    }
+  ],
+  "questions_unanswered": [
+    {
+      "id": "SCQ005",
+      "question_no": 12,
+      "note": "Is a single Successor field on the general Master record enough, or should a record be able to name several successors, for example when one product is split into two? The field holds one successor, and a general link between records would be needed for more."
+    }
+  ],
+  "candidate_dda_domains": [
+    "DMD000000012",
+    "DMD000000016"
+  ],
+  "source_cap_per_function": 6,
+  "external_standards": [
+    "Regulation (EU) No 1169/2011",
+    "FDA food labelling, 21 CFR 101",
+    "GS1 GTIN Management Standard",
+    "BRCGS Global Standard for Food Safety",
+    "EuroFIR recipe calculation guideline",
+    "GS1 GLN Allocation Rules",
+    "GS1 Product Image Specification Standard",
+    "GS1 trade channel code list",
+    "UN M49 standard country or area codes for statistical use"
+  ],
+  "platform_capabilities": [
+    "Entity resolution and duplicate detection",
+    "Audit history",
+    "Origin and lineage",
+    "Point-in-time reconstruction"
+  ],
+  "confirmed": {
+    "by": "Andrew Bush",
+    "date": "2026-09-24"
+  },
+  "model": {
+    "dda_id": "DMM000000005",
+    "code": "CPGFoodBeverageProducts",
+    "name": "CPG - Product Definition",
+    "description": "The CPG - Product Definition model holds what a food and beverage manufacturer needs to define a product, what goes into it, who may supply it and who stands behind it. A Made Product is made from Ingredients, and each Ingredient is itself a product. Product is used across industries, so what only a consumer goods product has, including whether it is a Logical or a Local product, is held in its consumer goods definition. A Logical Product groups the Variants that are its sizes and packs, and is never made, bought or sold itself. A Replaceable Ingredient may be replaced by a Permitted Alternative, and a Claiming Product is compared with a Comparator when its pack makes a claim against another product. A Bought Material may be sourced from an Authorised Supplier, which is held only as a company. A Certification Holder holds its certification from a Certifying Body. A Labelled Product names a Responsible Business on its pack. A Declaring Document states properties of a Declared Product, and an Issuing Organisation issues the Issued Document. Which labels and claims a change to a recipe reaches and which suppliers may supply an ingredient on a given date are worked out from these arrangements and not kept as facts of their own. The allergens a product declares are kept for each market, and the ingredient that brings each one is worked out from the formulation. Factories and the places inside them down to the shop floor, supplier sites, batches and supply chain detail belong to a separate, proposed CPG Manufacturing and Supply Chain model."
+  },
+  "withdrawn_items": [
+    {
+      "id": "SCI008",
+      "statement": "Where each product is made, which company runs that factory or supplier site, and which recipe version is used there",
+      "scope_list": "in_scope",
+      "withdrawn_reason": "Moved to the manufacturing model: factories, the places inside them down to the shop floor, supplier sites, batches and supply chain detail belong there. This model holds a supplier only as a company."
+    },
+    {
+      "id": "SCA011",
+      "statement": "A place always belongs to one company at a time. A supplier's site is held as a place run by the supplier, in the same way as the organisation's own factories.",
+      "scope_list": "assumptions",
+      "withdrawn_reason": "Moved to the manufacturing model: factories, the places inside them down to the shop floor, supplier sites, batches and supply chain detail belong there. This model holds a supplier only as a company."
+    },
+    {
+      "id": "SCQ003",
+      "question_no": 10,
+      "note": "Does each factory keep its own version of a product's recipe, or does one recipe cover all of them? The design records the version a factory uses. No source read establishes how often factories differ.",
+      "scope_list": "questions_unanswered",
+      "withdrawn_reason": "Moved to the manufacturing model: factories, the places inside them down to the shop floor, supplier sites, batches and supply chain detail belong there. This model holds a supplier only as a company."
+    },
+    {
+      "id": "SCS004",
+      "name": "Locations",
+      "dda_id": "DMD000000034",
+      "scope_list": "shared_objects",
+      "withdrawn_reason": "Moved to the manufacturing model: factories, the places inside them down to the shop floor, supplier sites, batches and supply chain detail belong there. This model holds a supplier only as a company."
+    },
+    {
+      "id": "SCQ002",
+      "question_no": 9,
+      "note": "Are nutrition values worked out by testing the finished product, by calculating from its ingredients, or both? All three are allowed, and the design keeps how each value was arrived at.",
+      "scope_list": "questions_unanswered",
+      "withdrawn_reason": "Settled: nutrition values belong to the product itself, each with a governed list of the ways a value is arrived at, so tested, calculated and any other way are all supported."
+    },
+    {
+      "id": "SCQ004",
+      "question_no": 11,
+      "note": "The allergen rules read for the United Kingdom market are written for Great Britain, and the design holds that list as the United Kingdom's. No source read says whether Northern Ireland needs a list of its own.",
+      "scope_list": "questions_unanswered",
+      "withdrawn_reason": "Settled: the United Kingdom keeps one allergen list, and Northern Ireland needs none of its own."
+    }
+  ]
+}

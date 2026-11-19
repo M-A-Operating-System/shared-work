@@ -1,0 +1,3484 @@
+{
+  "spec_version": "31.5",
+  "package_ref": "fnb-bdd",
+  "apply_mode": "web-ui",
+  "preconditions": [],
+  "operations": [
+    {
+      "seq": 1,
+      "op": "create",
+      "entity": "lookupTypes",
+      "local_id": "LKP017",
+      "dda_id": null,
+      "fields": {
+        "lookup_type_code": "UniversalAllergens",
+        "lookup_type_name": "UniversalAllergens",
+        "lookup_type_description": "The foods that cause allergies, held once for all markets, with a group above the foods that some markets name together. You can rely on it to say that the food in one market's allergen list is the same food as in another's. It is not a list of what a market requires to be declared, which is each market's own list.",
+        "lookups": [
+          {
+            "lookup_code": "MILK",
+            "lookup_name": "Milk",
+            "lookup_description": "Milk, and foods made from it such as whey and casein."
+          },
+          {
+            "lookup_code": "EGG",
+            "lookup_name": "Egg",
+            "lookup_description": "Egg, and foods made from it."
+          },
+          {
+            "lookup_code": "FISH",
+            "lookup_name": "Fish",
+            "lookup_description": "Fish, and foods made from it."
+          },
+          {
+            "lookup_code": "CRUSTACEAN",
+            "lookup_name": "Crustaceans",
+            "lookup_description": "Crustaceans such as prawns, crab and lobster, and foods made from them."
+          },
+          {
+            "lookup_code": "MOLLUSC",
+            "lookup_name": "Molluscs",
+            "lookup_description": "Molluscs such as mussels, oysters and squid, and foods made from them."
+          },
+          {
+            "lookup_code": "PEANUT",
+            "lookup_name": "Peanuts",
+            "lookup_description": "Peanuts, and foods made from them. A peanut is a legume and is not a tree nut."
+          },
+          {
+            "lookup_code": "SOY",
+            "lookup_name": "Soybeans",
+            "lookup_description": "Soybeans, and foods made from them."
+          },
+          {
+            "lookup_code": "SESAME",
+            "lookup_name": "Sesame",
+            "lookup_description": "Sesame seeds, and foods made from them."
+          },
+          {
+            "lookup_code": "CELERY",
+            "lookup_name": "Celery",
+            "lookup_description": "Celery, including celeriac, and foods made from them."
+          },
+          {
+            "lookup_code": "MUSTARD",
+            "lookup_name": "Mustard",
+            "lookup_description": "Mustard, and foods made from it."
+          },
+          {
+            "lookup_code": "LUPIN",
+            "lookup_name": "Lupin",
+            "lookup_description": "Lupin, and foods made from it."
+          },
+          {
+            "lookup_code": "SULPHITES",
+            "lookup_name": "Sulphur dioxide and sulphites",
+            "lookup_description": "Sulphur dioxide and sulphites, used to preserve food."
+          },
+          {
+            "lookup_code": "TREENUTS",
+            "lookup_name": "Tree nuts",
+            "lookup_description": "Group. The nuts that grow on trees. Markets differ on which nuts count, so each market's own entry says which."
+          },
+          {
+            "lookup_code": "GLUTENCEREALS",
+            "lookup_name": "Cereals containing gluten",
+            "lookup_description": "Group. Wheat, rye, barley and oats, which contain gluten. A market may name the whole group or a single cereal."
+          },
+          {
+            "lookup_code": "WHEAT",
+            "lookup_name": "Wheat",
+            "lookup_description": "Wheat, including spelt and khorasan wheat, and foods made from it.",
+            "lookup_parent_code": "GLUTENCEREALS"
+          },
+          {
+            "lookup_code": "RYE",
+            "lookup_name": "Rye",
+            "lookup_description": "Rye, and foods made from it.",
+            "lookup_parent_code": "GLUTENCEREALS"
+          },
+          {
+            "lookup_code": "BARLEY",
+            "lookup_name": "Barley",
+            "lookup_description": "Barley, and foods made from it.",
+            "lookup_parent_code": "GLUTENCEREALS"
+          },
+          {
+            "lookup_code": "OATS",
+            "lookup_name": "Oats",
+            "lookup_description": "Oats, and foods made from them.",
+            "lookup_parent_code": "GLUTENCEREALS"
+          }
+        ]
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 2,
+      "op": "create",
+      "entity": "lookupTypes",
+      "local_id": "LKP001",
+      "dda_id": null,
+      "fields": {
+        "lookup_type_code": "ProductFoodBevAllergens",
+        "lookup_type_name": "ProductFoodBevAllergens",
+        "lookup_type_description": "The food allergens a product must declare, listed for each market that requires them. Every value carries its market as a prefix, US for the United States, EU for the European Union and GB for Great Britain, so the same food appears once for each market. Each value is one of the foods in the universal list of allergens, or the group of foods the market names together, so the same food is recognised in every market. The United States list has nine allergens, the European Union list fourteen and the Great Britain list fourteen.",
+        "lookups": [
+          {
+            "lookup_code": "US-MILK",
+            "lookup_name": "Milk (US)",
+            "lookup_description": "United States. Declared as milk, including where it arrives as whey or casein.",
+            "lookup_parent": {
+              "lookup_type": "LKP017",
+              "lookup_code": "MILK"
+            }
+          },
+          {
+            "lookup_code": "US-EGG",
+            "lookup_name": "Egg (US)",
+            "lookup_description": "United States. Declared as egg.",
+            "lookup_parent": {
+              "lookup_type": "LKP017",
+              "lookup_code": "EGG"
+            }
+          },
+          {
+            "lookup_code": "US-FISH",
+            "lookup_name": "Fish (US)",
+            "lookup_description": "United States. Declared as fish.",
+            "lookup_parent": {
+              "lookup_type": "LKP017",
+              "lookup_code": "FISH"
+            }
+          },
+          {
+            "lookup_code": "US-CRUSTACEAN",
+            "lookup_name": "Crustacean shellfish (US)",
+            "lookup_description": "United States. Declared as crustacean shellfish.",
+            "lookup_parent": {
+              "lookup_type": "LKP017",
+              "lookup_code": "CRUSTACEAN"
+            }
+          },
+          {
+            "lookup_code": "US-TREENUT",
+            "lookup_name": "Tree nuts (US)",
+            "lookup_description": "United States. Declared by the nut. FDA's list of tree nuts does not include coconut.",
+            "lookup_parent": {
+              "lookup_type": "LKP017",
+              "lookup_code": "TREENUTS"
+            }
+          },
+          {
+            "lookup_code": "US-PEANUT",
+            "lookup_name": "Peanuts (US)",
+            "lookup_description": "United States. Declared as peanuts.",
+            "lookup_parent": {
+              "lookup_type": "LKP017",
+              "lookup_code": "PEANUT"
+            }
+          },
+          {
+            "lookup_code": "US-WHEAT",
+            "lookup_name": "Wheat (US)",
+            "lookup_description": "United States. Declared as wheat.",
+            "lookup_parent": {
+              "lookup_type": "LKP017",
+              "lookup_code": "WHEAT"
+            }
+          },
+          {
+            "lookup_code": "US-SOY",
+            "lookup_name": "Soybeans (US)",
+            "lookup_description": "United States. Declared as soy.",
+            "lookup_parent": {
+              "lookup_type": "LKP017",
+              "lookup_code": "SOY"
+            }
+          },
+          {
+            "lookup_code": "US-SESAME",
+            "lookup_name": "Sesame (US)",
+            "lookup_description": "United States. Declared as sesame. Required since 1 January 2023.",
+            "lookup_parent": {
+              "lookup_type": "LKP017",
+              "lookup_code": "SESAME"
+            }
+          },
+          {
+            "lookup_code": "EU-GLUTEN",
+            "lookup_name": "Cereals containing gluten (EU)",
+            "lookup_description": "European Union. Wheat, including spelt and khorasan, rye, barley and oats, and their hybrids.",
+            "lookup_parent": {
+              "lookup_type": "LKP017",
+              "lookup_code": "GLUTENCEREALS"
+            }
+          },
+          {
+            "lookup_code": "EU-CRUSTACEAN",
+            "lookup_name": "Crustaceans (EU)",
+            "lookup_description": "European Union. Declared as crustaceans.",
+            "lookup_parent": {
+              "lookup_type": "LKP017",
+              "lookup_code": "CRUSTACEAN"
+            }
+          },
+          {
+            "lookup_code": "EU-EGG",
+            "lookup_name": "Egg (EU)",
+            "lookup_description": "European Union. Declared as egg.",
+            "lookup_parent": {
+              "lookup_type": "LKP017",
+              "lookup_code": "EGG"
+            }
+          },
+          {
+            "lookup_code": "EU-FISH",
+            "lookup_name": "Fish (EU)",
+            "lookup_description": "European Union. Declared as fish.",
+            "lookup_parent": {
+              "lookup_type": "LKP017",
+              "lookup_code": "FISH"
+            }
+          },
+          {
+            "lookup_code": "EU-PEANUT",
+            "lookup_name": "Peanuts (EU)",
+            "lookup_description": "European Union. Declared as peanuts.",
+            "lookup_parent": {
+              "lookup_type": "LKP017",
+              "lookup_code": "PEANUT"
+            }
+          },
+          {
+            "lookup_code": "EU-SOY",
+            "lookup_name": "Soybeans (EU)",
+            "lookup_description": "European Union. Declared as soybeans.",
+            "lookup_parent": {
+              "lookup_type": "LKP017",
+              "lookup_code": "SOY"
+            }
+          },
+          {
+            "lookup_code": "EU-MILK",
+            "lookup_name": "Milk (EU)",
+            "lookup_description": "European Union. Declared as milk, including lactose.",
+            "lookup_parent": {
+              "lookup_type": "LKP017",
+              "lookup_code": "MILK"
+            }
+          },
+          {
+            "lookup_code": "EU-TREENUT",
+            "lookup_name": "Nuts (EU)",
+            "lookup_description": "European Union. Almond, hazelnut, walnut, cashew, pecan, Brazil nut, pistachio and macadamia (Queensland nut).",
+            "lookup_parent": {
+              "lookup_type": "LKP017",
+              "lookup_code": "TREENUTS"
+            }
+          },
+          {
+            "lookup_code": "EU-CELERY",
+            "lookup_name": "Celery (EU)",
+            "lookup_description": "European Union. Declared as celery.",
+            "lookup_parent": {
+              "lookup_type": "LKP017",
+              "lookup_code": "CELERY"
+            }
+          },
+          {
+            "lookup_code": "EU-MUSTARD",
+            "lookup_name": "Mustard (EU)",
+            "lookup_description": "European Union. Declared as mustard.",
+            "lookup_parent": {
+              "lookup_type": "LKP017",
+              "lookup_code": "MUSTARD"
+            }
+          },
+          {
+            "lookup_code": "EU-SESAME",
+            "lookup_name": "Sesame seeds (EU)",
+            "lookup_description": "European Union. Declared as sesame seeds.",
+            "lookup_parent": {
+              "lookup_type": "LKP017",
+              "lookup_code": "SESAME"
+            }
+          },
+          {
+            "lookup_code": "EU-SULPHITES",
+            "lookup_name": "Sulphur dioxide and sulphites (EU)",
+            "lookup_description": "European Union. Declared when present at more than 10 mg/kg or 10 mg/L.",
+            "lookup_parent": {
+              "lookup_type": "LKP017",
+              "lookup_code": "SULPHITES"
+            }
+          },
+          {
+            "lookup_code": "EU-LUPIN",
+            "lookup_name": "Lupin (EU)",
+            "lookup_description": "European Union. Declared as lupin.",
+            "lookup_parent": {
+              "lookup_type": "LKP017",
+              "lookup_code": "LUPIN"
+            }
+          },
+          {
+            "lookup_code": "EU-MOLLUSC",
+            "lookup_name": "Molluscs (EU)",
+            "lookup_description": "European Union. Declared as molluscs.",
+            "lookup_parent": {
+              "lookup_type": "LKP017",
+              "lookup_code": "MOLLUSC"
+            }
+          },
+          {
+            "lookup_code": "GB-CELERY",
+            "lookup_name": "Celery (GB)",
+            "lookup_description": "Great Britain. Declared as celery.",
+            "lookup_parent": {
+              "lookup_type": "LKP017",
+              "lookup_code": "CELERY"
+            }
+          },
+          {
+            "lookup_code": "GB-GLUTEN",
+            "lookup_name": "Cereals containing gluten (GB)",
+            "lookup_description": "Great Britain. Declared by the cereal: wheat, including spelt and Khorasan, rye, barley and oats.",
+            "lookup_parent": {
+              "lookup_type": "LKP017",
+              "lookup_code": "GLUTENCEREALS"
+            }
+          },
+          {
+            "lookup_code": "GB-CRUSTACEAN",
+            "lookup_name": "Crustaceans (GB)",
+            "lookup_description": "Great Britain. Declared as crustaceans.",
+            "lookup_parent": {
+              "lookup_type": "LKP017",
+              "lookup_code": "CRUSTACEAN"
+            }
+          },
+          {
+            "lookup_code": "GB-EGG",
+            "lookup_name": "Eggs (GB)",
+            "lookup_description": "Great Britain. Declared as egg.",
+            "lookup_parent": {
+              "lookup_type": "LKP017",
+              "lookup_code": "EGG"
+            }
+          },
+          {
+            "lookup_code": "GB-FISH",
+            "lookup_name": "Fish (GB)",
+            "lookup_description": "Great Britain. Declared as fish.",
+            "lookup_parent": {
+              "lookup_type": "LKP017",
+              "lookup_code": "FISH"
+            }
+          },
+          {
+            "lookup_code": "GB-LUPIN",
+            "lookup_name": "Lupin (GB)",
+            "lookup_description": "Great Britain. Declared as lupin.",
+            "lookup_parent": {
+              "lookup_type": "LKP017",
+              "lookup_code": "LUPIN"
+            }
+          },
+          {
+            "lookup_code": "GB-MILK",
+            "lookup_name": "Milk (GB)",
+            "lookup_description": "Great Britain. Declared as milk.",
+            "lookup_parent": {
+              "lookup_type": "LKP017",
+              "lookup_code": "MILK"
+            }
+          },
+          {
+            "lookup_code": "GB-MOLLUSC",
+            "lookup_name": "Molluscs (GB)",
+            "lookup_description": "Great Britain. Declared as molluscs.",
+            "lookup_parent": {
+              "lookup_type": "LKP017",
+              "lookup_code": "MOLLUSC"
+            }
+          },
+          {
+            "lookup_code": "GB-MUSTARD",
+            "lookup_name": "Mustard (GB)",
+            "lookup_description": "Great Britain. Declared as mustard.",
+            "lookup_parent": {
+              "lookup_type": "LKP017",
+              "lookup_code": "MUSTARD"
+            }
+          },
+          {
+            "lookup_code": "GB-TREENUT",
+            "lookup_name": "Tree nuts (GB)",
+            "lookup_description": "Great Britain. Declared by the nut: almonds, hazelnuts, walnuts, Brazil nuts, cashews, pecans, pistachios and macadamia nuts.",
+            "lookup_parent": {
+              "lookup_type": "LKP017",
+              "lookup_code": "TREENUTS"
+            }
+          },
+          {
+            "lookup_code": "GB-PEANUT",
+            "lookup_name": "Peanuts (GB)",
+            "lookup_description": "Great Britain. Declared as peanuts.",
+            "lookup_parent": {
+              "lookup_type": "LKP017",
+              "lookup_code": "PEANUT"
+            }
+          },
+          {
+            "lookup_code": "GB-SESAME",
+            "lookup_name": "Sesame seeds (GB)",
+            "lookup_description": "Great Britain. Declared as sesame.",
+            "lookup_parent": {
+              "lookup_type": "LKP017",
+              "lookup_code": "SESAME"
+            }
+          },
+          {
+            "lookup_code": "GB-SOY",
+            "lookup_name": "Soybeans (GB)",
+            "lookup_description": "Great Britain. Declared as soybeans.",
+            "lookup_parent": {
+              "lookup_type": "LKP017",
+              "lookup_code": "SOY"
+            }
+          },
+          {
+            "lookup_code": "GB-SULPHITES",
+            "lookup_name": "Sulphur dioxide and sulphites (GB)",
+            "lookup_description": "Great Britain. Declared where above ten parts per million.",
+            "lookup_parent": {
+              "lookup_type": "LKP017",
+              "lookup_code": "SULPHITES"
+            }
+          }
+        ]
+      },
+      "depends_on": [
+        1
+      ]
+    },
+    {
+      "seq": 3,
+      "op": "create",
+      "entity": "lookupTypes",
+      "local_id": "LKP002",
+      "dda_id": null,
+      "fields": {
+        "lookup_type_code": "ProductNutritionValuesBasisTypes",
+        "lookup_type_name": "ProductNutritionValuesBasisTypes",
+        "lookup_type_description": "How a declared nutrition value was arrived at: by testing the finished food, by calculating from its ingredients, or from accepted published data. Every value must say which way it used.",
+        "lookups": [
+          {
+            "lookup_code": "ANALYSIS",
+            "lookup_name": "Analysis of the food",
+            "lookup_description": "Measured in the finished product."
+          },
+          {
+            "lookup_code": "CALCULATION",
+            "lookup_name": "Calculation from ingredients",
+            "lookup_description": "Worked out from the known values of the ingredients used, allowing for edible portion, yield and nutrient loss."
+          },
+          {
+            "lookup_code": "PUBLISHED",
+            "lookup_name": "Accepted published data",
+            "lookup_description": "Taken from generally established and accepted data."
+          }
+        ]
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 4,
+      "op": "create",
+      "entity": "lookupTypes",
+      "local_id": "LKP003",
+      "dda_id": null,
+      "fields": {
+        "lookup_type_code": "ProductNutritionValuesNutrientTypes",
+        "lookup_type_name": "ProductNutritionValuesNutrientTypes",
+        "lookup_type_description": "The nutrients and energy that a nutrition declaration must show: energy, fat, saturates, carbohydrate, sugars, protein and salt. Others may be shown as well.",
+        "lookups": [
+          {
+            "lookup_code": "ENERGY",
+            "lookup_name": "Energy",
+            "lookup_description": "The energy value of the food."
+          },
+          {
+            "lookup_code": "FAT",
+            "lookup_name": "Fat",
+            "lookup_description": "Total fat."
+          },
+          {
+            "lookup_code": "SATURATES",
+            "lookup_name": "Saturates",
+            "lookup_description": "Saturated fat."
+          },
+          {
+            "lookup_code": "CARBOHYDRATE",
+            "lookup_name": "Carbohydrate",
+            "lookup_description": "Total carbohydrate."
+          },
+          {
+            "lookup_code": "SUGARS",
+            "lookup_name": "Sugars",
+            "lookup_description": "Sugars within the carbohydrate."
+          },
+          {
+            "lookup_code": "PROTEIN",
+            "lookup_name": "Protein",
+            "lookup_description": "Total protein."
+          },
+          {
+            "lookup_code": "SALT",
+            "lookup_name": "Salt",
+            "lookup_description": "Salt, or the sodium it is worked out from."
+          }
+        ]
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 5,
+      "op": "create",
+      "entity": "lookupTypes",
+      "local_id": "LKP004",
+      "dda_id": null,
+      "fields": {
+        "lookup_type_code": "ProductLabelItemsTypes",
+        "lookup_type_name": "ProductLabelItemsTypes",
+        "lookup_type_description": "The items that a pre-packed food label must show, such as the name of the food, its ingredients, allergens, net quantity, date mark and the business responsible for it.",
+        "lookups": [
+          {
+            "lookup_code": "NAME",
+            "lookup_name": "Name of the food",
+            "lookup_description": "The name the food is sold under."
+          },
+          {
+            "lookup_code": "INGREDIENTS",
+            "lookup_name": "Ingredient list",
+            "lookup_description": "Every ingredient, heaviest first."
+          },
+          {
+            "lookup_code": "ALLERGENS",
+            "lookup_name": "Allergen information",
+            "lookup_description": "Allergens, named by the food they come from."
+          },
+          {
+            "lookup_code": "QUID",
+            "lookup_name": "Quantity of certain ingredients",
+            "lookup_description": "The amount of an ingredient that the name or pack stresses."
+          },
+          {
+            "lookup_code": "NETQUANTITY",
+            "lookup_name": "Net quantity",
+            "lookup_description": "How much food is in the pack."
+          },
+          {
+            "lookup_code": "DATEMARK",
+            "lookup_name": "Date mark",
+            "lookup_description": "The use-by or best-before date."
+          },
+          {
+            "lookup_code": "STORAGE",
+            "lookup_name": "Storage and use conditions",
+            "lookup_description": "How to store and use the food."
+          },
+          {
+            "lookup_code": "OPERATOR",
+            "lookup_name": "Responsible business",
+            "lookup_description": "The business answerable for the food, and its address."
+          },
+          {
+            "lookup_code": "ORIGIN",
+            "lookup_name": "Country of origin",
+            "lookup_description": "Where the food, or its main ingredient, comes from."
+          },
+          {
+            "lookup_code": "NUTRITION",
+            "lookup_name": "Nutrition declaration",
+            "lookup_description": "Energy and the main nutrients."
+          },
+          {
+            "lookup_code": "BATCH",
+            "lookup_name": "Batch number",
+            "lookup_description": "Required in some markets only."
+          }
+        ]
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 6,
+      "op": "create",
+      "entity": "lookupTypes",
+      "local_id": "LKP005",
+      "dda_id": null,
+      "fields": {
+        "lookup_type_code": "ProductShelfLivesDateMarkTypes",
+        "lookup_type_name": "ProductShelfLivesDateMarkTypes",
+        "lookup_type_description": "The two kinds of date mark a food can carry: use-by for foods that could soon become unsafe, and best-before for foods that only lose quality.",
+        "lookups": [
+          {
+            "lookup_code": "USEBY",
+            "lookup_name": "Use by",
+            "lookup_description": "For foods that could soon become unsafe. After the date the food cannot be sold."
+          },
+          {
+            "lookup_code": "BESTBEFORE",
+            "lookup_name": "Best before",
+            "lookup_description": "For foods that only lose quality. Past the date the food may still be safe."
+          }
+        ]
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 7,
+      "op": "create",
+      "entity": "lookupTypes",
+      "local_id": "LKP006",
+      "dda_id": null,
+      "fields": {
+        "lookup_type_code": "ProductClaimsTypes",
+        "lookup_type_name": "ProductClaimsTypes",
+        "lookup_type_description": "The two kinds of claim a pack can make, which decide the conditions it must meet: a claim about what the food contains, and a claim that compares it with another product.",
+        "lookups": [
+          {
+            "lookup_code": "CONTENT",
+            "lookup_name": "Nutrition content claim",
+            "lookup_description": "Rests on a declared value meeting a fixed condition, such as a source of a vitamin."
+          },
+          {
+            "lookup_code": "COMPARATIVE",
+            "lookup_name": "Comparative claim",
+            "lookup_description": "Rests on a stated difference against a named comparator."
+          }
+        ]
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 8,
+      "op": "create",
+      "entity": "lookupTypes",
+      "local_id": "LKP007",
+      "dda_id": null,
+      "fields": {
+        "lookup_type_code": "ProductVariantsAxisTypes",
+        "lookup_type_name": "ProductVariantsAxisTypes",
+        "lookup_type_description": "The ways the members of a family of products can differ from one another: in size, in the kind of pack, or in how many units the pack holds.",
+        "lookups": [
+          {
+            "lookup_code": "SIZE",
+            "lookup_name": "Size",
+            "lookup_description": "Differs in how much food the pack holds."
+          },
+          {
+            "lookup_code": "FORMAT",
+            "lookup_name": "Format",
+            "lookup_description": "Differs in the shape or kind of pack."
+          },
+          {
+            "lookup_code": "PACKCOUNT",
+            "lookup_name": "Pack count",
+            "lookup_description": "Differs in how many units are in the pack."
+          }
+        ]
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 9,
+      "op": "create",
+      "entity": "lookupTypes",
+      "local_id": "LKP008",
+      "dda_id": null,
+      "fields": {
+        "lookup_type_code": "DocumentTypes",
+        "lookup_type_name": "DocumentTypes",
+        "lookup_type_description": "The kinds of document that state facts about a product or an ingredient: a certificate of analysis, a change notice, a certification document or a specification sheet.",
+        "lookups": [
+          {
+            "lookup_code": "COA",
+            "lookup_name": "Certificate of analysis",
+            "lookup_description": "A supplier's statement of what a delivery contains and how it was tested."
+          },
+          {
+            "lookup_code": "CHANGENOTICE",
+            "lookup_name": "Change notice",
+            "lookup_description": "A supplier's notice of a change that could affect an ingredient."
+          },
+          {
+            "lookup_code": "CERTIFICATION",
+            "lookup_name": "Certification document",
+            "lookup_description": "A certificate showing that a body has granted a certification."
+          },
+          {
+            "lookup_code": "SPECSHEET",
+            "lookup_name": "Specification sheet",
+            "lookup_description": "A statement of what an ingredient or product must be."
+          }
+        ]
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 10,
+      "op": "update",
+      "entity": "lookupTypes",
+      "local_id": "LKP009",
+      "dda_id": "DLT000000156",
+      "fields": {
+        "lookups_to_add": [
+          {
+            "lookup_code": "KG",
+            "lookup_name": "Kilogram",
+            "lookup_description": "Mass in kilograms."
+          },
+          {
+            "lookup_code": "G",
+            "lookup_name": "Gram",
+            "lookup_description": "Mass in grams."
+          },
+          {
+            "lookup_code": "L",
+            "lookup_name": "Litre",
+            "lookup_description": "Volume in litres."
+          },
+          {
+            "lookup_code": "ML",
+            "lookup_name": "Millilitre",
+            "lookup_description": "Volume in millilitres."
+          },
+          {
+            "lookup_code": "EA",
+            "lookup_name": "Each",
+            "lookup_description": "A count of items."
+          },
+          {
+            "lookup_code": "PCT",
+            "lookup_name": "Per cent",
+            "lookup_description": "A share of the whole, in per cent."
+          },
+          {
+            "lookup_code": "CASE",
+            "lookup_name": "Case",
+            "lookup_description": "A count of cases."
+          }
+        ]
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 11,
+      "op": "update",
+      "entity": "lookupTypes",
+      "local_id": "LKP011",
+      "dda_id": "DLT000000064",
+      "fields": {
+        "lookups_to_add": [
+          {
+            "lookup_code": "GTIN",
+            "lookup_name": "Trade item number",
+            "lookup_description": "The global trade item number allocated to a product under GS1 rules."
+          },
+          {
+            "lookup_code": "MATERIALNUMBER",
+            "lookup_name": "Internal material number",
+            "lookup_description": "The organisation's own number for a product."
+          },
+          {
+            "lookup_code": "SUPPLIERPART",
+            "lookup_name": "Supplier part number",
+            "lookup_description": "The supplier's own number for what it sells."
+          }
+        ]
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 12,
+      "op": "create",
+      "entity": "lookupTypes",
+      "local_id": "LKP012",
+      "dda_id": null,
+      "fields": {
+        "lookup_type_code": "UniversalRegions",
+        "lookup_type_name": "UniversalRegions",
+        "lookup_type_description": "The wider areas of the world that food rules treat as one market. In this design it holds the European Union. You can rely on it to name a market that is wider than one country. It does not place countries in regions, which the universal core data model does, and it holds no country.",
+        "lookups": [
+          {
+            "lookup_code": "EU",
+            "lookup_name": "European Union",
+            "lookup_description": "A group of countries that sets food rules as one market. Held as one market and not as the list of its member countries."
+          }
+        ]
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 13,
+      "op": "create",
+      "entity": "lookupTypes",
+      "local_id": "LKP013",
+      "dda_id": null,
+      "fields": {
+        "lookup_type_code": "ProductChannelsTypes",
+        "lookup_type_name": "ProductChannelsTypes",
+        "lookup_type_description": "The kinds of trade a food product is sold through, taken from the published trade channel list and limited to those a food business sells through. Every sales channel must name one.",
+        "lookups": [
+          {
+            "lookup_code": "GROCERY",
+            "lookup_name": "Grocery",
+            "lookup_description": "Retailers of a broad range of food products."
+          },
+          {
+            "lookup_code": "CONVENIENCE",
+            "lookup_name": "Convenience",
+            "lookup_description": "Small-format stores, often at or next to fuel stations."
+          },
+          {
+            "lookup_code": "FOODSERVICE",
+            "lookup_name": "Food service",
+            "lookup_description": "Sales of prepared food to restaurants, hotels and clubs."
+          },
+          {
+            "lookup_code": "CASHANDCARRY",
+            "lookup_name": "Cash and carry",
+            "lookup_description": "Self-service wholesale warehouse trade, sometimes called club."
+          },
+          {
+            "lookup_code": "MASSMERCHANDISING",
+            "lookup_name": "Mass merchandising",
+            "lookup_description": "Large department-organised stores offering wide product categories under one roof."
+          },
+          {
+            "lookup_code": "SPECIALTYRETAIL",
+            "lookup_name": "Specialty retail",
+            "lookup_description": "Retailers focused on one merchandise line with a deep range for a selective customer base."
+          },
+          {
+            "lookup_code": "ONLINE",
+            "lookup_name": "Online",
+            "lookup_description": "Items sold online and shipped to consumers or pickup locations."
+          },
+          {
+            "lookup_code": "VENDING",
+            "lookup_name": "Vending",
+            "lookup_description": "Sales through vending machines."
+          },
+          {
+            "lookup_code": "DUTYFREE",
+            "lookup_name": "Duty free",
+            "lookup_description": "Tax-exempt retail outlets for travellers leaving the country."
+          },
+          {
+            "lookup_code": "INSTITUTIONAL",
+            "lookup_name": "Institutional",
+            "lookup_description": "Sales to schools, universities and research centres."
+          }
+        ]
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 14,
+      "op": "create",
+      "entity": "lookupTypes",
+      "local_id": "LKP014",
+      "dda_id": null,
+      "fields": {
+        "lookup_type_code": "ProductImagesSides",
+        "lookup_type_name": "ProductImagesSides",
+        "lookup_type_description": "The side of a product that a picture shows, such as the front or the back, taken from the published picture standard. You can rely on it for which side a picture is of. It is not the kind of file the picture is held as. Every product picture must name one.",
+        "lookups": [
+          {
+            "lookup_code": "FRONT",
+            "lookup_name": "Front",
+            "lookup_description": "The front of the product as set by GS1."
+          },
+          {
+            "lookup_code": "BACK",
+            "lookup_name": "Back",
+            "lookup_description": "The back of the product."
+          },
+          {
+            "lookup_code": "LEFT",
+            "lookup_name": "Left",
+            "lookup_description": "The left side of the product."
+          },
+          {
+            "lookup_code": "RIGHT",
+            "lookup_name": "Right",
+            "lookup_description": "The right side of the product."
+          },
+          {
+            "lookup_code": "TOP",
+            "lookup_name": "Top",
+            "lookup_description": "The top of the product."
+          },
+          {
+            "lookup_code": "BOTTOM",
+            "lookup_name": "Bottom",
+            "lookup_description": "The bottom of the product."
+          }
+        ]
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 15,
+      "op": "create",
+      "entity": "lookupTypes",
+      "local_id": "LKP015",
+      "dda_id": null,
+      "fields": {
+        "lookup_type_code": "ProductImagesFileTypes",
+        "lookup_type_name": "ProductImagesFileTypes",
+        "lookup_type_description": "The kinds of file a product picture is held as. Every product picture must name one.",
+        "lookups": [
+          {
+            "lookup_code": "JPEG",
+            "lookup_name": "JPEG",
+            "lookup_description": "A compressed picture file used for sharing."
+          },
+          {
+            "lookup_code": "PNG",
+            "lookup_name": "PNG",
+            "lookup_description": "A picture file used for sharing."
+          },
+          {
+            "lookup_code": "TIFF",
+            "lookup_name": "TIFF",
+            "lookup_description": "A picture file used for keeping the master copy."
+          }
+        ]
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 16,
+      "op": "create",
+      "entity": "lookupTypes",
+      "local_id": "LKP018",
+      "dda_id": null,
+      "fields": {
+        "lookup_type_code": "ProductAllergensPresenceTypes",
+        "lookup_type_name": "ProductAllergensPresenceTypes",
+        "lookup_type_description": "Whether a product contains an allergen or only may be present through cross-contact. You can rely on it to separate an allergen the food is made with from an allergen that could be present without being an ingredient. It is not the reason, which is the explanation held with the allergen.",
+        "lookups": [
+          {
+            "lookup_code": "CONTAINS",
+            "lookup_name": "Contains",
+            "lookup_description": "The allergen is in the product by design: it comes from an ingredient, and is declared by the food it comes from."
+          },
+          {
+            "lookup_code": "MAY-CONTAIN",
+            "lookup_name": "May contain",
+            "lookup_description": "The allergen is not an ingredient but could be present through cross-contact that cannot be avoided. The explanation held with it says how."
+          }
+        ]
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 17,
+      "op": "create",
+      "entity": "lookupTypes",
+      "local_id": "LKP019",
+      "dda_id": null,
+      "fields": {
+        "lookup_type_code": "ProductCPGDefinitionCPGProductTypes",
+        "lookup_type_name": "ProductCPGDefinitionCPGProductTypes",
+        "lookup_type_description": "The two kinds of consumer goods product that set a product apart by what it is: a grouping of related sizes and packs, and a version that can be sold. You can rely on it to say which of the two a product is. It is not whether the product is an ingredient, which is found from the formulations it appears in, nor the link from a version to its grouping, which is kept separately between products.",
+        "lookups": [
+          {
+            "lookup_code": "LOGICAL",
+            "lookup_name": "Logical",
+            "lookup_description": "A product that stands for a group of related sizes, formats and pack counts, each of which is a product in its own right. It holds what the versions share and is never made, bought or sold."
+          },
+          {
+            "lookup_code": "LOCAL",
+            "lookup_name": "Local",
+            "lookup_description": "A version of a logical product that can be sold, such as one size, format or pack count of it. It is sold and counted on its own."
+          }
+        ]
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 18,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ001",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "Product",
+        "concept_name": "Product",
+        "concept_description": "There is one of these for each product the business sells, for each ingredient or packaging item it buys to make one, and for each product definition that only groups related sizes and packs. Everything else about a product refers back to it: what it is made from, what it must be, how long it lasts and what its pack says are each kept in their own concept. It is not a batch, which is one production run of a product, and it is not the facts that only a consumer goods product has, which the product's consumer goods definition holds.",
+        "concept_parent": "DMC000000100",
+        "concept_parent_rel": "ONE_TO_ONE_OPTIONAL",
+        "concept_is_domain": "DMD000000032"
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 19,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ002",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "ProductIdentifiers",
+        "concept_name": "ProductIdentifiers",
+        "concept_description": "There is one of these for each identifier a product is known by, in each scheme, such as a trade item number or the organisation's own material number. You can rely on it to say which identifiers belong to which product and who issued each. It is not the name of the product, which belongs to the product itself, and it is not an identifier of an organisation, which belongs to the legal entity identifiers.",
+        "concept_parent": "SBJ001",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        18
+      ]
+    },
+    {
+      "seq": 20,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ003",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "ProductFormulationVersions",
+        "concept_name": "ProductFormulationVersions",
+        "concept_description": "There is one of these for each version of a product's formulation, with the date it applies from and the market it applies in. You can rely on it to say which version of what goes into a product is in force, so that every ingredient line belongs to exactly one version. It is not the ingredient lines themselves, which are the relationship between a product and what it is made from.",
+        "concept_parent": "SBJ001",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        18
+      ]
+    },
+    {
+      "seq": 21,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ004",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "ProductSpecifications",
+        "concept_name": "ProductSpecifications",
+        "concept_description": "There is one of these for each limit on one characteristic of a product or ingredient, in each version of its specification. You can rely on it for what a product or ingredient must be on any past date. It is not what a supplier says it delivered, which comes from the supplier's documents, and it is not the testing of a delivery, which belongs to the manufacturing model.",
+        "concept_parent": "SBJ001",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        18
+      ]
+    },
+    {
+      "seq": 22,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ005",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "ProductAllergens",
+        "concept_name": "ProductAllergens",
+        "concept_description": "There is one of these for each allergen a product declares in a market, either because it contains the allergen or because the allergen may be present. The allergen is a value from the list for that market, so a product sold in two markets has an entry for each. You can rely on it to say which allergens are declared, whether each is contained or only may be present, how each came to be associated with the product, and whether it is known only because a supplier said so; for a product made from other products, the contained allergens come from its formulation. It is not the production line or the factory that cross-contact arises in, which belong to the manufacturing model.",
+        "concept_parent": "SBJ001",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        18
+      ]
+    },
+    {
+      "seq": 23,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ006",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "ProductNutritionValues",
+        "concept_name": "ProductNutritionValues",
+        "concept_description": "There is one of these for each nutrient value shown on a pack, for each way it was arrived at. It belongs to the product itself, whether the product is playing the part of an ingredient, a variant or a finished product. You can rely on it for the value, how it was arrived at and how far it may vary. It is not the ingredient lines a calculated value rests on, which are the product's formulation, and it is not the claims made from a value, which are kept as claims.",
+        "concept_parent": "SBJ001",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        18
+      ]
+    },
+    {
+      "seq": 24,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ009",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "ProductShelfLives",
+        "concept_name": "ProductShelfLives",
+        "concept_description": "There is one of these for each storage condition under which a product, ingredient or part-made good has a stated shelf life. You can rely on it for how long the item lasts under that storage, which date mark it carries, and the lowest and highest temperature it may be kept at. It is not the date on a particular batch, which is a manufacturing matter.",
+        "concept_parent": "SBJ001",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        18
+      ]
+    },
+    {
+      "seq": 25,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ010",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "ProductOrigins",
+        "concept_name": "ProductOrigins",
+        "concept_description": "There is one of these for each country of origin declared for a product or ingredient. You can rely on it for which country is declared and what the statement rests on. It is not the wording printed on the pack, which is a label item, and it is not who supplies the ingredient, which comes from its authorised suppliers.",
+        "concept_parent": "SBJ001",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        18
+      ]
+    },
+    {
+      "seq": 26,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ011",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "ProductFraudAssessments",
+        "concept_name": "ProductFraudAssessments",
+        "concept_description": "There is one of these for each assessment of an ingredient's exposure to tampering or substitution. You can rely on it for how likely the ingredient is judged to be swapped for something cheaper, what that rested on, and what extra checks it calls for. It is not the checks made on a delivery, which are a manufacturing matter.",
+        "concept_parent": "SBJ001",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        18
+      ]
+    },
+    {
+      "seq": 27,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ012",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "ProductIdentityChanges",
+        "concept_name": "ProductIdentityChanges",
+        "concept_description": "There is one of these for each change made to a product that affects what it is. You can rely on it to say whether the change made a different product or only a new version of what goes in, and why. It is not the new version itself, which is a formulation version, and a different product is a product of its own.",
+        "concept_parent": "SBJ001",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        18
+      ]
+    },
+    {
+      "seq": 28,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ017",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "DocumentDeclarations",
+        "concept_name": "DocumentDeclarations",
+        "concept_description": "There is one of these for each property a document states about a product or ingredient. You can rely on it for what the document says, one property at a time. It is not who issued the document or which product it is about, which come from the document's relationships, and it is not whether the organisation checked the statement, which is kept with the link to the product.",
+        "concept_parent": "DMC000000142",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 29,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ019",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "ProductMarkets",
+        "concept_name": "ProductMarkets",
+        "concept_description": "There is one of these for each market, a country or a wider region, in which a product is intended to be sold during a stated period. You can rely on it for where the product is sold and from when to when, and the pack items and claims it carries in that market hang from it. It is not the way the product is sold there, which is the sales channel, and it is not the rules of the market, which are applied through the label items and claims.",
+        "concept_parent": "SBJ001",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        18
+      ]
+    },
+    {
+      "seq": 30,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ020",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "ProductChannels",
+        "concept_name": "ProductChannels",
+        "concept_description": "There is one of these for each sales channel, such as grocery, food service or online, through which a product is sold in a market during a stated period. You can rely on it for how the product reaches buyers in that market. It is not a named customer, and it is not a price.",
+        "concept_parent": "SBJ019",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        29
+      ]
+    },
+    {
+      "seq": 31,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ021",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "ProductImages",
+        "concept_name": "ProductImages",
+        "concept_description": "There is one of these for each picture of a product taken from one side, for each period in which it is the current picture. You can rely on it for which side it shows and where the file is held. It is not the artwork printed on the pack, which is kept as label items, and it is not a document that gives evidence, which is a document.",
+        "concept_parent": "SBJ001",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        18
+      ]
+    },
+    {
+      "seq": 32,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ022",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "ProductCPGDefinition",
+        "concept_name": "ProductCPGDefinition",
+        "concept_description": "There is one of these for each product that the consumer goods business makes, buys or sells; a product of another industry has none. You can rely on it for the facts only a consumer goods product has: whether it is a Logical or a Local product, the name the law requires on its pack, and how much its pack contains. It is not the product's own name and identity, which every industry shares, and it is not what the product is made from, its allergens or its labels, which are kept separately.",
+        "concept_parent": "SBJ001",
+        "concept_parent_rel": "ONE_TO_ONE_OPTIONAL"
+      },
+      "depends_on": [
+        18
+      ]
+    },
+    {
+      "seq": 33,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ007",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "ProductLabelItems",
+        "concept_name": "ProductLabelItems",
+        "concept_description": "There is one of these for each item a pack must print in a market, such as the name of the food or the storage instructions. You can rely on it for what the pack actually prints and the language it prints it in, which can differ from what the formulation says it should print, so a pack that is out of step can be seen. It is not the allergen or nutrition facts, which are kept in their own concepts.",
+        "concept_parent": "SBJ019",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        29
+      ]
+    },
+    {
+      "seq": 34,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ008",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "ProductClaims",
+        "concept_name": "ProductClaims",
+        "concept_description": "There is one of these for each claim a pack makes in a market. You can rely on it for the wording, the nutrient it is about where it is about one, and the condition it rests on. It is not the nutrition values a condition rests on, which are kept as nutrition values, and the product a claim compares with is named through the comparison relationship.",
+        "concept_parent": "SBJ019",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        29
+      ]
+    },
+    {
+      "seq": 35,
+      "op": "create",
+      "entity": "roles",
+      "local_id": "ROL001",
+      "dda_id": null,
+      "fields": {
+        "role_code": "CPGMadeProduct",
+        "role_name": "Made Product",
+        "role_description": "A product is a Made Product while the organisation makes it. This is how the parts of a finished product are found. It is not a Variant, which is only another size or pack of the same product. A product the organisation stops making stops being a Made Product, and its earlier formulation remains on record.",
+        "role_domains": [
+          "DMD000000032"
+        ]
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 36,
+      "op": "create",
+      "entity": "roles",
+      "local_id": "ROL002",
+      "dda_id": null,
+      "fields": {
+        "role_code": "CPGIngredient",
+        "role_name": "Ingredient",
+        "role_description": "A product is an Ingredient while it goes into another product. This is how every product an ingredient ends up in is found. It is not a Bought Material, which says an item is bought in and nothing about where it goes. A product that goes into no other product stops being an Ingredient, and its earlier uses remain on record.",
+        "role_domains": [
+          "DMD000000032"
+        ]
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 37,
+      "op": "create",
+      "entity": "roles",
+      "local_id": "ROL003",
+      "dda_id": null,
+      "fields": {
+        "role_code": "CPGVariant",
+        "role_name": "Variant",
+        "role_description": "A product is a Variant while it belongs to a Logical Product that groups related sizes and packs, such as the 200g pack of a biscuit. It is sold and counted on its own. It is not a Made Product, which is defined by what goes into it and not by the group it belongs to. A product that leaves its group stops being a Variant, and its earlier membership remains on record.",
+        "role_domains": [
+          "DMD000000032"
+        ]
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 38,
+      "op": "create",
+      "entity": "roles",
+      "local_id": "ROL004",
+      "dda_id": null,
+      "fields": {
+        "role_code": "CPGLogicalProduct",
+        "role_name": "Logical Product",
+        "role_description": "A product is a Logical Product while it stands for a group of related sizes, formats and pack counts, each of which is a product in its own right. It holds what the versions share and is never itself made, bought or sold. It is not an Ingredient, which is defined by where a product goes and not by what it groups. A product definition with no sizes or packs left stops being a Logical Product, and its history remains on record.",
+        "role_domains": [
+          "DMD000000032"
+        ]
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 39,
+      "op": "create",
+      "entity": "roles",
+      "local_id": "ROL005",
+      "dda_id": null,
+      "fields": {
+        "role_code": "CPGReplaceableIngredient",
+        "role_name": "Replaceable Ingredient",
+        "role_description": "A product is a Replaceable Ingredient while it may be replaced by another product. It shows which ingredients have a cleared substitute, so the effect of a swap on the label can be looked up. It is not an Ingredient, which says only that an item goes into something. An ingredient whose cleared replacements have all ended stops being a Replaceable Ingredient, and the earlier replacements remain on record.",
+        "role_domains": [
+          "DMD000000032"
+        ]
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 40,
+      "op": "create",
+      "entity": "roles",
+      "local_id": "ROL006",
+      "dda_id": null,
+      "fields": {
+        "role_code": "CPGPermittedAlternative",
+        "role_name": "Permitted Alternative",
+        "role_description": "A product is a Permitted Alternative while it may stand in for another product, under stated conditions. It is not a Bought Material, which is about who supplies an item and not about whether it may replace another. A product whose clearance ends stops being a Permitted Alternative, and the earlier clearance remains on record.",
+        "role_domains": [
+          "DMD000000032"
+        ]
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 41,
+      "op": "create",
+      "entity": "roles",
+      "local_id": "ROL007",
+      "dda_id": null,
+      "fields": {
+        "role_code": "CPGClaimingProduct",
+        "role_name": "Claiming Product",
+        "role_description": "A product is a Claiming Product while it is compared with another product in a claim on its pack, such as lower in sugar than another. It is not a Labelled Product, which is defined by naming a responsible business and not by making a comparison. A product that stops making the claim stops being a Claiming Product, and the earlier comparison remains on record.",
+        "role_domains": [
+          "DMD000000032"
+        ]
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 42,
+      "op": "create",
+      "entity": "roles",
+      "local_id": "ROL008",
+      "dda_id": null,
+      "fields": {
+        "role_code": "CPGComparator",
+        "role_name": "Comparator",
+        "role_description": "A product is a Comparator while it is used to compare another product in a claim on that product's pack. It is the reference the claim is measured against, whether a named product or an average of leading brands. It is not a Permitted Alternative, which stands in for an ingredient and is not measured against. A product that ceases to be used as a reference stops being a Comparator, and the earlier comparison remains on record.",
+        "role_domains": [
+          "DMD000000032"
+        ]
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 43,
+      "op": "create",
+      "entity": "roles",
+      "local_id": "ROL009",
+      "dda_id": null,
+      "fields": {
+        "role_code": "CPGBoughtMaterial",
+        "role_name": "Bought Material",
+        "role_description": "A product is a Bought Material while it may be sourced from an outside organisation. It shows which ingredients rely on an outside organisation. It is not an Ingredient, which is about where an item goes and not where it comes from. An ingredient the organisation stops buying in stops being a Bought Material, and its earlier sources remain on record.",
+        "role_domains": [
+          "DMD000000032"
+        ]
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 44,
+      "op": "create",
+      "entity": "roles",
+      "local_id": "ROL010",
+      "dda_id": null,
+      "fields": {
+        "role_code": "CPGAuthorisedSupplier",
+        "role_name": "Authorised Supplier",
+        "role_description": "An organisation is an Authorised Supplier while it may supply a product, for a stated period. It is cleared to supply a particular ingredient or packaging item. It is not a Certifying Body, which grants certifications and does not supply anything. An organisation whose clearance ends stops being an Authorised Supplier, and its earlier clearance remains on record.",
+        "role_domains": [
+          "DMD000000012"
+        ]
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 45,
+      "op": "create",
+      "entity": "roles",
+      "local_id": "ROL011",
+      "dda_id": null,
+      "fields": {
+        "role_code": "CPGCertificationHolder",
+        "role_name": "Certification Holder",
+        "role_description": "A product is a Certification Holder while it holds a certification from another party. The certification can be revoked. It is not a Labelled Product, which is about who is named as answerable on the pack and not about a certification held. A product whose certification is revoked or lapses stops being a Certification Holder for it, and the earlier certification remains on record.",
+        "role_domains": [
+          "DMD000000032"
+        ]
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 46,
+      "op": "create",
+      "entity": "roles",
+      "local_id": "ROL012",
+      "dda_id": null,
+      "fields": {
+        "role_code": "CPGCertifyingBody",
+        "role_name": "Certifying Body",
+        "role_description": "An organisation is a Certifying Body while it grants a certification to another party, for a stated period. It stands behind that certification. It is not an Authorised Supplier, which supplies goods and does not grant anything. A body whose certification ends stops being a Certifying Body for it, and the earlier certification remains on record.",
+        "role_domains": [
+          "DMD000000012"
+        ]
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 47,
+      "op": "create",
+      "entity": "roles",
+      "local_id": "ROL013",
+      "dda_id": null,
+      "fields": {
+        "role_code": "CPGLabelledProduct",
+        "role_name": "Labelled Product",
+        "role_description": "A product is a Labelled Product while it is marketed by another party named on its pack. The pack names who is answerable for it. It is not a Certification Holder, which holds a certification and does not name a party. A product that stops carrying another party's name on its pack stops being a Labelled Product for that party, and the earlier naming remains on record.",
+        "role_domains": [
+          "DMD000000032"
+        ]
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 48,
+      "op": "create",
+      "entity": "roles",
+      "local_id": "ROL014",
+      "dda_id": null,
+      "fields": {
+        "role_code": "CPGResponsibleBusiness",
+        "role_name": "Responsible Business",
+        "role_description": "An organisation is a Responsible Business while it markets a product under its own name and address. It is the business the pack names as answerable. It is not an Authorised Supplier, which supplies an ingredient to a manufacturer and does not answer for a finished pack. A business that the pack stops naming stops being its Responsible Business, and its earlier responsibility remains on record.",
+        "role_domains": [
+          "DMD000000012"
+        ]
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 49,
+      "op": "create",
+      "entity": "roles",
+      "local_id": "ROL015",
+      "dda_id": null,
+      "fields": {
+        "role_code": "CPGDeclaredProduct",
+        "role_name": "Declared Product",
+        "role_description": "A product is a Declared Product while another party declares properties of it, for example in a supplier's certificate of analysis. It shows which facts about a product come from outside. It is not a Bought Material, which is about where an item is sourced and not about what is said of it. A product with no document declaring its properties stops being a Declared Product, and the earlier declarations remain on record.",
+        "role_domains": [
+          "DMD000000032"
+        ]
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 50,
+      "op": "create",
+      "entity": "roles",
+      "local_id": "ROL016",
+      "dda_id": null,
+      "fields": {
+        "role_code": "CPGDeclaringDocument",
+        "role_name": "Declaring Document",
+        "role_description": "A document is a Declaring Document while it declares properties of something else. It is the evidence for what a supplier says it supplied. It is not an Issued Document, which is about who produced a document and not about what it states. A document that is replaced stops being relied on as a Declaring Document, and it remains on record.",
+        "role_domains": [
+          "DMD000000016"
+        ]
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 51,
+      "op": "create",
+      "entity": "roles",
+      "local_id": "ROL017",
+      "dda_id": null,
+      "fields": {
+        "role_code": "CPGIssuedDocument",
+        "role_name": "Issued Document",
+        "role_description": "A document is an Issued Document while it is issued by another party. It lets a statement be traced to whoever made it. It is not a Declaring Document, which is about what a document states about a product. A document stays an Issued Document for good, because who issued it does not change.",
+        "role_domains": [
+          "DMD000000016"
+        ]
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 52,
+      "op": "create",
+      "entity": "roles",
+      "local_id": "ROL018",
+      "dda_id": null,
+      "fields": {
+        "role_code": "CPGIssuingOrganisation",
+        "role_name": "Issuing Organisation",
+        "role_description": "An organisation is an Issuing Organisation while it issues something to another party. It stands behind the statements in what it issues. It is not a Responsible Business, which answers for a finished pack and not for a document. An organisation that issues nothing further stops being an Issuing Organisation, and what it issued remains on record.",
+        "role_domains": [
+          "DMD000000012"
+        ]
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 53,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL001",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "ProductComposition",
+        "relationship_name": "ProductComposition",
+        "relationship_description": "A product is made from an ingredient for as long as that ingredient is in its formulation. This is the recipe line. While it holds, the ingredient goes into the product in a stated quantity, and the product's declared ingredient list, allergens and label follow from it. A product has many ingredients and an ingredient goes into many products; an ingredient may itself be made from other ingredients. The quantity used, its unit, the formulation version the line belongs to, its place in the declared list and whether it may be listed last belong to the line and are kept here. It does not say who supplies the ingredient, which is the authorised source, and it does not say where the product is made. To tell it apart from other arrangements between two products, ask whether one product physically goes into the other.",
+        "relationship_domain": "DMD000000032",
+        "relationship_destination_domain": "DMD000000032",
+        "relationship_forward_verb": "Is Made From",
+        "relationship_inverse_verb": "Is Used In",
+        "relationship_source_role": "ROL001",
+        "relationship_target_role": "ROL002",
+        "relationship_source_role_plural": "Made Products",
+        "relationship_target_role_plural": "Ingredients",
+        "relationship_cardinality": "MANY_TO_MANY",
+        "relationship_dates": true,
+        "relationship_order": 1
+      },
+      "depends_on": [
+        35,
+        36
+      ]
+    },
+    {
+      "seq": 54,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL002",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "ProductVariants",
+        "relationship_name": "ProductVariants",
+        "relationship_description": "A product belongs to a product definition for as long as it is one of that definition's sizes, formats or pack counts. This is the grouping arrangement. While it holds, the product is sold and counted on its own, and what the versions share is held once on the definition. A definition groups many products and a product belongs to one definition at a time. The kind of difference, such as size, format or pack count, and its value belong to the arrangement and are kept here. It does not say what goes into a product, which is its formulation, and a product definition is never made, bought or sold. To tell it apart from other arrangements between two products, ask whether the one is only another size or pack of the same thing.",
+        "relationship_domain": "DMD000000032",
+        "relationship_destination_domain": "DMD000000032",
+        "relationship_forward_verb": "Belongs To",
+        "relationship_inverse_verb": "Groups",
+        "relationship_source_role": "ROL003",
+        "relationship_target_role": "ROL004",
+        "relationship_source_role_plural": "Variants",
+        "relationship_target_role_plural": "Logical Products",
+        "relationship_cardinality": "MANY_TO_ONE",
+        "relationship_dates": true,
+        "relationship_order": 2
+      },
+      "depends_on": [
+        37,
+        38
+      ]
+    },
+    {
+      "seq": 55,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL003",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "ProductAlternatives",
+        "relationship_name": "ProductAlternatives",
+        "relationship_description": "A product may be replaced by another product for as long as the replacement is cleared. This is the substitution arrangement. While it holds, the alternative may stand in for the ingredient under stated conditions, and the label may change as a result. An ingredient may have several alternatives and an alternative may stand in for several ingredients. The conditions, and what using the alternative changes on the label, belong to the arrangement and are kept here. It does not say the ingredient is in use today, which is the formulation, and it does not say who supplies the alternative. To tell it apart from other arrangements between two products, ask whether the second is cleared to take the place of the first.",
+        "relationship_domain": "DMD000000032",
+        "relationship_destination_domain": "DMD000000032",
+        "relationship_forward_verb": "May Be Replaced By",
+        "relationship_inverse_verb": "May Stand In For",
+        "relationship_source_role": "ROL005",
+        "relationship_target_role": "ROL006",
+        "relationship_source_role_plural": "Replaceable Ingredients",
+        "relationship_target_role_plural": "Permitted Alternatives",
+        "relationship_cardinality": "MANY_TO_MANY",
+        "relationship_dates": true,
+        "relationship_order": 3
+      },
+      "depends_on": [
+        39,
+        40
+      ]
+    },
+    {
+      "seq": 56,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL004",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "ProductClaimComparators",
+        "relationship_name": "ProductClaimComparators",
+        "relationship_description": "A product is compared with another for as long as a claim on its pack rests on that comparison, such as lower in sugar than another. This is the comparison behind a claim. While it holds, the other product, or an average of leading brands, is the reference the claim is measured against. A product may be compared with several references and a reference may be used by several products. What the claim is compared against and the difference between the two belong to the comparison and are kept here. It does not hold the wording of the claim or the values it rests on, which belong to the product. To tell it apart from other arrangements between two products, ask whether the claim would stop being true if the other product changed.",
+        "relationship_domain": "DMD000000032",
+        "relationship_destination_domain": "DMD000000032",
+        "relationship_forward_verb": "Is Compared With",
+        "relationship_inverse_verb": "Is Used To Compare",
+        "relationship_source_role": "ROL007",
+        "relationship_target_role": "ROL008",
+        "relationship_source_role_plural": "Claiming Products",
+        "relationship_target_role_plural": "Comparators",
+        "relationship_cardinality": "MANY_TO_MANY",
+        "relationship_dates": true,
+        "relationship_order": 4
+      },
+      "depends_on": [
+        41,
+        42
+      ]
+    },
+    {
+      "seq": 57,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL005",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "ProductAuthorisedSources",
+        "relationship_name": "ProductAuthorisedSources",
+        "relationship_description": "An organisation may supply a bought-in ingredient or packaging item for as long as the manufacturer has cleared it to. This is the arrangement that says who may supply what. While it holds, the organisation may be used to buy that item, for a stated period. A material may have several authorised suppliers and a supplier may supply several materials. The programme it is cleared under, and the date it was suspended where it has been, belong to the arrangement and are kept here. It does not say which of the supplier's sites the supply comes from, which is the supplying site, and it does not say what the supplier declares is in the item. To tell it apart from other arrangements with an organisation, ask whether the manufacturer allows it to supply the item.",
+        "relationship_domain": "DMD000000032",
+        "relationship_destination_domain": "DMD000000012",
+        "relationship_forward_verb": "May Be Sourced From",
+        "relationship_inverse_verb": "May Supply",
+        "relationship_source_role": "ROL009",
+        "relationship_target_role": "ROL010",
+        "relationship_source_role_plural": "Bought Materials",
+        "relationship_target_role_plural": "Authorised Suppliers",
+        "relationship_cardinality": "MANY_TO_MANY",
+        "relationship_dates": true,
+        "relationship_order": 5
+      },
+      "depends_on": [
+        43,
+        44
+      ]
+    },
+    {
+      "seq": 58,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL006",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "ProductCertifications",
+        "relationship_name": "ProductCertifications",
+        "relationship_description": "A product holds a certification from a certifying body for as long as the certification stands. This is the certification of the product itself. While it holds, the body stands behind what the certificate says, and it can be revoked. A product may hold several certifications and a body may certify many products. The scheme it is held under and the number the body gave belong to the certification and are kept here. It does not cover certification of a site, which is kept separately, and it does not say who supplies or markets the product. To tell it apart from other arrangements between a product and an organisation, ask whether a body has certified the product itself.",
+        "relationship_domain": "DMD000000032",
+        "relationship_destination_domain": "DMD000000012",
+        "relationship_forward_verb": "Holds A Certification From",
+        "relationship_inverse_verb": "Grants A Certification To",
+        "relationship_source_role": "ROL011",
+        "relationship_target_role": "ROL012",
+        "relationship_source_role_plural": "Certification Holders",
+        "relationship_target_role_plural": "Certifying Bodies",
+        "relationship_cardinality": "MANY_TO_MANY",
+        "relationship_dates": true,
+        "relationship_order": 6
+      },
+      "depends_on": [
+        45,
+        46
+      ]
+    },
+    {
+      "seq": 59,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL007",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "ProductResponsibleBusinesses",
+        "relationship_name": "ProductResponsibleBusinesses",
+        "relationship_description": "A business is responsible for a product's pack for as long as the pack names it as answerable. This is the arrangement behind the name and address printed as marketing the product. While it holds, the business is the one a buyer or an authority is directed to, in the country or region the pack serves. A product may name different businesses in different places and a business may answer for many products. The region, or the country when the pack serves a single country, belongs to the arrangement and is kept here. It does not say who makes the product or who supplies its ingredients. To tell it apart from other arrangements between a product and an organisation, ask whether the pack names the business as answerable.",
+        "relationship_domain": "DMD000000032",
+        "relationship_destination_domain": "DMD000000012",
+        "relationship_forward_verb": "Is Marketed By",
+        "relationship_inverse_verb": "Markets",
+        "relationship_source_role": "ROL013",
+        "relationship_target_role": "ROL014",
+        "relationship_source_role_plural": "Labelled Products",
+        "relationship_target_role_plural": "Responsible Businesses",
+        "relationship_cardinality": "MANY_TO_MANY",
+        "relationship_dates": true,
+        "relationship_order": 7
+      },
+      "depends_on": [
+        47,
+        48
+      ]
+    },
+    {
+      "seq": 60,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL008",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "DocumentProductDeclarations",
+        "relationship_name": "DocumentProductDeclarations",
+        "relationship_description": "A document declares properties of a product when it states them, as a supplier's certificate of analysis does. This is how a statement from outside is tied to the thing it describes. While it holds, the properties the document states count as declared by someone else. A document may declare properties of several products and a product may be declared by several documents. Whether the organisation checked what the document states belongs to the arrangement and is kept here. It carries no start and end dates of its own. It does not say who issued the document, which is the issuing arrangement, and it does not hold the properties themselves. To tell it apart from other arrangements between a document and something else, ask whether the document says something about the product.",
+        "relationship_domain": "DMD000000016",
+        "relationship_destination_domain": "DMD000000032",
+        "relationship_forward_verb": "Declares Properties Of",
+        "relationship_inverse_verb": "Is Declared By",
+        "relationship_source_role": "ROL016",
+        "relationship_target_role": "ROL015",
+        "relationship_source_role_plural": "Declaring Documents",
+        "relationship_target_role_plural": "Declared Products",
+        "relationship_cardinality": "MANY_TO_MANY",
+        "relationship_dates": false,
+        "relationship_order": 8
+      },
+      "depends_on": [
+        49,
+        50
+      ]
+    },
+    {
+      "seq": 61,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL009",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "DocumentIssuers",
+        "relationship_name": "DocumentIssuers",
+        "relationship_description": "An organisation issues a document. This is how a statement is traced to whoever made it. A document has one issuing organisation and an organisation issues many documents. The arrangement carries no start and end dates of its own. It does not say what the document states about a product, which is the declaration. To tell it apart from other arrangements between a document and an organisation, ask whether the organisation produced the document.",
+        "relationship_domain": "DMD000000016",
+        "relationship_destination_domain": "DMD000000012",
+        "relationship_forward_verb": "Is Issued By",
+        "relationship_inverse_verb": "Issues",
+        "relationship_source_role": "ROL017",
+        "relationship_target_role": "ROL018",
+        "relationship_source_role_plural": "Issued Documents",
+        "relationship_target_role_plural": "Issuing Organisations",
+        "relationship_cardinality": "MANY_TO_ONE",
+        "relationship_dates": false,
+        "relationship_order": 9
+      },
+      "depends_on": [
+        51,
+        52
+      ]
+    },
+    {
+      "seq": 62,
+      "op": "update",
+      "entity": "models",
+      "local_id": "DMM000000005",
+      "dda_id": "DMM000000005",
+      "fields": {
+        "model_description": "The CPG - Product Definition model holds what a food and beverage manufacturer needs to define a product, what goes into it, who may supply it and who stands behind it. A Made Product is made from Ingredients, and each Ingredient is itself a product. Product is used across industries, so what only a consumer goods product has, including whether it is a Logical or a Local product, is held in its consumer goods definition. A Logical Product groups the Variants that are its sizes and packs, and is never made, bought or sold itself. A Replaceable Ingredient may be replaced by a Permitted Alternative, and a Claiming Product is compared with a Comparator when its pack makes a claim against another product. A Bought Material may be sourced from an Authorised Supplier, which is held only as a company. A Certification Holder holds its certification from a Certifying Body. A Labelled Product names a Responsible Business on its pack. A Declaring Document states properties of a Declared Product, and an Issuing Organisation issues the Issued Document. Which labels and claims a change to a recipe reaches and which suppliers may supply an ingredient on a given date are worked out from these arrangements and not kept as facts of their own. The allergens a product declares are kept for each market, and the ingredient that brings each one is worked out from the formulation. Factories and the places inside them down to the shop floor, supplier sites, batches and supply chain detail belong to a separate, proposed CPG Manufacturing and Supply Chain model.",
+        "model_relationships": [
+          "REL001",
+          "REL002",
+          "REL003",
+          "REL004",
+          "REL005",
+          "REL006",
+          "REL007",
+          "REL008",
+          "REL009"
+        ]
+      },
+      "depends_on": [
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61
+      ]
+    },
+    {
+      "seq": 63,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR001",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductCompositionQuantityUsed",
+        "attribute_name": "ProductCompositionQuantityUsed",
+        "attribute_fqn_name": "ProductCompositionQuantityUsed",
+        "attribute_description": "How much of the ingredient is used to make one of the product, by weight, as weighed at the time of use. This fact is kept in this one place for a formulation line.",
+        "attribute_type": "FLOAT",
+        "attribute_relationship": "REL001"
+      },
+      "depends_on": [
+        53
+      ]
+    },
+    {
+      "seq": 64,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR002",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductCompositionUnitOfMeasure",
+        "attribute_name": "ProductCompositionUnitOfMeasure",
+        "attribute_fqn_name": "ProductCompositionUnitOfMeasure",
+        "attribute_description": "The unit the quantity used is measured in. This fact is kept in this one place for a formulation line.",
+        "attribute_type": "LOOKUP",
+        "attribute_lookup_type": "DLT000000156",
+        "attribute_relationship": "REL001"
+      },
+      "depends_on": [
+        53,
+        10
+      ]
+    },
+    {
+      "seq": 65,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR003",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductCompositionFormulationVersion",
+        "attribute_name": "ProductCompositionFormulationVersion",
+        "attribute_fqn_name": "ProductCompositionFormulationVersion",
+        "attribute_description": "The version of the formulation this line belongs to. This fact is kept in this one place for a formulation line.",
+        "attribute_type": "TEXT",
+        "attribute_relationship": "REL001"
+      },
+      "depends_on": [
+        53
+      ]
+    },
+    {
+      "seq": 66,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR004",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductCompositionDeclarationOrder",
+        "attribute_name": "ProductCompositionDeclarationOrder",
+        "attribute_fqn_name": "ProductCompositionDeclarationOrder",
+        "attribute_description": "Where the ingredient falls in the declared list for the product, worked out from the quantities used, heaviest first. This fact is kept in this one place for a formulation line. It is worked out from the facts it names and is never typed in.",
+        "attribute_type": "INTEGER",
+        "attribute_class": "PUBLIC",
+        "attribute_relationship": "REL001"
+      },
+      "depends_on": [
+        53
+      ]
+    },
+    {
+      "seq": 67,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR005",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductCompositionMayBeListedLast",
+        "attribute_name": "ProductCompositionMayBeListedLast",
+        "attribute_fqn_name": "ProductCompositionMayBeListedLast",
+        "attribute_description": "Whether the ingredient may be listed at the end of the ingredient list, because it is under two per cent or a spice mix where none stands out. This fact is kept in this one place for a formulation line.",
+        "attribute_type": "BOOLEAN",
+        "attribute_class": "PUBLIC",
+        "attribute_relationship": "REL001"
+      },
+      "depends_on": [
+        53
+      ]
+    },
+    {
+      "seq": 68,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR006",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductAlternativesConditions",
+        "attribute_name": "ProductAlternativesConditions",
+        "attribute_fqn_name": "ProductAlternativesConditions",
+        "attribute_description": "The conditions under which the alternative may stand in for the ingredient. This fact is kept in this one place for an alternative.",
+        "attribute_type": "LONGTEXT",
+        "attribute_relationship": "REL003"
+      },
+      "depends_on": [
+        55
+      ]
+    },
+    {
+      "seq": 69,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR007",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductAlternativesLabelConsequence",
+        "attribute_name": "ProductAlternativesLabelConsequence",
+        "attribute_fqn_name": "ProductAlternativesLabelConsequence",
+        "attribute_description": "What using the alternative changes on the label, such as an allergen added or the order of ingredients altered. This fact is kept in this one place for an alternative.",
+        "attribute_type": "LONGTEXT",
+        "attribute_class": "PUBLIC",
+        "attribute_relationship": "REL003"
+      },
+      "depends_on": [
+        55
+      ]
+    },
+    {
+      "seq": 70,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR008",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductClaimComparatorsBasis",
+        "attribute_name": "ProductClaimComparatorsBasis",
+        "attribute_fqn_name": "ProductClaimComparatorsBasis",
+        "attribute_description": "What the claim is compared against: a named product, the average of leading brands, or a food composition database. This fact is kept in this one place for a comparison.",
+        "attribute_type": "TEXT",
+        "attribute_class": "PUBLIC",
+        "attribute_relationship": "REL004"
+      },
+      "depends_on": [
+        56
+      ]
+    },
+    {
+      "seq": 71,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR009",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductClaimComparatorsDifference",
+        "attribute_name": "ProductClaimComparatorsDifference",
+        "attribute_fqn_name": "ProductClaimComparatorsDifference",
+        "attribute_description": "The relative difference between the claiming product and the comparator, as a percentage, worked out from their declared values. This fact is kept in this one place for a comparison. It is worked out from the facts it names and is never typed in.",
+        "attribute_type": "FLOAT",
+        "attribute_class": "PUBLIC",
+        "attribute_relationship": "REL004"
+      },
+      "depends_on": [
+        56
+      ]
+    },
+    {
+      "seq": 72,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR010",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductAuthorisedSourcesProgramme",
+        "attribute_name": "ProductAuthorisedSourcesProgramme",
+        "attribute_fqn_name": "ProductAuthorisedSourcesProgramme",
+        "attribute_description": "The programme under which the supplier is authorised to supply this ingredient or packaging item. This fact is kept in this one place for an authorisation.",
+        "attribute_type": "TEXT",
+        "attribute_class": "INTERNAL",
+        "attribute_relationship": "REL005"
+      },
+      "depends_on": [
+        57
+      ]
+    },
+    {
+      "seq": 73,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR011",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductAuthorisedSourcesSuspendedOn",
+        "attribute_name": "ProductAuthorisedSourcesSuspendedOn",
+        "attribute_fqn_name": "ProductAuthorisedSourcesSuspendedOn",
+        "attribute_description": "The date the authorisation was suspended, where it has been. This fact is kept in this one place for an authorisation.",
+        "attribute_type": "DATE",
+        "attribute_class": "INTERNAL",
+        "attribute_relationship": "REL005"
+      },
+      "depends_on": [
+        57
+      ]
+    },
+    {
+      "seq": 74,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR012",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductCertificationsScheme",
+        "attribute_name": "ProductCertificationsScheme",
+        "attribute_fqn_name": "ProductCertificationsScheme",
+        "attribute_description": "The certification scheme the certification is held under. This fact is kept in this one place for a certification.",
+        "attribute_type": "TEXT",
+        "attribute_class": "PUBLIC",
+        "attribute_relationship": "REL006"
+      },
+      "depends_on": [
+        58
+      ]
+    },
+    {
+      "seq": 75,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR013",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductCertificationsCertificateNumber",
+        "attribute_name": "ProductCertificationsCertificateNumber",
+        "attribute_fqn_name": "ProductCertificationsCertificateNumber",
+        "attribute_description": "The number the certifying body gave the certification. This fact is kept in this one place for a certification.",
+        "attribute_type": "TEXT",
+        "attribute_class": "PUBLIC",
+        "attribute_relationship": "REL006"
+      },
+      "depends_on": [
+        58
+      ]
+    },
+    {
+      "seq": 76,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR014",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "DocumentProductDeclarationsVerified",
+        "attribute_name": "DocumentProductDeclarationsVerified",
+        "attribute_fqn_name": "DocumentProductDeclarationsVerified",
+        "attribute_description": "Whether the organisation checked what the document states about the product. This fact is kept in this one place for a document's statement about a product.",
+        "attribute_type": "BOOLEAN",
+        "attribute_class": "INTERNAL",
+        "attribute_relationship": "REL008"
+      },
+      "depends_on": [
+        60
+      ]
+    },
+    {
+      "seq": 77,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR015",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductVariantsAxisType",
+        "attribute_name": "ProductVariantsAxisType",
+        "attribute_fqn_name": "ProductVariantsAxisType",
+        "attribute_description": "The way the variant differs from the rest of its family: size, format or pack count. This fact is kept in this one place for a variant.",
+        "attribute_type": "LOOKUP",
+        "attribute_lookup_type": "LKP007",
+        "attribute_relationship": "REL002"
+      },
+      "depends_on": [
+        54,
+        8
+      ]
+    },
+    {
+      "seq": 78,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR016",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductVariantsAxisValue",
+        "attribute_name": "ProductVariantsAxisValue",
+        "attribute_fqn_name": "ProductVariantsAxisValue",
+        "attribute_description": "The value on that dimension for this variant, such as 200 grams or a pack of six. This fact is kept in this one place for a variant.",
+        "attribute_type": "TEXT",
+        "attribute_relationship": "REL002"
+      },
+      "depends_on": [
+        54
+      ]
+    },
+    {
+      "seq": 79,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR017",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductName",
+        "attribute_name": "ProductName",
+        "attribute_fqn_name": "ProductName",
+        "attribute_description": "The name the product is known by inside the organisation. This fact is kept in this one place for a product.",
+        "attribute_type": "TEXT",
+        "attribute_concept": "SBJ001"
+      },
+      "depends_on": [
+        18
+      ]
+    },
+    {
+      "seq": 80,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR018",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductCPGDefinitionLegalName",
+        "attribute_name": "ProductCPGDefinitionLegalName",
+        "attribute_fqn_name": "ProductCPGDefinitionLegalName",
+        "attribute_description": "The name the food must be given by law on the pack, where it differs from the name it is sold under. This fact is kept in this one place for a product.",
+        "attribute_type": "TEXT",
+        "attribute_class": "PUBLIC",
+        "attribute_concept": "SBJ022"
+      },
+      "depends_on": [
+        32
+      ]
+    },
+    {
+      "seq": 81,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR019",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductCPGDefinitionNetQuantity",
+        "attribute_name": "ProductCPGDefinitionNetQuantity",
+        "attribute_fqn_name": "ProductCPGDefinitionNetQuantity",
+        "attribute_description": "How much food the pack contains, as declared on the pack, in the unit stated with it. This fact is kept in this one place for a product.",
+        "attribute_type": "FLOAT",
+        "attribute_class": "PUBLIC",
+        "attribute_concept": "SBJ022"
+      },
+      "depends_on": [
+        32
+      ]
+    },
+    {
+      "seq": 82,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR020",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductCPGDefinitionUnitOfMeasure",
+        "attribute_name": "ProductCPGDefinitionUnitOfMeasure",
+        "attribute_fqn_name": "ProductCPGDefinitionUnitOfMeasure",
+        "attribute_description": "The unit the declared net quantity is measured in. This fact is kept in this one place for a product.",
+        "attribute_type": "LOOKUP",
+        "attribute_lookup_type": "DLT000000156",
+        "attribute_class": "PUBLIC",
+        "attribute_concept": "SBJ022"
+      },
+      "depends_on": [
+        32,
+        10
+      ]
+    },
+    {
+      "seq": 83,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR021",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductIdentifiersType",
+        "attribute_name": "ProductIdentifiersType",
+        "attribute_fqn_name": "ProductIdentifiersType",
+        "attribute_description": "The kind of identifier: a trade item number, an internal material number or a supplier's part number. This fact is kept in this one place for a product identifier.",
+        "attribute_type": "LOOKUP",
+        "attribute_lookup_type": "DLT000000064",
+        "attribute_concept": "SBJ002"
+      },
+      "depends_on": [
+        19,
+        11
+      ]
+    },
+    {
+      "seq": 84,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR022",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductIdentifiersValue",
+        "attribute_name": "ProductIdentifiersValue",
+        "attribute_fqn_name": "ProductIdentifiersValue",
+        "attribute_description": "The identifier itself, exactly as issued. This fact is kept in this one place for a product identifier.",
+        "attribute_type": "TEXT",
+        "attribute_concept": "SBJ002"
+      },
+      "depends_on": [
+        19
+      ]
+    },
+    {
+      "seq": 85,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR023",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductIdentifiersStartDate",
+        "attribute_name": "ProductIdentifiersStartDate",
+        "attribute_fqn_name": "ProductIdentifiersStartDate",
+        "attribute_description": "The first date from which the identifier identifies the product, as the issuer allocated it. This fact is kept in this one place for a product identifier.",
+        "attribute_type": "DATE",
+        "attribute_concept": "SBJ002"
+      },
+      "depends_on": [
+        19
+      ]
+    },
+    {
+      "seq": 86,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR024",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductIdentifiersExpiryDate",
+        "attribute_name": "ProductIdentifiersExpiryDate",
+        "attribute_fqn_name": "ProductIdentifiersExpiryDate",
+        "attribute_description": "The date after which the identifier no longer identifies the product; left blank while it is still in use. This fact is kept in this one place for a product identifier.",
+        "attribute_type": "DATE",
+        "attribute_concept": "SBJ002"
+      },
+      "depends_on": [
+        19
+      ]
+    },
+    {
+      "seq": 87,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR025",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductIdentifiersScope",
+        "attribute_name": "ProductIdentifiersScope",
+        "attribute_fqn_name": "ProductIdentifiersScope",
+        "attribute_description": "Who issued the identifier and where it applies, such as GS1 or the organisation's own systems. This fact is kept in this one place for a product identifier.",
+        "attribute_type": "TEXT",
+        "attribute_concept": "SBJ002"
+      },
+      "depends_on": [
+        19
+      ]
+    },
+    {
+      "seq": 88,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR026",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductIdentifiersComment",
+        "attribute_name": "ProductIdentifiersComment",
+        "attribute_fqn_name": "ProductIdentifiersComment",
+        "attribute_description": "Any note about the identifier that its other details do not carry. This fact is kept in this one place for a product identifier.",
+        "attribute_type": "LONGTEXT",
+        "attribute_concept": "SBJ002"
+      },
+      "depends_on": [
+        19
+      ]
+    },
+    {
+      "seq": 89,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR027",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductFormulationVersionsVersion",
+        "attribute_name": "ProductFormulationVersionsVersion",
+        "attribute_fqn_name": "ProductFormulationVersionsVersion",
+        "attribute_description": "Which version of the formulation this is, as the organisation numbers its versions. This fact is kept in this one place for a formulation version.",
+        "attribute_type": "TEXT",
+        "attribute_concept": "SBJ003"
+      },
+      "depends_on": [
+        20
+      ]
+    },
+    {
+      "seq": 90,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR028",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductFormulationVersionsEffectiveFrom",
+        "attribute_name": "ProductFormulationVersionsEffectiveFrom",
+        "attribute_fqn_name": "ProductFormulationVersionsEffectiveFrom",
+        "attribute_description": "The date from which this version of the formulation applies. This fact is kept in this one place for a formulation version.",
+        "attribute_type": "DATE",
+        "attribute_concept": "SBJ003"
+      },
+      "depends_on": [
+        20
+      ]
+    },
+    {
+      "seq": 91,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR030",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductSpecificationsVersion",
+        "attribute_name": "ProductSpecificationsVersion",
+        "attribute_fqn_name": "ProductSpecificationsVersion",
+        "attribute_description": "Which version of the specification this is. This fact is kept in this one place for a specification.",
+        "attribute_type": "TEXT",
+        "attribute_concept": "SBJ004"
+      },
+      "depends_on": [
+        21
+      ]
+    },
+    {
+      "seq": 92,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR031",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductSpecificationsCharacteristic",
+        "attribute_name": "ProductSpecificationsCharacteristic",
+        "attribute_fqn_name": "ProductSpecificationsCharacteristic",
+        "attribute_description": "The property being specified, such as moisture, fat content or origin. This fact is kept in this one place for a specification.",
+        "attribute_type": "TEXT",
+        "attribute_concept": "SBJ004"
+      },
+      "depends_on": [
+        21
+      ]
+    },
+    {
+      "seq": 93,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR032",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductSpecificationsLimit",
+        "attribute_name": "ProductSpecificationsLimit",
+        "attribute_fqn_name": "ProductSpecificationsLimit",
+        "attribute_description": "The limit the characteristic must fall within, stated with its unit. This fact is kept in this one place for a specification.",
+        "attribute_type": "TEXT",
+        "attribute_concept": "SBJ004"
+      },
+      "depends_on": [
+        21
+      ]
+    },
+    {
+      "seq": 94,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR033",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductSpecificationsEffectiveFrom",
+        "attribute_name": "ProductSpecificationsEffectiveFrom",
+        "attribute_fqn_name": "ProductSpecificationsEffectiveFrom",
+        "attribute_description": "The date from which this version of the specification applies. This fact is kept in this one place for a specification.",
+        "attribute_type": "DATE",
+        "attribute_concept": "SBJ004"
+      },
+      "depends_on": [
+        21
+      ]
+    },
+    {
+      "seq": 95,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR034",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductAllergensType",
+        "attribute_name": "ProductAllergensType",
+        "attribute_fqn_name": "ProductAllergensType",
+        "attribute_description": "The allergen the product declares for a market, named by the food it comes from. The value says which market's list it belongs to. This fact is kept in this one place for a product's allergen.",
+        "attribute_type": "LOOKUP",
+        "attribute_lookup_type": "LKP001",
+        "attribute_class": "PUBLIC",
+        "attribute_concept": "SBJ005"
+      },
+      "depends_on": [
+        22,
+        2
+      ]
+    },
+    {
+      "seq": 96,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR035",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductAllergensIsFromIngredient",
+        "attribute_name": "ProductAllergensIsFromIngredient",
+        "attribute_fqn_name": "ProductAllergensIsFromIngredient",
+        "attribute_description": "Whether the allergen comes into the product through an ingredient rather than being added directly, worked out from the formulation. This fact is kept in this one place for a product's allergen. It is worked out from the facts it names and is never typed in.",
+        "attribute_type": "BOOLEAN",
+        "attribute_class": "PUBLIC",
+        "attribute_concept": "SBJ005"
+      },
+      "depends_on": [
+        22
+      ]
+    },
+    {
+      "seq": 97,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR036",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductAllergensIsSupplierDeclared",
+        "attribute_name": "ProductAllergensIsSupplierDeclared",
+        "attribute_fqn_name": "ProductAllergensIsSupplierDeclared",
+        "attribute_description": "Whether the allergen is known only because a supplier declared it, rather than worked out from what the organisation holds. This fact is kept in this one place for a product's allergen.",
+        "attribute_type": "BOOLEAN",
+        "attribute_class": "INTERNAL",
+        "attribute_concept": "SBJ005"
+      },
+      "depends_on": [
+        22
+      ]
+    },
+    {
+      "seq": 98,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR037",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductNutritionValuesNutrientType",
+        "attribute_name": "ProductNutritionValuesNutrientType",
+        "attribute_fqn_name": "ProductNutritionValuesNutrientType",
+        "attribute_description": "The nutrient or energy value being declared. This fact is kept in this one place for a nutrition value.",
+        "attribute_type": "LOOKUP",
+        "attribute_lookup_type": "LKP003",
+        "attribute_class": "PUBLIC",
+        "attribute_concept": "SBJ006"
+      },
+      "depends_on": [
+        23,
+        4
+      ]
+    },
+    {
+      "seq": 99,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR038",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductNutritionValuesValue",
+        "attribute_name": "ProductNutritionValuesValue",
+        "attribute_fqn_name": "ProductNutritionValuesValue",
+        "attribute_description": "The declared value, per the reference quantity stated on the pack, in the unit for that nutrient. This fact is kept in this one place for a nutrition value.",
+        "attribute_type": "FLOAT",
+        "attribute_class": "PUBLIC",
+        "attribute_concept": "SBJ006"
+      },
+      "depends_on": [
+        23
+      ]
+    },
+    {
+      "seq": 100,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR039",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductNutritionValuesBasisType",
+        "attribute_name": "ProductNutritionValuesBasisType",
+        "attribute_fqn_name": "ProductNutritionValuesBasisType",
+        "attribute_description": "How the value was arrived at: analysis, calculation from ingredients, or accepted published data. This fact is kept in this one place for a nutrition value.",
+        "attribute_type": "LOOKUP",
+        "attribute_lookup_type": "LKP002",
+        "attribute_class": "PUBLIC",
+        "attribute_concept": "SBJ006"
+      },
+      "depends_on": [
+        23,
+        3
+      ]
+    },
+    {
+      "seq": 101,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR040",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductNutritionValuesTolerance",
+        "attribute_name": "ProductNutritionValuesTolerance",
+        "attribute_fqn_name": "ProductNutritionValuesTolerance",
+        "attribute_description": "How far the value may vary and still be correct, as the rules of the market allow. This fact is kept in this one place for a nutrition value.",
+        "attribute_type": "TEXT",
+        "attribute_class": "PUBLIC",
+        "attribute_concept": "SBJ006"
+      },
+      "depends_on": [
+        23
+      ]
+    },
+    {
+      "seq": 102,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR041",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductNutritionValuesEdiblePortionFactor",
+        "attribute_name": "ProductNutritionValuesEdiblePortionFactor",
+        "attribute_fqn_name": "ProductNutritionValuesEdiblePortionFactor",
+        "attribute_description": "For a calculated value, the share of each ingredient that is eaten, as a fraction. This fact is kept in this one place for a nutrition value.",
+        "attribute_type": "FLOAT",
+        "attribute_concept": "SBJ006"
+      },
+      "depends_on": [
+        23
+      ]
+    },
+    {
+      "seq": 103,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR042",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductNutritionValuesYieldFactor",
+        "attribute_name": "ProductNutritionValuesYieldFactor",
+        "attribute_fqn_name": "ProductNutritionValuesYieldFactor",
+        "attribute_description": "For a calculated value, the change in weight during preparation, as a ratio of weight after to weight before. This fact is kept in this one place for a nutrition value.",
+        "attribute_type": "FLOAT",
+        "attribute_concept": "SBJ006"
+      },
+      "depends_on": [
+        23
+      ]
+    },
+    {
+      "seq": 104,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR043",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductNutritionValuesRetentionFactor",
+        "attribute_name": "ProductNutritionValuesRetentionFactor",
+        "attribute_fqn_name": "ProductNutritionValuesRetentionFactor",
+        "attribute_description": "For a calculated value, the share of the nutrient that remains after preparation, as a fraction. This fact is kept in this one place for a nutrition value.",
+        "attribute_type": "FLOAT",
+        "attribute_concept": "SBJ006"
+      },
+      "depends_on": [
+        23
+      ]
+    },
+    {
+      "seq": 105,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR044",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductNutritionValuesIsAsPrepared",
+        "attribute_name": "ProductNutritionValuesIsAsPrepared",
+        "attribute_fqn_name": "ProductNutritionValuesIsAsPrepared",
+        "attribute_description": "Whether the value is for the food as prepared according to its instructions, rather than as sold. This fact is kept in this one place for a nutrition value.",
+        "attribute_type": "BOOLEAN",
+        "attribute_class": "PUBLIC",
+        "attribute_concept": "SBJ006"
+      },
+      "depends_on": [
+        23
+      ]
+    },
+    {
+      "seq": 106,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR045",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductLabelItemsType",
+        "attribute_name": "ProductLabelItemsType",
+        "attribute_fqn_name": "ProductLabelItemsType",
+        "attribute_description": "Which required label item this is. This fact is kept in this one place for a label item.",
+        "attribute_type": "LOOKUP",
+        "attribute_lookup_type": "LKP004",
+        "attribute_class": "PUBLIC",
+        "attribute_concept": "SBJ007"
+      },
+      "depends_on": [
+        33,
+        5
+      ]
+    },
+    {
+      "seq": 107,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR047",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductLabelItemsText",
+        "attribute_name": "ProductLabelItemsText",
+        "attribute_fqn_name": "ProductLabelItemsText",
+        "attribute_description": "What the pack prints for this item, exactly as printed. This fact is kept in this one place for a label item.",
+        "attribute_type": "LONGTEXT",
+        "attribute_class": "PUBLIC",
+        "attribute_concept": "SBJ007"
+      },
+      "depends_on": [
+        33
+      ]
+    },
+    {
+      "seq": 108,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR048",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductClaimsType",
+        "attribute_name": "ProductClaimsType",
+        "attribute_fqn_name": "ProductClaimsType",
+        "attribute_description": "What kind of claim this is: a content claim or a comparison. This fact is kept in this one place for a claim.",
+        "attribute_type": "LOOKUP",
+        "attribute_lookup_type": "LKP006",
+        "attribute_class": "PUBLIC",
+        "attribute_concept": "SBJ008"
+      },
+      "depends_on": [
+        34,
+        7
+      ]
+    },
+    {
+      "seq": 109,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR050",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductClaimsWording",
+        "attribute_name": "ProductClaimsWording",
+        "attribute_fqn_name": "ProductClaimsWording",
+        "attribute_description": "The claim as it appears on the pack, word for word. This fact is kept in this one place for a claim.",
+        "attribute_type": "TEXT",
+        "attribute_class": "PUBLIC",
+        "attribute_concept": "SBJ008"
+      },
+      "depends_on": [
+        34
+      ]
+    },
+    {
+      "seq": 110,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR051",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductClaimsCondition",
+        "attribute_name": "ProductClaimsCondition",
+        "attribute_fqn_name": "ProductClaimsCondition",
+        "attribute_description": "The condition the claim rests on and the figure it requires, such as at least a set share of the daily intake in a serving. This fact is kept in this one place for a claim.",
+        "attribute_type": "LONGTEXT",
+        "attribute_class": "PUBLIC",
+        "attribute_concept": "SBJ008"
+      },
+      "depends_on": [
+        34
+      ]
+    },
+    {
+      "seq": 111,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR053",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductShelfLivesDays",
+        "attribute_name": "ProductShelfLivesDays",
+        "attribute_fqn_name": "ProductShelfLivesDays",
+        "attribute_description": "How many days the product, ingredient or part-made good lasts under the stated storage condition. This fact is kept in this one place for a shelf life.",
+        "attribute_type": "INTEGER",
+        "attribute_concept": "SBJ009"
+      },
+      "depends_on": [
+        24
+      ]
+    },
+    {
+      "seq": 112,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR054",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductShelfLivesStorageCondition",
+        "attribute_name": "ProductShelfLivesStorageCondition",
+        "attribute_fqn_name": "ProductShelfLivesStorageCondition",
+        "attribute_description": "The storage the figure assumes, such as chilled or ambient, and whether the pack is open. This fact is kept in this one place for a shelf life.",
+        "attribute_type": "TEXT",
+        "attribute_concept": "SBJ009"
+      },
+      "depends_on": [
+        24
+      ]
+    },
+    {
+      "seq": 113,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR055",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductShelfLivesDateMarkType",
+        "attribute_name": "ProductShelfLivesDateMarkType",
+        "attribute_fqn_name": "ProductShelfLivesDateMarkType",
+        "attribute_description": "Which kind of date mark the product carries: use-by or best-before. This fact is kept in this one place for a shelf life.",
+        "attribute_type": "LOOKUP",
+        "attribute_lookup_type": "LKP005",
+        "attribute_class": "PUBLIC",
+        "attribute_concept": "SBJ009"
+      },
+      "depends_on": [
+        24,
+        6
+      ]
+    },
+    {
+      "seq": 114,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR056",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductOriginsCountry",
+        "attribute_name": "ProductOriginsCountry",
+        "attribute_fqn_name": "ProductOriginsCountry",
+        "attribute_description": "The country the product or ingredient is declared to come from. This fact is kept in this one place for a declared origin.",
+        "attribute_type": "LOOKUP",
+        "attribute_lookup_type": "DLT000000071",
+        "attribute_class": "PUBLIC",
+        "attribute_concept": "SBJ010"
+      },
+      "depends_on": [
+        25
+      ]
+    },
+    {
+      "seq": 115,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR057",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductOriginsBasis",
+        "attribute_name": "ProductOriginsBasis",
+        "attribute_fqn_name": "ProductOriginsBasis",
+        "attribute_description": "What the origin statement rests on, such as a supplier's declaration or an audit. This fact is kept in this one place for a declared origin.",
+        "attribute_type": "TEXT",
+        "attribute_concept": "SBJ010"
+      },
+      "depends_on": [
+        25
+      ]
+    },
+    {
+      "seq": 116,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR058",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductFraudAssessmentsAssessedOn",
+        "attribute_name": "ProductFraudAssessmentsAssessedOn",
+        "attribute_fqn_name": "ProductFraudAssessmentsAssessedOn",
+        "attribute_description": "The date the ingredient was assessed for fraud risk. This fact is kept in this one place for a fraud-risk assessment.",
+        "attribute_type": "DATE",
+        "attribute_class": "INTERNAL",
+        "attribute_concept": "SBJ011"
+      },
+      "depends_on": [
+        26
+      ]
+    },
+    {
+      "seq": 117,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR059",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductFraudAssessmentsOutcome",
+        "attribute_name": "ProductFraudAssessmentsOutcome",
+        "attribute_fqn_name": "ProductFraudAssessmentsOutcome",
+        "attribute_description": "What the assessment found: how likely the ingredient is to be tampered with or swapped. This fact is kept in this one place for a fraud-risk assessment.",
+        "attribute_type": "LONGTEXT",
+        "attribute_class": "INTERNAL",
+        "attribute_concept": "SBJ011"
+      },
+      "depends_on": [
+        26
+      ]
+    },
+    {
+      "seq": 118,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR060",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductFraudAssessmentsFactors",
+        "attribute_name": "ProductFraudAssessmentsFactors",
+        "attribute_fqn_name": "ProductFraudAssessmentsFactors",
+        "attribute_description": "What the judgement rested on, such as the length of the supply chain, the value of the ingredient and any history of substitution. This fact is kept in this one place for a fraud-risk assessment.",
+        "attribute_type": "LONGTEXT",
+        "attribute_class": "INTERNAL",
+        "attribute_concept": "SBJ011"
+      },
+      "depends_on": [
+        26
+      ]
+    },
+    {
+      "seq": 119,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR061",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductFraudAssessmentsControl",
+        "attribute_name": "ProductFraudAssessmentsControl",
+        "attribute_fqn_name": "ProductFraudAssessmentsControl",
+        "attribute_description": "The extra checks or testing the assessment calls for. This fact is kept in this one place for a fraud-risk assessment.",
+        "attribute_type": "LONGTEXT",
+        "attribute_class": "INTERNAL",
+        "attribute_concept": "SBJ011"
+      },
+      "depends_on": [
+        26
+      ]
+    },
+    {
+      "seq": 120,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR062",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductIdentityChangesMadeOn",
+        "attribute_name": "ProductIdentityChangesMadeOn",
+        "attribute_fqn_name": "ProductIdentityChangesMadeOn",
+        "attribute_description": "The date the change was made to the product. This fact is kept in this one place for a change to a product.",
+        "attribute_type": "DATE",
+        "attribute_concept": "SBJ012"
+      },
+      "depends_on": [
+        27
+      ]
+    },
+    {
+      "seq": 121,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR063",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductIdentityChangesMadeNewProduct",
+        "attribute_name": "ProductIdentityChangesMadeNewProduct",
+        "attribute_fqn_name": "ProductIdentityChangesMadeNewProduct",
+        "attribute_description": "Whether the change made a different product, rather than a new version of what goes into the same one. This fact is kept in this one place for a change to a product.",
+        "attribute_type": "BOOLEAN",
+        "attribute_concept": "SBJ012"
+      },
+      "depends_on": [
+        27
+      ]
+    },
+    {
+      "seq": 122,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR064",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductIdentityChangesReason",
+        "attribute_name": "ProductIdentityChangesReason",
+        "attribute_fqn_name": "ProductIdentityChangesReason",
+        "attribute_description": "What was changed and which rule decided that it made a different product or did not. This fact is kept in this one place for a change to a product.",
+        "attribute_type": "LONGTEXT",
+        "attribute_concept": "SBJ012"
+      },
+      "depends_on": [
+        27
+      ]
+    },
+    {
+      "seq": 123,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR065",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "DocumentName",
+        "attribute_name": "DocumentName",
+        "attribute_fqn_name": "DocumentName",
+        "attribute_description": "The name or reference the document is known by. This fact is kept in this one place for a document.",
+        "attribute_type": "TEXT",
+        "attribute_concept": "SBJ016"
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 124,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR066",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "DocumentType",
+        "attribute_name": "DocumentType",
+        "attribute_fqn_name": "DocumentType",
+        "attribute_description": "What kind of document it is: a certificate of analysis, a change notice, a certification document or a specification sheet. This fact is kept in this one place for a document.",
+        "attribute_type": "LOOKUP",
+        "attribute_lookup_type": "LKP008",
+        "attribute_concept": "SBJ016"
+      },
+      "depends_on": [
+        9
+      ]
+    },
+    {
+      "seq": 125,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR067",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "DocumentIssuedOn",
+        "attribute_name": "DocumentIssuedOn",
+        "attribute_fqn_name": "DocumentIssuedOn",
+        "attribute_description": "The date the issuer issued the document. This fact is kept in this one place for a document.",
+        "attribute_type": "DATE",
+        "attribute_concept": "SBJ016"
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 126,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR068",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "DocumentDeclarationsProperty",
+        "attribute_name": "DocumentDeclarationsProperty",
+        "attribute_fqn_name": "DocumentDeclarationsProperty",
+        "attribute_description": "The property the document states, such as an allergen content or a moisture level. This fact is kept in this one place for a document's statement.",
+        "attribute_type": "TEXT",
+        "attribute_concept": "SBJ017"
+      },
+      "depends_on": [
+        28
+      ]
+    },
+    {
+      "seq": 127,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR069",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "DocumentDeclarationsValue",
+        "attribute_name": "DocumentDeclarationsValue",
+        "attribute_fqn_name": "DocumentDeclarationsValue",
+        "attribute_description": "The value the document states for that property, exactly as stated, with its unit. This fact is kept in this one place for a document's statement.",
+        "attribute_type": "TEXT",
+        "attribute_concept": "SBJ017"
+      },
+      "depends_on": [
+        28
+      ]
+    },
+    {
+      "seq": 128,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR079",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductMarketsRegion",
+        "attribute_name": "ProductMarketsRegion",
+        "attribute_fqn_name": "ProductMarketsRegion",
+        "attribute_description": "The region of the world the product is intended to be sold in, when the market is a region and not a single country. This fact is kept in this one place for a market.",
+        "attribute_type": "LOOKUP",
+        "attribute_lookup_type": "LKP012",
+        "attribute_class": "PUBLIC",
+        "attribute_concept": "SBJ019"
+      },
+      "depends_on": [
+        29,
+        12
+      ]
+    },
+    {
+      "seq": 129,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR080",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductMarketsNation",
+        "attribute_name": "ProductMarketsNation",
+        "attribute_fqn_name": "ProductMarketsNation",
+        "attribute_description": "The country the product is intended to be sold in, when the market is a single country. This fact is kept in this one place for a market.",
+        "attribute_type": "LOOKUP",
+        "attribute_lookup_type": "DLT000000071",
+        "attribute_class": "PUBLIC",
+        "attribute_concept": "SBJ019"
+      },
+      "depends_on": [
+        29
+      ]
+    },
+    {
+      "seq": 130,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR081",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductMarketsSoldFrom",
+        "attribute_name": "ProductMarketsSoldFrom",
+        "attribute_fqn_name": "ProductMarketsSoldFrom",
+        "attribute_description": "The first day the product is on sale in the market, from which its pack items and claims for that market apply. This fact is kept in this one place for a market.",
+        "attribute_type": "DATE",
+        "attribute_class": "PUBLIC",
+        "attribute_concept": "SBJ019"
+      },
+      "depends_on": [
+        29
+      ]
+    },
+    {
+      "seq": 131,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR082",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductMarketsSoldUntil",
+        "attribute_name": "ProductMarketsSoldUntil",
+        "attribute_fqn_name": "ProductMarketsSoldUntil",
+        "attribute_description": "The last day the product is sold in the market, after which nothing is sold there. This fact is kept in this one place for a market.",
+        "attribute_type": "DATE",
+        "attribute_class": "PUBLIC",
+        "attribute_concept": "SBJ019"
+      },
+      "depends_on": [
+        29
+      ]
+    },
+    {
+      "seq": 132,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR083",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductChannelsType",
+        "attribute_name": "ProductChannelsType",
+        "attribute_fqn_name": "ProductChannelsType",
+        "attribute_description": "The kind of trade the product is sold through: grocery, food service, online and so on. This fact is kept in this one place for a sales channel.",
+        "attribute_type": "LOOKUP",
+        "attribute_lookup_type": "LKP013",
+        "attribute_class": "PUBLIC",
+        "attribute_concept": "SBJ020"
+      },
+      "depends_on": [
+        30,
+        13
+      ]
+    },
+    {
+      "seq": 133,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR084",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductChannelsSoldFrom",
+        "attribute_name": "ProductChannelsSoldFrom",
+        "attribute_fqn_name": "ProductChannelsSoldFrom",
+        "attribute_description": "The day the channel opens for the product in the market, so that buying through it can begin. This fact is kept in this one place for a sales channel.",
+        "attribute_type": "DATE",
+        "attribute_class": "PUBLIC",
+        "attribute_concept": "SBJ020"
+      },
+      "depends_on": [
+        30
+      ]
+    },
+    {
+      "seq": 134,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR085",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductChannelsSoldUntil",
+        "attribute_name": "ProductChannelsSoldUntil",
+        "attribute_fqn_name": "ProductChannelsSoldUntil",
+        "attribute_description": "The day the channel closes for the product in the market, after which buyers can no longer use it. This fact is kept in this one place for a sales channel.",
+        "attribute_type": "DATE",
+        "attribute_class": "PUBLIC",
+        "attribute_concept": "SBJ020"
+      },
+      "depends_on": [
+        30
+      ]
+    },
+    {
+      "seq": 135,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR086",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductImagesSide",
+        "attribute_name": "ProductImagesSide",
+        "attribute_fqn_name": "ProductImagesSide",
+        "attribute_description": "The side of the product the picture shows. This fact is kept in this one place for a product picture.",
+        "attribute_type": "LOOKUP",
+        "attribute_lookup_type": "LKP014",
+        "attribute_class": "PUBLIC",
+        "attribute_concept": "SBJ021"
+      },
+      "depends_on": [
+        31,
+        14
+      ]
+    },
+    {
+      "seq": 136,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR087",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductImagesFileReference",
+        "attribute_name": "ProductImagesFileReference",
+        "attribute_fqn_name": "ProductImagesFileReference",
+        "attribute_description": "Where the picture file is held. This fact is kept in this one place for a product picture.",
+        "attribute_type": "TEXT",
+        "attribute_class": "PUBLIC",
+        "attribute_concept": "SBJ021"
+      },
+      "depends_on": [
+        31
+      ]
+    },
+    {
+      "seq": 137,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR088",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductImagesFileType",
+        "attribute_name": "ProductImagesFileType",
+        "attribute_fqn_name": "ProductImagesFileType",
+        "attribute_description": "The kind of file the picture is held as. This fact is kept in this one place for a product picture.",
+        "attribute_type": "LOOKUP",
+        "attribute_lookup_type": "LKP015",
+        "attribute_class": "PUBLIC",
+        "attribute_concept": "SBJ021"
+      },
+      "depends_on": [
+        31,
+        15
+      ]
+    },
+    {
+      "seq": 138,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR089",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductImagesCurrentFrom",
+        "attribute_name": "ProductImagesCurrentFrom",
+        "attribute_fqn_name": "ProductImagesCurrentFrom",
+        "attribute_description": "The date from which the picture is the current one for that side. This fact is kept in this one place for a product picture.",
+        "attribute_type": "DATE",
+        "attribute_class": "PUBLIC",
+        "attribute_concept": "SBJ021"
+      },
+      "depends_on": [
+        31
+      ]
+    },
+    {
+      "seq": 139,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR090",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductLabelItemsLanguage",
+        "attribute_name": "ProductLabelItemsLanguage",
+        "attribute_fqn_name": "ProductLabelItemsLanguage",
+        "attribute_description": "The language the item is printed in. This fact is kept in this one place for a label item.",
+        "attribute_type": "LOOKUP",
+        "attribute_lookup_type": "DLT000000082",
+        "attribute_class": "PUBLIC",
+        "attribute_concept": "SBJ007"
+      },
+      "depends_on": [
+        33
+      ]
+    },
+    {
+      "seq": 140,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR091",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductResponsibleBusinessesRegion",
+        "attribute_name": "ProductResponsibleBusinessesRegion",
+        "attribute_fqn_name": "ProductResponsibleBusinessesRegion",
+        "attribute_description": "The region the named business is responsible in, when the pack serves a region and not a single country. This fact is kept in this one place for a responsible business.",
+        "attribute_type": "LOOKUP",
+        "attribute_lookup_type": "LKP012",
+        "attribute_class": "PUBLIC",
+        "attribute_relationship": "REL007"
+      },
+      "depends_on": [
+        59,
+        12
+      ]
+    },
+    {
+      "seq": 141,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR092",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductResponsibleBusinessesCountry",
+        "attribute_name": "ProductResponsibleBusinessesCountry",
+        "attribute_fqn_name": "ProductResponsibleBusinessesCountry",
+        "attribute_description": "The country the named business is responsible in, when the pack serves a single country. This fact is kept in this one place for a responsible business.",
+        "attribute_type": "LOOKUP",
+        "attribute_lookup_type": "DLT000000071",
+        "attribute_class": "PUBLIC",
+        "attribute_relationship": "REL007"
+      },
+      "depends_on": [
+        59
+      ]
+    },
+    {
+      "seq": 142,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR093",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductAllergensPresence",
+        "attribute_name": "ProductAllergensPresence",
+        "attribute_fqn_name": "ProductAllergensPresence",
+        "attribute_description": "Whether the product contains the allergen or it may be present through cross-contact that cannot be avoided. This fact is kept in this one place for an allergen entry.",
+        "attribute_type": "LOOKUP",
+        "attribute_lookup_type": "LKP018",
+        "attribute_class": "PUBLIC",
+        "attribute_concept": "SBJ005"
+      },
+      "depends_on": [
+        22,
+        16
+      ]
+    },
+    {
+      "seq": 143,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR094",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductAllergensExplanation",
+        "attribute_name": "ProductAllergensExplanation",
+        "attribute_fqn_name": "ProductAllergensExplanation",
+        "attribute_description": "How the allergen came to be associated with the product, in plain words: for example, that it comes from the lecithin in the coating, or that a production line is shared with a nut product. This fact is kept in this one place for an allergen entry.",
+        "attribute_type": "TEXT",
+        "attribute_class": "PUBLIC",
+        "attribute_concept": "SBJ005"
+      },
+      "depends_on": [
+        22
+      ]
+    },
+    {
+      "seq": 144,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR095",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductShelfLivesMinimumTemperature",
+        "attribute_name": "ProductShelfLivesMinimumTemperature",
+        "attribute_fqn_name": "ProductShelfLivesMinimumTemperature",
+        "attribute_description": "The temperature, in degrees Celsius, below which the product must not be kept under this storage condition, for example because it spoils or freezes when colder. Left blank where no lower limit is stated. This fact is kept in this one place for a shelf life.",
+        "attribute_type": "FLOAT",
+        "attribute_class": "PUBLIC",
+        "attribute_concept": "SBJ009"
+      },
+      "depends_on": [
+        24
+      ]
+    },
+    {
+      "seq": 145,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR096",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductShelfLivesMaximumTemperature",
+        "attribute_name": "ProductShelfLivesMaximumTemperature",
+        "attribute_fqn_name": "ProductShelfLivesMaximumTemperature",
+        "attribute_description": "The temperature, in degrees Celsius, above which the product must not be kept under this storage condition, for example because it loses quality or becomes unsafe when warmer. Left blank where no upper limit is stated. This fact is kept in this one place for a shelf life.",
+        "attribute_type": "FLOAT",
+        "attribute_class": "PUBLIC",
+        "attribute_concept": "SBJ009"
+      },
+      "depends_on": [
+        24
+      ]
+    },
+    {
+      "seq": 146,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR097",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductClaimsNutrientType",
+        "attribute_name": "ProductClaimsNutrientType",
+        "attribute_fqn_name": "ProductClaimsNutrientType",
+        "attribute_description": "The nutrient the claim is about, where it is about one, such as sugars for a claim of reduced sugar. This fact is kept in this one place for a claim. It lets the claims that a change to a nutrient reaches be found.",
+        "attribute_type": "LOOKUP",
+        "attribute_lookup_type": "LKP003",
+        "attribute_class": "PUBLIC",
+        "attribute_concept": "SBJ008"
+      },
+      "depends_on": [
+        34,
+        4
+      ]
+    },
+    {
+      "seq": 147,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR098",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductCPGDefinitionCPGProductType",
+        "attribute_name": "ProductCPGDefinitionCPGProductType",
+        "attribute_fqn_name": "ProductCPGDefinitionCPGProductType",
+        "attribute_description": "Whether the product is a Logical product, a grouping of related sizes and packs that is never sold, or a Local product, a version of a logical product that can be sold, chosen from a list. A product that only goes into other products has neither, because that it is an ingredient is found from the formulations it appears in. This fact is kept in this one place for a product.",
+        "attribute_type": "LOOKUP",
+        "attribute_lookup_type": "LKP019",
+        "attribute_class": "PUBLIC",
+        "attribute_concept": "SBJ022"
+      },
+      "depends_on": [
+        32,
+        17
+      ]
+    }
+  ]
+}

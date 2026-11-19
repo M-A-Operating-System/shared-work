@@ -1,0 +1,175 @@
+{
+  "domains": [
+    {
+      "id": "DOM001",
+      "dda_id": "DMD000000032",
+      "dda_action": "reuse",
+      "code": "Products",
+      "prefix": "PRD",
+      "definition": null,
+      "definition_update": null,
+      "used_here": "Everything an organisation makes, buys or sells, including ingredients, packaging, sizes and packs. This design uses it for what each product is, what it is made from, what it must be, how long it lasts and what its pack says. The domain has no concepts in DDA yet, so this design adds them.",
+      "anchor_subject_id": "SBJ001",
+      "shared": true,
+      "admission_gate": null,
+      "domain_tests": null,
+      "reuse_considered": [],
+      "subject_ids": [
+        "SBJ001",
+        "SBJ002",
+        "SBJ003",
+        "SBJ004",
+        "SBJ005",
+        "SBJ006",
+        "SBJ007",
+        "SBJ008",
+        "SBJ009",
+        "SBJ010",
+        "SBJ011",
+        "SBJ012",
+        "SBJ019",
+        "SBJ020",
+        "SBJ021"
+      ],
+      "committee_decision": null
+    },
+    {
+      "id": "DOM002",
+      "dda_id": "DMD000000012",
+      "dda_action": "reuse",
+      "code": "LegalEntities",
+      "prefix": "LEG",
+      "definition": null,
+      "definition_update": null,
+      "used_here": "Organisations of every kind. This design uses it for suppliers, certifying bodies, the business named on a pack and the organisations that issue supplier documents.",
+      "anchor_subject_id": "SBJ013",
+      "shared": true,
+      "admission_gate": null,
+      "domain_tests": null,
+      "reuse_considered": [],
+      "subject_ids": [
+        "SBJ013",
+        "SBJ014",
+        "SBJ015"
+      ],
+      "committee_decision": null
+    },
+    {
+      "id": "DOM003",
+      "dda_id": "DMD000000016",
+      "dda_action": "reuse",
+      "code": "Documents",
+      "prefix": "DOC",
+      "definition": null,
+      "definition_update": null,
+      "used_here": "Documents that give evidence for business processes. This design uses it for supplier certificates of analysis, change notices, certification documents and specification sheets.",
+      "anchor_subject_id": "SBJ016",
+      "shared": true,
+      "admission_gate": null,
+      "domain_tests": null,
+      "reuse_considered": [],
+      "subject_ids": [
+        "SBJ016",
+        "SBJ017"
+      ],
+      "committee_decision": null
+    }
+  ],
+  "rejected_candidates": [
+    {
+      "name": "Recipes",
+      "failed_tests": [
+        "DT3"
+      ],
+      "reason": "A recipe as a list of what goes in is the formulation of a product and is held on the product. A recipe as a set of instructions is out of scope and belongs to the manufacturing model.",
+      "placed_in_domain_id": "DOM001",
+      "prompted_by_subject_ids": [
+        "SBJ003"
+      ],
+      "rejected_by": "agent"
+    },
+    {
+      "name": "Labels",
+      "failed_tests": [
+        "DT3"
+      ],
+      "reason": "A label is what a product declares in a market. It has no life apart from the product it is on, so its items are held beneath the product.",
+      "placed_in_domain_id": "DOM001",
+      "prompted_by_subject_ids": [
+        "SBJ007"
+      ],
+      "rejected_by": "agent"
+    },
+    {
+      "name": "Allergens",
+      "failed_tests": [
+        "DT2"
+      ],
+      "reason": "An allergen is something a product carries, named by the food it comes from. It cannot be described without naming the product or ingredient that carries it.",
+      "placed_in_domain_id": "DOM001",
+      "prompted_by_subject_ids": [
+        "SBJ005"
+      ],
+      "rejected_by": "agent"
+    },
+    {
+      "name": "Suppliers",
+      "failed_tests": [
+        "DT2"
+      ],
+      "reason": "A supplier is what an organisation is to a buyer of a particular material. It is a role, established by the authorised-source relationship.",
+      "placed_in_domain_id": "DOM002",
+      "prompted_by_subject_ids": [
+        "SBJ013"
+      ],
+      "rejected_by": "agent"
+    },
+    {
+      "name": "Specifications",
+      "failed_tests": [
+        "DT3"
+      ],
+      "reason": "A specification is a version of what a product must be, and it has no life apart from the product it specifies.",
+      "placed_in_domain_id": "DOM001",
+      "prompted_by_subject_ids": [
+        "SBJ004"
+      ],
+      "rejected_by": "agent"
+    },
+    {
+      "name": "Quality",
+      "failed_tests": [
+        "DT1"
+      ],
+      "reason": "Quality is what the organisation does about products. The specification belongs to the product, and the checks made on deliveries are a manufacturing matter.",
+      "placed_in_domain_id": "DOM001",
+      "prompted_by_subject_ids": [
+        "SBJ004"
+      ],
+      "rejected_by": "agent"
+    }
+  ],
+  "withdrawn_domains": [
+    {
+      "id": "DOM004",
+      "dda_id": "DMD000000034",
+      "dda_action": "reuse",
+      "code": "Locations",
+      "prefix": "LOC",
+      "definition": null,
+      "definition_update": null,
+      "used_here": "Physical places that an organisation or its trading partners work from. This design uses it for the organisation's factories and its suppliers' sites, each run by a company. The domain has no concepts in DDA yet, so this design adds the root concept.",
+      "anchor_subject_id": "SBJ018",
+      "shared": true,
+      "admission_gate": null,
+      "domain_tests": null,
+      "reuse_considered": [],
+      "subject_ids": [
+        "SBJ018"
+      ],
+      "committee_decision": null,
+      "status": "withdrawn",
+      "withdrawn_reason": "Moved to the manufacturing model: factories, the places inside them down to the shop floor, supplier sites, batches and supply chain detail belong there. This model holds a supplier only as a company."
+    }
+  ]
+}

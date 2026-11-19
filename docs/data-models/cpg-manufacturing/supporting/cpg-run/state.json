@@ -1,0 +1,1025 @@
+{
+  "pass": 3,
+  "converged": false,
+  "rules": [
+    {
+      "id": "RUL001",
+      "rule": "Everything bought, made or sold is a Product. Its kind — ingredient, packaging, part-made, finished, family — says whether it may be bought, made, used or sold; kind is never several separate structures.",
+      "data_requirement_ids": [
+        "DRQ013"
+      ]
+    },
+    {
+      "id": "RUL002",
+      "rule": "What goes into what is a web, not a tree. A product sits under many things and above many others, and a branching picture only exists once a starting point is chosen.",
+      "data_requirement_ids": [
+        "DRQ001",
+        "DRQ002"
+      ]
+    },
+    {
+      "id": "RUL003",
+      "rule": "A recipe line says how much goes into one of the thing directly above it. How much ends up in the finished product is worked out by following the chain and is never written down separately.",
+      "data_requirement_ids": [
+        "DRQ001"
+      ]
+    },
+    {
+      "id": "RUL004",
+      "rule": "Nothing may contain itself, however many steps away. A loop is refused when someone tries to create it.",
+      "data_requirement_ids": [
+        "DRQ001"
+      ]
+    },
+    {
+      "id": "RUL005",
+      "rule": "Using an input uses all of it, in the proportions its own definition sets. A product names an amount of an input and never an amount of anything inside it.",
+      "data_requirement_ids": [
+        "DRQ003"
+      ]
+    },
+    {
+      "id": "RUL006",
+      "rule": "What goes into an input is never adjusted from inside the product using it. A variation is a different product with its own identifier.",
+      "data_requirement_ids": [
+        "DRQ003"
+      ]
+    },
+    {
+      "id": "RUL007",
+      "rule": "An approved alternative replaces a whole input with another whole product; it never reaches inside the input.",
+      "data_requirement_ids": [
+        "DRQ005"
+      ]
+    },
+    {
+      "id": "RUL008",
+      "rule": "Every recipe line belongs to one version of the recipe. Following the chain uses one version throughout.",
+      "data_requirement_ids": [
+        "DRQ001",
+        "DRQ015"
+      ]
+    },
+    {
+      "id": "RUL009",
+      "rule": "What a recipe says should go in and what a batch used are recorded separately and never worked out from each other. The difference between them is recorded, not smoothed over.",
+      "data_requirement_ids": [
+        "DRQ004"
+      ]
+    },
+    {
+      "id": "RUL010",
+      "rule": "Allergens, other hazards, certifications, origin and use-by limits on a product are worked out from its inputs, not written onto it. Where a worked-out value and a stated one disagree, the disagreement is raised rather than one overwriting the other.",
+      "data_requirement_ids": [
+        "DRQ009",
+        "DRQ011"
+      ]
+    },
+    {
+      "id": "RUL011",
+      "rule": "The chain of what went into what stops at anything bought in. Below that point, allergens, hazards, certifications and origin are what the supplier has declared, recorded with who declared it, in which document, and whether it was checked.",
+      "data_requirement_ids": [
+        "DRQ007",
+        "DRQ008"
+      ]
+    },
+    {
+      "id": "RUL012",
+      "rule": "A supplier's statement is never reported as the organisation's own test result.",
+      "data_requirement_ids": [
+        "DRQ007"
+      ]
+    },
+    {
+      "id": "RUL013",
+      "rule": "Which hazard rules apply to a product depends on its kind. Food allergen rules are applied to food and not to pet food, cosmetics or household cleaners.",
+      "data_requirement_ids": [
+        "DRQ009"
+      ]
+    },
+    {
+      "id": "RUL014",
+      "rule": "Use of a material from a supplier whose approval had lapsed is recorded as it happened and raised, never blocked after the event or removed from the record.",
+      "data_requirement_ids": [
+        "DRQ006"
+      ]
+    },
+    {
+      "id": "RUL015",
+      "rule": "A split keeps every part traceable to the batch it came from, and a combination keeps every batch that went into it.",
+      "data_requirement_ids": [
+        "DRQ012"
+      ]
+    },
+    {
+      "id": "RUL016",
+      "rule": "Stock is held by item, by condition and by place. Stock that is available, on hold and rejected at one place are separate quantities.",
+      "data_requirement_ids": [
+        "DRQ013"
+      ]
+    },
+    {
+      "id": "RUL017",
+      "rule": "A change to what the buyer receives — declared ingredients, net content, certification, pack count — makes a new product with a new identifier. A change to how it is made makes a new version of the recipe.",
+      "data_requirement_ids": [
+        "DRQ014"
+      ]
+    },
+    {
+      "id": "RUL018",
+      "rule": "Different sizes and packs are separate products linked through a family, never one product with a size field, because the amounts in their recipes differ.",
+      "data_requirement_ids": [
+        "DRQ014"
+      ]
+    },
+    {
+      "id": "RUL019",
+      "rule": "Every batch records the version of the recipe and of the specification it was made to. A question about a past batch is answered against those, not against what is current.",
+      "data_requirement_ids": [
+        "DRQ015",
+        "DRQ025"
+      ]
+    },
+    {
+      "id": "RUL020",
+      "rule": "Every individually identified unit is a unit of exactly one product, and that product says in full what should have gone into it. Every part it calls for is accounted for; a missing part means the build is incomplete.",
+      "data_requirement_ids": [
+        "DRQ016"
+      ]
+    },
+    {
+      "id": "RUL021",
+      "rule": "A part is recorded by serial number or by batch, depending on how it is tracked; one unit may contain both.",
+      "data_requirement_ids": [
+        "DRQ016"
+      ]
+    },
+    {
+      "id": "RUL022",
+      "rule": "The recipe and the method are kept separate. What goes into a product is never worked out from how it is made, nor the reverse.",
+      "data_requirement_ids": [
+        "DRQ017"
+      ]
+    },
+    {
+      "id": "RUL023",
+      "rule": "A step says what it needs — a capability, a qualification, a kind of material — not which machine, person or batch it will use.",
+      "data_requirement_ids": [
+        "DRQ017"
+      ]
+    },
+    {
+      "id": "RUL024",
+      "rule": "A setting belongs to a product at a place, not to the step in general, because the right value differs by line.",
+      "data_requirement_ids": [
+        "DRQ017"
+      ]
+    },
+    {
+      "id": "RUL025",
+      "rule": "A recipe narrows through four levels, each settling something the level above left open. Every batch records the instructions it actually ran to.",
+      "data_requirement_ids": [
+        "DRQ018"
+      ]
+    },
+    {
+      "id": "RUL026",
+      "rule": "Where the reason for a sequencing rule is contamination, the rule is enforced rather than advisory.",
+      "data_requirement_ids": [
+        "DRQ019"
+      ]
+    },
+    {
+      "id": "RUL027",
+      "rule": "A place on a line and the machine standing in it are separate records. Which machine ran a past batch is found from the dates it was installed, never from what stands there now.",
+      "data_requirement_ids": [
+        "DRQ020"
+      ]
+    },
+    {
+      "id": "RUL028",
+      "rule": "How much a machine matters is judged by what its failure causes. Whether a place is a bottleneck is judged by its capacity. The two are never treated as one.",
+      "data_requirement_ids": [
+        "DRQ021"
+      ]
+    },
+    {
+      "id": "RUL029",
+      "rule": "A stoppage is one event. Lost output and the repair are two records of it, never two stoppages.",
+      "data_requirement_ids": [
+        "DRQ022"
+      ]
+    },
+    {
+      "id": "RUL030",
+      "rule": "Every stoppage has a reason from a set list. A missing reason is an error, not a category.",
+      "data_requirement_ids": [
+        "DRQ022"
+      ]
+    },
+    {
+      "id": "RUL031",
+      "rule": "Every batch records who did each step, in what capacity, over what time, and whether they held a current qualification for it.",
+      "data_requirement_ids": [
+        "DRQ023"
+      ]
+    },
+    {
+      "id": "RUL032",
+      "rule": "A departure from procedure is recorded against the run and a failure against specification against the batch, and the two are never merged.",
+      "data_requirement_ids": [
+        "DRQ026"
+      ]
+    },
+    {
+      "id": "RUL033",
+      "rule": "Failed material is held back before it is investigated, and the decision about it names who approved it.",
+      "data_requirement_ids": [
+        "DRQ027"
+      ]
+    },
+    {
+      "id": "RUL034",
+      "rule": "A corrective action closes only once a separate check shows it worked.",
+      "data_requirement_ids": [
+        "DRQ028"
+      ]
+    },
+    {
+      "id": "RUL035",
+      "rule": "Output is unavailable until someone releases it; finishing a batch is not release.",
+      "data_requirement_ids": [
+        "DRQ029"
+      ]
+    },
+    {
+      "id": "RUL036",
+      "rule": "Recall scope is worked out by following the record of what went into what, never kept as a list. A lot code travels with every movement.",
+      "data_requirement_ids": [
+        "DRQ030"
+      ]
+    },
+    {
+      "id": "RUL037",
+      "rule": "A recorded entry is never changed. A correction is a new entry replacing it, and both stay visible.",
+      "data_requirement_ids": [
+        "DRQ032"
+      ]
+    },
+    {
+      "id": "RUL038",
+      "rule": "Goods become the organisation's on receipt. Nothing is recorded as the organisation's stock while a supplier or outside manufacturer holds it.",
+      "data_requirement_ids": [
+        "DRQ033"
+      ]
+    },
+    {
+      "id": "RUL039",
+      "rule": "A storage breach is recorded against the stock held at the time; it does not change the stock's specification.",
+      "data_requirement_ids": [
+        "DRQ034"
+      ]
+    },
+    {
+      "id": "RUL040",
+      "rule": "No role is stored on anything. Supplier, outside manufacturer, certifying body and the rest come from the relationships a record holds.",
+      "data_requirement_ids": [
+        "DRQ006",
+        "DRQ033"
+      ]
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "SCN001",
+      "question": "Which finished products contain this sugar batch, by any route?",
+      "data_requirement_ids": [
+        "DRQ002"
+      ],
+      "path": [
+        "SBJ016",
+        "REL028",
+        "SBJ052",
+        "REL029",
+        "SBJ016"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN002",
+      "question": "How much sugar is in one finished case?",
+      "data_requirement_ids": [
+        "DRQ001"
+      ],
+      "path": [
+        "SBJ012",
+        "REL001",
+        "SBJ012"
+      ],
+      "result": "pass",
+      "reason": "Worked out along each route and added where sugar is reached more than once."
+    },
+    {
+      "id": "SCN003",
+      "question": "A product manager asks for the standard crumb with less sugar in one bar.",
+      "data_requirement_ids": [
+        "DRQ003"
+      ],
+      "path": [
+        "SBJ012",
+        "REL001"
+      ],
+      "result": "pass",
+      "reason": "Refused as an adjustment; a new crumb product is defined and the bar uses that."
+    },
+    {
+      "id": "SCN004",
+      "question": "This batch used 4% more cocoa than the recipe said.",
+      "data_requirement_ids": [
+        "DRQ004"
+      ],
+      "path": [
+        "SBJ052",
+        "REL028",
+        "SBJ053"
+      ],
+      "result": "pass",
+      "reason": "Both quantities kept; the difference is recorded."
+    },
+    {
+      "id": "SCN005",
+      "question": "Which batches used the alternative sweetener, and where?",
+      "data_requirement_ids": [
+        "DRQ005"
+      ],
+      "path": [
+        "SBJ022",
+        "SBJ053",
+        "REL028"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN006",
+      "question": "Was this supplier approved for this flour on the day it arrived?",
+      "data_requirement_ids": [
+        "DRQ006"
+      ],
+      "path": [
+        "SBJ012",
+        "REL003",
+        "SBJ005"
+      ],
+      "result": "pass",
+      "reason": "Approval dates on the relationship are read as at the receipt date."
+    },
+    {
+      "id": "SCN007",
+      "question": "Which properties of this batch were tested here, and which were taken on the supplier's word?",
+      "data_requirement_ids": [
+        "DRQ007"
+      ],
+      "path": [
+        "SBJ010",
+        "REL036",
+        "SBJ016",
+        "SBJ011"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN008",
+      "question": "What is inside the bought-in chocolate coating?",
+      "data_requirement_ids": [
+        "DRQ008"
+      ],
+      "path": [
+        "SBJ012",
+        "REL001"
+      ],
+      "result": "fail",
+      "reason": "The chain stops at anything bought in. Only what the supplier declared is known."
+    },
+    {
+      "id": "SCN009",
+      "question": "A label adhesive now contains a sesame allergen. Which products carry it?",
+      "data_requirement_ids": [
+        "DRQ009"
+      ],
+      "path": [
+        "SBJ018",
+        "REL001",
+        "SBJ012"
+      ],
+      "result": "pass",
+      "reason": "Worked out from the input, so every product using it changes without anyone editing them."
+    },
+    {
+      "id": "SCN010",
+      "question": "Which of these rules apply to a dog food and which to a hand soap?",
+      "data_requirement_ids": [
+        "DRQ009"
+      ],
+      "path": [
+        "SBJ012",
+        "SBJ018"
+      ],
+      "result": "pass",
+      "reason": "Rules follow the kind of product."
+    },
+    {
+      "id": "SCN011",
+      "question": "What must this household cleaner disclose, and what is withheld?",
+      "data_requirement_ids": [
+        "DRQ010"
+      ],
+      "path": [
+        "SBJ023"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN012",
+      "question": "What is the latest this finished batch can be used, given its inputs?",
+      "data_requirement_ids": [
+        "DRQ011"
+      ],
+      "path": [
+        "SBJ016",
+        "REL028",
+        "SBJ021"
+      ],
+      "result": "pass",
+      "reason": "Answered, but the rule that the shortest-lived input sets the limit rests on little evidence."
+    },
+    {
+      "id": "SCN013",
+      "question": "Which parts came from this split batch, and which batches made up this blend?",
+      "data_requirement_ids": [
+        "DRQ012"
+      ],
+      "path": [
+        "SBJ054",
+        "SBJ017",
+        "SBJ016"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN014",
+      "question": "How much yeast is available, on hold and rejected at each site?",
+      "data_requirement_ids": [
+        "DRQ013"
+      ],
+      "path": [
+        "SBJ049"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN015",
+      "question": "Which pack sizes of this biscuit exist, and did the move from 200g to 180g make a new product?",
+      "data_requirement_ids": [
+        "DRQ014"
+      ],
+      "path": [
+        "SBJ012",
+        "REL002",
+        "SBJ026"
+      ],
+      "result": "pass",
+      "reason": "A change in net content makes a new product."
+    },
+    {
+      "id": "SCN016",
+      "question": "What recipe was this 2024 batch made to?",
+      "data_requirement_ids": [
+        "DRQ015"
+      ],
+      "path": [
+        "SBJ052",
+        "SBJ015"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN017",
+      "question": "What is inside this serialised unit, and which batch did each part come from?",
+      "data_requirement_ids": [
+        "DRQ016"
+      ],
+      "path": [
+        "SBJ027",
+        "REL013",
+        "REL014",
+        "REL015"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN018",
+      "question": "What steps, equipment, qualifications and settings does this product need on Line 3?",
+      "data_requirement_ids": [
+        "DRQ017"
+      ],
+      "path": [
+        "SBJ012",
+        "REL006",
+        "SBJ039",
+        "REL008",
+        "SBJ041"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN019",
+      "question": "Which instructions were issued for this batch, and which formulation did they come from?",
+      "data_requirement_ids": [
+        "DRQ018"
+      ],
+      "path": [
+        "SBJ052",
+        "REL026",
+        "SBJ040",
+        "REL009"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN020",
+      "question": "What ran on this line just before this nut-free batch, and was it cleaned?",
+      "data_requirement_ids": [
+        "DRQ019"
+      ],
+      "path": [
+        "SBJ052",
+        "REL025",
+        "SBJ055"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN021",
+      "question": "Which filler was in this place when last March's batch was made?",
+      "data_requirement_ids": [
+        "DRQ020"
+      ],
+      "path": [
+        "SBJ052",
+        "REL025",
+        "SBJ032",
+        "REL011",
+        "SBJ027"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN022",
+      "question": "Which machines caused the most unplanned stoppage this quarter, and how did they fail?",
+      "data_requirement_ids": [
+        "DRQ021"
+      ],
+      "path": [
+        "SBJ056",
+        "REL030",
+        "SBJ027",
+        "SBJ030"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN023",
+      "question": "Line 2 stopped for 40 minutes. Why, and what did maintenance do?",
+      "data_requirement_ids": [
+        "DRQ022"
+      ],
+      "path": [
+        "SBJ056",
+        "SBJ057"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN024",
+      "question": "Who did each step of this batch, and were they qualified that day?",
+      "data_requirement_ids": [
+        "DRQ023"
+      ],
+      "path": [
+        "SBJ052",
+        "REL027",
+        "SBJ001",
+        "REL020"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN025",
+      "question": "Where has this batch been, and where is it now?",
+      "data_requirement_ids": [
+        "DRQ024"
+      ],
+      "path": [
+        "SBJ047",
+        "REL022",
+        "REL023",
+        "REL024"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN026",
+      "question": "Did this batch meet the specification in force when it was made?",
+      "data_requirement_ids": [
+        "DRQ025"
+      ],
+      "path": [
+        "SBJ016",
+        "SBJ058",
+        "SBJ014"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN027",
+      "question": "A step was skipped but the product still passed. What is recorded?",
+      "data_requirement_ids": [
+        "DRQ026"
+      ],
+      "path": [
+        "SBJ059"
+      ],
+      "result": "pass",
+      "reason": "A departure from procedure, with no failure against specification."
+    },
+    {
+      "id": "SCN028",
+      "question": "What was decided about this failed batch, why, and by whom?",
+      "data_requirement_ids": [
+        "DRQ027"
+      ],
+      "path": [
+        "SBJ061",
+        "REL027"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN029",
+      "question": "Which corrective actions were closed without checking they worked?",
+      "data_requirement_ids": [
+        "DRQ028"
+      ],
+      "path": [
+        "SBJ062"
+      ],
+      "result": "pass",
+      "reason": "None can close without the check, so the answer is always none — and the attempt is visible."
+    },
+    {
+      "id": "SCN030",
+      "question": "Who released this batch, and on what basis?",
+      "data_requirement_ids": [
+        "DRQ029"
+      ],
+      "path": [
+        "SBJ063",
+        "REL027"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN031",
+      "question": "Every batch this peanut batch went into, and everywhere those went — within 24 hours.",
+      "data_requirement_ids": [
+        "DRQ030"
+      ],
+      "path": [
+        "SBJ016",
+        "REL028",
+        "SBJ052",
+        "REL029",
+        "REL022"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN032",
+      "question": "Which complaints concern this batch?",
+      "data_requirement_ids": [
+        "DRQ031"
+      ],
+      "path": [
+        "SBJ065",
+        "REL032",
+        "SBJ016"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN033",
+      "question": "Who signed this record, what did it mean, and has it been corrected since?",
+      "data_requirement_ids": [
+        "DRQ032"
+      ],
+      "path": [
+        "SBJ004",
+        "SBJ066",
+        "REL034"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN034",
+      "question": "Which of our batches were made by an outside manufacturer, and when did they become ours?",
+      "data_requirement_ids": [
+        "DRQ033"
+      ],
+      "path": [
+        "SBJ012",
+        "REL005",
+        "SBJ047",
+        "REL021"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN035",
+      "question": "Was this batch ever stored outside its temperature limits?",
+      "data_requirement_ids": [
+        "DRQ034"
+      ],
+      "path": [
+        "SBJ067",
+        "REL037",
+        "SBJ016"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN036",
+      "question": "Which site is 'GLN 5012345000009' in the supplier's file?",
+      "data_requirement_ids": [
+        "DRQ035"
+      ],
+      "path": [
+        "SBJ044",
+        "SBJ043"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN037",
+      "question": "What did this batch cost against its standard?",
+      "data_requirement_ids": [
+        "DRQ036"
+      ],
+      "path": [
+        "SBJ025"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN038",
+      "question": "What was the total cost of poor quality across the plant last year?",
+      "data_requirement_ids": [
+        "DRQ036"
+      ],
+      "path": [],
+      "result": "fail",
+      "reason": "Scrap, rework, stoppages and complaints are each recorded, but nothing brings them together as one measure, and adding them up is not the same question."
+    },
+    {
+      "id": "SCN039",
+      "question": "Which product was running on Line 3 at 14:20 on a given day?",
+      "data_requirement_ids": [
+        "DRQ023"
+      ],
+      "path": [
+        "SBJ052",
+        "REL025"
+      ],
+      "result": "fail",
+      "reason": "Nothing stops two runs overlapping at places inside one another, so the answer can be more than one."
+    },
+    {
+      "id": "SCN040",
+      "question": "A sugar batch inside a bought-in coating is recalled by the supplier. Which of our batches are affected?",
+      "data_requirement_ids": [
+        "DRQ030",
+        "DRQ008"
+      ],
+      "path": [
+        "SBJ016",
+        "REL028"
+      ],
+      "result": "fail",
+      "reason": "Our record reaches the coating batch. Whether that coating batch contains the recalled sugar is known only from the supplier's records."
+    },
+    {
+      "id": "SCN041",
+      "question": "Which regulator identified this site, and under what authority?",
+      "data_requirement_ids": [
+        "DRQ035"
+      ],
+      "path": [
+        "SBJ044"
+      ],
+      "result": "fail",
+      "reason": "The identifier is held, but nothing relates the regulator to what it regulates."
+    }
+  ],
+  "issues": [
+    {
+      "id": "ISS001",
+      "business_requirement_ids": [
+        "REQ070"
+      ],
+      "kind": "cannot answer",
+      "issue": "The total cost of poor quality across a plant cannot be answered.",
+      "why": "Scrap, rework, stoppages and complaints are each recorded, but nothing brings them together as one measure — and adding them up is not the same question.",
+      "raised_by": [
+        "SCN038"
+      ],
+      "resolution": "Awaiting DEC007"
+    },
+    {
+      "id": "ISS002",
+      "business_requirement_ids": [
+        "REQ040",
+        "REQ033"
+      ],
+      "kind": "cannot prevent",
+      "issue": "Which product was running on a line at a given moment can have more than one answer.",
+      "why": "Nothing stops two runs being recorded as overlapping at places that sit inside one another.",
+      "raised_by": [
+        "SCN039"
+      ],
+      "resolution": "Awaiting DEC006"
+    },
+    {
+      "id": "ISS003",
+      "business_requirement_ids": [
+        "REQ010",
+        "REQ063"
+      ],
+      "kind": "depends on another model",
+      "issue": "What is inside a bought-in ingredient cannot be answered here.",
+      "why": "The chain of what went into what stops at anything bought in. The contents belong to the supplier, and only what they declare is known.",
+      "raised_by": [
+        "SCN008"
+      ],
+      "resolution": "Accepted as a limit of the model"
+    },
+    {
+      "id": "ISS004",
+      "business_requirement_ids": [
+        "REQ051",
+        "REQ063"
+      ],
+      "kind": "depends on another model",
+      "issue": "A recall that starts inside a bought-in ingredient can only be scoped with the supplier's help.",
+      "why": "Our record reaches the bought-in batch. Whether it contains the recalled material is in the supplier's records, not ours — so meeting the twenty-four-hour limit depends on them.",
+      "raised_by": [
+        "SCN040"
+      ],
+      "resolution": "Accepted as a limit of the model"
+    },
+    {
+      "id": "ISS005",
+      "business_requirement_ids": [
+        "REQ015"
+      ],
+      "kind": "depends on evidence",
+      "issue": "The rule that the shortest-lived input sets a product's use-by date rests on little evidence.",
+      "why": "The sources establish that use-by dates are tracked per batch, but none states how an input's date limits the product made from it.",
+      "raised_by": [
+        "SCN012"
+      ],
+      "resolution": "Addressed in the next pass — step 2"
+    },
+    {
+      "id": "ISS006",
+      "business_requirement_ids": [
+        "REQ014"
+      ],
+      "kind": "depends on evidence",
+      "issue": "Hazard rules for cosmetics, beauty and pet food are not established.",
+      "why": "The sources set out food allergen rules and household ingredient disclosure, and confirm those rules do not apply to other kinds of product — but nothing says what does apply to cosmetics, beauty or pet food.",
+      "raised_by": [],
+      "resolution": "Addressed in the next pass — step 2"
+    },
+    {
+      "id": "ISS007",
+      "business_requirement_ids": [
+        "REQ067"
+      ],
+      "kind": "cannot record",
+      "issue": "The model holds an identifier a regulator issued, but not the regulator's relationship to what it regulates.",
+      "why": "The requirement names a regulator; no relationship gives a regulator a role, so who regulates what is not recorded.",
+      "raised_by": [
+        "SCN041"
+      ],
+      "resolution": "Addressed in the next pass — step 7"
+    }
+  ],
+  "exceptions": [
+    {
+      "id": "EXC001",
+      "standard": "One anchor per domain",
+      "applies_to": "SBJ012 Product",
+      "why": "Product anchors physical things and also the families that group them, which are not physical.",
+      "alternative_rejected": "A separate domain for families. Rejected: a family exists only as a grouping of products and has no life of its own.",
+      "owner": "Technical lead",
+      "raised_at": "Step 6"
+    },
+    {
+      "id": "EXC002",
+      "standard": "A relationship runs between main records",
+      "applies_to": "REL015, REL028, REL029, REL031, REL032, REL036, REL037",
+      "why": "These relationships point at a batch, which sits beneath the Product anchor rather than being the anchor itself.",
+      "alternative_rejected": "Making Batch a domain of its own. Rejected: a batch has no existence apart from the product it is a batch of.",
+      "owner": "Quality manager",
+      "raised_at": "Step 7"
+    }
+  ],
+  "decisions": [
+    {
+      "id": "DEC001",
+      "decision": "Approve or reject EXC001 and EXC002. Publication is blocked while either is unapproved.",
+      "status": "open"
+    },
+    {
+      "id": "DEC002",
+      "decision": "Business requirements are uncertified. No business owner has reviewed the set.",
+      "status": "open"
+    },
+    {
+      "id": "DEC003",
+      "decision": "Five new domains — Products, Instances, Equipment, Processes, Locations — and new anchors in the existing Events and Transactions domains need the Data Governance Committee.",
+      "status": "open"
+    },
+    {
+      "id": "DEC004",
+      "decision": "Instances takes the prefix UNT because INS is held by Instruments. Confirm, or reassign.",
+      "status": "open"
+    },
+    {
+      "id": "DEC005",
+      "decision": "Is finished output identified individually, or only by batch? (SCQ001)",
+      "status": "open"
+    },
+    {
+      "id": "DEC006",
+      "decision": "Is preventing overlapping runs a rule of this model or of the factory system? (ISS002)",
+      "status": "open"
+    },
+    {
+      "id": "DEC007",
+      "decision": "Is the total cost of poor quality in scope for a later pass? (ISS001)",
+      "status": "open"
+    },
+    {
+      "id": "DEC008",
+      "decision": "The existing Events and Transactions domain definitions in DDA are written for financial services. Propose broadening them, since this model uses both.",
+      "status": "open"
+    },
+    {
+      "id": "DEC009",
+      "decision": "Attributes are set out for relationships only in this pass. Concept attributes are to follow.",
+      "status": "open"
+    },
+    {
+      "id": "DEC010",
+      "decision": "The standards were not re-read from DDA at this run; the read needs approval in the app. Confirm Appendix C against DMS000000169.",
+      "status": "open"
+    }
+  ],
+  "summary": "The model covers the making of consumer packaged goods across five subgroups, through the organisation's own factories and outside manufacturers. It reuses five existing DDA domains and proposes five new ones. Seven issues are open: two the model cannot resolve alone, because the contents of anything bought in belong to the supplier; two resting on too little evidence; and three the next pass can address."
+}

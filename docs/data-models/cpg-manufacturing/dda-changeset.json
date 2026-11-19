@@ -1,0 +1,4530 @@
+{
+  "spec_version": "1.0",
+  "package_ref": "cpg-manufacturing",
+  "apply_mode": "web-ui",
+  "preconditions": [
+    {
+      "requires": "CPG - Product Definition change package applied first",
+      "provides": "Product",
+      "concept": "SBJ012"
+    }
+  ],
+  "preconditions_note": "State transitions could not be read from the platform; see DEC007.",
+  "operations": [
+    {
+      "seq": 1,
+      "op": "create",
+      "entity": "domains",
+      "local_id": "DOM007",
+      "dda_id": null,
+      "fields": {
+        "domain_code": "Instances",
+        "domain_name": "Instances",
+        "domain_id_structure": "UNT",
+        "domain_description": "Instances are individually identified physical things — a serial-numbered pack, a machine, a vessel, a tool — each made to a product definition and traceable as itself for its whole life. Includes what is fitted into each and what condition it is in. Excludes the product definition it is made to, which is a Product, and the batch it belongs to where it is not individually identified, which is a concept of Products."
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 2,
+      "op": "create",
+      "entity": "domains",
+      "local_id": "DOM009",
+      "dda_id": null,
+      "fields": {
+        "domain_code": "Processes",
+        "domain_name": "Processes",
+        "domain_id_structure": "PRC",
+        "domain_description": "Processes are the defined steps of work by which products are made — mixing, pasteurising, filling, labelling — the order they run in, the settings they run at, and the recipes that state them at each level of specificity from formulation to the instructions issued for one batch. Includes what each step requires of machines, people and materials. Excludes what a product is made from, which is Products, and the record of a step actually being performed, which is an Event."
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 3,
+      "op": "update",
+      "entity": "domains",
+      "local_id": "DOM010",
+      "dda_id": "DMD000000034",
+      "fields": {
+        "domain_description_addition": "The Locations domain also holds the structure of each factory down to the shop floor: the site, its areas, production lines, rooms and storage positions, each place inside the one above it, with the conditions each place must keep and the identifiers each is known by. Machines that stand in these places are held with Instances."
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 4,
+      "op": "create",
+      "entity": "lookupTypes",
+      "local_id": "LKP004",
+      "dda_id": null,
+      "fields": {
+        "lookup_type_code": "ProcessRecipeLevelsType",
+        "lookup_type_name": "ProcessRecipeLevelsType",
+        "lookup_type_description": "How specific a recipe is, from the general recipe the company holds to the instructions issued for one batch, following the ISA-88 standard. Each level is written from the one above it.",
+        "values": 4
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 5,
+      "op": "create",
+      "entity": "lookupTypes",
+      "local_id": "LKP005",
+      "dda_id": null,
+      "fields": {
+        "lookup_type_code": "LocationLevelType",
+        "lookup_type_name": "LocationLevelType",
+        "lookup_type_description": "The level a place holds in the structure of a factory, from the site down to the equipment module, following the ISA-95 standard. It lets a reader tell a line from the room it stands in.",
+        "values": 7
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 6,
+      "op": "create",
+      "entity": "lookupTypes",
+      "local_id": "LKP006",
+      "dda_id": null,
+      "fields": {
+        "lookup_type_code": "EventStoppagesReasonType",
+        "lookup_type_name": "EventStoppagesReasonType",
+        "lookup_type_description": "Why production stopped, chosen from a governed list so that stoppages can be counted and compared by reason. It does not say how long the stoppage lasted.",
+        "values": 10
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 7,
+      "op": "create",
+      "entity": "lookupTypes",
+      "local_id": "LKP007",
+      "dda_id": null,
+      "fields": {
+        "lookup_type_code": "EventDispositionsDecisionType",
+        "lookup_type_name": "EventDispositionsDecisionType",
+        "lookup_type_description": "What is done with material that failed its specification. Each decision has a different consequence for whether the material may still be sold.",
+        "values": 5
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 8,
+      "op": "create",
+      "entity": "lookupTypes",
+      "local_id": "LKP008",
+      "dda_id": null,
+      "fields": {
+        "lookup_type_code": "TransactionKindType",
+        "lookup_type_name": "TransactionKindType",
+        "lookup_type_description": "What kind of movement of goods a transaction records. It lets a reader tell goods coming in from goods going out.",
+        "values": 5
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 9,
+      "op": "update",
+      "entity": "lookupTypes",
+      "local_id": "LKP009",
+      "dda_id": "DLT000000156",
+      "fields": {
+        "lookups_to_add": [
+          {
+            "lookup_code": "KG",
+            "lookup_name": "Kilogram",
+            "lookup_description": "Mass in kilograms."
+          },
+          {
+            "lookup_code": "G",
+            "lookup_name": "Gram",
+            "lookup_description": "Mass in grams."
+          },
+          {
+            "lookup_code": "L",
+            "lookup_name": "Litre",
+            "lookup_description": "Volume in litres."
+          },
+          {
+            "lookup_code": "ML",
+            "lookup_name": "Millilitre",
+            "lookup_description": "Volume in millilitres."
+          },
+          {
+            "lookup_code": "EA",
+            "lookup_name": "Each",
+            "lookup_description": "A count of items."
+          },
+          {
+            "lookup_code": "PCT",
+            "lookup_name": "Per cent",
+            "lookup_description": "A share of the whole, in per cent."
+          },
+          {
+            "lookup_code": "CASE",
+            "lookup_name": "Case",
+            "lookup_description": "A count of cases."
+          }
+        ]
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 10,
+      "op": "create",
+      "entity": "lookupTypes",
+      "local_id": "LKP010",
+      "dda_id": null,
+      "fields": {
+        "lookup_type_code": "EventFindingsKindType",
+        "lookup_type_name": "EventFindingsKindType",
+        "lookup_type_description": "Whether a finding is a departure from procedure or a failure against specification. The two are kept apart because they are acted on differently and against different things.",
+        "values": 2
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 11,
+      "op": "create",
+      "entity": "lookupTypes",
+      "local_id": "LKP011",
+      "dda_id": null,
+      "fields": {
+        "lookup_type_code": "ProductPackLevelsLevelType",
+        "lookup_type_name": "ProductPackLevelsLevelType",
+        "lookup_type_description": "The levels a product is packed in, from the single unit up to the pallet. It names the level and does not say how many the level holds.",
+        "values": 5
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 12,
+      "op": "create",
+      "entity": "lookupTypes",
+      "local_id": "LKP012",
+      "dda_id": null,
+      "fields": {
+        "lookup_type_code": "InstanceKindType",
+        "lookup_type_name": "InstanceKindType",
+        "lookup_type_description": "Whether something tracked on its own is a machine standing in a place or an individual unit of product.",
+        "values": 2
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 13,
+      "op": "create",
+      "entity": "roles",
+      "local_id": "ROL010",
+      "dda_id": null,
+      "fields": {
+        "role_code": "ContractedProduct",
+        "role_name": "Contracted Product",
+        "role_description": "A product is a Contracted Product while it is made for the organisation by another company. It says that the organisation relies on an outside company to make or pack it. That is not the same as being a Routed Product, which says that the organisation has a method of its own for making it.",
+        "role_domains": [
+          "DMD000000032"
+        ]
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 14,
+      "op": "create",
+      "entity": "roles",
+      "local_id": "ROL011",
+      "dda_id": null,
+      "fields": {
+        "role_code": "OutsideManufacturer",
+        "role_name": "Outside Manufacturer",
+        "role_description": "A company is an Outside Manufacturer while it makes or packs a product for the organisation. It says that the company holds a contract to make or pack goods for the organisation. That is not the same as being a Site Operator, which says that the company runs a place, whatever it makes there.",
+        "role_domains": [
+          "DMD000000012"
+        ]
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 15,
+      "op": "create",
+      "entity": "roles",
+      "local_id": "ROL012",
+      "dda_id": null,
+      "fields": {
+        "role_code": "RoutedProduct",
+        "role_name": "Routed Product",
+        "role_description": "A product is a Routed Product while it is made by a method the organisation has defined. It says that the organisation has a defined way of making it. That is not the same as being a Contracted Product, which says that an outside company makes it.",
+        "role_domains": [
+          "DMD000000032"
+        ]
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 16,
+      "op": "create",
+      "entity": "roles",
+      "local_id": "ROL013",
+      "dda_id": null,
+      "fields": {
+        "role_code": "MakingMethod",
+        "role_name": "Making Method",
+        "role_description": "A method is a Making Method while it describes how a product is made. It says that this is the way the organisation makes the product. That is not the same as being a Permitted Step, which says one step within a method, not the whole method.",
+        "role_domains": [
+          "DOM009"
+        ]
+      },
+      "depends_on": [
+        2
+      ]
+    },
+    {
+      "seq": 17,
+      "op": "create",
+      "entity": "roles",
+      "local_id": "ROL014",
+      "dda_id": null,
+      "fields": {
+        "role_code": "LaterStep",
+        "role_name": "Later Step",
+        "role_description": "A step is a Later Step while it follows another step in a method. It says that the step comes after another and starts only once that one is done. That is not the same as being an Earlier Step, which says the step that must come first.",
+        "role_domains": [
+          "DOM009"
+        ]
+      },
+      "depends_on": [
+        2
+      ]
+    },
+    {
+      "seq": 18,
+      "op": "create",
+      "entity": "roles",
+      "local_id": "ROL015",
+      "dda_id": null,
+      "fields": {
+        "role_code": "EarlierStep",
+        "role_name": "Earlier Step",
+        "role_description": "A step is an Earlier Step while it comes before another step in a method. It says that another step depends on this one being done first. That is not the same as being a Later Step, which says the step that follows.",
+        "role_domains": [
+          "DOM009"
+        ]
+      },
+      "depends_on": [
+        2
+      ]
+    },
+    {
+      "seq": 19,
+      "op": "create",
+      "entity": "roles",
+      "local_id": "ROL016",
+      "dda_id": null,
+      "fields": {
+        "role_code": "PermittedStep",
+        "role_name": "Permitted Step",
+        "role_description": "A step is a Permitted Step while it may be run at a particular place. It says that the step may be carried out in that place. That is not the same as being a Qualified Work, which says that the step needs a qualified person, whatever the place.",
+        "role_domains": [
+          "DOM009"
+        ]
+      },
+      "depends_on": [
+        2
+      ]
+    },
+    {
+      "seq": 20,
+      "op": "create",
+      "entity": "roles",
+      "local_id": "ROL017",
+      "dda_id": null,
+      "fields": {
+        "role_code": "PermittedPlace",
+        "role_name": "Permitted Place",
+        "role_description": "A place is a Permitted Place while it is allowed to run a particular step. It says that the place is fit to host that step. That is not the same as being a Production Place, which says the place where a run actually took place.",
+        "role_domains": [
+          "DMD000000034"
+        ]
+      },
+      "depends_on": [
+        3
+      ]
+    },
+    {
+      "seq": 21,
+      "op": "create",
+      "entity": "roles",
+      "local_id": "ROL018",
+      "dda_id": null,
+      "fields": {
+        "role_code": "DerivedRecipe",
+        "role_name": "Derived Recipe",
+        "role_description": "A recipe is a Derived Recipe while it is written from a more general recipe. It says that its instructions come from a more general level. That is not the same as being a Source Recipe, which says the recipe that others are written from.",
+        "role_domains": [
+          "DOM009"
+        ]
+      },
+      "depends_on": [
+        2
+      ]
+    },
+    {
+      "seq": 22,
+      "op": "create",
+      "entity": "roles",
+      "local_id": "ROL019",
+      "dda_id": null,
+      "fields": {
+        "role_code": "SourceRecipe",
+        "role_name": "Source Recipe",
+        "role_description": "A recipe is a Source Recipe while it is the starting point for a more specific recipe. It says that other recipes are written from it. That is not the same as being a Derived Recipe, which says the recipe written from another.",
+        "role_domains": [
+          "DOM009"
+        ]
+      },
+      "depends_on": [
+        2
+      ]
+    },
+    {
+      "seq": 23,
+      "op": "create",
+      "entity": "roles",
+      "local_id": "ROL022",
+      "dda_id": null,
+      "fields": {
+        "role_code": "OccupiedPlace",
+        "role_name": "Occupied Place",
+        "role_description": "A place is an Occupied Place while it has a machine standing in it. It says that a machine is fitted in the place for a stated period. That is not the same as being a Production Place, which says that a run took place there, whether or not a machine is fitted.",
+        "role_domains": [
+          "DMD000000034"
+        ]
+      },
+      "depends_on": [
+        3
+      ]
+    },
+    {
+      "seq": 24,
+      "op": "create",
+      "entity": "roles",
+      "local_id": "ROL023",
+      "dda_id": null,
+      "fields": {
+        "role_code": "InstalledMachine",
+        "role_name": "Installed Machine",
+        "role_description": "A machine is an Installed Machine while it stands in a place in the plant. It says that the machine occupies a place for a stated period. That is not the same as being a Stopped Machine, which says a machine a stoppage halted, wherever it stands.",
+        "role_domains": [
+          "DOM007"
+        ]
+      },
+      "depends_on": [
+        1
+      ]
+    },
+    {
+      "seq": 25,
+      "op": "create",
+      "entity": "roles",
+      "local_id": "ROL026",
+      "dda_id": null,
+      "fields": {
+        "role_code": "IndividualUnit",
+        "role_name": "Individual Unit",
+        "role_description": "An unit is an Individual Unit while it is a single item made to a product. It says that the item is identified on its own and made to a product. That is not the same as being a Fitted Unit, which says an item built into another item.",
+        "role_domains": [
+          "DOM007"
+        ]
+      },
+      "depends_on": [
+        1
+      ]
+    },
+    {
+      "seq": 26,
+      "op": "create",
+      "entity": "roles",
+      "local_id": "ROL027",
+      "dda_id": null,
+      "fields": {
+        "role_code": "DefiningProduct",
+        "role_name": "Defining Product",
+        "role_description": "A product is a Defining Product while it is the product that individually identified units are made to. It says that units are made to it. That is not the same as being a Traded Product, which says goods bought or sold, not the units made to it.",
+        "role_domains": [
+          "DMD000000032"
+        ]
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 27,
+      "op": "create",
+      "entity": "roles",
+      "local_id": "ROL028",
+      "dda_id": null,
+      "fields": {
+        "role_code": "AssembledUnit",
+        "role_name": "Assembled Unit",
+        "role_description": "An unit is an Assembled Unit while it is built from other units or from batches. It says that the unit is put together from parts. That is not the same as being an Individual Unit, which says a unit identified on its own, whether or not it is assembled.",
+        "role_domains": [
+          "DOM007"
+        ]
+      },
+      "depends_on": [
+        1
+      ]
+    },
+    {
+      "seq": 28,
+      "op": "create",
+      "entity": "roles",
+      "local_id": "ROL029",
+      "dda_id": null,
+      "fields": {
+        "role_code": "FittedUnit",
+        "role_name": "Fitted Unit",
+        "role_description": "An unit is a Fitted Unit while it is built into another unit. It says that the unit is a part of a larger one. That is not the same as being an Assembled Unit, which says the larger unit it is built into.",
+        "role_domains": [
+          "DOM007"
+        ]
+      },
+      "depends_on": [
+        1
+      ]
+    },
+    {
+      "seq": 29,
+      "op": "create",
+      "entity": "roles",
+      "local_id": "ROL031",
+      "dda_id": null,
+      "fields": {
+        "role_code": "ContainedPlace",
+        "role_name": "Contained Place",
+        "role_description": "A place is a Contained Place while it sits within a larger place. It says that the place is inside another, such as a line within an area. That is not the same as being a Containing Place, which says the larger place that holds it.",
+        "role_domains": [
+          "DMD000000034"
+        ]
+      },
+      "depends_on": [
+        3
+      ]
+    },
+    {
+      "seq": 30,
+      "op": "create",
+      "entity": "roles",
+      "local_id": "ROL032",
+      "dda_id": null,
+      "fields": {
+        "role_code": "ContainingPlace",
+        "role_name": "Containing Place",
+        "role_description": "A place is a Containing Place while it holds smaller places within it. It says that other places sit inside it. That is not the same as being a Contained Place, which says the place that sits inside another.",
+        "role_domains": [
+          "DMD000000034"
+        ]
+      },
+      "depends_on": [
+        3
+      ]
+    },
+    {
+      "seq": 31,
+      "op": "create",
+      "entity": "roles",
+      "local_id": "ROL033",
+      "dda_id": null,
+      "fields": {
+        "role_code": "SiteOperator",
+        "role_name": "Site Operator",
+        "role_description": "A company is a Site Operator while it runs a place. It says that the company is responsible for running a place. That is not the same as being a Registering Authority, which says an authority that records a place without running it.",
+        "role_domains": [
+          "DMD000000012"
+        ]
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 32,
+      "op": "create",
+      "entity": "roles",
+      "local_id": "ROL034",
+      "dda_id": null,
+      "fields": {
+        "role_code": "OperatedSite",
+        "role_name": "Operated Site",
+        "role_description": "A place is an Operated Site while it is run by a company. It says that a company is responsible for running it. That is not the same as being a Registered Place, which says a place recorded by an authority, whoever runs it.",
+        "role_domains": [
+          "DMD000000034"
+        ]
+      },
+      "depends_on": [
+        3
+      ]
+    },
+    {
+      "seq": 33,
+      "op": "create",
+      "entity": "roles",
+      "local_id": "ROL035",
+      "dda_id": null,
+      "fields": {
+        "role_code": "RegisteredPlace",
+        "role_name": "Registered Place",
+        "role_description": "A place is a Registered Place while it is recorded on a register kept by an authority. It says that an authority knows the place under its own number. That is not the same as being an Operated Site, which says a place a company runs, whether or not it is registered.",
+        "role_domains": [
+          "DMD000000034"
+        ]
+      },
+      "depends_on": [
+        3
+      ]
+    },
+    {
+      "seq": 34,
+      "op": "create",
+      "entity": "roles",
+      "local_id": "ROL036",
+      "dda_id": null,
+      "fields": {
+        "role_code": "RegisteringAuthority",
+        "role_name": "Registering Authority",
+        "role_description": "A company is a Registering Authority while it keeps a register of places. It says that the body holds the register a place appears on. That is not the same as being a Site Operator, which says a company that runs a place.",
+        "role_domains": [
+          "DMD000000012"
+        ]
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 35,
+      "op": "create",
+      "entity": "roles",
+      "local_id": "ROL039",
+      "dda_id": null,
+      "fields": {
+        "role_code": "QualifiedPerson",
+        "role_name": "Qualified Person",
+        "role_description": "A person is a Qualified Person while it holds a qualification for a kind of work. It says that the person may carry out that work. That is not the same as being a Performer, which says a person who actually did a piece of work.",
+        "role_domains": [
+          "DMD000000001"
+        ]
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 36,
+      "op": "create",
+      "entity": "roles",
+      "local_id": "ROL040",
+      "dda_id": null,
+      "fields": {
+        "role_code": "QualifiedWork",
+        "role_name": "Qualified Work",
+        "role_description": "A step is a Qualified Work while it may be carried out by people holding the right qualification. It says that the step needs a qualified person. That is not the same as being a Permitted Step, which says a step that may be run at a place.",
+        "role_domains": [
+          "DOM009"
+        ]
+      },
+      "depends_on": [
+        2
+      ]
+    },
+    {
+      "seq": 37,
+      "op": "create",
+      "entity": "roles",
+      "local_id": "ROL043",
+      "dda_id": null,
+      "fields": {
+        "role_code": "TradedProduct",
+        "role_name": "Traded Product",
+        "role_description": "A product is a Traded Product while it is the product named on a movement of goods. It says that the product moved. That is not the same as being a Traced Batch, which says the particular batch, rather than the product.",
+        "role_domains": [
+          "DMD000000032"
+        ]
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 38,
+      "op": "create",
+      "entity": "roles",
+      "local_id": "ROL044",
+      "dda_id": null,
+      "fields": {
+        "role_code": "DespatchingPlace",
+        "role_name": "Despatching Place",
+        "role_description": "A place is a Despatching Place while it is where a movement of goods starts. It says that goods left from the place. That is not the same as being a Receiving Place, which says where goods arrive.",
+        "role_domains": [
+          "DMD000000034"
+        ]
+      },
+      "depends_on": [
+        3
+      ]
+    },
+    {
+      "seq": 39,
+      "op": "create",
+      "entity": "roles",
+      "local_id": "ROL045",
+      "dda_id": null,
+      "fields": {
+        "role_code": "ReceivingPlace",
+        "role_name": "Receiving Place",
+        "role_description": "A place is a Receiving Place while it is where a movement of goods ends. It says that goods arrived at the place. That is not the same as being a Despatching Place, which says where goods left from.",
+        "role_domains": [
+          "DMD000000034"
+        ]
+      },
+      "depends_on": [
+        3
+      ]
+    },
+    {
+      "seq": 40,
+      "op": "create",
+      "entity": "roles",
+      "local_id": "ROL046",
+      "dda_id": null,
+      "fields": {
+        "role_code": "ProductionRun",
+        "role_name": "Production Run",
+        "role_description": "A recorded event is a Production Run while it is the making of a batch on a line. It says that a batch was made, using some batches and producing others. That is not the same as being a Stoppage, which says an interruption within or between runs.",
+        "role_domains": [
+          "DMD000000020"
+        ]
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 41,
+      "op": "create",
+      "entity": "roles",
+      "local_id": "ROL047",
+      "dda_id": null,
+      "fields": {
+        "role_code": "ProductionPlace",
+        "role_name": "Production Place",
+        "role_description": "A place is a Production Place while it is where a production run took place. It says that the run happened there. That is not the same as being a Permitted Place, which says a place allowed to run a step, whether or not a run happened there.",
+        "role_domains": [
+          "DMD000000034"
+        ]
+      },
+      "depends_on": [
+        3
+      ]
+    },
+    {
+      "seq": 42,
+      "op": "create",
+      "entity": "roles",
+      "local_id": "ROL048",
+      "dda_id": null,
+      "fields": {
+        "role_code": "IssuedInstructions",
+        "role_name": "Issued Instructions",
+        "role_description": "A recipe is an Issued Instructions while it is the set of instructions a production run was issued. It says that a run was made to these instructions. That is not the same as being a Source Recipe, which says a more general recipe that others are written from.",
+        "role_domains": [
+          "DOM009"
+        ]
+      },
+      "depends_on": [
+        2
+      ]
+    },
+    {
+      "seq": 43,
+      "op": "create",
+      "entity": "roles",
+      "local_id": "ROL049",
+      "dda_id": null,
+      "fields": {
+        "role_code": "PerformedWork",
+        "role_name": "Performed Work",
+        "role_description": "A recorded event is a Performed Work while it was carried out by a person. It says that a named person did the work. That is not the same as being a Production Run, which says the making of a batch, whoever did it.",
+        "role_domains": [
+          "DMD000000020"
+        ]
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 44,
+      "op": "create",
+      "entity": "roles",
+      "local_id": "ROL050",
+      "dda_id": null,
+      "fields": {
+        "role_code": "Performer",
+        "role_name": "Performer",
+        "role_description": "A person is a Performer while it carries out recorded work. It says that the person did a piece of work, in a stated capacity. That is not the same as being a Qualified Person, which says a person entitled to do the work, whether or not they did it.",
+        "role_domains": [
+          "DMD000000001"
+        ]
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 45,
+      "op": "create",
+      "entity": "roles",
+      "local_id": "ROL055",
+      "dda_id": null,
+      "fields": {
+        "role_code": "Stoppage",
+        "role_name": "Stoppage",
+        "role_description": "A recorded event is a Stoppage while it halts a machine. It says that production stopped, for a reason. That is not the same as being a Production Run, which says the making of a batch.",
+        "role_domains": [
+          "DMD000000020"
+        ]
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 46,
+      "op": "create",
+      "entity": "roles",
+      "local_id": "ROL056",
+      "dda_id": null,
+      "fields": {
+        "role_code": "StoppedMachine",
+        "role_name": "Stopped Machine",
+        "role_description": "A machine is a Stopped Machine while it is halted by a stoppage. It says that this is the machine that stopped. That is not the same as being an Installed Machine, which says a machine standing in a place, whether or not it stopped.",
+        "role_domains": [
+          "DOM007"
+        ]
+      },
+      "depends_on": [
+        1
+      ]
+    },
+    {
+      "seq": 47,
+      "op": "create",
+      "entity": "roles",
+      "local_id": "ROL057",
+      "dda_id": null,
+      "fields": {
+        "role_code": "Finding",
+        "role_name": "Finding",
+        "role_description": "A recorded event is a Finding while it reports a departure from procedure, a failure against specification or a problem with a supplier. It says that something went wrong and needs a response. That is not the same as being a Complaint, which says a problem reported by a customer.",
+        "role_domains": [
+          "DMD000000020"
+        ]
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 48,
+      "op": "create",
+      "entity": "roles",
+      "local_id": "ROL059",
+      "dda_id": null,
+      "fields": {
+        "role_code": "Complaint",
+        "role_name": "Complaint",
+        "role_description": "A recorded event is a Complaint while it reports a problem raised by a customer. It says that a customer raised a problem with goods. That is not the same as being a Finding, which says a problem found by the organisation itself.",
+        "role_domains": [
+          "DMD000000020"
+        ]
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 49,
+      "op": "create",
+      "entity": "roles",
+      "local_id": "ROL061",
+      "dda_id": null,
+      "fields": {
+        "role_code": "Response",
+        "role_name": "Response",
+        "role_description": "A recorded event is a Response while it is an action taken in answer to another event. It says that it was prompted by something else, such as a corrective action following a finding. That is not the same as being a Trigger, which says the event that prompted it.",
+        "role_domains": [
+          "DMD000000020"
+        ]
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 50,
+      "op": "create",
+      "entity": "roles",
+      "local_id": "ROL062",
+      "dda_id": null,
+      "fields": {
+        "role_code": "Trigger",
+        "role_name": "Trigger",
+        "role_description": "A recorded event is a Trigger while it prompts another event. It says that something else was done because of it. That is not the same as being a Response, which says the event that answered it.",
+        "role_domains": [
+          "DMD000000020"
+        ]
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 51,
+      "op": "create",
+      "entity": "roles",
+      "local_id": "ROL063",
+      "dda_id": null,
+      "fields": {
+        "role_code": "Correction",
+        "role_name": "Correction",
+        "role_description": "A recorded event is a Correction while it corrects an earlier record. It says that an earlier record was altered, and why. That is not the same as being a Corrected Record, which says the record that was corrected.",
+        "role_domains": [
+          "DMD000000020"
+        ]
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 52,
+      "op": "create",
+      "entity": "roles",
+      "local_id": "ROL064",
+      "dda_id": null,
+      "fields": {
+        "role_code": "CorrectedRecord",
+        "role_name": "Corrected Record",
+        "role_description": "A recorded event is a Corrected Record while it has been corrected by a later entry. It says that the record stands corrected and is kept as it was. That is not the same as being a Correction, which says the entry that corrects it.",
+        "role_domains": [
+          "DMD000000020"
+        ]
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 53,
+      "op": "create",
+      "entity": "roles",
+      "local_id": "ROL066",
+      "dda_id": null,
+      "fields": {
+        "role_code": "ResponsibleSupplier",
+        "role_name": "Responsible Supplier",
+        "role_description": "A company is a Responsible Supplier while it is the supplier a problem is raised with. It says that the supplier is answerable for a problem. That is not the same as being a Trading Party, which says a company goods were bought from or sold to.",
+        "role_domains": [
+          "DMD000000012"
+        ]
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 54,
+      "op": "create",
+      "entity": "roles",
+      "local_id": "ROL067",
+      "dda_id": null,
+      "fields": {
+        "role_code": "DeclaringDocument",
+        "role_name": "Declaring Document",
+        "role_description": "A document is a Declaring Document while it states properties of a batch. It says that the document makes a claim about a batch. That is not the same as being a Traced Batch, which says the batch the claim is about.",
+        "role_domains": [
+          "DMD000000016"
+        ]
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 55,
+      "op": "create",
+      "entity": "roles",
+      "local_id": "ROL069",
+      "dda_id": null,
+      "fields": {
+        "role_code": "StorageBreach",
+        "role_name": "Storage Breach",
+        "role_description": "A recorded event is a Storage Breach while it records stock held outside its conditions. It says that stock was exposed to conditions it should not have been. That is not the same as being a Finding, which says a problem found by checking, not by exposure.",
+        "role_domains": [
+          "DMD000000020"
+        ]
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 56,
+      "op": "create",
+      "entity": "roles",
+      "local_id": "ROL071",
+      "dda_id": null,
+      "fields": {
+        "role_code": "TracedBatch",
+        "role_name": "Traced Batch",
+        "role_description": "A product is a Traced Batch while it is a batch that can be followed back to its inputs and forward to where it went. It says that the batch is the thing traceability follows, in either direction. That is not the same as being a Traded Product, which says the product named on a movement, not one batch of it.",
+        "role_domains": [
+          "DMD000000032"
+        ]
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 57,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ002",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "PersonQualificationRecords",
+        "concept_name": "PersonQualificationRecords",
+        "concept_description": "There is one of these for each qualification a person holds to carry out particular work, such as running a filling line or taking a sample. If you need to know whether someone was qualified to do a job on a given day, this is what you go by. It does not record the work they actually did, which is recorded against the batch.",
+        "concept_domain": "DMD000000001",
+        "concept_is_domain": null,
+        "concept_parent": "DMC000000143",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 58,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ003",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "PersonShiftAssignments",
+        "concept_name": "PersonShiftAssignments",
+        "concept_description": "There is one of these for each shift a person is rostered to work. If you need to know who was on duty at a given time, this is what you go by. It does not say what they worked on, which is recorded against each production run, and it does not say whether they were qualified for it.",
+        "concept_domain": "DMD000000001",
+        "concept_is_domain": null,
+        "concept_parent": "DMC000000143",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 59,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ004",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "PersonSignings",
+        "concept_name": "PersonSignings",
+        "concept_description": "There is one of these for each time a person puts their name to a record, whether to say they did the work or to confirm another person's work as a second check. If you need to know who signed a record, when, and what the signing meant, this is what you go by. A correction to a record is a record of its own and is not a signing.",
+        "concept_domain": "DMD000000001",
+        "concept_is_domain": null,
+        "concept_parent": "DMC000000143",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 60,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ008",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "LegalEntityAssessments",
+        "concept_name": "LegalEntityAssessments",
+        "concept_description": "There is one of these for each time a supplier or an outside manufacturer is assessed, saying what the assessment covered and how long it is valid. If you need to know whether a supplier held a valid assessment on the day a delivery arrived, this is what you go by. The problems raised against the supplier are not held here; each is recorded as a finding.",
+        "concept_domain": "DMD000000012",
+        "concept_is_domain": null,
+        "concept_parent": "DMC000000106",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 61,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ009",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "LegalEntitySupplierRequests",
+        "concept_name": "LegalEntitySupplierRequests",
+        "concept_description": "There is one of these for each request the business makes to a supplier to put a problem right, with the supplier's answer. If you need to know what a supplier was asked to do and how they replied, this is what you go by. The action the business takes itself is not held here; it is recorded as a corrective action.",
+        "concept_domain": "DMD000000012",
+        "concept_is_domain": null,
+        "concept_parent": "DMC000000106",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 62,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ011",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "DocumentDeclarations",
+        "concept_name": "DocumentDeclarations",
+        "concept_description": "There is one of these for each property a supplier's document states about a batch, such as a moisture level or the absence of an allergen. If you need to know what a supplier claims about a batch, and so what the business relies on without having tested it, this is what you go by. A test the business carried out itself is a test result and is not held here.",
+        "concept_domain": "DMD000000016",
+        "concept_is_domain": null,
+        "concept_parent": "DMC000000142",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 63,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ016",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "ProductBatches",
+        "concept_name": "ProductBatches",
+        "concept_description": "There is one of these for each batch of a product that was made, packed or received, known by the lot code given when it was first packed or transformed. If you need to know when it was made, how much there was and what to call it at every later movement, this is what you go by. What went into it and where it went are held on the links between production runs and batches.",
+        "concept_domain": "DMD000000032",
+        "concept_is_domain": null,
+        "concept_parent": "Product",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 64,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ017",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "ProductSubBatches",
+        "concept_name": "ProductSubBatches",
+        "concept_description": "There is one of these for each part a batch is divided into, with the quantity of that part. If you need to know which batch a quantity came from, this is what you go by. A batch combined from others is shown by the links between production runs and batches, not here.",
+        "concept_domain": "DMD000000032",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ016",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        63
+      ]
+    },
+    {
+      "seq": 65,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ026",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "Instance",
+        "concept_name": "Instance",
+        "concept_description": "There is one of these for each machine, vessel or tool, and for each individually identified unit of product, that is tracked on its own. If you need to know which machine stood in a place or what is inside a unit, this is what you go by. A kind of machine, or a product, which many of them share, is not held here.",
+        "concept_domain": "DOM007",
+        "concept_is_domain": "DOM007",
+        "concept_parent": "Master",
+        "concept_parent_rel": null
+      },
+      "depends_on": [
+        1
+      ]
+    },
+    {
+      "seq": 66,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ027",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "InstanceIdentifiers",
+        "concept_name": "InstanceIdentifiers",
+        "concept_description": "There is one of these for each identifier a machine or unit is known by, such as a serial number or an asset number, with the dates it applied. If you need to match a machine to its maker's records, this is what you go by. It does not say which identifier is preferred.",
+        "concept_domain": "DOM007",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ026",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        1,
+        65
+      ]
+    },
+    {
+      "seq": 67,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ028",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "InstanceConditions",
+        "concept_name": "InstanceConditions",
+        "concept_description": "There is one of these for each reading taken of a machine's condition, such as a temperature or the hours it has run, with the time it was taken. If you need to know how a machine was running before it failed, this is what you go by. A failure itself is recorded as a stoppage.",
+        "concept_domain": "DOM007",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ026",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        1,
+        65
+      ]
+    },
+    {
+      "seq": 68,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ029",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "InstanceFailureModes",
+        "concept_name": "InstanceFailureModes",
+        "concept_description": "There is one of these for each way a machine is known to fail, with what the failure does. If you need to know how a machine fails and what follows when it does, this is what you go by. A particular breakdown is recorded as a stoppage, not here.",
+        "concept_domain": "DOM007",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ026",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        1,
+        65
+      ]
+    },
+    {
+      "seq": 69,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ036",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "ProcessSegment",
+        "concept_name": "ProcessSegment",
+        "concept_description": "There is one of these for each defined step of work in making a product, such as mixing, pasteurising or filling. If you need to know what a step is called and what it does, this is what you go by. The order steps run in belongs to the method, and the performing of a step is recorded against the batch.",
+        "concept_domain": "DOM009",
+        "concept_is_domain": "DOM009",
+        "concept_parent": "Master",
+        "concept_parent_rel": null
+      },
+      "depends_on": [
+        2
+      ]
+    },
+    {
+      "seq": 70,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ037",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "ProcessSegmentRequirements",
+        "concept_name": "ProcessSegmentRequirements",
+        "concept_description": "There is one of these for each thing a step needs, whether a kind of machine, a qualified person or a material. If you need to know what must be in place before a step can run, this is what you go by. It does not say which machine or person was used on a given day, which is recorded against the production run.",
+        "concept_domain": "DOM009",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ036",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        2,
+        69
+      ]
+    },
+    {
+      "seq": 71,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ038",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "ProcessParameters",
+        "concept_name": "ProcessParameters",
+        "concept_description": "There is one of these for each setting a step is run at, such as a temperature or a speed, with the lowest and highest value allowed. If you need to know the limits a step must stay within, this is what you go by. The value used for a given batch is held with the recipe instructions.",
+        "concept_domain": "DOM009",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ036",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        2,
+        69
+      ]
+    },
+    {
+      "seq": 72,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ039",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "ProcessSamplingPlans",
+        "concept_name": "ProcessSamplingPlans",
+        "concept_description": "There is one of these for each plan for taking samples at a step, saying how often. If you need to know how often a step is sampled, this is what you go by. The sample actually taken and its result are recorded as a test.",
+        "concept_domain": "DOM009",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ036",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        2,
+        69
+      ]
+    },
+    {
+      "seq": 73,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ040",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "ProcessRoutings",
+        "concept_name": "ProcessRoutings",
+        "concept_description": "There is one of these for each method by which a product is made, as an ordered set of steps. If you need to know how a product is made and in what order, this is what you go by. The steps themselves are held separately, and the making of a batch is recorded as a production run.",
+        "concept_domain": "DOM009",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ036",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        2,
+        69
+      ]
+    },
+    {
+      "seq": 74,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ041",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "ProcessRecipeLevels",
+        "concept_name": "ProcessRecipeLevels",
+        "concept_description": "There is one of these for each level a recipe is written at, from the general recipe the company holds, through the site recipe and the master recipe, to the instructions issued for one batch. If you need to know which instructions a batch was made to and where they came from, this is what you go by. What the product is made from is held by CPG - Product Definition.",
+        "concept_domain": "DOM009",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ040",
+        "concept_parent_rel": "ONE_TO_MANY_MANDATORY"
+      },
+      "depends_on": [
+        2,
+        73
+      ]
+    },
+    {
+      "seq": 75,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ042",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "ProcessParameterValues",
+        "concept_name": "ProcessParameterValues",
+        "concept_description": "There is one of these for each value a setting is given at a particular level of a recipe. If you need to know what a setting was set to for a batch, this is what you go by. The limits the setting must stay within are held with the setting itself.",
+        "concept_domain": "DOM009",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ041",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        2,
+        74
+      ]
+    },
+    {
+      "seq": 76,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ043",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "Location",
+        "concept_name": "Location",
+        "concept_description": "There is one of these for each place the organisation needs to identify, from a site down through its areas, lines, rooms and storage positions to the shop floor, and each site a supplier, an outside manufacturer or a customer works from. If you need to know where something was made, held or sent, this is what you go by. Who owns or runs the place comes from its relationship with a legal entity, and the machines standing in it are held with Instances.",
+        "concept_domain": "DMD000000034",
+        "concept_is_domain": "DOM010",
+        "concept_parent": "Master",
+        "concept_parent_rel": null
+      },
+      "depends_on": [
+        3
+      ]
+    },
+    {
+      "seq": 77,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ044",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "LocationIdentifiers",
+        "concept_name": "LocationIdentifiers",
+        "concept_description": "There is one of these for each identifier a place is known by, such as a site number or a registration number a regulator issued, with who issued it. If you need to match a place to a supplier's or a regulator's record, this is what you go by. It does not say which identifier is preferred.",
+        "concept_domain": "DMD000000034",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ043",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        3,
+        76
+      ]
+    },
+    {
+      "seq": 78,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ045",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "LocationStorageConditions",
+        "concept_name": "LocationStorageConditions",
+        "concept_description": "There is one of these for each condition a place must keep stock in, such as a temperature range. If you need to know what a storage place must hold to, this is what you go by. A time the condition was broken is recorded as a storage breach.",
+        "concept_domain": "DMD000000034",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ043",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        3,
+        76
+      ]
+    },
+    {
+      "seq": 79,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ048",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "TransactionInventoryPositions",
+        "concept_name": "TransactionInventoryPositions",
+        "concept_description": "There is one of these for each count of an item held at a place, in a stated condition, at a time. If you need to know how much is available, on hold or rejected right now, this is what you go by. A decision to hold material is recorded as a disposition.",
+        "concept_domain": "DMD000000022",
+        "concept_is_domain": null,
+        "concept_parent": "DMC000000031",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 80,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ049",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "Event",
+        "concept_name": "Event",
+        "concept_description": "There is one of these for each thing that happens in making or handling goods that the business needs to record, with the time it happened. If you need to know that something happened and when, this is what you go by. What kind of thing it was, and its details, are held by the concept for that kind.",
+        "concept_domain": "DMD000000020",
+        "concept_is_domain": "DOM004",
+        "concept_parent": "Master",
+        "concept_parent_rel": null
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 81,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ051",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "EventProductionRuns",
+        "concept_name": "EventProductionRuns",
+        "concept_description": "There is one of these for each time a batch is made on a line, from its start to its end. If you need to know what was made, where, when and how much of each input was used, this is what you go by. The instructions it was made to are held as recipe levels, and the batch itself is held with the product.",
+        "concept_domain": "DMD000000020",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ049",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        80
+      ]
+    },
+    {
+      "seq": 82,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ053",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "EventBatchSplits",
+        "concept_name": "EventBatchSplits",
+        "concept_description": "There is one of these for each time a batch is divided into parts, with the reason. If you need to know why a batch was divided, this is what you go by. The parts and their quantities are held as sub-batches.",
+        "concept_domain": "DMD000000020",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ049",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        80
+      ]
+    },
+    {
+      "seq": 83,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ054",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "EventChangeovers",
+        "concept_name": "EventChangeovers",
+        "concept_description": "There is one of these for each time a line is switched from one product to another, with how long it took and whether it included a clean. If you need to know whether a line was cleaned between two products, this is what you go by. The rule about what may follow what is held as a sequencing rule.",
+        "concept_domain": "DMD000000020",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ049",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        80
+      ]
+    },
+    {
+      "seq": 84,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ055",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "EventStoppages",
+        "concept_name": "EventStoppages",
+        "concept_description": "There is one of these for each time production stops, with when it started, when it ended and why. If you need to know how long a line stopped and for what reason, this is what you go by. The repair that followed is recorded as maintenance work.",
+        "concept_domain": "DMD000000020",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ049",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        80
+      ]
+    },
+    {
+      "seq": 85,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ056",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "EventMaintenanceWork",
+        "concept_name": "EventMaintenanceWork",
+        "concept_description": "There is one of these for each piece of maintenance or repair work done on a machine, saying what was done. If you need to know what was done about a stoppage, this is what you go by. The stoppage itself is held as a stoppage, and the machine's wider history is held on the machine.",
+        "concept_domain": "DMD000000020",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ049",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        80
+      ]
+    },
+    {
+      "seq": 86,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ057",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "EventTests",
+        "concept_name": "EventTests",
+        "concept_description": "There is one of these for each test of a sample, with the method, the result, whether it met the specification and which version of the specification it was judged against. If you need to know whether a batch met its specification and by what test, this is what you go by. The specification itself is held by CPG - Product Definition.",
+        "concept_domain": "DMD000000020",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ049",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        80
+      ]
+    },
+    {
+      "seq": 87,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ058",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "EventFindings",
+        "concept_name": "EventFindings",
+        "concept_description": "There is one of these for each departure from procedure or failure against specification that is found, saying which it is, how serious it is and how it was contained. If you need to know what went wrong on a batch, this is what you go by. What was decided about the affected material is recorded as a disposition.",
+        "concept_domain": "DMD000000020",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ049",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        80
+      ]
+    },
+    {
+      "seq": 88,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ060",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "EventDispositions",
+        "concept_name": "EventDispositions",
+        "concept_description": "There is one of these for each decision about what is done with material that failed, such as rework or scrap, with the reason. If you need to know what was decided about failed material and why, this is what you go by. The failure itself is recorded as a finding.",
+        "concept_domain": "DMD000000020",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ049",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        80
+      ]
+    },
+    {
+      "seq": 89,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ061",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "EventCorrectiveActions",
+        "concept_name": "EventCorrectiveActions",
+        "concept_description": "There is one of these for each action taken to put right the cause of a problem, with the cause found, the check that the fix worked and when it was closed. If you need to know whether an action was closed before anyone checked it worked, this is what you go by. The problem itself is recorded as a finding.",
+        "concept_domain": "DMD000000020",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ049",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        80
+      ]
+    },
+    {
+      "seq": 90,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ062",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "EventReleases",
+        "concept_name": "EventReleases",
+        "concept_description": "There is one of these for each time a batch is released for use or sale, with who released it, when and on what basis. If you need to know whether and why a batch was released, this is what you go by. A batch that has finished being made is not available until this exists.",
+        "concept_domain": "DMD000000020",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ049",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        80
+      ]
+    },
+    {
+      "seq": 91,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ063",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "EventRecalls",
+        "concept_name": "EventRecalls",
+        "concept_description": "There is one of these for each recall of product already sent out, with what it covered. If you need to know what was recalled and why, this is what you go by. The batches a recall reached are found through the links between batches, not here.",
+        "concept_domain": "DMD000000020",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ049",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        80
+      ]
+    },
+    {
+      "seq": 92,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ064",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "EventComplaints",
+        "concept_name": "EventComplaints",
+        "concept_description": "There is one of these for each complaint received about a product, with the report as it was given. If you need to know what a customer reported and which batch it was about, this is what you go by. The investigation that follows is recorded as findings and corrective actions.",
+        "concept_domain": "DMD000000020",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ049",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        80
+      ]
+    },
+    {
+      "seq": 93,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ065",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "EventCorrections",
+        "concept_name": "EventCorrections",
+        "concept_description": "There is one of these for each correction made to an earlier record, saying why. If you need to know that a record was altered and why, this is what you go by. The earlier record is kept as it was and is never overwritten.",
+        "concept_domain": "DMD000000020",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ049",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        80
+      ]
+    },
+    {
+      "seq": 94,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ066",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "EventStorageBreaches",
+        "concept_name": "EventStorageBreaches",
+        "concept_description": "There is one of these for each time stock was held outside the conditions its place must keep, with when it began. If you need to know whether a batch was ever stored out of condition, this is what you go by. The conditions themselves are held with the place.",
+        "concept_domain": "DMD000000020",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ049",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        80
+      ]
+    },
+    {
+      "seq": 95,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ067",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "ProductPackLevels",
+        "concept_name": "ProductPackLevels",
+        "concept_description": "There is one of these for each level a product is packed in, such as a single unit, a case or a pallet, with how many of the level below it holds. If you need to know how many units are in a case and how many cases are on a pallet, this is what you go by. What is in the pack and the wording on it are held by CPG - Product Definition.",
+        "concept_domain": "DMD000000032",
+        "concept_is_domain": null,
+        "concept_parent": "Product",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 96,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ068",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "TransactionGoodsMovement",
+        "concept_name": "TransactionGoodsMovement",
+        "concept_description": "There is one of these for each time goods are received, issued, moved, bought or despatched, with the time it happened. If you need to know where goods went and when, this is what you go by. How much of an item is held at a point in time is held as stock positions. It is a movement of goods; a movement of money or of a holding is the transaction it sits beneath.",
+        "concept_domain": "DMD000000022",
+        "concept_is_domain": null,
+        "concept_parent": "DMC000000031",
+        "concept_parent_rel": "ONE_TO_ONE_OPTIONAL"
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 97,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ034",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "LocationSequencingRules",
+        "concept_name": "LocationSequencingRules",
+        "concept_description": "There is one of these for each rule about what may run on a line straight after what, with the reason and whether a clean is needed between. If you need to know whether one product may follow another on a line, this is what you go by. What actually ran, and whether the clean was done, is recorded as changeovers.",
+        "concept_domain": "DMD000000034",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ043",
+        "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
+      },
+      "depends_on": [
+        3,
+        76
+      ]
+    },
+    {
+      "seq": 98,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ047",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "TransactionGoodsMovementLines",
+        "concept_name": "TransactionGoodsMovementLines",
+        "concept_description": "There is one of these for each item and quantity on a movement of goods. If you need to know how much of what moved, this is what you go by. The parties and places of the movement are held on the movement itself.",
+        "concept_domain": "DMD000000022",
+        "concept_is_domain": null,
+        "concept_parent": "SBJ068",
+        "concept_parent_rel": "ONE_TO_MANY_MANDATORY"
+      },
+      "depends_on": [
+        96
+      ]
+    },
+    {
+      "seq": 99,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL005",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "ProductContractManufacture",
+        "relationship_name": "ProductContractManufacture",
+        "relationship_description": "Contracted Product is manufactured by Outside Manufacturer; Outside Manufacturer manufactures Contracted Product.",
+        "relationship_domain": "DMD000000032",
+        "relationship_destination_domain": "DMD000000012",
+        "relationship_forward_verb": "is manufactured by",
+        "relationship_inverse_verb": "manufactures",
+        "relationship_source_role": "ROL010",
+        "relationship_target_role": "ROL011",
+        "relationship_cardinality": "MANY_TO_MANY",
+        "relationship_dates": true,
+        "relationship_forward_view": "ProductOutsideManufacturers",
+        "relationship_mirror_view": "LegalEntityContractedProducts"
+      },
+      "depends_on": [
+        13,
+        14
+      ]
+    },
+    {
+      "seq": 100,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL006",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "ProductRoutings",
+        "relationship_name": "ProductRoutings",
+        "relationship_description": "Routed Product is made by Making Method; Making Method makes Routed Product.",
+        "relationship_domain": "DMD000000032",
+        "relationship_destination_domain": "DOM009",
+        "relationship_forward_verb": "is made by",
+        "relationship_inverse_verb": "makes",
+        "relationship_source_role": "ROL012",
+        "relationship_target_role": "ROL013",
+        "relationship_cardinality": "MANY_TO_ONE",
+        "relationship_dates": true,
+        "relationship_forward_view": "ProductMakingMethods",
+        "relationship_mirror_view": "ProcessSegmentRoutedProducts"
+      },
+      "depends_on": [
+        15,
+        16,
+        69
+      ]
+    },
+    {
+      "seq": 101,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL007",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "ProcessSegmentSequences",
+        "relationship_name": "ProcessSegmentSequences",
+        "relationship_description": "Later Step follows Earlier Step; Earlier Step precedes Later Step.",
+        "relationship_domain": "DOM009",
+        "relationship_destination_domain": "DOM009",
+        "relationship_forward_verb": "follows",
+        "relationship_inverse_verb": "precedes",
+        "relationship_source_role": "ROL014",
+        "relationship_target_role": "ROL015",
+        "relationship_cardinality": "MANY_TO_MANY",
+        "relationship_dates": false,
+        "relationship_forward_view": "ProcessSegmentEarlierSteps",
+        "relationship_mirror_view": "ProcessSegmentLaterSteps"
+      },
+      "depends_on": [
+        17,
+        18,
+        69
+      ]
+    },
+    {
+      "seq": 102,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL008",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "ProcessSegmentPlaces",
+        "relationship_name": "ProcessSegmentPlaces",
+        "relationship_description": "Permitted Step may be run at Permitted Place; Permitted Place may run Permitted Step.",
+        "relationship_domain": "DOM009",
+        "relationship_destination_domain": "DMD000000034",
+        "relationship_forward_verb": "may be run at",
+        "relationship_inverse_verb": "may run",
+        "relationship_source_role": "ROL016",
+        "relationship_target_role": "ROL017",
+        "relationship_cardinality": "MANY_TO_MANY",
+        "relationship_dates": true,
+        "relationship_forward_view": "ProcessSegmentPermittedPlaces",
+        "relationship_mirror_view": "LocationPermittedSteps"
+      },
+      "depends_on": [
+        19,
+        20,
+        69,
+        76
+      ]
+    },
+    {
+      "seq": 103,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL009",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "ProcessRecipeDerivations",
+        "relationship_name": "ProcessRecipeDerivations",
+        "relationship_description": "Derived Recipe is derived from Source Recipe; Source Recipe is the source of Derived Recipe.",
+        "relationship_domain": "DOM009",
+        "relationship_destination_domain": "DOM009",
+        "relationship_forward_verb": "is derived from",
+        "relationship_inverse_verb": "is the source of",
+        "relationship_source_role": "ROL018",
+        "relationship_target_role": "ROL019",
+        "relationship_cardinality": "MANY_TO_ONE",
+        "relationship_dates": true,
+        "relationship_forward_view": "ProcessSegmentSourceRecipes",
+        "relationship_mirror_view": "ProcessSegmentDerivedRecipes"
+      },
+      "depends_on": [
+        21,
+        22,
+        69
+      ]
+    },
+    {
+      "seq": 104,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL011",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "LocationInstallations",
+        "relationship_name": "LocationInstallations",
+        "relationship_description": "Occupied Place is occupied by Installed Machine; Installed Machine occupies Occupied Place.",
+        "relationship_domain": "DMD000000034",
+        "relationship_destination_domain": "DOM007",
+        "relationship_forward_verb": "is occupied by",
+        "relationship_inverse_verb": "occupies",
+        "relationship_source_role": "ROL022",
+        "relationship_target_role": "ROL023",
+        "relationship_cardinality": "MANY_TO_MANY",
+        "relationship_dates": true,
+        "relationship_forward_view": "LocationInstalledMachines",
+        "relationship_mirror_view": "InstanceOccupiedPlaces"
+      },
+      "depends_on": [
+        23,
+        24,
+        65,
+        76
+      ]
+    },
+    {
+      "seq": 105,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL013",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "InstanceDefinitions",
+        "relationship_name": "InstanceDefinitions",
+        "relationship_description": "Individual Unit is a unit of Defining Product; Defining Product is made as Individual Unit.",
+        "relationship_domain": "DOM007",
+        "relationship_destination_domain": "DMD000000032",
+        "relationship_forward_verb": "is a unit of",
+        "relationship_inverse_verb": "is made as",
+        "relationship_source_role": "ROL026",
+        "relationship_target_role": "ROL027",
+        "relationship_cardinality": "MANY_TO_ONE",
+        "relationship_dates": false,
+        "relationship_forward_view": "InstanceDefiningProducts",
+        "relationship_mirror_view": "ProductIndividualUnits"
+      },
+      "depends_on": [
+        25,
+        26,
+        65
+      ]
+    },
+    {
+      "seq": 106,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL014",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "InstanceComposition",
+        "relationship_name": "InstanceComposition",
+        "relationship_description": "Assembled Unit is built from Fitted Unit; Fitted Unit is built into Assembled Unit.",
+        "relationship_domain": "DOM007",
+        "relationship_destination_domain": "DOM007",
+        "relationship_forward_verb": "is built from",
+        "relationship_inverse_verb": "is built into",
+        "relationship_source_role": "ROL028",
+        "relationship_target_role": "ROL029",
+        "relationship_cardinality": "MANY_TO_MANY",
+        "relationship_dates": true,
+        "relationship_forward_view": "InstanceFittedUnits",
+        "relationship_mirror_view": "InstanceAssembledUnits"
+      },
+      "depends_on": [
+        27,
+        28,
+        65
+      ]
+    },
+    {
+      "seq": 107,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL015",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "InstanceBatchComposition",
+        "relationship_name": "InstanceBatchComposition",
+        "relationship_description": "Assembled Unit incorporates batch Traced Batch; Traced Batch is incorporated into Assembled Unit.",
+        "relationship_domain": "DOM007",
+        "relationship_destination_domain": "DMD000000032",
+        "relationship_forward_verb": "incorporates batch",
+        "relationship_inverse_verb": "is incorporated into",
+        "relationship_source_role": "ROL028",
+        "relationship_target_role": "ROL071",
+        "relationship_cardinality": "MANY_TO_MANY",
+        "relationship_dates": false,
+        "relationship_forward_view": "InstanceTracedBatches",
+        "relationship_mirror_view": "ProductAssembledUnits"
+      },
+      "depends_on": [
+        27,
+        56,
+        65
+      ]
+    },
+    {
+      "seq": 108,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL016",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "LocationHierarchies",
+        "relationship_name": "LocationHierarchies",
+        "relationship_description": "Contained Place is within Containing Place; Containing Place contains Contained Place.",
+        "relationship_domain": "DMD000000034",
+        "relationship_destination_domain": "DMD000000034",
+        "relationship_forward_verb": "is within",
+        "relationship_inverse_verb": "contains",
+        "relationship_source_role": "ROL031",
+        "relationship_target_role": "ROL032",
+        "relationship_cardinality": "MANY_TO_ONE",
+        "relationship_dates": false,
+        "relationship_forward_view": "LocationContainingPlaces",
+        "relationship_mirror_view": "LocationContainedPlaces"
+      },
+      "depends_on": [
+        29,
+        30,
+        76
+      ]
+    },
+    {
+      "seq": 109,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL018",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "LocationRegistrations",
+        "relationship_name": "LocationRegistrations",
+        "relationship_description": "Registered Place is registered with Registering Authority; Registering Authority registers Registered Place.",
+        "relationship_domain": "DMD000000034",
+        "relationship_destination_domain": "DMD000000012",
+        "relationship_forward_verb": "is registered with",
+        "relationship_inverse_verb": "registers",
+        "relationship_source_role": "ROL035",
+        "relationship_target_role": "ROL036",
+        "relationship_cardinality": "MANY_TO_MANY",
+        "relationship_dates": true,
+        "relationship_forward_view": "LocationRegisteringAuthorities",
+        "relationship_mirror_view": "LegalEntityRegisteredPlaces"
+      },
+      "depends_on": [
+        33,
+        34,
+        76
+      ]
+    },
+    {
+      "seq": 110,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL019",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "LegalEntitySiteOperations",
+        "relationship_name": "LegalEntitySiteOperations",
+        "relationship_description": "Site Operator operates Operated Site; Operated Site is operated by Site Operator.",
+        "relationship_domain": "DMD000000012",
+        "relationship_destination_domain": "DMD000000034",
+        "relationship_forward_verb": "operates",
+        "relationship_inverse_verb": "is operated by",
+        "relationship_source_role": "ROL033",
+        "relationship_target_role": "ROL034",
+        "relationship_cardinality": "MANY_TO_MANY",
+        "relationship_dates": true,
+        "relationship_forward_view": "LegalEntityOperatedSites",
+        "relationship_mirror_view": "LocationSiteOperators"
+      },
+      "depends_on": [
+        31,
+        32,
+        76
+      ]
+    },
+    {
+      "seq": 111,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL021",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "PersonWorkQualifications",
+        "relationship_name": "PersonWorkQualifications",
+        "relationship_description": "Qualified Person is qualified for Qualified Work; Qualified Work may be performed by Qualified Person.",
+        "relationship_domain": "DMD000000001",
+        "relationship_destination_domain": "DOM009",
+        "relationship_forward_verb": "is qualified for",
+        "relationship_inverse_verb": "may be performed by",
+        "relationship_source_role": "ROL039",
+        "relationship_target_role": "ROL040",
+        "relationship_cardinality": "MANY_TO_MANY",
+        "relationship_dates": true,
+        "relationship_forward_view": "PersonQualifiedWorks",
+        "relationship_mirror_view": "ProcessSegmentQualifiedPeople"
+      },
+      "depends_on": [
+        35,
+        36,
+        69
+      ]
+    },
+    {
+      "seq": 112,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL023",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "TransactionSubjects",
+        "relationship_name": "TransactionSubjects",
+        "relationship_description": "Transaction concerns Traded Product; Traded Product is traded in Transaction.",
+        "relationship_domain": "DMD000000022",
+        "relationship_destination_domain": "DMD000000032",
+        "relationship_forward_verb": "concerns",
+        "relationship_inverse_verb": "is traded in",
+        "relationship_source_role": "DMO000000016",
+        "relationship_target_role": "ROL043",
+        "relationship_cardinality": "MANY_TO_MANY",
+        "relationship_dates": false,
+        "relationship_forward_view": "TransactionTradedProducts",
+        "relationship_mirror_view": "ProductTransactions"
+      },
+      "depends_on": [
+        37
+      ]
+    },
+    {
+      "seq": 113,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL024",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "TransactionOrigins",
+        "relationship_name": "TransactionOrigins",
+        "relationship_description": "Transaction ships from Despatching Place; Despatching Place despatches Transaction.",
+        "relationship_domain": "DMD000000022",
+        "relationship_destination_domain": "DMD000000034",
+        "relationship_forward_verb": "ships from",
+        "relationship_inverse_verb": "despatches",
+        "relationship_source_role": "DMO000000016",
+        "relationship_target_role": "ROL044",
+        "relationship_cardinality": "MANY_TO_ONE",
+        "relationship_dates": false,
+        "relationship_forward_view": "TransactionDespatchingPlaces",
+        "relationship_mirror_view": "LocationTransactions"
+      },
+      "depends_on": [
+        38,
+        76
+      ]
+    },
+    {
+      "seq": 114,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL025",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "TransactionDestinations",
+        "relationship_name": "TransactionDestinations",
+        "relationship_description": "Transaction is delivered to Receiving Place; Receiving Place receives Transaction.",
+        "relationship_domain": "DMD000000022",
+        "relationship_destination_domain": "DMD000000034",
+        "relationship_forward_verb": "is delivered to",
+        "relationship_inverse_verb": "receives",
+        "relationship_source_role": "DMO000000016",
+        "relationship_target_role": "ROL045",
+        "relationship_cardinality": "MANY_TO_ONE",
+        "relationship_dates": false,
+        "relationship_forward_view": "TransactionReceivingPlaces",
+        "relationship_mirror_view": "TransactionReceivingPlacesOf"
+      },
+      "depends_on": [
+        39,
+        76
+      ]
+    },
+    {
+      "seq": 115,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL026",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "EventRunPlaces",
+        "relationship_name": "EventRunPlaces",
+        "relationship_description": "Production Run ran at Production Place; Production Place ran Production Run.",
+        "relationship_domain": "DMD000000020",
+        "relationship_destination_domain": "DMD000000034",
+        "relationship_forward_verb": "ran at",
+        "relationship_inverse_verb": "ran",
+        "relationship_source_role": "ROL046",
+        "relationship_target_role": "ROL047",
+        "relationship_cardinality": "MANY_TO_ONE",
+        "relationship_dates": false,
+        "relationship_forward_view": "EventProductionPlaces",
+        "relationship_mirror_view": "LocationProductionRuns"
+      },
+      "depends_on": [
+        40,
+        41,
+        76,
+        80
+      ]
+    },
+    {
+      "seq": 116,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL027",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "EventRunRecipes",
+        "relationship_name": "EventRunRecipes",
+        "relationship_description": "Production Run ran under Issued Instructions; Issued Instructions governed Production Run.",
+        "relationship_domain": "DMD000000020",
+        "relationship_destination_domain": "DOM009",
+        "relationship_forward_verb": "ran under",
+        "relationship_inverse_verb": "governed",
+        "relationship_source_role": "ROL046",
+        "relationship_target_role": "ROL048",
+        "relationship_cardinality": "MANY_TO_ONE",
+        "relationship_dates": false,
+        "relationship_forward_view": "EventIssuedInstructions",
+        "relationship_mirror_view": "ProcessSegmentProductionRuns"
+      },
+      "depends_on": [
+        40,
+        42,
+        69,
+        80
+      ]
+    },
+    {
+      "seq": 117,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL028",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "EventPerformers",
+        "relationship_name": "EventPerformers",
+        "relationship_description": "Performed Work was performed by Performer; Performer performed Performed Work.",
+        "relationship_domain": "DMD000000020",
+        "relationship_destination_domain": "DMD000000001",
+        "relationship_forward_verb": "was performed by",
+        "relationship_inverse_verb": "performed",
+        "relationship_source_role": "ROL049",
+        "relationship_target_role": "ROL050",
+        "relationship_cardinality": "MANY_TO_MANY",
+        "relationship_dates": true,
+        "relationship_forward_view": "EventPerformers",
+        "relationship_mirror_view": "PersonPerformedWorks"
+      },
+      "depends_on": [
+        43,
+        44,
+        80
+      ]
+    },
+    {
+      "seq": 118,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL029",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "EventBatchInputs",
+        "relationship_name": "EventBatchInputs",
+        "relationship_description": "Production Run consumed Traced Batch; Traced Batch was consumed by Production Run.",
+        "relationship_domain": "DMD000000020",
+        "relationship_destination_domain": "DMD000000032",
+        "relationship_forward_verb": "consumed",
+        "relationship_inverse_verb": "was consumed by",
+        "relationship_source_role": "ROL046",
+        "relationship_target_role": "ROL071",
+        "relationship_cardinality": "MANY_TO_MANY",
+        "relationship_dates": false,
+        "relationship_forward_view": "EventBatchesConsumed",
+        "relationship_mirror_view": "EventBatchesConsumedOf"
+      },
+      "depends_on": [
+        40,
+        56,
+        80
+      ]
+    },
+    {
+      "seq": 119,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL030",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "EventBatchOutputs",
+        "relationship_name": "EventBatchOutputs",
+        "relationship_description": "Production Run produced Traced Batch; Traced Batch was produced by Production Run.",
+        "relationship_domain": "DMD000000020",
+        "relationship_destination_domain": "DMD000000032",
+        "relationship_forward_verb": "produced",
+        "relationship_inverse_verb": "was produced by",
+        "relationship_source_role": "ROL046",
+        "relationship_target_role": "ROL071",
+        "relationship_cardinality": "MANY_TO_MANY",
+        "relationship_dates": false,
+        "relationship_forward_view": "EventBatchesProduced",
+        "relationship_mirror_view": "EventBatchesProducedOf"
+      },
+      "depends_on": [
+        40,
+        56,
+        80
+      ]
+    },
+    {
+      "seq": 120,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL031",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "EventStoppageMachines",
+        "relationship_name": "EventStoppageMachines",
+        "relationship_description": "Stoppage stopped Stopped Machine; Stopped Machine was stopped in Stoppage.",
+        "relationship_domain": "DMD000000020",
+        "relationship_destination_domain": "DOM007",
+        "relationship_forward_verb": "stopped",
+        "relationship_inverse_verb": "was stopped in",
+        "relationship_source_role": "ROL055",
+        "relationship_target_role": "ROL056",
+        "relationship_cardinality": "MANY_TO_ONE",
+        "relationship_dates": false,
+        "relationship_forward_view": "EventStoppedMachines",
+        "relationship_mirror_view": "InstanceStoppages"
+      },
+      "depends_on": [
+        45,
+        46,
+        65,
+        80
+      ]
+    },
+    {
+      "seq": 121,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL032",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "EventFindingBatches",
+        "relationship_name": "EventFindingBatches",
+        "relationship_description": "Finding is raised against Traced Batch; Traced Batch is subject of Finding.",
+        "relationship_domain": "DMD000000020",
+        "relationship_destination_domain": "DMD000000032",
+        "relationship_forward_verb": "is raised against",
+        "relationship_inverse_verb": "is subject of",
+        "relationship_source_role": "ROL057",
+        "relationship_target_role": "ROL071",
+        "relationship_cardinality": "MANY_TO_MANY",
+        "relationship_dates": false,
+        "relationship_forward_view": "EventBatchesFoundAgainst",
+        "relationship_mirror_view": "EventBatchesFoundAgainstOf"
+      },
+      "depends_on": [
+        47,
+        56,
+        80
+      ]
+    },
+    {
+      "seq": 122,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL033",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "EventComplaintBatches",
+        "relationship_name": "EventComplaintBatches",
+        "relationship_description": "Complaint reports a problem with Traced Batch; Traced Batch is complained about in Complaint.",
+        "relationship_domain": "DMD000000020",
+        "relationship_destination_domain": "DMD000000032",
+        "relationship_forward_verb": "reports a problem with",
+        "relationship_inverse_verb": "is complained about in",
+        "relationship_source_role": "ROL059",
+        "relationship_target_role": "ROL071",
+        "relationship_cardinality": "MANY_TO_ONE",
+        "relationship_dates": false,
+        "relationship_forward_view": "EventBatchesComplainedOf",
+        "relationship_mirror_view": "EventBatchesComplainedOfOf"
+      },
+      "depends_on": [
+        48,
+        56,
+        80
+      ]
+    },
+    {
+      "seq": 123,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL034",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "EventActionTriggers",
+        "relationship_name": "EventActionTriggers",
+        "relationship_description": "Response responds to Trigger; Trigger prompted Response.",
+        "relationship_domain": "DMD000000020",
+        "relationship_destination_domain": "DMD000000020",
+        "relationship_forward_verb": "responds to",
+        "relationship_inverse_verb": "prompted",
+        "relationship_source_role": "ROL061",
+        "relationship_target_role": "ROL062",
+        "relationship_cardinality": "MANY_TO_MANY",
+        "relationship_dates": false,
+        "relationship_forward_view": "EventTriggers",
+        "relationship_mirror_view": "EventResponses"
+      },
+      "depends_on": [
+        49,
+        50,
+        80
+      ]
+    },
+    {
+      "seq": 124,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL035",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "EventCorrectionTargets",
+        "relationship_name": "EventCorrectionTargets",
+        "relationship_description": "Correction corrects Corrected Record; Corrected Record is corrected by Correction.",
+        "relationship_domain": "DMD000000020",
+        "relationship_destination_domain": "DMD000000020",
+        "relationship_forward_verb": "corrects",
+        "relationship_inverse_verb": "is corrected by",
+        "relationship_source_role": "ROL063",
+        "relationship_target_role": "ROL064",
+        "relationship_cardinality": "MANY_TO_ONE",
+        "relationship_dates": false,
+        "relationship_forward_view": "EventCorrectedRecords",
+        "relationship_mirror_view": "EventCorrections"
+      },
+      "depends_on": [
+        51,
+        52,
+        80
+      ]
+    },
+    {
+      "seq": 125,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL036",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "EventSupplierFindings",
+        "relationship_name": "EventSupplierFindings",
+        "relationship_description": "Finding is raised with Responsible Supplier; Responsible Supplier received Finding.",
+        "relationship_domain": "DMD000000020",
+        "relationship_destination_domain": "DMD000000012",
+        "relationship_forward_verb": "is raised with",
+        "relationship_inverse_verb": "received",
+        "relationship_source_role": "ROL057",
+        "relationship_target_role": "ROL066",
+        "relationship_cardinality": "MANY_TO_ONE",
+        "relationship_dates": true,
+        "relationship_forward_view": "EventResponsibleSuppliers",
+        "relationship_mirror_view": "LegalEntityFindings"
+      },
+      "depends_on": [
+        47,
+        53,
+        80
+      ]
+    },
+    {
+      "seq": 126,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL037",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "DocumentBatchDeclarations",
+        "relationship_name": "DocumentBatchDeclarations",
+        "relationship_description": "Declaring Document declares properties of Traced Batch; Traced Batch is declared by Declaring Document.",
+        "relationship_domain": "DMD000000016",
+        "relationship_destination_domain": "DMD000000032",
+        "relationship_forward_verb": "declares properties of",
+        "relationship_inverse_verb": "is declared by",
+        "relationship_source_role": "ROL067",
+        "relationship_target_role": "ROL071",
+        "relationship_cardinality": "MANY_TO_MANY",
+        "relationship_dates": false,
+        "relationship_forward_view": "DocumentTracedBatches",
+        "relationship_mirror_view": "ProductDeclaringDocuments"
+      },
+      "depends_on": [
+        54,
+        56
+      ]
+    },
+    {
+      "seq": 127,
+      "op": "create",
+      "entity": "relationships",
+      "local_id": "REL038",
+      "dda_id": null,
+      "fields": {
+        "relationship_code": "EventStorageExposures",
+        "relationship_name": "EventStorageExposures",
+        "relationship_description": "Storage Breach exposed Traced Batch; Traced Batch was exposed in Storage Breach.",
+        "relationship_domain": "DMD000000020",
+        "relationship_destination_domain": "DMD000000032",
+        "relationship_forward_verb": "exposed",
+        "relationship_inverse_verb": "was exposed in",
+        "relationship_source_role": "ROL069",
+        "relationship_target_role": "ROL071",
+        "relationship_cardinality": "MANY_TO_MANY",
+        "relationship_dates": false,
+        "relationship_forward_view": "EventBatchesExposed",
+        "relationship_mirror_view": "EventBatchesExposedOf"
+      },
+      "depends_on": [
+        55,
+        56,
+        80
+      ]
+    },
+    {
+      "seq": 128,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR002",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventBatchInputsUnitOfMeasure",
+        "attribute_name": "EventBatchInputsUnitOfMeasure",
+        "attribute_fqn_name": "EventBatchInputsUnitOfMeasure",
+        "attribute_description": "The unit, such as kilograms or litres, in which the quantities on this link between a production run and a batch it used are stated. It applies to the quantity the recipe called for and to the quantity actually used.",
+        "attribute_type": "LOOKUP",
+        "attribute_lookup_type": "LKP009",
+        "attribute_concept": null,
+        "attribute_classification": null
+      },
+      "depends_on": [
+        9,
+        118
+      ]
+    },
+    {
+      "seq": 129,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR006",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "InstanceBatchCompositionQuantity",
+        "attribute_name": "InstanceBatchCompositionQuantity",
+        "attribute_fqn_name": "InstanceBatchCompositionQuantity",
+        "attribute_description": "How much of a batch was built into a unit, in the unit of measure stated for that batch. It is the only place that quantity is kept.",
+        "attribute_type": "FLOAT",
+        "attribute_lookup_type": null,
+        "attribute_concept": null,
+        "attribute_classification": null
+      },
+      "depends_on": [
+        107
+      ]
+    },
+    {
+      "seq": 130,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR008",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductContractManufactureScope",
+        "attribute_name": "ProductContractManufactureScope",
+        "attribute_fqn_name": "ProductContractManufactureScope",
+        "attribute_description": "What the outside manufacturer is contracted to do for a product, such as making it, packing it or both, and under which specification it works.",
+        "attribute_type": "TEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": null,
+        "attribute_classification": null
+      },
+      "depends_on": [
+        99
+      ]
+    },
+    {
+      "seq": 131,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR009",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "LocationInstallationsInstalledBy",
+        "attribute_name": "LocationInstallationsInstalledBy",
+        "attribute_fqn_name": "LocationInstallationsInstalledBy",
+        "attribute_description": "The person who fitted the machine into the place. It says who to ask about how the machine was installed on the day it went in.",
+        "attribute_type": "USER",
+        "attribute_lookup_type": null,
+        "attribute_concept": null,
+        "attribute_classification": "INTERNAL"
+      },
+      "depends_on": [
+        104
+      ]
+    },
+    {
+      "seq": 132,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR010",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventPerformersCapacity",
+        "attribute_name": "EventPerformersCapacity",
+        "attribute_fqn_name": "EventPerformersCapacity",
+        "attribute_description": "The capacity in which the person took part in the recorded event, such as operator, checker, decider or releaser. It is what shows, for a decision or a release, who made it.",
+        "attribute_type": "TEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": null,
+        "attribute_classification": null
+      },
+      "depends_on": [
+        117
+      ]
+    },
+    {
+      "seq": 133,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR011",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventBatchInputsQuantityUsed",
+        "attribute_name": "EventBatchInputsQuantityUsed",
+        "attribute_fqn_name": "EventBatchInputsQuantityUsed",
+        "attribute_description": "How much of the batch the production run actually used, in the unit of measure stated on the link. Set against the quantity the recipe called for, it shows how far the run departed from the recipe.",
+        "attribute_type": "FLOAT",
+        "attribute_lookup_type": null,
+        "attribute_concept": null,
+        "attribute_classification": null
+      },
+      "depends_on": [
+        118
+      ]
+    },
+    {
+      "seq": 134,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR012",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventBatchOutputsQuantityProduced",
+        "attribute_name": "EventBatchOutputsQuantityProduced",
+        "attribute_fqn_name": "EventBatchOutputsQuantityProduced",
+        "attribute_description": "How much of the batch the production run actually produced, in the unit of measure stated for it. It is the quantity the batch is followed by when it is split or sent on.",
+        "attribute_type": "FLOAT",
+        "attribute_lookup_type": null,
+        "attribute_concept": null,
+        "attribute_classification": null
+      },
+      "depends_on": [
+        119
+      ]
+    },
+    {
+      "seq": 135,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR013",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventStoppageMachinesFailureMode",
+        "attribute_name": "EventStoppageMachinesFailureMode",
+        "attribute_fqn_name": "EventStoppageMachinesFailureMode",
+        "attribute_description": "How the machine failed when it stopped, in words. It is empty when the stoppage was planned and the machine did not fail.",
+        "attribute_type": "TEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": null,
+        "attribute_classification": null
+      },
+      "depends_on": [
+        120
+      ]
+    },
+    {
+      "seq": 136,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR014",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "DocumentBatchDeclarationsVerified",
+        "attribute_name": "DocumentBatchDeclarationsVerified",
+        "attribute_fqn_name": "DocumentBatchDeclarationsVerified",
+        "attribute_description": "Whether the business checked what the supplier's document says about the batch by a test of its own. Where it is false, the claim is the supplier's and is not reported as the business's own result.",
+        "attribute_type": "BOOLEAN",
+        "attribute_lookup_type": null,
+        "attribute_concept": null,
+        "attribute_classification": null
+      },
+      "depends_on": [
+        126
+      ]
+    },
+    {
+      "seq": 137,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR015",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventStorageExposuresDuration",
+        "attribute_name": "EventStorageExposuresDuration",
+        "attribute_fqn_name": "EventStorageExposuresDuration",
+        "attribute_description": "How long the batch was exposed to conditions outside those its place must keep, counted in hours. It shows how serious the exposure was.",
+        "attribute_type": "FLOAT",
+        "attribute_lookup_type": null,
+        "attribute_concept": null,
+        "attribute_classification": null
+      },
+      "depends_on": [
+        127
+      ]
+    },
+    {
+      "seq": 138,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR029",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductBatchesLotCode",
+        "attribute_name": "ProductBatchesLotCode",
+        "attribute_fqn_name": "ProductBatchesLotCode",
+        "attribute_description": "The lot code given to the batch when it was first packed or transformed. It is carried unchanged at every later movement, so it is how the batch is followed back and forward.",
+        "attribute_type": "TEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ016",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        63
+      ]
+    },
+    {
+      "seq": 139,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR030",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductBatchesMadeOn",
+        "attribute_name": "ProductBatchesMadeOn",
+        "attribute_fqn_name": "ProductBatchesMadeOn",
+        "attribute_description": "The date the batch was made. For a batch that is split or combined, it is the date the new batch came into being.",
+        "attribute_type": "DATE",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ016",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        63
+      ]
+    },
+    {
+      "seq": 140,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR032",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductBatchesQuantityMade",
+        "attribute_name": "ProductBatchesQuantityMade",
+        "attribute_fqn_name": "ProductBatchesQuantityMade",
+        "attribute_description": "How much of the product the batch holds when it is made, in the product's unit of measure. Later splits are checked against it.",
+        "attribute_type": "FLOAT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ016",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        63
+      ]
+    },
+    {
+      "seq": 141,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR033",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductSubBatchesQuantity",
+        "attribute_name": "ProductSubBatchesQuantity",
+        "attribute_fqn_name": "ProductSubBatchesQuantity",
+        "attribute_description": "How much of the batch this part holds, in the same unit as the batch. The parts of a batch add up to what was divided.",
+        "attribute_type": "FLOAT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ017",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        64
+      ]
+    },
+    {
+      "seq": 142,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR048",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "InstanceBuiltOn",
+        "attribute_name": "InstanceBuiltOn",
+        "attribute_fqn_name": "InstanceBuiltOn",
+        "attribute_description": "The date the machine was built or the unit was made. It shows how old the machine or unit is.",
+        "attribute_type": "DATE",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ026",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        65
+      ]
+    },
+    {
+      "seq": 143,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR049",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "InstanceIdentifiersValue",
+        "attribute_name": "InstanceIdentifiersValue",
+        "attribute_fqn_name": "InstanceIdentifiersValue",
+        "attribute_description": "The identifier itself, such as a serial number or an asset number, exactly as the maker or the organisation wrote it. It is how a machine or unit is matched to outside records.",
+        "attribute_type": "TEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ027",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        66
+      ]
+    },
+    {
+      "seq": 144,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR050",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "InstanceConditionsMeasure",
+        "attribute_name": "InstanceConditionsMeasure",
+        "attribute_fqn_name": "InstanceConditionsMeasure",
+        "attribute_description": "What was measured when a reading was taken of the machine, such as its temperature or the hours it has run.",
+        "attribute_type": "TEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ028",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        67
+      ]
+    },
+    {
+      "seq": 145,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR051",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "InstanceConditionsValue",
+        "attribute_name": "InstanceConditionsValue",
+        "attribute_fqn_name": "InstanceConditionsValue",
+        "attribute_description": "The number the reading gave, in the unit the measure is normally stated in. Read with the time of the reading, it shows how the machine was running.",
+        "attribute_type": "FLOAT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ028",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        67
+      ]
+    },
+    {
+      "seq": 146,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR052",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "InstanceFailureModesEffect",
+        "attribute_name": "InstanceFailureModesEffect",
+        "attribute_fqn_name": "InstanceFailureModesEffect",
+        "attribute_description": "What happens when the machine fails in this way, such as lost output, spoiled product or a risk to safety. It helps judge how much the failure matters.",
+        "attribute_type": "LONGTEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ029",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        68
+      ]
+    },
+    {
+      "seq": 147,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR053",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "InstanceCriticalityScore",
+        "attribute_name": "InstanceCriticalityScore",
+        "attribute_fqn_name": "InstanceCriticalityScore",
+        "attribute_description": "A whole number showing how much the machine matters to production and to safety, where a higher number means a failure matters more. It is empty for an individual unit of product.",
+        "attribute_type": "INTEGER",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ026",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        65
+      ]
+    },
+    {
+      "seq": 148,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR054",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "LocationLevel",
+        "attribute_name": "LocationLevel",
+        "attribute_fqn_name": "LocationLevel",
+        "attribute_description": "How far down the plant structure the place is, such as site, area, production line, storage zone or work unit. It tells a reader where in the hierarchy the place sits.",
+        "attribute_type": "LOOKUP",
+        "attribute_lookup_type": "LKP005",
+        "attribute_concept": "SBJ043",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        5,
+        76
+      ]
+    },
+    {
+      "seq": 149,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR057",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "LocationSequencingRulesReason",
+        "attribute_name": "LocationSequencingRulesReason",
+        "attribute_fqn_name": "LocationSequencingRulesReason",
+        "attribute_description": "Why one product may not follow another on the line, such as an allergen that must not carry over. It is the reason the rule exists.",
+        "attribute_type": "LONGTEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ034",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        97
+      ]
+    },
+    {
+      "seq": 150,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR058",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "LocationSequencingRulesRequiresClean",
+        "attribute_name": "LocationSequencingRulesRequiresClean",
+        "attribute_fqn_name": "LocationSequencingRulesRequiresClean",
+        "attribute_description": "Whether a clean is needed on the line between the two products. Where it is true and no clean is recorded between the runs, the line was run against the rule.",
+        "attribute_type": "BOOLEAN",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ034",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        97
+      ]
+    },
+    {
+      "seq": 151,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR060",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProcessSegmentName",
+        "attribute_name": "ProcessSegmentName",
+        "attribute_fqn_name": "ProcessSegmentName",
+        "attribute_description": "What the step is called, in the words the factory uses, such as pasteurising or filling.",
+        "attribute_type": "TEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ036",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        69
+      ]
+    },
+    {
+      "seq": 152,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR061",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProcessSegmentRequirementsKind",
+        "attribute_name": "ProcessSegmentRequirementsKind",
+        "attribute_fqn_name": "ProcessSegmentRequirementsKind",
+        "attribute_description": "What sort of thing the step needs, such as a kind of machine, a qualified person or a material.",
+        "attribute_type": "TEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ037",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        70
+      ]
+    },
+    {
+      "seq": 153,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR062",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProcessParametersLowerLimit",
+        "attribute_name": "ProcessParametersLowerLimit",
+        "attribute_fqn_name": "ProcessParametersLowerLimit",
+        "attribute_description": "The floor for a setting: the lowest value the step may be run at and stay in control. A reading below it means the step ran too low, and it is stated in the unit the setting is normally read in.",
+        "attribute_type": "FLOAT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ038",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        71
+      ]
+    },
+    {
+      "seq": 154,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR063",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProcessParametersUpperLimit",
+        "attribute_name": "ProcessParametersUpperLimit",
+        "attribute_fqn_name": "ProcessParametersUpperLimit",
+        "attribute_description": "The ceiling for a setting: the highest value the step may be run at and stay in control. A reading above it means the step ran too high, and it is stated in the same unit as the floor.",
+        "attribute_type": "FLOAT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ038",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        71
+      ]
+    },
+    {
+      "seq": 155,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR064",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProcessParameterValuesValue",
+        "attribute_name": "ProcessParameterValuesValue",
+        "attribute_fqn_name": "ProcessParameterValuesValue",
+        "attribute_description": "What the setting is set to at this level of the recipe. For the instructions issued to a batch, it is what the operator was told to set.",
+        "attribute_type": "FLOAT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ042",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        75
+      ]
+    },
+    {
+      "seq": 156,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR065",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProcessRecipeLevelsLevel",
+        "attribute_name": "ProcessRecipeLevelsLevel",
+        "attribute_fqn_name": "ProcessRecipeLevelsLevel",
+        "attribute_description": "Which level the recipe is written at: the general recipe, the site recipe, the master recipe or the control recipe issued for one batch.",
+        "attribute_type": "LOOKUP",
+        "attribute_lookup_type": "LKP004",
+        "attribute_concept": "SBJ041",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        4,
+        74
+      ]
+    },
+    {
+      "seq": 157,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR066",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProcessRecipeLevelsIssuedOn",
+        "attribute_name": "ProcessRecipeLevelsIssuedOn",
+        "attribute_fqn_name": "ProcessRecipeLevelsIssuedOn",
+        "attribute_description": "The date the recipe at this level was issued. It shows which instructions were in force when a batch was made.",
+        "attribute_type": "DATE",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ041",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        74
+      ]
+    },
+    {
+      "seq": 158,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR067",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProcessSamplingPlansFrequency",
+        "attribute_name": "ProcessSamplingPlansFrequency",
+        "attribute_fqn_name": "ProcessSamplingPlansFrequency",
+        "attribute_description": "How often a sample is taken at the step, such as every pallet or every hour.",
+        "attribute_type": "TEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ039",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        72
+      ]
+    },
+    {
+      "seq": 159,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR068",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProcessRoutingsName",
+        "attribute_name": "ProcessRoutingsName",
+        "attribute_fqn_name": "ProcessRoutingsName",
+        "attribute_description": "What the method is called in the factory, such as the usual way of making a product on a particular line.",
+        "attribute_type": "TEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ040",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        73
+      ]
+    },
+    {
+      "seq": 160,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR069",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "LocationName",
+        "attribute_name": "LocationName",
+        "attribute_fqn_name": "LocationName",
+        "attribute_description": "What the place is called, in the words the business uses for it, such as a plant name, a line number or a cold store.",
+        "attribute_type": "TEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ043",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        76
+      ]
+    },
+    {
+      "seq": 161,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR070",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "LocationIdentifiersValue",
+        "attribute_name": "LocationIdentifiersValue",
+        "attribute_fqn_name": "LocationIdentifiersValue",
+        "attribute_description": "The identifier itself, such as a site number or a registration number, as the issuer wrote it. It is how the place is matched to a supplier's or a regulator's records.",
+        "attribute_type": "TEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ044",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        77
+      ]
+    },
+    {
+      "seq": 162,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR071",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "LocationIdentifiersIssuer",
+        "attribute_name": "LocationIdentifiersIssuer",
+        "attribute_fqn_name": "LocationIdentifiersIssuer",
+        "attribute_description": "Who issued the identifier, such as a regulator, a customer or the organisation itself. The same number from two issuers can mean two different places.",
+        "attribute_type": "TEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ044",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        77
+      ]
+    },
+    {
+      "seq": 163,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR072",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "LocationStorageConditionsLowerLimit",
+        "attribute_name": "LocationStorageConditionsLowerLimit",
+        "attribute_fqn_name": "LocationStorageConditionsLowerLimit",
+        "attribute_description": "The lower limit for a place: the coldest or lowest reading at which stock is safe to keep there. If the place falls below it, the stock was held out of condition.",
+        "attribute_type": "FLOAT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ045",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        78
+      ]
+    },
+    {
+      "seq": 164,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR073",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "LocationStorageConditionsUpperLimit",
+        "attribute_name": "LocationStorageConditionsUpperLimit",
+        "attribute_fqn_name": "LocationStorageConditionsUpperLimit",
+        "attribute_description": "The upper limit for a place: the warmest or highest reading at which stock is safe to keep there. If the place rises above it, the stock was held out of condition and a breach is recorded.",
+        "attribute_type": "FLOAT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ045",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        78
+      ]
+    },
+    {
+      "seq": 165,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR074",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "PersonQualificationRecordsAwardedOn",
+        "attribute_name": "PersonQualificationRecordsAwardedOn",
+        "attribute_fqn_name": "PersonQualificationRecordsAwardedOn",
+        "attribute_description": "The date the person was awarded the qualification. Work done before this date was not done by a qualified person.",
+        "attribute_type": "DATE",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ002",
+        "attribute_classification": "INTERNAL_PII"
+      },
+      "depends_on": [
+        57
+      ]
+    },
+    {
+      "seq": 166,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR075",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "PersonQualificationRecordsExpiresOn",
+        "attribute_name": "PersonQualificationRecordsExpiresOn",
+        "attribute_fqn_name": "PersonQualificationRecordsExpiresOn",
+        "attribute_description": "The date the qualification stops being valid. Work done after this date, unless the qualification was renewed, was not done by a qualified person.",
+        "attribute_type": "DATE",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ002",
+        "attribute_classification": "INTERNAL_PII"
+      },
+      "depends_on": [
+        57
+      ]
+    },
+    {
+      "seq": 167,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR076",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "PersonShiftAssignmentsStartedAt",
+        "attribute_name": "PersonShiftAssignmentsStartedAt",
+        "attribute_fqn_name": "PersonShiftAssignmentsStartedAt",
+        "attribute_description": "The time the person's shift began. Together with the shift pattern, it shows who was on duty at any moment.",
+        "attribute_type": "DATETIME",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ003",
+        "attribute_classification": "INTERNAL_PII"
+      },
+      "depends_on": [
+        58
+      ]
+    },
+    {
+      "seq": 168,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR077",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "PersonSigningsMeaning",
+        "attribute_name": "PersonSigningsMeaning",
+        "attribute_fqn_name": "PersonSigningsMeaning",
+        "attribute_description": "What the person meant by signing, such as that they did the work, checked it or released it. The same name on a record means different things for different meanings.",
+        "attribute_type": "TEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ004",
+        "attribute_classification": "INTERNAL_PII"
+      },
+      "depends_on": [
+        59
+      ]
+    },
+    {
+      "seq": 169,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR078",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "PersonSigningsSignedAt",
+        "attribute_name": "PersonSigningsSignedAt",
+        "attribute_fqn_name": "PersonSigningsSignedAt",
+        "attribute_description": "The time the person signed the record. It is the time of signing, which may be later than the time the work was done.",
+        "attribute_type": "DATETIME",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ004",
+        "attribute_classification": "INTERNAL_PII"
+      },
+      "depends_on": [
+        59
+      ]
+    },
+    {
+      "seq": 170,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR079",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "PersonSigningsIsSecondCheck",
+        "attribute_name": "PersonSigningsIsSecondCheck",
+        "attribute_fqn_name": "PersonSigningsIsSecondCheck",
+        "attribute_description": "Whether the signing is the check of another person's work, as is required where a step must be verified by a second qualified person, rather than the work itself.",
+        "attribute_type": "BOOLEAN",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ004",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        59
+      ]
+    },
+    {
+      "seq": 171,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR080",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "LegalEntityAssessmentsScope",
+        "attribute_name": "LegalEntityAssessmentsScope",
+        "attribute_fqn_name": "LegalEntityAssessmentsScope",
+        "attribute_description": "What the assessment covered, such as which materials or which site of the supplier or outside manufacturer.",
+        "attribute_type": "LONGTEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ008",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        60
+      ]
+    },
+    {
+      "seq": 172,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR081",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "LegalEntityAssessmentsValidUntil",
+        "attribute_name": "LegalEntityAssessmentsValidUntil",
+        "attribute_fqn_name": "LegalEntityAssessmentsValidUntil",
+        "attribute_description": "The date the assessment stops being valid. A delivery received after this date was not from a supplier holding a valid assessment.",
+        "attribute_type": "DATE",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ008",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        60
+      ]
+    },
+    {
+      "seq": 173,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR082",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "LegalEntitySupplierRequestsResponse",
+        "attribute_name": "LegalEntitySupplierRequestsResponse",
+        "attribute_fqn_name": "LegalEntitySupplierRequestsResponse",
+        "attribute_description": "What the supplier answered when asked to put a problem right. It is empty until the supplier replies.",
+        "attribute_type": "LONGTEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ009",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        61
+      ]
+    },
+    {
+      "seq": 174,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR083",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "DocumentDeclarationsProperty",
+        "attribute_name": "DocumentDeclarationsProperty",
+        "attribute_fqn_name": "DocumentDeclarationsProperty",
+        "attribute_description": "Which property of the batch the supplier's document states, such as its moisture level or whether it contains an allergen.",
+        "attribute_type": "TEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ011",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        62
+      ]
+    },
+    {
+      "seq": 175,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR084",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "DocumentDeclarationsValue",
+        "attribute_name": "DocumentDeclarationsValue",
+        "attribute_fqn_name": "DocumentDeclarationsValue",
+        "attribute_description": "What the document states the property to be. It is the supplier's claim, and it is read together with whether the business checked it.",
+        "attribute_type": "TEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ011",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        62
+      ]
+    },
+    {
+      "seq": 176,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR085",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "TransactionGoodsMovementKind",
+        "attribute_name": "TransactionGoodsMovementKind",
+        "attribute_fqn_name": "TransactionGoodsMovementKind",
+        "attribute_description": "What kind of movement of goods it is: a purchase, a receipt, an issue to production, a transfer between places or a despatch.",
+        "attribute_type": "LOOKUP",
+        "attribute_lookup_type": "LKP008",
+        "attribute_concept": "SBJ068",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        8,
+        96
+      ]
+    },
+    {
+      "seq": 177,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR086",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "TransactionGoodsMovementOccurredAt",
+        "attribute_name": "TransactionGoodsMovementOccurredAt",
+        "attribute_fqn_name": "TransactionGoodsMovementOccurredAt",
+        "attribute_description": "The time the goods moved. For a movement that takes time, it is the time they left or arrived, as the kind of movement says.",
+        "attribute_type": "DATETIME",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ068",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        96
+      ]
+    },
+    {
+      "seq": 178,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR087",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "TransactionGoodsMovementTitlePassesOnReceipt",
+        "attribute_name": "TransactionGoodsMovementTitlePassesOnReceipt",
+        "attribute_fqn_name": "TransactionGoodsMovementTitlePassesOnReceipt",
+        "attribute_description": "Whether the goods become the organisation's when they are received, rather than when they are paid for or when they leave the supplier. It decides who owns goods that are in transit.",
+        "attribute_type": "BOOLEAN",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ068",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        96
+      ]
+    },
+    {
+      "seq": 179,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR088",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "TransactionGoodsMovementLinesQuantity",
+        "attribute_name": "TransactionGoodsMovementLinesQuantity",
+        "attribute_fqn_name": "TransactionGoodsMovementLinesQuantity",
+        "attribute_description": "How much of the item moved on the line, in the item's unit of measure.",
+        "attribute_type": "FLOAT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ047",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        98
+      ]
+    },
+    {
+      "seq": 180,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR089",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "TransactionInventoryPositionsCondition",
+        "attribute_name": "TransactionInventoryPositionsCondition",
+        "attribute_fqn_name": "TransactionInventoryPositionsCondition",
+        "attribute_description": "The condition the held stock is in, such as available, on hold or rejected. Only stock that is available may be counted as available.",
+        "attribute_type": "TEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ048",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        79
+      ]
+    },
+    {
+      "seq": 181,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR090",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "TransactionInventoryPositionsQuantity",
+        "attribute_name": "TransactionInventoryPositionsQuantity",
+        "attribute_fqn_name": "TransactionInventoryPositionsQuantity",
+        "attribute_description": "How much of the item was held at the place in that condition when it was counted, in the item's unit of measure.",
+        "attribute_type": "FLOAT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ048",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        79
+      ]
+    },
+    {
+      "seq": 182,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR091",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "TransactionInventoryPositionsCountedAt",
+        "attribute_name": "TransactionInventoryPositionsCountedAt",
+        "attribute_fqn_name": "TransactionInventoryPositionsCountedAt",
+        "attribute_description": "The time the stock was counted. A figure is true only as at this time.",
+        "attribute_type": "DATETIME",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ048",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        79
+      ]
+    },
+    {
+      "seq": 183,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR092",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventOccurredAt",
+        "attribute_name": "EventOccurredAt",
+        "attribute_fqn_name": "EventOccurredAt",
+        "attribute_description": "The time the event happened. For an event that lasts, it is the time it started.",
+        "attribute_type": "DATETIME",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ049",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        80
+      ]
+    },
+    {
+      "seq": 184,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR093",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventProductionRunsStartedAt",
+        "attribute_name": "EventProductionRunsStartedAt",
+        "attribute_fqn_name": "EventProductionRunsStartedAt",
+        "attribute_description": "The time the production run began on the line, which is when the first input was taken for it. Together with the time it ended, it gives how long the batch took to make.",
+        "attribute_type": "DATETIME",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ051",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        81
+      ]
+    },
+    {
+      "seq": 185,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR094",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventProductionRunsEndedAt",
+        "attribute_name": "EventProductionRunsEndedAt",
+        "attribute_fqn_name": "EventProductionRunsEndedAt",
+        "attribute_description": "The time the production run ended on the line, which is when the last output was taken from it. It is empty while the run is still going on.",
+        "attribute_type": "DATETIME",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ051",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        81
+      ]
+    },
+    {
+      "seq": 186,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR095",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventProductionRunsYieldVariance",
+        "attribute_name": "EventProductionRunsYieldVariance",
+        "attribute_fqn_name": "EventProductionRunsYieldVariance",
+        "attribute_description": "How much more or less of its inputs the run used than the recipe called for. It is worked out from the quantity specified and the quantity actually used for each input.",
+        "attribute_type": "FLOAT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ051",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        81
+      ]
+    },
+    {
+      "seq": 187,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR096",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventBatchSplitsReason",
+        "attribute_name": "EventBatchSplitsReason",
+        "attribute_fqn_name": "EventBatchSplitsReason",
+        "attribute_description": "Why the batch was divided, such as to send part for rework, to fill different packs or to hold part back for testing.",
+        "attribute_type": "TEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ053",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        82
+      ]
+    },
+    {
+      "seq": 188,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR097",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventChangeoversDuration",
+        "attribute_name": "EventChangeoversDuration",
+        "attribute_fqn_name": "EventChangeoversDuration",
+        "attribute_description": "How long the changeover took, counted in minutes from the end of one product to the start of the next.",
+        "attribute_type": "FLOAT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ054",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        83
+      ]
+    },
+    {
+      "seq": 189,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR098",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventChangeoversIncludedClean",
+        "attribute_name": "EventChangeoversIncludedClean",
+        "attribute_fqn_name": "EventChangeoversIncludedClean",
+        "attribute_description": "Whether the changeover included cleaning the line. Where it is true, the line was cleaned between the two products.",
+        "attribute_type": "BOOLEAN",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ054",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        83
+      ]
+    },
+    {
+      "seq": 190,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR099",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventStoppagesReason",
+        "attribute_name": "EventStoppagesReason",
+        "attribute_fqn_name": "EventStoppagesReason",
+        "attribute_description": "Why production stopped, chosen from a governed list so that stoppages can be counted and compared by reason.",
+        "attribute_type": "LOOKUP",
+        "attribute_lookup_type": "LKP006",
+        "attribute_concept": "SBJ055",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        6,
+        84
+      ]
+    },
+    {
+      "seq": 191,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR100",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventStoppagesStartedAt",
+        "attribute_name": "EventStoppagesStartedAt",
+        "attribute_fqn_name": "EventStoppagesStartedAt",
+        "attribute_description": "The time production stopped. Together with the time it started again, it gives how long the stoppage lasted.",
+        "attribute_type": "DATETIME",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ055",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        84
+      ]
+    },
+    {
+      "seq": 192,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR101",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventStoppagesEndedAt",
+        "attribute_name": "EventStoppagesEndedAt",
+        "attribute_fqn_name": "EventStoppagesEndedAt",
+        "attribute_description": "The time production started again. It is empty while the stoppage is still going on.",
+        "attribute_type": "DATETIME",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ055",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        84
+      ]
+    },
+    {
+      "seq": 193,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR103",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventTestsMethod",
+        "attribute_name": "EventTestsMethod",
+        "attribute_fqn_name": "EventTestsMethod",
+        "attribute_description": "The method used to test the sample, as written in the specification or as the standard method named.",
+        "attribute_type": "TEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ057",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        86
+      ]
+    },
+    {
+      "seq": 194,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR104",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventTestsResult",
+        "attribute_name": "EventTestsResult",
+        "attribute_fqn_name": "EventTestsResult",
+        "attribute_description": "What the test found, as the person who did it recorded it, in the units the method gives. Whether it met the specification is held beside it.",
+        "attribute_type": "TEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ057",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        86
+      ]
+    },
+    {
+      "seq": 195,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR105",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventTestsConformed",
+        "attribute_name": "EventTestsConformed",
+        "attribute_fqn_name": "EventTestsConformed",
+        "attribute_description": "Whether the result met the specification it was judged against. Where it is true, the result was within the limits.",
+        "attribute_type": "BOOLEAN",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ057",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        86
+      ]
+    },
+    {
+      "seq": 196,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR106",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventFindingsClassification",
+        "attribute_name": "EventFindingsClassification",
+        "attribute_fqn_name": "EventFindingsClassification",
+        "attribute_description": "How serious the finding is, such as critical, major or minor, as the quality system grades it.",
+        "attribute_type": "TEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ058",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        87
+      ]
+    },
+    {
+      "seq": 197,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR107",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventFindingsContainedAt",
+        "attribute_name": "EventFindingsContainedAt",
+        "attribute_fqn_name": "EventFindingsContainedAt",
+        "attribute_description": "The time the problem was contained so that no more affected product could go on. It is empty while the problem is still uncontained.",
+        "attribute_type": "DATETIME",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ058",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        87
+      ]
+    },
+    {
+      "seq": 198,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR110",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventDispositionsDecision",
+        "attribute_name": "EventDispositionsDecision",
+        "attribute_fqn_name": "EventDispositionsDecision",
+        "attribute_description": "What was decided to do with the failed material: use it as it is, rework it, regrade it, scrap it or return it.",
+        "attribute_type": "LOOKUP",
+        "attribute_lookup_type": "LKP007",
+        "attribute_concept": "SBJ060",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        7,
+        88
+      ]
+    },
+    {
+      "seq": 199,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR111",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventDispositionsJustification",
+        "attribute_name": "EventDispositionsJustification",
+        "attribute_fqn_name": "EventDispositionsJustification",
+        "attribute_description": "Why that decision was taken, in the words of the person who took it. It is what a later reader relies on to understand why failed material was kept, reworked or scrapped.",
+        "attribute_type": "LONGTEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ060",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        88
+      ]
+    },
+    {
+      "seq": 200,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR112",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventCorrectiveActionsRootCause",
+        "attribute_name": "EventCorrectiveActionsRootCause",
+        "attribute_fqn_name": "EventCorrectiveActionsRootCause",
+        "attribute_description": "The cause found for the problem, which the action is meant to remove. It is the cause the action is judged against when its effect is checked.",
+        "attribute_type": "LONGTEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ061",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        89
+      ]
+    },
+    {
+      "seq": 201,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR113",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventCorrectiveActionsEffectivenessVerifiedAt",
+        "attribute_name": "EventCorrectiveActionsEffectivenessVerifiedAt",
+        "attribute_fqn_name": "EventCorrectiveActionsEffectivenessVerifiedAt",
+        "attribute_description": "The date the business checked that the action worked. An action closed before this date was closed without a check.",
+        "attribute_type": "DATE",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ061",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        89
+      ]
+    },
+    {
+      "seq": 202,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR114",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventCorrectiveActionsClosedAt",
+        "attribute_name": "EventCorrectiveActionsClosedAt",
+        "attribute_fqn_name": "EventCorrectiveActionsClosedAt",
+        "attribute_description": "The date the action was closed. It is empty while the action is still open.",
+        "attribute_type": "DATE",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ061",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        89
+      ]
+    },
+    {
+      "seq": 203,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR115",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventReleasesBasis",
+        "attribute_name": "EventReleasesBasis",
+        "attribute_fqn_name": "EventReleasesBasis",
+        "attribute_description": "What the release was based on, such as the test results and records that were looked at before the batch was let go.",
+        "attribute_type": "LONGTEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ062",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        90
+      ]
+    },
+    {
+      "seq": 204,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR116",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventReleasesReleasedAt",
+        "attribute_name": "EventReleasesReleasedAt",
+        "attribute_fqn_name": "EventReleasesReleasedAt",
+        "attribute_description": "The time the batch was released. Before this time the batch is not available for use or sale.",
+        "attribute_type": "DATETIME",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ062",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        90
+      ]
+    },
+    {
+      "seq": 205,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR117",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventRecallsScope",
+        "attribute_name": "EventRecallsScope",
+        "attribute_fqn_name": "EventRecallsScope",
+        "attribute_description": "Which batches and which markets the recall covered, as announced. The batches actually reached are found through the links between batches.",
+        "attribute_type": "LONGTEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ063",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        91
+      ]
+    },
+    {
+      "seq": 206,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR118",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventComplaintsReport",
+        "attribute_name": "EventComplaintsReport",
+        "attribute_fqn_name": "EventComplaintsReport",
+        "attribute_description": "What the person reported about the product, in their own words, exactly as they gave it. It is not altered by what the investigation later finds.",
+        "attribute_type": "LONGTEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ064",
+        "attribute_classification": "CUSTOMER"
+      },
+      "depends_on": [
+        92
+      ]
+    },
+    {
+      "seq": 207,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR119",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventCorrectionsReason",
+        "attribute_name": "EventCorrectionsReason",
+        "attribute_fqn_name": "EventCorrectionsReason",
+        "attribute_description": "Why the earlier record was corrected, in the words of the person who made the correction. The earlier record itself is kept as it was.",
+        "attribute_type": "LONGTEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ065",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        93
+      ]
+    },
+    {
+      "seq": 208,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR120",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventStorageBreachesStartedAt",
+        "attribute_name": "EventStorageBreachesStartedAt",
+        "attribute_fqn_name": "EventStorageBreachesStartedAt",
+        "attribute_description": "The time the stock first went outside the conditions its place must keep. Together with the length of the exposure, it shows how serious the breach was.",
+        "attribute_type": "DATETIME",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ066",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        94
+      ]
+    },
+    {
+      "seq": 209,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR121",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventBatchInputsQuantitySpecified",
+        "attribute_name": "EventBatchInputsQuantitySpecified",
+        "attribute_fqn_name": "EventBatchInputsQuantitySpecified",
+        "attribute_description": "How much of the input the recipe called for, as it stood when the batch was made. It is kept with the run so that a later recipe does not rewrite what was asked of this one.",
+        "attribute_type": "FLOAT",
+        "attribute_lookup_type": null,
+        "attribute_concept": null,
+        "attribute_classification": null
+      },
+      "depends_on": [
+        118
+      ]
+    },
+    {
+      "seq": 210,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR122",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventBatchInputsIsAlternative",
+        "attribute_name": "EventBatchInputsIsAlternative",
+        "attribute_fqn_name": "EventBatchInputsIsAlternative",
+        "attribute_description": "Whether the run used an alternative to the input the recipe named. Where it is true, the run did not use the specified input.",
+        "attribute_type": "BOOLEAN",
+        "attribute_lookup_type": null,
+        "attribute_concept": null,
+        "attribute_classification": null
+      },
+      "depends_on": [
+        118
+      ]
+    },
+    {
+      "seq": 211,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR123",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductPackLevelsLevel",
+        "attribute_name": "ProductPackLevelsLevel",
+        "attribute_fqn_name": "ProductPackLevelsLevel",
+        "attribute_description": "Which level of packing it is: a single unit, an inner pack, a case, a layer or a pallet.",
+        "attribute_type": "LOOKUP",
+        "attribute_lookup_type": "LKP011",
+        "attribute_concept": "SBJ067",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        11,
+        95
+      ]
+    },
+    {
+      "seq": 212,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR124",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductPackLevelsIdentifier",
+        "attribute_name": "ProductPackLevelsIdentifier",
+        "attribute_fqn_name": "ProductPackLevelsIdentifier",
+        "attribute_description": "The number by which the level is identified when it is counted and moved, such as the number on a case label.",
+        "attribute_type": "TEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ067",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        95
+      ]
+    },
+    {
+      "seq": 213,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR125",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductPackLevelsUnitsPerLevel",
+        "attribute_name": "ProductPackLevelsUnitsPerLevel",
+        "attribute_fqn_name": "ProductPackLevelsUnitsPerLevel",
+        "attribute_description": "How many of the next level down one of this level holds, such as the number of units in a case. It is always above zero, and a level never holds itself.",
+        "attribute_type": "INTEGER",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ067",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        95
+      ]
+    },
+    {
+      "seq": 214,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR126",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventMaintenanceWorkDescription",
+        "attribute_name": "EventMaintenanceWorkDescription",
+        "attribute_fqn_name": "EventMaintenanceWorkDescription",
+        "attribute_description": "What was done to the machine, such as the part replaced or the adjustment made.",
+        "attribute_type": "LONGTEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ056",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        85
+      ]
+    },
+    {
+      "seq": 215,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR127",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "InstanceKind",
+        "attribute_name": "InstanceKind",
+        "attribute_fqn_name": "InstanceKind",
+        "attribute_description": "Whether the item is a machine standing in a place or an individually identified unit of product.",
+        "attribute_type": "LOOKUP",
+        "attribute_lookup_type": "LKP012",
+        "attribute_concept": "SBJ026",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        12,
+        65
+      ]
+    },
+    {
+      "seq": 216,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR128",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventTestsSpecificationVersion",
+        "attribute_name": "EventTestsSpecificationVersion",
+        "attribute_fqn_name": "EventTestsSpecificationVersion",
+        "attribute_description": "Which version of the specification the result was judged against, so that the judgement stays true when the specification is later issued again.",
+        "attribute_type": "TEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ057",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        86
+      ]
+    },
+    {
+      "seq": 217,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR129",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "EventFindingsKind",
+        "attribute_name": "EventFindingsKind",
+        "attribute_fqn_name": "EventFindingsKind",
+        "attribute_description": "Whether the finding is a departure from procedure or a failure against specification. The two are never recorded as one.",
+        "attribute_type": "LOOKUP",
+        "attribute_lookup_type": "LKP010",
+        "attribute_concept": "SBJ058",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        10,
+        87
+      ]
+    },
+    {
+      "seq": 218,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR130",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "InstanceFailureModesName",
+        "attribute_name": "InstanceFailureModesName",
+        "attribute_fqn_name": "InstanceFailureModesName",
+        "attribute_description": "What the way of failing is called, such as a seized bearing or a leaking seal.",
+        "attribute_type": "TEXT",
+        "attribute_lookup_type": null,
+        "attribute_concept": "SBJ029",
+        "attribute_classification": null
+      },
+      "depends_on": [
+        68
+      ]
+    },
+    {
+      "seq": 219,
+      "op": "create",
+      "entity": "models",
+      "local_id": "MODEL001",
+      "dda_id": null,
+      "fields": {
+        "model_code": "CPGManufacturingAndSupplyChain",
+        "model_name": "CPG - Manufacturing and Supply Chain",
+        "model_description": "Factories, production runs, batches, packing and the supply chain for food and beverage manufacturers, with the traceability each batch needs.",
+        "model_roles": [
+          "ROL010",
+          "ROL011",
+          "ROL012",
+          "ROL013",
+          "ROL014",
+          "ROL015",
+          "ROL016",
+          "ROL017",
+          "ROL018",
+          "ROL019",
+          "ROL022",
+          "ROL023",
+          "ROL026",
+          "ROL027",
+          "ROL028",
+          "ROL029",
+          "ROL031",
+          "ROL032",
+          "ROL033",
+          "ROL034",
+          "ROL035",
+          "ROL036",
+          "DMO000000001",
+          "DMO000000002",
+          "ROL039",
+          "ROL040",
+          "DMO000000016",
+          "DMO000000017",
+          "ROL043",
+          "ROL044",
+          "ROL045",
+          "ROL046",
+          "ROL047",
+          "ROL048",
+          "ROL049",
+          "ROL050",
+          "ROL055",
+          "ROL056",
+          "ROL057",
+          "ROL059",
+          "ROL061",
+          "ROL062",
+          "ROL063",
+          "ROL064",
+          "ROL066",
+          "ROL067",
+          "ROL069",
+          "ROL071"
+        ],
+        "model_relationships": [
+          "REL005",
+          "REL006",
+          "REL007",
+          "REL008",
+          "REL009",
+          "REL011",
+          "REL013",
+          "REL014",
+          "REL015",
+          "REL016",
+          "REL018",
+          "REL019",
+          "DMR000000005",
+          "REL021",
+          "DMR000000037",
+          "REL023",
+          "REL024",
+          "REL025",
+          "REL026",
+          "REL027",
+          "REL028",
+          "REL029",
+          "REL030",
+          "REL031",
+          "REL032",
+          "REL033",
+          "REL034",
+          "REL035",
+          "REL036",
+          "REL037",
+          "REL038"
+        ]
+      },
+      "depends_on": [
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111,
+        112,
+        113,
+        114,
+        115,
+        116,
+        117,
+        118,
+        119,
+        120,
+        121,
+        122,
+        123,
+        124,
+        125,
+        126,
+        127
+      ]
+    }
+  ]
+}
