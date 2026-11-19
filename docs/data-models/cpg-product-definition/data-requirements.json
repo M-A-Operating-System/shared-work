@@ -804,5 +804,25 @@
         "artefact_id": "LKP001"
       }
     ]
+  },
+  {
+    "id": "DRQ032",
+    "business_requirement_ids": [
+      "REQ035",
+      "REQ008",
+      "REQ002"
+    ],
+    "must_record": [
+      "For each consumer goods product, whether it is a grouping of related sizes and packs, a version that can be sold, or an ingredient that goes into another product"
+    ],
+    "must_answer": [
+      "Which of our products are groupings, which are versions that can be sold, and which are ingredients?"
+    ],
+    "temporality": "as-at",
+    "must_prevent": [],
+    "status": "active",
+    "withdrawn_reason": null,
+    "prevent_how": [],
+    "prevent_resolution": []
   }
 ]

@@ -50,7 +50,7 @@ def words(n: int) -> str:
 
 
 def plain(code: str) -> str:
-    return re.sub(r"(?<=[a-z])(?=[A-Z])", " ", code)
+    return re.sub(r"(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])", " ", code)
 
 
 def anchor(i: str) -> str:

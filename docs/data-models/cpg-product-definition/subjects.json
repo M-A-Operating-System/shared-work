@@ -2,7 +2,7 @@
   {
     "id": "SBJ001",
     "code": "Product",
-    "definition": "There is one of these for each product the business sells, for each ingredient or packaging item it buys to make one, and for each product definition that only groups related sizes and packs. Everything else about a product refers back to it: what it is made from, what it must be, how long it lasts and what its pack says are each kept in their own concept. It is not a batch, which is one production run of a product.",
+    "definition": "There is one of these for each product the business sells, for each ingredient or packaging item it buys to make one, and for each product definition that only groups related sizes and packs. Everything else about a product refers back to it: what it is made from, what it must be, how long it lasts and what its pack says are each kept in their own concept. It is not a batch, which is one production run of a product, and it is not the facts that only a consumer goods product has, which the product's consumer goods definition holds.",
     "kind": "subject",
     "mastery": "mastered",
     "domain_id": "DOM001",
@@ -600,6 +600,38 @@
     ],
     "evidence_source_ids": [
       "SRC038"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "SBJ022",
+    "code": "ProductCPGDefinition",
+    "definition": "There is one of these for each product that the consumer goods business makes, buys or sells; a product of another industry has none. You can rely on it for the facts only a consumer goods product has: whether it is a Logical, Local or Ingredient product, the name the law requires on its pack, and how much its pack contains. It is not the product's own name and identity, which every industry shares, and it is not what the product is made from, its allergens or its labels, which are kept separately.",
+    "kind": "subject",
+    "mastery": "mastered",
+    "domain_id": "DOM001",
+    "is_anchor": false,
+    "parent_id": "SBJ001",
+    "parent_cardinality": "ONE_TO_ONE_OPTIONAL",
+    "singled_out_by": null,
+    "independence": "It is governed apart from the product, which every industry uses, and it is held only for products of the consumer goods business.",
+    "distinct_need": "Holds the facts only a consumer goods product has, so that Product stays usable by every industry.",
+    "used_here": null,
+    "template_dda_id": null,
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "Read the Products domain in DDA on 16 November 2026: it holds no concept. The Product concept in this model is used across industries, so it cannot carry the facts only a consumer goods product has. No other concept in this model holds them.",
+    "data_requirement_ids": [
+      "DRQ032",
+      "DRQ019",
+      "DRQ007"
+    ],
+    "evidence_source_ids": [
+      "SRC030",
+      "SRC001",
+      "SRC002",
+      "SRC006"
     ],
     "status": "active",
     "withdrawn_reason": null

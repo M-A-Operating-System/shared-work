@@ -455,9 +455,9 @@
   },
   {
     "id": "ATR018",
-    "subject_id": "SBJ001",
+    "subject_id": "SBJ022",
     "relationship_id": null,
-    "code": "ProductLegalName",
+    "code": "ProductCPGDefinitionLegalName",
     "definition": "The name the food must be given by law on the pack, where it differs from the name it is sold under. This fact is kept in this one place for a product.",
     "datatype": "TEXT",
     "lookup_id": null,
@@ -469,7 +469,7 @@
     "classification": "PUBLIC",
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "The parent is new to DDA, so it holds no attributes yet. No other attribute in this model holds this fact.",
+    "reuse_search": "The parent is new to DDA, so it holds no attributes yet. The fact is only true of a consumer goods product, so it is held here and not on Product, which every industry uses. No other attribute in this model holds this fact.",
     "data_requirement_ids": [
       "DRQ007"
     ],
@@ -481,9 +481,9 @@
   },
   {
     "id": "ATR019",
-    "subject_id": "SBJ001",
+    "subject_id": "SBJ022",
     "relationship_id": null,
-    "code": "ProductNetQuantity",
+    "code": "ProductCPGDefinitionNetQuantity",
     "definition": "How much food the pack contains, as declared on the pack, in the unit stated with it. This fact is kept in this one place for a product.",
     "datatype": "FLOAT",
     "lookup_id": null,
@@ -495,7 +495,7 @@
     "classification": "PUBLIC",
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "The parent is new to DDA, so it holds no attributes yet. No other attribute in this model holds this fact.",
+    "reuse_search": "The parent is new to DDA, so it holds no attributes yet. The fact is only true of a consumer goods product, so it is held here and not on Product, which every industry uses. No other attribute in this model holds this fact.",
     "data_requirement_ids": [
       "DRQ006",
       "DRQ007"
@@ -509,9 +509,9 @@
   },
   {
     "id": "ATR020",
-    "subject_id": "SBJ001",
+    "subject_id": "SBJ022",
     "relationship_id": null,
-    "code": "ProductUnitOfMeasure",
+    "code": "ProductCPGDefinitionUnitOfMeasure",
     "definition": "The unit the declared net quantity is measured in. This fact is kept in this one place for a product.",
     "datatype": "LOOKUP",
     "lookup_id": "LKP009",
@@ -523,7 +523,7 @@
     "classification": "PUBLIC",
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "The parent is new to DDA, so it holds no attributes yet. No other attribute in this model holds this fact.",
+    "reuse_search": "The parent is new to DDA, so it holds no attributes yet. The fact is only true of a consumer goods product, so it is held here and not on Product, which every industry uses. No other attribute in this model holds this fact.",
     "data_requirement_ids": [
       "DRQ006",
       "DRQ007"
@@ -2580,6 +2580,35 @@
     "evidence_source_ids": [
       "SRC013",
       "SRC014"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR098",
+    "subject_id": "SBJ022",
+    "relationship_id": null,
+    "code": "ProductCPGDefinitionCPGProductType",
+    "definition": "Which of three kinds the product is, chosen from a list: Logical, a grouping of related sizes and packs that is never sold; Local, a version of a logical product that can be sold; or Ingredient, a product that goes into another product. This fact is kept in this one place for a product.",
+    "datatype": "LOOKUP",
+    "lookup_id": "LKP019",
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": true,
+    "critical": true,
+    "classification": "PUBLIC",
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "The parent is new to DDA, so it holds no attributes yet. The groupings of related sizes and packs, the versions and the ingredients are also found from the arrangements between products, and this holds the kind the product is recorded as. No other attribute in this model holds this fact.",
+    "data_requirement_ids": [
+      "DRQ032",
+      "DRQ019"
+    ],
+    "evidence_source_ids": [
+      "SRC030",
+      "SRC001",
+      "SRC002"
     ],
     "status": "active",
     "withdrawn_reason": null

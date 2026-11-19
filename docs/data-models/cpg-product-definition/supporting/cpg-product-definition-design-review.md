@@ -105,7 +105,7 @@ A client-ready final design states the design and nothing about how it was produ
 |---|---|---|---|---|
 | D01 | Blocking | **The document names the DDA model "CPG - Product Definition (DMM000000005)"; DDA named it "CPG Food & Beverage Products" when read on 16 November.** | `scope.json` `model`; README. The DDA session lapsed, so the name was **not re-checked today**. | Reconnect DDA and read the record. Then update the DDA name, or reword §5. |
 | D02 | Major | **The editorial review is stale and not independent.** It applies to the 10 November version; the document has since gained DEC004, the 16 November DDA reconciliation and today's scope change (validator ER02). | `supporting/editorial-review.md`. | A fresh reading by someone who did not produce the package, after the fixes above. |
-| D03 | Minor | The change package (145 operations) is unapplied and its preconditions were last checked against DDA on 16 November. | `dda-changeset.json`. | Re-check after D01. |
+| D03 | Minor | The change package (147 operations) is unapplied and its preconditions were last checked against DDA on 16 November. | `dda-changeset.json`. | Re-check after D01. |
 
 ## 5 What is sound and should be kept
 
@@ -133,6 +133,7 @@ A client-ready final design states the design and nothing about how it was produ
 | D-3 | Do health claims fall inside the scope? | In · out, stated | Out, stated, unless a client needs them |
 | D-4 | Keep Appendix B in the lite edition? | Keep (house practice) · drop (method v31.5) | Keep, and record the exception |
 | D-5 | Apply M01–M04 and regenerate? | Yes · wait for the decisions above | **Done 19 November 2026** |
+| D-6 | Add a consumer goods definition under Product with a Logical, Local or Ingredient kind? | As asked | **Done 19 November 2026** (SBJ022, ATR098, LKP019). Two follow-ups are open: DEC005 (a product both sold and used as an ingredient) and DEC006 (a sold product with no logical product above it). The kind and the roles Logical Product, Variant and Ingredient overlap; SCA018 records that they are expected to agree and that nothing enforces it |
 
 ## 8 Limits of this review
 
@@ -140,7 +141,7 @@ A client-ready final design states the design and nothing about how it was produ
 - **DDA not reachable today.** The model name and the state of the Products domain rest on the 16 November read.
 - **Sources partly verified.** Read and confirmed: [FSA allergen labelling](https://food.gov.uk/business-guidance/allergen-labelling), [Annex VII](https://www.legislation.gov.uk/eur/2011/1169/annex/VII), [Article 9 of 1924/2006](https://legislation.gov.uk/eur/2006/1924/article/9/data.htm), the [GS1 decision page](https://gs1.org/1/hcgtinrules/en/decision-support/decision/4) and [nibusinessinfo](https://www.nibusinessinfo.co.uk/content/labelling-food-products). **Not read:** 21 CFR 101.13 (the fetch was refused), the GS1 UK handbook, and the package's other 38 sources.
 - **Northern Ireland** is not settled: the page I read says EU food law applies to food produced there but names no regulation.
-- **Counts** are active items from the package JSON: 42 requirements, 27 data requirements, 20 concepts (4 reused), 18 roles, 9 relationships, 84 attributes, 18 lists of values, 43 sources, 38 test cases, 144 operations.
+- **Counts** are active items from the package JSON: 42 requirements, 28 data requirements, 21 concepts (4 reused), 18 roles, 9 relationships, 85 attributes, 19 lists of values, 43 sources, 39 test cases, 147 operations.
 
 ## Sources
 

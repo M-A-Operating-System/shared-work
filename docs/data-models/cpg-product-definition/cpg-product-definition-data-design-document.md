@@ -133,17 +133,17 @@ The design has three stated limits. It cannot say what is inside a bought-in ing
 - Which of this ingredient's stated properties did we check, and which did we take on the supplier's word?
 - Where and through which channels is this product sold, and what must its pack say there?
 
-This design creates sixteen concepts, eighteen roles, nine relationships and fourteen lists of values in DDA, gathers the relationships into the existing CPG - Product Definition model, adds ten values to two existing lists, and reuses three existing domains, four existing concepts and two existing lists of values.
+This design creates seventeen concepts, eighteen roles, nine relationships and fifteen lists of values in DDA, gathers the relationships into the existing CPG - Product Definition model, adds ten values to two existing lists, and reuses three existing domains, four existing concepts and two existing lists of values.
 
 |  | Count |
 |---|---|
 | Business requirements | 42 |
-| Data requirements | 27 |
+| Data requirements | 28 |
 | Areas of the business covered (domains) | 3 (3 already in DDA) |
 | Roles, meaning the part something plays in a relationship | 18 |
 | Relationships between roles | 9 |
-| Concepts, meaning groups of related facts | 20 |
-| Lists of allowed values | 18 |
+| Concepts, meaning groups of related facts | 21 |
+| Lists of allowed values | 19 |
 | Sources | 43 |
 
 ## 2 Scope
@@ -217,6 +217,7 @@ These are used as DDA already holds them.
 | SCA015 | Nutrition values belong to the product itself, whether it is playing the part of an ingredient, a variant or a finished product. Each value names how it was arrived at from a governed list, so any number of ways can be supported by adding values to the list. |
 | SCA016 | All allergen information about a product is held in one concept. A universal list holds each food once, and each market's list names the food each of its allergens is. A market allergen has one food, or one group of foods, above it. How an allergen came to be associated with a product is held as plain text. |
 | SCA017 | Whether a claim still meets its condition is judged by the person responsible for the claim, from the nutrition values the claim names. The condition is held as wording, and the design does not evaluate it. |
+| SCA018 | Product is used by every industry, so the facts only a consumer goods product has are held in its consumer goods definition. The kind recorded there, Logical, Local or Ingredient, says what the product is in the business. The roles Logical Product, Variant and Ingredient come from how products are arranged with one another. The two are expected to agree, and the design does not enforce it. |
 
 ### 2.6 Open questions
 
@@ -306,6 +307,7 @@ What the business must keep, the questions it must be able to answer, and the mi
 | <a id="drq029"></a>DRQ029 | For each allergen a product declares in a market, whether the product contains it or it may be present<br>How the allergen came to be associated with the product, in plain words | Which allergens does this product contain, and which may it contain, in this market?<br>Why does this product carry this allergen? | Today | The same allergen shown as both contained and possibly present for one product in one market | A product has one entry for each allergen in a market, and each entry has one status. | [REQ045](#req045) |
 | <a id="drq030"></a>DRQ030 | The lowest and highest temperature a product may be kept at under each storage condition | At what temperature must this product be kept? | Today | — | — | [REQ046](#req046) |
 | <a id="drq031"></a>DRQ031 | Each food that causes allergies, held once for all markets<br>For each allergen in a market's list, the food it is, or the group of foods it names | Is the celery declared in one market the same food as the celery declared in another?<br>Which allergens in the markets' lists are this food? | Today | A market allergen that is two foods at once | Each market allergen names one food, and where a market groups several foods it names the group. | [REQ047](#req047) |
+| <a id="drq032"></a>DRQ032 | For each consumer goods product, whether it is a grouping of related sizes and packs, a version that can be sold, or an ingredient that goes into another product | Which of our products are groupings, which are versions that can be sold, and which are ingredients? | On any past date | — | — | [REQ035](#req035) · [REQ008](#req008) · [REQ002](#req002) |
 
 ## 5 Data Model
 
@@ -313,7 +315,7 @@ What the business must keep, the questions it must be able to answer, and the mi
 
 **The model.** DDA already holds a model for this field, **CPG - Product Definition** (DMM000000005), with nothing yet in it. The design gathers the nine relationships in 5.4 into it, and the eighteen roles in 5.3 are reached through them. Its description reads:
 
-> The CPG - Product Definition model holds what a food and beverage manufacturer needs to define a product, what goes into it, who may supply it and who stands behind it. A Made Product is made from Ingredients, and each Ingredient is itself a product. A Logical Product groups the Variants that are its sizes and packs, and is never made, bought or sold itself. A Replaceable Ingredient may be replaced by a Permitted Alternative, and a Claiming Product is compared with a Comparator when its pack makes a claim against another product. A Bought Material may be sourced from an Authorised Supplier, which is held only as a company. A Certification Holder holds its certification from a Certifying Body. A Labelled Product names a Responsible Business on its pack. A Declaring Document states properties of a Declared Product, and an Issuing Organisation issues the Issued Document. Which labels and claims a change to a recipe reaches and which suppliers may supply an ingredient on a given date are worked out from these arrangements and not kept as facts of their own. The allergens a product declares are kept for each market, and the ingredient that brings each one is worked out from the formulation. Factories and the places inside them down to the shop floor, supplier sites, batches and supply chain detail belong to a separate, proposed CPG Manufacturing and Supply Chain model.
+> The CPG - Product Definition model holds what a food and beverage manufacturer needs to define a product, what goes into it, who may supply it and who stands behind it. A Made Product is made from Ingredients, and each Ingredient is itself a product. Product is used across industries, so what only a consumer goods product has, including whether it is a Logical, Local or Ingredient product, is held in its consumer goods definition. A Logical Product groups the Variants that are its sizes and packs, and is never made, bought or sold itself. A Replaceable Ingredient may be replaced by a Permitted Alternative, and a Claiming Product is compared with a Comparator when its pack makes a claim against another product. A Bought Material may be sourced from an Authorised Supplier, which is held only as a company. A Certification Holder holds its certification from a Certifying Body. A Labelled Product names a Responsible Business on its pack. A Declaring Document states properties of a Declared Product, and an Issuing Organisation issues the Issued Document. Which labels and claims a change to a recipe reaches and which suppliers may supply an ingredient on a given date are worked out from these arrangements and not kept as facts of their own. The allergens a product declares are kept for each market, and the ingredient that brings each one is worked out from the formulation. Factories and the places inside them down to the shop floor, supplier sites, batches and supply chain detail belong to a separate, proposed CPG Manufacturing and Supply Chain model.
 
 ### 5.1 Diagrams
 
@@ -406,6 +408,7 @@ flowchart LR
   SBJ019("Product Markets<br>PRODUCTS")
   SBJ020("Product Channels<br>PRODUCTS")
   SBJ021("Product Images<br>PRODUCTS")
+  SBJ022("Product CPG Definition<br>PRODUCTS")
   SBJ001 -->|"may have many, or none"| SBJ002
   SBJ001 -->|"may have many, or none"| SBJ003
   SBJ001 -->|"may have many, or none"| SBJ004
@@ -420,6 +423,7 @@ flowchart LR
   SBJ001 -->|"may have many, or none"| SBJ019
   SBJ019 -->|"may have many, or none"| SBJ020
   SBJ001 -->|"may have many, or none"| SBJ021
+  SBJ001 -->|"may have one, or none"| SBJ022
 ```
 
 **Documents**
@@ -446,7 +450,7 @@ flowchart LR
 
 | Domain | In DDA | Main concept | What it covers | Roles | Concepts |
 |---|---|---|---|---|---|
-| <a id="dom001"></a>DOM001<br>**Products** | [DMD000000032](https://datadesign.maoperatingsystem.com/models/domains/DMD000000032) | Product | Everything an organisation makes, buys or sells, including ingredients, packaging, sizes and packs. This design uses it for what each product is, what it is made from, what it must be, how long it lasts and what its pack says. The domain has no concepts in DDA yet, so this design adds them. | [12](#53-canonical-roles) | [15](#55-concepts) |
+| <a id="dom001"></a>DOM001<br>**Products** | [DMD000000032](https://datadesign.maoperatingsystem.com/models/domains/DMD000000032) | Product | Everything an organisation makes, buys or sells, including ingredients, packaging, sizes and packs. This design uses it for what each product is, what it is made from, what it must be, how long it lasts and what its pack says. The domain has no concepts in DDA yet, so this design adds them. | [12](#53-canonical-roles) | [16](#55-concepts) |
 | <a id="dom003"></a>DOM003<br>**Documents** | [DMD000000016](https://datadesign.maoperatingsystem.com/models/domains/DMD000000016) | Document | Documents that give evidence for business processes. This design uses it for supplier certificates of analysis, change notices, certification documents and specification sheets. | [2](#53-canonical-roles) | [2](#55-concepts) |
 | <a id="dom002"></a>DOM002<br>**Legal Entities** | [DMD000000012](https://datadesign.maoperatingsystem.com/models/domains/DMD000000012) | Legal Entity | Organisations of every kind. This design uses it for suppliers, certifying bodies, the business named on a pack and the organisations that issue supplier documents. | [4](#53-canonical-roles) | [3](#55-concepts) |
 
@@ -497,7 +501,7 @@ Every concept the design uses, whether DDA already has it or the design adds it.
 
 | Area | Concept | In DDA | What it is | Sits under | How many | Why it is needed |
 |---|---|---|---|---|---|---|
-| Products | <a id="sbj001"></a>SBJ001<br>**Product**<br>Product | New | There is one of these for each product the business sells, for each ingredient or packaging item it buys to make one, and for each product definition that only groups related sizes and packs. Everything else about a product refers back to it: what it is made from, what it must be, how long it lasts and what its pack says are each kept in their own concept. It is not a batch, which is one production run of a product. | — | — | [DRQ001](#drq001) · [DRQ002](#drq002) · [DRQ005](#drq005) · [DRQ019](#drq019) |
+| Products | <a id="sbj001"></a>SBJ001<br>**Product**<br>Product | New | There is one of these for each product the business sells, for each ingredient or packaging item it buys to make one, and for each product definition that only groups related sizes and packs. Everything else about a product refers back to it: what it is made from, what it must be, how long it lasts and what its pack says are each kept in their own concept. It is not a batch, which is one production run of a product, and it is not the facts that only a consumer goods product has, which the product's consumer goods definition holds. | — | — | [DRQ001](#drq001) · [DRQ002](#drq002) · [DRQ005](#drq005) · [DRQ019](#drq019) |
 | Products | <a id="sbj002"></a>SBJ002<br>**Product Identifiers**<br>ProductIdentifiers | New | There is one of these for each identifier a product is known by, in each scheme, such as a trade item number or the organisation's own material number. You can rely on it to say which identifiers belong to which product and who issued each. It is not the name of the product, which belongs to the product itself, and it is not an identifier of an organisation, which belongs to the legal entity identifiers. | Product | Each product may have many, or none | [DRQ017](#drq017) |
 | Products | <a id="sbj003"></a>SBJ003<br>**Product Formulation Versions**<br>ProductFormulationVersions | New | There is one of these for each version of a product's formulation, with the date it applies from and the market it applies in. You can rely on it to say which version of what goes into a product is in force, so that every ingredient line belongs to exactly one version. It is not the ingredient lines themselves, which are the relationship between a product and what it is made from. | Product | Each product may have many, or none | [DRQ001](#drq001) · [DRQ006](#drq006) |
 | Products | <a id="sbj004"></a>SBJ004<br>**Product Specifications**<br>ProductSpecifications | New | There is one of these for each limit on one characteristic of a product or ingredient, in each version of its specification. You can rely on it for what a product or ingredient must be on any past date. It is not what a supplier says it delivered, which comes from the supplier's documents, and it is not the testing of a delivery, which belongs to the manufacturing model. | Product | Each product may have many, or none | [DRQ011](#drq011) · [DRQ012](#drq012) |
@@ -512,6 +516,7 @@ Every concept the design uses, whether DDA already has it or the design adds it.
 | Products | <a id="sbj019"></a>SBJ019<br>**Product Markets**<br>ProductMarkets | New | There is one of these for each market, a country or a wider region, in which a product is intended to be sold during a stated period. You can rely on it for where the product is sold and from when to when, and the pack items and claims it carries in that market hang from it. It is not the way the product is sold there, which is the sales channel, and it is not the rules of the market, which are applied through the label items and claims. | Product | Each product may have many, or none | [DRQ023](#drq023) |
 | Products | <a id="sbj020"></a>SBJ020<br>**Product Channels**<br>ProductChannels | New | There is one of these for each sales channel, such as grocery, food service or online, through which a product is sold in a market during a stated period. You can rely on it for how the product reaches buyers in that market. It is not a named customer, and it is not a price. | Product Markets | Each product market may have many, or none | [DRQ023](#drq023) |
 | Products | <a id="sbj021"></a>SBJ021<br>**Product Images**<br>ProductImages | New | There is one of these for each picture of a product taken from one side, for each period in which it is the current picture. You can rely on it for which side it shows and where the file is held. It is not the artwork printed on the pack, which is kept as label items, and it is not a document that gives evidence, which is a document. | Product | Each product may have many, or none | [DRQ027](#drq027) |
+| Products | <a id="sbj022"></a>SBJ022<br>**Product CPG Definition**<br>ProductCPGDefinition | New | There is one of these for each product that the consumer goods business makes, buys or sells; a product of another industry has none. You can rely on it for the facts only a consumer goods product has: whether it is a Logical, Local or Ingredient product, the name the law requires on its pack, and how much its pack contains. It is not the product's own name and identity, which every industry shares, and it is not what the product is made from, its allergens or its labels, which are kept separately. | Product | Each product may have one, or none | [DRQ032](#drq032) · [DRQ019](#drq019) · [DRQ007](#drq007) |
 | Documents | <a id="sbj016"></a>SBJ016<br>**Document**<br>Document | [DMC000000142](https://datadesign.maoperatingsystem.com/models/concepts/DMC000000142) | One document. This design uses it for supplier certificates of analysis, change notices, certification documents and specification sheets. | — | — | [DRQ012](#drq012) |
 | Documents | <a id="sbj017"></a>SBJ017<br>**Document Declarations**<br>DocumentDeclarations | New | There is one of these for each property a document states about a product or ingredient. You can rely on it for what the document says, one property at a time. It is not who issued the document or which product it is about, which come from the document's relationships, and it is not whether the organisation checked the statement, which is kept with the link to the product. | Document | Each document may have many, or none | [DRQ012](#drq012) |
 | Legal Entities | <a id="sbj013"></a>SBJ013<br>**Legal Entity**<br>LegalEntity | [DMC000000106](https://datadesign.maoperatingsystem.com/models/concepts/DMC000000106) | One organisation of any kind. This design uses it for suppliers, certifying bodies, the business named on a pack and the organisations that issue supplier documents. | — | — | [DRQ014](#drq014) · [DRQ017](#drq017) · [DRQ007](#drq007) |
@@ -827,7 +832,7 @@ The unit a quantity is stated in, used wherever a quantity of food, an ingredien
 
 | List | In DDA | Used for |
 |---|---|---|
-| <a id="lkp009"></a>LKP009 UniversalUnitOfMeasureCodes | [DLT000000156](https://datadesign.maoperatingsystem.com/models/lookup-types/DLT000000156) | Product, Product Composition |
+| <a id="lkp009"></a>LKP009 UniversalUnitOfMeasureCodes | [DLT000000156](https://datadesign.maoperatingsystem.com/models/lookup-types/DLT000000156) | Product CPG Definition, Product Composition |
 
 Values this design contributes to the existing list:
 
@@ -848,6 +853,8 @@ Design choices that remain open.
 | ID | Decision | Options |
 |---|---|---|
 | DEC002 | When a supplier tells the organisation that what is inside its ingredient now differs from what was specified, should acting on that notice be part of this design? The design keeps the notice and what it says, and does not keep the action taken. | Keep the action in this design · Leave the action to supplier management |
+| DEC005 | The kind of a product is one value: Logical, Local or Ingredient. A product that is both sold in its own right and used as an ingredient in another product, such as sugar sold to shoppers and used in a biscuit, has to be recorded as one of them. Should the kind hold one value, or more than one? | One value, the kind the product is mainly managed as · More than one value |
+| DEC006 | A Local product is a version of a logical product that can be sold. A product that is sold in a single size and format has no logical product above it. Should every sold product have a logical product above it, even where there is only one version, or may a sold product stand alone? | Every sold product has a logical product above it · A sold product may stand alone, and is then Local without a logical product |
 
 ## Appendix A — Sources
 
@@ -912,12 +919,12 @@ These are the design principles set by DDA in its standard [DMS000000169](https:
 | 5 | Reports should consume governed business information, not become the place where enterprise information is defined. | Dashboards agree with one another, and the same definitions serve APIs, operations, and AI. | Does not apply. This design defines no reports. |
 | 6 | Author reusable business information once, and publish it through several purpose-built products. | New products are quicker to build because the core design work has already been completed and can be reused. | Applies in part. The product definition is written once so that other models can refer to it (section 5.2). No data product is designed here. |
 | 7 | Model, govern, and preserve relationships with the same care applied to the subjects they connect. | Cross-role questions, operational authorization, and AI context all become answerable rather than reconstructed. | There are nine relationships (section 5.4). Each has a verb that reads naturally in both directions, the role at each end, how many can link, and whether dates are kept. None is reduced to a field on either side. |
-| 8 | Approved business metadata should generate or validate the implementation and its documentation. | Less manual schema work, design and implementation that stay in step, and lineage that is produced rather than written. | The list of changes to make in DDA is generated from the model (144 steps in dependency order), and this document is produced from the same working files. One exception applies: DDA's Products definition disagrees with a requirement (see below). |
+| 8 | Approved business metadata should generate or validate the implementation and its documentation. | Less manual schema work, design and implementation that stay in step, and lineage that is produced rather than written. | The list of changes to make in DDA is generated from the model (147 steps in dependency order), and this document is produced from the same working files. One exception applies: DDA's Products definition disagrees with a requirement (see below). |
 | 9 | Use the language of the business consistently across definitions, governance, product contracts, and delivery. | Non-technical stakeholders can take part in design decisions, and ownership of a definition is unambiguous. | Definitions are written in the business's own words. Each concept shows a plain name beside its DDA name, and the requirements use the vocabulary of the field. |
 | 10 | Business information exists independently of the applications, projects, reports, and AI initiatives that use it. | Institutional knowledge outlives the systems and projects that produced it. | No concept, list of values or relationship refers to an application, a report or a project. |
 | 11 | Package governed information into products with defined consumers, ownership, quality, freshness, access, and lifecycle. | Consumers know what they are getting, and it can be changed without breaking them. | Does not apply. This design defines no data products. |
 | 12 | Publish trusted information at the frequency the business decision actually requires. | Decisions use information at the frequency required without imposing real-time processing where it is unnecessary. | Does not apply. This design defines no publication of information. |
-| 13 | Define privacy, security, quality, retention, provenance, and stewardship as part of information design. | Protection is consistent by construction, and correction, audit, and erasure are possible rather than aspirational. | Sensitivity is set on 51 of the facts the design keeps, where it applies, and 45 are marked critical because they support a legal or safety duty. Retention and provenance are looked after by the platform and are not modelled here. Stewardship and retention are not defined, which is an exception (see below). |
+| 13 | Define privacy, security, quality, retention, provenance, and stewardship as part of information design. | Protection is consistent by construction, and correction, audit, and erasure are possible rather than aspirational. | Sensitivity is set on 52 of the facts the design keeps, where it applies, and 46 are marked critical because they support a legal or safety duty. Retention and provenance are looked after by the platform and are not modelled here. Stewardship and retention are not defined, which is an exception (see below). |
 | 14 | The information architecture should describe the same enduring subjects, capabilities, and relationships through which the business operates. | The business recognizes itself in the model, which is what makes ownership real rather than nominal. | The model uses the things the business itself talks about, products, ingredients, suppliers and certificates, and the arrangements between them, as the requirements describe them. |
 
 A proposed design should state how it satisfies each principle that applies to it. Where one is not satisfied, the exception should name the consequence, the owner, and the route back, rather than being left as a gap for someone to find later. Where a principle does not apply, the table says so. Where one is not fully met, the section below names the consequence, who would resolve it, and how.

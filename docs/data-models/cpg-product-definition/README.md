@@ -13,19 +13,23 @@ Package for the **CPG - Product Definition** data model (Food and Beverage; DDA 
 
 ## Status (2026-11-19)
 
+- **Consumer goods definition (19 November 2026):** Product is used across industries, so a new concept, `ProductCPGDefinition` (SBJ022), is a one-to-one child of Product and holds the facts only a consumer goods product has: the legal name, net quantity and unit (moved from Product, identifiers kept) and a required drop-down, `CPGProductType` (ATR098, list LKP019), with the values Logical, Local and Ingredient. Local is a version of a logical product that can be sold. Two questions are open (DEC005, DEC006) and the relation to the roles is recorded as SCA018. Applied by `supporting/render-scripts/apply_cpg_definition.py`.
+
 - **Review fixes (19 November 2026):** claims name the nutrient they rest on; the stored claim-condition value and the logical-product flag are withdrawn; the two formulation rules and the model description are reworded; one assumption added (SCA017). Applied by `supporting/render-scripts/apply_review_fixes.py`.
 
 - **Scope (17 November 2026):** the markets covered are the United States, the United Kingdom and the European Union, and no others. The design extends to other markets by adding list values; none is included by choice (SCI011, SCO013, SCA008).
 
 - Validator v31.5 (`validate.py <package>`): **0 blocking, 0 material, 2 advisory** (the word *entity* in one concept and one list definition, the field's own word).
-- Run with `--document`, the document reports the same hits the template carries (Appendix B and the full-edition section names, "review" in the supplied cover paragraph, "changed" in section 1.1) and one more, ER02: the document has one more decision row (DEC004) than the version the editorial review read.
-- 42 requirements, 27 data requirements, 3 domains (all reused), 20 concepts (4 reused, 16 new), 18 roles, 9 relationships, 84 attributes, 18 lists of values (14 new, 2 extended, 2 reused), 43 sources, 38 test cases (35 pass, 3 accepted limits). The change package has 144 operations.
+- Run with `--document`, the document reports the same hits the template carries (Appendix B and the full-edition section names, "review" in the supplied cover paragraph, "changed" in section 1.1) and one more, ER02: the document has more decision rows (DEC004 to DEC006) than the version the editorial review read.
+- 42 requirements, 28 data requirements, 3 domains (all reused), 21 concepts (4 reused, 17 new), 18 roles, 9 relationships, 85 attributes, 19 lists of values (15 new, 2 extended, 2 reused), 43 sources, 39 test cases (36 pass, 3 accepted limits). The change package has 147 operations.
 - Reconciled with DDA on 2026-11-16: the baseline (13 domains, 86 lookup types, 28 standards) is refreshed. The unit-of-measure list is `UniversalUnitOfMeasureCodes` (DLT000000156), shared with Manufacturing.
 
 ## Decisions
 
 - **DEC002** (open): what to record when a supplier says what is inside its ingredient now differs from what was specified.
 - **DEC003** (decided): the unit-of-measure list is shared with CPG Manufacturing and Supply Chain.
+- **DEC005** (open): the kind of a product holds one value; what to record for a product both sold and used as an ingredient.
+- **DEC006** (open): whether every sold product has a logical product above it, or a single-version product may stand alone.
 - **DEC004** (decided 18 November 2026): this model creates Product and holds the hierarchy of products and ingredients; CPG Manufacturing and Supply Chain refers to them. Manufacturing now refers to it (DEC009 decided the same day).
 
 ## Still open

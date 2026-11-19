@@ -990,13 +990,43 @@
     {
       "seq": 17,
       "op": "create",
+      "entity": "lookupTypes",
+      "local_id": "LKP019",
+      "dda_id": null,
+      "fields": {
+        "lookup_type_code": "ProductCPGDefinitionCPGProductTypes",
+        "lookup_type_name": "ProductCPGDefinitionCPGProductTypes",
+        "lookup_type_description": "The three kinds of consumer goods product: a grouping of related sizes and packs, a version that can be sold, and something that goes into another product. You can rely on it to say which of the three a product is. It is not the link from a version to its grouping, nor the lines of a formulation, which are kept separately between products.",
+        "lookups": [
+          {
+            "lookup_code": "LOGICAL",
+            "lookup_name": "Logical",
+            "lookup_description": "A product that stands for a group of related sizes, formats and pack counts, each of which is a product in its own right. It holds what the versions share and is never made, bought or sold."
+          },
+          {
+            "lookup_code": "LOCAL",
+            "lookup_name": "Local",
+            "lookup_description": "A version of a logical product that can be sold, such as one size, format or pack count of it. It is sold and counted on its own."
+          },
+          {
+            "lookup_code": "INGREDIENT",
+            "lookup_name": "Ingredient",
+            "lookup_description": "A product that goes into another product, whether a raw material, a bought-in ingredient or a packaging item."
+          }
+        ]
+      },
+      "depends_on": []
+    },
+    {
+      "seq": 18,
+      "op": "create",
       "entity": "concepts",
       "local_id": "SBJ001",
       "dda_id": null,
       "fields": {
         "concept_code": "Product",
         "concept_name": "Product",
-        "concept_description": "There is one of these for each product the business sells, for each ingredient or packaging item it buys to make one, and for each product definition that only groups related sizes and packs. Everything else about a product refers back to it: what it is made from, what it must be, how long it lasts and what its pack says are each kept in their own concept. It is not a batch, which is one production run of a product.",
+        "concept_description": "There is one of these for each product the business sells, for each ingredient or packaging item it buys to make one, and for each product definition that only groups related sizes and packs. Everything else about a product refers back to it: what it is made from, what it must be, how long it lasts and what its pack says are each kept in their own concept. It is not a batch, which is one production run of a product, and it is not the facts that only a consumer goods product has, which the product's consumer goods definition holds.",
         "concept_parent": "DMC000000100",
         "concept_parent_rel": "ONE_TO_ONE_OPTIONAL",
         "concept_is_domain": "DMD000000032"
@@ -1004,7 +1034,7 @@
       "depends_on": []
     },
     {
-      "seq": 18,
+      "seq": 19,
       "op": "create",
       "entity": "concepts",
       "local_id": "SBJ002",
@@ -1017,11 +1047,11 @@
         "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
       },
       "depends_on": [
-        17
+        18
       ]
     },
     {
-      "seq": 19,
+      "seq": 20,
       "op": "create",
       "entity": "concepts",
       "local_id": "SBJ003",
@@ -1034,11 +1064,11 @@
         "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
       },
       "depends_on": [
-        17
+        18
       ]
     },
     {
-      "seq": 20,
+      "seq": 21,
       "op": "create",
       "entity": "concepts",
       "local_id": "SBJ004",
@@ -1051,11 +1081,11 @@
         "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
       },
       "depends_on": [
-        17
+        18
       ]
     },
     {
-      "seq": 21,
+      "seq": 22,
       "op": "create",
       "entity": "concepts",
       "local_id": "SBJ005",
@@ -1068,11 +1098,11 @@
         "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
       },
       "depends_on": [
-        17
+        18
       ]
     },
     {
-      "seq": 22,
+      "seq": 23,
       "op": "create",
       "entity": "concepts",
       "local_id": "SBJ006",
@@ -1085,11 +1115,11 @@
         "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
       },
       "depends_on": [
-        17
+        18
       ]
     },
     {
-      "seq": 23,
+      "seq": 24,
       "op": "create",
       "entity": "concepts",
       "local_id": "SBJ009",
@@ -1102,11 +1132,11 @@
         "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
       },
       "depends_on": [
-        17
+        18
       ]
     },
     {
-      "seq": 24,
+      "seq": 25,
       "op": "create",
       "entity": "concepts",
       "local_id": "SBJ010",
@@ -1119,11 +1149,11 @@
         "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
       },
       "depends_on": [
-        17
+        18
       ]
     },
     {
-      "seq": 25,
+      "seq": 26,
       "op": "create",
       "entity": "concepts",
       "local_id": "SBJ011",
@@ -1136,11 +1166,11 @@
         "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
       },
       "depends_on": [
-        17
+        18
       ]
     },
     {
-      "seq": 26,
+      "seq": 27,
       "op": "create",
       "entity": "concepts",
       "local_id": "SBJ012",
@@ -1153,11 +1183,11 @@
         "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
       },
       "depends_on": [
-        17
+        18
       ]
     },
     {
-      "seq": 27,
+      "seq": 28,
       "op": "create",
       "entity": "concepts",
       "local_id": "SBJ017",
@@ -1172,7 +1202,7 @@
       "depends_on": []
     },
     {
-      "seq": 28,
+      "seq": 29,
       "op": "create",
       "entity": "concepts",
       "local_id": "SBJ019",
@@ -1185,11 +1215,11 @@
         "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
       },
       "depends_on": [
-        17
+        18
       ]
     },
     {
-      "seq": 29,
+      "seq": 30,
       "op": "create",
       "entity": "concepts",
       "local_id": "SBJ020",
@@ -1202,11 +1232,11 @@
         "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
       },
       "depends_on": [
-        28
+        29
       ]
     },
     {
-      "seq": 30,
+      "seq": 31,
       "op": "create",
       "entity": "concepts",
       "local_id": "SBJ021",
@@ -1219,11 +1249,28 @@
         "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
       },
       "depends_on": [
-        17
+        18
       ]
     },
     {
-      "seq": 31,
+      "seq": 32,
+      "op": "create",
+      "entity": "concepts",
+      "local_id": "SBJ022",
+      "dda_id": null,
+      "fields": {
+        "concept_code": "ProductCPGDefinition",
+        "concept_name": "ProductCPGDefinition",
+        "concept_description": "There is one of these for each product that the consumer goods business makes, buys or sells; a product of another industry has none. You can rely on it for the facts only a consumer goods product has: whether it is a Logical, Local or Ingredient product, the name the law requires on its pack, and how much its pack contains. It is not the product's own name and identity, which every industry shares, and it is not what the product is made from, its allergens or its labels, which are kept separately.",
+        "concept_parent": "SBJ001",
+        "concept_parent_rel": "ONE_TO_ONE_OPTIONAL"
+      },
+      "depends_on": [
+        18
+      ]
+    },
+    {
+      "seq": 33,
       "op": "create",
       "entity": "concepts",
       "local_id": "SBJ007",
@@ -1236,11 +1283,11 @@
         "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
       },
       "depends_on": [
-        28
+        29
       ]
     },
     {
-      "seq": 32,
+      "seq": 34,
       "op": "create",
       "entity": "concepts",
       "local_id": "SBJ008",
@@ -1253,11 +1300,11 @@
         "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
       },
       "depends_on": [
-        28
+        29
       ]
     },
     {
-      "seq": 33,
+      "seq": 35,
       "op": "create",
       "entity": "roles",
       "local_id": "ROL001",
@@ -1273,7 +1320,7 @@
       "depends_on": []
     },
     {
-      "seq": 34,
+      "seq": 36,
       "op": "create",
       "entity": "roles",
       "local_id": "ROL002",
@@ -1289,7 +1336,7 @@
       "depends_on": []
     },
     {
-      "seq": 35,
+      "seq": 37,
       "op": "create",
       "entity": "roles",
       "local_id": "ROL003",
@@ -1305,7 +1352,7 @@
       "depends_on": []
     },
     {
-      "seq": 36,
+      "seq": 38,
       "op": "create",
       "entity": "roles",
       "local_id": "ROL004",
@@ -1321,7 +1368,7 @@
       "depends_on": []
     },
     {
-      "seq": 37,
+      "seq": 39,
       "op": "create",
       "entity": "roles",
       "local_id": "ROL005",
@@ -1337,7 +1384,7 @@
       "depends_on": []
     },
     {
-      "seq": 38,
+      "seq": 40,
       "op": "create",
       "entity": "roles",
       "local_id": "ROL006",
@@ -1353,7 +1400,7 @@
       "depends_on": []
     },
     {
-      "seq": 39,
+      "seq": 41,
       "op": "create",
       "entity": "roles",
       "local_id": "ROL007",
@@ -1369,7 +1416,7 @@
       "depends_on": []
     },
     {
-      "seq": 40,
+      "seq": 42,
       "op": "create",
       "entity": "roles",
       "local_id": "ROL008",
@@ -1385,7 +1432,7 @@
       "depends_on": []
     },
     {
-      "seq": 41,
+      "seq": 43,
       "op": "create",
       "entity": "roles",
       "local_id": "ROL009",
@@ -1401,7 +1448,7 @@
       "depends_on": []
     },
     {
-      "seq": 42,
+      "seq": 44,
       "op": "create",
       "entity": "roles",
       "local_id": "ROL010",
@@ -1417,7 +1464,7 @@
       "depends_on": []
     },
     {
-      "seq": 43,
+      "seq": 45,
       "op": "create",
       "entity": "roles",
       "local_id": "ROL011",
@@ -1433,7 +1480,7 @@
       "depends_on": []
     },
     {
-      "seq": 44,
+      "seq": 46,
       "op": "create",
       "entity": "roles",
       "local_id": "ROL012",
@@ -1449,7 +1496,7 @@
       "depends_on": []
     },
     {
-      "seq": 45,
+      "seq": 47,
       "op": "create",
       "entity": "roles",
       "local_id": "ROL013",
@@ -1465,7 +1512,7 @@
       "depends_on": []
     },
     {
-      "seq": 46,
+      "seq": 48,
       "op": "create",
       "entity": "roles",
       "local_id": "ROL014",
@@ -1481,7 +1528,7 @@
       "depends_on": []
     },
     {
-      "seq": 47,
+      "seq": 49,
       "op": "create",
       "entity": "roles",
       "local_id": "ROL015",
@@ -1497,7 +1544,7 @@
       "depends_on": []
     },
     {
-      "seq": 48,
+      "seq": 50,
       "op": "create",
       "entity": "roles",
       "local_id": "ROL016",
@@ -1513,7 +1560,7 @@
       "depends_on": []
     },
     {
-      "seq": 49,
+      "seq": 51,
       "op": "create",
       "entity": "roles",
       "local_id": "ROL017",
@@ -1529,7 +1576,7 @@
       "depends_on": []
     },
     {
-      "seq": 50,
+      "seq": 52,
       "op": "create",
       "entity": "roles",
       "local_id": "ROL018",
@@ -1545,7 +1592,7 @@
       "depends_on": []
     },
     {
-      "seq": 51,
+      "seq": 53,
       "op": "create",
       "entity": "relationships",
       "local_id": "REL001",
@@ -1567,12 +1614,12 @@
         "relationship_order": 1
       },
       "depends_on": [
-        33,
-        34
+        35,
+        36
       ]
     },
     {
-      "seq": 52,
+      "seq": 54,
       "op": "create",
       "entity": "relationships",
       "local_id": "REL002",
@@ -1594,12 +1641,12 @@
         "relationship_order": 2
       },
       "depends_on": [
-        35,
-        36
+        37,
+        38
       ]
     },
     {
-      "seq": 53,
+      "seq": 55,
       "op": "create",
       "entity": "relationships",
       "local_id": "REL003",
@@ -1621,12 +1668,12 @@
         "relationship_order": 3
       },
       "depends_on": [
-        37,
-        38
+        39,
+        40
       ]
     },
     {
-      "seq": 54,
+      "seq": 56,
       "op": "create",
       "entity": "relationships",
       "local_id": "REL004",
@@ -1648,12 +1695,12 @@
         "relationship_order": 4
       },
       "depends_on": [
-        39,
-        40
+        41,
+        42
       ]
     },
     {
-      "seq": 55,
+      "seq": 57,
       "op": "create",
       "entity": "relationships",
       "local_id": "REL005",
@@ -1675,12 +1722,12 @@
         "relationship_order": 5
       },
       "depends_on": [
-        41,
-        42
+        43,
+        44
       ]
     },
     {
-      "seq": 56,
+      "seq": 58,
       "op": "create",
       "entity": "relationships",
       "local_id": "REL006",
@@ -1702,12 +1749,12 @@
         "relationship_order": 6
       },
       "depends_on": [
-        43,
-        44
+        45,
+        46
       ]
     },
     {
-      "seq": 57,
+      "seq": 59,
       "op": "create",
       "entity": "relationships",
       "local_id": "REL007",
@@ -1729,12 +1776,12 @@
         "relationship_order": 7
       },
       "depends_on": [
-        45,
-        46
+        47,
+        48
       ]
     },
     {
-      "seq": 58,
+      "seq": 60,
       "op": "create",
       "entity": "relationships",
       "local_id": "REL008",
@@ -1756,12 +1803,12 @@
         "relationship_order": 8
       },
       "depends_on": [
-        47,
-        48
+        49,
+        50
       ]
     },
     {
-      "seq": 59,
+      "seq": 61,
       "op": "create",
       "entity": "relationships",
       "local_id": "REL009",
@@ -1783,18 +1830,18 @@
         "relationship_order": 9
       },
       "depends_on": [
-        49,
-        50
+        51,
+        52
       ]
     },
     {
-      "seq": 60,
+      "seq": 62,
       "op": "update",
       "entity": "models",
       "local_id": "DMM000000005",
       "dda_id": "DMM000000005",
       "fields": {
-        "model_description": "The CPG - Product Definition model holds what a food and beverage manufacturer needs to define a product, what goes into it, who may supply it and who stands behind it. A Made Product is made from Ingredients, and each Ingredient is itself a product. A Logical Product groups the Variants that are its sizes and packs, and is never made, bought or sold itself. A Replaceable Ingredient may be replaced by a Permitted Alternative, and a Claiming Product is compared with a Comparator when its pack makes a claim against another product. A Bought Material may be sourced from an Authorised Supplier, which is held only as a company. A Certification Holder holds its certification from a Certifying Body. A Labelled Product names a Responsible Business on its pack. A Declaring Document states properties of a Declared Product, and an Issuing Organisation issues the Issued Document. Which labels and claims a change to a recipe reaches and which suppliers may supply an ingredient on a given date are worked out from these arrangements and not kept as facts of their own. The allergens a product declares are kept for each market, and the ingredient that brings each one is worked out from the formulation. Factories and the places inside them down to the shop floor, supplier sites, batches and supply chain detail belong to a separate, proposed CPG Manufacturing and Supply Chain model.",
+        "model_description": "The CPG - Product Definition model holds what a food and beverage manufacturer needs to define a product, what goes into it, who may supply it and who stands behind it. A Made Product is made from Ingredients, and each Ingredient is itself a product. Product is used across industries, so what only a consumer goods product has, including whether it is a Logical, Local or Ingredient product, is held in its consumer goods definition. A Logical Product groups the Variants that are its sizes and packs, and is never made, bought or sold itself. A Replaceable Ingredient may be replaced by a Permitted Alternative, and a Claiming Product is compared with a Comparator when its pack makes a claim against another product. A Bought Material may be sourced from an Authorised Supplier, which is held only as a company. A Certification Holder holds its certification from a Certifying Body. A Labelled Product names a Responsible Business on its pack. A Declaring Document states properties of a Declared Product, and an Issuing Organisation issues the Issued Document. Which labels and claims a change to a recipe reaches and which suppliers may supply an ingredient on a given date are worked out from these arrangements and not kept as facts of their own. The allergens a product declares are kept for each market, and the ingredient that brings each one is worked out from the formulation. Factories and the places inside them down to the shop floor, supplier sites, batches and supply chain detail belong to a separate, proposed CPG Manufacturing and Supply Chain model.",
         "model_relationships": [
           "REL001",
           "REL002",
@@ -1808,19 +1855,19 @@
         ]
       },
       "depends_on": [
-        51,
-        52,
         53,
         54,
         55,
         56,
         57,
         58,
-        59
+        59,
+        60,
+        61
       ]
     },
     {
-      "seq": 61,
+      "seq": 63,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR001",
@@ -1834,11 +1881,11 @@
         "attribute_relationship": "REL001"
       },
       "depends_on": [
-        51
+        53
       ]
     },
     {
-      "seq": 62,
+      "seq": 64,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR002",
@@ -1853,12 +1900,12 @@
         "attribute_relationship": "REL001"
       },
       "depends_on": [
-        51,
+        53,
         10
       ]
     },
     {
-      "seq": 63,
+      "seq": 65,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR003",
@@ -1872,11 +1919,11 @@
         "attribute_relationship": "REL001"
       },
       "depends_on": [
-        51
+        53
       ]
     },
     {
-      "seq": 64,
+      "seq": 66,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR004",
@@ -1891,11 +1938,11 @@
         "attribute_relationship": "REL001"
       },
       "depends_on": [
-        51
+        53
       ]
     },
     {
-      "seq": 65,
+      "seq": 67,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR005",
@@ -1910,11 +1957,11 @@
         "attribute_relationship": "REL001"
       },
       "depends_on": [
-        51
+        53
       ]
     },
     {
-      "seq": 66,
+      "seq": 68,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR006",
@@ -1928,11 +1975,11 @@
         "attribute_relationship": "REL003"
       },
       "depends_on": [
-        53
+        55
       ]
     },
     {
-      "seq": 67,
+      "seq": 69,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR007",
@@ -1947,11 +1994,11 @@
         "attribute_relationship": "REL003"
       },
       "depends_on": [
-        53
+        55
       ]
     },
     {
-      "seq": 68,
+      "seq": 70,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR008",
@@ -1966,11 +2013,11 @@
         "attribute_relationship": "REL004"
       },
       "depends_on": [
-        54
+        56
       ]
     },
     {
-      "seq": 69,
+      "seq": 71,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR009",
@@ -1985,11 +2032,11 @@
         "attribute_relationship": "REL004"
       },
       "depends_on": [
-        54
+        56
       ]
     },
     {
-      "seq": 70,
+      "seq": 72,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR010",
@@ -2004,11 +2051,11 @@
         "attribute_relationship": "REL005"
       },
       "depends_on": [
-        55
+        57
       ]
     },
     {
-      "seq": 71,
+      "seq": 73,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR011",
@@ -2023,11 +2070,11 @@
         "attribute_relationship": "REL005"
       },
       "depends_on": [
-        55
+        57
       ]
     },
     {
-      "seq": 72,
+      "seq": 74,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR012",
@@ -2042,11 +2089,11 @@
         "attribute_relationship": "REL006"
       },
       "depends_on": [
-        56
+        58
       ]
     },
     {
-      "seq": 73,
+      "seq": 75,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR013",
@@ -2061,11 +2108,11 @@
         "attribute_relationship": "REL006"
       },
       "depends_on": [
-        56
+        58
       ]
     },
     {
-      "seq": 74,
+      "seq": 76,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR014",
@@ -2080,11 +2127,11 @@
         "attribute_relationship": "REL008"
       },
       "depends_on": [
-        58
+        60
       ]
     },
     {
-      "seq": 75,
+      "seq": 77,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR015",
@@ -2099,12 +2146,12 @@
         "attribute_relationship": "REL002"
       },
       "depends_on": [
-        52,
+        54,
         8
       ]
     },
     {
-      "seq": 76,
+      "seq": 78,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR016",
@@ -2118,11 +2165,11 @@
         "attribute_relationship": "REL002"
       },
       "depends_on": [
-        52
+        54
       ]
     },
     {
-      "seq": 77,
+      "seq": 79,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR017",
@@ -2136,70 +2183,70 @@
         "attribute_concept": "SBJ001"
       },
       "depends_on": [
-        17
-      ]
-    },
-    {
-      "seq": 78,
-      "op": "create",
-      "entity": "attributes",
-      "local_id": "ATR018",
-      "dda_id": null,
-      "fields": {
-        "attribute_code": "ProductLegalName",
-        "attribute_name": "ProductLegalName",
-        "attribute_fqn_name": "ProductLegalName",
-        "attribute_description": "The name the food must be given by law on the pack, where it differs from the name it is sold under. This fact is kept in this one place for a product.",
-        "attribute_type": "TEXT",
-        "attribute_class": "PUBLIC",
-        "attribute_concept": "SBJ001"
-      },
-      "depends_on": [
-        17
-      ]
-    },
-    {
-      "seq": 79,
-      "op": "create",
-      "entity": "attributes",
-      "local_id": "ATR019",
-      "dda_id": null,
-      "fields": {
-        "attribute_code": "ProductNetQuantity",
-        "attribute_name": "ProductNetQuantity",
-        "attribute_fqn_name": "ProductNetQuantity",
-        "attribute_description": "How much food the pack contains, as declared on the pack, in the unit stated with it. This fact is kept in this one place for a product.",
-        "attribute_type": "FLOAT",
-        "attribute_class": "PUBLIC",
-        "attribute_concept": "SBJ001"
-      },
-      "depends_on": [
-        17
+        18
       ]
     },
     {
       "seq": 80,
       "op": "create",
       "entity": "attributes",
-      "local_id": "ATR020",
+      "local_id": "ATR018",
       "dda_id": null,
       "fields": {
-        "attribute_code": "ProductUnitOfMeasure",
-        "attribute_name": "ProductUnitOfMeasure",
-        "attribute_fqn_name": "ProductUnitOfMeasure",
-        "attribute_description": "The unit the declared net quantity is measured in. This fact is kept in this one place for a product.",
-        "attribute_type": "LOOKUP",
-        "attribute_lookup_type": "DLT000000156",
+        "attribute_code": "ProductCPGDefinitionLegalName",
+        "attribute_name": "ProductCPGDefinitionLegalName",
+        "attribute_fqn_name": "ProductCPGDefinitionLegalName",
+        "attribute_description": "The name the food must be given by law on the pack, where it differs from the name it is sold under. This fact is kept in this one place for a product.",
+        "attribute_type": "TEXT",
         "attribute_class": "PUBLIC",
-        "attribute_concept": "SBJ001"
+        "attribute_concept": "SBJ022"
       },
       "depends_on": [
-        17,
-        10
+        32
       ]
     },
     {
       "seq": 81,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR019",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductCPGDefinitionNetQuantity",
+        "attribute_name": "ProductCPGDefinitionNetQuantity",
+        "attribute_fqn_name": "ProductCPGDefinitionNetQuantity",
+        "attribute_description": "How much food the pack contains, as declared on the pack, in the unit stated with it. This fact is kept in this one place for a product.",
+        "attribute_type": "FLOAT",
+        "attribute_class": "PUBLIC",
+        "attribute_concept": "SBJ022"
+      },
+      "depends_on": [
+        32
+      ]
+    },
+    {
+      "seq": 82,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR020",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductCPGDefinitionUnitOfMeasure",
+        "attribute_name": "ProductCPGDefinitionUnitOfMeasure",
+        "attribute_fqn_name": "ProductCPGDefinitionUnitOfMeasure",
+        "attribute_description": "The unit the declared net quantity is measured in. This fact is kept in this one place for a product.",
+        "attribute_type": "LOOKUP",
+        "attribute_lookup_type": "DLT000000156",
+        "attribute_class": "PUBLIC",
+        "attribute_concept": "SBJ022"
+      },
+      "depends_on": [
+        32,
+        10
+      ]
+    },
+    {
+      "seq": 83,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR021",
@@ -2214,12 +2261,12 @@
         "attribute_concept": "SBJ002"
       },
       "depends_on": [
-        18,
+        19,
         11
       ]
     },
     {
-      "seq": 82,
+      "seq": 84,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR022",
@@ -2233,11 +2280,11 @@
         "attribute_concept": "SBJ002"
       },
       "depends_on": [
-        18
+        19
       ]
     },
     {
-      "seq": 83,
+      "seq": 85,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR023",
@@ -2251,11 +2298,11 @@
         "attribute_concept": "SBJ002"
       },
       "depends_on": [
-        18
+        19
       ]
     },
     {
-      "seq": 84,
+      "seq": 86,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR024",
@@ -2269,11 +2316,11 @@
         "attribute_concept": "SBJ002"
       },
       "depends_on": [
-        18
+        19
       ]
     },
     {
-      "seq": 85,
+      "seq": 87,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR025",
@@ -2287,11 +2334,11 @@
         "attribute_concept": "SBJ002"
       },
       "depends_on": [
-        18
+        19
       ]
     },
     {
-      "seq": 86,
+      "seq": 88,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR026",
@@ -2305,11 +2352,11 @@
         "attribute_concept": "SBJ002"
       },
       "depends_on": [
-        18
+        19
       ]
     },
     {
-      "seq": 87,
+      "seq": 89,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR027",
@@ -2323,11 +2370,11 @@
         "attribute_concept": "SBJ003"
       },
       "depends_on": [
-        19
+        20
       ]
     },
     {
-      "seq": 88,
+      "seq": 90,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR028",
@@ -2341,11 +2388,11 @@
         "attribute_concept": "SBJ003"
       },
       "depends_on": [
-        19
+        20
       ]
     },
     {
-      "seq": 89,
+      "seq": 91,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR030",
@@ -2359,11 +2406,11 @@
         "attribute_concept": "SBJ004"
       },
       "depends_on": [
-        20
+        21
       ]
     },
     {
-      "seq": 90,
+      "seq": 92,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR031",
@@ -2377,11 +2424,11 @@
         "attribute_concept": "SBJ004"
       },
       "depends_on": [
-        20
+        21
       ]
     },
     {
-      "seq": 91,
+      "seq": 93,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR032",
@@ -2395,11 +2442,11 @@
         "attribute_concept": "SBJ004"
       },
       "depends_on": [
-        20
+        21
       ]
     },
     {
-      "seq": 92,
+      "seq": 94,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR033",
@@ -2413,11 +2460,11 @@
         "attribute_concept": "SBJ004"
       },
       "depends_on": [
-        20
+        21
       ]
     },
     {
-      "seq": 93,
+      "seq": 95,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR034",
@@ -2433,12 +2480,12 @@
         "attribute_concept": "SBJ005"
       },
       "depends_on": [
-        21,
+        22,
         2
       ]
     },
     {
-      "seq": 94,
+      "seq": 96,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR035",
@@ -2453,11 +2500,11 @@
         "attribute_concept": "SBJ005"
       },
       "depends_on": [
-        21
+        22
       ]
     },
     {
-      "seq": 95,
+      "seq": 97,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR036",
@@ -2472,11 +2519,11 @@
         "attribute_concept": "SBJ005"
       },
       "depends_on": [
-        21
+        22
       ]
     },
     {
-      "seq": 96,
+      "seq": 98,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR037",
@@ -2492,12 +2539,12 @@
         "attribute_concept": "SBJ006"
       },
       "depends_on": [
-        22,
+        23,
         4
       ]
     },
     {
-      "seq": 97,
+      "seq": 99,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR038",
@@ -2512,11 +2559,11 @@
         "attribute_concept": "SBJ006"
       },
       "depends_on": [
-        22
+        23
       ]
     },
     {
-      "seq": 98,
+      "seq": 100,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR039",
@@ -2532,12 +2579,12 @@
         "attribute_concept": "SBJ006"
       },
       "depends_on": [
-        22,
+        23,
         3
       ]
     },
     {
-      "seq": 99,
+      "seq": 101,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR040",
@@ -2552,11 +2599,11 @@
         "attribute_concept": "SBJ006"
       },
       "depends_on": [
-        22
+        23
       ]
     },
     {
-      "seq": 100,
+      "seq": 102,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR041",
@@ -2570,11 +2617,11 @@
         "attribute_concept": "SBJ006"
       },
       "depends_on": [
-        22
+        23
       ]
     },
     {
-      "seq": 101,
+      "seq": 103,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR042",
@@ -2588,11 +2635,11 @@
         "attribute_concept": "SBJ006"
       },
       "depends_on": [
-        22
+        23
       ]
     },
     {
-      "seq": 102,
+      "seq": 104,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR043",
@@ -2606,11 +2653,11 @@
         "attribute_concept": "SBJ006"
       },
       "depends_on": [
-        22
+        23
       ]
     },
     {
-      "seq": 103,
+      "seq": 105,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR044",
@@ -2625,11 +2672,11 @@
         "attribute_concept": "SBJ006"
       },
       "depends_on": [
-        22
+        23
       ]
     },
     {
-      "seq": 104,
+      "seq": 106,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR045",
@@ -2645,12 +2692,12 @@
         "attribute_concept": "SBJ007"
       },
       "depends_on": [
-        31,
+        33,
         5
       ]
     },
     {
-      "seq": 105,
+      "seq": 107,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR047",
@@ -2665,11 +2712,11 @@
         "attribute_concept": "SBJ007"
       },
       "depends_on": [
-        31
+        33
       ]
     },
     {
-      "seq": 106,
+      "seq": 108,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR048",
@@ -2685,12 +2732,12 @@
         "attribute_concept": "SBJ008"
       },
       "depends_on": [
-        32,
+        34,
         7
       ]
     },
     {
-      "seq": 107,
+      "seq": 109,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR050",
@@ -2705,11 +2752,11 @@
         "attribute_concept": "SBJ008"
       },
       "depends_on": [
-        32
+        34
       ]
     },
     {
-      "seq": 108,
+      "seq": 110,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR051",
@@ -2724,11 +2771,11 @@
         "attribute_concept": "SBJ008"
       },
       "depends_on": [
-        32
+        34
       ]
     },
     {
-      "seq": 109,
+      "seq": 111,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR053",
@@ -2742,11 +2789,11 @@
         "attribute_concept": "SBJ009"
       },
       "depends_on": [
-        23
+        24
       ]
     },
     {
-      "seq": 110,
+      "seq": 112,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR054",
@@ -2760,11 +2807,11 @@
         "attribute_concept": "SBJ009"
       },
       "depends_on": [
-        23
+        24
       ]
     },
     {
-      "seq": 111,
+      "seq": 113,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR055",
@@ -2780,12 +2827,12 @@
         "attribute_concept": "SBJ009"
       },
       "depends_on": [
-        23,
+        24,
         6
       ]
     },
     {
-      "seq": 112,
+      "seq": 114,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR056",
@@ -2801,11 +2848,11 @@
         "attribute_concept": "SBJ010"
       },
       "depends_on": [
-        24
+        25
       ]
     },
     {
-      "seq": 113,
+      "seq": 115,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR057",
@@ -2819,11 +2866,11 @@
         "attribute_concept": "SBJ010"
       },
       "depends_on": [
-        24
+        25
       ]
     },
     {
-      "seq": 114,
+      "seq": 116,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR058",
@@ -2838,11 +2885,11 @@
         "attribute_concept": "SBJ011"
       },
       "depends_on": [
-        25
+        26
       ]
     },
     {
-      "seq": 115,
+      "seq": 117,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR059",
@@ -2857,11 +2904,11 @@
         "attribute_concept": "SBJ011"
       },
       "depends_on": [
-        25
+        26
       ]
     },
     {
-      "seq": 116,
+      "seq": 118,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR060",
@@ -2876,11 +2923,11 @@
         "attribute_concept": "SBJ011"
       },
       "depends_on": [
-        25
+        26
       ]
     },
     {
-      "seq": 117,
+      "seq": 119,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR061",
@@ -2895,11 +2942,11 @@
         "attribute_concept": "SBJ011"
       },
       "depends_on": [
-        25
+        26
       ]
     },
     {
-      "seq": 118,
+      "seq": 120,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR062",
@@ -2913,11 +2960,11 @@
         "attribute_concept": "SBJ012"
       },
       "depends_on": [
-        26
+        27
       ]
     },
     {
-      "seq": 119,
+      "seq": 121,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR063",
@@ -2931,11 +2978,11 @@
         "attribute_concept": "SBJ012"
       },
       "depends_on": [
-        26
+        27
       ]
     },
     {
-      "seq": 120,
+      "seq": 122,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR064",
@@ -2949,11 +2996,11 @@
         "attribute_concept": "SBJ012"
       },
       "depends_on": [
-        26
+        27
       ]
     },
     {
-      "seq": 121,
+      "seq": 123,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR065",
@@ -2969,7 +3016,7 @@
       "depends_on": []
     },
     {
-      "seq": 122,
+      "seq": 124,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR066",
@@ -2988,7 +3035,7 @@
       ]
     },
     {
-      "seq": 123,
+      "seq": 125,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR067",
@@ -3004,7 +3051,7 @@
       "depends_on": []
     },
     {
-      "seq": 124,
+      "seq": 126,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR068",
@@ -3018,11 +3065,11 @@
         "attribute_concept": "SBJ017"
       },
       "depends_on": [
-        27
+        28
       ]
     },
     {
-      "seq": 125,
+      "seq": 127,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR069",
@@ -3036,11 +3083,11 @@
         "attribute_concept": "SBJ017"
       },
       "depends_on": [
-        27
+        28
       ]
     },
     {
-      "seq": 126,
+      "seq": 128,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR079",
@@ -3056,12 +3103,12 @@
         "attribute_concept": "SBJ019"
       },
       "depends_on": [
-        28,
+        29,
         12
       ]
     },
     {
-      "seq": 127,
+      "seq": 129,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR080",
@@ -3077,11 +3124,11 @@
         "attribute_concept": "SBJ019"
       },
       "depends_on": [
-        28
+        29
       ]
     },
     {
-      "seq": 128,
+      "seq": 130,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR081",
@@ -3096,11 +3143,11 @@
         "attribute_concept": "SBJ019"
       },
       "depends_on": [
-        28
+        29
       ]
     },
     {
-      "seq": 129,
+      "seq": 131,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR082",
@@ -3115,11 +3162,11 @@
         "attribute_concept": "SBJ019"
       },
       "depends_on": [
-        28
+        29
       ]
     },
     {
-      "seq": 130,
+      "seq": 132,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR083",
@@ -3135,12 +3182,12 @@
         "attribute_concept": "SBJ020"
       },
       "depends_on": [
-        29,
+        30,
         13
       ]
     },
     {
-      "seq": 131,
+      "seq": 133,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR084",
@@ -3155,11 +3202,11 @@
         "attribute_concept": "SBJ020"
       },
       "depends_on": [
-        29
+        30
       ]
     },
     {
-      "seq": 132,
+      "seq": 134,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR085",
@@ -3174,11 +3221,11 @@
         "attribute_concept": "SBJ020"
       },
       "depends_on": [
-        29
+        30
       ]
     },
     {
-      "seq": 133,
+      "seq": 135,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR086",
@@ -3194,12 +3241,12 @@
         "attribute_concept": "SBJ021"
       },
       "depends_on": [
-        30,
+        31,
         14
       ]
     },
     {
-      "seq": 134,
+      "seq": 136,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR087",
@@ -3214,11 +3261,11 @@
         "attribute_concept": "SBJ021"
       },
       "depends_on": [
-        30
+        31
       ]
     },
     {
-      "seq": 135,
+      "seq": 137,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR088",
@@ -3234,12 +3281,12 @@
         "attribute_concept": "SBJ021"
       },
       "depends_on": [
-        30,
+        31,
         15
       ]
     },
     {
-      "seq": 136,
+      "seq": 138,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR089",
@@ -3254,11 +3301,11 @@
         "attribute_concept": "SBJ021"
       },
       "depends_on": [
-        30
+        31
       ]
     },
     {
-      "seq": 137,
+      "seq": 139,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR090",
@@ -3274,11 +3321,11 @@
         "attribute_concept": "SBJ007"
       },
       "depends_on": [
-        31
+        33
       ]
     },
     {
-      "seq": 138,
+      "seq": 140,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR091",
@@ -3294,12 +3341,12 @@
         "attribute_relationship": "REL007"
       },
       "depends_on": [
-        57,
+        59,
         12
       ]
     },
     {
-      "seq": 139,
+      "seq": 141,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR092",
@@ -3315,11 +3362,11 @@
         "attribute_relationship": "REL007"
       },
       "depends_on": [
-        57
+        59
       ]
     },
     {
-      "seq": 140,
+      "seq": 142,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR093",
@@ -3335,12 +3382,12 @@
         "attribute_concept": "SBJ005"
       },
       "depends_on": [
-        21,
+        22,
         16
       ]
     },
     {
-      "seq": 141,
+      "seq": 143,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR094",
@@ -3355,11 +3402,11 @@
         "attribute_concept": "SBJ005"
       },
       "depends_on": [
-        21
+        22
       ]
     },
     {
-      "seq": 142,
+      "seq": 144,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR095",
@@ -3374,11 +3421,11 @@
         "attribute_concept": "SBJ009"
       },
       "depends_on": [
-        23
+        24
       ]
     },
     {
-      "seq": 143,
+      "seq": 145,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR096",
@@ -3393,11 +3440,11 @@
         "attribute_concept": "SBJ009"
       },
       "depends_on": [
-        23
+        24
       ]
     },
     {
-      "seq": 144,
+      "seq": 146,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR097",
@@ -3413,8 +3460,29 @@
         "attribute_concept": "SBJ008"
       },
       "depends_on": [
-        32,
+        34,
         4
+      ]
+    },
+    {
+      "seq": 147,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR098",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductCPGDefinitionCPGProductType",
+        "attribute_name": "ProductCPGDefinitionCPGProductType",
+        "attribute_fqn_name": "ProductCPGDefinitionCPGProductType",
+        "attribute_description": "Which of three kinds the product is, chosen from a list: Logical, a grouping of related sizes and packs that is never sold; Local, a version of a logical product that can be sold; or Ingredient, a product that goes into another product. This fact is kept in this one place for a product.",
+        "attribute_type": "LOOKUP",
+        "attribute_lookup_type": "LKP019",
+        "attribute_class": "PUBLIC",
+        "attribute_concept": "SBJ022"
+      },
+      "depends_on": [
+        32,
+        17
       ]
     }
   ]

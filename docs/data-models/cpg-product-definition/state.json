@@ -2,7 +2,7 @@
   "spec_version": "31.5",
   "spec_uri": "dda://skills/domain-discovery",
   "mechanics": "manual",
-  "pass": 54,
+  "pass": 55,
   "next_action": {
     "step": 9,
     "reason": "validate the elaborated model and run the new test cases"
@@ -124,6 +124,7 @@
       "path": [
         "REL007",
         "SBJ007",
+        "SBJ022",
         "ATR018",
         "ATR019"
       ],
@@ -640,6 +641,24 @@
       "path": [
         "SBJ005",
         "ATR034"
+      ],
+      "result": "pass",
+      "reason": ""
+    },
+    {
+      "id": "SCN043",
+      "question": "Which products are Logical, which are Local versions that can be sold, and which are Ingredients?",
+      "data_requirement_ids": [
+        "DRQ032"
+      ],
+      "kind": "designed",
+      "as_at": "as-at",
+      "path": [
+        "SBJ001",
+        "SBJ022",
+        "ATR098",
+        "REL002",
+        "REL001"
       ],
       "result": "pass",
       "reason": ""
@@ -1427,6 +1446,22 @@
         "DRQ030",
         "DRQ031"
       ]
+    },
+    {
+      "pass": 55,
+      "counts": {
+        "domains": 3,
+        "roles": 18,
+        "relationships": 9,
+        "concepts": 21,
+        "attributes": 86,
+        "lookups": 19
+      },
+      "merged": [],
+      "withdrawn": [],
+      "growth_justified_by": [
+        "DRQ032"
+      ]
     }
   ],
   "standards_conformance": [
@@ -1737,6 +1772,32 @@
       "decision": "This model creates Product and holds the hierarchy of products and ingredients. CPG Manufacturing and Supply Chain refers to them.",
       "by": "Andrew Bush",
       "date": "2026-11-18"
+    },
+    {
+      "id": "DEC005",
+      "question": "The kind of a product is one value: Logical, Local or Ingredient. A product that is both sold in its own right and used as an ingredient in another product, such as sugar sold to shoppers and used in a biscuit, has to be recorded as one of them. Should the kind hold one value, or more than one?",
+      "options": [
+        "One value, the kind the product is mainly managed as",
+        "More than one value"
+      ],
+      "raised_at_pass": 55,
+      "status": "open",
+      "decision": "",
+      "by": "",
+      "date": ""
+    },
+    {
+      "id": "DEC006",
+      "question": "A Local product is a version of a logical product that can be sold. A product that is sold in a single size and format has no logical product above it. Should every sold product have a logical product above it, even where there is only one version, or may a sold product stand alone?",
+      "options": [
+        "Every sold product has a logical product above it",
+        "A sold product may stand alone, and is then Local without a logical product"
+      ],
+      "raised_at_pass": 55,
+      "status": "open",
+      "decision": "",
+      "by": "",
+      "date": ""
     }
   ],
   "converged": false,
