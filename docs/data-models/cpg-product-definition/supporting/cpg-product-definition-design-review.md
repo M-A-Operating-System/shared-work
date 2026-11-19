@@ -133,7 +133,7 @@ A client-ready final design states the design and nothing about how it was produ
 | D-3 | Do health claims fall inside the scope? | In · out, stated | Out, stated, unless a client needs them |
 | D-4 | Keep Appendix B in the lite edition? | Keep (house practice) · drop (method v31.5) | Keep, and record the exception |
 | D-5 | Apply M01–M04 and regenerate? | Yes · wait for the decisions above | **Done 19 November 2026** |
-| D-6 | Add a consumer goods definition under Product with a Logical, Local or Ingredient kind? | As asked | **Done 19 November 2026** (SBJ022, ATR098, LKP019). Two follow-ups are open: DEC005 (a product both sold and used as an ingredient) and DEC006 (a sold product with no logical product above it). The kind and the roles Logical Product, Variant and Ingredient overlap; SCA018 records that they are expected to agree and that nothing enforces it |
+| D-6 | Add a consumer goods definition under Product with a kind field? | As asked | **Done 19 November 2026** (SBJ022, ATR098, LKP019). Ingredient was taken out of the kind the same day, because it is a role found from the formulations; the kind is Logical or Local and the field is optional. One follow-up is open: DEC006 (a sold product with no logical product above it). Logical and Local also overlap the roles Logical Product and Variant; SCA018 records that they are expected to agree and that nothing enforces it |
 
 ## 8 Limits of this review
 

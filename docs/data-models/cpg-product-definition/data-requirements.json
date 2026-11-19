@@ -809,14 +809,13 @@
     "id": "DRQ032",
     "business_requirement_ids": [
       "REQ035",
-      "REQ008",
-      "REQ002"
+      "REQ008"
     ],
     "must_record": [
-      "For each consumer goods product, whether it is a grouping of related sizes and packs, a version that can be sold, or an ingredient that goes into another product"
+      "For each consumer goods product, whether it is a grouping of related sizes and packs or a version that can be sold"
     ],
     "must_answer": [
-      "Which of our products are groupings, which are versions that can be sold, and which are ingredients?"
+      "Which of our products are groupings, and which are versions that can be sold?"
     ],
     "temporality": "as-at",
     "must_prevent": [],

@@ -996,7 +996,7 @@
       "fields": {
         "lookup_type_code": "ProductCPGDefinitionCPGProductTypes",
         "lookup_type_name": "ProductCPGDefinitionCPGProductTypes",
-        "lookup_type_description": "The three kinds of consumer goods product: a grouping of related sizes and packs, a version that can be sold, and something that goes into another product. You can rely on it to say which of the three a product is. It is not the link from a version to its grouping, nor the lines of a formulation, which are kept separately between products.",
+        "lookup_type_description": "The two kinds of consumer goods product that set a product apart by what it is: a grouping of related sizes and packs, and a version that can be sold. You can rely on it to say which of the two a product is. It is not whether the product is an ingredient, which is found from the formulations it appears in, nor the link from a version to its grouping, which is kept separately between products.",
         "lookups": [
           {
             "lookup_code": "LOGICAL",
@@ -1007,11 +1007,6 @@
             "lookup_code": "LOCAL",
             "lookup_name": "Local",
             "lookup_description": "A version of a logical product that can be sold, such as one size, format or pack count of it. It is sold and counted on its own."
-          },
-          {
-            "lookup_code": "INGREDIENT",
-            "lookup_name": "Ingredient",
-            "lookup_description": "A product that goes into another product, whether a raw material, a bought-in ingredient or a packaging item."
           }
         ]
       },
@@ -1261,7 +1256,7 @@
       "fields": {
         "concept_code": "ProductCPGDefinition",
         "concept_name": "ProductCPGDefinition",
-        "concept_description": "There is one of these for each product that the consumer goods business makes, buys or sells; a product of another industry has none. You can rely on it for the facts only a consumer goods product has: whether it is a Logical, Local or Ingredient product, the name the law requires on its pack, and how much its pack contains. It is not the product's own name and identity, which every industry shares, and it is not what the product is made from, its allergens or its labels, which are kept separately.",
+        "concept_description": "There is one of these for each product that the consumer goods business makes, buys or sells; a product of another industry has none. You can rely on it for the facts only a consumer goods product has: whether it is a Logical or a Local product, the name the law requires on its pack, and how much its pack contains. It is not the product's own name and identity, which every industry shares, and it is not what the product is made from, its allergens or its labels, which are kept separately.",
         "concept_parent": "SBJ001",
         "concept_parent_rel": "ONE_TO_ONE_OPTIONAL"
       },
@@ -1841,7 +1836,7 @@
       "local_id": "DMM000000005",
       "dda_id": "DMM000000005",
       "fields": {
-        "model_description": "The CPG - Product Definition model holds what a food and beverage manufacturer needs to define a product, what goes into it, who may supply it and who stands behind it. A Made Product is made from Ingredients, and each Ingredient is itself a product. Product is used across industries, so what only a consumer goods product has, including whether it is a Logical, Local or Ingredient product, is held in its consumer goods definition. A Logical Product groups the Variants that are its sizes and packs, and is never made, bought or sold itself. A Replaceable Ingredient may be replaced by a Permitted Alternative, and a Claiming Product is compared with a Comparator when its pack makes a claim against another product. A Bought Material may be sourced from an Authorised Supplier, which is held only as a company. A Certification Holder holds its certification from a Certifying Body. A Labelled Product names a Responsible Business on its pack. A Declaring Document states properties of a Declared Product, and an Issuing Organisation issues the Issued Document. Which labels and claims a change to a recipe reaches and which suppliers may supply an ingredient on a given date are worked out from these arrangements and not kept as facts of their own. The allergens a product declares are kept for each market, and the ingredient that brings each one is worked out from the formulation. Factories and the places inside them down to the shop floor, supplier sites, batches and supply chain detail belong to a separate, proposed CPG Manufacturing and Supply Chain model.",
+        "model_description": "The CPG - Product Definition model holds what a food and beverage manufacturer needs to define a product, what goes into it, who may supply it and who stands behind it. A Made Product is made from Ingredients, and each Ingredient is itself a product. Product is used across industries, so what only a consumer goods product has, including whether it is a Logical or a Local product, is held in its consumer goods definition. A Logical Product groups the Variants that are its sizes and packs, and is never made, bought or sold itself. A Replaceable Ingredient may be replaced by a Permitted Alternative, and a Claiming Product is compared with a Comparator when its pack makes a claim against another product. A Bought Material may be sourced from an Authorised Supplier, which is held only as a company. A Certification Holder holds its certification from a Certifying Body. A Labelled Product names a Responsible Business on its pack. A Declaring Document states properties of a Declared Product, and an Issuing Organisation issues the Issued Document. Which labels and claims a change to a recipe reaches and which suppliers may supply an ingredient on a given date are worked out from these arrangements and not kept as facts of their own. The allergens a product declares are kept for each market, and the ingredient that brings each one is worked out from the formulation. Factories and the places inside them down to the shop floor, supplier sites, batches and supply chain detail belong to a separate, proposed CPG Manufacturing and Supply Chain model.",
         "model_relationships": [
           "REL001",
           "REL002",
@@ -3474,7 +3469,7 @@
         "attribute_code": "ProductCPGDefinitionCPGProductType",
         "attribute_name": "ProductCPGDefinitionCPGProductType",
         "attribute_fqn_name": "ProductCPGDefinitionCPGProductType",
-        "attribute_description": "Which of three kinds the product is, chosen from a list: Logical, a grouping of related sizes and packs that is never sold; Local, a version of a logical product that can be sold; or Ingredient, a product that goes into another product. This fact is kept in this one place for a product.",
+        "attribute_description": "Whether the product is a Logical product, a grouping of related sizes and packs that is never sold, or a Local product, a version of a logical product that can be sold, chosen from a list. A product that only goes into other products has neither, because that it is an ingredient is found from the formulations it appears in. This fact is kept in this one place for a product.",
         "attribute_type": "LOOKUP",
         "attribute_lookup_type": "LKP019",
         "attribute_class": "PUBLIC",

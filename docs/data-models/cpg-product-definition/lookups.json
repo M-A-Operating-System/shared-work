@@ -1072,7 +1072,7 @@
   {
     "id": "LKP019",
     "code": "ProductCPGDefinitionCPGProductTypes",
-    "definition": "The three kinds of consumer goods product: a grouping of related sizes and packs, a version that can be sold, and something that goes into another product. You can rely on it to say which of the three a product is. It is not the link from a version to its grouping, nor the lines of a formulation, which are kept separately between products.",
+    "definition": "The two kinds of consumer goods product that set a product apart by what it is: a grouping of related sizes and packs, and a version that can be sold. You can rely on it to say which of the two a product is. It is not whether the product is an ingredient, which is found from the formulations it appears in, nor the link from a version to its grouping, which is kept separately between products.",
     "scope": "concept",
     "values": [
       {
@@ -1086,17 +1086,11 @@
         "name": "Local",
         "definition": "A version of a logical product that can be sold, such as one size, format or pack count of it. It is sold and counted on its own.",
         "parent_code": null
-      },
-      {
-        "code": "INGREDIENT",
-        "name": "Ingredient",
-        "definition": "A product that goes into another product, whether a raw material, a bought-in ingredient or a packaging item.",
-        "parent_code": null
       }
     ],
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "Read the 83 lookup types in DDA; none lists whether a product is a grouping, a version that can be sold or an ingredient, and no other list in this model does.",
+    "reuse_search": "Read the 83 lookup types in DDA; none lists whether a product is a grouping or a version that can be sold, and no other list in this model does.",
     "used_here": null,
     "data_requirement_ids": [
       "DRQ032",
@@ -1104,8 +1098,7 @@
     ],
     "evidence_source_ids": [
       "SRC030",
-      "SRC001",
-      "SRC002"
+      "SRC001"
     ],
     "status": "active",
     "withdrawn_reason": null

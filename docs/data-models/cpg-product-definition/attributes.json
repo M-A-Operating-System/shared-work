@@ -2589,26 +2589,25 @@
     "subject_id": "SBJ022",
     "relationship_id": null,
     "code": "ProductCPGDefinitionCPGProductType",
-    "definition": "Which of three kinds the product is, chosen from a list: Logical, a grouping of related sizes and packs that is never sold; Local, a version of a logical product that can be sold; or Ingredient, a product that goes into another product. This fact is kept in this one place for a product.",
+    "definition": "Whether the product is a Logical product, a grouping of related sizes and packs that is never sold, or a Local product, a version of a logical product that can be sold, chosen from a list. A product that only goes into other products has neither, because that it is an ingredient is found from the formulations it appears in. This fact is kept in this one place for a product.",
     "datatype": "LOOKUP",
     "lookup_id": "LKP019",
     "nature": "observed",
     "derived_from": [],
     "temporality": "as-at",
-    "mandatory": true,
+    "mandatory": false,
     "critical": true,
     "classification": "PUBLIC",
     "dda_action": "create",
     "dda_id": null,
-    "reuse_search": "The parent is new to DDA, so it holds no attributes yet. The groupings of related sizes and packs, the versions and the ingredients are also found from the arrangements between products, and this holds the kind the product is recorded as. No other attribute in this model holds this fact.",
+    "reuse_search": "The parent is new to DDA, so it holds no attributes yet. The groupings and the versions are also found from the arrangements between products, and this holds the kind the product is recorded as. No other attribute in this model holds this fact.",
     "data_requirement_ids": [
       "DRQ032",
       "DRQ019"
     ],
     "evidence_source_ids": [
       "SRC030",
-      "SRC001",
-      "SRC002"
+      "SRC001"
     ],
     "status": "active",
     "withdrawn_reason": null

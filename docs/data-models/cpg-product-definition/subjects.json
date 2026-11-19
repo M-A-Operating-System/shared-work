@@ -607,7 +607,7 @@
   {
     "id": "SBJ022",
     "code": "ProductCPGDefinition",
-    "definition": "There is one of these for each product that the consumer goods business makes, buys or sells; a product of another industry has none. You can rely on it for the facts only a consumer goods product has: whether it is a Logical, Local or Ingredient product, the name the law requires on its pack, and how much its pack contains. It is not the product's own name and identity, which every industry shares, and it is not what the product is made from, its allergens or its labels, which are kept separately.",
+    "definition": "There is one of these for each product that the consumer goods business makes, buys or sells; a product of another industry has none. You can rely on it for the facts only a consumer goods product has: whether it is a Logical or a Local product, the name the law requires on its pack, and how much its pack contains. It is not the product's own name and identity, which every industry shares, and it is not what the product is made from, its allergens or its labels, which are kept separately.",
     "kind": "subject",
     "mastery": "mastered",
     "domain_id": "DOM001",
