@@ -3,7 +3,7 @@
     "id": "ROL001",
     "name": "Made Product",
     "plural": "Made Products",
-    "definition": "A product is a Made Product while the organisation makes it. This is how the parts of a finished product are found,. It is not a Variant, which is only another size or pack of the same product. A product the organisation stops making stops being a Made Product, and its earlier formulation remains on record.",
+    "definition": "A product is a Made Product while the organisation makes it. This is how the parts of a finished product are found. It is not a Variant, which is only another size or pack of the same product. A product the organisation stops making stops being a Made Product, and its earlier formulation remains on record.",
     "played_by_domain_ids": [
       "DOM001"
     ],

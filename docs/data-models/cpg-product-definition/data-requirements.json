@@ -22,8 +22,8 @@
     "status": "active",
     "withdrawn_reason": null,
     "prevent_how": [
-      "A product cannot be listed as an ingredient of itself, directly or through other products.",
-      "Every line of a formulation must say which version it belongs to."
+      "The relationship is a composition, which cannot loop back on itself, so a product cannot be listed as an ingredient of itself, directly or through other products.",
+      "Every line of a formulation carries the one version number it belongs to."
     ],
     "prevent_resolution": [
       {
@@ -241,25 +241,25 @@
       "REQ019"
     ],
     "must_record": [
-      "Each claim made, the market it is made in, the condition it rests on, and the product it is compared with where it compares"
+      "Each claim made, the market it is made in, the nutrient and condition it rests on, and the product it is compared with where it compares"
     ],
     "must_answer": [
-      "Which claims does this pack make, and does each still meet its condition?"
+      "Which claims does this pack make, and what does each rest on?"
     ],
     "temporality": "as-at",
     "must_prevent": [
-      "A claim kept after its condition stops being met"
+      "A claim made without the condition it rests on being stated"
     ],
     "status": "active",
     "withdrawn_reason": null,
     "prevent_how": [
-      "Whether a claim's condition is still met is worked out from the current values, so a claim cannot outlive its condition unnoticed."
+      "Every claim must state the condition it rests on."
     ],
     "prevent_resolution": [
       {
         "must_prevent_index": 0,
         "expressed_by": "mandatory-attribute",
-        "artefact_id": "ATR052"
+        "artefact_id": "ATR051"
       }
     ]
   },
@@ -453,7 +453,7 @@
     ],
     "must_record": [
       "Which products are the sizes, formats and pack counts of one product definition",
-      "Whether a product is only a grouping and is never made, bought or sold"
+      "Which products are only groupings, never made, bought or sold"
     ],
     "must_answer": [
       "Which products are sold as versions of this product definition, and how does each differ?"

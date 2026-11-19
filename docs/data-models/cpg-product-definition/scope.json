@@ -1,6 +1,6 @@
 {
   "domain": "CPG - Product Definition",
-  "business": "Consumer packaged goods are products that a company makes and sells in packs to consumers through shops and online, and this design is shown with food and beverage products. The design records what each product is: the product definition, its variants (the sizes, packs and recipes that are sold) and the ingredients that go into it. Around that it records what a product must be, who may supply its ingredients, what may be said about it on pack, and where it is sold and how it is pictured. It does not cover how a product is made: factories, production lines, machines, batches and the steps of manufacture belong to the proposed CPG Manufacturing and Supply Chain model.",
+  "business": "Consumer packaged goods are products that a company makes and sells in packs to consumers through shops and online, and this design covers food and beverage products. The design records what each product is: the product definition, its variants (the sizes, packs and recipes that are sold) and the ingredients that go into it. Around that it records what a product must be, who may supply its ingredients, what may be said about it on pack, and where it is sold and how it is pictured. It does not cover how a product is made: factories, production lines, machines, batches and the steps of manufacture belong to the proposed CPG Manufacturing and Supply Chain model.",
   "subgroups": [
     {
       "id": "SCG001",
@@ -193,6 +193,10 @@
     {
       "id": "SCA016",
       "statement": "All allergen information about a product is held in one concept. A universal list holds each food once, and each market's list names the food each of its allergens is. A market allergen has one food, or one group of foods, above it. How an allergen came to be associated with a product is held as plain text."
+    },
+    {
+      "id": "SCA017",
+      "statement": "Whether a claim still meets its condition is judged by the person responsible for the claim, from the nutrition values the claim names. The condition is held as wording, and the design does not evaluate it."
     }
   ],
   "questions_unanswered": [
@@ -232,7 +236,7 @@
     "dda_id": "DMM000000005",
     "code": "CPGFoodBeverageProducts",
     "name": "CPG - Product Definition",
-    "description": "The CPG - Product Definition model holds what a food and beverage manufacturer needs to define a product, what goes into it, who may supply it and who stands behind it. A Made Product is made from Ingredients, and each Ingredient is itself a product. A Logical Product groups the Variants that are its sizes and packs, and is never made, bought or sold itself. A Replaceable Ingredient may be replaced by a Permitted Alternative, and a Claiming Product is compared with a Comparator when its pack makes a claim against another product. A Bought Material may be sourced from an Authorised Supplier, which is held only as a company. A Certification Holder holds its certification from a Certifying Body. A Labelled Product names a Responsible Business on its pack. A Declaring Document states properties of a Declared Product, and an Issuing Organisation issues the Issued Document. Which labels and claims a change to a recipe reaches, which allergens a product must declare and which suppliers may supply an ingredient on a given date are worked out from these arrangements and never stored. Factories and the places inside them down to the shop floor, supplier sites, batches and supply chain detail belong to a separate, proposed CPG Manufacturing and Supply Chain model."
+    "description": "The CPG - Product Definition model holds what a food and beverage manufacturer needs to define a product, what goes into it, who may supply it and who stands behind it. A Made Product is made from Ingredients, and each Ingredient is itself a product. A Logical Product groups the Variants that are its sizes and packs, and is never made, bought or sold itself. A Replaceable Ingredient may be replaced by a Permitted Alternative, and a Claiming Product is compared with a Comparator when its pack makes a claim against another product. A Bought Material may be sourced from an Authorised Supplier, which is held only as a company. A Certification Holder holds its certification from a Certifying Body. A Labelled Product names a Responsible Business on its pack. A Declaring Document states properties of a Declared Product, and an Issuing Organisation issues the Issued Document. Which labels and claims a change to a recipe reaches and which suppliers may supply an ingredient on a given date are worked out from these arrangements and not kept as facts of their own. The allergens a product declares are kept for each market, and the ingredient that brings each one is worked out from the formulation. Factories and the places inside them down to the shop floor, supplier sites, batches and supply chain detail belong to a separate, proposed CPG Manufacturing and Supply Chain model."
   },
   "withdrawn_items": [
     {

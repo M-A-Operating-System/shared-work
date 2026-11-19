@@ -214,7 +214,7 @@
   {
     "id": "SBJ008",
     "code": "ProductClaims",
-    "definition": "There is one of these for each claim a pack makes in a market. You can rely on it for the wording, the condition the claim rests on, and whether the declared values still meet that condition. It is not the nutrition values a condition rests on, which are kept as nutrition values, and the product a claim compares with is named through the comparison relationship.",
+    "definition": "There is one of these for each claim a pack makes in a market. You can rely on it for the wording, the nutrient it is about where it is about one, and the condition it rests on. It is not the nutrition values a condition rests on, which are kept as nutrition values, and the product a claim compares with is named through the comparison relationship.",
     "kind": "subject",
     "mastery": "mastered",
     "domain_id": "DOM001",

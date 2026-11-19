@@ -1388,8 +1388,8 @@
     "evidence_source_ids": [
       "SRC013"
     ],
-    "status": "active",
-    "withdrawn_reason": null
+    "status": "withdrawn",
+    "withdrawn_reason": "The condition a claim rests on is held as wording, so whether the declared values meet it cannot be worked out. The person responsible for the claim judges it from the nutrition values the claim names."
   },
   {
     "id": "ATR053",
@@ -1866,8 +1866,8 @@
     "evidence_source_ids": [
       "SRC030"
     ],
-    "status": "active",
-    "withdrawn_reason": null
+    "status": "withdrawn",
+    "withdrawn_reason": "A product is a grouping while it plays the Logical Product role in the variants relationship. The role says it, so a flag on the product would say it twice."
   },
   {
     "id": "ATR071",
@@ -2552,6 +2552,34 @@
       "SRC046",
       "SRC047",
       "SRC048"
+    ],
+    "status": "active",
+    "withdrawn_reason": null
+  },
+  {
+    "id": "ATR097",
+    "subject_id": "SBJ008",
+    "relationship_id": null,
+    "code": "ProductClaimsNutrientType",
+    "definition": "The nutrient the claim is about, where it is about one, such as sugars for a claim of reduced sugar. This fact is kept in this one place for a claim. It lets the claims that a change to a nutrient reaches be found.",
+    "datatype": "LOOKUP",
+    "lookup_id": "LKP003",
+    "nature": "observed",
+    "derived_from": [],
+    "temporality": "as-at",
+    "mandatory": false,
+    "critical": true,
+    "classification": "PUBLIC",
+    "dda_action": "create",
+    "dda_id": null,
+    "reuse_search": "The parent is new to DDA, so it holds no attributes yet. The nutrient list already in this model is used for its value. No other attribute in this model holds this fact.",
+    "data_requirement_ids": [
+      "DRQ010",
+      "DRQ009"
+    ],
+    "evidence_source_ids": [
+      "SRC013",
+      "SRC014"
     ],
     "status": "active",
     "withdrawn_reason": null

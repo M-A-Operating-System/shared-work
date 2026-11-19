@@ -499,7 +499,8 @@
     "reuse_search": "Read all 67 lookup types in DDA; none governs nutrients. No other list in this model does.",
     "used_here": null,
     "data_requirement_ids": [
-      "DRQ009"
+      "DRQ009",
+      "DRQ010"
     ],
     "evidence_source_ids": [
       "SRC005"

@@ -8,7 +8,6 @@ This **Data Model Design Document** by **M&A Operating System** provides a singl
 |---|---|
 | Domain | CPG - Product Definition |
 | Document date | 17 November 2026 |
-| Package reference (the working files this document is produced from) | fnb-bdd |
 | Method version | 31.5 |
 
 **In brief.** This design covers what a food or beverage product is, what goes into it, where it is sold, what it must be, how long it lasts, who may supply its ingredients and what may be said about it on pack. The full summary, the questions it answers and the counts are in section 1.3. In this document, DDA means the Data Design Authority, the central register where the company's data model is kept.

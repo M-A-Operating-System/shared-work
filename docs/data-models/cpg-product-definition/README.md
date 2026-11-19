@@ -11,13 +11,15 @@ Package for the **CPG - Product Definition** data model (Food and Beverage; DDA 
 | `supporting/editorial-review.md` | The same-agent reading of the 10 November 2026 version. It applies to that version only |
 | `supporting/render-scripts/` | `render.py <package> <static-source.md> <out.md>` and the static source it copies the cover and sections 1.1 and 1.2 from |
 
-## Status (2026-11-17)
+## Status (2026-11-19)
+
+- **Review fixes (19 November 2026):** claims name the nutrient they rest on; the stored claim-condition value and the logical-product flag are withdrawn; the two formulation rules and the model description are reworded; one assumption added (SCA017). Applied by `supporting/render-scripts/apply_review_fixes.py`.
 
 - **Scope (17 November 2026):** the markets covered are the United States, the United Kingdom and the European Union, and no others. The design extends to other markets by adding list values; none is included by choice (SCI011, SCO013, SCA008).
 
 - Validator v31.5 (`validate.py <package>`): **0 blocking, 0 material, 2 advisory** (the word *entity* in one concept and one list definition, the field's own word).
 - Run with `--document`, the document reports the same hits the template carries (Appendix B and the full-edition section names, "review" in the supplied cover paragraph, "changed" in section 1.1) and one more, ER02: the document has one more decision row (DEC004) than the version the editorial review read.
-- 42 requirements, 27 data requirements, 3 domains (all reused), 20 concepts (4 reused, 16 new), 18 roles, 9 relationships, 85 attributes, 18 lists of values (14 new, 2 extended, 2 reused), 43 sources, 38 test cases (35 pass, 3 accepted limits). The change package has 145 operations.
+- 42 requirements, 27 data requirements, 3 domains (all reused), 20 concepts (4 reused, 16 new), 18 roles, 9 relationships, 84 attributes, 18 lists of values (14 new, 2 extended, 2 reused), 43 sources, 38 test cases (35 pass, 3 accepted limits). The change package has 144 operations.
 - Reconciled with DDA on 2026-11-16: the baseline (13 domains, 86 lookup types, 28 standards) is refreshed. The unit-of-measure list is `UniversalUnitOfMeasureCodes` (DLT000000156), shared with Manufacturing.
 
 ## Decisions

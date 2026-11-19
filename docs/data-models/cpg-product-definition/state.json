@@ -166,7 +166,7 @@
     },
     {
       "id": "SCN010",
-      "question": "Which claims does this pack make, and does each still meet its condition?",
+      "question": "Which claims does this pack make, and what does each rest on?",
       "data_requirement_ids": [
         "DRQ010"
       ],
@@ -396,10 +396,10 @@
         "REL001",
         "SBJ006",
         "SBJ008",
-        "ATR052"
+        "ATR097"
       ],
       "result": "pass",
-      "reason": "The nutrition values, the ingredient order and every claim resting on them are worked out from the formulation, so the reach can be read before the change is made."
+      "reason": "The sugars value, the claims resting on sugars and the label items of the product are found directly, and so are the products that use it as an ingredient. Whether a claim still meets its condition after the change is judged by the person responsible, because the condition is held as wording."
     },
     {
       "id": "SCN024",
@@ -441,7 +441,6 @@
       "path": [
         "SBJ001",
         "REL002",
-        "ATR070",
         "ATR015",
         "ATR016"
       ],

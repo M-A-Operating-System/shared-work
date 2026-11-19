@@ -1248,7 +1248,7 @@
       "fields": {
         "concept_code": "ProductClaims",
         "concept_name": "ProductClaims",
-        "concept_description": "There is one of these for each claim a pack makes in a market. You can rely on it for the wording, the condition the claim rests on, and whether the declared values still meet that condition. It is not the nutrition values a condition rests on, which are kept as nutrition values, and the product a claim compares with is named through the comparison relationship.",
+        "concept_description": "There is one of these for each claim a pack makes in a market. You can rely on it for the wording, the nutrient it is about where it is about one, and the condition it rests on. It is not the nutrition values a condition rests on, which are kept as nutrition values, and the product a claim compares with is named through the comparison relationship.",
         "concept_parent": "SBJ019",
         "concept_parent_rel": "ONE_TO_MANY_OPTIONAL"
       },
@@ -1265,7 +1265,7 @@
       "fields": {
         "role_code": "CPGMadeProduct",
         "role_name": "Made Product",
-        "role_description": "A product is a Made Product while the organisation makes it. This is how the parts of a finished product are found,. It is not a Variant, which is only another size or pack of the same product. A product the organisation stops making stops being a Made Product, and its earlier formulation remains on record.",
+        "role_description": "A product is a Made Product while the organisation makes it. This is how the parts of a finished product are found. It is not a Variant, which is only another size or pack of the same product. A product the organisation stops making stops being a Made Product, and its earlier formulation remains on record.",
         "role_domains": [
           "DMD000000032"
         ]
@@ -1794,7 +1794,7 @@
       "local_id": "DMM000000005",
       "dda_id": "DMM000000005",
       "fields": {
-        "model_description": "The CPG - Product Definition model holds what a food and beverage manufacturer needs to define a product, what goes into it, who may supply it and who stands behind it. A Made Product is made from Ingredients, and each Ingredient is itself a product. A Logical Product groups the Variants that are its sizes and packs, and is never made, bought or sold itself. A Replaceable Ingredient may be replaced by a Permitted Alternative, and a Claiming Product is compared with a Comparator when its pack makes a claim against another product. A Bought Material may be sourced from an Authorised Supplier, which is held only as a company. A Certification Holder holds its certification from a Certifying Body. A Labelled Product names a Responsible Business on its pack. A Declaring Document states properties of a Declared Product, and an Issuing Organisation issues the Issued Document. Which labels and claims a change to a recipe reaches, which allergens a product must declare and which suppliers may supply an ingredient on a given date are worked out from these arrangements and never stored. Factories and the places inside them down to the shop floor, supplier sites, batches and supply chain detail belong to a separate, proposed CPG Manufacturing and Supply Chain model.",
+        "model_description": "The CPG - Product Definition model holds what a food and beverage manufacturer needs to define a product, what goes into it, who may supply it and who stands behind it. A Made Product is made from Ingredients, and each Ingredient is itself a product. A Logical Product groups the Variants that are its sizes and packs, and is never made, bought or sold itself. A Replaceable Ingredient may be replaced by a Permitted Alternative, and a Claiming Product is compared with a Comparator when its pack makes a claim against another product. A Bought Material may be sourced from an Authorised Supplier, which is held only as a company. A Certification Holder holds its certification from a Certifying Body. A Labelled Product names a Responsible Business on its pack. A Declaring Document states properties of a Declared Product, and an Issuing Organisation issues the Issued Document. Which labels and claims a change to a recipe reaches and which suppliers may supply an ingredient on a given date are worked out from these arrangements and not kept as facts of their own. The allergens a product declares are kept for each market, and the ingredient that brings each one is worked out from the formulation. Factories and the places inside them down to the shop floor, supplier sites, batches and supply chain detail belong to a separate, proposed CPG Manufacturing and Supply Chain model.",
         "model_relationships": [
           "REL001",
           "REL002",
@@ -2731,25 +2731,6 @@
       "seq": 109,
       "op": "create",
       "entity": "attributes",
-      "local_id": "ATR052",
-      "dda_id": null,
-      "fields": {
-        "attribute_code": "ProductClaimsConditionMet",
-        "attribute_name": "ProductClaimsConditionMet",
-        "attribute_fqn_name": "ProductClaimsConditionMet",
-        "attribute_description": "Whether the declared nutrition values currently meet the condition the claim rests on, worked out from those values. This fact is kept in this one place for a claim. It is worked out from the facts it names and is never typed in.",
-        "attribute_type": "BOOLEAN",
-        "attribute_class": "PUBLIC",
-        "attribute_concept": "SBJ008"
-      },
-      "depends_on": [
-        32
-      ]
-    },
-    {
-      "seq": 110,
-      "op": "create",
-      "entity": "attributes",
       "local_id": "ATR053",
       "dda_id": null,
       "fields": {
@@ -2765,7 +2746,7 @@
       ]
     },
     {
-      "seq": 111,
+      "seq": 110,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR054",
@@ -2783,7 +2764,7 @@
       ]
     },
     {
-      "seq": 112,
+      "seq": 111,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR055",
@@ -2804,7 +2785,7 @@
       ]
     },
     {
-      "seq": 113,
+      "seq": 112,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR056",
@@ -2824,7 +2805,7 @@
       ]
     },
     {
-      "seq": 114,
+      "seq": 113,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR057",
@@ -2842,7 +2823,7 @@
       ]
     },
     {
-      "seq": 115,
+      "seq": 114,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR058",
@@ -2861,7 +2842,7 @@
       ]
     },
     {
-      "seq": 116,
+      "seq": 115,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR059",
@@ -2880,7 +2861,7 @@
       ]
     },
     {
-      "seq": 117,
+      "seq": 116,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR060",
@@ -2899,7 +2880,7 @@
       ]
     },
     {
-      "seq": 118,
+      "seq": 117,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR061",
@@ -2918,7 +2899,7 @@
       ]
     },
     {
-      "seq": 119,
+      "seq": 118,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR062",
@@ -2936,7 +2917,7 @@
       ]
     },
     {
-      "seq": 120,
+      "seq": 119,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR063",
@@ -2954,7 +2935,7 @@
       ]
     },
     {
-      "seq": 121,
+      "seq": 120,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR064",
@@ -2972,7 +2953,7 @@
       ]
     },
     {
-      "seq": 122,
+      "seq": 121,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR065",
@@ -2988,7 +2969,7 @@
       "depends_on": []
     },
     {
-      "seq": 123,
+      "seq": 122,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR066",
@@ -3007,7 +2988,7 @@
       ]
     },
     {
-      "seq": 124,
+      "seq": 123,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR067",
@@ -3023,7 +3004,7 @@
       "depends_on": []
     },
     {
-      "seq": 125,
+      "seq": 124,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR068",
@@ -3041,7 +3022,7 @@
       ]
     },
     {
-      "seq": 126,
+      "seq": 125,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR069",
@@ -3059,26 +3040,7 @@
       ]
     },
     {
-      "seq": 127,
-      "op": "create",
-      "entity": "attributes",
-      "local_id": "ATR070",
-      "dda_id": null,
-      "fields": {
-        "attribute_code": "ProductIsLogical",
-        "attribute_name": "ProductIsLogical",
-        "attribute_fqn_name": "ProductIsLogical",
-        "attribute_description": "Whether the product is only a grouping of related sizes and packs, with nothing made, bought or sold under it. This fact is kept in this one place for a product.",
-        "attribute_type": "BOOLEAN",
-        "attribute_class": "PUBLIC",
-        "attribute_concept": "SBJ001"
-      },
-      "depends_on": [
-        17
-      ]
-    },
-    {
-      "seq": 128,
+      "seq": 126,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR079",
@@ -3099,7 +3061,7 @@
       ]
     },
     {
-      "seq": 129,
+      "seq": 127,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR080",
@@ -3119,7 +3081,7 @@
       ]
     },
     {
-      "seq": 130,
+      "seq": 128,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR081",
@@ -3138,7 +3100,7 @@
       ]
     },
     {
-      "seq": 131,
+      "seq": 129,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR082",
@@ -3157,7 +3119,7 @@
       ]
     },
     {
-      "seq": 132,
+      "seq": 130,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR083",
@@ -3178,7 +3140,7 @@
       ]
     },
     {
-      "seq": 133,
+      "seq": 131,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR084",
@@ -3197,7 +3159,7 @@
       ]
     },
     {
-      "seq": 134,
+      "seq": 132,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR085",
@@ -3216,7 +3178,7 @@
       ]
     },
     {
-      "seq": 135,
+      "seq": 133,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR086",
@@ -3237,7 +3199,7 @@
       ]
     },
     {
-      "seq": 136,
+      "seq": 134,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR087",
@@ -3256,7 +3218,7 @@
       ]
     },
     {
-      "seq": 137,
+      "seq": 135,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR088",
@@ -3277,7 +3239,7 @@
       ]
     },
     {
-      "seq": 138,
+      "seq": 136,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR089",
@@ -3296,7 +3258,7 @@
       ]
     },
     {
-      "seq": 139,
+      "seq": 137,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR090",
@@ -3316,7 +3278,7 @@
       ]
     },
     {
-      "seq": 140,
+      "seq": 138,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR091",
@@ -3337,7 +3299,7 @@
       ]
     },
     {
-      "seq": 141,
+      "seq": 139,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR092",
@@ -3357,7 +3319,7 @@
       ]
     },
     {
-      "seq": 142,
+      "seq": 140,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR093",
@@ -3378,7 +3340,7 @@
       ]
     },
     {
-      "seq": 143,
+      "seq": 141,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR094",
@@ -3397,7 +3359,7 @@
       ]
     },
     {
-      "seq": 144,
+      "seq": 142,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR095",
@@ -3416,7 +3378,7 @@
       ]
     },
     {
-      "seq": 145,
+      "seq": 143,
       "op": "create",
       "entity": "attributes",
       "local_id": "ATR096",
@@ -3432,6 +3394,27 @@
       },
       "depends_on": [
         23
+      ]
+    },
+    {
+      "seq": 144,
+      "op": "create",
+      "entity": "attributes",
+      "local_id": "ATR097",
+      "dda_id": null,
+      "fields": {
+        "attribute_code": "ProductClaimsNutrientType",
+        "attribute_name": "ProductClaimsNutrientType",
+        "attribute_fqn_name": "ProductClaimsNutrientType",
+        "attribute_description": "The nutrient the claim is about, where it is about one, such as sugars for a claim of reduced sugar. This fact is kept in this one place for a claim. It lets the claims that a change to a nutrient reaches be found.",
+        "attribute_type": "LOOKUP",
+        "attribute_lookup_type": "LKP003",
+        "attribute_class": "PUBLIC",
+        "attribute_concept": "SBJ008"
+      },
+      "depends_on": [
+        32,
+        4
       ]
     }
   ]
